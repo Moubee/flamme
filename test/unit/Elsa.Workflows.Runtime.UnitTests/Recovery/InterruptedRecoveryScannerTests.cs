@@ -18,8 +18,8 @@ public class InterruptedRecoveryScannerTests
     private readonly RuntimeOptions _runtimeOptions = new() { RestartInterruptedWorkflowsBatchSize = 10 };
 
     [Test]
-    [DisplayName("Scan filters by SubStatus = Interrupted")]
-    public async Task FiltersBySubStatus()
+    [DisplayName("Scan filters by SubStatus = Interrupted and Status = Running")]
+    public async Task FiltersByInterruptedAndRunning()
     {
         StubInstances(new[] { Summary("a") });
         var sut = BuildSut();
@@ -27,7 +27,9 @@ public class InterruptedRecoveryScannerTests
         await sut.ScanAndRequeueAsync(CancellationToken.None);
 
         await _instanceStore.Received().SummarizeManyAsync(
-            Arg.Is<WorkflowInstanceFilter>(f => f.WorkflowSubStatus == WorkflowSubStatus.Interrupted),
+            Arg.Is<WorkflowInstanceFilter>(f =>
+                f.WorkflowSubStatus == WorkflowSubStatus.Interrupted
+                && f.WorkflowStatus == WorkflowStatus.Running),
             Arg.Any<PageArgs>(),
             Arg.Any<CancellationToken>());
     }
@@ -97,9 +99,10 @@ public class InterruptedRecoveryScannerTests
     }
 
     [Test]
-    [Arguments(null, DisplayName = "Null tenant id does NOT push tenant context")]
-    [Arguments("", DisplayName = "Empty tenant id does NOT push tenant context")]
-    [Arguments("*", DisplayName = "Agnostic tenant id does NOT push tenant context")]
+    [DisplayName("Default or agnostic tenant ids do NOT push tenant context")]
+    [Arguments(null)]
+    [Arguments("")]
+    [Arguments("*")]
     public async Task DefaultOrAgnosticTenant(string? tenantId)
     {
         StubInstances(new[] { Summary("a", tenantId: tenantId) });

@@ -131,7 +131,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
                         .AddWorkflowsProvider<TestWorkflowProvider>()
                         .AddNotificationHandlersFrom<WorkflowEventHandlers>()
                         .Decorate<IChangeTokenSignaler, EventPublishingChangeTokenSignaler>()
-                        .AddSingleton<TestBookmarkQueueWorker>()
+                        .AddScoped<TestBookmarkQueueWorker>()
                         .AddSingleton<TestJavaScriptState>()
                         .AddSingleton<TestHostMethodState>()
                         .AddSingleton(serviceProvider =>

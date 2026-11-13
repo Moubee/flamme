@@ -6,20 +6,22 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Filters;
+using Elsa.Workflows.Runtime.Middleware.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// End-to-end test for the drain orchestrator's deadline-breach path against a real workflow execution. A workflow
-/// containing a slow activity is started on a background task; the orchestrator is invoked mid-flight with a
-/// sub-activity-duration deadline; the test asserts the workflow lands in <see cref="WorkflowSubStatus.Interrupted"/>
-/// and a <c>WorkflowInterrupted</c> forensic log entry is written.
+/// containing an activity held until cancellation is started on a background task; the orchestrator is invoked
+/// mid-flight with a short deadline; the test asserts the drain-cancelled workflow stays
+/// <see cref="WorkflowStatus.Finished"/> / <see cref="WorkflowSubStatus.Cancelled"/> and a
+/// <c>WorkflowInterrupted</c> forensic log entry is written.
 ///
 /// This is the integration-level companion to the unit tests in <c>DrainOrchestratorWaitTests</c> — it exercises the
 /// production DI graph, the real <see cref="Pipelines.WorkflowExecution.IWorkflowExecutionPipeline"/>, and the
-/// <c>ExecutionCycleHandle.Disposed</c>-await sequencing that ensures the orchestrator's <c>Interrupted</c> persistence wins
-/// the race against the workflow runner's terminal commit.
+/// <c>ExecutionCycleHandle.Disposed</c>-await sequencing that observes the workflow runner's terminal commit
+/// before the orchestrator classifies the persisted instance.
 /// </summary>
 public class DeadlineBreachEndToEndTests : IAsyncDisposable
 {
@@ -34,7 +36,7 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
             .ConfigureElsa(elsa => elsa
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
-                    // Sub-activity-duration deadline forces the orchestrator down the deadline-breach path.
+                    // The deadline test holds its activity until drain cancellation, regardless of scheduling delay.
                     o.DrainDeadline = TimeSpan.FromMilliseconds(50);
                     o.IngressPauseTimeout = TimeSpan.FromMilliseconds(50);
                 })))
@@ -44,8 +46,8 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
     }
 
     [Test]
-    [DisplayName("Drain deadline breach against a running workflow persists the instance as Interrupted with a WorkflowInterrupted log entry")]
-    public async Task DeadlineBreachPersistsInterrupted()
+    [DisplayName("Drain deadline breach leaves a Finished/Cancelled instance as-is with a WorkflowInterrupted log entry and does not requeue it")]
+    public async Task DeadlineBreachLeavesFinishedCancelledAndDoesNotRequeue()
     {
         await _services.PopulateRegistriesAsync();
 
@@ -53,12 +55,12 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
         var workflow = new TestWorkflow(builder => builder.Root = new ObservableActivity
         {
             State = activityState,
-            DelayMs = 500
+            WaitForCancellation = true
         });
 
         using var workflowCancellation = new CancellationTokenSource();
 
-        // Start the workflow on a background task. Its activity runs well beyond the configured drain deadline.
+        // Start a real execution cycle that cannot finish naturally before the drain reaches its deadline.
         var workflowTask = Task.Run(() => _workflowRunner.RunAsync(workflow, cancellationToken: workflowCancellation.Token));
 
         try
@@ -66,7 +68,7 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
             // Wait until the activity has actually started executing.
             await activityState.Started.Task.WaitAsync(TimeSpan.FromSeconds(2));
 
-            // Trigger drain mid-flight: 50 ms deadline, 500 ms activity guarantees the deadline-breach path.
+            // Trigger drain mid-flight. The activity stays active until this real drain cancels its cycle.
             var outcome = await _orchestrator.DrainAsync(DrainTrigger.HostStopSignal);
 
             // Wait for the workflow runner to fully unwind.
@@ -78,17 +80,28 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
             await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
             await Assert.That(outcome.ForceCancelledInstanceIds).HasSingleItem();
 
-            // The workflow instance ends up persisted as Interrupted. The ExecutionCycleAwareCommitStateHandler decorator
-            // disposes the execution cycle handle AFTER the runner's commit, so the orchestrator's await-disposed sequencing
-            // correctly lands the Interrupted write last (no runner-clobber).
+            // The runner committed Finished/Cancelled after the force-cancel. Drain must leave that
+            // row as-is (#8419): promoting it to Running/Interrupted would requeue a workflow whose
+            // serialized state has no scheduled work.
             using var scope = _services.CreateScope();
             var instanceStore = scope.ServiceProvider.GetRequiredService<IWorkflowInstanceStore>();
+            var cancelledId = (await Assert.That(outcome.ForceCancelledInstanceIds).HasSingleItem());
+            var cancelled = await instanceStore.FindAsync(new WorkflowInstanceFilter { Id = cancelledId });
+
+            await Assert.That(cancelled).IsNotNull();
+            await Assert.That(cancelled.Status).IsEqualTo(WorkflowStatus.Finished);
+            await Assert.That(cancelled.SubStatus).IsEqualTo(WorkflowSubStatus.Cancelled);
+
+            var restarter = new RecordingRestarter();
+            var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, restarter);
+            var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
+            await Assert.That(requeued).IsEqualTo(0);
+            await Assert.That(restarter.RestartedIds).IsEmpty();
+
             var interruptedInstances = (await instanceStore.FindManyAsync(
                 new WorkflowInstanceFilter { WorkflowSubStatus = WorkflowSubStatus.Interrupted },
                 CancellationToken.None)).ToList();
-
-            await Assert.That(interruptedInstances).IsNotEmpty();
-            await Assert.That(interruptedInstances[0].IsExecuting).IsFalse().Because("An Interrupted instance must have IsExecuting=false so the existing timeout-based crash recovery does not also pick it up.");
+            await Assert.That(interruptedInstances).IsEmpty();
 
             // A WorkflowInterrupted forensic log entry was written for the force-cancelled execution cycle.
             var logStore = scope.ServiceProvider.GetRequiredService<IWorkflowExecutionLogStore>();
@@ -128,6 +141,17 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);
+
+    private sealed class RecordingRestarter : IWorkflowRestarter
+    {
+        public List<string> RestartedIds { get; } = new();
+
+        public Task RestartWorkflowAsync(string workflowInstanceId, CancellationToken cancellationToken = default)
+        {
+            RestartedIds.Add(workflowInstanceId);
+            return Task.CompletedTask;
+        }
+    }
 }
 
 /// <summary>Shared state for <see cref="ObservableActivity"/>: signals when execution started and the natural-completion / cancelled outcome.</summary>
@@ -138,13 +162,16 @@ public sealed class ObservableActivityState
 }
 
 /// <summary>
-/// A test activity that signals entry, then runs long enough for the drain deadline to expire while observing its
+/// A test activity that signals entry, then waits for cancellation or a configured duration while observing its
 /// <see cref="ActivityExecutionContext.CancellationToken"/>.
 /// </summary>
 public class ObservableActivity : CodeActivity
 {
     /// <summary>Delay in milliseconds; an integer keeps the activity serializable.</summary>
     public int DelayMs { get; set; }
+
+    /// <summary>Holds the execution cycle until cancellation without relying on relative timer scheduling.</summary>
+    public bool WaitForCancellation { get; set; }
 
     /// <summary>Out-of-band signalling channel for the test (set by the test before scheduling).</summary>
     public ObservableActivityState? State { get; set; }
@@ -154,7 +181,21 @@ public class ObservableActivity : CodeActivity
         State?.Started.TrySetResult();
         try
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(DelayMs), context.CancellationToken);
+            if (WaitForCancellation)
+            {
+                // Drain cancels this cycle after transitioning the workflow through context.Cancel().
+                // The activity's caller token is separate, so retain it only as a cleanup fallback.
+                var cycle = (ExecutionCycleHandle)context.WorkflowExecutionContext.TransientProperties[ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey];
+                using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, cycle.CancellationToken);
+                var cancellationToken = cancellation.Token;
+                var cancelled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                using var registration = cancellationToken.Register(() => cancelled.TrySetCanceled(cancellationToken));
+                await cancelled.Task;
+            }
+            else
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(DelayMs), context.CancellationToken);
+            }
         }
         catch (OperationCanceledException)
         {

@@ -19,7 +19,7 @@ on:
     types: [published]
 
 env:
-  base_version: '3.8.0'
+  base_version: '3.9.0'
   feedz_feed_source: 'https://f.feedz.io/elsa-workflows/elsa-3/nuget/index.json'
   nuget_feed_source: 'https://api.nuget.org/v3/index.json'
 
@@ -72,8 +72,8 @@ jobs:
             --report-trx
 
           coverage_count=$(find artifacts/test-results/unit-integration -maxdepth 1 -type f -name '*.cobertura.xml' | wc -l | tr -d ' ')
-          if [[ "$coverage_count" != "59" ]]; then
-            echo "Expected 59 unit/integration coverage files, found $coverage_count." >&2
+          if [[ "$coverage_count" != "60" ]]; then
+            echo "Expected 60 unit/integration coverage files, found $coverage_count." >&2
             exit 1
           fi
 
@@ -363,7 +363,7 @@ jobs:
         uses: ./.github/actions/push-nuget-packages
         with:
           feed-source: ${{ env.nuget_feed_source }}
-          api-key: ${{ secrets.NUGET_API_KEY }}
+          api-key: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
 
   deploy_coverage:
     name: Deploy coverage to GitHub Pages

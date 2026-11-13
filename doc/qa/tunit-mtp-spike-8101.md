@@ -1,12 +1,26 @@
 # Issue #8101: TUnit migration research and rollout plan
 
-Status: **all 60 active test projects migrated and root MTP/CI cutover implemented; the shared-session component App and native keyed serialization are locally verified, with the final-pushed-commit CI measurement pending**
+Status: **3.9.0 release synchronization: 61 active test projects on TUnit/MTP; see the current validation report below**
 Recorded: 2026-09-13
-Updated: 2026-09-14
+Updated: 2026-11-13
 Issue: [elsa-workflows/elsa-core#8101][s1]  
 Comparison base: `37b1a453169201e577ef6db0bfd0348b08070211`  
 Isolated branch: `spike/8101-tunit-mtp`  
 Isolated worktree: `elsa-core-tunit-8101`
+
+## Release 3.9.0 synchronization (2026-11-13)
+
+The current release merge, inventory, commands, and validation results are recorded in
+[TUnit/MTP release 3.9.0 validation](tunit-mtp-elsa-3.9.0-8101.md). It preserves the local
+TUnit 1.68.4 base and the official 3.9.0 tag in one merge history. The active inventory
+is 61 test applications (39 unit, 21 integration, one component), with 60 unit/integration
+coverage shards plus one component shard. The component host, performance benchmark,
+and TLS smoke utility are not test applications.
+
+The 3,974/4,417 outcomes and 205 component outcomes below describe earlier checkpoints;
+they are not expected counts for 3.9.0. Release 3.9.0 adds PostgreSQL ownership scenarios
+and fixes/re-enables the internal workflow input/output logging scenario. The shared
+session App and its native keyed serialization remain the selected architecture.
 
 ## Executive finding
 

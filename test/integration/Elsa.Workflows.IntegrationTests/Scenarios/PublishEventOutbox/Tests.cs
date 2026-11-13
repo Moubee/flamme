@@ -1,0 +1,132 @@
+using Elsa.Common.Models;
+using Elsa.KeyValues.Features;
+using Elsa.Mediator.HostedServices;
+using Elsa.Testing.Shared;
+using Elsa.Workflows.Helpers;
+using Elsa.Workflows.Management;
+using Elsa.Workflows.Management.Entities;
+using Elsa.Workflows.Management.Filters;
+using Elsa.Workflows.Models;
+using Elsa.Workflows.Runtime;
+using Elsa.Workflows.Runtime.Activities;
+using Elsa.Workflows.Runtime.Messages;
+using Elsa.Workflows.Runtime.Models;
+using Elsa.Workflows.Runtime.Options;
+using Elsa.Workflows.Runtime.Stimuli;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace Elsa.Workflows.IntegrationTests.Scenarios.PublishEventOutbox;
+
+public class Tests
+{
+    private readonly TextWriter _testOutputHelper;
+
+    public Tests()
+    {
+        _testOutputHelper = TestContext.Current!.Output.StandardOutput;
+    }
+
+    [Test]
+    [DisplayName("With outbox on, in-workflow PublishEvent survives a crash between parent commit and delivery")]
+    public async Task PublishEvent_WithOutboxOn_SurvivesCrashBetweenCommitAndDelivery()
+    {
+        await using var services = CreateServices(useTransactionalOutbox: true, processOutboxAfterCommit: false);
+        await services.PopulateRegistriesAsync();
+
+        var parentResponse = await RunPublisherAsync(services);
+        await Assert.That(parentResponse.Status).IsEqualTo(WorkflowStatus.Finished);
+
+        var outboxItems = (await services.GetRequiredService<IWorkflowDispatchOutboxStore>().FindManyAsync()).ToList();
+        var outboxItem = (await Assert.That(outboxItems).HasSingleItem());
+        await Assert.That(outboxItem.Kind).IsEqualTo(WorkflowDispatchOutboxItemKind.TriggerWorkflows);
+        await Assert.That(outboxItem.OwnerWorkflowInstanceId).IsEqualTo(parentResponse.WorkflowInstanceId);
+        await Assert.That(outboxItem.TriggerWorkflowsCommand).IsNotNull();
+        await Assert.That(outboxItem.TriggerWorkflowsCommand.ActivityTypeName).IsEqualTo(ActivityTypeNameHelper.GenerateTypeName<Event>());
+        await Assert.That((await Assert.That(outboxItem.TriggerWorkflowsCommand.Stimulus).IsTypeOf<EventStimulus>()).EventName).IsEqualTo(PublishOrderShippedEventWorkflow.EventName);
+
+        var parentInstance = await services.GetRequiredService<IWorkflowInstanceStore>().FindAsync(new WorkflowInstanceFilter
+        {
+            Id = parentResponse.WorkflowInstanceId
+        });
+        await Assert.That(parentInstance).IsNotNull();
+        await Assert.That(parentInstance.WorkflowState.HasWorkflowDispatchOutboxItem(outboxItem.Id)).IsTrue();
+        await Assert.That(await FindConsumerInstancesAsync(services)).IsEmpty();
+
+        await services.GetRequiredService<IWorkflowDispatchOutboxProcessor>().ProcessAsync();
+
+        await Assert.That(await services.GetRequiredService<IWorkflowDispatchOutboxStore>().FindManyAsync()).IsEmpty();
+
+        var commandProcessor = services.GetServices<IHostedService>().OfType<BackgroundCommandSenderHostedService>().Single();
+        await commandProcessor.StartAsync(CancellationToken.None);
+
+        try
+        {
+            await WaitUntilConsumerInstanceExistsAsync(services);
+            await Assert.That(await FindConsumerInstancesAsync(services)).HasSingleItem();
+        }
+        finally
+        {
+            await commandProcessor.StopAsync(CancellationToken.None);
+        }
+    }
+
+    [Test]
+    [DisplayName("With outbox off, in-workflow PublishEvent is not written to the outbox")]
+    public async Task PublishEvent_WithOutboxOff_DoesNotWriteToOutbox()
+    {
+        await using var services = CreateServices(useTransactionalOutbox: false, processOutboxAfterCommit: false);
+        await services.PopulateRegistriesAsync();
+
+        var parentResponse = await RunPublisherAsync(services);
+        await Assert.That(parentResponse.Status).IsEqualTo(WorkflowStatus.Finished);
+        await Assert.That(await services.GetRequiredService<IWorkflowDispatchOutboxStore>().FindManyAsync()).IsEmpty();
+    }
+
+    private ServiceProvider CreateServices(bool useTransactionalOutbox, bool processOutboxAfterCommit)
+    {
+        return (ServiceProvider)new TestApplicationBuilder(_testOutputHelper)
+            .AddWorkflow<PublishOrderShippedEventWorkflow>()
+            .AddWorkflow<ConsumeOrderShippedEventWorkflow>()
+            .ConfigureElsa(elsa => elsa.Configure<KeyValueFeature>())
+            .ConfigureServices(services => services.Configure<WorkflowDispatcherOptions>(options =>
+            {
+                options.UseTransactionalOutbox = useTransactionalOutbox;
+                options.ProcessOutboxAfterCommit = processOutboxAfterCommit;
+            }))
+            .Build();
+    }
+
+    private static async Task<RunWorkflowInstanceResponse> RunPublisherAsync(IServiceProvider services)
+    {
+        var workflowRuntime = services.GetRequiredService<IWorkflowRuntime>();
+        var workflowClient = await workflowRuntime.CreateClientAsync();
+        return await workflowClient.CreateAndRunInstanceAsync(new CreateAndRunWorkflowInstanceRequest
+        {
+            WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId(nameof(PublishOrderShippedEventWorkflow), VersionOptions.Published)
+        });
+    }
+
+    private static ValueTask<IEnumerable<WorkflowInstance>> FindConsumerInstancesAsync(IServiceProvider services)
+    {
+        return services.GetRequiredService<IWorkflowInstanceStore>().FindManyAsync(new WorkflowInstanceFilter
+        {
+            DefinitionId = nameof(ConsumeOrderShippedEventWorkflow)
+        });
+    }
+
+    private static async Task WaitUntilConsumerInstanceExistsAsync(IServiceProvider services)
+    {
+        using var timeoutTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        while (!timeoutTokenSource.IsCancellationRequested)
+        {
+            if ((await FindConsumerInstancesAsync(services)).Any())
+                return;
+
+            await Task.Delay(50);
+        }
+
+        Assert.Fail("ConsumeOrderShippedEventWorkflow was not created before the timeout elapsed.");
+    }
+}

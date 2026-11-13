@@ -1,18 +1,18 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Common.Serialization;
 using Elsa.Expressions.Options;
 using Elsa.Expressions.Services;
 using Elsa.Extensions;
 using Elsa.Workflows.Exceptions;
 using Elsa.Workflows.Memory;
+using Elsa.Workflows.Models;
 using Elsa.Workflows.Options;
 using Elsa.Workflows.Serialization.Converters;
 using Elsa.Workflows.Services;
 using Elsa.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
+using Elsa.Common.Serialization;
 
 namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
 
@@ -154,11 +154,7 @@ public sealed class SerializationTypeResolverTests
     [Test]
     public async Task When_ConfigureWorkflowsFeature_Then_RegistersCoreAliases()
     {
-        var services = new ServiceCollection();
-        var module = services.CreateModule();
-        module.UseWorkflows();
-        module.Apply();
-        using var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = CreateWorkflowsServices();
         var registry = serviceProvider.GetRequiredService<ISerializationTypeRegistry>();
 
         var aliasRegistered = registry.TryGetAlias(typeof(NullReferenceException), out var alias);
@@ -178,6 +174,31 @@ public sealed class SerializationTypeResolverTests
         await Assert.That(incidentStrategyAlias).IsEqualTo(nameof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
         await Assert.That(registry.TryGetType(typeof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy).GetSimpleAssemblyQualifiedName(), out var legacyIncidentStrategyType)).IsTrue();
         await Assert.That(legacyIncidentStrategyType).IsEqualTo(typeof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
+        await Assert.That(registry.TryGetAlias(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy), out var activationStrategyAlias)).IsTrue();
+        await Assert.That(activationStrategyAlias).IsEqualTo(nameof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy));
+        await Assert.That(registry.TryGetType(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy).GetSimpleAssemblyQualifiedName(), out var legacyActivationStrategyType)).IsTrue();
+        await Assert.That(legacyActivationStrategyType).IsEqualTo(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy));
+    }
+
+    [Test]
+    public async Task When_ConfigureWorkflowsFeature_Then_WorkflowOptionsRoundTripActivationStrategyType()
+    {
+        using var serviceProvider = CreateWorkflowsServices();
+        var serializer = serviceProvider.GetRequiredService<IApiSerializer>();
+        var strategyType = typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy);
+
+        var byAlias = serializer.Deserialize<WorkflowOptions>("""{"activationStrategyType":"AllowAlwaysStrategy"}""");
+        await Assert.That(byAlias.ActivationStrategyType).IsEqualTo(strategyType);
+
+        var byLegacyName = serializer.Deserialize<WorkflowOptions>($$"""{"activationStrategyType":{{JsonString(strategyType.GetSimpleAssemblyQualifiedName())}}}""");
+        await Assert.That(byLegacyName.ActivationStrategyType).IsEqualTo(strategyType);
+
+        var serialized = serializer.Serialize(new WorkflowOptions { ActivationStrategyType = strategyType });
+        await Assert.That(serialized).Contains("AllowAlwaysStrategy");
+        await Assert.That(serialized).DoesNotContain("UnregisteredClrType:");
+
+        var roundTrip = serializer.Deserialize<WorkflowOptions>(serialized);
+        await Assert.That(roundTrip.ActivationStrategyType).IsEqualTo(strategyType);
     }
 
     [Test]
@@ -337,6 +358,15 @@ public sealed class SerializationTypeResolverTests
 
         await Assert.That(SerializationTypeResolver.TryResolveType(_workflowJsonTypeRegistry, typeAlias, out var result)).IsTrue();
         await Assert.That(result).IsEqualTo(typeof(LateRegisteredPayload));
+    }
+
+    private static ServiceProvider CreateWorkflowsServices()
+    {
+        var services = new ServiceCollection();
+        var module = services.CreateModule();
+        module.UseWorkflows();
+        module.Apply();
+        return services.BuildServiceProvider();
     }
 
     private static JsonSerializerOptions CreateOptions(ISerializationTypeRegistry workflowJsonTypeRegistry) => new()

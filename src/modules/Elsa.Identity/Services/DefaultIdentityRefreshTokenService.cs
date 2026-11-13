@@ -1,4 +1,5 @@
 using Elsa.Common.Multitenancy;
+using Elsa.Extensions;
 using Elsa.Identity.Constants;
 using Elsa.Identity.Contracts;
 using Elsa.Identity.Models;
@@ -15,6 +16,7 @@ public sealed class DefaultIdentityRefreshTokenService(
     IUserProvider userProvider,
     IAccessTokenIssuer accessTokenIssuer,
     ITenantAccessor tenantAccessor,
+    SessionRevoker sessionRevoker,
     IOptions<IdentityTokenOptions> identityTokenOptions) : IIdentityRefreshTokenService
 {
     /// <inheritdoc />
@@ -35,20 +37,23 @@ public sealed class DefaultIdentityRefreshTokenService(
         if (!string.Equals(tokenUse, TokenUse.Refresh, StringComparison.Ordinal))
             return null;
 
-        var userId = identity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        var userName = identity.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
+        var session = SessionRevoker.GetSession(identity, refreshToken);
 
-        if (string.IsNullOrWhiteSpace(userId) && string.IsNullOrWhiteSpace(userName))
+        if (await sessionRevoker.IsRevokedAsync(session.Id, cancellationToken))
             return null;
+
+        var userId = RefreshTokenSubject.FindUserId(identity);
+
+        if (userId is null)
+        {
+            return null;
+        }
 
         var tenantId = identity.FindFirst(options.TenantIdClaimsType)?.Value;
         var tenant = string.IsNullOrWhiteSpace(tenantId) ? null : new Tenant { Id = tenantId, Name = tenantId };
         using var tenantContext = tenantAccessor.PushContext(tenant);
-        var userFilter = string.IsNullOrWhiteSpace(userId)
-            ? new UserFilter { Name = userName }
-            : new UserFilter { Id = userId };
-        var user = await userProvider.FindAsync(userFilter, cancellationToken);
+        var user = await userProvider.FindByIdAsync(userId, cancellationToken);
 
-        return user is null ? null : await accessTokenIssuer.IssueTokensAsync(user, cancellationToken);
+        return user is null ? null : await accessTokenIssuer.IssueTokensAsync(user, session, cancellationToken);
     }
 }

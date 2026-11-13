@@ -27,7 +27,7 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        _authentication.SetClaims(new Claim(ClaimTypes.Name, "admin"));
+        _authentication.SetClaims(new Claim(ClaimTypes.NameIdentifier, "user-a"), new Claim(ClaimTypes.Name, "admin"));
         services.AddSingleton(_authentication);
         services.AddSingleton(_credentialsValidator);
         services.AddSingleton(_userProvider);
@@ -69,8 +69,8 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
     public async Task IdentityRefreshTokenRetainsItsRouteAndLocalTokenContract()
     {
         var user = new User { Id = "user-a", Name = "admin" };
-        _userProvider.FindAsync(Arg.Is<UserFilter>(filter => filter.Name == "admin"), Arg.Any<CancellationToken>()).Returns(user);
-        _tokenIssuer.IssueTokensAsync(user, Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-b", "refresh-b"));
+        _userProvider.FindAsync(Arg.Is<UserFilter>(filter => filter.Id == user.Id), Arg.Any<CancellationToken>()).Returns(user);
+        _tokenIssuer.IssueTokensAsync(user, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-b", "refresh-b"));
 
         var response = await Client.PostAsync("/identity/refresh-token", null);
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());

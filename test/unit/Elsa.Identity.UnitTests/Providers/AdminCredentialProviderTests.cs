@@ -1,3 +1,4 @@
+using Elsa;
 using Elsa.Identity.Options;
 using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
@@ -30,6 +31,22 @@ public class AdminCredentialProviderTests
         await Assert.That(apiKey).IsNotNull();
         await Assert.That(apiKey.OwnerName).IsEqualTo("admin");
         await Assert.That(apiKey.Claims).Contains(claim => claim.Type == "permissions" && claim.Value == "*");
+        await Assert.That(apiKey.Claims).DoesNotContain(claim => claim.Type == "permissions" && claim.Value == PermissionNames.None);
+    }
+
+    [Test]
+    public async Task AdminApiKeyProviderEmitsTheEmptySetSentinelWhenConfiguredWithNoPermissions()
+    {
+        var provider = CreateAdminApiKeyProvider(options =>
+        {
+            options.ApiKey = AdminApiKeyProvider.DevelopmentApiKey;
+            options.Permissions = [];
+        });
+
+        var apiKey = await provider.ProvideAsync(AdminApiKeyProvider.DevelopmentApiKey);
+
+        await Assert.That(apiKey).IsNotNull();
+        await Assert.That((await Assert.That(apiKey.Claims).HasSingleItem(claim => claim.Type == PermissionNames.ClaimType)).Value).IsEqualTo(PermissionNames.None);
     }
 
     [Test]

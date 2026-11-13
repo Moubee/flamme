@@ -6,6 +6,15 @@ Branch: `spike/8101-tunit-mtp`
 
 Baseline commit: `bf5c9dd041e58ffafe9ccbfe1c8effec89d959ef`
 
+## Release 3.9.0 follow-up
+
+The measurements below remain the 2026-09-14 historical checkpoint, using TUnit 1.66.27.
+The subsequent local base pins TUnit 1.68.4. See
+[release 3.9.0 validation](tunit-mtp-elsa-3.9.0-8101.md) for the merged release inventory,
+current component outcomes, lifecycle checks, and verification limitations. The old
+205/4,417 counts are not acceptance targets for that release. No matched framework
+performance comparison is claimed by the release synchronization.
+
 ## Executive result
 
 The accepted component architecture restores the lifetime and scheduling semantics of the former xUnit `AppCollection`: one App is shared across the TUnit test session, and every App consumer is serialized with a native keyed constraint.
@@ -21,7 +30,7 @@ Three complete Release component runs passed the exact 205-outcome contract: 202
 
 The 442.725/453.808-second unconstrained per-invocation samples and both four-slot experiments below are retained as **historical design evidence**. They compare component resource topologies and scheduling policies within the already-migrated TUnit suite; none is a TUnit-versus-xUnit framework comparison. The exact ordinary PR workflow still needs to measure the final pushed commit.
 
-TUnit remains pinned at `1.66.27`; the resolved TRX reporter remains `2.3.3`.
+At this historical checkpoint, TUnit was pinned at `1.66.27`; the resolved TRX reporter remains `2.3.3`.
 
 ## Measurement environment
 

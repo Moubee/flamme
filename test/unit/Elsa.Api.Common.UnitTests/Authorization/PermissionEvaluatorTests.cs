@@ -57,6 +57,16 @@ public class PermissionEvaluatorTests
     }
 
     [Test]
+    public async Task TheEmptySetSentinelIsNotAGrant()
+    {
+        // Elsa writes "none" when it knows the caller has zero grants. It must never authorize anything.
+        var principal = PrincipalWith(PermissionNames.None);
+
+        await Assert.That(_evaluator.GetGrants(principal)).IsEmpty();
+        await Assert.That(_evaluator.HasPermission(principal, "dashboard", "view")).IsFalse();
+    }
+
+    [Test]
     public async Task ANullOrAnonymousPrincipalHoldsNothing()
     {
         await Assert.That(_evaluator.HasPermission(null, "dashboard", "view")).IsFalse();

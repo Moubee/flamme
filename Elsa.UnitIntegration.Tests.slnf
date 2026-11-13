@@ -12,6 +12,7 @@
       "test/integration/Elsa.Diagnostics.ConsoleLogs.IntegrationTests/Elsa.Diagnostics.ConsoleLogs.IntegrationTests.csproj",
       "test/integration/Elsa.Diagnostics.OpenTelemetry.IntegrationTests/Elsa.Diagnostics.OpenTelemetry.IntegrationTests.csproj",
       "test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests/Elsa.Diagnostics.StructuredLogs.IntegrationTests.csproj",
+      "test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests/Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests.csproj",
       "test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests.csproj",
       "test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj",
       "test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj",

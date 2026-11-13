@@ -4,7 +4,6 @@ using Elsa.Workflows.Runtime.HostedServices;
 using Elsa.Workflows.Runtime.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
@@ -49,7 +48,8 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
         await Assert.That(outcome.ForceCancelledInstanceIds).Contains("instance-1");
         await Assert.That(handle.CancellationToken.IsCancellationRequested).IsTrue();
-        await InstanceStore.Received(1).SaveAsync(Arg.Is<WorkflowInstance>(i => i.SubStatus == WorkflowSubStatus.Interrupted && !i.IsExecuting), Arg.Any<CancellationToken>());
+        await InstanceStore.Received(1).TryMarkInterruptedAsync("instance-1", Arg.Any<CancellationToken>(), false);
+        await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.Received(1).AddAsync(Arg.Is<Entities.WorkflowExecutionLogRecord>(r => r.EventName == WorkflowInterruptedPayload.WorkflowInterruptedEventName), Arg.Any<CancellationToken>());
     }
 
@@ -65,7 +65,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
             .Returns(_ => new ValueTask<WorkflowInstance?>(RunningInstance("instance-fatal-callback")));
 
         var sut = BuildSut();
-        var exception = await Assert.That(() => sut.DrainAsync(DrainTrigger.OperatorForce).AsTask()).ThrowsExactly<AggregateException>();
+        var exception = await Assert.ThrowsExactlyAsync<AggregateException>(() => sut.DrainAsync(DrainTrigger.OperatorForce).AsTask());
 
         await Assert.That(exception.Flatten().InnerExceptions).Contains(inner => inner is OutOfMemoryException);
     }
@@ -86,8 +86,8 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
                 Version = 1,
                 IsExecuting = true,
             }));
-        InstanceStore.SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-            .Returns(_ => throw new InvalidOperationException("db unavailable"));
+        InstanceStore.TryMarkInterruptedAsync("instance-2", Arg.Any<CancellationToken>(), false)
+            .Returns(_ => ValueTask.FromException<bool>(new InvalidOperationException("db unavailable")));
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.OperatorForce);
@@ -168,12 +168,12 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(count);
         foreach (var handle in handles)
-            await InstanceStore.Received().SaveAsync(Arg.Is<WorkflowInstance>(i => i.Id == handle.WorkflowInstanceId && i.SubStatus == WorkflowSubStatus.Interrupted), Arg.Any<CancellationToken>());
+            await InstanceStore.Received().TryMarkInterruptedAsync(handle.WorkflowInstanceId, Arg.Any<CancellationToken>(), false);
     }
 
     [Test]
-    [DisplayName("A null pre-cancel snapshot still promotes a later drain-induced Finished/Cancelled row")]
-    public async Task NullSnapshotPromotesLaterCancelledInstance()
+    [DisplayName("A null pre-cancel snapshot writes WorkflowInterrupted for a later drain-induced Finished/Cancelled row without promoting it")]
+    public async Task NullSnapshotDoesNotPromoteLaterCancelledInstance()
     {
         var handle = new ExecutionCycleHandle(Guid.NewGuid(), "instance-missing", ingressSourceName: "http.trigger", startedAt: DateTimeOffset.UtcNow, linkedToken: CancellationToken.None);
         ExecutionCycleRegistry.ActiveCount.Returns(1);
@@ -194,7 +194,12 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
-        await InstanceStore.Received().SaveAsync(Arg.Is<WorkflowInstance>(i => i.Id == "instance-missing" && i.SubStatus == WorkflowSubStatus.Interrupted), Arg.Any<CancellationToken>());
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync("instance-missing", Arg.Any<CancellationToken>(), Arg.Any<bool>());
+        await LogStore.Received(1).AddAsync(
+            Arg.Is<Entities.WorkflowExecutionLogRecord>(r =>
+                r.WorkflowInstanceId == "instance-missing"
+                && r.EventName == WorkflowInterruptedPayload.WorkflowInterruptedEventName),
+            Arg.Any<CancellationToken>());
     }
 
     [Test]
@@ -212,6 +217,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.DidNotReceive().AddAsync(Arg.Any<Entities.WorkflowExecutionLogRecord>(), Arg.Any<CancellationToken>());
     }
@@ -240,6 +246,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.DidNotReceive().AddAsync(Arg.Any<Entities.WorkflowExecutionLogRecord>(), Arg.Any<CancellationToken>());
     }
@@ -260,9 +267,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
-        await InstanceStore.Received(1).SaveAsync(
-            Arg.Is<WorkflowInstance>(i => i.Id == "instance-disposed-at-checkpoint" && i.SubStatus == WorkflowSubStatus.Interrupted && !i.IsExecuting),
-            Arg.Any<CancellationToken>());
+        await InstanceStore.Received(1).TryMarkInterruptedAsync("instance-disposed-at-checkpoint", Arg.Any<CancellationToken>(), false);
     }
 
     [Test]
@@ -285,6 +290,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.DidNotReceive().AddAsync(Arg.Any<Entities.WorkflowExecutionLogRecord>(), Arg.Any<CancellationToken>());
     }
@@ -305,6 +311,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
     }
 
@@ -365,9 +372,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
             await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
             await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
-            await InstanceStore.Received(1).SaveAsync(
-                Arg.Is<WorkflowInstance>(i => i.Id == target.WorkflowInstanceId && i.SubStatus == WorkflowSubStatus.Interrupted && !i.IsExecuting),
-                Arg.Any<CancellationToken>());
+            await InstanceStore.Received(1).TryMarkInterruptedAsync(target.WorkflowInstanceId, Arg.Any<CancellationToken>(), false);
         }
         finally
         {
@@ -431,7 +436,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
             await drainCts.CancelAsync();
             releaseBlockerCallback.TrySetResult();
 
-            await Assert.That(() => drainTask.WaitAsync(TimeSpan.FromSeconds(1))).ThrowsExactly<TimeoutException>();
+            await Assert.ThrowsExactlyAsync<TimeoutException>(() => drainTask.WaitAsync(TimeSpan.FromSeconds(1)));
             releaseDisposal.TrySetResult();
 
             var outcome = await drainTask.WaitAsync(TimeSpan.FromSeconds(5));
@@ -440,9 +445,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
             await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
             await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(1);
             await Assert.That(outcome.ForceCancelledInstanceIds).DoesNotContain(handle.WorkflowInstanceId);
-            await InstanceStore.Received(1).SaveAsync(
-                Arg.Is<WorkflowInstance>(i => i.Id == handle.WorkflowInstanceId && i.SubStatus == WorkflowSubStatus.Interrupted && !i.IsExecuting),
-                Arg.Any<CancellationToken>());
+            await InstanceStore.Received(1).TryMarkInterruptedAsync(handle.WorkflowInstanceId, Arg.Any<CancellationToken>(), false);
         }
         finally
         {
@@ -479,6 +482,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.DidNotReceive().AddAsync(Arg.Any<Entities.WorkflowExecutionLogRecord>(), Arg.Any<CancellationToken>());
     }
@@ -523,6 +527,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var outcome = await drainTask.WaitAsync(TimeSpan.FromSeconds(5));
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.Forced);
         await Assert.That(outcome.ExecutionCyclesForceCancelledCount).IsEqualTo(0);
+        await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
         await InstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
         await LogStore.DidNotReceive().AddAsync(Arg.Any<Entities.WorkflowExecutionLogRecord>(), Arg.Any<CancellationToken>());
     }
@@ -553,7 +558,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
                 lock (seen)
                 {
                     // Phase C: runner committed Finished/Cancelled after force-cancel.
-                    // Only ids that snapshot successfully join drainInduced and may promote.
+                    // Only ids that snapshot successfully join drainInduced and get the forensic log.
                     if (!seen.Add(id))
                         return new ValueTask<WorkflowInstance?>(CancelledInstance(id));
                 }
@@ -580,9 +585,22 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         await Assert.That(hang.Task.IsCompleted).IsFalse();
 
         foreach (var id in stalledIds)
-            await InstanceStore.DidNotReceive().SaveAsync(Arg.Is<WorkflowInstance>(i => i.Id == id), Arg.Any<CancellationToken>());
+        {
+            await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(id, Arg.Any<CancellationToken>(), Arg.Any<bool>());
+            await LogStore.DidNotReceive().AddAsync(
+                Arg.Is<Entities.WorkflowExecutionLogRecord>(r => r.WorkflowInstanceId == id),
+                Arg.Any<CancellationToken>());
+        }
+
         foreach (var id in promotedIds)
-            await InstanceStore.Received().SaveAsync(Arg.Is<WorkflowInstance>(i => i.Id == id && i.SubStatus == WorkflowSubStatus.Interrupted), Arg.Any<CancellationToken>());
+        {
+            await InstanceStore.DidNotReceive().TryMarkInterruptedAsync(id, Arg.Any<CancellationToken>(), Arg.Any<bool>());
+            await LogStore.Received().AddAsync(
+                Arg.Is<Entities.WorkflowExecutionLogRecord>(r =>
+                    r.WorkflowInstanceId == id
+                    && r.EventName == WorkflowInterruptedPayload.WorkflowInterruptedEventName),
+                Arg.Any<CancellationToken>());
+        }
     }
 
     private static WorkflowInstance RunningInstance(string id) => new()
@@ -641,7 +659,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var sut = BuildSut();
         await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
-        await Assert.That(async () => await sut.DrainAsync(DrainTrigger.HostStopSignal)).ThrowsExactly<InvalidOperationException>();
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await sut.DrainAsync(DrainTrigger.HostStopSignal));
     }
 
     [Test]
@@ -680,7 +698,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         orchestrator.DrainAsync(DrainTrigger.HostStopSignal, CancellationToken.None).Returns(_ => ThrowObjectDisposedAsync());
         var hostedService = new DrainOrchestratorHostedService(orchestrator, Substitute.For<ILogger<DrainOrchestratorHostedService>>());
 
-        await Assert.That(() => hostedService.StopAsync(CancellationToken.None)).ThrowsExactly<ObjectDisposedException>();
+        await Assert.ThrowsExactlyAsync<ObjectDisposedException>(() => hostedService.StopAsync(CancellationToken.None));
     }
 
     private static async ValueTask<DrainOutcome> ThrowObjectDisposedAsync()

@@ -529,6 +529,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elsa.Labels.Persistence.Con
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elsa.Workflows.Persistence.ConformanceTests", "test\integration\Elsa.Workflows.Persistence.ConformanceTests\Elsa.Workflows.Persistence.ConformanceTests.csproj", "{F57BE775-222D-44AF-A27B-F1AC03A9A321}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests", "test\integration\Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests\Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests.csproj", "{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -539,6 +541,18 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|x64.Build.0 = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Debug|x86.Build.0 = Debug|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|x64.ActiveCfg = Release|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|x64.Build.0 = Release|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|x86.ActiveCfg = Release|Any CPU
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41}.Release|x86.Build.0 = Release|Any CPU
 		{C9539BD8-D2AE-4A8D-8281-71A05B3FBF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C9539BD8-D2AE-4A8D-8281-71A05B3FBF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9539BD8-D2AE-4A8D-8281-71A05B3FBF31}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -2570,6 +2584,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{C3D9A4E6-1F28-4B07-9A15-8E6C2D0B7F41} = {1B8D5897-902E-4632-8698-E89CAF3DDF54}
 		{C6658DE0-2B2F-47F0-BB61-2CA66D435C09} = {61017E64-6D00-49CB-9E81-5002DC8F7D5F}
 		{5BA4A8FA-F7F4-45B3-AEC8-8886D35AAC79} = {61017E64-6D00-49CB-9E81-5002DC8F7D5F}
 		{C9539BD8-D2AE-4A8D-8281-71A05B3FBF31} = {B08B4E00-C2AB-48F3-8389-449F42AEF179}

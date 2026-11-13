@@ -1,3 +1,4 @@
+using Elsa.Common.Multitenancy;
 using Elsa.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,15 @@ namespace Elsa.Workflows.ComponentTests.Services;
 public sealed class TestBookmarkQueueWorker(
     IBookmarkQueueSignaler signaler,
     IServiceScopeFactory scopeFactory,
-    ILogger<TestBookmarkQueueWorker> logger) : IBookmarkQueueWorker, IAsyncDisposable
+    ILogger<TestBookmarkQueueWorker> logger,
+    ITenantScopeFactory? tenantScopeFactory = null,
+    ITenantAccessor? tenantAccessor = null) : IBookmarkQueueWorker, IAsyncDisposable
 {
     private readonly object _lifetimeLock = new();
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _workerTask;
     private bool _disposed;
+    private Tenant? _tenant = tenantAccessor?.Tenant;
 
     public void Start()
     {
@@ -25,6 +29,7 @@ public sealed class TestBookmarkQueueWorker(
             if (_workerTask is not null)
                 return;
 
+            _tenant ??= tenantAccessor?.Tenant;
             var cancellationTokenSource = new CancellationTokenSource();
             _cancellationTokenSource = cancellationTokenSource;
             _workerTask = Task.Run(() => AwaitSignalAsync(cancellationTokenSource.Token));
@@ -39,6 +44,8 @@ public sealed class TestBookmarkQueueWorker(
                 return;
 
             _cancellationTokenSource?.Cancel();
+            if (signaler is BookmarkQueueSignaler bookmarkQueueSignaler)
+                bookmarkQueueSignaler.Release(_tenant?.Id ?? string.Empty);
         }
     }
 
@@ -104,6 +111,7 @@ public sealed class TestBookmarkQueueWorker(
         {
             try
             {
+                using var tenantContext = tenantAccessor?.PushContext(_tenant);
                 await signaler.AwaitAsync(cancellationToken);
                 await ProcessAsync(cancellationToken);
             }
@@ -121,9 +129,18 @@ public sealed class TestBookmarkQueueWorker(
     private async Task ProcessAsync(CancellationToken cancellationToken)
     {
         logger.LogDebug("Processing bookmark queue without throttling.");
-        await using var scope = scopeFactory.CreateAsyncScope();
-        var processor = scope.ServiceProvider.GetRequiredService<IBookmarkQueueProcessor>();
-        await processor.ProcessAsync(cancellationToken);
+        if (tenantScopeFactory is not null && _tenant is not null)
+        {
+            await using var tenantScope = tenantScopeFactory.CreateScope(_tenant);
+            var processor = tenantScope.ServiceProvider.GetRequiredService<IBookmarkQueueProcessor>();
+            await processor.ProcessAsync(cancellationToken);
+        }
+        else
+        {
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var processor = scope.ServiceProvider.GetRequiredService<IBookmarkQueueProcessor>();
+            await processor.ProcessAsync(cancellationToken);
+        }
         logger.LogDebug("Processed bookmark queue.");
     }
 }

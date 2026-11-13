@@ -5,12 +5,13 @@ using Elsa.Workflows.Api.Endpoints.OutputConverters.List;
 using Elsa.Workflows.Models;
 using FastEndpoints;
 using NSubstitute;
+
 namespace Elsa.Workflows.Api.UnitTests.OutputConverters;
 
 public class OutputConverterEndpointTests
 {
     [Test]
-    public async Task Configure_ExposesTheAuthorizedDescriptorRoute()
+    public async Task Configure_ExposesTheDescriptorRouteWithoutRequiringAPermission()
     {
         var endpoint = new List(Substitute.For<IOutputConverterRegistry>(), SerializationTypeRegistry.CreateDefault());
         var definition = new EndpointDefinition(typeof(List), typeof(EmptyRequest), typeof(ListResponse<OutputConverterDescriptorModel>));
@@ -20,11 +21,7 @@ public class OutputConverterEndpointTests
 
         await Assert.That(definition.Routes).Contains("/descriptors/output-converters");
 
-        var permission = Elsa.Authorization.EndpointPermissionRegistry.Find(typeof(List));
-
-        await Assert.That(permission.HasValue).IsTrue();
-        await Assert.That(permission!.Value.Resource).IsEqualTo(Elsa.Workflows.Api.Permissions.WorkflowPermissions.DescriptorsOutputConverters);
-        await Assert.That(permission.Value.Verb).IsEqualTo(Elsa.Authorization.CoreVerbs.View);
+        await Assert.That(Elsa.Authorization.EndpointPermissionRegistry.FindRequirement(typeof(List))).IsNull();
     }
 
     [Test]
@@ -54,8 +51,7 @@ public class OutputConverterEndpointTests
         await Assert.That(model.DisplayName).IsEqualTo("Convert to text");
         await Assert.That(model.Description).IsEqualTo("Formats the source as text.");
         await Assert.That(model.SettingsSchema!.Value.GetProperty("type").GetString()).IsEqualTo("object");
-        await Assert.That(typeof(OutputConverterDescriptorModel).GetProperties())
-            .DoesNotContain(property => property.Name is "SourceType" or "ResultType" or "ServiceKey" or "ServiceLifetime");
+        await Assert.That(typeof(OutputConverterDescriptorModel).GetProperties()).DoesNotContain(property => property.Name is "SourceType" or "ResultType" or "ServiceKey" or "ServiceLifetime");
     }
 
     [Test]

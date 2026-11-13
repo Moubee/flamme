@@ -1,10 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Elsa.Common.Services;
 using Elsa.Identity.Constants;
+using Elsa.Identity.Entities;
 using Elsa.Identity.Options;
+using Elsa.Identity.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 
@@ -12,6 +16,14 @@ namespace Elsa.Identity.UnitTests.Options;
 
 public class IdentityTokenOptionsTokenUseTests
 {
+    // The refresh-token scheme checks each refresh token's session against the revocations; none are recorded here.
+    private static readonly IServiceProvider RequestServices = new ServiceCollection()
+        .AddSingleton(new SessionRevoker(
+            new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()),
+            new MutableSystemClock(),
+            Microsoft.Extensions.Options.Options.Create(new IdentityTokenOptions())))
+        .BuildServiceProvider();
+
     [Test]
     public async Task AccessTokenSchemeRejectsRefreshToken()
     {
@@ -124,7 +136,7 @@ public class IdentityTokenOptionsTokenUseTests
         };
         var principal = ValidateToken(CreateToken(identityOptions, actualTokenUse), jwtBearerOptions.TokenValidationParameters, out var securityToken);
         var context = new TokenValidatedContext(
-            new DefaultHttpContext(),
+            new DefaultHttpContext { RequestServices = RequestServices },
             new AuthenticationScheme(JwtBearerDefaults.AuthenticationScheme, null, typeof(JwtBearerHandler)),
             jwtBearerOptions)
         {

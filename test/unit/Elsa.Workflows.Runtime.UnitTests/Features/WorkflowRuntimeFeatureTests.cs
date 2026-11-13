@@ -1,17 +1,18 @@
 using System.Reflection;
+using Elsa.Common.Serialization;
+using Elsa.Extensions;
 using Elsa.Features.Attributes;
 using Elsa.Features.Services;
-using Elsa.Extensions;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Options;
+using Elsa.Workflows.Runtime.ActivationValidators;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Providers;
 using NSubstitute;
 using RuntimeFeature = Elsa.Workflows.Runtime.Features.WorkflowRuntimeFeature;
 using ShellRuntimeFeature = Elsa.Workflows.Runtime.ShellFeatures.WorkflowRuntimeFeature;
-using Elsa.Common.Serialization;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Features;
 
@@ -28,7 +29,6 @@ public class WorkflowRuntimeFeatureTests
 
     [Test]
     [MethodDataSource(nameof(NonInstantiableWorkflowTypes))]
-    [DisplayName("AddWorkflow rejects non-instantiable workflow type $workflowType")]
     public void AddWorkflow_Throws_WhenWorkflowTypeIsNotInstantiable(Type workflowType)
     {
         Assert.ThrowsExactly<ArgumentException>(() => _feature.AddWorkflow(workflowType));
@@ -42,7 +42,6 @@ public class WorkflowRuntimeFeatureTests
 
     [Test]
     [MethodDataSource(nameof(NonInstantiableWorkflowTypes))]
-    [DisplayName("ShellAddWorkflow rejects non-instantiable workflow type $workflowType")]
     public void ShellAddWorkflow_Throws_WhenWorkflowTypeIsNotInstantiable(Type workflowType)
     {
         Assert.ThrowsExactly<ArgumentException>(() => _shellFeature.AddWorkflow(workflowType));
@@ -155,6 +154,32 @@ public class WorkflowRuntimeFeatureTests
     }
 
     [Test]
+    public async Task RegisterWorkflowTypeAliases_RegistersBuiltInActivationStrategyAliases()
+    {
+        var options = new SerializationTypeOptions();
+
+        RegisterWorkflowTypeAliases(_feature, options);
+        var registry = new SerializationTypeRegistry(Microsoft.Extensions.Options.Options.Create(options));
+
+        await AssertActivationStrategyAlias(options, registry, typeof(SingletonStrategy), nameof(SingletonStrategy));
+        await AssertActivationStrategyAlias(options, registry, typeof(CorrelatedSingletonStrategy), nameof(CorrelatedSingletonStrategy));
+        await AssertActivationStrategyAlias(options, registry, typeof(CorrelationStrategy), nameof(CorrelationStrategy));
+    }
+
+    [Test]
+    public async Task ShellRegisterWorkflowTypeAliases_RegistersBuiltInActivationStrategyAliases()
+    {
+        var options = new SerializationTypeOptions();
+
+        RegisterWorkflowTypeAliases(_shellFeature, options);
+        var registry = new SerializationTypeRegistry(Microsoft.Extensions.Options.Options.Create(options));
+
+        await AssertActivationStrategyAlias(options, registry, typeof(SingletonStrategy), nameof(SingletonStrategy));
+        await AssertActivationStrategyAlias(options, registry, typeof(CorrelatedSingletonStrategy), nameof(CorrelatedSingletonStrategy));
+        await AssertActivationStrategyAlias(options, registry, typeof(CorrelationStrategy), nameof(CorrelationStrategy));
+    }
+
+    [Test]
     public async Task RegisterWorkflowTypeAliases_RegistersOnlyTrackedWorkflowTypes()
     {
         var workflowType = typeof(GenericWorkflow<int>);
@@ -214,5 +239,13 @@ public class WorkflowRuntimeFeatureTests
         feature.GetType()
             .GetMethod("RegisterWorkflowTypeAliases", BindingFlags.Instance | BindingFlags.NonPublic)!
             .Invoke(feature, new object[] { options });
+    }
+
+    private static async Task AssertActivationStrategyAlias(SerializationTypeOptions options, ISerializationTypeRegistry registry, Type strategyType, string alias)
+    {
+        await Assert.That(options.AliasTypeDictionary[alias]).IsEqualTo(strategyType);
+        await Assert.That(options.TypeAliasDictionary[strategyType]).IsEqualTo(alias);
+        await Assert.That(registry.TryGetType(strategyType.GetSimpleAssemblyQualifiedName(), out var legacyType)).IsTrue();
+        await Assert.That(legacyType).IsEqualTo(strategyType);
     }
 }

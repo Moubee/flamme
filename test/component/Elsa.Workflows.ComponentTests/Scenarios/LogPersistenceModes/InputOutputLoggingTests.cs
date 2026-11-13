@@ -40,8 +40,8 @@ public class InputOutputLoggingTests(App app) : AppComponentTest(app)
     [Test]
     public async Task WorkflowAsActivity_ShouldHonorSettings_WhenExecuting()
     {
-        await ExecuteWorkflowAsync("input-output-logging-3");
-        var activityExecutionRecord = await GetRecordByActivityNameAsync("InputOutputLogging3-Child1");
+        var workflowState = await ExecuteWorkflowAsync("input-output-logging-3");
+        var activityExecutionRecord = await GetRecordByActivityNameAsync(workflowState.Id, "InputOutputLogging3-Child1");
         var output1IsIncluded = activityExecutionRecord.Outputs!.ContainsKey("Output1");
         var output2IsIncluded = activityExecutionRecord.Outputs!.ContainsKey("Output2");
 
@@ -50,12 +50,11 @@ public class InputOutputLoggingTests(App app) : AppComponentTest(app)
     }
 
     [Test]
-    [Skip("Although this functionality works in practice, the component test fails from time to time for no clear reason (yet).")]
     public async Task WorkflowAsActivityInternal_ShouldHonorSettings_WhenExecuting()
     {
-        await ExecuteWorkflowAsync("input-output-logging-3");
-        var setOutput1Record = await GetRecordByActivityNameAsync("SetOutput1");
-        var setOutput2Record = await GetRecordByActivityNameAsync("SetOutput2");
+        var workflowState = await ExecuteWorkflowAsync("input-output-logging-3");
+        var setOutput1Record = await GetRecordByActivityNameAsync(workflowState.Id, "SetOutput1");
+        var setOutput2Record = await GetRecordByActivityNameAsync(workflowState.Id, "SetOutput2");
         var output1IsIncluded = setOutput1Record.ActivityState?.ContainsKey("OutputName") == true;
         var output2IsIncluded = setOutput2Record.ActivityState?.ContainsKey("OutputName") == true;
 
@@ -80,13 +79,14 @@ public class InputOutputLoggingTests(App app) : AppComponentTest(app)
         return GetActivityExecutionRecordsAsync(activityExecutionRecordFilter, predicate);
     }
 
-    private Task<ActivityExecutionRecord> GetRecordByActivityNameAsync(string name)
+    private async Task<ActivityExecutionRecord> GetRecordByActivityNameAsync(string workflowInstanceId, string name)
     {
         var filter = new ActivityExecutionRecordFilter
         {
+            WorkflowInstanceId = workflowInstanceId,
             Name = name
         };
-        return GetActivityExecutionRecordAsync(filter);
+        return await Assert.That(await GetActivityExecutionRecordsAsync(filter)).HasSingleItem();
     }
 
     private async Task<IEnumerable<ActivityExecutionRecord>> GetActivityExecutionRecordsAsync(ActivityExecutionRecordFilter filter, Func<ActivityExecutionRecord, bool>? predicate = null)
@@ -95,16 +95,5 @@ public class InputOutputLoggingTests(App app) : AppComponentTest(app)
         var orderBy = new ActivityExecutionRecordOrder<DateTimeOffset>(x => x.StartedAt, OrderDirection.Ascending);
         var activityExecutionRecords = await activityExecutionStore.FindManyAsync(filter, orderBy);
         return predicate == null ? activityExecutionRecords : activityExecutionRecords.Where(predicate);
-    }
-
-    private async Task<ActivityExecutionRecord> GetActivityExecutionRecordAsync(ActivityExecutionRecordFilter filter)
-    {
-        var activityExecutionStore = Scope.ServiceProvider.GetRequiredService<IActivityExecutionStore>();
-        var result = await activityExecutionStore.FindAsync(filter);
-        
-        if(result == null)
-            throw new InvalidOperationException($"Activity execution record not found.");
-        
-        return result;
     }
 }

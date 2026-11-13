@@ -1,3 +1,4 @@
+using Elsa.Common.Entities;
 using Elsa.Common.Models;
 using Elsa.Common.Multitenancy;
 using Elsa.Workflows;
@@ -5,6 +6,7 @@ using Elsa.Workflows.Management.Entities;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Runtime.Entities;
 using Elsa.Workflows.Runtime.Filters;
+using Elsa.Workflows.Runtime.OrderDefinitions;
 
 namespace Elsa.Workflows.Persistence.ConformanceTests;
 
@@ -316,6 +318,182 @@ public abstract class WorkflowStoreConformanceTests
         await Assert.That((await Assert.That((await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter(), PageArgs.All)).Items).HasSingleItem()).Id).IsEqualTo("el-3");
     }
 
+    [Test]
+    public async Task ExecutionLogDefaultOrderIsTimestampThenSequenceAndLastEntryUsesSequence()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        var sameTimestamp = StartedAt;
+        var laterTimestamp = StartedAt.AddMinutes(1);
+
+        // Insert later Sequence first so dictionary/heap order cannot accidentally match the contract.
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-2", "instance-1", "activity-a", "Completed", timestamp: sameTimestamp, sequence: 2));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-3", "instance-1", "activity-a", "Faulted", timestamp: sameTimestamp, sequence: 3));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-1", "instance-1", "activity-a", "Started", timestamp: sameTimestamp, sequence: 1));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-later", "instance-1", "activity-b", "Started", timestamp: laterTimestamp, sequence: 0));
+
+        var filter = new WorkflowExecutionLogRecordFilter { WorkflowInstanceId = "instance-1" };
+        var page = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
+        await Assert.That(page.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3", "el-later"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var firstPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2));
+        await Assert.That(firstPage.TotalCount).IsEqualTo(4);
+        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var first = await scenario.ExecutionLogs.FindAsync(filter);
+        await Assert.That(first!.Id).IsEqualTo("el-seq-1");
+
+        var sameTimestampFilter = new WorkflowExecutionLogRecordFilter
+        {
+            WorkflowInstanceId = "instance-1",
+            ActivityId = "activity-a",
+            EventNames = ["Started", "Completed", "Faulted"]
+        };
+        var lastEntryOrder = new WorkflowExecutionLogRecordOrder<long>(x => x.Sequence, OrderDirection.Descending);
+        var last = await scenario.ExecutionLogs.FindAsync(sameTimestampFilter, lastEntryOrder);
+        await Assert.That(last!.Id).IsEqualTo("el-seq-3");
+    }
+
+    [Test]
+    public async Task ExecutionLogDefaultOrderUsesIdWhenTimestampAndSequenceTieAcrossInstances()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        var timestamp = StartedAt;
+        const long sequence = 1;
+
+        // Reverse Id insert order so dictionary/heap order cannot accidentally match Id ascending.
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-d", "instance-4", "activity-a", "Started", timestamp: timestamp, sequence: sequence));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-b", "instance-2", "activity-a", "Started", timestamp: timestamp, sequence: sequence));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-c", "instance-3", "activity-a", "Started", timestamp: timestamp, sequence: sequence));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-a", "instance-1", "activity-a", "Started", timestamp: timestamp, sequence: sequence));
+
+        var filter = new WorkflowExecutionLogRecordFilter();
+        var all = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
+        await Assert.That(all.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b", "el-c", "el-d"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var firstPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2));
+        var secondPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(2, 2));
+        await Assert.That(firstPage.TotalCount).IsEqualTo(4);
+        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(secondPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-c", "el-d"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
+
+    [Test]
+    public async Task ExecutionLogOrderedFindManyUsesProvidedOrderNotDefault()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        var timestamp = StartedAt;
+
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-2", "instance-1", "activity-a", "Completed", timestamp: timestamp, sequence: 2));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-3", "instance-1", "activity-a", "Faulted", timestamp: timestamp, sequence: 3));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-seq-1", "instance-1", "activity-a", "Started", timestamp: timestamp, sequence: 1));
+
+        var filter = new WorkflowExecutionLogRecordFilter
+        {
+            WorkflowInstanceId = "instance-1",
+            ActivityId = "activity-a"
+        };
+
+        var defaultPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
+        await Assert.That(defaultPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var descending = new WorkflowExecutionLogRecordOrder<long>(x => x.Sequence, OrderDirection.Descending);
+        var descendingPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All, descending);
+        await Assert.That(descendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2", "el-seq-1"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var firstDescendingPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2), descending);
+        await Assert.That(firstDescendingPage.TotalCount).IsEqualTo(3);
+        await Assert.That(firstDescendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        var journalOrder = new WorkflowExecutionLogRecordOrder<long>(x => x.Sequence, OrderDirection.Ascending);
+        var journalPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2), journalOrder);
+        await Assert.That(journalPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
+
+    [Test]
+    public async Task ActivityExecutionFindManyAndSummariesShareCompletedStatusAndNameFilters()
+    {
+        await using var scenario = await CreateScenarioAsync();
+
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution("ae-running", "instance-1", "activity-a", ActivityStatus.Running, activityName: "WriteLine"));
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-completed",
+            "instance-1",
+            "activity-b",
+            ActivityStatus.Completed,
+            completedAt: StartedAt.AddMinutes(1),
+            activityName: "WriteLine",
+            startedAt: StartedAt.AddMinutes(1)));
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-faulted",
+            "instance-1",
+            "activity-c",
+            ActivityStatus.Faulted,
+            completedAt: StartedAt.AddMinutes(2),
+            activityName: "HttpEndpoint",
+            startedAt: StartedAt.AddMinutes(2)));
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-other",
+            "instance-2",
+            "activity-b",
+            ActivityStatus.Completed,
+            completedAt: StartedAt.AddMinutes(1),
+            activityName: "WriteLine"));
+
+        await AssertFindManyAndSummariesMatchAsync(scenario, new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1", Completed = true }, ["ae-completed", "ae-faulted"]);
+        await AssertFindManyAndSummariesMatchAsync(scenario, new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1", Completed = false }, ["ae-running"]);
+        await AssertFindManyAndSummariesMatchAsync(scenario, new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1", Status = ActivityStatus.Completed }, ["ae-completed"]);
+        await AssertFindManyAndSummariesMatchAsync(scenario, new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1", Name = "HttpEndpoint" }, ["ae-faulted"]);
+        await AssertFindManyAndSummariesMatchAsync(scenario, new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1", Name = "WriteLine" }, ["ae-running", "ae-completed"]);
+    }
+
+    [Test]
+    public async Task ActivityExecutionSummariesHonorStartedAtOrderAndProjectIdentityFields()
+    {
+        await using var scenario = await CreateScenarioAsync();
+
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-late",
+            "instance-1",
+            "activity-c",
+            ActivityStatus.Completed,
+            completedAt: StartedAt.AddMinutes(3),
+            activityName: "WriteLine",
+            startedAt: StartedAt.AddMinutes(2)));
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-early",
+            "instance-1",
+            "activity-a",
+            ActivityStatus.Running,
+            activityName: "HttpEndpoint"));
+        await scenario.ActivityExecutions.SaveAsync(ActivityExecution(
+            "ae-mid",
+            "instance-1",
+            "activity-b",
+            ActivityStatus.Faulted,
+            completedAt: StartedAt.AddMinutes(2),
+            activityName: "WriteLine",
+            startedAt: StartedAt.AddMinutes(1)));
+
+        var filter = new ActivityExecutionRecordFilter { WorkflowInstanceId = "instance-1" };
+        var order = new ActivityExecutionRecordOrder<DateTimeOffset>(x => x.StartedAt, OrderDirection.Ascending);
+        var records = (await scenario.ActivityExecutions.FindManyAsync(filter, order)).ToList();
+        var summaries = (await scenario.ActivityExecutions.FindManySummariesAsync(filter, order)).ToList();
+
+        await Assert.That(records.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(summaries.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+
+        for (var i = 0; i < records.Count; i++)
+        {
+            await Assert.That(summaries[i].Id).IsEqualTo(records[i].Id);
+            await Assert.That(summaries[i].WorkflowInstanceId).IsEqualTo(records[i].WorkflowInstanceId);
+            await Assert.That(summaries[i].ActivityId).IsEqualTo(records[i].ActivityId);
+            await Assert.That(summaries[i].ActivityName).IsEqualTo(records[i].ActivityName);
+            await Assert.That(summaries[i].Status).IsEqualTo(records[i].Status);
+            await Assert.That(summaries[i].StartedAt).IsEqualTo(records[i].StartedAt);
+            await Assert.That(summaries[i].CompletedAt).IsEqualTo(records[i].CompletedAt);
+        }
+    }
+
     private static async Task SeedMixedTriggersAsync(WorkflowStoreScenario scenario)
     {
         await scenario.Triggers.SaveAsync(Trigger("id-a", hash: "hash-a", tenantId: "tenant-a"));
@@ -385,12 +563,27 @@ public abstract class WorkflowStoreConformanceTests
             CreatedAt = StartedAt
         };
 
+    private static async Task AssertFindManyAndSummariesMatchAsync(
+        WorkflowStoreScenario scenario,
+        ActivityExecutionRecordFilter filter,
+        string[] expectedIds)
+    {
+        var records = (await scenario.ActivityExecutions.FindManyAsync(filter)).Select(x => x.Id).OrderBy(x => x).ToArray();
+        var summaries = (await scenario.ActivityExecutions.FindManySummariesAsync(filter)).Select(x => x.Id).OrderBy(x => x).ToArray();
+        var expected = expectedIds.OrderBy(x => x).ToArray();
+
+        await Assert.That(records).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(summaries).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
+
     private static ActivityExecutionRecord ActivityExecution(
         string id,
         string workflowInstanceId,
         string activityId,
         ActivityStatus status,
-        DateTimeOffset? completedAt = null) =>
+        DateTimeOffset? completedAt = null,
+        string? activityName = null,
+        DateTimeOffset? startedAt = null) =>
         new()
         {
             Id = id,
@@ -400,9 +593,9 @@ public abstract class WorkflowStoreConformanceTests
             ActivityNodeId = $"node-{activityId}",
             ActivityType = "Elsa.WriteLine",
             ActivityTypeVersion = 1,
-            ActivityName = activityId,
+            ActivityName = activityName ?? activityId,
             Status = status,
-            StartedAt = StartedAt,
+            StartedAt = startedAt ?? StartedAt,
             CompletedAt = completedAt
         };
 
@@ -411,7 +604,9 @@ public abstract class WorkflowStoreConformanceTests
         string workflowInstanceId,
         string activityId,
         string eventName,
-        string activityType = "Elsa.WriteLine") =>
+        string activityType = "Elsa.WriteLine",
+        DateTimeOffset? timestamp = null,
+        long sequence = 0) =>
         new()
         {
             Id = id,
@@ -425,8 +620,8 @@ public abstract class WorkflowStoreConformanceTests
             ActivityType = activityType,
             ActivityTypeVersion = 1,
             ActivityNodeId = $"node-{activityId}",
-            Timestamp = StartedAt,
-            Sequence = 0,
+            Timestamp = timestamp ?? StartedAt,
+            Sequence = sequence,
             EventName = eventName
         };
 

@@ -38,7 +38,6 @@ public class DefaultAccessTokenIssuerRegistrationTests
         var module = Substitute.For<IModule>();
         module.Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
-
         await AssertUserDeletionCoordinatorResolves(services);
     }
 
@@ -47,8 +46,27 @@ public class DefaultAccessTokenIssuerRegistrationTests
     {
         var services = CreateServices();
         new ShellIdentityFeature().ConfigureServices(services);
-
         await AssertUserDeletionCoordinatorResolves(services);
+    }
+
+    [Test]
+    public async Task ModuleFeatureRegistersInMemorySessionRevocation()
+    {
+        var services = CreateServices();
+        var module = Substitute.For<IModule>();
+        module.Services.Returns(services);
+        new ModuleIdentityFeature(module).Apply();
+
+        await AssertInMemorySessionRevocationResolves(services);
+    }
+
+    [Test]
+    public async Task ShellFeatureRegistersInMemorySessionRevocation()
+    {
+        var services = CreateServices();
+        new ShellIdentityFeature().ConfigureServices(services);
+
+        await AssertInMemorySessionRevocationResolves(services);
     }
 
     private static ServiceCollection CreateServices()
@@ -64,6 +82,14 @@ public class DefaultAccessTokenIssuerRegistrationTests
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAccessTokenIssuer>()).IsOfType(typeof(DefaultAccessTokenIssuer));
     }
 
+    // SessionRevoker is checked by registration: resolving it binds the token options, which the shell feature reads from shell configuration.
+    private static async Task AssertInMemorySessionRevocationResolves(IServiceCollection services)
+    {
+        await Assert.That(services).Contains(x => x.ServiceType == typeof(SessionRevoker));
+        using var serviceProvider = services.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        await Assert.That(scope.ServiceProvider.GetRequiredService<IRevokedSessionStore>()).IsTypeOf<MemoryRevokedSessionStore>();
+    }
     private static async Task AssertUserDeletionCoordinatorResolves(IServiceCollection services)
     {
         using var serviceProvider = services.BuildServiceProvider();
