@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-**Elsa Workflows** is a powerful .NET workflow library that enables workflow execution within any .NET application. This is version 3.0, supporting .NET 8.0, .NET 9.0 and .NET 10.0 and providing both a visual designer (from a different repository, elsa-studio) and programmatic workflow definition capabilities.
+**Elsa Workflows** is a powerful .NET workflow library that enables workflow execution within any .NET application. This is version 3.0, supporting .NET 8.0, .NET 9.0 and .NET 10.0 and providing server APIs and programmatic workflow definition capabilities. This repository builds backend libraries and reference servers. Elsa Studio is maintained and hosted separately; Studio applications and deployment artifacts are not included here.
 
 ### Key Statistics
 - **Language**: C# (.NET 10.0)
@@ -17,9 +17,11 @@
 ### Directory Structure
 ```
 src/
-├── apps/               # Reference applications (5 projects)
+├── apps/               # Reference servers and sample package
 │   ├── Elsa.Server.Web            # Workflow server only
-│   └── Elsa.Server.LoadBalancer    # Load balancer
+│   ├── Elsa.ModularServer.Web     # Shell-based workflow server
+│   ├── Elsa.Server.LoadBalancer   # Load balancer
+│   └── Elsa.SamplePackage         # Sample extension package
 ├── common/             # Shared libraries (8 projects)
 ├── modules/            # Core functionality modules (70+ projects)
 │   ├── Elsa.Workflows.Core         # Core workflow engine
@@ -65,7 +67,7 @@ docker/                 # Docker configurations
 # Restore packages (may show warnings for inaccessible feeds)
 ./build.sh Restore --ignore-failed-sources
 
-# Compile core components (excludes studio apps)
+# Compile the solution
 ./build.sh Compile
 
 # Create NuGet packages
@@ -165,7 +167,6 @@ coverage thresholds.
 3. Compile through NUKE
 4. Run all TUnit applications through the root MTP entry point
 5. Expected warnings for external feed access
-6. Studio apps may be excluded from CI builds
 
 The packages workflow uses the native unit/integration and component solution
 filters, collects Microsoft Cobertura coverage, and applies the shared aggregate
@@ -185,8 +186,7 @@ coverage gate after the runs complete.
 
 Multiple Docker configurations available:
 - `ElsaServer.Dockerfile` - Server only
-- `ElsaServerAndStudio.Dockerfile` - Combined server + studio
-- `ElsaStudio.Dockerfile` - Studio only
+- `ElsaServer-Datadog.Dockerfile` - Server with Datadog instrumentation
 - Docker Compose configurations for development
 
 ## Quick Start for Development
@@ -198,7 +198,7 @@ Multiple Docker configurations available:
    ./build.sh Clean Restore --ignore-failed-sources
    ```
 
-2. **Work with core modules** (avoid studio dependencies):
+2. **Work with core modules**:
    ```bash
    dotnet build src/modules/Elsa.Workflows.Core/Elsa.Workflows.Core.csproj
    dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj
@@ -229,23 +229,17 @@ The server will start on the configured ports (check `appsettings.json` or envir
 
 ### Common Issues
 
-1. **Missing External Packages**: If you encounter `NU1101` errors for Elsa.Studio packages:
-   - This is expected for studio-related apps
-   - Focus development on core workflow modules instead
-   - Or use Docker images that have pre-built studio components
-
-2. **Build Fails on Server Apps**: If `Elsa.Server.Web` fails due to WebhooksCore:
+1. **Build Fails on Server Apps**: If `Elsa.Server.Web` fails due to WebhooksCore:
    - This is a known issue with external package feeds
    - Try building individual core modules instead
    - Use `--ignore-failed-sources` flag consistently
 
-3. **Test Failures**: If many tests fail to run:
+2. **Test Failures**: If many tests fail to run:
    - External package dependencies may be unavailable
    - Run a specific project with `dotnet test --project <csproj>`
    - Remember that options after `--` are passed to every selected TUnit application
-   - Focus on tests that don't require studio packages
 
-4. **Slow Initial Build**: First restore and compile can take 5-10+ minutes:
+3. **Slow Initial Build**: First restore and compile can take 5-10+ minutes:
    - This is normal for a large solution with 100+ projects
    - Subsequent builds are much faster (incremental)
    - Consider building specific projects/modules when iterating

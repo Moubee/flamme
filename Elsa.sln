@@ -181,12 +181,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{AA5ACF
 		scripts\docker\docker-run-all-in-one-web.ps1 = scripts\docker\docker-run-all-in-one-web.ps1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "elsa-studio", "elsa-studio", "{DFFE6199-B5A7-4BA8-A5E1-77D0426C6468}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\k8s\elsa-studio\deployment.yaml = scripts\k8s\elsa-studio\deployment.yaml
-		scripts\k8s\elsa-studio\service.yaml = scripts\k8s\elsa-studio\service.yaml
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multitenancy", "multitenancy", "{2F3E1026-5054-4E1F-899B-F1A7F70F9912}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elsa.Tenants.AspNetCore", "src\modules\Elsa.Tenants.AspNetCore\Elsa.Tenants.AspNetCore.csproj", "{D5720DBC-8C2B-42D5-9D9F-2FF6EAD4001C}"
@@ -2632,7 +2626,6 @@ Global
 		{16B570BC-E293-4A19-B20E-5C97BAF8476B} = {B32DB9B2-AD6C-48A5-8682-4373CB045185}
 		{3666CF13-1353-4620-9472-506670214A6A} = {C80C8231-D35C-4ACC-9ED6-9F3DB221535E}
 		{AA5ACF15-8647-4AC9-B9F5-73FCB92BE7E3} = {C80C8231-D35C-4ACC-9ED6-9F3DB221535E}
-		{DFFE6199-B5A7-4BA8-A5E1-77D0426C6468} = {B32DB9B2-AD6C-48A5-8682-4373CB045185}
 		{2F3E1026-5054-4E1F-899B-F1A7F70F9912} = {5BA4A8FA-F7F4-45B3-AEC8-8886D35AAC79}
 		{D5720DBC-8C2B-42D5-9D9F-2FF6EAD4001C} = {2F3E1026-5054-4E1F-899B-F1A7F70F9912}
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {5BA4A8FA-F7F4-45B3-AEC8-8886D35AAC79}

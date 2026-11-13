@@ -18,30 +18,30 @@
 Elsa is a powerful workflow library that enables workflow execution within any .NET application. Elsa allows you to define workflows in various ways, including:
 
 - Writing C# code
-- Using a visual designer
+- Using a separately hosted visual designer
 - Specifying workflows in JSON
 
-![Elsa ships with a powerful visual designer](./design/screenshots/http-hello-world-workflow-designer.png)
+![Workflow authored in a separately hosted visual designer](./design/screenshots/http-hello-world-workflow-designer.png)
 
 ### Try with Docker
 
-To give the Elsa Studio + Elsa Server a quick spin, you can run the following command to start the Elsa Docker container:
+This repository builds the workflow server and backend libraries. To try the reference server, build and run its Docker image from the repository root:
 
 ```shell
-docker pull elsaworkflows/elsa-server-and-studio-v3:latest
-docker run -t -i -e ASPNETCORE_ENVIRONMENT='Development' -e HTTP_PORTS=8080 -e HTTP__BASEURL=http://localhost:13000 -p 13000:8080 elsaworkflows/elsa-server-and-studio-v3:latest
+docker build -f docker/ElsaServer.Dockerfile -t elsa-server:local .
+docker run --rm -it \
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  -e HTTP_PORTS=8080 \
+  -e HTTP__BASEURL=http://localhost:13000 \
+  -p 13000:8080 \
+  elsa-server:local
 ```
 
-> This Docker image is based on a reference ASP.NET application that hosts both the workflow server and designer and is not intended for production use.
+The server exposes a health check at `http://localhost:13000/health/live` and management APIs under `http://localhost:13000/elsa/api`. The reference application is intended for development. Studio hosting and deployment artifacts are no longer included; [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) must be hosted separately if you need a visual designer.
 
 For any non-development deployment, inject a secure random JWT signing key through environment variables or a secrets manager instead of using committed appsettings values. For code-first hosts such as `Elsa.Server.Web`, set `Identity__Tokens__SigningKey`. For shell-based hosts, set the shell feature key, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 
-By default, you can access http://localhost:13000 and log in with:
-
-```
-  Username: admin
-  Password: password
-```
+The Development configuration includes sample identity users and applications. For other environments, configure your own API credentials through environment-specific identity configuration or a secret manager; see the [server configuration notes](src/apps/Elsa.Server.Web/README.md#secrets).
 
 ### TLS and custom certificate authorities
 
@@ -51,9 +51,10 @@ If you need to trust a private or corporate CA, mount the certificate bundle int
 
 ```bash
 docker run \
+  -e ASPNETCORE_ENVIRONMENT=Development \
   -v /path/to/company-ca.crt:/certs/company-ca.crt:ro \
   -e EXTRA_CA_CERT=/certs/company-ca.crt \
-  elsaworkflows/elsa-server-and-studio-v3:latest
+  elsa-server:local
 ```
 
 On startup, the container copies the certificate into `/usr/local/share/ca-certificates` and runs `update-ca-certificates`, making the trust available to .NET, OpenSSL, curl, and other system components. Multiple certificates can be provided by pointing `EXTRA_CA_CERT` at a directory containing `.crt` or `.pem` files.
@@ -62,9 +63,10 @@ In highly restricted environments where you cannot modify the system trust store
 
 ```bash
 docker run \
+  -e ASPNETCORE_ENVIRONMENT=Development \
   -v /path/to/company-ca-bundle.pem:/certs/custom.pem:ro \
   -e SSL_CERT_FILE=/certs/custom.pem \
-  elsaworkflows/elsa-server-and-studio-v3:latest
+  elsa-server:local
 ```
 
 > ℹ️ Installing the CA bundle adds roughly 300KB to the Debian-based images. No package managers run at container startup; all trust updates happen immutably at build time or via the mounted certificates shown above.
@@ -94,10 +96,6 @@ docker run \
 Elsa is continually evolving, and while it offers powerful capabilities, there are some known limitations and ongoing work:
 
 - Documentation is still a work in progress.
-- Input/Output is not yet implemented in the Workflow Instance Viewer.
-- Starting workflows from the designer is currently supported only for workflows that do not require input and do not start with a trigger; this is planned for a future release.
-- The designer currently only supports Flowchart activities. Support for Sequence and StateMachine activities is planned for a future release.
-- UI input validation is not yet implemented.
 
 ## Features
 
@@ -106,7 +104,7 @@ Elsa offers a wide range of features for building and executing workflows, inclu
 - Execution of workflows in any .NET application with support for .NET 6 and beyond.
 - Support for both short-running and long-running workflows.
 - A programming model loosely inspired by Windows Workflow Foundation.
-- A web-based drag & drop designer with support for custom activities.
+- Support for workflows authored in separately hosted visual designers.
 - Native support for activity composition, including activities like `Sequence`, `Flowchart`, and `ForEach`.
 - Parallel execution of activities.
 - Built-in activities for common scenarios, such as sending emails, making HTTP calls, scheduling tasks, sending and receiving messages, and more.
@@ -115,7 +113,7 @@ Elsa offers a wide range of features for building and executing workflows, inclu
 - Actor model for increased workflow throughput.
 - Dynamic expressions with support for C#, JavaScript, Python, and Liquid.
 - Persistence agnostic, with support for Entity Framework Core, MongoDB, and Dapper out of the box.
-- [Elsa Studio](https://github.com/elsa-workflows/elsa-studio): a modular Blazor dashboard app for managing and designing workflows.
+- [Elsa Studio](https://github.com/elsa-workflows/elsa-studio): a separately maintained and hosted Blazor app for managing and designing workflows.
 
 ## Roadmap
 
@@ -164,9 +162,9 @@ public class SendEmailWorkflow : WorkflowBase
 
 ## Designing Workflows
 
-Elsa allows you to define workflows using a visual designer. The following example shows how to receive HTTP requests and send an email in response:
+Workflows can be authored in a separately hosted visual designer such as [Elsa Studio](https://github.com/elsa-workflows/elsa-studio). The following example shows how to receive HTTP requests and send an email in response:
 
-![Elsa ships with a powerful visual designer](./design/screenshots/http-send-email-workflow-designer.png)
+![Workflow authored in a separately hosted visual designer](./design/screenshots/http-send-email-workflow-designer.png)
 
 ## Contributing
 
@@ -185,13 +183,13 @@ Incorporating the details about the "apps" folder and its projects into the seco
 ### 2. Open `Elsa.sln` Using Your Favorite IDE
 After cloning the repository, navigate to the cloned directory and open the `Elsa.sln` solution file with your preferred IDE that supports .NET development, such as Visual Studio, JetBrains Rider, or Visual Studio Code with the appropriate extensions.
 
-Within the solution, you will find an "apps" folder containing three projects designed to help you get started and explore the capabilities of Elsa Workflow:
+Within the solution, the "apps" folder includes these reference server applications:
 
 - **Elsa.Server.Web**: This project is a reference ASP.NET Core application that acts as a workflow server. It's a great starting point if you want to understand how Elsa functions as a server-side workflow engine.
 
-- **Elsa.ServerAndStudio.Web**: This project serves a dual purpose. Like `Elsa.Server.Web`, it acts as a workflow server. Additionally, it hosts the Elsa Studio Blazor WebAssembly app. This is the perfect project to run if you want to see the full capabilities of Elsa, including both the server aspects and the client-side studio experience in one application.
+- **Elsa.ModularServer.Web**: A shell-based workflow server with configuration-driven features and package loading.
 
-- **Elsa.Studio.Web**: This project is a reference Blazor WebAssembly application that solely hosts the Elsa Studio Blazor WebAssembly app. It requires a running Elsa server application to connect to. Use this project if you're interested in focusing on the Elsa Studio UI and its interactions with an Elsa workflow server.
+- **Elsa.Server.LoadBalancer**: A reverse proxy configured through YARP.
 
 ### 3. Submit a PR with Your Changes
 Once you have made your changes, commit them and push them back to your fork. Then, navigate to the original Elsa Workflow repository and create a new Pull Request. Ensure your PR description clearly describes the changes and any relevant information that will help the reviewers understand your contributions. For a detailed guide on creating a pull request, visit [Creating a pull request from a fork](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork).
