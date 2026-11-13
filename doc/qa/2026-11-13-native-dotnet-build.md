@@ -72,3 +72,11 @@ These are validation-environment settings, not repository build requirements.
 CI publishing and coverage deployment were not executed. Only the server Dockerfile was built;
 the other three Dockerfiles received the same verified SDK and shared-build-file changes.
 Dependency upgrades and existing warnings are outside this migration's scope.
+
+## Pull Request Follow-Up
+
+All four Docker certificate smoke jobs passed in GitHub Actions on the initial PR head.
+The inherited Claude review workflow failed because the repository had no Claude GitHub App
+installation or OAuth token. At the user's request, the Claude review, mention-triggered assistant,
+Greploop, and wiki-refresh workflows were removed. No remaining workflow invokes Claude or
+references its OAuth secret.
