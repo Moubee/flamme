@@ -29,14 +29,6 @@ jobs:
             dockerfile: docker/ElsaServer.Dockerfile
             image: elsa-server-smoke
             skip_otel: '0'
-          - name: elsa-server-and-studio
-            dockerfile: docker/ElsaServerAndStudio.Dockerfile
-            image: elsa-server-and-studio-smoke
-            skip_otel: '0'
-          - name: elsa-studio
-            dockerfile: docker/ElsaStudio.Dockerfile
-            image: elsa-studio-smoke
-            skip_otel: '0'
           - name: elsa-server-datadog
             dockerfile: docker/ElsaServer-Datadog.Dockerfile
             image: elsa-server-datadog-smoke
