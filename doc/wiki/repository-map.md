@@ -15,7 +15,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 | [test/integration](../../test/integration) | In-process tests that compose multiple Elsa services. |
 | [test/component](../../test/component) | Larger host-level and persistence-oriented scenarios. |
 | [test/performance](../../test/performance) | Benchmark and throughput-oriented tests. |
-| [build](../../build) | NUKE build project and CI build wiring. |
+| [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets) | Shared MSBuild settings used by the .NET CLI and CI. |
 | [doc](../../doc) | ADRs, QA notes, agent logs, bounty docs, and this wiki. |
 | [specs](../../specs) | Spec Kit feature specs, plans, tasks, contracts, and quickstarts. |
 | [design](../../design) | Logos, screenshots, and visual assets used by public docs and README files. |
@@ -59,7 +59,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 - [Directory.Build.props](../../Directory.Build.props) contains shared MSBuild settings.
 - [src/Directory.Build.props](../../src/Directory.Build.props) multi-targets source packages for `net8.0`, `net9.0`, and `net10.0`.
 - [Directory.Packages.props](../../Directory.Packages.props) centrally manages package versions, including conditional versions for .NET 8/9 versus .NET 10.
-- [build/Build.cs](../../build/Build.cs) defines the NUKE build and package orchestration.
+- [global.json](../../global.json) selects the .NET SDK and Microsoft Testing Platform runner. Build and package commands use the standard .NET CLI; see [Build, Run, And Operate](build-run-operate.md).
 - TUnit tests run directly through Microsoft Testing Platform with `dotnet test --solution Elsa.sln` or `dotnet test --project <path-to-test.csproj>`.
 
 ## How To Find Code Fast

@@ -4,19 +4,21 @@ This page collects day-to-day build, run, and operational notes for Elsa Core co
 
 ## Build Commands
 
-Restore first when working from a clean checkout or after dependency changes. The `--ignore-failed-sources` option keeps external feed hiccups from blocking packages that are available from other configured sources:
+Install the SDK selected by [global.json](../../global.json): .NET SDK 11.0.100 with patch roll-forward and prereleases disabled. Install the .NET 10 SDK/runtime alongside it to run tests and application hosts. Library target frameworks remain `net8.0`, `net9.0`, and `net10.0`.
+
+Restore first when working from a clean checkout or after dependency changes. Use `--ignore-failed-sources` when packages are available from other configured sources despite an unavailable feed:
 
 ```bash
-./build.sh Restore --ignore-failed-sources
+dotnet restore Elsa.sln --ignore-failed-sources
 ```
 
-Default NUKE build target after restore:
+Build the solution (restore is implicit unless `--no-restore` is supplied):
 
 ```bash
-./build.sh
+dotnet build Elsa.sln
 ```
 
-Direct solution build with the same restore/no-restore pattern:
+For an explicit restore/build sequence:
 
 ```bash
 dotnet restore Elsa.sln --ignore-failed-sources
@@ -45,7 +47,9 @@ ElsaScript DSL tests:
 
 ## Build System
 
-The NUKE build lives in [build/Build.cs](../../build/Build.cs). It defines clean, restore, compile, and package behavior through NUKE components.
+The .NET CLI invokes MSBuild directly. Shared settings live in [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets). Builds default to Debug, while the CI workflows explicitly select Release. Pass `--configuration Debug` or `--configuration Release` to select a configuration explicitly.
+
+Clean the selected configuration with `dotnet clean Elsa.sln --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
 
 Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.sln`, or select one test project with `dotnet test --project <path-to-test.csproj>`.
 
@@ -159,4 +163,12 @@ Structured logs options include recent log capacity, query size, source heartbea
 
 ## Release And Package Notes
 
-Package behavior is controlled by the NUKE build and project metadata. Because source projects multi-target three frameworks, package upgrades should be checked against all target frameworks and provider packages. Persistence changes usually need extra scrutiny because each provider package may need migrations or compatibility updates.
+Create packages with an explicit version using the standard pack command:
+
+```bash
+dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
+```
+
+This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. `Elsa.SamplePackage` retains its fixed fixture version (`1.0.1`) even when a solution-wide version is supplied. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.
+
+Because source projects multi-target three frameworks, package upgrades should be checked against all target frameworks and provider packages. Persistence changes usually need extra scrutiny because each provider package may need migrations or compatibility updates.

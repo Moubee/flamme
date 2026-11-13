@@ -7,7 +7,7 @@
 | Primary language | C# (`LangVersion` latest) | `Directory.Build.props` |
 | Runtime | .NET 8, 9, and 10 for source projects | `src/Directory.Build.props` |
 | Package manager | NuGet with central package management | `Directory.Packages.props` |
-| Build system | MSBuild solution with NUKE wrappers | `Elsa.sln`, `build/Build.cs`, `build.sh` |
+| Build system | .NET CLI and MSBuild; SDK 11.0.100 with patch roll-forward | `Elsa.sln`, `Directory.Build.props`, `global.json` |
 | Test runner | Microsoft Testing Platform | `global.json` |
 
 ## Production Frameworks and Dependencies
@@ -34,7 +34,8 @@ dotnet test --solution Elsa.sln
 dotnet test --project test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj
 ```
 
-The root `global.json` selects Microsoft Testing Platform. Keep `dotnet test`
+The root `global.json` selects the .NET SDK and Microsoft Testing Platform.
+Install the .NET 10 SDK/runtime alongside the build SDK for tests and app hosts. Keep `dotnet test`
 options before the literal `--`; place TUnit/MTP application options such as
 `--coverage` and `--report-trx` after it.
 
