@@ -80,12 +80,20 @@ When running outside the explicit `Development` or `Demo` environments, configur
 
 ## Docker Quick Try
 
-The root [README](../../README.md) documents the public Docker quick start:
+Build and run the reference server from the repository root, as documented in the
+[README](../../README.md):
 
 ```bash
-docker pull elsaworkflows/elsa-server-and-studio-v3:latest
-docker run -t -i -e ASPNETCORE_ENVIRONMENT='Development' -e HTTP_PORTS=8080 -e HTTP__BASEURL=http://localhost:13000 -p 13000:8080 elsaworkflows/elsa-server-and-studio-v3:latest
+docker build -f docker/ElsaServer.Dockerfile -t elsa-server:local .
+docker run --rm -it \
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  -e HTTP_PORTS=8080 \
+  -e HTTP__BASEURL=http://localhost:13000 \
+  -p 13000:8080 \
+  elsa-server:local
 ```
+
+Host [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) separately when a visual designer is needed.
 
 Production containers must inject a secure JWT signing key through environment variables or a secrets manager. The appsettings placeholder and known public sample keys are rejected during startup outside `Development` or `Demo`.
 

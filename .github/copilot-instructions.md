@@ -17,11 +17,10 @@
 ### Directory Structure
 ```
 src/
-├── apps/               # Reference servers and sample package
+├── apps/               # Reference servers
 │   ├── Elsa.Server.Web            # Workflow server only
 │   ├── Elsa.ModularServer.Web     # Shell-based workflow server
-│   ├── Elsa.Server.LoadBalancer   # Load balancer
-│   └── Elsa.SamplePackage         # Sample extension package
+│   └── Elsa.Server.LoadBalancer   # Load balancer
 ├── common/             # Shared libraries (8 projects)
 ├── modules/            # Core functionality modules (70+ projects)
 │   ├── Elsa.Workflows.Core         # Core workflow engine

@@ -25,7 +25,7 @@ An independent review followed the first three conventional commits:
 3. `build: remove nuke and document native dotnet workflows`
 
 The review identified one P2 issue: floating Docker SDK tags could advance to a feature band rejected
-by `global.json`'s `latestPatch` policy. All four Dockerfiles now use `sdk:11.0.100`.
+by `global.json`'s `latestPatch` policy. Both remaining server Dockerfiles use `sdk:11.0.100`.
 Its verified manifest digest matches the SDK image used by the successful container build:
 `sha256:65f3c7c6a25a239ab3e6719f2896147e7b68242ff2d8818dd70498bde6ef8bea`.
 
@@ -33,7 +33,7 @@ The final review also covered the sample-package removal, package versions and d
 symbol packages, output overrides, MTP runtime installation, publishing action pinning, and the
 availability of `global.json` in sparse checkouts. No actionable findings remain.
 
-## Validation
+## Initial Validation
 
 | Check | Result |
 | --- | --- |
@@ -69,8 +69,8 @@ Local MSBuild-server restrictions required `DOTNET_CLI_USE_MSBUILD_SERVER=0`; th
 also needed normal process, localhost, and Docker access outside the filesystem sandbox.
 These are validation-environment settings, not repository build requirements.
 
-CI publishing and coverage deployment were not executed. Only the server Dockerfile was built;
-the other three Dockerfiles received the same verified SDK and shared-build-file changes.
+CI publishing and coverage deployment were not executed. The initial local container check built
+the server Dockerfile; GitHub Actions subsequently validated the complete container matrix.
 Dependency upgrades and existing warnings are outside this migration's scope.
 
 ## Pull Request Follow-Up
@@ -86,3 +86,7 @@ annotation reported `System.IO.IOException: No space left on device` while writi
 diagnostic log, and the worker terminated before tests. PR and package full-solution build jobs now
 reclaim unused Android, Haskell, Swift, and CodeQL installations before setup and restore, while
 retaining .NET and Docker. They report available disk space before and after cleanup.
+
+The branch was then rebased onto the merged Studio-removal PR, preserving its backend-only server
+configuration and deleted Studio Dockerfiles. The remaining certificate-smoke matrix covers the
+server and Datadog server images. The initial validation totals above predate that upstream change.
