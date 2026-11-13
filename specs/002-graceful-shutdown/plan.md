@@ -11,7 +11,7 @@ Introduce a container-scoped **Quiescence Signal** inside the workflow runtime, 
 
 **Language/Version**: C# latest (`<LangVersion>latest</LangVersion>`), nullable reference types enabled, implicit usings enabled — per `src/Directory.Build.props`.
 **Primary Dependencies**: `Elsa.Workflows.Runtime`, `Elsa.Workflows.Runtime.Distributed`, `Elsa.Hosting.Management` (existing heartbeat), `Elsa.Http` and `Elsa.Scheduling` (first ingress-source adapters), `Elsa.Api.Common` (`ElsaEndpoint<TRequest, TResponse>` on FastEndpoints), `Elsa.Features` (`IShellFeature`), `Microsoft.Extensions.DependencyInjection`, `Elsa.Mediator`.
-**Storage**: EF Core per-provider (`Elsa.Persistence.EFCore.SqlServer`, `.PostgreSql`, `.MySql`, `.Sqlite`, `.Oracle`). Two persistence touchpoints: (1) the existing `WorkflowInstance` row (new `Interrupted` value for the `SubStatus` column — an enum already persisted as an integer, so no schema migration is strictly required, but each provider migration project MUST be verified); (2) the existing `WorkflowExecutionLogRecord` entity (new `WorkflowInterrupted` `EventName` with typed payload — no schema change).
+**Storage**: PostgreSQL EF Core (`Elsa.Persistence.EFCore.PostgreSql`) and core in-memory stores. Two persistence touchpoints: (1) the existing `WorkflowInstance` row (new `Interrupted` value for the `SubStatus` column — an enum already persisted as an integer, so no schema migration is strictly required, but the PostgreSQL migration project MUST be verified); (2) the existing `WorkflowExecutionLogRecord` entity (new `WorkflowInterrupted` `EventName` with typed payload — no schema change).
 **Testing**: xUnit. Unit tests per the constitution's `test/unit/` + `test/integration/` layout. Reuse `ActivityTestFixture` and `WorkflowTestFixture`. New fixtures for the quiescence state machine, fake ingress sources, and drain harness. No external services in unit tests.
 **Target Platform**: Multi-target `.NET 8.0`, `.NET 9.0`, `.NET 10.0` (primary) via `src/Directory.Build.props`. Runs in any ASP.NET Core / hosted-service process; both single-runtime hosts and multi-shell hosts (`Elsa.Shells.Api`).
 **Project Type**: Modular .NET library — the 100+ project solution already described by the constitution. This feature adds no new modules; all changes land in existing modules.
@@ -118,7 +118,7 @@ src/
 │   ├── Elsa.Scheduling/
 │   │   └── IngressSources/
 │   │       └── ScheduledTriggerIngressSource.cs   # NEW — wraps the scheduler tick loop
-│   └── Elsa.Persistence.EFCore.{SqlServer,PostgreSql,MySql,Sqlite,Oracle}/
+│   └── Elsa.Persistence.EFCore.PostgreSql/
 │       └── Migrations/                            # NO-OP unless a persistence review requires one
 ├── clients/
 │   └── Elsa.Api.Client/

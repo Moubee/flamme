@@ -102,7 +102,7 @@ Studio adds **Assigned to me**, **Available**, **History**, and manager-only **A
 
 ## Decision: Mirror the Elsa.Secrets persistence shape
 
-**Rationale**: The module follows the repository's established split: a Core package owns contracts, services, default repository, activity, endpoints, permissions, and an in-memory implementation; persistence packages add provider-specific repositories, shell features, migrations, and mappings. This keeps the default useful for development and tests while allowing durable EF Core providers and future persistence-vNext adapters without changing the REST or activity contract.
+**Rationale**: The module follows the repository's established split: a Core package owns contracts, services, default repository, activity, endpoints, permissions, and an in-memory implementation; persistence packages add provider-specific repositories, shell features, migrations, and mappings. This keeps the default useful for development and tests while allowing durable PostgreSQL EF Core persistence without changing the REST or activity contract.
 
 Persist `UserTasks`, normalized `UserTaskCandidates`, and append-only `UserTaskEvents`. Index tenant, status, assignee provider/ID, priority, due date, workflow definition/instance, activity instance, created/completed time, and revision. Store bounded protected task data, completion data, and form references as JSON. Unique keys cover task ID, bookmark ID, and the tenant/workflow-instance/activity-instance materialization key.
 

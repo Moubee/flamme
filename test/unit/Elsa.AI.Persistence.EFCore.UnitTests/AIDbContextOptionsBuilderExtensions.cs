@@ -1,15 +1,15 @@
-using Elsa.AI.Persistence.EFCore.Sqlite;
+using Elsa.AI.Persistence.EFCore.PostgreSql;
 using Elsa.Persistence.EFCore;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 
 namespace Elsa.AI.Persistence.EFCore.UnitTests;
 
 internal static class AIDbContextOptionsBuilderExtensions
 {
-    public static DbContextOptionsBuilder<AIDbContext> UseSqliteAIMigrations(this DbContextOptionsBuilder<AIDbContext> builder, SqliteConnection connection)
+    public static DbContextOptionsBuilder<AIDbContext> UsePostgreSqlAIMigrations(this DbContextOptionsBuilder<AIDbContext> builder, PostgreSqlTestDatabase connection)
     {
         builder.UseElsaDbContextOptions(null);
-        return builder.UseSqlite(connection, db => db.MigrationsAssembly(typeof(AIDbContextFactory).Assembly.GetName().Name));
+        return builder.UseNpgsql(connection.Connection, db => db.MigrationsAssembly(typeof(AIDbContextFactory).Assembly.GetName().Name));
     }
 }

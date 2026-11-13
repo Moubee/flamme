@@ -1,7 +1,7 @@
 using Elsa.AI.Abstractions.Models;
 using Elsa.AI.Persistence.EFCore.Entities;
 using Elsa.AI.Persistence.EFCore.Stores;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ namespace Elsa.AI.Persistence.EFCore.UnitTests;
 
 public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
 {
-    private readonly SqliteConnection _connection = new("DataSource=:memory:");
+    private readonly PostgreSqlTestDatabase _connection = new();
     private AIDbContext _dbContext = default!;
 
     [Test]
@@ -219,7 +219,7 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
     public async Task ProposalStoreRetriesConcurrentInsertsAsUpdates()
     {
         var options = new DbContextOptionsBuilder<AIDbContext>()
-            .UseSqliteAIMigrations(_connection)
+            .UsePostgreSqlAIMigrations(_connection)
             .AddInterceptors(new ConcurrentProposalInsertInterceptor(_connection))
             .Options;
         await using var context = new AIDbContext(options);
@@ -359,7 +359,7 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();
-        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UseSqliteAIMigrations(_connection).Options);
+        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UsePostgreSqlAIMigrations(_connection).Options);
         await _dbContext.Database.MigrateAsync();
     }
 
@@ -369,7 +369,7 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
         await _connection.DisposeAsync();
     }
 
-    private class ConcurrentProposalInsertInterceptor(SqliteConnection connection) : SaveChangesInterceptor
+    private class ConcurrentProposalInsertInterceptor(PostgreSqlTestDatabase connection) : SaveChangesInterceptor
     {
         private bool _inserted;
 
@@ -383,7 +383,7 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
                 return result;
 
             _inserted = true;
-            var options = new DbContextOptionsBuilder<AIDbContext>().UseSqliteAIMigrations(connection).Options;
+            var options = new DbContextOptionsBuilder<AIDbContext>().UsePostgreSqlAIMigrations(connection).Options;
             await using var competingContext = new AIDbContext(options);
             competingContext.Proposals.Add(new AIProposalRecord
             {

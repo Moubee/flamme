@@ -79,8 +79,7 @@ src/modules/
 │   ├── Services/
 │   └── ShellFeatures/
 ├── Elsa.Secrets.Persistence.EFCore.PostgreSql/
-├── Elsa.Secrets.Persistence.EFCore.Sqlite/
-└── Elsa.Secrets.Persistence.EFCore.SqlServer/
+└── Elsa.Secrets.Persistence.EFCore.PostgreSql/
 
 test/unit/
 └── Elsa.Secrets.UnitTests/

@@ -26,12 +26,13 @@ public class ClassicHostSmokeTests : HostSmokeTests<ClassicHostWebApplicationFac
 
     protected override IReadOnlyDictionary<string, string?> CreateTestConfiguration()
     {
-        var connectionString = GetConnectionString("classic.db");
+        var connectionString = ConnectionString;
         return new Dictionary<string, string?>
         {
-            ["Multitenancy:Tenants:0:Configuration:ConnectionStrings:Sqlite"] = connectionString,
-            ["Multitenancy:Tenants:1:Configuration:ConnectionStrings:Sqlite"] = connectionString,
-            ["Multitenancy:Tenants:2:Configuration:ConnectionStrings:Sqlite"] = connectionString,
+            ["ConnectionStrings:PostgreSql"] = connectionString,
+            ["Multitenancy:Tenants:0:Configuration:ConnectionStrings:PostgreSql"] = connectionString,
+            ["Multitenancy:Tenants:1:Configuration:ConnectionStrings:PostgreSql"] = connectionString,
+            ["Multitenancy:Tenants:2:Configuration:ConnectionStrings:PostgreSql"] = connectionString,
             ["Multitenancy:Tenants:0:Configuration:Http:Host"] = "localhost",
             ["Multitenancy:Tenants:1:Configuration:Http:Host"] = "localhost",
             ["Multitenancy:Tenants:2:Configuration:Http:Host"] = "localhost",
@@ -84,17 +85,16 @@ public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFacto
 
     protected override IReadOnlyDictionary<string, string?> CreateTestConfiguration()
     {
-        var connectionString = GetConnectionString("modular.db");
+        var connectionString = ConnectionString;
         var packageStore = CreateDirectory("package-store");
         var shellOverlayPath = Path.Join(TestRoot, "platform-shell-overrides.json");
         var overlayConfiguration = new Dictionary<string, string?>
         {
-            ["CShells:Shells:Default:Features:SqliteWorkflowPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:SqliteIdentityPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:SqliteExternalAuthenticationPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:SqliteAlterationsPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:SqliteUserTasksPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:SqliteStructuredLogPersistence:ConnectionString"] = GetConnectionString("structured-logs.db"),
+            ["CShells:Shells:Default:Features:PostgreSqlWorkflowPersistence:ConnectionString"] = connectionString,
+            ["CShells:Shells:Default:Features:PostgreSqlIdentityPersistence:ConnectionString"] = connectionString,
+            ["CShells:Shells:Default:Features:PostgreSqlExternalAuthenticationPersistence:ConnectionString"] = connectionString,
+            ["CShells:Shells:Default:Features:PostgreSqlAlterationsPersistence:ConnectionString"] = connectionString,
+            ["CShells:Shells:Default:Features:PostgreSqlUserTasksPersistence:ConnectionString"] = connectionString,
             ["CShells:Shells:Default:Features:Http:HttpActivityOptions:BaseUrl"] = "https://localhost",
             ["CShells:Shells:Default:Features:ExternalAuthentication:Redirects:ExternalCallbackBaseUri"] = "https://localhost/elsa/api/",
             ["Diagnostics:OpenTelemetry:Exporter:Endpoint"] = "http://127.0.0.1:1",

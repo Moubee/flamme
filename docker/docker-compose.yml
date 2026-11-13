@@ -12,47 +12,6 @@ services:
     ports:
       - "5432:5432"
         
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=!Elsa2025@
-    ports:
-      - 1433:1433
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-        
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: elsa
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-        
-  oracle:
-      image: container-registry.oracle.com/database/free:latest
-      container_name: oracle-db
-      environment:
-        ORACLE_PWD: elsa
-      ports:
-        - "1521:1521"
-        - "5500:5500"
-      volumes:
-        - ./data/oracle-data:/opt/oracle/oradata
-  
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "127.0.0.1:27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-  
   rabbitmq:
     image: "rabbitmq:4-management"
     ports:
@@ -86,7 +45,4 @@ services:
       ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
 
 volumes:
-  sqlserver_data:
   postgres-data:
-  mysql_data:
-  mongodb_data:

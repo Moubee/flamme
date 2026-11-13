@@ -112,7 +112,7 @@ Elsa offers a wide range of features for building and executing workflows, inclu
 - Easy integration with external applications via HTTP, message queues, and more.
 - Actor model for increased workflow throughput.
 - Dynamic expressions with support for C#, JavaScript, Python, and Liquid.
-- Persistence agnostic, with support for Entity Framework Core, MongoDB, and Dapper out of the box.
+- Persistence through PostgreSQL with Entity Framework Core or the built-in in-memory stores. See the [migration guide](doc/postgres-inmemory-migration.md) for removed providers.
 - [Elsa Studio](https://github.com/elsa-workflows/elsa-studio): a separately maintained and hosted Blazor app for managing and designing workflows.
 
 ## Roadmap

@@ -1,5 +1,5 @@
 using Elsa.Workflows.ComponentTests.Services;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using TUnit.Core.Interfaces;
 
 namespace Elsa.Workflows.ComponentTests.Fixtures;
@@ -33,17 +33,17 @@ public sealed class App : IAsyncInitializer, IAsyncDisposable
             Path.GetTempPath(),
             testContext.Isolation.GetIsolatedName($"elsa_component_files_{testContext.Id.Replace("-", string.Empty, StringComparison.Ordinal)}"));
 
-        var catalogBuilder = new SqlConnectionStringBuilder(Infrastructure.DbContainer.GetConnectionString())
+        var catalogBuilder = new NpgsqlConnectionStringBuilder(Infrastructure.DbContainer.GetConnectionString())
         {
-            InitialCatalog = CatalogName,
+            Database = CatalogName,
             // Elsa's ambient commit transaction opens sequential EF connections. Pool reuse keeps
-            // those enlistments promotable on platforms without MSDTC support.
+            // those enlistments on the same PostgreSQL connection, avoiding distributed transactions.
             Pooling = true
         };
         ConnectionString = catalogBuilder.ConnectionString;
-        var masterConnectionString = new SqlConnectionStringBuilder(Infrastructure.DbContainer.GetConnectionString())
+        var masterConnectionString = new NpgsqlConnectionStringBuilder(Infrastructure.DbContainer.GetConnectionString())
         {
-            InitialCatalog = "master",
+            Database = "postgres",
             Pooling = false
         }.ConnectionString;
         _catalog = new ComponentTestCatalog(
@@ -257,7 +257,7 @@ internal sealed class ComponentTestCatalog(
     private async Task ProvisionCoreAsync(CancellationToken cancellationToken)
     {
         // Claim cleanup ownership before provisioning: a transport or cancellation failure can
-        // be ambiguous even when SQL Server has already created or restored the database.
+        // be ambiguous even when PostgreSQL has already created or restored the database.
         Volatile.Write(ref _cleanupRequired, 1);
         await provisionAsync(cancellationToken);
     }
@@ -292,7 +292,7 @@ internal sealed class ComponentTestCatalog(
             catch
             {
                 // The host startup path owns the provisioning failure. Cleanup must still probe
-                // for a catalog because SQL Server may have committed CREATE before the failure.
+                // for a catalog because PostgreSQL may have committed CREATE before the failure.
             }
         }
 
@@ -301,26 +301,18 @@ internal sealed class ComponentTestCatalog(
 
         // Clear the session catalog's pool after all shared hosts are down so DROP can take
         // exclusive ownership and release the database files cleanly.
-        using (var pooledConnection = new SqlConnection(connectionString))
-            SqlConnection.ClearPool(pooledConnection);
+        using (var pooledConnection = new NpgsqlConnection(connectionString))
+            NpgsqlConnection.ClearPool(pooledConnection);
 
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        await using var connection = new SqlConnection(masterConnectionString);
+        await using var connection = new NpgsqlConnection(masterConnectionString);
         await connection.OpenAsync(timeout.Token);
         await using var command = connection.CreateCommand();
-        command.CommandText = $"""
-            IF DB_ID(@catalogName) IS NOT NULL
-            BEGIN
-                IF DATABASEPROPERTYEX(@catalogName, 'Status') = N'ONLINE'
-                    ALTER DATABASE {QuoteIdentifier(catalogName)} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                DROP DATABASE {QuoteIdentifier(catalogName)};
-            END
-            """;
+        command.CommandText = $"DROP DATABASE IF EXISTS {QuoteIdentifier(catalogName)} WITH (FORCE)";
         command.CommandTimeout = 30;
-        command.Parameters.AddWithValue("@catalogName", catalogName);
         await command.ExecuteNonQueryAsync(timeout.Token);
         Volatile.Write(ref _cleanupRequired, 0);
     }
 
-    private static string QuoteIdentifier(string identifier) => $"[{identifier.Replace("]", "]]", StringComparison.Ordinal)}]";
+    private static string QuoteIdentifier(string identifier) => $"\"{identifier.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
 }

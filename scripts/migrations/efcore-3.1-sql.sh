@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 
+repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
+
 # Define the modules to update
 mods=("Alterations" "Runtime" "Management" "Identity")
 
 # Define the list of providers
-providers=("MySql" "SqlServer" "Sqlite" "PostgreSql" "Oracle")
+providers=("PostgreSql")
 
 # Loop through each module
 for module in "${mods[@]}"; do
     # Loop through each provider
     for provider in "${providers[@]}"; do
-        providerPath="../src/modules/Elsa.EntityFrameworkCore.$provider"
+        providerPath="$repository_root/src/modules/Elsa.Persistence.EFCore.$provider"
         sqlPath="$providerPath/Migrations/$module/v3.1.sql"
     
         echo "Generating SQL for $provider..."

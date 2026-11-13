@@ -4,7 +4,7 @@ using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Persistence.EFCore;
 using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Core.Interfaces;
@@ -17,17 +17,17 @@ namespace Elsa.ExternalAuthentication.IntegrationTests.Distributed;
 /// </summary>
 public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
 {
-    private SqliteConnection _connection = null!;
+    private PostgreSqlTestDatabase _database = null!;
     private ServiceProvider _services = null!;
     private ExternalAuthenticationDbContextLeaseFactory _contexts = null!;
     private readonly ISystemClock _clock = new FixedClock();
 
     public async Task InitializeAsync()
     {
-        _connection = new SqliteConnection("Data Source=:memory:");
-        await _connection.OpenAsync();
+        _database = new PostgreSqlTestDatabase();
+        await _database.OpenAsync();
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection, sqlite => sqlite.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.Sqlite.ExternalAuthenticationDbContextFactory).Assembly.FullName))
+            .UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName))
             .Options;
         _services = new ServiceCollection()
             .AddSingleton<IDbContextFactory<ExternalAuthenticationElsaDbContext>>(services => new TestDbContextFactory(options, services))
@@ -40,7 +40,7 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await _services.DisposeAsync();
-        await _connection.DisposeAsync();
+        await _database.DisposeAsync();
     }
 
     [Test]

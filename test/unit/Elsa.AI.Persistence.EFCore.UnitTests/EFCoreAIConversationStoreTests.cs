@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using Elsa.AI.Abstractions.Models;
 using Elsa.AI.Persistence.EFCore.Services;
 using Elsa.AI.Persistence.EFCore.Stores;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using TUnit.Core.Interfaces;
@@ -12,7 +12,7 @@ namespace Elsa.AI.Persistence.EFCore.UnitTests;
 
 public class EFCoreAIConversationStoreTests : IAsyncInitializer, IAsyncDisposable
 {
-    private readonly SqliteConnection _connection = new("DataSource=:memory:");
+    private readonly PostgreSqlTestDatabase _connection = new();
     private AIDbContext _dbContext = default!;
 
     [Test]
@@ -520,7 +520,7 @@ public class EFCoreAIConversationStoreTests : IAsyncInitializer, IAsyncDisposabl
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();
-        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UseSqliteAIMigrations(_connection).Options);
+        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UsePostgreSqlAIMigrations(_connection).Options);
         await _dbContext.Database.MigrateAsync();
     }
 

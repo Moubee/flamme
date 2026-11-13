@@ -128,7 +128,7 @@ Operators rely on due-date notifications, optional timeout outcomes, reconciliat
 - **FR-020**: Terminal mutation APIs MUST require `expectedRevision` and `operationId`, return `202` when accepted, `409` for races or divergent operation reuse, and `422` for domain validation.
 - **FR-021**: Anonymous invitation APIs MUST use generic errors and rate limiting; raw invitation secrets MUST never be stored outside an encrypted transient delivery outbox and MUST be returned only once to a dispatcher.
 - **FR-022**: The first successfully verified invitation MUST atomically claim the task, revoke sibling invitations, and issue a bounded guest session; guests MUST NOT release tasks.
-- **FR-023**: Persistence MUST offer an in-memory default plus EF Core packages for SQLite, SQL Server, PostgreSQL, MySQL, and Oracle, and a VNext provider abstraction with equivalent behavior.
+- **FR-023**: Persistence MUST offer an in-memory default and a PostgreSQL EF Core package with equivalent repository behavior.
 - **FR-024**: Storage MUST index normalized query fields and use bounded JSON only for protected task, form, and completion payloads; default payload limit is 256 KiB.
 - **FR-025**: Audit events MUST be append-only, tenant-scoped, and exclude raw protected payloads.
 - **FR-026**: Terminal retention MUST be indefinite by default with configurable purge that never deletes open tasks.
@@ -159,7 +159,7 @@ Operators rely on due-date notifications, optional timeout outcomes, reconciliat
 - **SC-002**: Two concurrent claimants or terminal actors yield exactly one winner in all automated race tests.
 - **SC-003**: Authorization tests prove no candidate, released worker, unrelated user, cross-tenant manager, or unverified guest can read protected content.
 - **SC-004**: Authorized list queries remain cursor-stable at the target envelope of 100,000 open tasks and millions of terminal tasks per tenant without loading protected payloads.
-- **SC-005**: All supported persistence providers expose the same schema contract and the SQLite integration suite proves restart durability and indexed query behavior.
+- **SC-005**: All supported persistence providers expose the same schema contract and the PostgreSQL integration suite proves restart durability and indexed query behavior.
 - **SC-006**: A worker can locate, claim, and complete a seeded task from Studio on desktop and a narrow viewport without entering an Elsa Identity user ID.
 - **SC-007**: Reconciliation restores every intentionally interrupted bookmark/task/operation test fixture without duplicate tasks or workflow resumes.
 - **SC-008**: Requirements, contracts, implementation tasks, automated tests, and documentation retain stable traceability identifiers.

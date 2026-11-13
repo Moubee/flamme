@@ -1,6 +1,6 @@
 using Elsa.AI.Abstractions.Models;
 using Elsa.AI.Persistence.EFCore.Stores;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ namespace Elsa.AI.Persistence.EFCore.UnitTests;
 public class EFCoreAIAuditSinkTests : IAsyncInitializer, IAsyncDisposable
 {
     private static readonly NullLogger<EFCoreAIAuditSink> AuditLogger = NullLogger<EFCoreAIAuditSink>.Instance;
-    private readonly SqliteConnection _connection = new("DataSource=:memory:");
+    private readonly PostgreSqlTestDatabase _connection = new();
     private AIDbContext _dbContext = default!;
 
     [Test]
@@ -108,7 +108,7 @@ public class EFCoreAIAuditSinkTests : IAsyncInitializer, IAsyncDisposable
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();
-        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UseSqliteAIMigrations(_connection).Options);
+        _dbContext = new AIDbContext(new DbContextOptionsBuilder<AIDbContext>().UsePostgreSqlAIMigrations(_connection).Options);
         await _dbContext.Database.MigrateAsync();
     }
 

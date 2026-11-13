@@ -1,5 +1,7 @@
 # Elsa Workflows Core — ISO 25010 quality assessment
 
+> Historical snapshot: provider lists, commands, and test counts below describe the assessed revision. Current support is PostgreSQL and in-memory only; removed provider packages and vNext tests are no longer available. See the [storage upgrade guide](../postgres-inmemory-migration.md).
+
 | Field | Value |
 |---|---|
 | **Repository / project** | elsa-workflows/elsa-core |

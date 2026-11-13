@@ -15,7 +15,7 @@ using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
 using Elsa.Persistence.EFCore;
 using Elsa.Workflows;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +27,7 @@ namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
 
 public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, IAsyncDisposable
 {
-    private SqliteConnection _connection = null!;
+    private PostgreSqlTestDatabase _database = null!;
     private ServiceProvider _services = null!;
     private TestDbContextFactory _dbContextFactory = null!;
     private ExternalAuthenticationDbContextLeaseFactory _leaseFactory = null!;
@@ -37,12 +37,12 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
 
     public async Task InitializeAsync()
     {
-        _connection = new SqliteConnection("Data Source=:memory:");
-        await _connection.OpenAsync();
+        _database = new PostgreSqlTestDatabase();
+        await _database.OpenAsync();
         _clock = new SystemClock();
         var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
         optionsBuilder.UseElsaDbContextOptions(null);
-        optionsBuilder.UseSqlite(_connection, sqlite => sqlite.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.Sqlite.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+        optionsBuilder.UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
         var options = optionsBuilder.Options;
         _services = new ServiceCollection()
             .AddSingleton<IDbContextFactory<ExternalAuthenticationElsaDbContext>>(serviceProvider => new TestDbContextFactory(options, serviceProvider))
@@ -58,7 +58,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     public async ValueTask DisposeAsync()
     {
         await _services.DisposeAsync();
-        await _connection.DisposeAsync();
+        await _database.DisposeAsync();
     }
 
     private EFCoreExternalIdentityProvisioner CreateProvisioner(
@@ -103,13 +103,14 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     }
 
     [Test]
-    public async Task SqliteInitialMigrationCreatesTheOptionalRefreshTokenTable()
+    public async Task PostgreSqlInitialMigrationCreatesTheOptionalRefreshTokenTable()
     {
-        await using var connection = new SqliteConnection("Data Source=:memory:");
-        await connection.OpenAsync();
+        await using var database = new PostgreSqlTestDatabase();
+        await database.OpenAsync();
+        var connection = database.Connection;
         var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
         optionsBuilder.UseElsaDbContextOptions(null);
-        optionsBuilder.UseSqlite(connection, sqlite => sqlite.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.Sqlite.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+        optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
         var options = optionsBuilder.Options;
         await using var services = new ServiceCollection().BuildServiceProvider();
         await using var dbContext = new ExternalAuthenticationElsaDbContext(options, services);
@@ -118,9 +119,9 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
 
         await Assert.That(await dbContext.Database.GetAppliedMigrationsAsync()).HasSingleItem();
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'ExternalAuthenticationSessionRefreshTokens'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessionRefreshTokens'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(1L);
-        command.CommandText = "SELECT COUNT(*) FROM pragma_table_info('ExternalAuthenticationSessions') WHERE name = 'CurrentRefreshTokenHash'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessions' AND column_name = 'CurrentRefreshTokenHash'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(0L);
     }
 
@@ -326,12 +327,13 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task ProvisionerRemovesTheJustInTimeUserThatLosesTheLinkRace()
     {
-        var databasePath = Path.Combine(Path.GetTempPath(), $"elsa-external-identity-provisioning-{Guid.NewGuid():N}.db");
+        var database = new PostgreSqlTestDatabase();
+        await database.OpenAsync();
         try
         {
             await using var services = new ServiceCollection().BuildServiceProvider();
             var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-                .UseSqlite($"Data Source={databasePath};Default Timeout=30;Pooling=False")
+                .UseNpgsql(database.ConnectionString)
                 .Options;
             var factory = new TestDbContextFactory(options, services);
             await using (var dbContext = await factory.CreateDbContextAsync())
@@ -359,7 +361,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         }
         finally
         {
-            File.Delete(databasePath);
+            await database.DisposeAsync();
         }
     }
 
@@ -367,7 +369,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     public async Task ProvisionerRemovesTheJustInTimeUserWhenLinkPersistenceFails()
     {
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailingLinkSaveInterceptor())
             .Options;
         var provisioner = CreateProvisioner(
@@ -409,7 +411,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     public async Task ProvisionerFailsWhenAJustInTimeUserCannotBeCompensated()
     {
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailingLinkSaveInterceptor())
             .Options;
         var userStore = new DeleteFailingUserStore(new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a")));
@@ -434,7 +436,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new DeleteLinkedUserBeforeCommitInterceptor(users))
             .Options;
         var provisioner = CreateProvisioner(
@@ -459,7 +461,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     {
         await _userStore.SaveAsync(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" });
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new DeleteLinkedUserAfterSaveAndThrowInterceptor(_userStore))
             .Options;
         using var hasher = new HmacExternalAuthenticationHandleHasher();
@@ -612,7 +614,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         await _userStore.SaveAsync(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" });
         await _userStore.SaveAsync(new User { Id = "user-b", Name = "bob", TenantId = "tenant-a" });
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailSelectedLinkDeleteInterceptor(3))
             .Options;
         using var hasher = new HmacExternalAuthenticationHandleHasher();
@@ -671,7 +673,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         var old = (await originalProvisioner.CreateLinkOrGetExistingAsync(
             new ProvisioningRequest("tenant-a", "contoso", new ExternalIdentity("https://issuer.example", "subject-old", EmptyClaims), null, "user-a"))).Link;
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new ThrowAfterSelectedCommitInterceptor(1))
             .Options;
         var provisioner = CreateProvisioner(hasher, new TestDbContextFactory(options, _services));
@@ -703,7 +705,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         var old = (await originalProvisioner.CreateLinkOrGetExistingAsync(
             new ProvisioningRequest("tenant-a", "contoso", new ExternalIdentity("https://issuer.example", "subject-old", EmptyClaims), null, "user-a"))).Link;
         var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseSqlite(_connection)
+            .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new ThrowAfterSelectedCommitInterceptor(2))
             .Options;
         var racingProvider = new DeleteOnSelectedFindUserProvider(new StoreBasedUserProvider(_userStore), _userStore, 2);
@@ -726,12 +728,13 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task DurableConcurrentReplacementUsesTheOldLinkIdAsAnAtomicGuard()
     {
-        var databasePath = Path.Combine(Path.GetTempPath(), $"elsa-external-identity-links-{Guid.NewGuid():N}.db");
+        var database = new PostgreSqlTestDatabase();
+        await database.OpenAsync();
         try
         {
             await using var services = new ServiceCollection().BuildServiceProvider();
             var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-                .UseSqlite($"Data Source={databasePath};Default Timeout=30;Pooling=False")
+                .UseNpgsql(database.ConnectionString)
                 .Options;
             var factory = new TestDbContextFactory(options, services);
             await using (var dbContext = await factory.CreateDbContextAsync())
@@ -760,7 +763,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         }
         finally
         {
-            File.Delete(databasePath);
+            await database.DisposeAsync();
         }
     }
 

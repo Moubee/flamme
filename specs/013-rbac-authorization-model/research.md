@@ -83,7 +83,6 @@ The ticket's "roles configurable per tenant, never shared" is not currently safe
 - **`UserManager.CreateUserAsync` never sets `TenantId`** — it relies on the EF saving handler.
 - **`Elsa.Secrets` is entirely tenancy-blind** — `Secret` is a POCO with no `TenantId`. The ticket
   wants per-tenant secrets access control; the data is not tenant-partitioned at all.
-- **`Elsa.Persistence.VNext*` has no tenancy plumbing whatsoever.**
 - **There is no host/root administrator concept** in `Elsa.Identity`.
 
 ---

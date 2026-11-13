@@ -210,21 +210,7 @@ elsa.UseWorkflowRuntime(runtime =>
 Production clustered deployments must configure an `IDistributedLockProvider` backed by infrastructure shared by all nodes. Common Medallion providers include:
 
 - Redis: `DistributedLock.Redis` with `Medallion.Threading.Redis.RedisDistributedSynchronizationProvider`.
-- SQL Server: `DistributedLock.SqlServer` with `Medallion.Threading.SqlServer.SqlDistributedSynchronizationProvider`.
 - PostgreSQL: `DistributedLock.Postgres` with `Medallion.Threading.Postgres.PostgresDistributedSynchronizationProvider`.
-
-Example SQL Server setup:
-
-```csharp
-using Medallion.Threading.SqlServer;
-
-elsa.UseWorkflowRuntime(runtime =>
-{
-    runtime.UseDistributedRuntime();
-    runtime.DistributedLockProvider = _ =>
-        new SqlDistributedSynchronizationProvider(configuration.GetConnectionString("SqlServer"));
-});
-```
 
 Example PostgreSQL setup:
 

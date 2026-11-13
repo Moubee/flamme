@@ -85,8 +85,8 @@ public class HttpEndpointTests(App app) : AppComponentTest(app)
         using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         var tasks = new List<Task<string>>();
 
-        // Act - Send a small concurrent batch. Larger batches can deadlock SQL Server
-        // while persisting activity execution logs, which is not what this test covers.
+        // Act - Send a small concurrent batch to exercise request handling while keeping
+        // activity-log persistence load bounded.
         for (var i = 0; i < ConcurrentRequestCount; i++)
         {
             var index = i;

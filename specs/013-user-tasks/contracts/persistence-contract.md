@@ -22,21 +22,13 @@ Elsa.UserTasks.Persistence.EFCore
 ├── entity configurations and repository
 └── EFCoreUserTasksPersistenceFeature
 
-Elsa.UserTasks.Persistence.EFCore.Sqlite
-Elsa.UserTasks.Persistence.EFCore.SqlServer
 Elsa.UserTasks.Persistence.EFCore.PostgreSql
-Elsa.UserTasks.Persistence.EFCore.MySql
-Elsa.UserTasks.Persistence.EFCore.Oracle
 ├── provider configuration and design-time factory
 ├── provider-specific migration assembly
 └── provider shell feature
-
-Elsa.UserTasks.Persistence.VNext
-├── IPersistenceSchemaProvider descriptor
-└── document-store adapter with equivalent semantics
 ```
 
-The Core feature registers an in-memory repository for development/tests. EF Core and VNext packages replace the repository through feature composition, following the `Elsa.Secrets` pattern. Providers must not add a dependency on `Elsa.Identity`.
+The Core feature registers an in-memory repository for development/tests. The PostgreSQL EF Core package replaces the repository through feature composition, following the `Elsa.Secrets` pattern. Providers must not add a dependency on `Elsa.Identity`.
 
 ## Logical storage units
 
@@ -216,29 +208,11 @@ The workflow runtime is the source of truth for bookmark existence and workflow 
 
 Provider packages must provide:
 
-- `Elsa.UserTasks.Persistence.EFCore.Sqlite` with SQLite configuration, design-time context factory, migrations, and shell feature.
-- `Elsa.UserTasks.Persistence.EFCore.SqlServer` with SQL Server configuration, design-time context factory, migrations, and shell feature.
 - `Elsa.UserTasks.Persistence.EFCore.PostgreSql` with PostgreSQL configuration, design-time context factory, migrations, and shell feature.
-- `Elsa.UserTasks.Persistence.EFCore.MySql` with MySQL configuration, design-time context factory, migrations, and shell feature.
-- `Elsa.UserTasks.Persistence.EFCore.Oracle` with Oracle configuration, design-time context factory, migrations, and shell feature.
 
-The provider differences are dialect and column-type details only. All providers must expose the same lifecycle transitions, revision conflicts, idempotency behavior, visibility scope, retention behavior, and projection/reconciliation semantics. SQLite stores UTC timestamps in its provider-compatible ISO-8601 representation; other providers use their native UTC-capable representation. JSON may use provider-native JSON types or text, but round-trip semantics and payload limits are identical.
+In-memory and PostgreSQL repositories must expose the same lifecycle transitions, revision conflicts, idempotency behavior, visibility scope, retention behavior, and projection/reconciliation semantics. PostgreSQL uses its UTC-capable timestamp representation. JSON round-trip semantics and payload limits must match across stores.
 
 Each provider migration must create its complete User Tasks schema, including child units, constraints, indexes, and any required schema marker. Migration tests must apply from an empty database and verify restart durability and indexed query behavior.
-
-## VNext provider parity
-
-`Elsa.UserTasks.Persistence.VNext` registers an `IPersistenceSchemaProvider` describing the same logical storage units, fields, indexes, JSON payload limits, and uniqueness constraints under the `Elsa.UserTasks` schema namespace. Its document-store adapter uses compare-and-swap document versions for `Revision` and supports equivalent indexed queries for safe fields.
-
-The VNext adapter must preserve:
-
-- tenant/materialization/bookmark uniqueness;
-- candidate, exclusion, and snapshot membership semantics;
-- append-only events;
-- operation idempotency and stale-operation scans;
-- encrypted invitation delivery outbox and hashed invitation/session tokens;
-- terminal-only retention purge; and
-- the same protected-data and authorization boundaries.
 
 No provider may make Elsa.Identity a prerequisite or silently weaken tenant isolation.
 

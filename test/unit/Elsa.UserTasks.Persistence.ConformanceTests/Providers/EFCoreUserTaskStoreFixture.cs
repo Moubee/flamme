@@ -65,7 +65,7 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
     {
     }
 
-    /// <summary>The connection string for this run. Relational providers get a uniquely named database.</summary>
+    /// <summary>The isolated or operator-supplied PostgreSQL connection string for this run.</summary>
     protected abstract string ResolveConnectionString();
 
     protected override async Task ActivateCoreAsync()
@@ -103,13 +103,6 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
             foreach (var secondaryScope in _secondaryScopes)
                 await secondaryScope.DisposeAsync();
             _secondaryScopes.Clear();
-
-            if (DropsOwnDatabase)
-            {
-                var factory = _scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
-                await using var dbContext = await factory.CreateDbContextAsync();
-                await dbContext.Database.EnsureDeletedAsync();
-            }
         }
         finally
         {
@@ -124,13 +117,6 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
             }
         }
     }
-
-    /// <summary>
-    /// True where the fixture created the database itself and may remove it. The container-backed providers
-    /// run against an operator-supplied connection string and must never drop it; they rely on the suite's
-    /// per-test tenant isolation instead.
-    /// </summary>
-    protected virtual bool DropsOwnDatabase => false;
 
     private static InvalidOperationException NotActivated() =>
         new("The fixture was used before ActivateAsync ran. Every conformance test must await ActivateAsync first.");

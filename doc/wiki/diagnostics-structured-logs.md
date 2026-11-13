@@ -69,7 +69,7 @@ The default provider keeps recent logs in process:
 - [InMemoryStructuredLogLiveFeed](../../src/modules/Elsa.Diagnostics.StructuredLogs/Providers/InMemory/InMemoryStructuredLogLiveFeed.cs)
 - [RingBuffer](../../src/modules/Elsa.Diagnostics.StructuredLogs/Providers/InMemory/RingBuffer.cs)
 
-This is bounded and process-local. In clustered deployments, each node has its own source identity and in-memory history unless durable/shared persistence is configured.
+This is bounded and process-local. In clustered deployments, each node has its own source identity and in-memory history and history is lost on process restart. No durable backend is bundled.
 
 ## REST And SignalR Surface
 
@@ -98,31 +98,9 @@ The endpoints require `read:diagnostics:structured-logs`, defined in [Structured
 
 Events pass through `IStructuredLogRedactor` before buffering or streaming. Configuration lives in [StructuredLogsOptions](../../src/modules/Elsa.Diagnostics.StructuredLogs/Options/StructuredLogsOptions.cs). Extend sensitive property names and text patterns there.
 
-## SQLite Persistence
+## Storage Support
 
-Durable SQLite storage is available through the relational and SQLite packages:
-
-- design plan: [specs/005-structured-log-persistence/plan.md](../../specs/005-structured-log-persistence/plan.md)
-- quickstart: [specs/005-structured-log-persistence/quickstart.md](../../specs/005-structured-log-persistence/quickstart.md)
-- relational package: [Elsa.Diagnostics.StructuredLogs.Persistence.Relational](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Relational)
-- SQLite package: [Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite)
-
-Configuration example from the SQLite README:
-
-```csharp
-services.AddElsa(elsa =>
-{
-    elsa.UseStructuredLogs(structuredLogs =>
-    {
-        structuredLogs.UseSqliteStorage("Data Source=elsa-structured-logs.db", sqlite =>
-        {
-            sqlite.RunMigrationsOnStartup = true;
-            sqlite.Relational.WriteQueue.Capacity = 10_000;
-            sqlite.Relational.WriteQueue.BatchSize = 100;
-        });
-    });
-});
-```
+The bundled store is bounded and in-memory. The legacy durable provider has been removed; see the [upgrade guide](../postgres-inmemory-migration.md). Configure an external logging pipeline when logs must survive process restarts.
 
 ## Relational Persistence Design
 
@@ -142,16 +120,9 @@ The write buffer uses a bounded queue. If the queue is full, newest events are d
 
 Recent-log queries honor `StructuredLogsOptions.MaxRecentLogQuerySize` for both the default `Take` and the upper clamp, matching the in-memory store. Query order is `Timestamp`, `ReceivedAt`, `SourceId`, `Sequence`, then `Id`. `ListSources` prefers the in-process source registry for identity metadata and heartbeat/`Stale` status, and uses persisted `SourceId` rows only as a fallback for sources this process has not seen.
 
-## SQLite Provider Boundary
+## Relational Extension Boundary
 
-[AddSqliteStructuredLogPersistence](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite/Extensions/SqliteStructuredLogsModuleExtensions.cs) supplies provider-specific services:
-
-- `IRelationalStructuredLogConnectionFactory`
-- `IRelationalStructuredLogDialect`
-- `IStructuredLogSchemaMigrator`
-- startup migration/cleanup hosted service
-
-The core structured logs package must remain unaware of SQLite. Future relational providers should copy this boundary: provider package supplies connection factory, dialect, migrator, and option binding; relational package supplies shared store behavior.
+The relational package retains shared connection, dialect, migration, write-buffer, and retention contracts. It does not register a concrete database provider by itself. PostgreSQL is the only supported durable database for any host-provided implementation.
 
 ## Tests
 
@@ -160,6 +131,5 @@ Relevant tests:
 - [test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests)
 - [test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests](../../test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests)
 - [test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests)
-- [test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests](../../test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests)
 
 Run targeted structured-log tests before broader builds when touching this area.

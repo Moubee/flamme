@@ -1,33 +1,34 @@
 using Elsa.Authorization;
+using Elsa.Common;
 using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Common;
+using Elsa.Testing.Shared.Databases;
 using Elsa.UserTasks.Contracts;
+using Elsa.UserTasks.Models;
 using Elsa.UserTasks.Options;
 using Elsa.UserTasks.Permissions;
+using Elsa.UserTasks.Persistence.EFCore;
+using Elsa.UserTasks.Persistence.EFCore.PostgreSql.Extensions;
+using Elsa.UserTasks.Persistence.EFCore.Repositories;
 using Elsa.UserTasks.Services;
 using Elsa.Workflows;
-using Microsoft.Extensions.Options;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Persistence.EFCore;
-using Elsa.UserTasks.Persistence.EFCore.Repositories;
-using Elsa.UserTasks.Persistence.EFCore.Sqlite.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Elsa.UserTasks.Persistence.EFCore.UnitTests;
 
 public sealed class EFCoreUserTaskRepositoryTests
 {
-    private readonly string databasePath = Path.Join(Path.GetTempPath(), $"elsa-user-tasks-{Guid.NewGuid():N}.db");
+    private readonly PostgreSqlTestDatabase database = new();
     private readonly ServiceProvider serviceProvider;
 
     public EFCoreUserTaskRepositoryTests()
     {
         var services = new ServiceCollection();
-        services.AddSqliteEntityModelCreatingHandlers();
+        services.AddPostgreSqlEntityModelCreatingHandlers();
         services.AddDbContextFactory<UserTasksElsaDbContext>(builder =>
-            builder.UseElsaSqlite(typeof(SqliteUserTasksPersistenceFeatureExtensions).Assembly, $"Data Source={databasePath}"));
+            builder.UseElsaPostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly, database.ConnectionString));
         services.AddScoped<Store<UserTasksElsaDbContext, UserTaskRecord>>();
         services.AddScoped<EFCoreUserTaskRepository>();
         serviceProvider = services.BuildServiceProvider();
@@ -46,8 +47,7 @@ public sealed class EFCoreUserTaskRepositoryTests
     public async Task DisposeAsync()
     {
         await serviceProvider.DisposeAsync();
-        if (File.Exists(databasePath))
-            File.Delete(databasePath);
+        await database.DisposeAsync();
     }
 
     [Test]
@@ -80,6 +80,60 @@ public sealed class EFCoreUserTaskRepositoryTests
         await Assert.That(persisted.Operations.Single().Status).IsEqualTo(UserTaskOperationStatus.Completed);
         await Assert.That(persisted.Operations.Single().ActionKey).IsEqualTo("Complete");
         await Assert.That(persisted.Operations.Single().ErrorCode).IsEqualTo("none");
+    }
+
+    [Test]
+    public async Task TagsJson_TracksInPlaceCollectionChanges()
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+        var repository = scope.ServiceProvider.GetRequiredService<EFCoreUserTaskRepository>();
+        var actor = new ParticipantReference("tenant-1", "directory", UserTaskParticipantType.User, "u1");
+        var task = CreateTask(DateTimeOffset.UtcNow, actor);
+        await repository.AddProjectionAsync(task);
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+
+        await using (var context = await factory.CreateDbContextAsync())
+        {
+            var record = await context.UserTasks.SingleAsync(x => x.Id == task.Id);
+            record.Tags.Add("risk_100%'");
+            await context.SaveChangesAsync();
+        }
+
+        var loaded = await Assert.That(await repository.GetAsync(task.TenantId, task.Id)).IsNotNull();
+        await Assert.That(loaded.Tags).Contains("finance");
+        await Assert.That(loaded.Tags).Contains("risk_100%'");
+    }
+
+    [Test]
+    [Arguments("tenant{0}")]
+    [Arguments("tenant{archive}\"")]
+    public async Task TagSearch_QuotesConfiguredSchemaAndTreatsSearchAsLiteral(string schemaName)
+    {
+        await using var database = new PostgreSqlTestDatabase();
+        await using var services = new ServiceCollection()
+            .AddPostgreSqlEntityModelCreatingHandlers()
+            .AddDbContextFactory<UserTasksElsaDbContext>(builder => builder
+                .UseElsaPostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly,
+                    database.ConnectionString, new ElsaDbContextOptions { SchemaName = schemaName })
+                .EnableServiceProviderCaching(false))
+            .AddScoped<Store<UserTasksElsaDbContext, UserTaskRecord>>()
+            .AddScoped<EFCoreUserTaskRepository>()
+            .BuildServiceProvider();
+        await using var scope = services.CreateAsyncScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+        await using (var context = await factory.CreateDbContextAsync())
+            await context.Database.EnsureCreatedAsync();
+        var repository = scope.ServiceProvider.GetRequiredService<EFCoreUserTaskRepository>();
+        var actor = new ParticipantReference("tenant-1", "directory", UserTaskParticipantType.User, "u1");
+        var task = CreateTask(DateTimeOffset.UtcNow, actor);
+        task.Tags = ["risk_100%'"];
+        await repository.AddProjectionAsync(task);
+
+        var result = await repository.QueryAsync(Query(task.TenantId, actor, limit: 1, includeTotalCount: true) with { Search = "risk_100%'" });
+
+        var found = await Assert.That(result.Items).HasSingleItem();
+        await Assert.That(found.Id).IsEqualTo(task.Id);
+        await Assert.That(result.TotalCount).IsEqualTo(1);
     }
 
     [Test]

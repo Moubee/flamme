@@ -8,8 +8,9 @@ using Elsa.Persistence.EFCore.EntityHandlers;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Management;
 using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Persistence.EFCore.Sqlite;
+using Elsa.Persistence.EFCore.PostgreSql;
 using Elsa.Tenants.Options;
+using Elsa.Testing.Shared.Databases;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Workflows;
 using Elsa.Workflows.Management;
@@ -18,15 +19,15 @@ using Elsa.Workflows.Management.Stores;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Entities;
 using Elsa.Workflows.Runtime.Stores;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Elsa.Workflows.Persistence.ConformanceTests;
 
 /// <summary>
-/// Holds one Memory or EF/SQLite set of management + runtime stores and the ambient tenant they read.
+/// Holds one Memory or EF/PostgreSQL set of management + runtime stores and the ambient tenant they read.
 /// </summary>
 public sealed class WorkflowStoreScenario(
     TestTenantAccessor tenantAccessor,
@@ -85,12 +86,12 @@ public sealed class WorkflowStoreScenario(
             () => ValueTask.CompletedTask));
     }
 
-    public static Task<WorkflowStoreScenario> CreateSqliteAsync() => CreateSqliteAsync("tenant-a");
+    public static Task<WorkflowStoreScenario> CreatePostgreSqlAsync() => CreatePostgreSqlAsync("tenant-a");
 
-    public static async Task<WorkflowStoreScenario> CreateSqliteAsync(string tenantId, bool tenantsEnabled = true)
+    public static async Task<WorkflowStoreScenario> CreatePostgreSqlAsync(string tenantId, bool tenantsEnabled = true)
     {
-        var managementPath = Path.Combine(Path.GetTempPath(), $"elsa-workflow-management-conformance-{Guid.NewGuid():N}.db");
-        var runtimePath = Path.Combine(Path.GetTempPath(), $"elsa-workflow-runtime-conformance-{Guid.NewGuid():N}.db");
+        var managementDatabase = new PostgreSqlTestDatabase();
+        var runtimeDatabase = new PostgreSqlTestDatabase();
         var tenantAccessor = new TestTenantAccessor(tenantId);
         ServiceProvider? services = null;
         IServiceScope? scope = null;
@@ -107,14 +108,14 @@ public sealed class WorkflowStoreScenario(
                 .Configure<TenantsOptions>(options => options.IsEnabled = tenantsEnabled)
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-                .AddSqliteEntityModelCreatingHandlers()
+                .AddPostgreSqlEntityModelCreatingHandlers()
                 // The disabled-tenancy contract has a different EF model (no tenant query filters).
                 // Keep it out of the shared provider/model cache used by the parallel tenant-aware scenarios.
                 .AddDbContextFactory<ManagementElsaDbContext>((_, builder) =>
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={managementPath};Default Timeout=30;Pooling=False")
+                    builder.UseElsaPostgreSql(migrationsAssembly, managementDatabase.ConnectionString)
                         .EnableServiceProviderCaching(tenantsEnabled))
                 .AddDbContextFactory<RuntimeElsaDbContext>((_, builder) =>
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={runtimePath};Default Timeout=30;Pooling=False")
+                    builder.UseElsaPostgreSql(migrationsAssembly, runtimeDatabase.ConnectionString)
                         .EnableServiceProviderCaching(tenantsEnabled))
                 .Decorate<IDbContextFactory<ManagementElsaDbContext>, TenantAwareDbContextFactory<ManagementElsaDbContext>>()
                 .Decorate<IDbContextFactory<RuntimeElsaDbContext>, TenantAwareDbContextFactory<RuntimeElsaDbContext>>()
@@ -148,13 +149,13 @@ public sealed class WorkflowStoreScenario(
                 scoped.GetRequiredService<EFBookmarkQueueDeadLetterStore>(),
                 scoped.GetRequiredService<EFCoreActivityExecutionStore>(),
                 scoped.GetRequiredService<EFCoreWorkflowExecutionLogStore>(),
-                AssertSqliteUniquenessConflictAsync,
+                AssertPostgreSqlUniquenessConflictAsync,
                 async () =>
                 {
                     scope.Dispose();
                     await services.DisposeAsync();
-                    File.Delete(managementPath);
-                    File.Delete(runtimePath);
+                    await managementDatabase.DisposeAsync();
+                    await runtimeDatabase.DisposeAsync();
                 },
                 scoped.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>());
         }
@@ -163,24 +164,23 @@ public sealed class WorkflowStoreScenario(
             scope?.Dispose();
             if (services is not null)
                 await services.DisposeAsync();
-            File.Delete(managementPath);
-            File.Delete(runtimePath);
+            await managementDatabase.DisposeAsync();
+            await runtimeDatabase.DisposeAsync();
             throw;
         }
     }
 
-    private static async Task AssertSqliteUniquenessConflictAsync(Func<Task> operation)
+    private static async Task AssertPostgreSqlUniquenessConflictAsync(Func<Task> operation)
     {
         var exception = await CaptureExceptionAsync(operation);
-        var sqliteException = exception switch
+        var postgresException = exception switch
         {
-            DbUpdateException { InnerException: SqliteException inner } => inner,
-            SqliteException direct => direct,
-            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a SQLite uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
+            DbUpdateException { InnerException: PostgresException inner } => inner,
+            PostgresException direct => direct,
+            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a PostgreSQL uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
         };
 
-        await Assert.That(sqliteException.SqliteErrorCode).IsEqualTo(19);
-        await Assert.That(sqliteException.Message).Contains("UNIQUE constraint failed").WithComparison(StringComparison.Ordinal);
+        await Assert.That(postgresException.SqlState).IsEqualTo("23505");
     }
 
     private static async Task<Exception?> CaptureExceptionAsync(Func<Task> operation)

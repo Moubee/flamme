@@ -6,20 +6,21 @@ using Elsa.Secrets.Contracts;
 using Elsa.Secrets.Models;
 using Elsa.Secrets.Options;
 using Elsa.Secrets.Persistence.EFCore;
+using Elsa.Secrets.Persistence.EFCore.PostgreSql.Extensions;
 using Elsa.Secrets.Persistence.EFCore.Repositories;
-using Elsa.Secrets.Persistence.EFCore.Sqlite.Extensions;
 using Elsa.Secrets.Repositories;
 using Elsa.Secrets.Services;
 using Elsa.Tenants.Options;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Elsa.Secrets.UnitTests;
 
 /// <summary>
-/// One File, InMemory, or EF/SQLite <see cref="ISecretRepository"/> plus the ambient tenant it reads.
+/// One File, InMemory, or EF/PostgreSQL <see cref="ISecretRepository"/> plus the ambient tenant it reads.
 /// </summary>
 public sealed class SecretRepositoryScenario(
     ITenantAccessor tenantAccessor,
@@ -69,24 +70,24 @@ public sealed class SecretRepositoryScenario(
             }));
     }
 
-    public static async Task<SecretRepositoryScenario> CreateSqliteAsync()
+    public static async Task<SecretRepositoryScenario> CreatePostgreSqlAsync()
     {
-        var databasePath = Path.Join(Path.GetTempPath(), $"elsa-secrets-conformance-{Guid.NewGuid():N}.db");
+        var database = new PostgreSqlTestDatabase();
         var tenantAccessor = new DefaultTenantAccessor();
         ServiceProvider? services = null;
         IServiceScope? scope = null;
 
         try
         {
-            var migrationsAssembly = typeof(SqliteSecretsPersistenceFeatureExtensions).Assembly;
+            var migrationsAssembly = typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly;
             services = new ServiceCollection()
                 .AddSingleton<ITenantAccessor>(tenantAccessor)
                 .Configure<TenantsOptions>(options => options.IsEnabled = true)
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-                .AddSqliteEntityModelCreatingHandlers()
+                .AddPostgreSqlEntityModelCreatingHandlers()
                 .AddDbContextFactory<SecretsElsaDbContext>((_, builder) =>
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={databasePath}")
+                    builder.UseElsaPostgreSql(migrationsAssembly, database.ConnectionString)
                         .ReplaceService<IModelCacheKeyFactory, TenantAwareSecretModelCacheKeyFactory>())
                 .Decorate<IDbContextFactory<SecretsElsaDbContext>, TenantAwareDbContextFactory<SecretsElsaDbContext>>()
                 .AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>()
@@ -105,9 +106,7 @@ public sealed class SecretRepositoryScenario(
                 {
                     scope.Dispose();
                     await services.DisposeAsync();
-                    SqliteConnection.ClearAllPools();
-                    if (File.Exists(databasePath))
-                        File.Delete(databasePath);
+                    await database.DisposeAsync();
                 });
         }
         catch
@@ -115,9 +114,7 @@ public sealed class SecretRepositoryScenario(
             scope?.Dispose();
             if (services is not null)
                 await services.DisposeAsync();
-            SqliteConnection.ClearAllPools();
-            if (File.Exists(databasePath))
-                File.Delete(databasePath);
+            await database.DisposeAsync();
             throw;
         }
     }

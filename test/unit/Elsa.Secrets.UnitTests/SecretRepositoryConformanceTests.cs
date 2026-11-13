@@ -154,8 +154,8 @@ public sealed class FileSecretRepositoryConformanceTests : SecretRepositoryConfo
 }
 
 [InheritsTests]
-public sealed class SqliteSecretRepositoryConformanceTests : SecretRepositoryConformanceTests
+public sealed class PostgreSqlSecretRepositoryConformanceTests : SecretRepositoryConformanceTests
 {
     protected override Task<SecretRepositoryScenario> CreateScenarioAsync() =>
-        SecretRepositoryScenario.CreateSqliteAsync();
+        SecretRepositoryScenario.CreatePostgreSqlAsync();
 }

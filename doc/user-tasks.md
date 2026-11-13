@@ -33,7 +33,7 @@ Protected task, form, and completion payloads are limited to 256 KiB by default.
 
 ## Persistence
 
-The Core feature includes an in-memory repository for development and tests. Production hosts can select the EF Core User Tasks package for SQLite, SQL Server, PostgreSQL, MySQL, or Oracle, or use the VNext persistence adapter. The provider-neutral API and activity contract do not change with the store.
+The Core feature includes an in-memory repository for development and tests. Production hosts use `Elsa.UserTasks.Persistence.EFCore.PostgreSql` for durable persistence. The provider-neutral API and activity contract do not change with the store.
 
 Terminal tasks are retained indefinitely by default. Configurable cleanup may purge terminal aggregates and their protected data, but never open tasks. Audit events remain append-only and contain safe metadata only.
 

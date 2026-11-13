@@ -1,7 +1,7 @@
 # Quickstart: Elsa User Tasks
 
 **Status**: Approved  
-**Last reviewed**: 2026-08-17
+**Last reviewed**: 2026-11-13
 
 This walkthrough creates a workflow-bound invoice approval, executes it, lists the candidate task, claims it as an external user, and completes it with a typed action and form payload. The examples use the planned `Elsa.UserTasks` REST contract and do not require `Elsa.Identity`.
 
@@ -22,7 +22,7 @@ services.AddElsa(elsa =>
 
 // Enable the provider-specific User Tasks persistence feature in the host.
 // The feature registers the User Task repository, DbContext, mappings, and migrations.
-// Use the SQLite, SQL Server, PostgreSQL, MySQL, or Oracle package selected by the host.
+// Reference Elsa.UserTasks.Persistence.EFCore.PostgreSql for durable storage.
 ```
 
 Do not add an `Elsa.Identity` reference merely to run this walkthrough. The default claims resolver reads the configured subject/provider/group claims; a host may replace it with `IUserTaskIdentityResolver` and `IUserTaskAccessPolicy`.

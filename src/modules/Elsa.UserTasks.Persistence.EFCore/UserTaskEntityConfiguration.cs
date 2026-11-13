@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 
 namespace Elsa.UserTasks.Persistence.EFCore;
@@ -22,7 +24,18 @@ internal static class UserTaskEntityConfiguration
             entity.Property(x => x.Summary).HasMaxLength(4000);
             entity.Property(x => x.Reference).HasMaxLength(500);
             entity.Property(x => x.TaskType).HasMaxLength(200);
-            entity.PrimitiveCollection(x => x.Tags).HasColumnName("TagsJson").IsRequired();
+            // Retain the JSON text schema instead of Npgsql's implicit native-array mapping.
+            entity.Property(x => x.Tags)
+                .HasColumnName("TagsJson")
+                .HasColumnType("text")
+                .HasConversion(
+                    tags => JsonSerializer.Serialize(tags, (JsonSerializerOptions?)null),
+                    json => JsonSerializer.Deserialize<List<string>>(json, (JsonSerializerOptions?)null)!)
+                .IsRequired()
+                .Metadata.SetValueComparer(new ValueComparer<List<string>>(
+                    (left, right) => ReferenceEquals(left, right) || left != null && right != null && left.SequenceEqual(right),
+                    tags => tags.Aggregate(0, (hash, tag) => HashCode.Combine(hash, tag.GetHashCode())),
+                    tags => tags.ToList()));
             entity.Property(x => x.RequesterProvider).HasMaxLength(200);
             entity.Property(x => x.RequesterType).HasMaxLength(64);
             entity.Property(x => x.RequesterId).HasMaxLength(450);

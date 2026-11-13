@@ -12,12 +12,11 @@ namespace Elsa.UserTasks.Persistence.ConformanceTests;
 /// </summary>
 public sealed class ConformanceCoverageTests
 {
-    /// <summary>Providers that must run everywhere, including on a developer machine with no containers.</summary>
+    /// <summary>Providers required in every conformance run.</summary>
     private static readonly string[] RequiredProviders =
     [
         ConformanceProviders.InMemory,
-        ConformanceProviders.Sqlite,
-        ConformanceProviders.VNext
+        ConformanceProviders.PostgreSql
     ];
 
     [Test]
@@ -37,7 +36,7 @@ public sealed class ConformanceCoverageTests
     public async Task AProviderRequestedByTheEnvironmentIsNotQuietlyIgnored()
     {
         // Setting the variable to whitespace is the failure mode worth catching: it looks configured on the
-        // CI job and gates nothing, so the provider reports as skipped while the operator believes it ran.
+        // CI job but cannot select a database, so the provider must fail the coverage requirement.
         var misconfigured = ConformanceProviders.All
             .Where(x => x.ConnectionStringVariable is not null && !x.IsAvailable)
             .Where(x => Environment.GetEnvironmentVariable(x.ConnectionStringVariable!) is not null)
@@ -69,27 +68,14 @@ public sealed class ConformanceCoverageTests
         foreach (var provider in ConformanceProviders.All)
         {
             var status = provider.IsAvailable ? "covered" : $"**not covered** — {provider.SkipReason}";
-            builder.AppendLine($"| {provider.Name} | {Mark(provider.Name, Contract.Repository)} | {Mark(provider.Name, Contract.GuestSessions)} | {Mark(provider.Name, Contract.Outbox)} | {status} |");
+            builder.AppendLine($"| {provider.Name} | {Mark(provider.Name)} | {Mark(provider.Name)} | {Mark(provider.Name)} | {status} |");
         }
 
         builder.AppendLine();
-        builder.AppendLine("`yes` means the suite ran against that contract in this run. A blank cell means the provider");
-        builder.AppendLine("ships no implementation of it; `no` means it has one that this run did not exercise.");
+        builder.AppendLine("`yes` means the suite ran against that contract in this run; `no` means this run did not exercise it.");
         return builder.ToString();
     }
 
-    private static string Mark(string providerName, Contract contract)
-    {
-        // VNext ships a repository only. Saying so beats leaving it to be inferred from an absent class.
-        if (providerName == ConformanceProviders.VNext && contract != Contract.Repository)
-            return "n/a";
-        return ConformanceProviders.Get(providerName).IsAvailable ? "yes" : "no";
-    }
-
-    private enum Contract
-    {
-        Repository,
-        GuestSessions,
-        Outbox
-    }
+    private static string Mark(string providerName) =>
+        ConformanceProviders.Get(providerName).IsAvailable ? "yes" : "no";
 }

@@ -84,7 +84,7 @@ Elsa includes typed input/output models, variables, workflow input, activity out
 
 ### Persistence-Agnostic Architecture
 
-Elsa is persistence-agnostic and includes persistence packages for EF Core providers such as SQLite, SQL Server, PostgreSQL, MySQL, and Oracle. Extension packages also add Dapper and MongoDB persistence options. This lets teams choose infrastructure that fits existing operational standards.
+Elsa provides store interfaces with in-memory implementations for development and PostgreSQL EF Core packages for durable deployments. PostgreSQL and in-memory are the supported storage backends in this source tree.
 
 ### Multi-Tenancy and Identity
 
@@ -108,9 +108,9 @@ Elsa stores workflow and activity execution records that can be exposed through 
 
 `Elsa.Diagnostics.StructuredLogs` captures semantic `ILogger` events from Elsa hosts, redacts sensitive data, stores recent records, exposes REST query endpoints, and streams live events to Studio over SignalR. Records include rendered messages, templates, properties, scopes, exceptions, source metadata, trace/span IDs, workflow context, tenant, and correlation fields.
 
-### Durable Structured Log Persistence
+### Structured Log Storage
 
-Structured logs default to a bounded in-memory store, with relational/SQLite persistence available for durable storage. The design includes bounded write queues, batch writes, retention services, storage diagnostics, and dropped-write reporting.
+Structured logs use bounded, process-local in-memory history and live streaming. No durable structured-log backend is bundled. Shared relational contracts remain available for host extensions.
 
 ### Console Log Streaming
 
@@ -216,7 +216,7 @@ The extensions repository includes connection modules for registering, describin
 
 ### SQL Automation
 
-The SQL extension provides `SqlQuery`, `SqlCommand`, and `SqlSingleValue` activities, with providers for MySQL, PostgreSQL, SQLite, and SQL Server. It supports parameterization of workflow inputs, outputs, variables, activity context, execution context, workflow properties, POCOs, dictionaries, arrays, lists, and JSON objects, plus SQL syntax highlighting in Studio.
+The SQL extension provides `SqlQuery`, `SqlCommand`, and `SqlSingleValue` activities, with PostgreSQL as the supported database in this source tree. It supports parameterization of workflow inputs, outputs, variables, activity context, execution context, workflow properties, POCOs, dictionaries, arrays, lists, and JSON objects, plus SQL syntax highlighting in Studio.
 
 ### CSV Processing
 
@@ -248,11 +248,11 @@ Extensions include distributed caching modules over MassTransit and Proto.Actor.
 
 ### Scheduling Backends
 
-Extensions include Hangfire and Quartz scheduling packages, with Quartz EF Core providers for MySQL, PostgreSQL, SQL Server, and SQLite. This lets teams use mature scheduling infrastructure behind Elsa's workflow scheduling concepts.
+Extensions include Hangfire and Quartz scheduling packages. PostgreSQL is the supported durable database for this source tree's deployment guidance.
 
 ### Persistence Extensions
 
-Extensions add persistence options such as Dapper, MongoDB, and Elasticsearch. These broaden deployment choices for organizations that standardize on specific storage technologies.
+Core persistence supports PostgreSQL and in-memory stores. Other database adapters are outside the supported package set.
 
 ### File and Blob Storage
 

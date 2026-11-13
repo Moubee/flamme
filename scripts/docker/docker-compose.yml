@@ -28,17 +28,6 @@
       - "8600:8600/udp"
     command: "agent -server -bootstrap-expect 3 -ui -client 0.0.0.0"
   
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - 1433:1433
-    environment:
-      MSSQL_SA_PASSWORD: "Elsa2022!"
-      ACCEPT_EULA: "Y"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    restart: unless-stopped
-  
   postgres:
     image: postgres:13.3-alpine
     container_name: elsa3-postgres
@@ -50,26 +39,6 @@
       - "5432:5432"
     volumes:
       - pgdata-3:/var/lib/postgresql/data
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "127.0.0.1:27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-  
-  mysql:
-    image: arm64v8/mysql
-    restart: always
-    environment:
-      MYSQL_DATABASE: 'elsa'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
-    ports:
-      - '3306:3306'
-    expose:
-      - '3306'
 
   citusdata:
     image: citusdata/citus:13.0
@@ -135,9 +104,7 @@ networks:
   consul:
 
 volumes:
-  mongodb_data:
   pgdata-3:
-  sqlserver_data:
   citusdata_data:
   elasticsearch-data:
     driver: local

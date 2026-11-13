@@ -1,7 +1,6 @@
 using Elsa.AI.Abstractions.Contracts;
 using Elsa.AI.Persistence.EFCore;
 using Elsa.Extensions;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,10 +13,8 @@ public class AIPersistenceLifetimeTests
     public async Task EFCoreConversationPersistenceResolvesWithScopeValidationEnabled()
     {
         var services = new ServiceCollection();
-        using var connection = new SqliteConnection("DataSource=:memory:");
-        connection.Open();
         services.AddAIHostServices();
-        services.AddAIPersistenceStores(options => options.UseSqlite(connection));
+        services.AddAIPersistenceStores(options => options.UseNpgsql("Host=localhost;Database=elsa_registration"));
 
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions
         {
@@ -25,7 +22,6 @@ public class AIPersistenceLifetimeTests
             ValidateOnBuild = true
         });
         using var scope = provider.CreateScope();
-        scope.ServiceProvider.GetRequiredService<AIDbContext>().Database.EnsureCreated();
 
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAIOrchestrator>()).IsNotNull();
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAIConversationStore>()).IsNotNull();

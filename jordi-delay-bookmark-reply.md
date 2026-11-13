@@ -188,28 +188,28 @@ The least invasive database-style nudge is to insert a bookmark queue item and l
 
 Important: the exact table and column names can vary by Elsa version and provider, so please confirm your version before using SQL like this.
 
-Illustrative SQL Server example:
+Illustrative PostgreSQL example:
 
 ```sql
-INSERT INTO Elsa.BookmarkQueueItems
+INSERT INTO "Elsa"."BookmarkQueueItems"
 (
-    Id,
-    WorkflowInstanceId,
-    BookmarkId,
-    ActivityInstanceId,
-    ActivityTypeName,
-    CreatedAt,
-    SerializedOptions,
-    TenantId
+    "Id",
+    "WorkflowInstanceId",
+    "BookmarkId",
+    "ActivityInstanceId",
+    "ActivityTypeName",
+    "CreatedAt",
+    "SerializedOptions",
+    "TenantId"
 )
 VALUES
 (
-    LOWER(REPLACE(CONVERT(varchar(36), NEWID()), '-', '')),
+    replace(gen_random_uuid()::text, '-', ''),
     '2f95829eb7abe851',
     '2cdf1537300ebbde',
     '2aacb800a50923f4',
     'Elsa.Delay',
-    SYSUTCDATETIME(),
+    CURRENT_TIMESTAMP,
     NULL,
     NULL
 );

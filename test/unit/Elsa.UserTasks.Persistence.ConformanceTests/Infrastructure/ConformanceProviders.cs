@@ -10,26 +10,13 @@ namespace Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
 public static class ConformanceProviders
 {
     public const string InMemory = "InMemory";
-    public const string Sqlite = "EFCore.Sqlite";
-    public const string SqlServer = "EFCore.SqlServer";
     public const string PostgreSql = "EFCore.PostgreSql";
-    public const string Oracle = "EFCore.Oracle";
-    public const string MySql = "EFCore.MySql";
-    public const string VNext = "VNext.Sqlite";
 
     /// <summary>Every provider, in report order. Availability is resolved once per test run.</summary>
     public static IReadOnlyList<ConformanceProvider> All { get; } =
     [
         Always(InMemory, "Elsa.UserTasks in-process stores"),
-        Always(Sqlite, "Elsa.UserTasks.Persistence.EFCore over SQLite"),
-        Always(VNext, "Elsa.UserTasks.Persistence.VNext over the SQLite document store"),
-        Gated(SqlServer, "Elsa.UserTasks.Persistence.EFCore over SQL Server", "ELSA_USERTASKS_TEST_SQLSERVER"),
-        Gated(PostgreSql, "Elsa.UserTasks.Persistence.EFCore over PostgreSQL", "ELSA_USERTASKS_TEST_POSTGRES"),
-        Gated(Oracle, "Elsa.UserTasks.Persistence.EFCore over Oracle", "ELSA_USERTASKS_TEST_ORACLE"),
-        Blocked(MySql, "Elsa.UserTasks.Persistence.EFCore over MySQL",
-            "Pomelo.EntityFrameworkCore.MySql 9.0.0 caps Microsoft.EntityFrameworkCore.Relational at 9.0.x while this " +
-            "repository targets 10.0.9, so the module cannot be referenced from a test project at all (NU1107). " +
-            "This provider is uncovered until the Pomelo pin moves to an EF Core 10 release.")
+        RequiredPostgreSql()
     ];
 
     public static ConformanceProvider Get(string name) =>
@@ -37,18 +24,21 @@ public static class ConformanceProviders
 
     private static ConformanceProvider Always(string name, string description) => new(name, description, null, null);
 
-    private static ConformanceProvider Gated(string name, string description, string variable) => new(
-        name, description, variable,
-        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(variable))
-            ? null
-            : $"{description} is not covered by this run: set {variable} to a non-empty, non-whitespace connection string to include it.");
+    private static ConformanceProvider RequiredPostgreSql()
+    {
+        const string variable = "ELSA_USERTASKS_TEST_POSTGRES";
+        var configured = Environment.GetEnvironmentVariable(variable);
+        var reason = configured is not null && string.IsNullOrWhiteSpace(configured)
+            ? $"{variable} is set but empty or whitespace. Supply a PostgreSQL connection string or unset it to use an isolated test database."
+            : null;
+        return new(PostgreSql, "Elsa.UserTasks.Persistence.EFCore over PostgreSQL", variable, reason);
+    }
 
-    private static ConformanceProvider Blocked(string name, string description, string reason) => new(name, description, null, reason);
 }
 
 /// <param name="Name">The stable provider key used by <see cref="ConformanceProviderAttribute"/>.</param>
 /// <param name="Description">Human-readable description used in the coverage report.</param>
-/// <param name="ConnectionStringVariable">The environment variable carrying the connection string, when gated.</param>
+/// <param name="ConnectionStringVariable">The environment variable carrying an optional explicit database connection string.</param>
 /// <param name="SkipReason">Null when the provider runs; otherwise the reason it does not.</param>
 public sealed record ConformanceProvider(string Name, string Description, string? ConnectionStringVariable, string? SkipReason)
 {

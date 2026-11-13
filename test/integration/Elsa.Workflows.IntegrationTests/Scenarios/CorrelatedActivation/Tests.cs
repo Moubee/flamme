@@ -1,3 +1,4 @@
+using Elsa.Testing.Shared.Databases;
 using System.Collections.Concurrent;
 using Elsa.Common.Models;
 using Elsa.Extensions;
@@ -137,17 +138,17 @@ public class Tests
     }
 
     [Test]
-    [DisplayName("Concurrent dispatch on two runtime nodes sharing SQLite and a distributed lock persists one Running instance")]
+    [DisplayName("Concurrent dispatch on two runtime nodes sharing PostgreSQL and a distributed lock persists one Running instance")]
     public async Task ConcurrentDispatch_AcrossRuntimeNodes_CreatesOneRunningInstance()
     {
-        var databasePath = Path.Join(Path.GetTempPath(), $"elsa-activation-multinode-{Guid.NewGuid():N}.db");
-        var connectionString = $"Data Source={databasePath};Default Timeout=30;Pooling=False";
+        await using var database = new PostgreSqlTestDatabase();
+        var connectionString = database.ConnectionString;
         var lockProvider = new BarrierDistributedLockProvider();
 
         try
         {
-            await using var nodeA = CreateSqliteServices(connectionString, lockProvider);
-            await using var nodeB = CreateSqliteServices(connectionString, lockProvider);
+            await using var nodeA = CreatePostgreSqlServices(connectionString, lockProvider);
+            await using var nodeB = CreatePostgreSqlServices(connectionString, lockProvider);
             await Assert.That(nodeB).IsNotSameReferenceAs(nodeA);
             await Assert.That(nodeA.GetRequiredService<IDistributedLockProvider>()).IsSameReferenceAs(lockProvider);
             await Assert.That(nodeB.GetRequiredService<IDistributedLockProvider>()).IsSameReferenceAs(lockProvider);
@@ -173,7 +174,7 @@ public class Tests
                     dispatcherB.DispatchAsync(new DispatchWorkflowDefinitionRequest(graphB.Workflow.Identity.Id) { CorrelationId = "shared-runtime-correlation" }, null));
 
                 await lockProvider.TwoActivationLockAttempts.Task.WaitAsync(TimeSpan.FromSeconds(10));
-                // The SQLite connection timeout is 30 seconds; allow a transient provider lock wait
+                // The PostgreSQL connection timeout is 30 seconds; allow a transient provider lock wait
                 // to complete so the assertion timeout does not fire before the persistence timeout.
                 await lockProvider.TwoActivationLockReleases.Task.WaitAsync(TimeSpan.FromSeconds(40));
 
@@ -196,8 +197,6 @@ public class Tests
         finally
         {
             lockProvider.ReleaseActivationBarrier();
-            if (File.Exists(databasePath))
-                File.Delete(databasePath);
         }
     }
 
@@ -475,12 +474,12 @@ public class Tests
             .Build();
     }
 
-    private ServiceProvider CreateSqliteServices(string connectionString, IDistributedLockProvider lockProvider)
+    private ServiceProvider CreatePostgreSqlServices(string connectionString, IDistributedLockProvider lockProvider)
     {
         var builder = new TestApplicationBuilder(_testOutputHelper)
             .ConfigureElsa(elsa => elsa
                 .UseWorkflowManagement(management => management.UseWorkflowInstances(instances =>
-                    instances.UseEntityFrameworkCore(persistence => persistence.UseSqlite(connectionString))))
+                    instances.UseEntityFrameworkCore(persistence => persistence.UsePostgreSql(connectionString))))
                 .UseWorkflowRuntime(runtime => runtime.DistributedLockProvider = _ => lockProvider));
 
         return (ServiceProvider)builder

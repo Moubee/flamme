@@ -1,5 +1,7 @@
 # Issue #8101: TUnit migration research and rollout plan
 
+> Historical snapshot: provider lists, commands, and test counts below describe the assessed revision. Current support is PostgreSQL and in-memory only; removed provider packages and vNext tests are no longer available. See the [storage upgrade guide](../postgres-inmemory-migration.md).
+
 Status: **3.9.0 release synchronization: 61 active test projects on TUnit/MTP; see the current validation report below**
 Recorded: 2026-09-13
 Updated: 2026-11-13

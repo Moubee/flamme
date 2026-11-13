@@ -364,7 +364,7 @@ public sealed class InMemoryLabelStoreConformanceTests : LabelStoreConformanceTe
 }
 
 [InheritsTests]
-public sealed class SqliteLabelStoreConformanceTests : LabelStoreConformanceTests
+public sealed class PostgreSqlLabelStoreConformanceTests : LabelStoreConformanceTests
 {
-    protected override Task<LabelStoreScenario> CreateScenarioAsync() => LabelStoreScenario.CreateSqliteAsync();
+    protected override Task<LabelStoreScenario> CreateScenarioAsync() => LabelStoreScenario.CreatePostgreSqlAsync();
 }

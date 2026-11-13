@@ -1,5 +1,7 @@
 # Requirements Checklist: Structured Log Persistence
 
+> Historical design, superseded 2026-11-13: the durable structured-log provider and its tests have been removed. Only bounded in-memory storage is bundled; the relational contracts remain extension points. See the [storage upgrade guide](../../../doc/postgres-inmemory-migration.md).
+
 - [x] Requirements preserve in-memory behavior as the default.
 - [x] Requirements define SQLite as the only initial durable provider.
 - [x] Requirements separate storage, live feed, and provider facade responsibilities.

@@ -3,7 +3,7 @@
 ## Test Stack and Commands
 
 - Runner and framework: Microsoft Testing Platform with TUnit 1.66.27.
-- Assertion/mocking: TUnit assertions, NSubstitute 5.3.0, ASP.NET Core TestServer, SQLite in-memory EF Core.
+- Assertion/mocking: TUnit assertions, NSubstitute 5.3.0, ASP.NET Core TestServer, in-memory stores, and PostgreSQL integration fixtures.
 
 ```bash
 dotnet test --solution Elsa.sln
@@ -30,7 +30,7 @@ are forwarded to each TUnit test application.
 | Scope | Covered | Typical target | Notes |
 |---|---|---|---|
 | Unit | Yes | Validators, in-memory stores, isolated services | Fast and dependency-light |
-| Integration | Yes | Broker flow, REST endpoints, SQLite persistence | Used for external-auth tracking regression |
+| Integration | Yes | Broker flow, REST endpoints, PostgreSQL persistence | Used for external-auth tracking regression |
 | Component | Yes | Workflow runtime behavior | Not needed for this identity defect |
 | E2E browser | `[TODO]` | Studio rendering | Studio repository is separate |
 
@@ -38,7 +38,7 @@ are forwarded to each TUnit test application.
 
 - Prefer real in-memory provisioners and stores for state assertions.
 - Substitute adapters, role providers, and notification senders at boundaries.
-- SQLite `Data Source=:memory:` provides isolated durable-store tests.
+- Use a dedicated PostgreSQL test database for durable-store tests. EF Core InMemory is suitable only for provider-independent behavior; it does not verify relational constraints or transactions.
 
 ## Coverage and Quality Signals
 

@@ -5,7 +5,6 @@ using Elsa.Alterations.Core.Filters;
 using Elsa.Alterations.Core.Models;
 using Elsa.Common.Multitenancy;
 using Elsa.Persistence.EFCore;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -21,7 +20,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenOtherNamedTenantOwnsPlanId_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Plans.SaveAsync(Plan("shared", "tenant-a", AlterationPlanStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -38,7 +37,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenAgnosticPlanExists_NamedTenantThrowsAndLeavesOwnerAndPayload()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(Tenant.AgnosticTenantId);
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(Tenant.AgnosticTenantId);
         await scenario.Plans.SaveAsync(Plan("shared", Tenant.AgnosticTenantId, AlterationPlanStatus.Running, "original"));
 
         using (scenario.UseTenant("tenant-b"))
@@ -58,7 +57,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenAmbientForgesOwnerTenantIdOnPlan_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Plans.SaveAsync(Plan("shared", "tenant-a", AlterationPlanStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -75,7 +74,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenSameTenantOwnsPlanId_UpdatesPayload()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Plans.SaveAsync(Plan("plan-a", "tenant-a", AlterationPlanStatus.Pending, "before"));
 
         await scenario.Plans.SaveAsync(Plan("plan-a", "tenant-a", AlterationPlanStatus.Completed, "after"));
@@ -87,7 +86,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenIncomingPlanTenantDiffers_PreservesExistingTenantId()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Plans.SaveAsync(Plan("plan-a", "tenant-a", AlterationPlanStatus.Pending, "before"));
 
         await scenario.Plans.SaveAsync(Plan("plan-a", "tenant-b", AlterationPlanStatus.Completed, "after"));
@@ -99,7 +98,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenAmbientIsAgnostic_UpdatesAgnosticPlan()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(Tenant.AgnosticTenantId);
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(Tenant.AgnosticTenantId);
         await scenario.Plans.SaveAsync(Plan("shared", Tenant.AgnosticTenantId, AlterationPlanStatus.Pending, "before"));
 
         await scenario.Plans.SaveAsync(Plan("shared", Tenant.AgnosticTenantId, AlterationPlanStatus.Completed, "after"));
@@ -111,7 +110,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenOtherNamedTenantOwnsJobId_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Jobs.SaveAsync(Job("shared", "tenant-a", AlterationJobStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -128,7 +127,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenAmbientForgesOwnerTenantIdOnJob_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Jobs.SaveAsync(Job("shared", "tenant-a", AlterationJobStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -145,7 +144,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenOtherNamedTenantOwnsJobId_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Jobs.SaveAsync(Job("shared", "tenant-a", AlterationJobStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -161,7 +160,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenAmbientForgesOwnerTenantIdOnJob_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Jobs.SaveAsync(Job("shared", "tenant-a", AlterationJobStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -178,7 +177,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenAgnosticJobExists_NamedTenantThrowsAndLeavesOwnerAndPayload()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(Tenant.AgnosticTenantId);
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(Tenant.AgnosticTenantId);
         await scenario.Jobs.SaveAsync(Job("shared", Tenant.AgnosticTenantId, AlterationJobStatus.Running, "original"));
 
         using (scenario.UseTenant("tenant-b"))
@@ -197,7 +196,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenSameTenantOwnsJobId_UpdatesPayload()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Jobs.SaveAsync(Job("job-a", "tenant-a", AlterationJobStatus.Pending, "before"));
 
         await scenario.Jobs.SaveManyAsync([Job("job-a", "tenant-a", AlterationJobStatus.Completed, "after")]);
@@ -209,7 +208,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenIncomingJobTenantDiffers_PreservesExistingTenantId()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Jobs.SaveAsync(Job("job-a", "tenant-a", AlterationJobStatus.Pending, "before"));
 
         await scenario.Jobs.SaveManyAsync([Job("job-a", "tenant-b", AlterationJobStatus.Completed, "after")]);
@@ -221,7 +220,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_WhenTenancyIsDisabled_UpdatesNamedAndAgnosticPlansThroughLegacyStore()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-b", tenantsEnabled: false);
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-b", tenantsEnabled: false);
         await scenario.Plans.SaveAsync(Plan("named", "tenant-a", AlterationPlanStatus.Pending, "before"));
         await scenario.Plans.SaveAsync(Plan("agnostic", Tenant.AgnosticTenantId, AlterationPlanStatus.Pending, "before"));
 
@@ -235,7 +234,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenTenancyIsDisabled_UpdatesNamedAndAgnosticJobsThroughLegacyStore()
     {
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync("tenant-b", tenantsEnabled: false);
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-b", tenantsEnabled: false);
         await scenario.Jobs.SaveAsync(Job("named", "tenant-a", AlterationJobStatus.Pending, "before"));
         await scenario.Jobs.SaveAsync(Job("agnostic", Tenant.AgnosticTenantId, AlterationJobStatus.Pending, "before"));
 
@@ -253,10 +252,10 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_WhenDirectPlanUpdateFails_InvokesDbExceptionHandler()
     {
         var handler = new RecordingDbExceptionHandler();
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"AlterationPlans\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationPlans\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Plans.SaveAsync(Plan(
@@ -272,10 +271,10 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_WhenDirectJobInsertFails_InvokesDbExceptionHandler()
     {
         var handler = new RecordingDbExceptionHandler();
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"Elsa\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveAsync(Job(
@@ -291,10 +290,10 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveManyAsync_WhenDirectJobUpdateFails_InvokesDbExceptionHandlerAfterRetryBoundary()
     {
         var handler = new RecordingDbExceptionHandler();
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveManyAsync([
@@ -308,7 +307,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_WhenPlanIdIsHidden_DoesNotSendOwnershipConflictToDbExceptionHandler()
     {
         var handler = new RecordingDbExceptionHandler();
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
             dbExceptionHandler: handler);
@@ -327,7 +326,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_WhenJobIdIsHidden_DoesNotSendOwnershipConflictToDbExceptionHandler()
     {
         var handler = new RecordingDbExceptionHandler();
-        await using var scenario = await AlterationStoreScenario.CreateSqliteAsync(
+        await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
             dbExceptionHandler: handler);
@@ -346,7 +345,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_ConcurrentSameTenantPlanId_BothWritersSucceedAndOnePayloadWins()
     {
         var gate = new GateFirstAlterationUpdates("AlterationPlans");
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync("tenant-a", "tenant-a", gate);
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync("tenant-a", "tenant-a", gate);
         gate.Arm();
 
         var results = await Task.WhenAll(
@@ -368,7 +367,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenBatchCollides_RollsBackEarlierInserts()
     {
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Jobs.SaveAsync(Job("owned", "tenant-a", AlterationJobStatus.Running, "original"));
 
         using (owner.UseTenant("tenant-b"))
@@ -390,7 +389,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_ConcurrentNamedTenantsOnEmptyPlanId_OneOwnerKeepsPayload()
     {
         var gate = new GateFirstAlterationUpdates("AlterationPlans");
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync("tenant-a", "tenant-b", gate);
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync("tenant-a", "tenant-b", gate);
         gate.Arm();
 
         var results = await Task.WhenAll(
@@ -417,7 +416,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveAsync_ConcurrentNamedVersusAgnosticOnExistingStarPlan_PreservesStarPayload()
     {
         var gate = new GateFirstAlterationUpdates("AlterationPlans");
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync(Tenant.AgnosticTenantId, "tenant-b", gate);
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync(Tenant.AgnosticTenantId, "tenant-b", gate);
         await pair.First.Plans.SaveAsync(Plan("shared", Tenant.AgnosticTenantId, AlterationPlanStatus.Running, "original"));
         gate.Arm();
 
@@ -445,12 +444,10 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     public async Task SaveManyAsync_ConcurrentNamedTenantsOnEmptyJobId_OneOwnerKeepsPayload()
     {
         var gate = new GateFirstAlterationUpdates("AlterationJobs", gateBeforeExecution: true);
-        var transactionInterceptor = new DeferredSqliteTransactionInterceptor();
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync(
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync(
             "tenant-a",
             "tenant-b",
-            gate,
-            transactionInterceptor);
+            gate);
         gate.Arm();
 
         var results = await Task.WhenAll(
@@ -477,7 +474,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_ConcurrentNamedVersusAgnosticOnExistingStarJob_PreservesStarPayload()
     {
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync(Tenant.AgnosticTenantId, "tenant-b");
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync(Tenant.AgnosticTenantId, "tenant-b");
         await pair.First.Jobs.SaveAsync(Job("shared", Tenant.AgnosticTenantId, AlterationJobStatus.Running, "original"));
 
         var results = await Task.WhenAll(
@@ -503,8 +500,8 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
     [Test]
     public async Task SaveAsync_ConcurrentNamedTenantsOnExistingNamedPlan_PreservesOriginalOwnerAndPayload()
     {
-        await using var pair = await AlterationStoreScenario.CreateSqlitePairAsync("tenant-b", "tenant-c");
-        await using var owner = await AlterationStoreScenario.CreateSqliteAsync("tenant-a", pair.DatabasePath, ownsDatabaseFile: false);
+        await using var pair = await AlterationStoreScenario.CreatePostgreSqlPairAsync("tenant-b", "tenant-c");
+        await using var owner = await AlterationStoreScenario.CreatePostgreSqlAsync("tenant-a", pair.ConnectionString);
         await owner.Plans.SaveAsync(Plan("shared", "tenant-a", AlterationPlanStatus.Running, "original"));
 
         var results = await Task.WhenAll(
@@ -580,7 +577,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
 /// Coordinates the first two relevant alteration UPDATE commands so competing writers
 /// reach their INSERT/retry paths together. By default the gate releases them after
 /// execution; the batch race gates before execution so an explicit transaction does not
-/// hold a SQLite writer lock while waiting. The gate is armed explicitly after setup writes.
+/// hold a PostgreSQL writer lock while waiting. The gate is armed explicitly after setup writes.
 /// </summary>
 public sealed class GateFirstAlterationUpdates(
     string tableName,
@@ -622,7 +619,7 @@ public sealed class GateFirstAlterationUpdates(
     }
 
     private bool IsArmedAlterationUpdate(DbCommand command) =>
-        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"{tableName}\"", StringComparison.OrdinalIgnoreCase);
+        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"Elsa\".\"{tableName}\"", StringComparison.OrdinalIgnoreCase);
 
     private async Task CoordinateAsync(CancellationToken cancellationToken)
     {
@@ -637,29 +634,6 @@ public sealed class GateFirstAlterationUpdates(
 
             await _bothReached.Task.WaitAsync(TimeSpan.FromSeconds(15), cancellationToken);
         }
-    }
-}
-
-/// <summary>
-/// Uses a deferred SQLite transaction for the gated batch race. The normal SQLite
-/// transaction starts with <c>BEGIN IMMEDIATE</c>, which reserves the writer lock before
-/// a command interceptor can coordinate both writers.
-/// </summary>
-public sealed class DeferredSqliteTransactionInterceptor : DbTransactionInterceptor
-{
-    public override ValueTask<InterceptionResult<DbTransaction>> TransactionStartingAsync(
-        DbConnection connection,
-        TransactionStartingEventData eventData,
-        InterceptionResult<DbTransaction> result,
-        CancellationToken cancellationToken = default)
-    {
-        if (connection is SqliteConnection sqliteConnection)
-        {
-            var transaction = sqliteConnection.BeginTransaction(deferred: true);
-            return ValueTask.FromResult(InterceptionResult<DbTransaction>.SuppressWithResult(transaction));
-        }
-
-        return ValueTask.FromResult(result);
     }
 }
 

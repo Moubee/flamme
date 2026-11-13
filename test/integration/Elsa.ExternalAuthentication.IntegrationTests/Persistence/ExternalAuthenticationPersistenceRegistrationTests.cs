@@ -1,9 +1,9 @@
 using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Sqlite.ShellFeatures;
+using Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ShellFeatures;
 using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
 using Elsa.ExternalAuthentication.Services;
 using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Persistence.EFCore.Sqlite.ShellFeatures.Identity;
+using Elsa.Persistence.EFCore.PostgreSql.ShellFeatures.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
@@ -23,14 +23,14 @@ public class ExternalAuthenticationPersistenceRegistrationTests
     }
 
     [Test]
-    public async Task SqliteIdentityShellFeatureDoesNotRegisterExternalAuthenticationPersistence()
+    public async Task PostgreSqlIdentityShellFeatureDoesNotRegisterExternalAuthenticationPersistence()
     {
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new SqliteIdentityPersistenceShellFeature
+        var feature = new PostgreSqlIdentityPersistenceFeature
         {
-            ConnectionString = "Data Source=:memory:"
+            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
         };
         feature.ConfigureServices(services);
 
@@ -41,14 +41,14 @@ public class ExternalAuthenticationPersistenceRegistrationTests
     }
 
     [Test]
-    public async Task SqliteExternalAuthenticationShellFeatureRegistersEntityFrameworkCoreStores()
+    public async Task PostgreSqlExternalAuthenticationShellFeatureRegistersEntityFrameworkCoreStores()
     {
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new SqliteExternalAuthenticationPersistenceShellFeature
+        var feature = new PostgreSqlExternalAuthenticationPersistenceShellFeature
         {
-            ConnectionString = "Data Source=:memory:"
+            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
         };
         feature.ConfigureServices(services);
 
@@ -66,9 +66,9 @@ public class ExternalAuthenticationPersistenceRegistrationTests
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new SqliteExternalAuthenticationPersistenceShellFeature
+        var feature = new PostgreSqlExternalAuthenticationPersistenceShellFeature
         {
-            ConnectionString = "Data Source=:memory:"
+            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
         };
         feature.ConfigureServices(services);
 

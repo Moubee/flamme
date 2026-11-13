@@ -1,3 +1,4 @@
+using Elsa.Testing.Shared.Databases;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +34,7 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
     where TEntryPoint : class
 {
     private string? _testRoot;
+    private PostgreSqlTestDatabase? _database;
     private IReadOnlyDictionary<string, string?>? _testConfiguration;
     private bool _entryPointProcessStateCaptured;
 
@@ -84,7 +86,8 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
 
     protected string TestRoot => _testRoot ?? throw new InvalidOperationException("The per-test host root has not been initialized.");
 
-    protected string GetConnectionString(string fileName) => $"Data Source={Path.Join(TestRoot, fileName)};Pooling=False";
+    protected string ConnectionString => _database?.ConnectionString
+        ?? throw new InvalidOperationException("The per-test PostgreSQL database has not been initialized.");
 
     protected string CreateDirectory(string name)
     {
@@ -107,6 +110,8 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
         Directory.CreateDirectory(_testRoot);
         CaptureEntryPointProcessState();
         _entryPointProcessStateCaptured = true;
+        _database = new PostgreSqlTestDatabase();
+        await _database.OpenAsync();
         _testConfiguration = CreateTestConfiguration();
         GlobalFactory.SetStartupConfiguration(_testConfiguration);
         await base.SetupAsync();
@@ -123,7 +128,7 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
 
     /// <remarks>
     /// TUnit disposes the test instance after inherited <c>After(Test)</c> hooks, so the application factory
-    /// and its SQLite connections are gone before this invocation-owned directory is removed.
+    /// and its PostgreSQL connections are gone before the invocation-owned database and directory are removed.
     /// </remarks>
     public async ValueTask DisposeAsync()
     {
@@ -140,6 +145,16 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
         catch (Exception ex)
         {
             cleanupException = ex;
+        }
+
+        try
+        {
+            if (_database is not null)
+                await _database.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            cleanupException = cleanupException is null ? ex : new AggregateException(cleanupException, ex);
         }
 
         try

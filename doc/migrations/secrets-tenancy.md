@@ -54,15 +54,8 @@ The default tenant id is `""` (`Tenant.DefaultTenantId`), the same sentinel Labe
 would have left `TenantId` null now persist `""`, so they participate in `(TenantId, NormalizedName)`.
 
 `SecretDefaultTenantUniqueness` stamps leftover nulls from `SecretTenancy` to `""` and rebuilds that unique
-index. SQL Server still creates the composite index with a `TenantId IS NOT NULL` filter; after the stamp
-those rows are non-null, so they collide in it. SQLite, PostgreSQL and MySQL treat nulls as distinct — the
-stamp is what brings them into the index.
-
-Oracle is different: it stores `''` as `NULL`, so the stamp is a no-op and a `TenantId IS NOT NULL` filter
-would leave every default-tenant row outside the index. That provider creates a function-based unique index
-on `NVL(TenantId, CHR(1))` plus `NormalizedName` instead. `CHR(1)` is not a tenant id; it only exists so
-NULL default-tenant names share one index key. The EF model snapshot cannot express `NVL`, so it looks like
-the other unfiltered unique indexes; the physical Oracle index is the function-based one from this migration.
+index. PostgreSQL treats nulls as distinct, so the stamp makes default-tenant rows participate in
+the same unique index key.
 
 The migration does not delete duplicates: it lists leftover `(TenantId, NormalizedName)` keys and aborts,
 then the unique index fails loudly if any remain.
@@ -71,27 +64,9 @@ then the unique index fails loudly if any remain.
 that somehow remains unstamped stays visible there. File and InMemory already treat null and `""` as the
 same tenant for uniqueness.
 
-## The MySQL provider ships for net8.0 and net9.0 only
+## Supported persistence
 
-`Elsa.Secrets.Persistence.EFCore.MySql` targets `net8.0;net9.0`, while the Sqlite, SQL Server, PostgreSQL and
-Oracle secrets providers also target `net10.0`. That is a dependency constraint, not an oversight:
-`Pomelo.EntityFrameworkCore.MySql` tops out at 9.0.0, built for EF Core 9, so there is no net10.0 provider to
-build against. Every MySQL project in the repository carries the same pin, and the secrets one additionally
-inherits it by referencing `Elsa.Persistence.EFCore.MySql`.
-
-A net10.0 host referencing the MySQL secrets provider resolves the net9.0 asset and runs normally, including
-the `SecretTenancy` migration — migrations are ordinary C# and do not depend on the host framework. The pins
-come out together once Pomelo ships for EF Core 10.
-
-## The VNext persistence provider does not support this
-
-`Elsa.Secrets.Persistence.VNext` stores documents keyed by secret name alone, and `Elsa.Persistence.VNext` has
-no tenant concept to filter on. Rather than silently serve one tenant's secret to another, it now throws when
-used outside the default tenant context. If you run multitenancy, use an Entity Framework Core secrets
-provider. Single-tenant deployments are unaffected.
-
-Making it tenant-aware means changing the document id scheme, which relocates existing documents — a storage
-change to make deliberately rather than fold into this one.
+Use PostgreSQL for durable secrets or the core in-memory store for development and tests. Legacy provider and persistence-system upgrades are covered in the [storage migration guide](../postgres-inmemory-migration.md).
 
 ## Configuration-backed secrets
 

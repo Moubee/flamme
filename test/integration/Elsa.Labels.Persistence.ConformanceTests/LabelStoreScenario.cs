@@ -7,17 +7,18 @@ using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.EntityHandlers;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Labels;
-using Elsa.Persistence.EFCore.Sqlite;
+using Elsa.Persistence.EFCore.PostgreSql;
 using Elsa.Tenants.Options;
+using Elsa.Testing.Shared.Databases;
 using Elsa.Testing.Shared.Multitenancy;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Elsa.Labels.Persistence.ConformanceTests;
 
 /// <summary>
-/// Holds one InMemory or EF/SQLite pair of Labels stores and the ambient tenant they read.
+/// Holds one InMemory or EF/PostgreSQL pair of Labels stores and the ambient tenant they read.
 /// </summary>
 public sealed class LabelStoreScenario(
     TestTenantAccessor tenantAccessor,
@@ -58,9 +59,9 @@ public sealed class LabelStoreScenario(
             () => ValueTask.CompletedTask));
     }
 
-    public static async Task<LabelStoreScenario> CreateSqliteAsync()
+    public static async Task<LabelStoreScenario> CreatePostgreSqlAsync()
     {
-        var databasePath = Path.Join(Path.GetTempPath(), $"elsa-labels-conformance-{Guid.NewGuid():N}.db");
+        var database = new PostgreSqlTestDatabase();
         var tenantAccessor = new TestTenantAccessor("tenant-a");
         ServiceProvider? services = null;
         IServiceScope? scope = null;
@@ -74,9 +75,9 @@ public sealed class LabelStoreScenario(
                 .Configure<TenantsOptions>(options => options.IsEnabled = true)
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-                .AddSqliteEntityModelCreatingHandlers()
+                .AddPostgreSqlEntityModelCreatingHandlers()
                 .AddDbContextFactory<LabelsElsaDbContext>((_, builder) =>
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={databasePath};Default Timeout=30"))
+                    builder.UseElsaPostgreSql(migrationsAssembly, database.ConnectionString))
                 .Decorate<IDbContextFactory<LabelsElsaDbContext>, TenantAwareDbContextFactory<LabelsElsaDbContext>>()
                 .AddScoped<EntityStore<LabelsElsaDbContext, Label>>()
                 .AddScoped<EntityStore<LabelsElsaDbContext, WorkflowDefinitionLabel>>()
@@ -96,13 +97,12 @@ public sealed class LabelStoreScenario(
                 scoped.GetRequiredService<EFCoreLabelStore>(),
                 associationStore,
                 associationStore,
-                AssertSqliteUniquenessConflictAsync,
+                AssertPostgreSqlUniquenessConflictAsync,
                 async () =>
                 {
                     scope.Dispose();
                     await services.DisposeAsync();
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(databasePath);
+                    await database.DisposeAsync();
                 });
         }
         catch
@@ -110,24 +110,22 @@ public sealed class LabelStoreScenario(
             scope?.Dispose();
             if (services is not null)
                 await services.DisposeAsync();
-            SqliteConnection.ClearAllPools();
-            File.Delete(databasePath);
+            await database.DisposeAsync();
             throw;
         }
     }
 
-    private static async Task AssertSqliteUniquenessConflictAsync(Func<Task> operation)
+    private static async Task AssertPostgreSqlUniquenessConflictAsync(Func<Task> operation)
     {
         var exception = await CaptureExceptionAsync(operation);
-        var sqliteException = exception switch
+        var postgresException = exception switch
         {
-            DbUpdateException { InnerException: SqliteException inner } => inner,
-            SqliteException direct => direct,
-            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a SQLite uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
+            DbUpdateException { InnerException: PostgresException inner } => inner,
+            PostgresException direct => direct,
+            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a PostgreSQL uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
         };
 
-        await Assert.That(sqliteException.SqliteErrorCode).IsEqualTo(19);
-        await Assert.That(sqliteException.Message).Contains("UNIQUE constraint failed").WithComparison(StringComparison.Ordinal);
+        await Assert.That(postgresException.SqlState).IsEqualTo("23505");
     }
 
     private static async Task<Exception?> CaptureExceptionAsync(Func<Task> operation)

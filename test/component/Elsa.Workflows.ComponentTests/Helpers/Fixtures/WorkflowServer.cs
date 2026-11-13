@@ -189,7 +189,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
                 identity.TokenOptions += options => options.SigningKey = TestSigningKey;
                 identity.UseEntityFrameworkCore(ef =>
                 {
-                    ef.UseSqlServer(GetConnectionString);
+                    ef.UsePostgreSql(GetConnectionString);
                     ef.RunMigrations = false;
                 });
             })
@@ -197,7 +197,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
             {
                 management.UseEntityFrameworkCore(ef =>
                 {
-                    ef.UseSqlServer(GetConnectionString);
+                    ef.UsePostgreSql(GetConnectionString);
                     ef.RunMigrations = false;
                 });
             })
@@ -205,7 +205,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
             {
                 runtime.UseEntityFrameworkCore(ef =>
                 {
-                    ef.UseSqlServer(GetConnectionString);
+                    ef.UsePostgreSql(GetConnectionString);
                     ef.RunMigrations = false;
                 });
                 runtime.DistributedLockProvider = serviceProvider =>
@@ -232,7 +232,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
             })
             .UseAlterations(alterations => alterations.UseEntityFrameworkCore(ef =>
             {
-                ef.UseSqlServer(GetConnectionString);
+                ef.UsePostgreSql(GetConnectionString);
                 ef.RunMigrations = false;
             }));
 

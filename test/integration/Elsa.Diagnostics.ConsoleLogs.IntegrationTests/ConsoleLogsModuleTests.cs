@@ -24,7 +24,5 @@ public class ConsoleLogsModuleTests
             .ToList();
 
         await Assert.That(references).DoesNotContain("Elsa.Diagnostics.StructuredLogs");
-        await Assert.That(references).DoesNotContain("Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite");
-        await Assert.That(references).DoesNotContain("ConsoleLogStreaming.Persistence.Sqlite");
     }
 }

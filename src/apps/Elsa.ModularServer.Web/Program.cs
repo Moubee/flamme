@@ -7,7 +7,7 @@ using Elsa.Diagnostics.ConsoleLogs.Dashboard.ShellFeatures;
 using Elsa.Diagnostics.StructuredLogs.Dashboard.ShellFeatures;
 using Elsa.ExternalAuthentication.OpenIdConnect.ShellFeatures;
 using Elsa.ExternalAuthentication.Secrets.ShellFeatures;
-using Elsa.UserTasks.Persistence.EFCore.Sqlite.ShellFeatures;
+using Elsa.UserTasks.Persistence.EFCore.PostgreSql.ShellFeatures;
 using Elsa.UserTasks.ShellFeatures;
 using Elsa.ModularServer.Web;
 using Elsa.ModularServer.Web.Catalog;
@@ -92,7 +92,7 @@ builder.AddShells(shells => shells
             typeof(StructuredLogsDashboardFeature),
             typeof(WorkflowsApiFeature),
             typeof(UserTasksFeature),
-            typeof(SqliteUserTasksPersistenceShellFeature));
+            typeof(PostgreSqlUserTasksPersistenceShellFeature));
     }));
 
 services.AddSingleton<PluginCatalog>();

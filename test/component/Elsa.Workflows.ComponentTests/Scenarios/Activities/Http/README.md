@@ -97,7 +97,7 @@ The `Workflows/` directory contains test workflow implementations:
 ### Prerequisites
 
 - .NET 10.0 SDK
-- Docker; the test session starts its SQL Server Testcontainer automatically
+- Docker; the test session starts its PostgreSQL Testcontainer automatically
 
 ### Running Tests
 

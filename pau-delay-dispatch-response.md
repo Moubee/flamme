@@ -10,7 +10,7 @@ Thanks for the detailed information and screenshots. The confirmed Elsa version 
 - So far, seeing only `Elsa.Delay` in the active `Bookmarks` table after the parent has passed `Dispatch Workflow` looks expected.
 - The current active blocker appears to be the Delay bookmark, so the next checks are Delay payload, Quartz trigger/job, logs, and workflow instance state.
 - Please send the smallest Studio export that reproduces the issue.
-- If possible, configure that reproduction with SQLite and include the SQLite database file captured after the workflow gets stuck.
+- If possible, configure that reproduction with PostgreSQL and include a database dump captured after the workflow gets stuck.
 
 We have also started a focused `3.6.1` reproduction on our side, using a small parent/child workflow with `Dispatch Workflow`, `Wait for Completion`, and a subsequent `Delay`. So far, the active bookmark table containing only `Elsa.Delay` after the parent continues past `Dispatch Workflow` looks expected. Once the dispatch bookmark has resumed the parent, it should be consumed and disappear from the active `Bookmarks` table.
 
@@ -25,7 +25,7 @@ Ideally this would include:
 - The final `Delay` activity.
 - Any variables/outputs involved in passing data from the child workflow back to the parent.
 - The approximate reproduction rate, for example “1 in 10 executions” or “always when run under load”.
-- If possible, a reproduction configured against SQLite, with the SQLite database file included after the issue occurs. That would let us inspect the workflow definitions, workflow instances, bookmarks, queue items, execution logs, and persisted state exactly as they are after the failure.
+- If possible, a reproduction configured against PostgreSQL, with a database dump included after the issue occurs. That would let us inspect the workflow definitions, workflow instances, bookmarks, queue items, execution logs, and persisted state exactly as they are after the failure.
 
 Without that, we can investigate the general mechanism and likely failure modes, but we may still miss a detail that only exists in your actual workflow structure, variable/output configuration, persistence setup, or Quartz configuration.
 
@@ -165,7 +165,7 @@ Please send a minimal Studio export that reproduces the issue. If possible, incl
 4. Steps to run it.
 5. Expected behavior.
 6. Actual behavior.
-7. Preferably, a SQLite-backed reproduction database captured after the workflow gets stuck.
+7. Preferably, a PostgreSQL reproduction database dump captured after the workflow gets stuck.
 8. One affected parent workflow instance ID with matching rows from:
    - `Bookmarks`
    - `BookmarkQueueItems`

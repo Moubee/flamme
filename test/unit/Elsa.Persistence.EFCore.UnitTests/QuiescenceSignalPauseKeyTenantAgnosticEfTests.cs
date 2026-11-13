@@ -7,12 +7,12 @@ using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.EntityHandlers;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Persistence.EFCore.Sqlite;
+using Elsa.Persistence.EFCore.PostgreSql;
 using Elsa.Tenants.Options;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -162,7 +162,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
     }
 
     [Test]
-    [DisplayName("Two-node shared SQLite: restart is unpaused whether A resumes before or after B writes")]
+    [DisplayName("Two-node shared PostgreSQL: restart is unpaused whether A resumes before or after B writes")]
     [Arguments(false)]
     [Arguments(true)]
     public async Task TwoNodeLegacyAdoption_RestartIsUnpaused(bool resumeBeforeBWrites)
@@ -198,7 +198,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
     }
 
     [Test]
-    [DisplayName("Two-node shared SQLite: loser stays paused while the winner's host save is gated")]
+    [DisplayName("Two-node shared PostgreSQL: loser stays paused while the winner's host save is gated")]
     public async Task TwoNodeLegacyAdoption_LoserIsPausedWhileWinnerHostSaveIsGated()
     {
         await using var harness = await EfHarness.CreateAsync(tenancyEnabled: true);
@@ -278,14 +278,14 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
 
     private sealed class EfHarness : IAsyncDisposable
     {
-        private readonly string _databasePath;
+        private readonly PostgreSqlTestDatabase _database;
         private readonly ServiceProvider _services;
         private readonly IServiceScope _scope;
         private readonly ISystemClock _clock;
         private readonly IExecutionCycleRegistry _cycleRegistry;
 
         private EfHarness(
-            string databasePath,
+            PostgreSqlTestDatabase database,
             ServiceProvider services,
             IServiceScope scope,
             DefaultTenantAccessor tenantAccessor,
@@ -293,7 +293,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
             ISystemClock clock,
             IExecutionCycleRegistry cycleRegistry)
         {
-            _databasePath = databasePath;
+            _database = database;
             _services = services;
             _scope = scope;
             TenantAccessor = tenantAccessor;
@@ -307,7 +307,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
 
         public static async Task<EfHarness> CreateAsync(bool tenancyEnabled)
         {
-            var databasePath = Path.Join(Path.GetTempPath(), $"elsa-quiescence-{Guid.NewGuid():N}.db");
+            var database = new PostgreSqlTestDatabase();
             var tenantAccessor = new DefaultTenantAccessor();
             var clock = Substitute.For<ISystemClock>();
             clock.UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
@@ -320,10 +320,10 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
                 .Configure<TenantsOptions>(options => options.IsEnabled = tenancyEnabled)
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-                .AddSqliteEntityModelCreatingHandlers()
+                .AddPostgreSqlEntityModelCreatingHandlers()
                 .AddDbContextFactory<RuntimeElsaDbContext>((_, builder) =>
                 {
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={databasePath};Default Timeout=30");
+                    builder.UseElsaPostgreSql(migrationsAssembly, database.ConnectionString);
                     if (tenancyEnabled)
                         builder.ReplaceService<IModelCacheKeyFactory, TenancyOnModelCacheKeyFactory>();
                     else
@@ -339,7 +339,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
 
             var scope = services.CreateScope();
             return new(
-                databasePath,
+                database,
                 services,
                 scope,
                 tenantAccessor,
@@ -389,9 +389,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
         {
             _scope.Dispose();
             await _services.DisposeAsync();
-            SqliteConnection.ClearAllPools();
-            if (File.Exists(_databasePath))
-                File.Delete(_databasePath);
+            await _database.DisposeAsync();
         }
     }
 

@@ -11,7 +11,7 @@ namespace Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests;
 /// <remarks>
 /// Equality filters that differ only by case are not a shared contract: InMemory uses
 /// <see cref="StringComparison.OrdinalIgnoreCase"/> while Relational SQL uses <c>=</c>
-/// (collation-dependent, BINARY on Sqlite). Tests use exact-case values. See README.md.
+/// (ordinal for the in-memory store). Tests use exact-case values. See README.md.
 /// </remarks>
 public abstract class StructuredLogStoreConformanceTests
 {
@@ -257,11 +257,4 @@ public sealed class InMemoryStructuredLogStoreConformanceTests : StructuredLogSt
 {
     protected override Task<StructuredLogStoreScenario> CreateScenarioAsync(Action<StructuredLogsOptions>? configure = null) =>
         StructuredLogStoreScenario.CreateInMemoryAsync(configure);
-}
-
-[InheritsTests]
-public sealed class SqliteStructuredLogStoreConformanceTests : StructuredLogStoreConformanceTests
-{
-    protected override Task<StructuredLogStoreScenario> CreateScenarioAsync(Action<StructuredLogsOptions>? configure = null) =>
-        StructuredLogStoreScenario.CreateSqliteAsync(configure);
 }

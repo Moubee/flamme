@@ -8,10 +8,10 @@ using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.EntityHandlers;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Alterations;
-using Elsa.Persistence.EFCore.Sqlite;
+using Elsa.Persistence.EFCore.PostgreSql;
 using Elsa.Tenants.Options;
 using Elsa.Testing.Shared.Multitenancy;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Elsa.Alterations.Persistence.ConformanceTests;
 
 /// <summary>
-/// Holds one Memory or EF/SQLite pair of Alterations stores and the ambient tenant they read.
+/// Holds one Memory or EF/PostgreSQL pair of Alterations stores and the ambient tenant they read.
 /// </summary>
 public sealed class AlterationStoreScenario(
     TestTenantAccessor tenantAccessor,
@@ -51,75 +51,69 @@ public sealed class AlterationStoreScenario(
             () => ValueTask.CompletedTask));
     }
 
-    public static Task<AlterationStoreScenario> CreateSqliteAsync() =>
-        CreateSqliteAsync("tenant-a");
+    public static Task<AlterationStoreScenario> CreatePostgreSqlAsync() => CreatePostgreSqlAsync("tenant-a");
 
-    public static Task<AlterationStoreScenario> CreateSqliteAsync(string tenantId) =>
-        CreateSqliteAsync(tenantId, Path.Join(Path.GetTempPath(), $"elsa-alterations-conformance-{Guid.NewGuid():N}.db"), ownsDatabaseFile: true);
+    public static Task<AlterationStoreScenario> CreatePostgreSqlAsync(string tenantId) =>
+        CreatePostgreSqlAsync(tenantId, tenantsEnabled: true);
 
-    public static Task<AlterationStoreScenario> CreateSqliteAsync(
+    public static async Task<AlterationStoreScenario> CreatePostgreSqlAsync(
         string tenantId,
         bool tenantsEnabled,
         DbCommandInterceptor? commandInterceptor = null,
         IDbExceptionHandler? dbExceptionHandler = null,
-        DbTransactionInterceptor? transactionInterceptor = null) =>
-        CreateSqliteAsync(
-            tenantId,
-            Path.Join(Path.GetTempPath(), $"elsa-alterations-conformance-{Guid.NewGuid():N}.db"),
-            ownsDatabaseFile: true,
-            tenantsEnabled,
-            commandInterceptor,
-            dbExceptionHandler,
-            transactionInterceptor);
+        DbTransactionInterceptor? transactionInterceptor = null)
+    {
+        var database = new PostgreSqlTestDatabase();
+        try
+        {
+            var scenario = await CreatePostgreSqlHostAsync(tenantId, database.ConnectionString, tenantsEnabled,
+                commandInterceptor, dbExceptionHandler, transactionInterceptor);
+            return new(scenario.TenantAccessor, scenario.Plans, scenario.Jobs, async () =>
+            {
+                await scenario.DisposeAsync();
+                await database.DisposeAsync();
+            });
+        }
+        catch
+        {
+            await database.DisposeAsync();
+            throw;
+        }
+    }
 
-    /// <summary>
-    /// Two EF/SQLite hosts that share a file and keep separate ambient tenants so concurrent
-    /// Save/SaveMany calls do not mutate a single <see cref="ITenantAccessor"/>.
-    /// </summary>
-    public static async Task<SqliteOwnershipPair> CreateSqlitePairAsync(
+    public static async Task<PostgreSqlOwnershipPair> CreatePostgreSqlPairAsync(
         string firstTenantId,
         string secondTenantId,
         DbCommandInterceptor? commandInterceptor = null,
         DbTransactionInterceptor? transactionInterceptor = null)
     {
-        var databasePath = Path.Join(Path.GetTempPath(), $"elsa-alterations-ownership-{Guid.NewGuid():N}.db");
-        var first = await CreateSqliteAsync(
-            firstTenantId,
-            databasePath,
-            ownsDatabaseFile: false,
-            commandInterceptor: commandInterceptor,
-            transactionInterceptor: transactionInterceptor);
+        var database = new PostgreSqlTestDatabase();
+        var first = await CreatePostgreSqlHostAsync(firstTenantId, database.ConnectionString, true, commandInterceptor, null, transactionInterceptor);
         try
         {
-            var second = await CreateSqliteAsync(
-                secondTenantId,
-                databasePath,
-                ownsDatabaseFile: false,
-                commandInterceptor: commandInterceptor,
-                transactionInterceptor: transactionInterceptor);
-            return new SqliteOwnershipPair(first, second, databasePath);
+            var second = await CreatePostgreSqlHostAsync(secondTenantId, database.ConnectionString, true, commandInterceptor, null, transactionInterceptor);
+            return new(first, second, database);
         }
         catch
         {
             await first.DisposeAsync();
+            await database.DisposeAsync();
             throw;
         }
     }
 
-    public static Task<AlterationStoreScenario> CreateSqliteAsync(
+    public static Task<AlterationStoreScenario> CreatePostgreSqlAsync(
         string tenantId,
-        string databasePath,
-        bool ownsDatabaseFile,
+        string connectionString,
         bool tenantsEnabled = true,
         DbCommandInterceptor? commandInterceptor = null,
         IDbExceptionHandler? dbExceptionHandler = null,
         DbTransactionInterceptor? transactionInterceptor = null) =>
-        CreateSqliteHostAsync(tenantId, databasePath, ownsDatabaseFile, tenantsEnabled, commandInterceptor, dbExceptionHandler, transactionInterceptor);
+        CreatePostgreSqlHostAsync(tenantId, connectionString, tenantsEnabled, commandInterceptor, dbExceptionHandler, transactionInterceptor);
 
-    private static async Task<AlterationStoreScenario> CreateSqliteHostAsync(
+    private static async Task<AlterationStoreScenario> CreatePostgreSqlHostAsync(
         string tenantId,
-        string databasePath,
-        bool ownsDatabaseFile,
+        string connectionString,
         bool tenantsEnabled,
         DbCommandInterceptor? commandInterceptor,
         IDbExceptionHandler? dbExceptionHandler,
@@ -128,7 +122,6 @@ public sealed class AlterationStoreScenario(
         var tenantAccessor = new TestTenantAccessor(tenantId);
         ServiceProvider? services = null;
         IServiceScope? scope = null;
-
         try
         {
             var migrationsAssembly = typeof(AlterationsDbContextFactories).Assembly;
@@ -139,10 +132,10 @@ public sealed class AlterationStoreScenario(
                 .Configure<TenantsOptions>(options => options.IsEnabled = tenantsEnabled)
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-                .AddSqliteEntityModelCreatingHandlers()
+                .AddPostgreSqlEntityModelCreatingHandlers()
                 .AddDbContextFactory<AlterationsElsaDbContext>((_, builder) =>
                 {
-                    builder.UseElsaSqlite(migrationsAssembly, $"Data Source={databasePath};Default Timeout=30");
+                    builder.UseElsaPostgreSql(migrationsAssembly, connectionString);
                     builder.EnableServiceProviderCaching(false);
                     if (commandInterceptor is not null)
                         builder.AddInterceptors(commandInterceptor);
@@ -154,44 +147,22 @@ public sealed class AlterationStoreScenario(
                 .AddScoped<EntityStore<AlterationsElsaDbContext, AlterationJob>>()
                 .AddScoped<EFCoreAlterationPlanStore>()
                 .AddScoped<EFCoreAlterationJobStore>();
-
             if (dbExceptionHandler is not null)
                 serviceCollection.AddSingleton(dbExceptionHandler);
-
             services = serviceCollection.BuildServiceProvider();
-
             await using (var dbContext = await services.GetRequiredService<IDbContextFactory<AlterationsElsaDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.EnsureCreatedAsync();
-
             scope = services.CreateScope();
-            var scoped = scope.ServiceProvider;
-
-            return new(
-                tenantAccessor,
-                scoped.GetRequiredService<EFCoreAlterationPlanStore>(),
-                scoped.GetRequiredService<EFCoreAlterationJobStore>(),
-                async () =>
-                {
-                    scope.Dispose();
-                    await services.DisposeAsync();
-                    if (ownsDatabaseFile)
-                    {
-                        SqliteConnection.ClearAllPools();
-                        File.Delete(databasePath);
-                    }
-                });
+            return new(tenantAccessor,
+                scope.ServiceProvider.GetRequiredService<EFCoreAlterationPlanStore>(),
+                scope.ServiceProvider.GetRequiredService<EFCoreAlterationJobStore>(),
+                async () => { scope.Dispose(); await services.DisposeAsync(); });
         }
         catch
         {
             scope?.Dispose();
             if (services is not null)
                 await services.DisposeAsync();
-            if (ownsDatabaseFile)
-            {
-                SqliteConnection.ClearAllPools();
-                File.Delete(databasePath);
-            }
-
             throw;
         }
     }
@@ -213,21 +184,18 @@ public sealed class AlterationStoreScenario(
     }
 }
 
-/// <summary>
-/// Two SQLite alteration-store hosts that share one database file.
-/// </summary>
-public sealed class SqliteOwnershipPair(AlterationStoreScenario first, AlterationStoreScenario second, string databasePath) : IAsyncDisposable
+/// <summary>Two PostgreSQL alteration-store hosts sharing one isolated database.</summary>
+public sealed class PostgreSqlOwnershipPair(AlterationStoreScenario first, AlterationStoreScenario second, PostgreSqlTestDatabase database) : IAsyncDisposable
 {
     public AlterationStoreScenario First { get; } = first;
     public AlterationStoreScenario Second { get; } = second;
-    public string DatabasePath { get; } = databasePath;
+    public string ConnectionString => database.ConnectionString;
 
     public async ValueTask DisposeAsync()
     {
         await First.DisposeAsync();
         await Second.DisposeAsync();
-        SqliteConnection.ClearAllPools();
-        File.Delete(DatabasePath);
+        await database.DisposeAsync();
     }
 }
 
