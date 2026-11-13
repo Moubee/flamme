@@ -183,7 +183,11 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
     public async Task ProposalStorePreservesCreationTimestampOnUpdate()
     {
         var store = new EFCoreAIProposalStore(_dbContext);
-        var createdAt = DateTimeOffset.UtcNow.AddMinutes(-10);
+        // Include sub-microsecond ticks on every OS, then align inputs to PostgreSQL's timestamp precision.
+        var now = DateTimeOffset.UtcNow;
+        var rawTimestamp = now.AddTicks(7 - now.Ticks % TimeSpan.TicksPerMicrosecond);
+        var timestamp = rawTimestamp.AddTicks(-(rawTimestamp.Ticks % TimeSpan.TicksPerMicrosecond));
+        var createdAt = timestamp.AddMinutes(-10);
 
         await store.SaveAsync(new AIProposal
         {

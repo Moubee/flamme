@@ -102,8 +102,12 @@ public class EFCoreAIConversationStoreTests : IAsyncInitializer, IAsyncDisposabl
     public async Task ConversationStorePreservesCreationTimestampAndUpdatesRetentionTimestamp()
     {
         var store = new EFCoreAIConversationStore(_dbContext);
-        var createdAt = DateTimeOffset.UtcNow.AddMinutes(-10);
-        var retentionExpiresAt = DateTimeOffset.UtcNow.AddDays(1);
+        // Include sub-microsecond ticks on every OS, then align inputs to PostgreSQL's timestamp precision.
+        var now = DateTimeOffset.UtcNow;
+        var rawTimestamp = now.AddTicks(7 - now.Ticks % TimeSpan.TicksPerMicrosecond);
+        var timestamp = rawTimestamp.AddTicks(-(rawTimestamp.Ticks % TimeSpan.TicksPerMicrosecond));
+        var createdAt = timestamp.AddMinutes(-10);
+        var retentionExpiresAt = timestamp.AddDays(1);
 
         await store.SaveAsync(new AIConversation
         {
