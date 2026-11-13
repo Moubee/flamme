@@ -189,10 +189,10 @@ class VerifyPackagesTests(unittest.TestCase):
         nuget: list[dict[str, object]] = [
             {"id": "Elsa.Core"},
             {
-                "id": "Elsa.SamplePackage",
+                "id": "Fixture.FixedPackage",
                 "version": "1.0.1",
                 "verify_published": False,
-                "reason": "sample package is intentionally fixed-version",
+                "reason": "fixture package is intentionally fixed-version",
             },
         ]
         if not fixed:
@@ -235,9 +235,9 @@ class VerifyPackagesTests(unittest.TestCase):
 
     def seed_success(self) -> None:
         core = nupkg("Elsa.Core", VERSION, SOURCE_COMMIT)
-        sample = nupkg("Elsa.SamplePackage", "1.0.1", SOURCE_COMMIT, signed=True, dependency=VERSION)
+        sample = nupkg("Fixture.FixedPackage", "1.0.1", SOURCE_COMMIT, signed=True, dependency=VERSION)
         self.write_nupkg("Elsa.Core.9.4.0.nupkg", core)
-        self.write_nupkg("Elsa.SamplePackage.1.0.1.nupkg", sample)
+        self.write_nupkg("Fixture.FixedPackage.1.0.1.nupkg", sample)
         for feed in ("feed-405", "feed-ok"):
             self.registry.add_nuget(feed, "Elsa.Core", VERSION, core)
         npm = npm_tgz("elsa-ui", VERSION)
@@ -324,7 +324,7 @@ class VerifyPackagesTests(unittest.TestCase):
 
     def test_fixed_skip_requires_reason_and_explicit_version(self) -> None:
         manifest = self.manifest(fixed=False)
-        manifest["nuget"].append({"id": "Elsa.SamplePackage", "verify_published": False})
+        manifest["nuget"].append({"id": "Fixture.FixedPackage", "verify_published": False})
         manifest["feeds"] = []
         self.write_nupkg("Elsa.Core.9.4.0.nupkg", nupkg("Elsa.Core", VERSION, SOURCE_COMMIT))
         code, report = self.run_verify(manifest)

@@ -169,6 +169,6 @@ Create packages with an explicit version using the standard pack command:
 dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
 
-This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. `Elsa.SamplePackage` retains its fixed fixture version (`1.0.1`) even when a solution-wide version is supplied. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.
+This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.
 
 Because source projects multi-target three frameworks, package upgrades should be checked against all target frameworks and provider packages. Persistence changes usually need extra scrutiny because each provider package may need migrations or compatibility updates.

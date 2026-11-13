@@ -58,7 +58,7 @@ or cross-module behavior.
 
 ## Repository Structure
 
-- `src/apps/`: runnable app hosts and sample packages.
+- `src/apps/`: runnable app hosts.
 - `src/clients/`: client libraries.
 - `src/common/`: shared infrastructure and testing support.
 - `src/extensions/`: extension packages.
