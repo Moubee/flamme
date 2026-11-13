@@ -97,8 +97,6 @@ public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFacto
             ["CShells:Shells:Default:Features:SqliteStructuredLogPersistence:ConnectionString"] = GetConnectionString("structured-logs.db"),
             ["CShells:Shells:Default:Features:Http:HttpActivityOptions:BaseUrl"] = "https://localhost",
             ["CShells:Shells:Default:Features:ExternalAuthentication:Redirects:ExternalCallbackBaseUri"] = "https://localhost/elsa/api/",
-            ["CShells:Shells:Default:Features:ExternalAuthentication:AuthenticationClients:0:CallbackUris:0"] = "https://localhost/authentication/external/callback",
-            ["CShells:Shells:Default:Features:ExternalAuthentication:AuthenticationClients:0:LogoutCallbackUris:0"] = "https://localhost/authentication/external/logout-callback",
             ["Diagnostics:OpenTelemetry:Exporter:Endpoint"] = "http://127.0.0.1:1",
             ["Elsa:PlatformIntegration:Enabled"] = "false",
             ["Nuplane:Setup:AutomaticReconciliation"] = "false",
