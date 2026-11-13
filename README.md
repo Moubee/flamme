@@ -41,7 +41,7 @@ The server exposes a health check at `http://localhost:13000/health/live` and ma
 
 For any non-development deployment, inject a secure random JWT signing key through environment variables or a secrets manager instead of using committed appsettings values. For code-first hosts such as `Elsa.Server.Web`, set `Identity__Tokens__SigningKey`. For shell-based hosts, set the shell feature key, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 
-The reference server has no default admin credentials or API keys. Configure initial users or applications through environment-specific identity configuration or a secret manager before calling authenticated APIs; see the [server configuration notes](src/apps/Elsa.Server.Web/README.md#secrets).
+The Development configuration includes sample identity users and applications. For other environments, configure your own API credentials through environment-specific identity configuration or a secret manager; see the [server configuration notes](src/apps/Elsa.Server.Web/README.md#secrets).
 
 ### TLS and custom certificate authorities
 
