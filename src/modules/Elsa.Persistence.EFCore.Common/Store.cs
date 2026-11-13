@@ -22,9 +22,6 @@ namespace Elsa.Persistence.EFCore;
 [PublicAPI]
 public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextFactory, IServiceProvider serviceProvider) where TDbContext : DbContext where TEntity : class, new()
 {
-    private const int WriteMaxRetryCount = 3;
-    private static readonly TimeSpan WriteBaseDelay = TimeSpan.FromMilliseconds(50);
-
     // ReSharper disable once StaticMemberInGenericType
     // Justification: This is a static member that is used to ensure that only one thread can access the database for TEntity at a time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
@@ -96,7 +93,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             if (entityList.Count == 0)
                 return;
 
-            await ExecuteWriteWithRetryAsync(async (dbContext, ct) =>
+            await ExecuteWriteAsync(async (dbContext, ct) =>
             {
                 if (onSaving != null)
                 {
@@ -194,7 +191,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             var tenantId = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId;
             var tenancyEnabled = serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
 
-            await ExecuteWriteWithRetryAsync(async (dbContext, ct) =>
+            await ExecuteWriteAsync(async (dbContext, ct) =>
             {
                 if (onSaving != null)
                 {
@@ -405,47 +402,15 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     }
 
     /// <summary>
-    /// Executes a whole database write operation with a fresh context after a provider
-    /// transient failure. The caller owns the transaction boundary so a retry never
-    /// resumes a partially completed transaction.
+    /// Executes a database write operation with a fresh context.
     /// </summary>
-    internal async Task ExecuteWriteWithRetryAsync(
+    internal async Task ExecuteWriteAsync(
         Func<TDbContext, CancellationToken, Task> operation,
         CancellationToken cancellationToken)
     {
-        for (var attempt = 0;; attempt++)
-        {
-            var providerName = string.Empty;
-
-            try
-            {
-                await using var dbContext = await CreateDbContextAsync(cancellationToken);
-                providerName = dbContext.Database.ProviderName ?? string.Empty;
-                await operation(dbContext, cancellationToken);
-                return;
-            }
-            catch (Exception ex)
-            {
-                if (ShouldRetryWrite(providerName, ex, attempt, cancellationToken))
-                {
-                    await Task.Delay(GetWriteRetryDelay(attempt), cancellationToken);
-                    continue;
-                }
-
-                throw;
-            }
-        }
+        await using var dbContext = await CreateDbContextAsync(cancellationToken);
+        await operation(dbContext, cancellationToken);
     }
-
-    private static bool ShouldRetryWrite(string providerName, Exception exception, int attempt, CancellationToken cancellationToken)
-    {
-        return attempt < WriteMaxRetryCount
-               && !cancellationToken.IsCancellationRequested
-               && exception is not OperationCanceledException
-               && DbExceptionClassifier.IsTransient(providerName, exception);
-    }
-
-    private static TimeSpan GetWriteRetryDelay(int attempt) => TimeSpan.FromMilliseconds(WriteBaseDelay.TotalMilliseconds * (attempt + 1));
 
     /// <summary>
     /// Updates the entity.

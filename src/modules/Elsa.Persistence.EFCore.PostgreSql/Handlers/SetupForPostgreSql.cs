@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace Elsa.Persistence.EFCore.PostgreSql.Handlers;
 
 /// <summary>
-/// Represents a class that handles entity model creation for SQLite databases.
+/// Represents a class that handles entity model creation for PostgreSQL databases.
 /// </summary>
 public class SetupForPostgreSql : IEntityModelCreatingHandler
 {

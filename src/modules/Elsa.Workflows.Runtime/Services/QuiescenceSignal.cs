@@ -276,7 +276,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
 
         // Legacy persistent-store rows used elsa.quiescence.pause.{shell} and may be stamped '', NULL,
         // or a named tenant. Memory starts empty on restart, so the leftover-row risk is on
-        // persistent stores (EF, Dapper, MongoDb). The host-pause key never shares that PK;
+        // persistent stores. The host-pause key never shares that PK;
         // startup adopts a visible leftover and always deletes it.
         await UseKeyValueStoreAsync(async store =>
         {

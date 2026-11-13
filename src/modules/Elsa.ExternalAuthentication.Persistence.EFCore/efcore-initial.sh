@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Creates the initial migration for ExternalAuthenticationElsaDbContext across every provider.
+# Creates the initial migration for ExternalAuthenticationElsaDbContext for PostgreSQL.
 # Run from this directory so the relative provider paths resolve.
 #
 # dotnet-ef is pinned to 9.0.11 with rollForward disabled, so the target framework must be pinned to net9.0.
@@ -10,7 +10,7 @@
 migrationName="${1:-Initial}"
 
 # Define the list of providers
-providers=("MySql" "SqlServer" "Sqlite" "PostgreSql" "Oracle")
+providers=("PostgreSql")
 
 for provider in "${providers[@]}"; do
     providerPath="../Elsa.ExternalAuthentication.Persistence.EFCore.$provider"

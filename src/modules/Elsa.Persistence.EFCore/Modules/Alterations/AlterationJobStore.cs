@@ -76,7 +76,7 @@ public class EFCoreAlterationJobStore : IAlterationJobStore
         await _store.ExecuteWithDbExceptionHandlingAsync(
             async () =>
             {
-                await _store.ExecuteWriteWithRetryAsync(async (dbContext, ct) =>
+                await _store.ExecuteWriteAsync(async (dbContext, ct) =>
                 {
                     await using var transaction = await dbContext.Database.BeginTransactionAsync(ct);
 

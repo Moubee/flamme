@@ -46,21 +46,11 @@ Elsa Studio can use this module to show:
 
 The default in-memory provider captures logs for the current process only. It still includes source identity and Kubernetes/container metadata so Studio can filter and display the active source.
 
-For persisted logs, add a storage package such as `Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite` and opt in from the structured logs feature:
-
-```csharp
-services.AddElsa(elsa =>
-{
-    elsa.UseStructuredLogs(structuredLogs =>
-    {
-        structuredLogs.UseSqliteStorage("Data Source=elsa-structured-logs.db");
-    });
-});
-```
+Structured logs use the built-in in-memory provider. The repository does not ship a durable structured-log storage provider.
 
 The core module remains storage-provider neutral. Custom stores can replace `IStructuredLogStore` while live updates continue through `IStructuredLogLiveFeed`; Studio continues to use the same REST and SignalR contracts, including source filtering, source-change notifications, and storage diagnostics.
 
-Shared store contracts (InMemory and Relational/Sqlite): `MaxRecentLogQuerySize` is the default and upper `Take`; query order is `Timestamp`, `ReceivedAt`, `SourceId`, `Sequence`, `Id`; `ListSources` prefers the in-process source registry for identity metadata and `SourceHeartbeatTimeout` → `Stale`. `QueryAsync.DroppedEvents` is the in-memory ring overflow count — relational write-queue drops are reported through storage diagnostics, not that field. Equality filters that differ only by case are not portable: InMemory is `OrdinalIgnoreCase`, SQL follows the database collation.
+Shared store contracts (in-memory and custom relational stores): `MaxRecentLogQuerySize` is the default and upper `Take`; query order is `Timestamp`, `ReceivedAt`, `SourceId`, `Sequence`, `Id`; `ListSources` prefers the in-process source registry for identity metadata and `SourceHeartbeatTimeout` → `Stale`. `QueryAsync.DroppedEvents` is the in-memory ring overflow count — relational write-queue drops are reported through storage diagnostics, not that field. Equality filters that differ only by case are not portable: InMemory is `OrdinalIgnoreCase`, SQL follows the database collation.
 
 ## Redaction
 

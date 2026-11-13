@@ -5,7 +5,7 @@ namespace Elsa.Persistence.EFCore;
 
 /// <summary>
 /// Represents shared persistence settings that can be cascaded to dependent persistence features.
-/// When a combined persistence feature (e.g., SqliteWorkflowPersistence) is configured,
+/// When a combined persistence feature (e.g., PostgreSqlWorkflowPersistence) is configured,
 /// it can register these shared settings that individual features will use as defaults.
 /// </summary>
 public class SharedPersistenceSettings

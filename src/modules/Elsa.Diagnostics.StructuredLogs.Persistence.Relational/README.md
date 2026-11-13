@@ -2,7 +2,7 @@
 
 This package contains the reusable relational storage layer for diagnostics structured logs. It is provider-neutral: concrete packages supply the connection factory, SQL dialect, and FluentMigrator runner wiring.
 
-To add a new relational provider such as SQL Server or PostgreSQL:
+To add a new relational provider for PostgreSQL:
 
 1. Reference this package from the provider package.
 2. Implement `IRelationalStructuredLogConnectionFactory`.

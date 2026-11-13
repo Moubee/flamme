@@ -201,7 +201,7 @@ public sealed class InMemoryUserTaskRepository : IUserTaskRepository
                || task.Tags.Any(x => x.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
-    // Same contract as EF/VNext: REST sorts only, Id always ThenBy ascending, JSON base64url cursors.
+    // Same contract as EF: REST sorts only, Id always ThenBy ascending, JSON base64url cursors.
     private static IEnumerable<UserTask> ApplyOrdering(IEnumerable<UserTask> tasks, UserTaskQuery query) => query.Sort.ToLowerInvariant() switch
     {
         "priority" => query.Descending ? tasks.OrderByDescending(x => x.Priority).ThenBy(x => x.Id) : tasks.OrderBy(x => x.Priority).ThenBy(x => x.Id),

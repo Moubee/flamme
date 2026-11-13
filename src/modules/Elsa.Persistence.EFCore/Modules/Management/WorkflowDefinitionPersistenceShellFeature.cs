@@ -7,7 +7,7 @@ namespace Elsa.Persistence.EFCore.Modules.Management;
 
 /// <summary>
 /// Base class for workflow definition persistence features.
-/// This is not a standalone shell feature - use provider-specific features like SqliteWorkflowDefinitionPersistenceShellFeature.
+/// This is not a standalone shell feature - use provider-specific features like PostgreSqlWorkflowDefinitionPersistenceFeature.
 /// </summary>
 [UsedImplicitly]
 public abstract class EFCoreWorkflowDefinitionPersistenceShellFeatureBase : PersistenceShellFeatureBase<ManagementElsaDbContext>

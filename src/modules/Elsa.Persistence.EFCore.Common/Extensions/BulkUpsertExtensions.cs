@@ -3,14 +3,13 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage;
 
 // ReSharper disable once CheckNamespace
 namespace Elsa.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extension methods to perform bulk upsert operations for entities
-/// in an Entity Framework Core context, supporting multiple database providers.
+/// in an Entity Framework Core context using PostgreSQL.
 /// </summary>
 public static class BulkUpsertExtensions
 {
@@ -59,153 +58,18 @@ public static class BulkUpsertExtensions
         if (entities.Count == 0)
             return;
 
-        // Identify the current provider (e.g., "Microsoft.EntityFrameworkCore.SqlServer")
-        var providerName = dbContext.Database.ProviderName?.ToLowerInvariant() ?? string.Empty;
-
-        // Determine the method for generating SQL based on the provider
-        Func<DbContext, IList<TEntity>, Expression<Func<TEntity, string>>, (string, object[])> generateSql = providerName switch
-        {
-            var pn when pn.Contains("sqlserver") => GenerateSqlServerUpsert,
-            var pn when pn.Contains("sqlite") => GenerateSqliteUpsert,
-            var pn when pn.Contains("postgres") => GeneratePostgresUpsert,
-            var pn when pn.Contains("mysql") => GenerateMySqlUpsert,
-            var pn when pn.Contains("oracle") => GenerateOracleUpsert,
-            _ => throw new NotSupportedException($"Provider '{providerName}' is not supported.")
-        };
+        var providerName = dbContext.Database.ProviderName ?? string.Empty;
+        if (!providerName.Contains("Npgsql", StringComparison.OrdinalIgnoreCase))
+            throw new NotSupportedException($"Provider '{providerName}' is not supported. Only PostgreSQL is supported.");
 
         // Loop through batched entities
         foreach (var batch in entities.Chunk(batchSize))
         {
             // Generate SQL and parameters
-            var (sql, parameters) = generateSql(dbContext, batch, keySelector);
+            var (sql, parameters) = GeneratePostgresUpsert(dbContext, batch, keySelector);
 
             await dbContext.Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
         }
-    }
-
-    private static (string, object[]) GenerateSqlServerUpsert<TEntity>(
-        DbContext dbContext,
-        IList<TEntity> entities,
-        Expression<Func<TEntity, string>> keySelector)
-        where TEntity : class
-    {
-        var entityType = dbContext.Model.FindEntityType(typeof(TEntity))!;
-        var tableName = $"[{entityType.GetSchema()}].[{entityType.GetTableName()}]";
-        var storeObject = StoreObjectIdentifier.Table(entityType.GetTableName()!, entityType.GetSchema());
-        var props = entityType.GetProperties().ToList();
-        var keyProp = entityType.FindProperty(keySelector.GetMemberAccess().Name)!;
-        var keyColumnName = $"[{keyProp.GetColumnName(storeObject)}]";
-        var columnNames = props
-            .Select(p => $"[{p.GetColumnName(storeObject)}]")
-            .ToList();
-
-        var mergeSql = new StringBuilder();
-        mergeSql.AppendLine($"MERGE {tableName} AS Target");
-        mergeSql.AppendLine("USING (VALUES");
-
-        var parameters = new List<object>();
-        var parameterCount = 0;
-
-        for (var i = 0; i < entities.Count; i++)
-        {
-            var entity = entities[i];
-            var values = new List<string>();
-
-            foreach (var property in props)
-            {
-                var paramName = $"{{{parameterCount++}}}";
-
-                // If it's a shadow property, retrieve value via Entry(..).Property(..)
-                var value = property.IsShadowProperty()
-                    ? dbContext.Entry(entity).Property(property.Name).CurrentValue
-                    : property.PropertyInfo?.GetValue(entity);
-
-                var converter = property.GetTypeMapping().Converter;
-                if (converter != null)
-                    value = converter.ConvertToProvider(value)!;
-
-                // Explicitly cast null values for varbinary columns
-                if (property.GetColumnType().StartsWith("varbinary", StringComparison.OrdinalIgnoreCase) && value is null)
-                    values.Add("CAST(NULL AS varbinary(max))"); // Explicitly cast null
-                else
-                    values.Add(paramName);
-                
-                parameters.Add(value!);
-            }
-
-            var line = $"({string.Join(", ", values)}){(i < entities.Count - 1 ? "," : string.Empty)}";
-            mergeSql.AppendLine(line);
-        }
-
-        mergeSql.AppendLine($") AS Source ({string.Join(", ", columnNames)})");
-        mergeSql.AppendLine($"ON Target.{keyColumnName} = Source.{keyColumnName}");
-        mergeSql.AppendLine("WHEN MATCHED THEN");
-        mergeSql.AppendLine($"    UPDATE SET {string.Join(", ", columnNames.Where(c => c != keyColumnName).Select(c => $"Target.{c} = Source.{c}"))}");
-        mergeSql.AppendLine("WHEN NOT MATCHED THEN");
-        mergeSql.AppendLine($"    INSERT ({string.Join(", ", columnNames)})");
-        mergeSql.AppendLine($"    VALUES ({string.Join(", ", columnNames.Select(c => $"Source.{c}"))});");
-
-        return (mergeSql.ToString(), parameters.ToArray());
-    }
-
-    private static (string, object[]) GenerateSqliteUpsert<TEntity>(
-        DbContext dbContext,
-        IList<TEntity> entities,
-        Expression<Func<TEntity, string>> keySelector)
-        where TEntity : class
-    {
-        var entityType = dbContext.Model.FindEntityType(typeof(TEntity))!;
-        var tableName = entityType.GetTableName();
-        var storeObject = StoreObjectIdentifier.Table(tableName!, entityType.GetSchema());
-        var props = entityType.GetProperties().ToList();
-        var keyProp = entityType.FindProperty(keySelector.GetMemberAccess().Name)!;
-        var keyColumnName = keyProp.GetColumnName(storeObject);
-        var columnNames = props
-            .Select(p => p.GetColumnName(storeObject)!)
-            .ToList();
-
-        var sb = new StringBuilder();
-        var parameters = new List<object>();
-        var parameterCount = 0;
-
-        sb.Append($"INSERT INTO \"{tableName}\" ({string.Join(", ", columnNames.Select(c => $"\"{c}\""))}) VALUES ");
-
-        for (var i = 0; i < entities.Count; i++)
-        {
-            var entity = entities[i];
-            var placeholders = new List<string>();
-
-            foreach (var property in props)
-            {
-                var paramName = $"{{{parameterCount++}}}";
-
-                var value = property.IsShadowProperty()
-                    ? dbContext.Entry(entity).Property(property.Name).CurrentValue
-                    : property.PropertyInfo?.GetValue(entity);
-
-                var converter = property.GetTypeMapping().Converter;
-                if (converter != null)
-                    value = converter.ConvertToProvider(value);
-
-                placeholders.Add(paramName);
-                parameters.Add(value!);
-            }
-
-            sb.Append($"({string.Join(", ", placeholders)})");
-            if (i < entities.Count - 1)
-                sb.Append(", ");
-        }
-
-        sb.AppendLine();
-        sb.AppendLine($"ON CONFLICT(\"{keyColumnName}\") DO UPDATE SET");
-
-        var updateAssignments = columnNames
-            .Where(c => c != keyColumnName)
-            .Select(c => $"\"{c}\"=excluded.\"{c}\"");
-
-        sb.AppendLine(string.Join(", ", updateAssignments) + ";");
-
-        return (sb.ToString(), parameters.ToArray());
     }
 
     private static (string, object[]) GeneratePostgresUpsert<TEntity>(
@@ -274,153 +138,6 @@ public static class BulkUpsertExtensions
             .Select(c => $"\"{c}\" = EXCLUDED.\"{c}\"");
 
         sb.AppendLine(string.Join(", ", updateAssignments) + ";");
-
-        return (sb.ToString(), parameters.ToArray());
-    }
-
-    private static (string, object[]) GenerateMySqlUpsert<TEntity>(
-        DbContext dbContext,
-        IList<TEntity> entities,
-        Expression<Func<TEntity, string>> keySelector)
-        where TEntity : class
-    {
-        var entityType = dbContext.Model.FindEntityType(typeof(TEntity))!;
-        var tableName = entityType.GetTableName();
-        var storeObject = StoreObjectIdentifier.Table(tableName!, entityType.GetSchema());
-
-        var props = entityType.GetProperties().ToList();
-
-        var keyProp = entityType.FindProperty(keySelector.GetMemberAccess().Name)!;
-        var keyColumnName = keyProp.GetColumnName(storeObject);
-        var columnNames = props
-            .Select(p => p.GetColumnName(storeObject)!)
-            .ToList();
-
-        var sb = new StringBuilder();
-        var parameters = new List<object>();
-        var parameterCount = 0;
-
-        sb.Append($"INSERT INTO `{tableName}` ({string.Join(", ", columnNames.Select(c => $"`{c}`"))}) VALUES ");
-
-        for (var i = 0; i < entities.Count; i++)
-        {
-            var entity = entities[i];
-            var placeholders = new List<string>();
-
-            foreach (var property in props)
-            {
-                var paramName = $"{{{parameterCount++}}}";
-
-                var value = property.IsShadowProperty()
-                    ? dbContext.Entry(entity).Property(property.Name).CurrentValue
-                    : property.PropertyInfo?.GetValue(entity);
-
-                var converter = property.GetTypeMapping().Converter;
-                if (converter != null)
-                    value = converter.ConvertToProvider(value);
-
-                placeholders.Add(paramName);
-                parameters.Add(value!);
-            }
-
-            sb.Append($"({string.Join(", ", placeholders)})");
-            if (i < entities.Count - 1)
-                sb.Append(", ");
-        }
-
-        sb.AppendLine();
-        sb.AppendLine("ON DUPLICATE KEY UPDATE");
-
-        var updateAssignments = columnNames
-            .Where(c => c != keyColumnName)
-            .Select(c => $"`{c}` = VALUES(`{c}`)");
-
-        sb.AppendLine(string.Join(", ", updateAssignments) + ";");
-
-        return (sb.ToString(), parameters.ToArray());
-    }
-
-    internal static (string, object[]) GenerateOracleUpsert<TEntity>(
-        DbContext dbContext,
-        IList<TEntity> entities,
-        Expression<Func<TEntity, string>> keySelector)
-        where TEntity : class
-    {
-        var entityType = dbContext.Model.FindEntityType(typeof(TEntity))!;
-        var schema = entityType.GetSchema();
-        var tableName = entityType.GetTableName()!;
-        var storeObject = StoreObjectIdentifier.Table(tableName, schema);
-        var sqlGenerationHelper = dbContext.GetService<ISqlGenerationHelper>();
-        var fullName = sqlGenerationHelper.DelimitIdentifier(tableName, schema);
-
-        var props = entityType.GetProperties().ToList();
-
-        var keyProp = entityType.FindProperty(keySelector.GetMemberAccess().Name)!;
-        var keyColumnName = keyProp.GetColumnName(storeObject)!;
-
-        // Pre-build quoted column names once and reuse throughout all clauses.
-        var quotedColumnNames = props
-            .Select(p => sqlGenerationHelper.DelimitIdentifier(p.GetColumnName(storeObject)!))
-            .ToList();
-        var quotedKeyColumnName = sqlGenerationHelper.DelimitIdentifier(keyColumnName);
-
-        var sb = new StringBuilder();
-        var parameters = new List<object>();
-        var parameterCount = 0;
-
-        sb.AppendLine($"MERGE INTO {fullName} Target");
-        sb.AppendLine("USING (SELECT");
-
-        for (var i = 0; i < entities.Count; i++)
-        {
-            var entity = entities[i];
-            var lineParts = new List<string>();
-
-            foreach (var property in props)
-            {
-                var paramName = $"{{{parameterCount++}}}";
-
-                var value = property.IsShadowProperty()
-                    ? dbContext.Entry(entity).Property(property.Name).CurrentValue
-                    : property.PropertyInfo?.GetValue(entity);
-
-                var converter = property.GetTypeMapping().Converter;
-                if (converter != null)
-                    value = converter.ConvertToProvider(value);
-
-                parameters.Add(value!);
-
-                // Aliases must be quoted so Oracle preserves their case, matching
-                // the quoted references in ON, UPDATE SET, and INSERT/VALUES below.
-                var quotedAlias = sqlGenerationHelper.DelimitIdentifier(property.GetColumnName(storeObject)!);
-
-                // In a SELECT … FROM DUAL subquery, ODP.NET has no target column to
-                // derive bind parameter types from and defaults to VARCHAR2 for .NET
-                // strings. Elsa's Oracle migrations define string columns as NVARCHAR2,
-                // so an explicit CAST is required to avoid a datatype mismatch error.
-                // The full EF Core column type string (e.g. "NVARCHAR2(450)") is
-                // used directly in the CAST so all Oracle type variants are handled
-                // correctly without any string parsing.
-                var columnType = property.GetColumnType() ?? string.Empty;
-                var expr = columnType.StartsWith("NVARCHAR2", StringComparison.OrdinalIgnoreCase)
-                    ? $"CAST({paramName} AS {columnType})"
-                    : paramName;
-
-                lineParts.Add($"{expr} AS {quotedAlias}");
-            }
-
-            var suffix = i < entities.Count - 1 ? " FROM DUAL UNION ALL SELECT" : " FROM DUAL";
-            sb.AppendLine(string.Join(", ", lineParts) + suffix);
-        }
-
-        sb.AppendLine($") Source ON (Target.{quotedKeyColumnName} = Source.{quotedKeyColumnName})");
-        sb.AppendLine("WHEN MATCHED THEN UPDATE SET");
-        sb.AppendLine(string.Join(", ", quotedColumnNames
-            .Where(c => c != quotedKeyColumnName)
-            .Select(c => $"Target.{c} = Source.{c}")));
-        sb.AppendLine("WHEN NOT MATCHED THEN");
-        sb.AppendLine($"INSERT ({string.Join(", ", quotedColumnNames)})");
-        sb.AppendLine($"VALUES ({string.Join(", ", quotedColumnNames.Select(c => $"Source.{c}"))});");
 
         return (sb.ToString(), parameters.ToArray());
     }

@@ -174,7 +174,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
                 new ProvisioningRequest(request.TenantId, normalizedConnectionKey, request.Identity, null, request.UserId),
                 cancellationToken: cancellationToken);
 
-            // Keep the optimistic reads outside the SQLite transaction so concurrent callers can observe the same
+            // Keep the optimistic reads outside the transaction so concurrent callers can observe the same
             // old link; the guarded delete and replacement insert remain atomic within the transaction.
             await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
             var deleted = await dbContext.ExternalIdentityLinks
