@@ -1,31 +1,29 @@
 <!--
   Sync Impact Report
   ===================
-  Version change: 1.1.0 → 1.2.0 (MINOR — updates the mandatory testing
-  discipline and quality-gate workflow for the repository-wide TUnit and
-  Microsoft Testing Platform migration.)
+  Version change: 1.2.0 → 1.3.0 (MINOR — replaces NUKE build/package
+  automation with standard .NET CLI and MSBuild guidance.)
 
-  Modified principles:
-    - V. Testing Discipline
-        - Replaces xUnit/VSTest guidance with TUnit 1.66.27 on Microsoft
-          Testing Platform.
-        - Requires native solution/project test commands, TUnit attributes and
-          asynchronous assertions, and aggregate Microsoft coverage.
-    - Technology Stack & Constraints
-        - Separates NUKE build/package automation from the native MTP test path.
-    - Development Workflow & Quality Gates
-        - Replaces the removed NUKE Test target with direct `dotnet test` usage.
+  Modified sections:
+    - Technology Stack & Constraints: SDK selected by global.json; MSBuild
+      and the .NET CLI own build and packaging.
+    - Development Workflow & Quality Gates: native restore/build/clean/pack
+      commands, explicit package versions, and unchanged MTP test entry points.
 
-  Added principles: none
-  Added sections: none
-  Removed sections: none
+  Rationale: remove the separate build project and bootstrap scripts while
+  keeping build configuration in MSBuild and workflow orchestration in CI.
+  Migration: use dotnet restore/build/clean/pack in place of build scripts;
+  install the selected SDK and the .NET 10 SDK/runtime for tests and apps.
 
   Runtime guidance updated:
     - AGENTS.md
     - .github/copilot-instructions.md
+    - CONTRIBUTING.md
+    - doc/wiki/build-run-operate.md
+    - doc/wiki/repository-map.md
+    - doc/wiki/testing-guide.md
     - doc/codebase/STACK.md
-    - doc/codebase/TESTING.md
-    - doc/codebase/CONVENTIONS.md
+    - doc/codebase/STRUCTURE.md
 
   Follow-up TODOs: none
 -->
@@ -209,7 +207,10 @@ is harder to undo once entrenched.
 - **Language**: C# latest (`<LangVersion>latest</LangVersion>`).
 - **Nullable reference types**: Enabled globally.
 - **Implicit usings**: Enabled globally.
-- **Build system**: NUKE build/package automation (`build/Build.cs`).
+- **Build system**: standard .NET CLI and MSBuild, with shared settings in
+  `Directory.Build.props` and `Directory.Build.targets`. The root `global.json`
+  selects SDK 11.0.100 with patch roll-forward and prereleases disabled. Install
+  the .NET 10 SDK/runtime alongside it for tests and application hosts.
 - **Testing**: TUnit 1.66.27 on Microsoft Testing Platform; the root
   `global.json` configures the runner and CI invokes `dotnet test` directly.
 - **Package management**: Central package management via
@@ -230,10 +231,13 @@ is harder to undo once entrenched.
 
 ```bash
 # Restore (always use --ignore-failed-sources for external feed resilience)
-./build.sh Restore --ignore-failed-sources
+dotnet restore Elsa.sln --ignore-failed-sources
 
-# Compile (excludes studio apps)
-./build.sh Compile
+# Build the solution
+dotnet build Elsa.sln --no-restore
+
+# Clean outputs for the selected configuration
+dotnet clean Elsa.sln --configuration Release
 
 # Complete repository test suite
 dotnet test --solution Elsa.sln
@@ -241,9 +245,15 @@ dotnet test --solution Elsa.sln
 # Focused test project
 dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj
 
-# Package after validation
-./build.sh Pack
+# Package after validation with an explicit version
+dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
+
+Builds default to Debug and CI commands explicitly select Release;
+`--configuration` overrides the default. Build outputs remain in project-local
+`bin/` and `obj/` directories. Packages go to `packages/`, with no automatic
+timestamp version suffix. `dotnet pack` restores and builds implicitly; use
+`--no-build` only after building the same configuration and version.
 
 For MTP commands, options consumed by the outer `dotnet test` command MUST
 appear before the literal `--`; options after it are forwarded to every selected
@@ -288,4 +298,4 @@ and development practices in the Elsa Workflows repository.
 - **Runtime guidance**: See `.github/copilot-instructions.md` for build
   commands, troubleshooting, and CI details.
 
-**Version**: 1.2.0 | **Ratified**: 2026-03-08 | **Last Amended**: 2026-09-14
+**Version**: 1.3.0 | **Ratified**: 2026-03-08 | **Last Amended**: 2026-11-13

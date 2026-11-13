@@ -39,10 +39,10 @@ Shared helpers:
 
 ## Useful Commands
 
-Restore first when starting from a clean checkout or after dependency changes:
+Use the SDK selected by [global.json](../../global.json) and install the .NET 10 SDK/runtime for test applications. Restore first when starting from a clean checkout or after dependency changes:
 
 ```bash
-./build.sh Restore --ignore-failed-sources
+dotnet restore Elsa.sln --ignore-failed-sources
 ```
 
 Build the solution with direct `dotnet` commands:

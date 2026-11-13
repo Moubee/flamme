@@ -27,6 +27,35 @@ All changes happen through Pull Requests targeting the `main` branch.
 4. Ensure the test suite passes.
 5. Open a Pull Request.
 
+### Build And Test
+
+Install the SDK selected by [global.json](global.json) (.NET SDK 11.0.100 with
+patch roll-forward), plus the .NET 10 SDK/runtime for test applications and app
+hosts. Source libraries continue to target .NET 8, 9, and 10.
+
+```bash
+dotnet restore Elsa.sln
+dotnet build Elsa.sln --configuration Release --no-restore
+dotnet test --solution Elsa.sln --configuration Release --no-build
+```
+
+While iterating, use `dotnet test --project <test.csproj>` to select a test
+project. Create versioned packages with:
+
+```bash
+dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
+```
+
+Packing restores and builds implicitly. Reuse existing outputs with `--no-build`
+only after building the same configuration and version. Packages are written to
+`packages/`; build and intermediate outputs remain in each project's `bin/` and
+`obj/` directories. Builds default to Debug and CI commands explicitly select
+Release; `--configuration` overrides the default. Use `dotnet clean Elsa.sln` to
+clean outputs for the selected configuration.
+
+See [Build, Run, And Operate](doc/wiki/build-run-operate.md) for targeted commands,
+server startup, and operational guidance.
+
 ### Architecture Decision Records
 
 Records live in `doc/adr/`. Name a new one `YYYY-MM-DD-slug.md` and give it a `# ` heading with the title

@@ -1,13 +1,13 @@
 # Version: 1
 # Description: Dockerfile for building and running Elsa Server with Datadog and OpenTelemetry auto-instrumentation
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100 AS build
 WORKDIR /source
 
 # Copy sources.
 COPY src/. ./src
 COPY ./NuGet.Config ./
-COPY *.props ./
+COPY *.props *.targets global.json ./
 
 # Restore packages.
 RUN dotnet restore "./src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj"

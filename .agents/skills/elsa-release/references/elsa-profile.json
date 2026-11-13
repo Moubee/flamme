@@ -14,13 +14,7 @@
         "Publish to feedz.io",
         "Publish release to nuget.org"
       ],
-      "fixed_packages": {
-        "Elsa.SamplePackage": {
-          "version": "1.0.1",
-          "verify_published": false,
-          "reason": "Sample project has its own fixed version; validate its artifact but do not require republishing an immutable sample version."
-        }
-      },
+      "fixed_packages": {},
       "npm": []
     },
     {

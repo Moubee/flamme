@@ -35,7 +35,8 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.x
+          global-json-file: global.json
+          dotnet-version: 10.0.x
 
       - name: Show .NET info
         run: |
@@ -106,7 +107,8 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.x
+          global-json-file: global.json
+          dotnet-version: 10.0.x
 
       - name: Show .NET info
         run: |
@@ -184,7 +186,8 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.x
+          global-json-file: global.json
+          dotnet-version: 10.0.x
 
       - name: Download unit and integration test results
         uses: actions/download-artifact@v4
@@ -233,6 +236,13 @@ jobs:
     timeout-minutes: 30
     if: ${{ github.event_name != 'pull_request' && needs.coverage_report.result == 'success' }}
     steps:
+      - name: Reclaim hosted runner disk space
+        shell: bash
+        run: |
+          df -h /
+          # These preinstalled toolchains are unused by the .NET build and tests.
+          sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
+          df -h /
       - name: Extract branch name
         run: |
           BRANCH_NAME=${{ github.ref }} # e.g., refs/heads/main
@@ -276,10 +286,17 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.x
+          global-json-file: global.json
+          dotnet-version: 10.0.x
 
-      - name: Compile+Pack
-        run: ./build.sh Compile+Pack --version ${VERSION}
+      - name: Restore
+        run: dotnet restore Elsa.sln -p:Version="$VERSION"
+
+      - name: Build
+        run: dotnet build Elsa.sln --configuration Release --no-restore -p:Version="$VERSION"
+
+      - name: Pack
+        run: dotnet pack Elsa.sln --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -313,6 +330,12 @@ jobs:
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: elsa-nuget-packages
+
+      - name: Set up .NET SDK
+        # Pinned for the reason given on the checkout above.
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: global.json
 
       - name: Publish to feedz.io
         uses: ./.github/actions/push-nuget-packages
@@ -348,6 +371,12 @@ jobs:
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: elsa-nuget-packages
+
+      - name: Set up .NET SDK
+        # Pinned for the reason given on the checkout above.
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: global.json
 
       # Exchanges a GitHub OIDC token for a temporary nuget.org API key (valid 1 hour).
       # Requires a Trusted Publishing policy on nuget.org matching:

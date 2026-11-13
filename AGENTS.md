@@ -7,7 +7,7 @@ Guidance for AI coding agents working in this repository.
 - Elsa Core is a .NET solution centered on `Elsa.sln`.
 - Production code lives under `src/`.
 - Tests live under `test/`, grouped by `unit`, `integration`, `component`, and `performance`.
-- Build automation is implemented with NUKE in `build/Build.cs` and exposed through `build.sh`, `build.ps1`, and `build.cmd`.
+- Build and package automation uses the .NET CLI and shared MSBuild settings in `Directory.Build.props` and `Directory.Build.targets`.
 
 ## Working Rules
 
@@ -27,13 +27,21 @@ Guidance for AI coding agents working in this repository.
 
 ## Build And Test Commands
 
-- Build the default target: `./build.sh`
-- Build with dotnet directly: `dotnet build Elsa.sln`
+- Restore dependencies: `dotnet restore Elsa.sln`
+- Build the solution: `dotnet build Elsa.sln`
+- Clean build outputs: `dotnet clean Elsa.sln`
+- Create versioned packages: `dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1`
 - Run the complete repository test suite: `dotnet test --solution Elsa.sln`
 - Run a specific test project: `dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj`
 - Run ElsaScript DSL integration tests: `./run-dsl-tests.sh`
 
-The root `global.json` selects Microsoft Testing Platform (MTP). Options for the
+Install the .NET SDK selected by the root `global.json` (11.0.100 with patch roll-forward)
+and the .NET 10 SDK/runtime for test applications and app hosts. Builds default
+to Debug; CI commands explicitly select Release. Pass `--configuration` to override. Packages go
+to `packages/`; build and intermediate outputs remain in each project's `bin/` and
+`obj/` directories. Set `-p:Version=<version>` explicitly for release or preview packages.
+
+The root `global.json` also selects Microsoft Testing Platform (MTP). Options for the
 outer `dotnet test` command go before the literal `--`; options after it are
 forwarded to each TUnit test application. Prefer targeted
 `dotnet test --project <csproj>` commands while iterating, then run
@@ -50,7 +58,7 @@ or cross-module behavior.
 
 ## Repository Structure
 
-- `src/apps/`: runnable app hosts and sample packages.
+- `src/apps/`: runnable app hosts.
 - `src/clients/`: client libraries.
 - `src/common/`: shared infrastructure and testing support.
 - `src/extensions/`: extension packages.
@@ -59,7 +67,7 @@ or cross-module behavior.
 - `test/integration/`: integration tests.
 - `test/component/`: component tests.
 - `test/performance/`: performance tests.
-- `build/`: NUKE build project.
+- `Directory.Build.props`, `Directory.Build.targets`: shared MSBuild configuration.
 - `doc/`, `design/`, and `specs/`: documentation, design assets, and feature specifications.
 
 ## Architecture Decision Records

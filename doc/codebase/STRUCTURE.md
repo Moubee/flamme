@@ -9,7 +9,7 @@
 | `src/modules/` | Feature and domain modules | `Elsa.sln` |
 | `src/clients/` | API client contracts | `src/clients/Elsa.Api.Client/` |
 | `test/` | Unit, integration, component, and performance tests | `test/Directory.Build.props` |
-| `build/` | NUKE build automation | `build/Build.cs` |
+| `Directory.Build.props`, `Directory.Build.targets` | Shared MSBuild build/package settings | `Elsa.sln`, `global.json` |
 | `specs/` | Feature specifications and plans | `specs/012-weaver-grounding-tools/plan.md` |
 
 ## Entry Points

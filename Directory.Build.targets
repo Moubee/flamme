@@ -1,4 +1,10 @@
 <Project>
+  <PropertyGroup>
+    <!-- Keep the package artifact contract for both libraries and app packages. -->
+    <PackageOutputPath>$(MSBuildThisFileDirectory)packages/</PackageOutputPath>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' And '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
   <!-- Use project references instead of NuGet packages for local development -->
   <PropertyGroup>
     <UseProjectReferences>true</UseProjectReferences>
