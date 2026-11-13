@@ -1,9 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="Version">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- This independently versioned sample is also checked by release verification. -->
         <Version>1.0.1</Version>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
