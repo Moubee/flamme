@@ -46,4 +46,12 @@ No PostgreSQL structured-log backend is bundled. The shared relational package r
 
 Removed backend and vNext tests are no longer part of the solution. In-memory suites cover provider-independent behavior. PostgreSQL suites cover durable behavior when their documented test-database prerequisites are configured. An in-memory run does not establish PostgreSQL migration, constraint, transaction, restart, or concurrency guarantees.
 
+Shared PostgreSQL fixtures create isolated databases on the server selected by
+`ELSA_TEST_POSTGRES`, or start a `postgres:17-alpine` Testcontainers instance when
+that variable is unset. Docker is required for the automatic container path;
+an explicitly configured server requires a role that can create databases. The
+helper drops only the isolated databases it creates. User Tasks conformance runs
+both supported backends by default; its optional supplied-database override is
+described in the conformance suite README.
+
 Older release notes, dated QA evidence, and security assessments describe their original revisions; their provider lists and test counts do not define current support.
