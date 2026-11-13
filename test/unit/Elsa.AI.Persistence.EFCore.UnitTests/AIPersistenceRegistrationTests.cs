@@ -2,7 +2,6 @@ using Elsa.AI.Abstractions.Contracts;
 using Elsa.AI.Abstractions.Models;
 using Elsa.Extensions;
 using Elsa.AI.Persistence.EFCore.Stores;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
@@ -15,10 +14,9 @@ public class AIPersistenceRegistrationTests
     [DisplayName("AI persistence store registration configures DbContext")]
     public async Task AIPersistenceStoreRegistrationConfiguresDbContext()
     {
-        using var connection = new SqliteConnection("DataSource=:memory:");
         var services = new ServiceCollection();
 
-        services.AddAIPersistenceStores(options => options.UseSqlite(connection));
+        services.AddAIPersistenceStores(options => options.UseNpgsql("Host=localhost;Database=elsa_registration"));
 
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
         using var scope = provider.CreateScope();
@@ -32,12 +30,11 @@ public class AIPersistenceRegistrationTests
     [DisplayName("AI persistence store registration replaces existing conversation store")]
     public async Task AIPersistenceStoreRegistrationReplacesExistingConversationStore()
     {
-        using var connection = new SqliteConnection("DataSource=:memory:");
         var services = new ServiceCollection();
         services.AddSingleton<IAIConversationStore, StubConversationStore>();
         services.AddSingleton<IAIProposalStore, StubProposalStore>();
 
-        services.AddAIPersistenceStores(options => options.UseSqlite(connection));
+        services.AddAIPersistenceStores(options => options.UseNpgsql("Host=localhost;Database=elsa_registration"));
 
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
         using var scope = provider.CreateScope();
@@ -59,9 +56,8 @@ public class AIPersistenceRegistrationTests
     [DisplayName("AI persistence store registration uses preconfigured DbContext options")]
     public async Task AIPersistenceStoreRegistrationUsesPreconfiguredDbContextOptions()
     {
-        using var connection = new SqliteConnection("DataSource=:memory:");
         var services = new ServiceCollection();
-        services.AddSingleton(new DbContextOptionsBuilder<AIDbContext>().UseSqlite(connection).Options);
+        services.AddSingleton(new DbContextOptionsBuilder<AIDbContext>().UseNpgsql("Host=localhost;Database=elsa_registration").Options);
 
         services.AddAIPersistenceStores();
 

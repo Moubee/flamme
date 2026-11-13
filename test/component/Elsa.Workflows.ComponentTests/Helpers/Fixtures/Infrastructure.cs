@@ -1,27 +1,26 @@
 using Elsa.Expressions.Helpers;
 using Elsa.Workflows.ComponentTests.Services;
-using Microsoft.Data.SqlClient;
-using Testcontainers.MsSql;
+using Npgsql;
+using Testcontainers.PostgreSql;
 using TUnit.Core.Interfaces;
 
 namespace Elsa.Workflows.ComponentTests.Fixtures;
 
 /// <summary>
-/// Owns the SQL Server container and migrated database template shared by the native TUnit test session.
+/// Owns the PostgreSQL container and migrated database template shared by the native TUnit test session.
 /// The session-shared <see cref="App"/> restores that immutable template exactly once.
 /// </summary>
 public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
 {
     private const string TemplateCatalogName = "elsa_component_template";
-    private const string TemplateBackupPath = "/var/opt/mssql/data/elsa_component_template.bak";
-    private MsSqlContainer? _dbContainer;
-    private DatabaseTemplate? _databaseTemplate;
+    private PostgreSqlContainer? _dbContainer;
+    private ComponentTestCatalog? _databaseTemplate;
     private bool _strictModeCaptured;
     private bool _originalStrictMode;
     private int _disposed;
 
-    public MsSqlContainer DbContainer => _dbContainer
-        ?? throw new InvalidOperationException("The component-test SQL Server infrastructure has not been initialized.");
+    public PostgreSqlContainer DbContainer => _dbContainer
+        ?? throw new InvalidOperationException("The component-test PostgreSQL infrastructure has not been initialized.");
 
     public async Task InitializeAsync()
     {
@@ -30,7 +29,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
 
         // Building the Testcontainers object performs Docker endpoint discovery and can throw.
         // Do that before mutating the process-wide parity setting.
-        var dbContainer = new MsSqlBuilder().Build();
+        var dbContainer = new PostgreSqlBuilder().WithImage("postgres:17-alpine").Build();
         _dbContainer = dbContainer;
         _originalStrictMode = ObjectConverter.StrictMode;
         _strictModeCaptured = true;
@@ -60,7 +59,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             }
 
             if (cleanupFailure is not null)
-                throw new AggregateException("SQL Server infrastructure initialization and cleanup both failed.", initializationFailure, cleanupFailure);
+                throw new AggregateException("PostgreSQL infrastructure initialization and cleanup both failed.", initializationFailure, cleanupFailure);
 
             throw;
         }
@@ -69,31 +68,14 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
     internal async Task RestoreDatabaseAsync(string catalogName, CancellationToken cancellationToken)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
-        var template = _databaseTemplate
+        _ = _databaseTemplate
             ?? throw new InvalidOperationException("The component database template has not been initialized.");
-        var physicalName = $"elsa_component_{Guid.NewGuid():N}";
-        var moveClauses = template.Files.Select(file =>
-        {
-            var extension = Path.GetExtension(file.PhysicalName);
-            if (string.IsNullOrWhiteSpace(extension))
-                extension = file.Type == "L" ? ".ldf" : ".mdf";
-            var targetPath = $"/var/opt/mssql/data/{physicalName}_{file.FileId}{extension}";
-            return $"MOVE N'{EscapeSqlLiteral(file.LogicalName)}' TO N'{EscapeSqlLiteral(targetPath)}'";
-        });
-        await using var connection = new SqlConnection(GetMasterConnectionString());
+        await using var connection = new NpgsqlConnection(GetMasterConnectionString());
         await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand();
-        command.CommandText = $"""
-            RESTORE DATABASE {QuoteIdentifier(catalogName)}
-            FROM DISK = N'{EscapeSqlLiteral(template.BackupPath)}'
-            WITH {string.Join(",\n     ", moveClauses)},
-                 RECOVERY,
-                 CHECKSUM,
-                 NEW_BROKER;
-            """;
+        command.CommandText = $"CREATE DATABASE {QuoteIdentifier(catalogName)} TEMPLATE {QuoteIdentifier(TemplateCatalogName)}";
         command.CommandTimeout = 120;
-        // Once RESTORE starts, let SQL Server finish atomically instead of leaving a cancelled
-        // test database in RESTORING state. CommandTimeout remains the hard upper bound.
+        // Once cloning starts, finish atomically so a cancelled test cannot leave provisioning ambiguous.
         await command.ExecuteNonQueryAsync(CancellationToken.None);
     }
 
@@ -125,7 +107,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             throw new AggregateException("Failed to dispose the component-test session infrastructure.", failure);
     }
 
-    private async Task<DatabaseTemplate> CreateDatabaseTemplateAsync(TestContext testContext)
+    private async Task<ComponentTestCatalog> CreateDatabaseTemplateAsync(TestContext testContext)
     {
         var scenarioDirectory = Path.Combine(AppContext.BaseDirectory, "Scenarios");
         if (!Directory.Exists(scenarioDirectory))
@@ -156,7 +138,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             DatabaseBootstrapOnly: true,
             DatabaseBootstrapTracker: bootstrapTracker);
 
-        DatabaseTemplate? databaseTemplate = null;
+        ComponentTestCatalog? databaseTemplate = null;
         Exception? operationFailure = null;
         try
         {
@@ -164,12 +146,16 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             if (bootstrapTracker.MigrationCount != 4)
                 throw new InvalidOperationException($"Expected one migration for each of four component schemas, but observed {bootstrapTracker.MigrationCount}.");
 
-            // The host has released every template connection. Clear its pool before BACKUP so
-            // the session image is stable and subsequent test hosts can only use restored copies.
-            using (var pooledConnection = new SqlConnection(templateConnectionString))
-                SqlConnection.ClearPool(pooledConnection);
-
-            databaseTemplate = await BackUpTemplateAsync(masterConnectionString, CancellationToken.None);
+            // PostgreSQL clones a database only when no sessions are connected to it. The host
+            // has stopped; clear its pool and disable new connections to keep the template immutable.
+            using (var pooledConnection = new NpgsqlConnection(templateConnectionString))
+                NpgsqlConnection.ClearPool(pooledConnection);
+            await using var connection = new NpgsqlConnection(masterConnectionString);
+            await connection.OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = $"ALTER DATABASE {QuoteIdentifier(TemplateCatalogName)} WITH ALLOW_CONNECTIONS false";
+            await command.ExecuteNonQueryAsync();
+            databaseTemplate = templateCatalog;
         }
         catch (Exception exception)
         {
@@ -177,13 +163,16 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
         }
 
         List<Exception>? cleanupFailures = null;
-        try
+        if (operationFailure is not null)
         {
-            await templateCatalog.DisposeAsync();
-        }
-        catch (Exception exception)
-        {
-            (cleanupFailures ??= []).Add(exception);
+            try
+            {
+                await templateCatalog.DisposeAsync();
+            }
+            catch (Exception exception)
+            {
+                (cleanupFailures ??= []).Add(exception);
+            }
         }
 
         try
@@ -204,7 +193,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             throw new AggregateException("Database-template cleanup failed.", cleanupFailures);
 
         return databaseTemplate
-            ?? throw new InvalidOperationException("Database-template creation completed without producing backup metadata.");
+            ?? throw new InvalidOperationException("Database-template creation completed without producing a migrated template.");
     }
 
     private static async Task StartAndStopTemplateHostAsync(
@@ -254,59 +243,9 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
             throw new AggregateException("Database-template host cleanup failed.", cleanupFailures);
     }
 
-    private static async Task<DatabaseTemplate> BackUpTemplateAsync(
-        string masterConnectionString,
-        CancellationToken cancellationToken)
-    {
-        await using var connection = new SqlConnection(masterConnectionString);
-        await connection.OpenAsync(cancellationToken);
-
-        await using (var backupCommand = connection.CreateCommand())
-        {
-            backupCommand.CommandText = $"""
-                BACKUP DATABASE {QuoteIdentifier(TemplateCatalogName)}
-                TO DISK = N'{EscapeSqlLiteral(TemplateBackupPath)}'
-                WITH COPY_ONLY, INIT, CHECKSUM;
-                """;
-            backupCommand.CommandTimeout = 120;
-            await backupCommand.ExecuteNonQueryAsync(cancellationToken);
-        }
-
-        await using (var verifyCommand = connection.CreateCommand())
-        {
-            verifyCommand.CommandText = $"RESTORE VERIFYONLY FROM DISK = N'{EscapeSqlLiteral(TemplateBackupPath)}' WITH CHECKSUM;";
-            verifyCommand.CommandTimeout = 120;
-            await verifyCommand.ExecuteNonQueryAsync(cancellationToken);
-        }
-
-        await using var fileListCommand = connection.CreateCommand();
-        fileListCommand.CommandText = $"RESTORE FILELISTONLY FROM DISK = N'{EscapeSqlLiteral(TemplateBackupPath)}';";
-        fileListCommand.CommandTimeout = 30;
-        await using var reader = await fileListCommand.ExecuteReaderAsync(cancellationToken);
-        var logicalNameOrdinal = reader.GetOrdinal("LogicalName");
-        var physicalNameOrdinal = reader.GetOrdinal("PhysicalName");
-        var typeOrdinal = reader.GetOrdinal("Type");
-        var fileIdOrdinal = reader.GetOrdinal("FileId");
-        var files = new List<DatabaseFile>();
-
-        while (await reader.ReadAsync(cancellationToken))
-        {
-            files.Add(new DatabaseFile(
-                reader.GetString(logicalNameOrdinal),
-                reader.GetString(physicalNameOrdinal),
-                reader.GetString(typeOrdinal),
-                Convert.ToInt32(reader.GetValue(fileIdOrdinal))));
-        }
-
-        if (files.Count == 0 || files.All(x => x.Type != "D") || files.All(x => x.Type != "L"))
-            throw new InvalidOperationException("The component database template backup did not contain both data and log files.");
-
-        return new DatabaseTemplate(TemplateBackupPath, files);
-    }
-
     private async Task CreateEmptyDatabaseAsync(string catalogName, CancellationToken cancellationToken)
     {
-        await using var connection = new SqlConnection(GetMasterConnectionString());
+        await using var connection = new NpgsqlConnection(GetMasterConnectionString());
         await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = $"CREATE DATABASE {QuoteIdentifier(catalogName)}";
@@ -314,15 +253,15 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private string GetConnectionString(string catalogName) => new SqlConnectionStringBuilder(DbContainer.GetConnectionString())
+    private string GetConnectionString(string catalogName) => new NpgsqlConnectionStringBuilder(DbContainer.GetConnectionString())
     {
-        InitialCatalog = catalogName,
+        Database = catalogName,
         Pooling = true
     }.ConnectionString;
 
-    private string GetMasterConnectionString() => new SqlConnectionStringBuilder(DbContainer.GetConnectionString())
+    private string GetMasterConnectionString() => new NpgsqlConnectionStringBuilder(DbContainer.GetConnectionString())
     {
-        InitialCatalog = "master",
+        Database = "postgres",
         Pooling = false
     }.ConnectionString;
 
@@ -335,12 +274,5 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
         _strictModeCaptured = false;
     }
 
-    private static string QuoteIdentifier(string identifier) => $"[{identifier.Replace("]", "]]", StringComparison.Ordinal)}]";
-    private static string EscapeSqlLiteral(string value) => value.Replace("'", "''", StringComparison.Ordinal);
-
-    private sealed record DatabaseTemplate(
-        string BackupPath,
-        IReadOnlyList<DatabaseFile> Files);
-
-    private sealed record DatabaseFile(string LogicalName, string PhysicalName, string Type, int FileId);
+    private static string QuoteIdentifier(string identifier) => $"\"{identifier.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
 }

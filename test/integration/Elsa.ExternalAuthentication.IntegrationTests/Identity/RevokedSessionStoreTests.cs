@@ -10,7 +10,8 @@ using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.EntityHandlers;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Identity;
-using Elsa.Persistence.EFCore.Sqlite;
+using Elsa.Persistence.EFCore.PostgreSql;
+using Elsa.Testing.Shared.Databases;
 using Elsa.Tenants.Options;
 using Elsa.Testing.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +97,7 @@ public abstract class RevokedSessionStoreTests
     [Test]
     public async Task DeleteExpiredKeepsRevocationsThatHaveNotExpired()
     {
-        // SQLite stores these as text, so sub-second and cross-month values check that ordering survives the conversion.
+        // Sub-second and cross-month values verify expiry ordering across the persistence boundary.
         await Store.AddOrExtendAsync(Revocation("expired", Now.AddMilliseconds(-500)));
         await Store.AddOrExtendAsync(Revocation("expires-just-after", Now.AddMilliseconds(250)));
         await Store.AddOrExtendAsync(Revocation("expires-next-month", Now.AddDays(40)));
@@ -135,9 +136,9 @@ public sealed class MemoryRevokedSessionStoreTests : RevokedSessionStoreTests
 }
 
 [InheritsTests]
-public sealed class SqliteRevokedSessionStoreTests : RevokedSessionStoreTests
+public sealed class PostgreSqlRevokedSessionStoreTests : RevokedSessionStoreTests
 {
-    private readonly string _databasePath = Path.Join(Path.GetTempPath(), $"elsa-identity-revoked-sessions-{Guid.NewGuid():N}.db");
+    private readonly PostgreSqlTestDatabase _database = new();
     private readonly InsertInterceptor _inserts = new();
     private ServiceProvider? _services;
     private IServiceScope? _scope;
@@ -159,15 +160,16 @@ public sealed class SqliteRevokedSessionStoreTests : RevokedSessionStoreTests
 
     protected override async Task<IRevokedSessionStore> CreateStoreAsync()
     {
+        await _database.OpenAsync();
         _services = new ServiceCollection()
             .AddLogging()
             .AddSingleton<ITenantAccessor>(TenantAccessor)
             .Configure<TenantsOptions>(options => options.IsEnabled = true)
             .AddScoped<IEntitySavingHandler, ApplyTenantId>()
             .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-            .AddSqliteEntityModelCreatingHandlers()
+            .AddPostgreSqlEntityModelCreatingHandlers()
             .AddDbContextFactory<IdentityElsaDbContext>((_, builder) =>
-                builder.UseElsaSqlite(typeof(IdentityDbContextFactory).Assembly, $"Data Source={_databasePath};Default Timeout=30;Pooling=False").AddInterceptors(_inserts))
+                builder.UseElsaPostgreSql(typeof(IdentityDbContextFactory).Assembly, _database.ConnectionString).AddInterceptors(_inserts))
             .Decorate<IDbContextFactory<IdentityElsaDbContext>, TenantAwareDbContextFactory<IdentityElsaDbContext>>()
             .AddScoped<EntityStore<IdentityElsaDbContext, RevokedSession>>()
             .AddScoped<EFCoreRevokedSessionStore>()
@@ -188,7 +190,7 @@ public sealed class SqliteRevokedSessionStoreTests : RevokedSessionStoreTests
         if (_services is not null)
             await _services.DisposeAsync();
 
-        File.Delete(_databasePath);
+        await _database.DisposeAsync();
     }
 
     // Runs an action just before the next insert reaches the database.

@@ -59,6 +59,8 @@ Source projects multi-target `net8.0`, `net9.0`, and `net10.0` through [src/Dire
 
 The main sample host is [src/apps/Elsa.Server.Web](../../src/apps/Elsa.Server.Web). It wires most major modules in [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
 
+Start PostgreSQL with `docker compose -f docker/docker-compose.yml up -d postgres` from the repository root. The checked-in `ConnectionStrings:PostgreSql` matches that development service; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
+
 Restore the project and run it with:
 
 ```bash
@@ -74,7 +76,7 @@ Notable toggles in `Program.cs`:
 - `useMultitenancy`
 - `disableVariableWrappers`
 
-The sample configures identity, default authentication, workflow management/runtime with SQLite, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants/structured logs.
+The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants/structured logs.
 
 When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings. Shell-based hosts use the shell feature path, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 

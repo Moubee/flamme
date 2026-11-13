@@ -1,5 +1,7 @@
 # Persistence Contract: Structured Log Persistence
 
+> Historical design, superseded 2026-11-13: the durable structured-log provider and its tests have been removed. Only bounded in-memory storage is bundled; the relational contracts remain extension points. See the [storage upgrade guide](../../../doc/postgres-inmemory-migration.md).
+
 ## IStructuredLogSink
 
 Append-only destination for redacted structured log events.

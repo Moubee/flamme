@@ -36,18 +36,6 @@ public class V3_6RuntimeMigrationTests
         await AssertDropIndexStatementsAreTerminated(script, schema);
     }
 
-    // Note: EF Core's SQLite provider does not support generating idempotent migration scripts
-    // (SqliteHistoryRepository.GetEndIfScript throws NotSupportedException), so only the plain
-    // script form is exercised here. The SQLite migration also never schema-qualifies its DROP
-    // INDEX statements, so there is no schema-prefixed variant to cover.
-    [Test]
-    public async Task GenerateScript_Sqlite_Plain_TerminatesDropIndexStatements()
-    {
-        var script = GenerateSqliteScript(MigrationsSqlGenerationOptions.Default);
-
-        await AssertDropIndexStatementsAreTerminated(script, schema: null);
-    }
-
     // ElsaDbContextOptions.SchemaName always falls back to ElsaDbContextBase.ElsaSchema ("Elsa") when it
     // isn't set, so the branch the V3_6 migration guards against with
     // `_schema.Schema != null ? "\"{schema}\"." : ""` - a null schema - is unreachable through the
@@ -61,17 +49,6 @@ public class V3_6RuntimeMigrationTests
             builder => builder.UseElsaPostgreSql(migrationsAssembly, "Host=unused", contextOptions),
             fromMigration: "20250530104953_V3_5",
             toMigration: "20251204150341_V3_6",
-            options);
-    }
-
-    private static string GenerateSqliteScript(MigrationsSqlGenerationOptions options)
-    {
-        var migrationsAssembly = typeof(Elsa.Persistence.EFCore.Sqlite.Migrations.Runtime.V3_6).Assembly;
-
-        return MigrationScriptGenerator.Generate<RuntimeElsaDbContext>(
-            builder => builder.UseElsaSqlite(migrationsAssembly, "Data Source=:memory:"),
-            fromMigration: "20250530104854_V3_5",
-            toMigration: "20251204150006_V3_6",
             options);
     }
 

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using Elsa.Common.Multitenancy;
 using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.EntityHandlers;
@@ -6,28 +7,28 @@ using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Secrets.Contracts;
 using Elsa.Secrets.Models;
 using Elsa.Secrets.Persistence.EFCore;
+using Elsa.Secrets.Persistence.EFCore.PostgreSql.Extensions;
 using Elsa.Secrets.Persistence.EFCore.Repositories;
-using Elsa.Secrets.Persistence.EFCore.Sqlite.Extensions;
 using Elsa.Secrets.Services;
 using Elsa.Tenants.Options;
+using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 
 namespace Elsa.Secrets.UnitTests;
 
 public class EFCoreSecretRepositoryTests
 {
-    private readonly string _databasePath = Path.Join(Path.GetTempPath(), $"elsa-secrets-{Guid.NewGuid():N}.db");
+    private readonly PostgreSqlTestDatabase _database = new();
     private readonly ServiceProvider _serviceProvider;
 
     public EFCoreSecretRepositoryTests()
     {
         var services = new ServiceCollection();
-        var connectionString = $"Data Source={_databasePath}";
-        services.AddSqliteEntityModelCreatingHandlers();
-        services.AddDbContextFactory<SecretsElsaDbContext>(builder => builder.UseElsaSqlite(typeof(SqliteSecretsPersistenceFeatureExtensions).Assembly, connectionString));
+        var connectionString = _database.ConnectionString;
+        services.AddPostgreSqlEntityModelCreatingHandlers();
+        services.AddDbContextFactory<SecretsElsaDbContext>(builder => builder.UseElsaPostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, connectionString));
         services.AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>();
         services.AddScoped<Store<SecretsElsaDbContext, Secret>>();
         services.AddScoped<EFCoreSecretRepository>();
@@ -48,8 +49,7 @@ public class EFCoreSecretRepositoryTests
     {
         await _serviceProvider.DisposeAsync();
 
-        if (File.Exists(_databasePath))
-            File.Delete(_databasePath);
+        await _database.DisposeAsync();
     }
 
     [Test]
@@ -451,17 +451,17 @@ public class EFCoreSecretRepositoryTests
 
     private static async Task WithTenantAwareRepositoryAsync(Func<EFCoreSecretRepository, DefaultTenantAccessor, Task> test, bool useLegacyConstructor = false)
     {
-        var databasePath = Path.Join(Path.GetTempPath(), $"elsa-secrets-tenant-{Guid.NewGuid():N}.db");
+        await using var database = new PostgreSqlTestDatabase();
         var tenantAccessor = new DefaultTenantAccessor();
         var services = new ServiceCollection()
-            .AddSqliteEntityModelCreatingHandlers()
+            .AddPostgreSqlEntityModelCreatingHandlers()
             .AddSingleton<ITenantAccessor>(tenantAccessor)
             .Configure<TenantsOptions>(options => options.IsEnabled = true)
             .AddScoped<IEntitySavingHandler, ApplyTenantId>()
             .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
             .AddDbContextFactory<SecretsElsaDbContext>(builder => builder
                 .EnableServiceProviderCaching(false)
-                .UseElsaSqlite(typeof(SqliteSecretsPersistenceFeatureExtensions).Assembly, $"Data Source={databasePath}"))
+                .UseElsaPostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, database.ConnectionString))
             .Decorate<IDbContextFactory<SecretsElsaDbContext>, TenantAwareDbContextFactory<SecretsElsaDbContext>>()
             .AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>()
             .AddScoped<Store<SecretsElsaDbContext, Secret>>()
@@ -485,8 +485,7 @@ public class EFCoreSecretRepositoryTests
         finally
         {
             await services.DisposeAsync();
-            if (File.Exists(databasePath))
-                File.Delete(databasePath);
+
         }
     }
 

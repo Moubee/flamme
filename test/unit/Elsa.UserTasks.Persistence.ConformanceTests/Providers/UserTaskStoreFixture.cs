@@ -41,11 +41,11 @@ public abstract class UserTaskStoreFixture : IAsyncInitializer, IAsyncDisposable
 
     public abstract IUserTaskRepository Repository { get; }
 
-    /// <summary>Overridden by providers that ship a guest session store. VNext deliberately does not.</summary>
+    /// <summary>Returns the provider's guest session store.</summary>
     public virtual IUserTaskGuestSessionIssuer GuestSessions =>
         throw new NotSupportedException($"Provider '{Provider.Name}' has no guest session store.");
 
-    /// <summary>Overridden by providers that ship an invitation outbox. VNext deliberately does not.</summary>
+    /// <summary>Returns the provider's invitation outbox.</summary>
     public virtual IUserTaskInvitationOutbox Outbox =>
         throw new NotSupportedException($"Provider '{Provider.Name}' has no invitation outbox.");
 

@@ -114,11 +114,11 @@ In-memory stores are the default for many features. EF Core provider packages re
 - runtime stores through `WorkflowRuntimeFeature`
 - identity, tenants, labels, alterations, and key values through their own feature hooks
 
-Provider-specific packages such as SQLite, SQL Server, PostgreSQL, MySQL, and Oracle depend on the shared EF Core module and provide database-specific setup.
+PostgreSQL provider packages depend on the shared EF Core module and provide database setup and migrations. Core in-memory stores support development and tests.
 
 ## Diagnostics Layer
 
-[Elsa.Diagnostics.StructuredLogs](../../src/modules/Elsa.Diagnostics.StructuredLogs) captures semantic `ILogger` events, redacts them, keeps recent events, exposes REST endpoints, and streams live events through SignalR. The default store is in-memory; SQLite persistence is available through the relational and SQLite persistence packages.
+[Elsa.Diagnostics.StructuredLogs](../../src/modules/Elsa.Diagnostics.StructuredLogs) captures semantic `ILogger` events, redacts them, keeps recent events, exposes REST endpoints, and streams live events through SignalR. The bundled store is bounded and in-memory; no durable structured-log backend is bundled.
 
 [Elsa.Diagnostics.ConsoleLogs](../../src/modules/Elsa.Diagnostics.ConsoleLogs) captures raw `stdout` and `stderr` from the host process, buffers recent lines, and streams live console output to authorized callers through SignalR. It is separate from structured logs and does not write to durable storage.
 

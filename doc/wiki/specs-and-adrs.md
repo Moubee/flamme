@@ -53,7 +53,7 @@ Current ADRs:
 | [002 graceful shutdown](../../specs/002-graceful-shutdown/spec.md) | Runtime | Defines quiescence, ingress sources, drain orchestration, interrupted recovery, and runtime admin endpoints. |
 | [003 live server logs](../../specs/003-live-server-logs/spec.md) | Diagnostics precursor | Earlier live server logs work that led to structured diagnostics. |
 | [004 diagnostics structured logs](../../specs/004-diagnostics-structured-logs/spec.md) | Diagnostics | Refactors server logs into structured log diagnostics with semantic `ILogger` capture. |
-| [005 structured log persistence](../../specs/005-structured-log-persistence/spec.md) | Diagnostics persistence | Adds storage abstraction, relational persistence, SQLite durability, migrations, write queue, and retention. |
+| [005 structured log persistence](../../specs/005-structured-log-persistence/spec.md) | Historical diagnostics persistence design | Storage contracts and relational helpers remain; the former durable provider has been removed. |
 | [006 diagnostics console logs](../../specs/006-diagnostics-console-logs/spec.md) | Diagnostics | Defines capture, buffering, endpoints, SignalR hub, permissions, source identity, and redaction for raw console output. |
 | [006 state machine activity](../../specs/006-state-machine-activity/spec.md) | Workflow core | Adds a state machine activity with named states and trigger-driven transitions to the workflow engine. |
 | [007 secrets module](../../specs/007-secrets-module/spec.md) | Secrets | Revamps the secrets module with named secrets, pluggable stores, extensible secret types, secret picker UX, permissions, import/export encryption support, and migration from existing sensitive fields. |
@@ -61,7 +61,6 @@ Current ADRs:
 | [008 Weaver AI copilot](../../specs/008-weaver-ai-copilot/spec.md) | AI | Implements Weaver, an agentic workflow assistant with streaming chat, context resolution, reviewable proposals, audit, and Studio integration. |
 | [009 operational dashboard](../../specs/009-operational-dashboard/prd.md) | Dashboard API | PRD for a read-only backend dashboard API module exposing workflow activity aggregates, health signals, and operational summaries without requiring Studio to orchestrate many separate requests. |
 | [010 workflow JSON hardening](../../specs/010-workflow-json-hardening/spec.md) | Workflow core | Introduces dedicated type aliases for workflow JSON, rejects unknown/unsafe CLR names, and preserves backward-compatible reads for selected legacy identifiers. |
-| [011 persistence vNext](../../specs/011-persistence-vnext/spec.md) | Persistence | Provider-neutral module-owned storage manifests, portable document/index store, relational and MongoDB physicalization, and schema versioning without per-provider migration packages. |
 | [012 output converters](../../specs/012-output-converters/spec.md) | Workflow core | Extensible, explicitly-identified output converters that transform an activity's native output at the binding boundary before writing the destination variable or workflow output. |
 | [012 external authentication](../../specs/012-external-authentication/spec.md) | Security | Server-brokered external identity providers: Identity Provider Connections, OpenID Connect adapter, linked identity resolution, configurable unlinked-identity policies, and EF Core persistence across all providers. |
 | [012 weaver grounding tools](../../specs/012-weaver-grounding-tools/spec.md) | AI | Grounds Weaver in real Elsa server data: activity registry discovery, workflow definition inspection, instance and incident investigation, and proposal-based workflow authoring with validation. |
@@ -111,7 +110,7 @@ For runtime behavior, read in this order:
 2. [specs/004-diagnostics-structured-logs/plan.md](../../specs/004-diagnostics-structured-logs/plan.md)
 3. [specs/005-structured-log-persistence/plan.md](../../specs/005-structured-log-persistence/plan.md)
 4. structured logs core package
-5. relational and SQLite persistence packages
+5. shared relational extension contracts (no bundled durable provider)
 6. structured logs unit/integration tests
 
 ## Reading Order For Secrets Work
@@ -156,7 +155,7 @@ For runtime behavior, read in this order:
 3. [ADR 0026](../adr/0026-identity-neutral-user-task-participants.md) — identity-neutral participant references
 4. [ADR 0027](../adr/0027-project-user-tasks-from-committed-bookmarks.md) — bookmark-projection model
 5. `Elsa.UserTasks` feature, contracts, and stores
-6. `Elsa.UserTasks.Persistence.EFCore` and vNext persistence packages
+6. `Elsa.UserTasks.Persistence.EFCore` and `Elsa.UserTasks.Persistence.EFCore.PostgreSql`
 
 ## Reading Order For BPMN Work
 
@@ -166,14 +165,6 @@ For runtime behavior, read in this order:
 4. `Elsa.Bpmn.Interchange/Binding/BpmnActivityBindingFormat.cs` — `elsa:` vendor extension
 5. `Elsa.Bpmn.Interchange/Features/BpmnInterchangeFeature.cs` — feature registration
 6. `test/integration/Elsa.Bpmn.IntegrationTests` and `Elsa.Bpmn.Interchange.IntegrationTests`
-
-## Reading Order For Persistence vNext Work
-
-1. [Persistence wiki page](persistence.md) — Persistence vNext section
-2. [specs/011-persistence-vnext/spec.md](../../specs/011-persistence-vnext/spec.md)
-3. [specs/011-persistence-vnext/roadmap.md](../../specs/011-persistence-vnext/roadmap.md)
-4. `Elsa.Persistence.VNext` core abstractions
-5. `Elsa.Persistence.VNext.Relational`, `Sqlite`, `PostgreSql`, `SqlServer`, `MongoDb` providers
 
 ## When To Write An ADR
 

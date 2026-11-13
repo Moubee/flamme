@@ -24,18 +24,6 @@ public class StructuredLogsStorageRegistrationTests
     }
 
     [Test]
-    public async Task StructuredLogsAssembly_DoesNotReferenceSqlitePersistence()
-    {
-        var references = typeof(IStructuredLogProvider)
-            .Assembly
-            .GetReferencedAssemblies()
-            .Select(x => x.Name)
-            .ToList();
-
-        await Assert.That(references).DoesNotContain("Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite");
-    }
-
-    [Test]
     public async Task AddStructuredLogsServices_RegistersLoggerProvider()
     {
         var services = new ServiceCollection();

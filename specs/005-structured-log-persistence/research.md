@@ -1,5 +1,7 @@
 # Research: Structured Log Persistence
 
+> Historical design, superseded 2026-11-13: the durable structured-log provider and its tests have been removed. Only bounded in-memory storage is bundled; the relational contracts remain extension points. See the [storage upgrade guide](../../doc/postgres-inmemory-migration.md).
+
 ## Decision: Preserve in-memory storage as the default
 
 **Rationale**: The existing bounded in-memory provider is the current structured logs behavior and has the lowest operational burden. It should remain the zero-configuration path for development, tests, and hosts that only need live diagnostics.

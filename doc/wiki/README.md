@@ -47,7 +47,7 @@ flowchart LR
 | [Expressions And Scripting](expressions-and-scripting.md) | Expression evaluators and language feature packages. |
 | [HTTP, Scheduling, And Resilience](http-scheduling-resilience.md) | Inbound HTTP workflows, outbound HTTP, scheduled triggers, and resilience strategies. |
 | [Persistence](persistence.md) | In-memory stores, EF Core stores, provider packages, migrations, and multi-provider rules. |
-| [Diagnostics Structured Logs](diagnostics-structured-logs.md) | `ILogger` capture, live feed, REST/SignalR surface, redaction, and SQLite persistence. |
+| [Diagnostics Structured Logs](diagnostics-structured-logs.md) | `ILogger` capture, live feed, REST/SignalR surface, redaction, and bounded in-memory storage. |
 | [Diagnostics Console Logs](diagnostics-console-logs.md) | Raw stdout/stderr capture, live feed, REST/SignalR surface, and redaction. |
 | [Health Checks](health-checks.md) | Elsa runtime readiness probes, liveness/readiness mapping, and Kubernetes probe guidance. |
 | [Identity, Tenancy, And Security](identity-tenancy-security.md) | Users, applications, roles, API keys, tenant resolution, and authorization touch points. |

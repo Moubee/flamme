@@ -53,13 +53,10 @@ Tasks use `[ID] [P?] [Story] Description with file path`. `[P]` tasks may run in
 
 - [x] T033 [US5] Scaffold `Elsa.UserTasks.Persistence.EFCore` with module DbContext, entity configurations, repository, and feature.
 - [x] T034 [P] [US5] Add normalized indexes and bounded JSON mappings for tasks, participants, audit, operations, invitations, guest sessions, and delivery outbox.
-- [x] T035 [P] [US5] Add SQLite provider configuration, migration, design-time factory, and shell feature.
-- [x] T036 [P] [US5] Add SQL Server provider configuration, migration, design-time factory, and shell feature.
 - [x] T037 [P] [US5] Add PostgreSQL provider configuration, migration, design-time factory, and shell feature.
-- [x] T038 [P] [US5] Add MySQL provider configuration, migration, design-time factory, and shell feature.
-- [x] T039 [P] [US5] Add Oracle provider configuration, migration, design-time factory, and shell feature.
-- [x] T040 [P] [US5] Add VNext document-store repository and feature.
-- [ ] T041 [US5] Add shared persistence conformance and SQLite restart/index/tenant/cursor tests. **Partially done (verified 2026-08-27)** — the shared conformance half has landed, the SQLite half has not. See the verification-status note below for exactly what exists.
+- [ ] T041 [US5] Verify shared in-memory/PostgreSQL persistence conformance and PostgreSQL restart/index/tenant/cursor behavior.
+
+T035, T036, and T038–T040 are withdrawn following the supported-storage reduction; their packages and provider-specific tests have been removed.
 
 ## Phase 6: Elsa Studio
 
@@ -86,7 +83,7 @@ Tasks use `[ID] [P?] [Story] Description with file path`. `[P]` tasks may run in
 
 ## Dependencies
 
-T001–T008 precede implementation. Domain T009–T015 precede runtime T016–T019 and REST commands. Auth contracts T011/T014 precede all public queries. Core REST T021–T027 precedes Studio T042–T050. Invitations depend on the core state machine and REST security. EF/VNext depend on repository contracts but can proceed alongside Studio after the Core slice stabilizes. Documentation and final gates follow all slices.
+T001–T008 precede implementation. Domain T009–T015 precede runtime T016–T019 and REST commands. Auth contracts T011/T014 precede all public queries. Core REST T021–T027 precedes Studio T042–T050. Invitations depend on the core state machine and REST security. PostgreSQL EF Core persistence depends on repository contracts but can proceed alongside Studio after the Core slice stabilizes. Documentation and final gates follow all slices.
 
 ## Requirement traceability
 
@@ -112,13 +109,7 @@ worktree. The following remain open and are deliberately left unchecked:
   end to end.
 - **T027** — authorization, concealment, idempotency, and conflict behavior are covered at the service
   layer. There are no HTTP-level endpoint tests asserting the status-code mapping.
-- **T041** — *partially closed 2026-08-27.* The shared conformance half has landed: the suite runs
-  across in-memory, EF Core (SQLite, SQL Server, PostgreSQL, Oracle) and VNext, declared in
-  `ProviderConformanceSuites.cs`, with `ConformanceCoverageTests` failing the run when a provider
-  silently skips. Tenant and cursor behaviour are covered. Still missing are the SQLite **restart**
-  and **index** tests this task also names — there is no restart/reopen test anywhere in the
-  persistence suites, and no index-specific assertion. MySQL is additionally uncovered: it is pinned
-  to net8.0/net9.0 because Pomelo tops out at EF Core 9 — see `doc/migrations/secrets-tenancy.md`.
+- **T041** — PostgreSQL and in-memory are the supported conformance targets. PostgreSQL restart/reopen and index behavior require database-backed evidence; an in-memory test run does not establish those guarantees.
 - **T047** — the Studio activity editor contribution and participant-picker integration for the
   designer are not implemented.
 - **T050** — Studio tests cover the wire contract, URL state, and error mapping. Component-level tests

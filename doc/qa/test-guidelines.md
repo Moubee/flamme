@@ -26,7 +26,7 @@ For contributors, tests are the first line of code review: they must document in
 - **Invoker** — the core engine component that orchestrates workflow execution, including activity execution, scheduling, and state transitions.
 - **Scheduler** — the subsystem that manages background tasks, timers, and resumption of workflows.
 - **Journal** — a log of all activity executions and state changes in a workflow instance.
-- **Persistence** — the storage mechanism for workflow definitions and instances (e.g., EF Core, MongoDB).
+- **Persistence** — the storage mechanism for workflow definitions and instances (in-memory stores or PostgreSQL through EF Core).
 - **Unit Test** — a test that verifies a small, isolated piece of code (such as a function or method) works as expected.
 - **Integration Test** — a test that verifies the interaction between multiple components or subsystems works as expected.
 - **Component Test** — a test that verifies the behavior of a larger part of the system, often involving persistence and external dependencies.

@@ -9,7 +9,6 @@ public class Label : Entity
 {
     /// <summary>
     /// Shared maximum for <see cref="Name"/> and <see cref="NormalizedName"/>.
-    /// Matches the MySQL unique-index limit that every provider's schema must honor.
     /// </summary>
     public const int NameMaxLength = 255;
 

@@ -645,7 +645,7 @@ public sealed class InMemoryWorkflowStoreConformanceTests : WorkflowStoreConform
 }
 
 [InheritsTests]
-public sealed class SqliteWorkflowStoreConformanceTests : WorkflowStoreConformanceTests
+public sealed class PostgreSqlWorkflowStoreConformanceTests : WorkflowStoreConformanceTests
 {
-    protected override Task<WorkflowStoreScenario> CreateScenarioAsync() => WorkflowStoreScenario.CreateSqliteAsync();
+    protected override Task<WorkflowStoreScenario> CreateScenarioAsync() => WorkflowStoreScenario.CreatePostgreSqlAsync();
 }

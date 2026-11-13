@@ -1,10 +1,8 @@
-using System.Globalization;
 using Elsa.Common.Entities;
 using Elsa.Common.Multitenancy;
 using Elsa.Persistence.EFCore;
 using Elsa.Tenants.Options;
 using Elsa.Testing.Shared.Multitenancy;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -52,34 +50,6 @@ public sealed class OwnershipStoreScenario : IAsyncDisposable
 
     public ValueTask DisposeAsync() => _disposeAsync();
 
-    public const string NoAccentCollation = "NOACCENT";
-
-    public static async Task<OwnershipStoreScenario> CreateSqliteAsync(string tenantId, bool tenantsEnabled, string? keyCollation = null)
-    {
-        var connection = new SqliteConnection("Data Source=:memory:");
-        await connection.OpenAsync();
-        // Stands in for accent-insensitive collations such as MySQL ai_ci or SQL Server CI_AI.
-        connection.CreateCollation(NoAccentCollation, (x, y) => string.Compare(
-            x, y, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace));
-        try
-        {
-            return await CreateAsync(
-                tenantId,
-                tenantsEnabled,
-                builder => builder.UseSqlite(connection),
-                async () =>
-                {
-                    await connection.DisposeAsync();
-                },
-                keyCollation);
-        }
-        catch
-        {
-            await connection.DisposeAsync();
-            throw;
-        }
-    }
-
     public static async Task<OwnershipStoreScenario> CreatePostgreSqlAsync(string connectionString, string tenantId, bool tenantsEnabled)
     {
         var (isolatedConnectionString, adminConnectionString, database) = await CreateIsolatedDatabaseAsync(connectionString);
@@ -102,8 +72,7 @@ public sealed class OwnershipStoreScenario : IAsyncDisposable
         string tenantId,
         bool tenantsEnabled,
         Action<DbContextOptionsBuilder> configure,
-        Func<ValueTask> disposeAsync,
-        string? keyCollation = null)
+        Func<ValueTask> disposeAsync)
     {
         var tenantAccessor = new TestTenantAccessor(tenantId);
         var services = new ServiceCollection()
@@ -119,20 +88,7 @@ public sealed class OwnershipStoreScenario : IAsyncDisposable
         await using (var dbContext = await factory.CreateDbContextAsync())
         {
             await dbContext.Database.EnsureCreatedAsync();
-            if (keyCollation != null)
-            {
-                var tableName = dbContext.Model.FindEntityType(typeof(OwnedRow))!.GetTableName()!;
-                var recreateSql =
-                    $"""
-                    DROP TABLE IF EXISTS "{tableName}";
-                    CREATE TABLE "{tableName}" (
-                        "Id" TEXT NOT NULL PRIMARY KEY COLLATE {keyCollation},
-                        "TenantId" TEXT NULL,
-                        "Payload" TEXT NOT NULL
-                    );
-                    """;
-                await dbContext.Database.ExecuteSqlRawAsync(recreateSql);
-            }
+
         }
 
         return new OwnershipStoreScenario(

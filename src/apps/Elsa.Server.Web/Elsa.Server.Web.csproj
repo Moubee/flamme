@@ -9,7 +9,7 @@
 		<ProjectReference Include="..\..\modules\Elsa.Diagnostics.StructuredLogs\Elsa.Diagnostics.StructuredLogs.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Dsl.ElsaScript\Elsa.Dsl.ElsaScript.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Expressions\Elsa.Expressions.csproj" />
-		<ProjectReference Include="..\..\modules\Elsa.Persistence.EFCore.Sqlite\Elsa.Persistence.EFCore.Sqlite.csproj" />
+		<ProjectReference Include="..\..\modules\Elsa.Persistence.EFCore.PostgreSql\Elsa.Persistence.EFCore.PostgreSql.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Scheduling\Elsa.Scheduling.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.WorkflowProviders.BlobStorage.ElsaScript\Elsa.WorkflowProviders.BlobStorage.ElsaScript.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.WorkflowProviders.BlobStorage\Elsa.WorkflowProviders.BlobStorage.csproj" />

@@ -16,7 +16,8 @@ using Elsa.Identity.Services;
 using Elsa.Persistence.EFCore;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Workflows;
-using Microsoft.Data.Sqlite;
+using Elsa.Testing.Shared.Databases;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -197,7 +198,7 @@ public abstract class ExternalAuthenticationStoreConformanceTests
         await using var scenario = await CreateScenarioAsync();
         var old = (await scenario.IdentityProvisioner.CreateLinkOrGetExistingAsync(new ProvisioningRequest("tenant-a", "contoso", Identity("subject-old"), null, "user-a"))).Link;
 
-        // SQLite coordinates both initial reads before either caller starts the replacement transaction, proving that
+        // PostgreSQL coordinates both initial reads before either caller starts the replacement transaction, proving that
         // each guarded DELETE races from the same observed old-link state.
         var results = await RunConcurrentlyAsync(scenario, ConformanceRacePoint.IdentityLinkReplace,
             () => scenario.IdentityProvisioner.ReplaceAsync(new ExternalIdentityLinkReplaceRequest("tenant-a", old.Id, "user-a", "contoso", Identity("subject-a"))),
@@ -381,9 +382,9 @@ public sealed class InMemoryExternalAuthenticationStoreConformanceTests : Extern
 }
 
 [InheritsTests]
-public sealed class SqliteExternalAuthenticationStoreConformanceTests : ExternalAuthenticationStoreConformanceTests
+public sealed class PostgreSqlExternalAuthenticationStoreConformanceTests : ExternalAuthenticationStoreConformanceTests
 {
-    protected override Task<ExternalAuthenticationStoreScenario> CreateScenarioAsync() => ExternalAuthenticationStoreScenario.CreateSqliteAsync();
+    protected override Task<ExternalAuthenticationStoreScenario> CreateScenarioAsync() => ExternalAuthenticationStoreScenario.CreatePostgreSqlAsync();
 }
 
 public enum ConformanceRacePoint
@@ -456,9 +457,9 @@ public sealed class ExternalAuthenticationStoreScenario(
             });
     }
 
-    public static async Task<ExternalAuthenticationStoreScenario> CreateSqliteAsync()
+    public static async Task<ExternalAuthenticationStoreScenario> CreatePostgreSqlAsync()
     {
-        var databasePath = Path.Combine(Path.GetTempPath(), $"elsa-external-authentication-conformance-{Guid.NewGuid():N}.db");
+        var database = new PostgreSqlTestDatabase();
         var hasher = new HmacExternalAuthenticationHandleHasher();
         var races = new ConformanceRaceCoordinator(true);
         ServiceProvider? services = null;
@@ -466,9 +467,10 @@ public sealed class ExternalAuthenticationStoreScenario(
 
         try
         {
+            await database.OpenAsync();
             var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
             optionsBuilder.UseElsaDbContextOptions(null);
-            optionsBuilder.UseSqlite($"Data Source={databasePath};Default Timeout=30", sqlite => sqlite.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.Sqlite.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+            optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
             optionsBuilder.AddInterceptors(races);
             var options = optionsBuilder.Options;
             services = new ServiceCollection()
@@ -499,14 +501,13 @@ public sealed class ExternalAuthenticationStoreScenario(
                 new EFCoreIdentityProviderConnectionStore(leaseFactory),
                 provisioner,
                 new EFCoreConnectionRegistryVersionStore(leaseFactory),
-                AssertSqliteRefreshTokenConflictAsync,
+                AssertPostgreSqlRefreshTokenConflictAsync,
                 races,
                 async () =>
                 {
                     hasher.Dispose();
                     await services!.DisposeAsync();
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(databasePath);
+                    await database.DisposeAsync();
                 });
         }
         catch
@@ -514,8 +515,7 @@ public sealed class ExternalAuthenticationStoreScenario(
             hasher.Dispose();
             if (services is not null)
                 await services.DisposeAsync();
-            SqliteConnection.ClearAllPools();
-            File.Delete(databasePath);
+            await database.DisposeAsync();
             throw;
         }
     }
@@ -523,19 +523,18 @@ public sealed class ExternalAuthenticationStoreScenario(
     private static async Task AssertInMemoryRefreshTokenConflictAsync(Func<Task> operation) =>
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(operation);
 
-    private static async Task AssertSqliteRefreshTokenConflictAsync(Func<Task> operation)
+    private static async Task AssertPostgreSqlRefreshTokenConflictAsync(Func<Task> operation)
     {
         var exception = await CaptureExceptionAsync(operation);
-        var sqliteException = exception switch
+        var postgresException = exception switch
         {
-            DbUpdateException { InnerException: SqliteException inner } => inner,
-            SqliteException direct => direct,
-            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a SQLite uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
+            DbUpdateException { InnerException: PostgresException inner } => inner,
+            PostgresException direct => direct,
+            _ => throw new TUnit.Assertions.Exceptions.AssertionException($"Expected a PostgreSQL uniqueness violation, received {exception?.GetType().FullName ?? "no exception"}.")
         };
 
-        await Assert.That(sqliteException.SqliteErrorCode).IsEqualTo(19);
-        await Assert.That(sqliteException.Message).Contains("UNIQUE constraint failed").WithComparison(StringComparison.Ordinal);
-        await Assert.That(sqliteException.Message).Contains("ExternalAuthenticationSessionRefreshTokens.Hash").WithComparison(StringComparison.Ordinal);
+        await Assert.That(postgresException.SqlState).IsEqualTo(PostgresErrorCodes.UniqueViolation);
+        await Assert.That(postgresException.ConstraintName).IsEqualTo("IX_ExternalAuthenticationSessionRefreshToken_Hash");
     }
 
     private static async Task<Exception?> CaptureExceptionAsync(Func<Task> operation)
@@ -551,7 +550,7 @@ public sealed class ExternalAuthenticationStoreScenario(
         }
     }
 
-    // SQLite uses reader-disposal boundaries to hold both callers after EF has consumed their results and before
+    // PostgreSQL uses reader-disposal boundaries to hold both callers after EF has consumed their results and before
     // mutation. The in-memory implementations complete synchronously while holding their private lock, so there is no
     // safe public boundary at which a test can pause both callers without changing production code; its completed handle
     // still exercises the same shared outcomes.
@@ -661,11 +660,12 @@ public sealed class ExternalAuthenticationStoreScenario(
         };
 
         public bool MatchesMutation(string commandText) => Point == ConformanceRacePoint.RegistryVersionAdvance &&
-            commandText.Contains("UPDATE \"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
+            commandText.Contains("UPDATE \"Elsa\".\"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
 
         private static bool IsSelectFrom(string commandText, string tableName) =>
             commandText.Contains("SELECT", StringComparison.Ordinal) &&
-            commandText.Contains($"FROM \"{tableName}\"", StringComparison.Ordinal);
+            (commandText.Contains($"FROM \"{tableName}\"", StringComparison.Ordinal) ||
+             commandText.Contains($"FROM \"Elsa\".\"{tableName}\"", StringComparison.Ordinal));
     }
 
     private static async Task<(MemoryUserStore Users, StoreBasedUserProvider Provider)> CreateUsersAsync()

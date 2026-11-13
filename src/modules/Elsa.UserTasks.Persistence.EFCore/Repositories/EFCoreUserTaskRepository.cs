@@ -5,6 +5,9 @@ using Elsa.UserTasks.Contracts;
 using Elsa.UserTasks.Models;
 using Elsa.UserTasks.Persistence.EFCore.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Elsa.UserTasks.Persistence.EFCore.Repositories;
 
@@ -191,7 +194,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
             records = records.Where(x => x.AssigneeType == query.AssigneeType);
         if (!string.IsNullOrWhiteSpace(query.AssigneeId))
             records = records.Where(x => x.AssigneeId == query.AssigneeId);
-        records = ApplySafeSearch(records, query.Search);
+        records = ApplySafeSearch(dbContext, records, query.TenantId, query.Search);
 
         var limit = query.Limit is > 0 ? Math.Min(query.Limit.Value, 200) : 100;
         return await records.OrderBy(x => x.DueAt == null).ThenBy(x => x.DueAt).ThenByDescending(x => x.Priority).ThenBy(x => x.CreatedAt).ThenBy(x => x.Id).Take(limit).ToListAsync(cancellationToken);
@@ -265,7 +268,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
             records = records.Where(x => x.WorkflowInstanceId == query.WorkflowInstanceId);
         if (!string.IsNullOrWhiteSpace(query.Reference))
             records = records.Where(x => x.Reference == query.Reference);
-        records = ApplySafeSearch(records, query.Search);
+        records = ApplySafeSearch(dbContext, records, query.TenantId, query.Search);
         if (query.Scope is { } requestedScope &&
             (!string.Equals(requestedScope.TenantId, query.TenantId, StringComparison.Ordinal) ||
              !string.Equals(requestedScope.Subject.TenantId, query.TenantId, StringComparison.Ordinal) ||
@@ -341,23 +344,42 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
 
     /// <summary>
     /// Safe search is a bounded text contains over title, summary, reference, task type, and tags.
-    /// Tags stay in the existing <c>TagsJson</c> column as a primitive collection, so each tag is
-    /// matched individually and case-insensitively — the same semantics as InMemory/VNext, with no
+    /// Tags stay in the existing JSON-text <c>TagsJson</c> column, so each tag is
+    /// matched individually and case-insensitively — the same semantics as InMemory, with no
     /// tag table and no JSON-syntax false positives.
     /// </summary>
-    private static IQueryable<UserTaskRecord> ApplySafeSearch(IQueryable<UserTaskRecord> records, string? search)
+    private static IQueryable<UserTaskRecord> ApplySafeSearch(UserTasksElsaDbContext dbContext, IQueryable<UserTaskRecord> records, string tenantId, string? search)
     {
         if (string.IsNullOrWhiteSpace(search))
             return records;
 
         var value = search.Trim();
         var tag = value.ToLower();
+        var entityType = dbContext.Model.FindEntityType(typeof(UserTaskRecord))!;
+        var tableName = entityType.GetTableName()!;
+        var schema = entityType.GetSchema();
+        var tableIdentifier = StoreObjectIdentifier.Table(tableName, schema);
+        var sqlHelper = dbContext.GetService<ISqlGenerationHelper>();
+        // SqlQueryRaw applies composite formatting after SQL identifier quoting.
+        static string EscapeFormat(string identifier) => identifier.Replace("{", "{{", StringComparison.Ordinal).Replace("}", "}}", StringComparison.Ordinal);
+        var table = EscapeFormat(sqlHelper.DelimitIdentifier(tableName, schema));
+        var idColumn = EscapeFormat(sqlHelper.DelimitIdentifier(entityType.FindProperty(nameof(UserTaskRecord.Id))!.GetColumnName(tableIdentifier)!));
+        var tagsColumn = EscapeFormat(sqlHelper.DelimitIdentifier(entityType.FindProperty(nameof(UserTaskRecord.Tags))!.GetColumnName(tableIdentifier)!));
+        var tenantColumn = EscapeFormat(sqlHelper.DelimitIdentifier(entityType.FindProperty(nameof(UserTaskRecord.TenantId))!.GetColumnName(tableIdentifier)!));
+        // Only provider-delimited model identifiers enter the SQL text; search stays a parameter.
+        var tagQuerySql = $$"""
+            SELECT {{idColumn}} AS "Value" FROM {{table}}
+            WHERE {{tenantColumn}} = {0} AND EXISTS (
+                SELECT 1 FROM jsonb_array_elements_text({{tagsColumn}}::jsonb) AS tag(value)
+                WHERE strpos(lower(tag.value), {1}) > 0)
+            """;
+        var matchingTagIds = dbContext.Database.SqlQueryRaw<string>(tagQuerySql, tenantId, tag);
         return records.Where(x =>
             x.Title.Contains(value)
             || (x.Summary != null && x.Summary.Contains(value))
             || (x.Reference != null && x.Reference.Contains(value))
             || (x.TaskType != null && x.TaskType.Contains(value))
-            || x.Tags.Any(t => t.ToLower().Contains(tag)));
+            || matchingTagIds.Contains(x.Id));
     }
 
     private static IQueryable<UserTaskRecord> ApplyOrdering(IQueryable<UserTaskRecord> records, UserTaskQuery query)
@@ -370,7 +392,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
             "priority" when query.Descending => records.OrderByDescending(x => x.Priority).ThenBy(x => x.Id),
             "priority" => records.OrderBy(x => x.Priority).ThenBy(x => x.Id),
             // Title OrderBy and cursor use column collation (self-consistent). Title cursors are not
-            // portable to InMemory/VNext ordinal comparison; recreate the list after a provider change.
+            // portable to InMemory ordinal comparison; recreate the list after a provider change.
             "title" when query.Descending => records.OrderByDescending(x => x.Title).ThenBy(x => x.Id),
             "title" => records.OrderBy(x => x.Title).ThenBy(x => x.Id),
             "updated" when query.Descending => records.OrderByDescending(x => x.UpdatedAt).ThenBy(x => x.Id),

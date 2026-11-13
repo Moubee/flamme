@@ -1,31 +1,15 @@
 <!--
   Sync Impact Report
   ===================
-  Version change: 1.2.0 → 1.3.0 (MINOR — replaces NUKE build/package
-  automation with standard .NET CLI and MSBuild guidance.)
+  Version change: 1.3.0 → 1.4.0 (MINOR — narrows supported persistence
+  infrastructure to PostgreSQL and in-memory stores.)
 
-  Modified sections:
-    - Technology Stack & Constraints: SDK selected by global.json; MSBuild
-      and the .NET CLI own build and packaging.
-    - Development Workflow & Quality Gates: native restore/build/clean/pack
-      commands, explicit package versions, and unchanged MTP test entry points.
-
-  Rationale: remove the separate build project and bootstrap scripts while
-  keeping build configuration in MSBuild and workflow orchestration in CI.
-  Migration: use dotnet restore/build/clean/pack in place of build scripts;
-  install the selected SDK and the .NET 10 SDK/runtime for tests and apps.
-
-  Runtime guidance updated:
-    - AGENTS.md
-    - .github/copilot-instructions.md
-    - CONTRIBUTING.md
-    - doc/wiki/build-run-operate.md
-    - doc/wiki/repository-map.md
-    - doc/wiki/testing-guide.md
-    - doc/codebase/STACK.md
-    - doc/codebase/STRUCTURE.md
-
-  Follow-up TODOs: none
+  Modified section: Technology Stack & Constraints / Persistence.
+  Rationale: remove unmaintained database providers and the vNext system.
+  Runtime guidance updated: AGENTS.md, persistence wiki, current specs.
+  Migration guidance: doc/postgres-inmemory-migration.md.
+  Existing native .NET build/package guidance, modular store interfaces, and
+  testing principles remain unchanged.
 -->
 
 # Elsa Workflows Constitution
@@ -218,12 +202,14 @@ is harder to undo once entrenched.
 - **Serialization**: System.Text.Json with custom converters and type
   registries; polymorphic serialisation via `IWellKnownTypeRegistry`.
 - **Persistence**: EF Core with per-module `DbContext`; generic
-  `Store<TDbContext, TEntity>` base class; supports SQL Server, PostgreSQL,
-  MySQL, SQLite, Oracle.
+  `Store<TDbContext, TEntity>` base class; PostgreSQL is the supported durable
+  database. Core in-memory stores remain available for development and tests.
+  Structured logs use bounded in-memory storage; no durable provider is bundled.
 - **Multi-tenancy**: `ITenantAccessor` with `AsyncLocal<Tenant?>` context;
   query filters for tenant isolation.
 - **License**: MIT.
-- **Docker**: Server, Studio, and combined images available under `docker/`.
+- **Docker**: Server images are available under `docker/`; Studio is maintained
+  and hosted separately.
 
 ## Development Workflow & Quality Gates
 
@@ -298,4 +284,4 @@ and development practices in the Elsa Workflows repository.
 - **Runtime guidance**: See `.github/copilot-instructions.md` for build
   commands, troubleshooting, and CI details.
 
-**Version**: 1.3.0 | **Ratified**: 2026-03-08 | **Last Amended**: 2026-11-13
+**Version**: 1.4.0 | **Ratified**: 2026-03-08 | **Last Amended**: 2026-11-14

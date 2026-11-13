@@ -1,17 +1,16 @@
 #!/usr/bin/env zsh
 
+repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
+
 # Define the modules to update
 mods=("Alterations" "Runtime" "Management" "Identity" "Labels")
 
 # Define the list of providers
-providers=("MySql" "SqlServer" "Sqlite" "PostgreSql" "Oracle")
+providers=("PostgreSql")
 
 # Connection strings for each provider
 typeset -A connStrings
 connStrings=(
-    MySql "Server=localhost;Port=3306;Database=elsa;User=root;Password=password;"
-    SqlServer ""
-    Sqlite ""
     PostgreSql ""
 )
 
@@ -19,7 +18,7 @@ connStrings=(
 for module in "${mods[@]}"; do
     # Loop through each provider
     for provider in "${providers[@]}"; do
-        providerPath="../src/modules/Elsa.EntityFrameworkCore.$provider"
+        providerPath="$repository_root/src/modules/Elsa.Persistence.EFCore.$provider"
         migrationsPath="Migrations/$module"
     
         echo "Updating migrations for $provider..."

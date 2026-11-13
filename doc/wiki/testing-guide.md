@@ -30,12 +30,11 @@ Shared helpers:
 | API endpoint shape or authorization | Unit/integration endpoint test if existing pattern exists; component test for host-level behavior. |
 | EF Core store or migration | Provider-specific integration/component test. |
 | HTTP workflows | Component test under HTTP workflow scenarios. |
-| Structured log SQLite persistence | SQLite integration test project. |
+| Structured log capture, storage, or API | Structured log unit/integration projects. |
 | Console log capture, buffering, or endpoints | `Elsa.Diagnostics.ConsoleLogs.UnitTests` or `Elsa.Diagnostics.ConsoleLogs.IntegrationTests`. |
 | OpenTelemetry diagnostics collection or endpoints | `Elsa.Diagnostics.OpenTelemetry.UnitTests` or `Elsa.Diagnostics.OpenTelemetry.IntegrationTests`. |
 | Dashboard API endpoints or aggregation logic | `Elsa.Dashboard.Api.UnitTests`. |
 | AI/Weaver abstractions or host behavior | `Elsa.AI.Abstractions.UnitTests`, `Elsa.AI.Host.UnitTests`, or `Elsa.AI.IntegrationTests`. |
-| Persistence vNext store or physicalization logic | `Elsa.Persistence.VNext.UnitTests`. |
 
 ## Useful Commands
 
@@ -71,8 +70,6 @@ dotnet test --project test/integration/Elsa.Workflows.IntegrationTests/Elsa.Work
 dotnet restore test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj --ignore-failed-sources
 dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj --no-restore
 
-dotnet restore test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests.csproj --ignore-failed-sources
-dotnet test --project test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests.csproj --no-restore
 ```
 
 Run ElsaScript DSL tests:
@@ -120,9 +117,8 @@ Structured log tests are split by layer:
 - [test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests)
 - [test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests](../../test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests)
 - [test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests)
-- [test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests](../../test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.IntegrationTests)
 
-This mirrors the architecture: core capture and API behavior should not require SQLite; SQLite tests should prove durability, migrations, retention, timestamp storage, queue overflow, and filtering.
+Core capture and API behavior use in-memory storage. The relational unit tests exercise shared contracts without claiming database durability. PostgreSQL persistence tests must use a real PostgreSQL database; EF Core InMemory does not verify relational transactions, indexes, or migrations.
 
 ## Console Log Tests
 

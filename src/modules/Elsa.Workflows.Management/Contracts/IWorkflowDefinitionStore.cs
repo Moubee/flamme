@@ -144,7 +144,7 @@ public interface IWorkflowDefinitionStore
     /// of a published version), the previously latest row is unmarked in the same step.
     /// </para>
     /// <para>
-    /// Persistence providers outside this repository (Mongo, Dapper, Event Sourcing) must implement
+    /// Custom persistence providers outside this repository must implement
     /// this the same way before the BPMN document <c>PUT</c> is concurrency-safe on those stores.
     /// Until they do, that endpoint's atomic precondition is not available there.
     /// </para>

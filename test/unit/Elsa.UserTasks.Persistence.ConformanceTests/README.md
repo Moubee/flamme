@@ -8,10 +8,10 @@ suite could not see — every one of them was found by injecting a failure again
 
 | Contract | Suite | Implementations |
 | --- | --- | --- |
-| `IUserTaskRepository` | `UserTaskRepositoryConformanceTests` | InMemory, EF Core, VNext |
-| `IUserTaskGuestSessionIssuer` | `UserTaskGuestSessionConformanceTests` | InMemory, EF Core |
-| `IUserTaskInvitationOutbox` | `UserTaskInvitationOutboxConformanceTests` | InMemory, EF Core |
-| The services above them | `UserTaskFaultInjectionConformanceTests` | InMemory, EF Core |
+| `IUserTaskRepository` | `UserTaskRepositoryConformanceTests` | InMemory, PostgreSQL EF Core |
+| `IUserTaskGuestSessionIssuer` | `UserTaskGuestSessionConformanceTests` | InMemory, PostgreSQL EF Core |
+| `IUserTaskInvitationOutbox` | `UserTaskInvitationOutboxConformanceTests` | InMemory, PostgreSQL EF Core |
+| The services above them | `UserTaskFaultInjectionConformanceTests` | InMemory, PostgreSQL EF Core |
 
 `UserTaskFaultInjectionConformanceTests` runs the real `DefaultUserTaskManager` and
 `DefaultUserTaskInvitationService` against a real store and breaks the seams between them with the
@@ -20,33 +20,34 @@ retry, and the retry must converge.
 
 ## Providers
 
-Availability is resolved once per run by `ConformanceProviders`, and nothing is ever skipped quietly:
+Both in-memory and PostgreSQL are required in every conformance run. PostgreSQL uses
+`PostgreSqlTestDatabase` to create an isolated database on the `ELSA_TEST_POSTGRES` server, or starts a
+shared PostgreSQL test container when that server variable is unset. The fixture drops only the isolated
+database it created. A working Docker engine or the configured PostgreSQL test server is required;
+missing infrastructure fails the suite instead of silently skipping relational coverage.
 
-- **Always run**: in-memory, EF Core over SQLite, VNext over the SQLite document store.
-- **Opt in with a connection string**: SQL Server, PostgreSQL, Oracle. Each test reports as *skipped, with
-  the reason*, when the variable is unset — not as passed.
-- **Not coverable**: MySQL. `Pomelo.EntityFrameworkCore.MySql` 9.0.0 caps
-  `Microsoft.EntityFrameworkCore.Relational` at 9.0.x while this repository targets 10.0.9, so
-  `Elsa.UserTasks.Persistence.EFCore.MySql` cannot be referenced from a test project at all (NU1107).
+```bash
+dotnet test --project test/unit/Elsa.UserTasks.Persistence.ConformanceTests/Elsa.UserTasks.Persistence.ConformanceTests.csproj
+```
+
+To use an existing **disposable** database directly, supply the optional conformance-specific override:
 
 ```bash
 ELSA_USERTASKS_TEST_POSTGRES="Host=localhost;Database=elsa_conformance;Username=elsa;Password=elsa" \
   dotnet test --project test/unit/Elsa.UserTasks.Persistence.ConformanceTests/Elsa.UserTasks.Persistence.ConformanceTests.csproj
 ```
 
-The remaining variables are `ELSA_USERTASKS_TEST_SQLSERVER` and `ELSA_USERTASKS_TEST_ORACLE`.
-
-Point them at a **disposable** database. The suite migrates the schema and isolates each test with its own
-tenant, but it never drops the database — that is deliberate, so it can never delete something an operator
-cared about.
+The override database is migrated and each test uses its own tenant, but the suite never drops that
+database. An explicitly empty or whitespace-only override is invalid: unset it to select the isolated
+default, or provide a valid connection string.
 
 `ConformanceCoverageTests` always runs. It fails if a provider that must run is unreachable, fails if a
-variable is set but empty (configured on the CI job, gating nothing), and writes the full matrix to the
+override is set but empty or whitespace, and writes the full matrix to the
 test output and to `user-task-conformance-coverage.md` in the output directory.
 
-## Adding a provider
+## Maintaining provider coverage
 
-1. Add a `ConformanceProvider` entry to `ConformanceProviders.All`.
+1. Keep `ConformanceProviders.All` limited to the supported in-memory and PostgreSQL implementations.
 2. Add an `IAsyncInitializer` fixture under `Providers/` whose constructor does not connect to the provider.
 3. Add a stable provider key to `ProviderFixtureKeys`.
 4. Add one concrete class per supported contract to `ProviderConformanceSuites.cs`. Put all four native

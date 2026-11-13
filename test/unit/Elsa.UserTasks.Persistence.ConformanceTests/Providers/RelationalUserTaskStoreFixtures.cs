@@ -1,61 +1,57 @@
 using System.Reflection;
 using Elsa.Persistence.EFCore.Extensions;
+using Elsa.Testing.Shared.Databases;
 using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.UserTasks.Persistence.ConformanceTests.Providers;
 
-/// <summary>SQLite runs unconditionally: it is the relational provider CI covers on every pull request.</summary>
-public sealed class SqliteUserTaskStoreFixture : EFCoreUserTaskStoreFixture
-{
-    private readonly string _databasePath = Path.Join(Path.GetTempPath(), $"elsa-user-tasks-conformance-{Guid.NewGuid():N}.db");
-
-    public SqliteUserTaskStoreFixture() : base(ConformanceProviders.Sqlite)
-    {
-    }
-
-    protected override bool DropsOwnDatabase => true;
-    protected override Assembly MigrationsAssembly => typeof(UserTasks.Persistence.EFCore.Sqlite.Extensions.SqliteUserTasksPersistenceFeatureExtensions).Assembly;
-    protected override string ResolveConnectionString() => $"Data Source={_databasePath}";
-    protected override void ConfigureServices(IServiceCollection services) => services.AddSqliteEntityModelCreatingHandlers();
-    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaSqlite(MigrationsAssembly, connectionString);
-}
-
 /// <summary>
-/// SQL Server, PostgreSQL, and Oracle run only when an operator points the matching environment variable at
-/// a disposable database. The suite migrates that database and isolates itself by tenant; it never drops it.
+/// PostgreSQL runs by default in an isolated test database. ELSA_USERTASKS_TEST_POSTGRES can select
+/// an operator-supplied disposable database instead; that database is migrated but never dropped.
 /// </summary>
-public sealed class SqlServerUserTaskStoreFixture : EFCoreUserTaskStoreFixture
-{
-    public SqlServerUserTaskStoreFixture() : base(ConformanceProviders.SqlServer)
-    {
-    }
-
-    protected override Assembly MigrationsAssembly => typeof(UserTasks.Persistence.EFCore.SqlServer.Extensions.SqlServerUserTasksPersistenceFeatureExtensions).Assembly;
-    protected override string ResolveConnectionString() => Provider.ConnectionString;
-    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaSqlServer(MigrationsAssembly, connectionString);
-}
-
 public sealed class PostgreSqlUserTaskStoreFixture : EFCoreUserTaskStoreFixture
 {
+    private readonly PostgreSqlTestDatabase _database = new();
+    private string? _connectionString;
+
     public PostgreSqlUserTaskStoreFixture() : base(ConformanceProviders.PostgreSql)
     {
     }
 
     protected override Assembly MigrationsAssembly => typeof(UserTasks.Persistence.EFCore.PostgreSql.Extensions.PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly;
-    protected override string ResolveConnectionString() => Provider.ConnectionString;
-    protected override void ConfigureServices(IServiceCollection services) => services.AddPostgreSqlEntityModelCreatingHandlers();
-    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaPostgreSql(MigrationsAssembly, connectionString);
-}
+    protected override string ResolveConnectionString() => _connectionString
+        ?? throw new InvalidOperationException("The PostgreSQL conformance database has not been initialized.");
 
-public sealed class OracleUserTaskStoreFixture : EFCoreUserTaskStoreFixture
-{
-    public OracleUserTaskStoreFixture() : base(ConformanceProviders.Oracle)
+    protected override async Task ActivateCoreAsync()
     {
+        var configured = Environment.GetEnvironmentVariable("ELSA_USERTASKS_TEST_POSTGRES");
+        if (configured is null)
+        {
+            await _database.OpenAsync();
+            _connectionString = _database.ConnectionString;
+        }
+        else
+        {
+            _connectionString = Provider.ConnectionString;
+        }
+
+        await base.ActivateCoreAsync();
     }
 
-    protected override Assembly MigrationsAssembly => typeof(UserTasks.Persistence.EFCore.Oracle.Extensions.OracleUserTasksPersistenceFeatureExtensions).Assembly;
-    protected override string ResolveConnectionString() => Provider.ConnectionString;
-    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaOracle(MigrationsAssembly, connectionString);
+    protected override async Task DisposeCoreAsync()
+    {
+        try
+        {
+            await base.DisposeCoreAsync();
+        }
+        finally
+        {
+            await _database.DisposeAsync();
+        }
+    }
+
+    protected override void ConfigureServices(IServiceCollection services) => services.AddPostgreSqlEntityModelCreatingHandlers();
+    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaPostgreSql(MigrationsAssembly, connectionString);
 }

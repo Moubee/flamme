@@ -4,7 +4,7 @@
 mods=("Runtime")
 
 # Define the list of providers
-providers=("MySql" "SqlServer" "Sqlite" "PostgreSql" "Oracle")
+providers=("PostgreSql")
 
 # Loop through each module
 for module in "${mods[@]}"; do

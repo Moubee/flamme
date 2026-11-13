@@ -1,5 +1,7 @@
 # Tasks: Structured Log Persistence
 
+> Historical design, superseded 2026-11-13: the durable structured-log provider and its tests have been removed. Only bounded in-memory storage is bundled; the relational contracts remain extension points. See the [storage upgrade guide](../../doc/postgres-inmemory-migration.md).
+
 **Input**: Design documents from `/specs/005-structured-log-persistence/`  
 **Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md), [data-model.md](./data-model.md), [contracts/](./contracts), [quickstart.md](./quickstart.md)
 

@@ -352,7 +352,7 @@ public sealed class InMemoryAlterationStoreConformanceTests : AlterationStoreCon
 }
 
 [InheritsTests]
-public sealed class SqliteAlterationStoreConformanceTests : AlterationStoreConformanceTests
+public sealed class PostgreSqlAlterationStoreConformanceTests : AlterationStoreConformanceTests
 {
-    protected override Task<AlterationStoreScenario> CreateScenarioAsync() => AlterationStoreScenario.CreateSqliteAsync();
+    protected override Task<AlterationStoreScenario> CreateScenarioAsync() => AlterationStoreScenario.CreatePostgreSqlAsync();
 }

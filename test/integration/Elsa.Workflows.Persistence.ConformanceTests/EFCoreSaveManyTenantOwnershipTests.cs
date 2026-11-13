@@ -22,7 +22,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenOtherTenantOwnsId_ThrowsAndLeavesOwnerAndPayload()
     {
-        await using var owner = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Bookmarks.SaveManyAsync([Bookmark("shared", "tenant-a", "original")], CancellationToken.None);
 
         using (owner.UseTenant("tenant-b"))
@@ -38,7 +38,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenMixedBatchContainsForeignId_WritesNothing()
     {
-        await using var owner = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var owner = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await owner.Bookmarks.SaveManyAsync([Bookmark("owned", "tenant-a", "original")], CancellationToken.None);
 
         using (owner.UseTenant("tenant-b"))
@@ -59,7 +59,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenSameTenantOwnsId_UpdatesPayload()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Bookmarks.SaveManyAsync([Bookmark("bm-a", "tenant-a", "before")], CancellationToken.None);
 
         await scenario.Bookmarks.SaveManyAsync([Bookmark("bm-a", "tenant-a", "after")], CancellationToken.None);
@@ -71,7 +71,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenPopulatorResavesStarUnderNamedTenant_KeepsStar()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Bookmarks.SaveManyAsync([Bookmark("shared", Tenant.AgnosticTenantId, "before")], CancellationToken.None);
 
         await scenario.Bookmarks.SaveManyAsync([Bookmark("shared", Tenant.AgnosticTenantId, "after")], CancellationToken.None);
@@ -83,7 +83,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenNamedTenantSavesNullTenantIdOverStar_ThrowsAndLeavesStar()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Bookmarks.SaveManyAsync([Bookmark("shared", Tenant.AgnosticTenantId, "original")], CancellationToken.None);
 
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
@@ -96,7 +96,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenDefaultTenantUpdatesLegacyNullRow_Succeeds()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync(Tenant.DefaultTenantId);
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync(Tenant.DefaultTenantId);
         await scenario.Bookmarks.SaveManyAsync([Bookmark("legacy", Tenant.DefaultTenantId, "before")], CancellationToken.None);
         await scenario.ClearBookmarkTenantIdAsync("legacy");
 
@@ -111,7 +111,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task SaveManyAsync_WhenTenancyIsDisabled_OverwritesForeignId()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync("tenant-b", tenantsEnabled: false);
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-b", tenantsEnabled: false);
         await scenario.Bookmarks.SaveManyAsync([Bookmark("shared", "tenant-a", "original")], CancellationToken.None);
 
         await scenario.Bookmarks.SaveManyAsync([Bookmark("shared", "tenant-b", "taken")], CancellationToken.None);
@@ -123,7 +123,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     [Test]
     public async Task Import_WhenBookmarkHasForeignId_Refuses_AndForeignRecordTenantIdIsStampedToWriter()
     {
-        await using var scenario = await WorkflowStoreScenario.CreateSqliteAsync("tenant-a");
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
         await scenario.Bookmarks.SaveManyAsync([Bookmark("foreign-bookmark", "tenant-a", "original")], CancellationToken.None);
 
         using (scenario.UseTenant("tenant-b"))

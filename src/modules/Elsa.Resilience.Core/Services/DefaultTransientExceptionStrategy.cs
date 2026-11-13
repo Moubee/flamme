@@ -17,13 +17,7 @@ public class DefaultTransientExceptionStrategy : ITransientExceptionStrategy
         
         // Database-related transient exceptions (by name, not type reference)
         "DbException",
-        "SqlException",
         "NpgsqlException",
-        "MongoConnectionException",
-        "MongoExecutionTimeoutException",
-        "MongoNodeIsRecoveringException",
-        "MongoNotPrimaryException",
-        "MySqlException",
         
         // Network-related exceptions
         "HttpIOException",

@@ -81,14 +81,16 @@ services
             .UseFlowchart(flowchart => flowchart.UseTokenBasedExecution())
             .UseWorkflowManagement(management =>
             {
-                management.UseEntityFrameworkCore(ef => ef.UseSqlite());
+                management.UseEntityFrameworkCore(ef => ef.UsePostgreSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("PostgreSql")
+                    ?? throw new InvalidOperationException("ConnectionStrings:PostgreSql is required.")));
                 management.SetDefaultLogPersistenceMode(LogPersistenceMode.Inherit);
                 management.UseCache();
                 management.UseReadOnlyMode(useReadOnlyMode);
             })
             .UseWorkflowRuntime(runtime =>
             {
-                runtime.UseEntityFrameworkCore(ef => ef.UseSqlite());
+                runtime.UseEntityFrameworkCore(ef => ef.UsePostgreSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("PostgreSql")
+                    ?? throw new InvalidOperationException("ConnectionStrings:PostgreSql is required.")));
                 runtime.UseCache();
                 runtime.UseDistributedRuntime();
                 // This sample host acknowledges single-host file-system locks in development or explicit single-host opt-in.

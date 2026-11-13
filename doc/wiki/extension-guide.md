@@ -25,7 +25,7 @@ Examples:
 
 - [Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs](../../src/modules/Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs)
 - [Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs](../../src/modules/Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs)
-- [EF Core provider shell features](../../src/modules/Elsa.Persistence.EFCore.Sqlite/ShellFeatures)
+- [EF Core provider shell features](../../src/modules/Elsa.Persistence.EFCore.PostgreSql/ShellFeatures)
 
 ## Add An Activity
 
@@ -92,7 +92,7 @@ For diagnostics structured log relational providers:
 4. Implement `IStructuredLogSchemaMigrator`.
 5. Register those services and call `AddRelationalStructuredLogPersistence`.
 
-See [SqliteStructuredLogsModuleExtensions](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite/Extensions/SqliteStructuredLogsModuleExtensions.cs).
+No concrete structured-log database backend is bundled. PostgreSQL is the supported durable database if a host supplies an implementation.
 
 ## Add A Runtime Ingress Source
 

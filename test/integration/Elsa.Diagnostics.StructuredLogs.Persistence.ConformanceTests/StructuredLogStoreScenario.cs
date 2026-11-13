@@ -2,14 +2,12 @@ using Elsa.Diagnostics.StructuredLogs.Contracts;
 using Elsa.Diagnostics.StructuredLogs.Extensions;
 using Elsa.Diagnostics.StructuredLogs.Models;
 using Elsa.Diagnostics.StructuredLogs.Options;
-using Elsa.Diagnostics.StructuredLogs.Persistence.Relational.Contracts;
-using Elsa.Diagnostics.StructuredLogs.Persistence.Sqlite.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests;
 
 /// <summary>
-/// One InMemory or Sqlite <see cref="IStructuredLogStore"/> plus the registry and options it reads.
+/// One in-memory <see cref="IStructuredLogStore"/> plus the registry and options it reads.
 /// </summary>
 public sealed class StructuredLogStoreScenario : IAsyncDisposable
 {
@@ -64,50 +62,6 @@ public sealed class StructuredLogStoreScenario : IAsyncDisposable
             reportsRingDroppedEvents: true,
             () => ValueTask.CompletedTask,
             () => services.DisposeAsync()));
-    }
-
-    public static async Task<StructuredLogStoreScenario> CreateSqliteAsync(Action<StructuredLogsOptions>? configure = null)
-    {
-        var directory = Path.Join(Path.GetTempPath(), $"elsa-structured-logs-conformance-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(directory);
-        var databasePath = Path.Join(directory, "structured-logs.db");
-        ServiceProvider? services = null;
-
-        try
-        {
-            services = new ServiceCollection()
-                .AddLogging()
-                .AddStructuredLogsServices(options =>
-                {
-                    ApplySharedDefaults(options);
-                    configure?.Invoke(options);
-                })
-                .AddSqliteStructuredLogPersistence(options => options.ConnectionString = $"Data Source={databasePath};Pooling=False")
-                .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
-
-            await services.GetRequiredService<IStructuredLogSchemaMigrator>().MigrateAsync();
-            var buffer = services.GetRequiredService<IStructuredLogWriteBuffer>();
-
-            return new(
-                services.GetRequiredService<IStructuredLogStore>(),
-                services.GetRequiredService<IStructuredLogSourceRegistry>(),
-                reportsRingDroppedEvents: false,
-                () => buffer.FlushAsync(),
-                async () =>
-                {
-                    await services.DisposeAsync();
-                    if (Directory.Exists(directory))
-                        Directory.Delete(directory, true);
-                });
-        }
-        catch
-        {
-            if (services is not null)
-                await services.DisposeAsync();
-            if (Directory.Exists(directory))
-                Directory.Delete(directory, true);
-            throw;
-        }
     }
 
     private static void ApplySharedDefaults(StructuredLogsOptions options)

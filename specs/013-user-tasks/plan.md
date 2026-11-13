@@ -10,8 +10,8 @@ Deliver an identity-neutral human-task bounded context in Elsa Core and a refere
 
 **Language/Version**: C# latest; nullable and implicit usings enabled; Blazor/Razor in Studio  
 **Primary Dependencies**: Elsa feature/module and workflow runtime infrastructure, FastEndpoints via Elsa endpoint base types, mediator notifications, SignalR, Microsoft.Extensions.Options/Logging, ASP.NET Core Data Protection/rate limiting, EF Core provider packages  
-**Storage**: In-memory development/test repository; module-specific EF Core context and SQLite, SQL Server, PostgreSQL, MySQL, Oracle packages; VNext document-store adapter  
-**Testing**: xUnit, existing Elsa testing helpers, SQLite integration fixtures, Studio component/client tests where available  
+**Storage**: In-memory development/test repository; module-specific EF Core context and PostgreSQL provider package
+**Testing**: TUnit on Microsoft Testing Platform, existing Elsa testing helpers, PostgreSQL integration fixtures, Studio component/client tests where available
 **Targets**: Core `net8.0;net9.0;net10.0`; existing Studio targets  
 **Performance Envelope**: approximately 100,000 open and millions of terminal tasks per tenant; cursor queries avoid protected JSON and page-number offsets  
 **Constraints**: no Elsa.Identity dependency; no change to generic RunTask; task/bookmark consistency across failure and cluster races; protected data never disclosed through summary/search/realtime  
@@ -43,7 +43,7 @@ flowchart LR
     A["UserTask activity"] -->|"bookmark payload"| B["Workflow commit"]
     B --> C["Post-commit projector"]
     C --> D["IUserTaskRepository"]
-    D --> E["In-memory / EF Core / VNext"]
+    D --> E["In-memory / PostgreSQL EF Core"]
     F["Studio or host app"] --> G["Authorized REST endpoints"]
     G --> H["IUserTaskManager"]
     H --> D
@@ -63,8 +63,7 @@ flowchart LR
 
 - `src/modules/Elsa.UserTasks`: activity, domain models, contracts, default services, in-memory repository, projection/reconciliation/due workers, permissions, notifications, SignalR hub, endpoints, feature and shell feature.
 - `src/modules/Elsa.UserTasks.Persistence.EFCore`: context, configurations, repository, feature.
-- `src/modules/Elsa.UserTasks.Persistence.EFCore.{Sqlite,SqlServer,PostgreSql,MySql,Oracle}`: provider configuration, migrations, shell features.
-- `src/modules/Elsa.UserTasks.Persistence.VNext`: document-store-backed repository/feature.
+- `src/modules/Elsa.UserTasks.Persistence.EFCore.PostgreSql`: provider configuration, migrations, shell features.
 - `test/unit/Elsa.UserTasks.UnitTests`: lifecycle, identity, disclosure, form, invitation, idempotency, projection, due, API model tests.
 - `test/integration/Elsa.UserTasks.IntegrationTests` where an existing test project pattern supports endpoint/runtime integration.
 
@@ -80,7 +79,7 @@ flowchart LR
 3. Add post-commit projection, asynchronous completion, reconciliation, due processing, and lifecycle notifications.
 4. Add authorized REST query/commands and safe DTO mapping.
 5. Add invitations, guest sessions, delivery outbox, anonymous defenses, and tests.
-6. Add EF Core/VNext persistence and provider migrations/configuration.
+6. Add PostgreSQL EF Core persistence and migrations/configuration.
 7. Add Studio queue/detail/designer/guest integrations.
 8. Run targeted then broad local verification, traceability analysis, and up to five self-review passes.
 
@@ -89,8 +88,8 @@ flowchart LR
 - Unit-test legal and illegal state transitions, exact revision increments, canonical idempotency payloads, claim and terminal races.
 - Contract-test query authorization and safe/protected DTO mapping for every relationship.
 - Runtime-test task projection after workflow commit, bookmark resume, finalization, and each reconciliation gap.
-- SQLite-test durable restart, indexes, tenant isolation, cursor stability, and cleanup.
-- Schema-review every provider migration and compile all provider projects.
+- PostgreSQL-test durable restart, indexes, tenant isolation, cursor stability, and cleanup.
+- Review PostgreSQL migrations and compile the shared persistence and PostgreSQL provider projects.
 - Studio-test tab queries, URL state, responsive route behavior, capability actions, conflict refresh, disclosure, realtime fallback, and accessibility semantics.
 - Build affected projects first, then both repositories broadly without GitHub-dependent checks.
 

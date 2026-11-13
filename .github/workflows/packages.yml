@@ -73,8 +73,9 @@ jobs:
             --report-trx
 
           coverage_count=$(find artifacts/test-results/unit-integration -maxdepth 1 -type f -name '*.cobertura.xml' | wc -l | tr -d ' ')
-          if [[ "$coverage_count" != "60" ]]; then
-            echo "Expected 60 unit/integration coverage files, found $coverage_count." >&2
+          expected_coverage_count=$(python3 -c 'import json; print(len(json.load(open("Elsa.UnitIntegration.Tests.slnf"))["solution"]["projects"]))')
+          if [[ "$coverage_count" != "$expected_coverage_count" ]]; then
+            echo "Expected $expected_coverage_count unit/integration coverage files, found $coverage_count." >&2
             exit 1
           fi
 

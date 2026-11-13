@@ -217,7 +217,7 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         await Assert.That(onlyUpperTask.Id).IsEqualTo(tagged.Id);
 
         // JSON array syntax sits between tags in EF storage. That text is not a tag value, so
-        // InMemory/VNext reject it and EF must not treat the serialized payload as a match.
+        // InMemory rejects it and EF must not treat the serialized payload as a match.
         var jsonSyntax = await Repository.QueryAsync(Query(includeTotalCount: true) with
         {
             Search = """priority-escalation","routine-review"""
@@ -226,7 +226,7 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         await Assert.That(jsonSyntax.TotalCount).IsEqualTo(0);
 
         var punctuated = CreateTask(subject, title: "Approve invoice");
-        punctuated.Tags = ["review[urgent]"];
+        punctuated.Tags = ["review[urgent]", "literal%_O'Brien"];
         await Repository.AddProjectionAsync(punctuated);
 
         var bracket = await Repository.QueryAsync(Query(includeTotalCount: true) with
@@ -235,6 +235,31 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         });
         var onlyBracketTask = await Assert.That(bracket.Items).HasSingleItem();
         await Assert.That(onlyBracketTask.Id).IsEqualTo(punctuated.Id);
+
+        var otherTenant = $"other-{TenantId}";
+        var foreign = CreateTask(subject with { TenantId = otherTenant }, title: "Other tenant");
+        foreign.TenantId = otherTenant;
+        foreign.Tags = ["literal%_O'Brien"];
+        await Repository.AddProjectionAsync(foreign);
+
+        var excluded = CreateTask(subject, title: "Excluded task");
+        excluded.Tags = ["literal%_O'Brien"];
+        excluded.ExcludedUsers = [subject];
+        await Repository.AddProjectionAsync(excluded);
+
+        // SQL wildcard characters and apostrophes are literal tag text. Matching IDs from a tag
+        // subquery must still pass tenant/scope filters before counts and page limits are applied.
+        foreach (var search in new[] { "%", "_", "O'BRIEN" })
+        {
+            var literal = await Repository.QueryAsync(Query(limit: 1, includeTotalCount: true) with
+            {
+                Search = search
+            });
+            await Assert.That(literal.TotalCount).IsEqualTo(1);
+            var onlyLiteralTask = await Assert.That(literal.Items).HasSingleItem();
+            await Assert.That(onlyLiteralTask.Id).IsEqualTo(punctuated.Id);
+            await Assert.That(literal.NextCursor).IsNull();
+        }
     }
 
     [Test]

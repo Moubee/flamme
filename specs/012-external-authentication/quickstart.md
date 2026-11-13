@@ -27,7 +27,7 @@ services.AddElsa(elsa =>
 services.AddOpenIdConnectExternalAuthentication();
 ```
 
-Configuration-only/single-node development uses the in-memory atomic state store. A production multi-node host also enables the External Authentication EF persistence feature (for example `SqliteExternalAuthenticationPersistence`) for shared external-authentication state, configures shared ASP.NET Core Data Protection keys, and gives every node the same External Authentication handle-hashing key:
+Configuration-only/single-node development uses the in-memory atomic state store. A production multi-node host also enables the External Authentication EF persistence feature (for example `PostgreSqlExternalAuthenticationPersistence`) for shared external-authentication state, configures shared ASP.NET Core Data Protection keys, and gives every node the same External Authentication handle-hashing key:
 
 ```json
 {

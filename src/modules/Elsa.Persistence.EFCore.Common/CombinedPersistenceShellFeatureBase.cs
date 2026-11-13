@@ -24,14 +24,14 @@ namespace Elsa.Persistence.EFCore;
 ///   "CShells": {
 ///     "Shells": [{
 ///       "Settings": {
-///         "SqliteWorkflowPersistence": {
-///           "ConnectionString": "Data Source=elsa.db;Cache=Shared",
+///         "PostgreSqlWorkflowPersistence": {
+///           "ConnectionString": "Host=localhost;Database=elsa;Username=elsa;Password=elsa",
 ///           "DbContextOptions": {
 ///             "EnableSensitiveDataLogging": false
 ///           }
 ///         }
 ///       },
-///       "Features": ["SqliteWorkflowPersistence"]
+///       "Features": ["PostgreSqlWorkflowPersistence"]
 ///     }]
 ///   }
 /// }
