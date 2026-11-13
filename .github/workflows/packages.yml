@@ -236,6 +236,13 @@ jobs:
     timeout-minutes: 30
     if: ${{ github.event_name != 'pull_request' && needs.coverage_report.result == 'success' }}
     steps:
+      - name: Reclaim hosted runner disk space
+        shell: bash
+        run: |
+          df -h /
+          # These preinstalled toolchains are unused by the .NET build and tests.
+          sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
+          df -h /
       - name: Extract branch name
         run: |
           BRANCH_NAME=${{ github.ref }} # e.g., refs/heads/main

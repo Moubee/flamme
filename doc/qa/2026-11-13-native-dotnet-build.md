@@ -80,3 +80,9 @@ The inherited Claude review workflow failed because the repository had no Claude
 installation or OAuth token. At the user's request, the Claude review, mention-triggered assistant,
 Greploop, and wiki-refresh workflows were removed. No remaining workflow invokes Claude or
 references its OAuth secret.
+
+The initial Linux PR build also exhausted the hosted runner's disk during compilation. The check
+annotation reported `System.IO.IOException: No space left on device` while writing the runner's
+diagnostic log, and the worker terminated before tests. PR and package full-solution build jobs now
+reclaim unused Android, Haskell, Swift, and CodeQL installations before setup and restore, while
+retaining .NET and Docker. They report available disk space before and after cleanup.

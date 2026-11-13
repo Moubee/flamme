@@ -19,6 +19,13 @@ jobs:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     steps:
+      - name: Reclaim hosted runner disk space
+        shell: bash
+        run: |
+          df -h /
+          # These preinstalled toolchains are unused by the .NET build and tests.
+          sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v4
         with:
