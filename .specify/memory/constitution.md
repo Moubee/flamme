@@ -208,7 +208,8 @@ is harder to undo once entrenched.
 - **Multi-tenancy**: `ITenantAccessor` with `AsyncLocal<Tenant?>` context;
   query filters for tenant isolation.
 - **License**: MIT.
-- **Docker**: Server, Studio, and combined images available under `docker/`.
+- **Docker**: Server images are available under `docker/`; Studio is maintained
+  and hosted separately.
 
 ## Development Workflow & Quality Gates
 
