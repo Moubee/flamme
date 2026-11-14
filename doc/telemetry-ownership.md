@@ -122,3 +122,26 @@ The full solution rebuild and test run also passed:
 `dotnet test --solution Elsa.slnx --no-restore --max-parallel-test-modules 2`
 completed with 8,887 passed, zero failed, and four existing skips across .NET 10 and
 .NET 11. No dependency or lock-file changes were needed.
+
+## CI scheduling failure
+
+The Linux .NET 11 Release [CI job](https://github.com/DenDeline/flamme/actions/runs/43635055396/job/132569977163)
+aborted with exit code 134 because a cron callback read
+`CancellationTokenSource.Token` after another thread disposed the source. The read
+was outside the callback's exception boundary, so the exception escaped the
+asynchronous timer event and terminated the test process. The .NET 10 job and all
+four Docker smoke checks passed on that revision.
+
+Cron, recurring, and specific-instant tasks now capture their token during construction
+and route their callbacks through an awaitable method with a complete exception
+boundary. Scope creation, command resolution, execution, and teardown are covered.
+The existing timer scheduling and deferred-cancellation behavior are preserved.
+
+Nine deterministic cases per framework cover disposal during scope creation, queued
+callbacks after disposal, and disposal while a command is executing. Using the original
+cron callback logic in the awaitable method reproduces the exact disposed-token
+exception on both frameworks; the production fix is restored after this check.
+
+All 142 scheduling tests pass in Release mode across .NET 10 and .NET 11, including
+the new disposal cases. No dependencies, runtime-async settings, or CI test selections
+were changed to address the failure.

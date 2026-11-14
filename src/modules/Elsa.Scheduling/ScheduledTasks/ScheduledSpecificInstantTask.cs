@@ -23,6 +23,7 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
     private readonly PastDueScheduleStaggerer _pastDueScheduleStaggerer;
     private readonly DateTimeOffset _startAt;
     private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly CancellationToken _cancellationToken;
     private readonly SemaphoreSlim _executionSemaphore = new(1, 1);
     private Timer? _timer;
     private bool _executing;
@@ -61,6 +62,7 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
         _pastDueScheduleStaggerer = pastDueScheduleStaggerer;
         _startAt = startAt;
         _cancellationTokenSource = new();
+        _cancellationToken = _cancellationTokenSource.Token;
 
         Schedule();
     }
@@ -95,7 +97,13 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
             Enabled = true
         };
 
-        _timer.Elapsed += async (_, _) =>
+        _timer.Elapsed += async (_, _) => await OnElapsedAsync();
+    }
+
+    // Timer events cannot return a Task to their caller, so contain failures across the entire callback.
+    private async Task OnElapsedAsync()
+    {
+        try
         {
             _timer?.Dispose();
             _timer = null;
@@ -106,10 +114,10 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
             using var scope = _scopeFactory.CreateScope();
             var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
 
-            // Check disposed again before accessing CancellationTokenSource
+            // Stop a callback whose scope was resolved during disposal
             if (_disposed) return;
 
-            var cancellationToken = _cancellationTokenSource.Token;
+            var cancellationToken = _cancellationToken;
             if (!cancellationToken.IsCancellationRequested)
             {
                 var acquired = false;
@@ -126,9 +134,22 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
                         _cancellationTokenSource.Cancel();
                     }
                 }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Error executing scheduled task");
+                    if (!_disposed)
+                    {
+                        try
+                        {
+                            _logger.LogError(e, "Error executing scheduled task");
+                        }
+                        catch
+                        {
+                            // Logging infrastructure may already be disposed during shutdown.
+                        }
+                    }
                 }
                 finally
                 {
@@ -137,7 +158,24 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
                         _executionSemaphore.Release();
                 }
             }
-        };
+        }
+        catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception e)
+        {
+            if (!_disposed)
+            {
+                try
+                {
+                    _logger.LogError(e, "Error executing scheduled task");
+                }
+                catch
+                {
+                    // Logging infrastructure may already be disposed during shutdown.
+                }
+            }
+        }
     }
 
     void IDisposable.Dispose()
