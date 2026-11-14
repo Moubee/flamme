@@ -51,10 +51,9 @@ jobs:
         uses: ./.github/actions/cache-nuget
         with:
           workload: unit-integration
-          framework: ${{ matrix.framework }}
 
       - name: Restore unit and integration tests
-        run: dotnet restore Elsa.UnitIntegration.Tests.slnf -p:TargetFramework=${{ matrix.framework }} --ignore-failed-sources
+        run: dotnet restore Elsa.UnitIntegration.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -127,10 +126,9 @@ jobs:
         uses: ./.github/actions/cache-nuget
         with:
           workload: component
-          framework: ${{ matrix.framework }}
 
       - name: Restore component tests
-        run: dotnet restore Elsa.Component.Tests.slnf -p:TargetFramework=${{ matrix.framework }} --ignore-failed-sources
+        run: dotnet restore Elsa.Component.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -304,7 +302,7 @@ jobs:
           workload: solution
 
       - name: Restore
-        run: dotnet restore Elsa.slnx -p:Version="$VERSION"
+        run: dotnet restore Elsa.slnx --locked-mode -p:Version="$VERSION"
 
       - name: Build
         run: dotnet build Elsa.slnx --configuration Release --no-restore -p:Version="$VERSION"

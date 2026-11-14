@@ -19,8 +19,9 @@ Research date: 2026-11-14. Base: `origin/main` at `245760a22`.
 2. Add consistent dependency caching and reduce workflow serialization and redundant work.
 3. Migrate existing mocks to `TUnit.Mocks`, remove legacy package references, and run
    affected tests on both supported frameworks.
-4. Review the changes independently, resolve findings, and record validation and remaining
-   measurements. Keep each implementation step in a conventional commit.
+4. Evaluate and adopt dependency locks where appropriate, then review the changes
+   independently, resolve findings, and record validation and remaining measurements.
+   Keep each implementation step in a conventional commit.
 
 ## Baseline
 
@@ -45,10 +46,10 @@ Older failed runs are unsuitable for claiming a current-main speedup.
 | Option | Assessment |
 | --- | --- |
 | Dependency cache | Adopt for restore consumers. Key by OS, architecture, restore inputs, and workload/framework; broader fallback caches still require restore. Separate workloads avoid an immutable cache being permanently populated by the first, smallest matrix subset. |
-| `setup-dotnet` built-in cache | The documented contract uses `packages.lock.json`; this repository has no lock files. Use explicit `actions/cache` rather than introducing a lock-file migration into the performance change. |
+| Dependency locks | Adopt committed locks for executable/test entry points after validating the actual graph. They pin resolved transitives and package hashes; CPM alone does not do that. Keep explicit cache keys including locks and tool/restore configuration. |
 | Framework-level PR parallelism | Both frameworks currently share two CPU-based MTP slots. Independent runners can shorten feedback time, with additional runner/build cost. Preserve full-solution compilation, including net10-only benchmarks. |
 | Main package build overlap | Build packages alongside tests; gate every publisher on successful aggregate coverage. This saves the serialized build interval on successful runs but also builds artifacts for commits whose tests fail. |
-| Framework-specific test restore | Restore the matrix framework with `-p:TargetFramework=...`, then use the same `--framework` for tests. Do not constrain the multi-targeted package build. |
+| Framework-specific test restore | Initial optimization rejected after the lock-file experiment: a two-target lock fails validation with a single-target restore. Restore the complete locked graph, then select the test framework with `--framework`. |
 | Cache `bin` / `obj` | Defer: Fody, generated code, framework selection, paths, and restore state complicate correctness. |
 | Increase MTP parallelism | Defer until CPU, memory, and container pressure are measured. MTP already defaults to processor count; more processes are not free capacity. |
 | Native AOT | Defer whole-suite adoption. TUnit supports it, but runtime scripting and dependency compatibility need separate work. Compare restore + publish + instrumentation + execution, not execution time alone. |
@@ -66,6 +67,51 @@ The repository already selects the .NET 11 GA SDK, with its current CLI and
 MSBuild optimizations. Keep SDK selection in `global.json` and retain the .NET 10
 runtime required by the second test target.
 
+## Lock-file applicability
+
+The solution contains 135 projects; two further project files sit outside it.
+CPM defines framework-dependent Microsoft package versions, disables transitive
+pinning, and uses no explicit floating versions or version ranges. Preview
+dependencies are versioned explicitly, including packages from mapped Feedz feeds.
+None of this prevents NuGet lock files: the copied real solution restored and
+generated its complete multi-target graph successfully.
+
+Generating a lock for every solution project produces 135 files, about 9.4 MB
+and 234,269 lines. Instead, enable locks only for `OutputType=Exe`: 64 executable,
+test, and benchmark entry points in the solution, plus the standalone TLS smoke
+application. These entry-point locks record project-reference dependencies and
+their resolved packages. A reusable library's own lock would not constrain the
+dependency graph chosen by applications consuming its package.
+
+Actual SDK 11.0.100 experiments on the copied repository established:
+
+- Full-target locked restore succeeds with CPM, project references, preview feeds,
+  and a CI `Version` override used for packaging.
+- Changing a transitive library dependency fails an entry-point locked restore
+  with `NU1004`, as desired.
+- NuGet otherwise creates an absent lock even in locked mode. The repository's
+  `ELSA0003` guard rejects a missing executable lock during locked restore;
+  ordinary unlocked restore can generate it for review.
+- Restoring with `-p:TargetFramework=net11.0 --locked-mode` against complete
+  `net10.0;net11.0` locks fails with `NU1004`. CI must restore both frameworks;
+  test execution remains framework-specific.
+- Three warm-cache UnitIntegration restores, with clean `obj` each time and
+  NuGet audit disabled for the timing comparison, had medians of 3.991s for
+  single-target unlocked restore and 6.012s for complete locked restore on macOS
+  ARM64. This approximately two-second cost buys graph validation; it is not a
+  hosted-runner performance prediction.
+
+Update dependencies locally with a complete
+`dotnet restore Elsa.slnx --force-evaluate`, review the changed locks, and commit
+them with package changes.
+For the standalone smoke app, restore `test/TlsSmoke/TlsSmoke.csproj` separately.
+CI uses `--locked-mode`; a package cache hit never skips restore. SDK patch
+roll-forward remains enabled, so restore changes introduced by a newer SDK may
+require reviewed lock updates. Existing NuGet audit behavior remains enabled.
+For a focused test, first restore its complete project graph, then use
+`dotnet test --project <path> --framework net11.0 --no-restore` (or `net10.0`).
+Do not regenerate committed two-target locks with a single-target restore.
+
 ## Sources
 
 - [TUnit engine modes](https://tunit.dev/docs/execution/engine-modes/)
@@ -78,6 +124,7 @@ runtime required by the second test target.
 - [MTP CLI and concurrency](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test-mtp)
 - [`setup-dotnet` cache contract](https://github.com/actions/setup-dotnet#caching-nuget-packages)
 - [`actions/cache` keys and fallback](https://github.com/actions/cache)
+- [NuGet dependency locks and library guidance](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#locking-dependencies)
 
 ## Measurement after rollout
 

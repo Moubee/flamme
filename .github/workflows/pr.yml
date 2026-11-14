@@ -43,12 +43,11 @@ jobs:
         uses: ./.github/actions/cache-nuget
         with:
           workload: ${{ matrix.framework == 'net10.0' && 'solution' || 'correctness' }}
-          framework: ${{ matrix.framework == 'net10.0' && 'all' || matrix.framework }}
 
       # One lane still validates every project and target, including the net10-only benchmarks.
       - name: 'Run: Restore solution'
         if: matrix.framework == 'net10.0'
-        run: dotnet restore Elsa.slnx
+        run: dotnet restore Elsa.slnx --locked-mode
       - name: 'Run: Build solution'
         if: matrix.framework == 'net10.0'
         run: dotnet build Elsa.slnx --configuration Release --no-restore
@@ -56,12 +55,12 @@ jobs:
         if: matrix.framework == 'net10.0'
         run: dotnet test --solution Elsa.slnx --framework net10.0 --configuration Release --no-build
 
-      # Build the second framework's test graphs on another runner, without rebuilding net10.
+      # Locks describe both frameworks, while this lane only compiles and runs net11.
       - name: 'Run: Restore .NET 11 tests'
         if: matrix.framework == 'net11.0'
         run: |
-          dotnet restore Elsa.UnitIntegration.Tests.slnf -p:TargetFramework=net11.0
-          dotnet restore Elsa.Component.Tests.slnf -p:TargetFramework=net11.0
+          dotnet restore Elsa.UnitIntegration.Tests.slnf --locked-mode
+          dotnet restore Elsa.Component.Tests.slnf --locked-mode
       - name: 'Run: Test .NET 11'
         if: matrix.framework == 'net11.0'
         run: |
