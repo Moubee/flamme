@@ -6,7 +6,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 | Path | Purpose |
 | --- | --- |
-| [src/apps](../../src/apps) | Runnable reference hosts, load-balancer host, and modular server host. |
+| [src/apps](../../src/apps) | Reference server, modular server host, and shared service defaults. |
 | [src/modules](../../src/modules) | Elsa product modules: workflow engine, runtime, management, APIs, HTTP, identity, persistence, diagnostics, scripting, scheduling, tenants, labels, resilience, and more. |
 | [src/common](../../src/common) | Shared infrastructure such as feature/module plumbing, mediator, API helpers, and test helpers. |
 | [src/clients](../../src/clients) | Client packages, currently including the Elsa API client. |
@@ -50,7 +50,6 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 - [Elsa.Server.Web](../../src/apps/Elsa.Server.Web) is the most useful all-up ASP.NET Core sample. Its [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs) shows typical module composition with identity, PostgreSQL EF Core persistence, runtime, management, HTTP, scheduling, scripting, multitenancy, and optional structured logs.
 - [Elsa.ModularServer.Web](../../src/apps/Elsa.ModularServer.Web) demonstrates modular package loading through Nuplane and shell features.
-- [Elsa.Server.LoadBalancer](../../src/apps/Elsa.Server.LoadBalancer) is a load-balancer host.
 
 ## Build And Package Files
 

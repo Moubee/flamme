@@ -185,6 +185,5 @@
         <PackageVersion Include="TUnit.Mocks" Version="1.84.0"/>
         <PackageVersion Include="TUnit.AspNetCore" Version="1.84.0"/>
         <PackageVersion Include="WebhooksCore" Version="0.0.1"/>
-        <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0"/>
     </ItemGroup>
 </Project>

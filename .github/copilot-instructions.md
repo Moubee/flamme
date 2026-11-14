@@ -19,8 +19,7 @@
 src/
 ├── apps/               # Reference servers
 │   ├── Elsa.Server.Web            # Workflow server only
-│   ├── Elsa.ModularServer.Web     # Shell-based workflow server
-│   └── Elsa.Server.LoadBalancer   # Load balancer
+│   └── Elsa.ModularServer.Web     # Shell-based workflow server
 ├── common/             # Shared libraries (8 projects)
 ├── modules/            # Core functionality modules (70+ projects)
 │   ├── Elsa.Workflows.Core         # Core workflow engine

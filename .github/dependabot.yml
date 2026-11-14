@@ -20,7 +20,6 @@ updates:
           - "Microsoft.*"
           - "Azure.*"
           - "NuGet.*"
-          - "Yarp.ReverseProxy"
           - "System.CommandLine"
           - "System.Formats.Asn1"
           - "System.Net.Http"

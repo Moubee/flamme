@@ -81,7 +81,6 @@
   <Folder Name="/src/apps/">
     <File Path="src/apps/Directory.Build.props" />
     <Project Path="src/apps/Elsa.ModularServer.Web/Elsa.ModularServer.Web.csproj" />
-    <Project Path="src/apps/Elsa.Server.LoadBalancer/Elsa.Server.LoadBalancer.csproj" />
     <Project Path="src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
   </Folder>
   <Folder Name="/src/clients/">

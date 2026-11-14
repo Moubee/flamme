@@ -24,6 +24,9 @@ plugin and exporter configuration; the load balancer assumes several nodes with
 distributed locks. These are follow-up integrations rather than dependencies of
 the reference-server demo.
 
+Follow-up: the legacy load-balancer sample was subsequently removed at the user's
+request. The Aspire development graph continues to run one reference server.
+
 ```mermaid
 flowchart LR
     AppHost["Aspire AppHost (.NET 11)"] --> PostgreSQL["PostgreSQL 17 + data volume"]
