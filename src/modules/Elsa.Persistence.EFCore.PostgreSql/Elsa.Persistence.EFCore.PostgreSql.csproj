@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides PostgreSQL EF Core migrations for various modules.
+            Provides PostgreSQL EF Core persistence and migrations for Flamme modules.
         </Description>
         <PackageTags>elsa extension module persistence efcore postgresql</PackageTags>
     </PropertyGroup>

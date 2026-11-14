@@ -6,7 +6,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides core workflowing functionality. Basically the heart of Elsa Workflows.
+            Provides the core workflow execution and activity composition model for Flamme process orchestration.
         </Description>
         <PackageTags>elsa module common workflows</PackageTags>
     </PropertyGroup>

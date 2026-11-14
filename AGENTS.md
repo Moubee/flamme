@@ -4,7 +4,9 @@ Guidance for AI coding agents working in this repository.
 
 ## Project Overview
 
-- Elsa Core is a .NET solution centered on `Elsa.slnx`.
+- Flamme is a .NET process orchestrator forked from Elsa 3.9, centered on `Elsa.slnx`. Existing `Elsa.*` technical identifiers remain unchanged.
+- Priorities are high-load performance, distributed production execution, PostgreSQL persistence, and Kubernetes hosting. UI work is secondary; see [project direction](doc/project-direction.md) and the [roadmap](ROADMAP.md).
+- PostgreSQL is the only supported durable database. In-memory stores are for development and tests; MySQL, SQLite, and Cassandra are future plans, not bundled providers.
 - Production code lives under `src/`.
 - Tests live under `test/`, grouped by `unit`, `integration`, `component`, and `performance`.
 - Build and package automation uses the .NET CLI and shared MSBuild settings in `Directory.Build.props` and `Directory.Build.targets`.

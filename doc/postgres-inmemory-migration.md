@@ -1,6 +1,8 @@
 # Upgrade to PostgreSQL and in-memory persistence
 
-PostgreSQL and the core in-memory stores are now the supported persistence backends. This is a breaking package and configuration change.
+PostgreSQL is Flamme's only supported durable database. Core in-memory stores remain available for development and tests, with process-local state that is lost on restart. Narrowing the provider scope reduces maintenance and validation work while the project focuses on high-load, distributed process orchestration. This is a breaking package and configuration change; see [project direction](project-direction.md).
+
+MySQL, SQLite, and Cassandra support is planned for the future, with Cassandra intended for high-load scenarios. None is currently bundled or supported, and no delivery date is committed. The removed packages below do not become supported through this plan.
 
 ## Removed packages and APIs
 

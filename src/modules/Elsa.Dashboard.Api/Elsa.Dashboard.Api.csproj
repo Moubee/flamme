@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Provides operational dashboard API endpoints for Elsa hosts.</Description>
+        <Description>Provides operational dashboard API endpoints for Flamme hosts.</Description>
         <PackageTags>elsa module dashboard operations workflows diagnostics</PackageTags>
     </PropertyGroup>
 

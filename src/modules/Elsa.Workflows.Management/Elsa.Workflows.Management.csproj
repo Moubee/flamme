@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides workflow management functionality.
+            Provides workflow definition and instance management for Flamme process orchestration.
         </Description>
         <PackageTags>elsa module workflows management</PackageTags>
     </PropertyGroup>

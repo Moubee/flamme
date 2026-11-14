@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides live raw console log streaming for Elsa hosts.
+            Provides live raw console log streaming for Flamme hosts.
         </Description>
         <PackageTags>elsa module diagnostics console-logs stdout stderr signalr operations</PackageTags>
     </PropertyGroup>

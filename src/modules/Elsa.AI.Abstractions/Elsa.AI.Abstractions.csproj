@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides provider-neutral abstractions for Elsa AI capabilities.
+            Provides provider-neutral abstractions for Flamme AI capabilities.
         </Description>
         <PackageTags>elsa module ai abstractions</PackageTags>
     </PropertyGroup>

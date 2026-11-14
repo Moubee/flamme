@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides Entity Framework Core persistence for Elsa external authentication.
+            Provides Entity Framework Core persistence for Flamme external authentication.
         </Description>
         <PackageTags>elsa extension module external-authentication persistence efcore</PackageTags>
     </PropertyGroup>

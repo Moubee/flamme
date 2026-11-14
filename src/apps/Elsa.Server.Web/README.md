@@ -1,14 +1,14 @@
-# Server
+# Flamme reference server
 
-This project represents an Elsa application that hosts workflows and exposes API endpoints to manage & execute workflows.
+`Elsa.Server.Web` is the Flamme reference ASP.NET Core host for managing and executing workflows through APIs. Its project name and `Elsa.*` identifiers remain unchanged. It is a development host; production orchestration and Kubernetes operations guide the [project direction](../../../doc/project-direction.md), while UI work is secondary. See the [root README](../../../README.md) for local setup.
 
 ## Persistence
 
 The reference host uses PostgreSQL for workflow management and runtime. Start the
-PostgreSQL service with `docker compose -f docker/docker-compose.yml up -d postgres`
-from the repository root. Configure `ConnectionStrings:PostgreSql` (or
+PostgreSQL development container using the [root README setup](../../../README.md#run-locally).
+Configure `ConnectionStrings:PostgreSql` (or
 `ConnectionStrings__PostgreSql`) for your environment. The checked-in connection
-string matches the local development service. Custom hosts can omit the EF Core
+string matches that local example. Custom hosts can omit the EF Core
 registrations to use the built-in in-memory stores, whose state is lost at restart.
 
 ## Secrets

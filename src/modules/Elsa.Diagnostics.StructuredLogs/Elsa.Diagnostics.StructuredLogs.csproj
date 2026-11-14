@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides live structured log streaming for Elsa hosts.
+            Provides live structured log streaming for Flamme hosts.
         </Description>
         <PackageTags>elsa module diagnostics structured-logs logging signalr operations</PackageTags>
     </PropertyGroup>

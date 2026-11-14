@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Description>
-			Provides BPMN execution support by wiring the Bpmn.Model and Bpmn.Semantics libraries into Elsa.
+			Provides BPMN execution support by wiring the Bpmn.Model and Bpmn.Semantics libraries into Flamme.
 		</Description>
 		<PackageTags>elsa extension module bpmn</PackageTags>
 	</PropertyGroup>

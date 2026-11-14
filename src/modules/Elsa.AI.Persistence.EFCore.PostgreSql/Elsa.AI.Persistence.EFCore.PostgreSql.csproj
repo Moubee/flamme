@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides PostgreSQL EF Core migrations for Elsa AI persistence.
+            Provides PostgreSQL EF Core migrations for Flamme AI persistence.
         </Description>
         <PackageTags>elsa module ai persistence efcore postgresql</PackageTags>
     </PropertyGroup>

@@ -1,17 +1,17 @@
-# Elsa Core Wiki
+# Flamme contributor wiki
 
-This wiki is a repo-local, code-grounded map of Elsa Core. It is intended for contributors who need the same kind of fast orientation that a DeepWiki-style generated wiki gives: what the system is, where the important code lives, how the pieces connect, and how to safely extend or test them.
+This wiki maps Flamme from its source code: where the important components live, how they connect, and how to extend or test them. Flamme is forked from Elsa 3.9 and retains `Elsa.*` technical identifiers. The [project direction](../project-direction.md) explains its focus on high-load, distributed process orchestration, PostgreSQL, and Kubernetes.
 
 The source of truth is still the code, specs, ADRs, and tests. Each page links back to the relevant files so you can jump from explanation to implementation.
 
 ## Start Here
 
-Elsa Core is a modular .NET workflow engine. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
+Flamme is a modular .NET process orchestrator. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
 
-The shortest mental model:
+The main execution flow:
 
 1. An application calls `services.AddElsa(...)`.
-2. Elsa builds an `IModule` and configures feature objects.
+2. Flamme builds an `IModule` and configures feature objects.
 3. Features register services, activities, API endpoints, middleware, hosted services, and persistence stores.
 4. Workflow definitions are created by code, JSON, imported files, or providers.
 5. The runtime starts, resumes, dispatches, and persists workflow instances.

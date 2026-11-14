@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Description>
-			Provides BPMN XML interchange support by wiring the Bpmn.Interchange library into Elsa.
+			Provides BPMN XML interchange support by wiring the Bpmn.Interchange library into Flamme.
 		</Description>
 		<PackageTags>elsa extension module bpmn interchange</PackageTags>
 	</PropertyGroup>

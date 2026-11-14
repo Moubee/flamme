@@ -1,6 +1,6 @@
 # Build, Run, And Operate
 
-This page collects day-to-day build, run, and operational notes for Elsa Core contributors.
+This page collects build, run, and operational notes for Flamme contributors. The [project direction](../project-direction.md) sets Kubernetes as the primary production hosting scenario; the local reference server and container build below are development foundations.
 
 ## Build Commands
 
@@ -59,7 +59,7 @@ Source libraries multi-target `net10.0` and `net11.0` through [src/Directory.Bui
 
 The main sample host is [src/apps/Elsa.Server.Web](../../src/apps/Elsa.Server.Web). It wires most major modules in [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
 
-Start PostgreSQL with `docker compose -f docker/docker-compose.yml up -d postgres` from the repository root. The checked-in `ConnectionStrings:PostgreSql` matches that development service; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
+Start the isolated PostgreSQL development container using the [root README setup](../../README.md#run-locally). The checked-in `ConnectionStrings:PostgreSql` matches that example; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
 
 Restore the project and run it with:
 
@@ -80,24 +80,19 @@ The sample configures identity, default authentication, workflow management/runt
 
 When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings. Shell-based hosts use the shell feature path, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 
-## Docker Quick Try
+## Build a container image
 
-Build and run the reference server from the repository root, as documented in the
-[README](../../README.md):
+Build the reference server image from the repository root:
 
 ```bash
-docker build -f docker/ElsaServer.Dockerfile -t elsa-server:local .
-docker run --rm -it \
-  -e ASPNETCORE_ENVIRONMENT=Development \
-  -e HTTP_PORTS=8080 \
-  -e HTTP__BASEURL=http://localhost:13000 \
-  -p 13000:8080 \
-  elsa-server:local
+docker build -f docker/ElsaServer.Dockerfile -t flamme-server:local .
 ```
+
+This command builds an image; running the reference host also requires PostgreSQL connectivity and environment configuration. Follow the canonical [local setup in the README](../../README.md) to start PostgreSQL and run the host. For containers, configure `ConnectionStrings__PostgreSql` with a database address reachable from the container rather than relying on the host's `localhost`.
 
 Dockerfiles run on .NET 11 by default. Pass `--build-arg DOTNET_RUNTIME_VERSION=10.0` to build a .NET 10 image.
 
-Host [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) separately when a visual designer is needed.
+UI work is secondary. [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) is a separate upstream project and is not hosted by this repository.
 
 Production containers must inject a secure JWT signing key through environment variables or a secrets manager. The appsettings placeholder and known public sample keys are rejected during startup outside `Development` or `Demo`.
 
@@ -109,6 +104,24 @@ Password: password
 ```
 
 Do not use development credentials in production.
+
+### TLS and custom certificate authorities
+
+The server image includes the operating system CA bundle for outbound HTTPS.
+To trust a private CA, mount a certificate file or directory and set
+`EXTRA_CA_CERT` to its path inside the container. The [entrypoint](../../docker/entrypoint.sh)
+copies `.crt` and `.pem` files into the system trust directory and refreshes it
+before starting the application. This requires permission to write that store.
+
+For example, add these options to your configured container invocation:
+
+```bash
+--mount type=bind,source=/path/to/company-ca.crt,target=/certs/company-ca.crt,readonly \
+--env EXTRA_CA_CERT=/certs/company-ca.crt
+```
+
+If the system trust store cannot be changed, mount a prepared CA bundle and
+configure `SSL_CERT_FILE` or `SSL_CERT_DIR` for clients that honor those variables.
 
 ## ASP.NET Middleware Order
 

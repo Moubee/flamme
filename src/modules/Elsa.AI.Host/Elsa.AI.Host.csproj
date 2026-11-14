@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Hosts Elsa AI orchestration, tools, context resolution, proposals, and audit services.
+            Hosts Flamme AI orchestration, tools, context resolution, proposals, and audit services.
         </Description>
         <PackageTags>elsa module ai host</PackageTags>
     </PropertyGroup>

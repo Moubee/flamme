@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Provides OpenID Connect protocol support for Elsa External Authentication.</Description>
+        <Description>Provides OpenID Connect protocol support for Flamme External Authentication.</Description>
         <PackageTags>elsa module authentication identity openid-connect security</PackageTags>
     </PropertyGroup>
 

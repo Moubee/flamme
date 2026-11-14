@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Provides runtime-configurable external authentication for Elsa.</Description>
+        <Description>Provides runtime-configurable external authentication for Flamme.</Description>
         <PackageTags>elsa module authentication identity security</PackageTags>
     </PropertyGroup>
 
