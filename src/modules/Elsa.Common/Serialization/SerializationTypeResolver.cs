@@ -13,22 +13,22 @@ public static class SerializationTypeResolver
 {
     private static readonly IDictionary<string, Type> GenericCollectionTypes = new Dictionary<string, Type>(StringComparer.Ordinal)
     {
-        ["IEnumerable"] = typeof(IEnumerable<>),
-        ["ICollection"] = typeof(ICollection<>),
-        ["IList"] = typeof(IList<>),
-        ["IReadOnlyCollection"] = typeof(IReadOnlyCollection<>),
-        ["IReadOnlyList"] = typeof(IReadOnlyList<>),
-        ["ISet"] = typeof(ISet<>),
-        ["List"] = typeof(List<>),
-        ["HashSet"] = typeof(HashSet<>),
-        ["Collection"] = typeof(Collection<>)
+        [nameof(IEnumerable<>)] = typeof(IEnumerable<>),
+        [nameof(ICollection<>)] = typeof(ICollection<>),
+        [nameof(IList<>)] = typeof(IList<>),
+        [nameof(IReadOnlyCollection<>)] = typeof(IReadOnlyCollection<>),
+        [nameof(IReadOnlyList<>)] = typeof(IReadOnlyList<>),
+        [nameof(ISet<>)] = typeof(ISet<>),
+        [nameof(List<>)] = typeof(List<>),
+        [nameof(HashSet<>)] = typeof(HashSet<>),
+        [nameof(Collection<>)] = typeof(Collection<>)
     };
 
     private static readonly IDictionary<Type, string> GenericCollectionAliases = new Dictionary<Type, string>
     {
-        [typeof(List<>)] = "List",
-        [typeof(HashSet<>)] = "HashSet",
-        [typeof(Collection<>)] = "Collection"
+        [typeof(List<>)] = nameof(List<>),
+        [typeof(HashSet<>)] = nameof(HashSet<>),
+        [typeof(Collection<>)] = nameof(Collection<>)
     };
 
     private static readonly IDictionary<Type, Type> GenericCollectionInterfaceMappings = new Dictionary<Type, Type>

@@ -37,6 +37,8 @@ public sealed class SerializationTypeResolverTests
     [Arguments("List<String>", typeof(List<string>))]
     [Arguments("List<String[]>", typeof(List<string[]>))]
     [Arguments("List<List<String>>", typeof(List<List<string>>))]
+    [Arguments("HashSet<String>", typeof(HashSet<string>))]
+    [Arguments("Collection<String>", typeof(System.Collections.ObjectModel.Collection<string>))]
     [Arguments("ExceptionState", typeof(ExceptionState))]
     [Arguments("FaultException", typeof(FaultException))]
     [Arguments("ObjectDictionary", typeof(IDictionary<string, object>))]
@@ -82,6 +84,8 @@ public sealed class SerializationTypeResolverTests
     [Arguments(typeof(List<string>), "List<String>")]
     [Arguments(typeof(List<string[]>), "List<String[]>")]
     [Arguments(typeof(List<List<string>>), "List<List<String>>")]
+    [Arguments(typeof(HashSet<string>), "HashSet<String>")]
+    [Arguments(typeof(System.Collections.ObjectModel.Collection<string>), "Collection<String>")]
     [Arguments(typeof(ExceptionState), "ExceptionState")]
     [Arguments(typeof(FaultException), "FaultException")]
     public async Task When_SerializeSupportedType_Then_EmitsAliasThatCanBeDeserialized(Type type, string expectedAlias)

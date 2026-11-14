@@ -28,12 +28,15 @@ Primary references:
    backing fields used only by accessors in activity execution and HTTP bookmark
    normalization. Preserve taint tracking, hierarchy registration, record
    equality, normalization, and JSON behavior.
-3. `refactor(common): use native Zstandard compression on .NET 11`: keep the
+3. `refactor(common): use generic nameof for collection aliases`: replace
+   duplicated CLR collection-name strings with C# 14 unbound generic `nameof`.
+   Keep literal wire-alias assertions to verify persisted names remain unchanged.
+4. `refactor(common): use native Zstandard compression on .NET 11`: keep the
    .NET 10 implementation and existing codec contract, while using the built-in
    .NET 11 implementation. Verify legacy/new frame interoperability before
    accepting the change. Compressed bytes need not be identical between
    implementations; stored base64 Zstandard data must remain readable.
-4. Review the preceding three steps independently, address findings in separate
+5. Review the preceding four steps independently, address findings in separate
    conventional commits if necessary, and record final validation and limits.
 
 ## Selection decisions
@@ -63,7 +66,7 @@ Primary references:
   with the legacy reader, including empty, Unicode, and large inputs.
 - Build the complete solution in Release with locked dependencies and capture
   a binary log. Run affected Core, HTTP, and Common unit suites on both targets.
-- Review after three commits, fix actionable findings, and keep the worktree
+- Review after four commits, fix actionable findings, and keep the worktree
   clean with each completed step committed conventionally.
 
 ## Validation results
