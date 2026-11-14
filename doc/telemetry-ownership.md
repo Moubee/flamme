@@ -62,3 +62,39 @@ these four steps, fix findings in follow-up commits, and repeat the relevant che
 
 The initial environment provides .NET SDK 11.0.100, .NET 10/11 runtimes, and Aspire CLI
 13.6.5. Keep framework and package versions centralized and avoid unrelated upgrades.
+
+## Review checkpoint
+
+The four planned steps were committed as `c672acb5d`, `4eaf060fb`, `4e59f5d8f`, and
+`8ab7c9e27`. Independent review started after the third commit and checked the final
+combined change after the fourth.
+
+Review identified that the modular host enabled the official exporter only for the
+generic OTLP endpoint. Commit `c650fdf1f` also accepts the standard traces, metrics,
+and logs endpoint variables, leaving their interpretation to the official package.
+
+The first complete test run detected two failures, one per framework, because the
+authorization migration table still recommended removed diagnostics permissions. The
+guide now explicitly marks those permissions removed, and all 12 host smoke tests
+pass on rerun. No test was weakened or excluded to address these failures.
+
+Final review found no remaining issues. Native instrumentation assertion listeners and
+the focused warning-assertion logger remain test helpers; production workflow
+instrumentation, trace propagation, execution journals, and retry history are unchanged.
+
+## Validation results
+
+- Full-target `dotnet restore Elsa.slnx --force-evaluate` passed. The standalone TLS
+  smoke project was restored separately. Both also passed `--locked-mode` restore.
+- Reviewed every changed retained lock file: no resolved package version changed;
+  changes remove diagnostics dependencies and add or centrally pin TUnit logging.
+- `dotnet build Elsa.slnx --no-restore` passed for both frameworks with zero errors
+  and 189 warnings. The host was rebuilt successfully after the reviewed endpoint fix.
+- Workflow core tests passed: 624 tests across .NET 10 and .NET 11.
+- Final `dotnet test --solution Elsa.slnx --no-build --no-restore
+  --max-parallel-test-modules 2` passed across both frameworks: 8,883 succeeded,
+  zero failed, and four existing component-test skips (two skipped scenarios per
+  framework). This includes Docker-backed PostgreSQL, host, and component tests.
+- All project-reference paths resolve, whitespace checks pass, and retained source
+  and lock files contain no references to the removed diagnostics packages.
+- The original checkout's unrelated local changes were preserved.
