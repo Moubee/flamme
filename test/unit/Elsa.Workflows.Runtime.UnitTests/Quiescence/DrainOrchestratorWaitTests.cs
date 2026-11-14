@@ -115,14 +115,15 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var capReached = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seenLock = new Lock();
         var inFlight = 0;
         var maxInFlight = 0;
-        var maxLock = new object();
+        var maxLock = new Lock();
         Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var id = __arg0.Id!;
-                        lock (seen)
+                        lock (seenLock)
                         {
                             if (!seen.Add(id))
                                 return new ValueTask<WorkflowInstance?>(RunningInstance(id));
@@ -543,14 +544,17 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
         var hang = new TaskCompletionSource<WorkflowInstance?>(TaskCreationOptions.RunContinuationsAsynchronously);
         var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seenLock = new Lock();
         var stalledIds = new HashSet<string>(StringComparer.Ordinal);
+        var stalledIdsLock = new Lock();
         var promotedIds = new HashSet<string>(StringComparer.Ordinal);
+        var promotedIdsLock = new Lock();
         var snapshotFinds = 0;
         Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var id = __arg0.Id!;
-                        lock (seen)
+                        lock (seenLock)
                         {
                             // Phase C: runner committed Finished/Cancelled after force-cancel.
                             // Only ids that snapshot successfully join drainInduced and get the forensic log.
@@ -560,12 +564,12 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 
                         if (Interlocked.Increment(ref snapshotFinds) <= cap)
                         {
-                            lock (stalledIds)
+                            lock (stalledIdsLock)
                                 stalledIds.Add(id);
                             return new ValueTask<WorkflowInstance?>(hang.Task);
                         }
 
-                        lock (promotedIds)
+                        lock (promotedIdsLock)
                             promotedIds.Add(id);
                         return new ValueTask<WorkflowInstance?>(RunningInstance(id));
                     });

@@ -12,7 +12,7 @@ namespace Elsa.Workflows.ComponentTests.Services;
 /// </summary>
 public sealed class WorkflowExecutionTracker
 {
-    private readonly object _gate = new();
+    private readonly Lock _gate = new();
     private int _activeCount;
     private TaskCompletionSource<bool> _idle = CreateCompletedSignal();
 

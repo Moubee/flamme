@@ -15,7 +15,7 @@ public sealed class TestBookmarkQueueWorker(
     ITenantScopeFactory? tenantScopeFactory = null,
     ITenantAccessor? tenantAccessor = null) : IBookmarkQueueWorker, IAsyncDisposable
 {
-    private readonly object _lifetimeLock = new();
+    private readonly Lock _lifetimeLock = new();
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _workerTask;
     private bool _disposed;

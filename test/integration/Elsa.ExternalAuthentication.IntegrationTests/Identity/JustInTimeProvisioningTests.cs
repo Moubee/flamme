@@ -228,7 +228,7 @@ public class JustInTimeProvisioningTests
 
     private sealed class AtomicProvisioner : IExternalIdentityProvisioner
     {
-        private readonly object _syncRoot = new();
+        private readonly Lock _syncRoot = new();
         private readonly Dictionary<(string TenantId, string ConnectionKey, string Issuer, string Subject), ProvisioningResult> _links = new();
         private readonly List<User> _users = [];
 

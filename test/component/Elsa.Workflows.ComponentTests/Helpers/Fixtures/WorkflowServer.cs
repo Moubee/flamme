@@ -364,7 +364,7 @@ internal sealed class ComponentDatabaseMigrationService(
 /// </summary>
 public sealed class WorkflowServer : IAsyncDisposable
 {
-    private readonly object _clientLock = new();
+    private readonly Lock _clientLock = new();
     private readonly List<HttpClient> _clients = [];
     private readonly TracedWebApplicationFactory<ComponentTestHost> _factory;
     private readonly ComponentPodHarness? _ownedPod;
@@ -554,7 +554,7 @@ internal sealed class ComponentPodHarness : WebApplicationTest<ComponentTestWebA
 /// </summary>
 internal sealed class ElsaModuleRegistryLease
 {
-    private readonly object _captureLock = new();
+    private readonly Lock _captureLock = new();
     private IServiceCollection? _services;
     private IModule? _module;
     private Exception? _lifecycleReleaseFailure;

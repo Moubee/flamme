@@ -21,7 +21,7 @@ public class SelectiveMockLockProvider : IDistributedLockProvider, IDisposable
 {
     private readonly IDistributedLockProvider _realProvider;
     private readonly Dictionary<string, TestDistributedLockProvider> _mockProvidersByPrefix = new();
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     public SelectiveMockLockProvider(IDistributedLockProvider realProvider)
     {

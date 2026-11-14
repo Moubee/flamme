@@ -22,10 +22,11 @@ public class BookmarkQueueTenantIsolationTests
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
         var resumed = new List<string>();
+        var resumedLock = new Lock();
         var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
 
-        var (workerA, processorA) = CreateResumingWorker(signaler, accessor, tenantA, "bookmark-a", resumed, tenantsProvider);
-        var (workerB, processorB) = CreateResumingWorker(signaler, accessor, tenantB, "bookmark-b", resumed, tenantsProvider);
+        var (workerA, processorA) = CreateResumingWorker(signaler, accessor, tenantA, "bookmark-a", resumed, resumedLock, tenantsProvider);
+        var (workerB, processorB) = CreateResumingWorker(signaler, accessor, tenantB, "bookmark-b", resumed, resumedLock, tenantsProvider);
 
         try
         {
@@ -39,10 +40,18 @@ public class BookmarkQueueTenantIsolationTests
             using (accessor.PushContext(tenantB))
                 await signaler.TriggerAsync();
 
-            await WaitUntilAsync(() => resumed.Count >= 2);
+            await WaitUntilAsync(() =>
+            {
+                lock (resumedLock)
+                    return resumed.Count >= 2;
+            });
 
-            await Assert.That(resumed).Contains("bookmark-a");
-            await Assert.That(resumed).Contains("bookmark-b");
+            string[] resumedSnapshot;
+            lock (resumedLock)
+                resumedSnapshot = resumed.ToArray();
+
+            await Assert.That(resumedSnapshot).Contains("bookmark-a");
+            await Assert.That(resumedSnapshot).Contains("bookmark-b");
             await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             await Assert.That(processorB.AmbientTenantIds).IsEquivalentTo(["tenant-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
             Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
@@ -207,6 +216,7 @@ public class BookmarkQueueTenantIsolationTests
         Tenant tenant,
         string bookmarkId,
         List<string> resumed,
+        Lock resumedLock,
         ITenantsProvider tenantsProvider)
     {
         var store = new MemoryBookmarkQueueStore(new MemoryStore<BookmarkQueueItem>());
@@ -222,7 +232,7 @@ public class BookmarkQueueTenantIsolationTests
         Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
                     .Returns((global::Elsa.Workflows.Runtime.Filters.BookmarkFilter __arg0, global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions? __arg1, global::System.Threading.CancellationToken __arg2) =>
                     {
-                        lock (resumed)
+                        lock (resumedLock)
                             resumed.Add(__arg0.BookmarkId!);
                         return new[]
                         {
