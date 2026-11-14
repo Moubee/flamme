@@ -1,6 +1,7 @@
 name: Docker certificate smoke tests
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -23,6 +24,9 @@ on:
       - 'scripts/test-ca-trust.sh'
       - 'test/TlsSmoke/**'
       - '.github/workflows/docker-ca.yml'
+
+permissions:
+  contents: read
 
 jobs:
   smoke:

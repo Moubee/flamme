@@ -2,10 +2,35 @@
 
 Research date: 2026-11-14. Base: `origin/main` at `245760a22`.
 
+## Current validation workflow
+
+The Packages workflow builds and uploads validation artifacts on branch pushes
+and manual runs. The full-solution package build runs alongside the unit/integration
+and component suites on both `net10.0` and `net11.0`. The aggregate report still
+requires both suites to pass and enforces 10% line coverage. A successful workflow
+requires the build, all test lanes, and coverage reporting to succeed; package
+artifacts from a failed workflow do not establish a validated release.
+
+Download `elsa-nuget-packages`, the framework-specific test-result artifacts, and
+`coverage-reports` from the Actions run. Manual Packages runs upload the same
+artifacts as push runs, and an empty package upload fails the build job. The PR
+and Docker certificate workflows can also be run manually, preserving their
+existing framework and image matrices.
+
+The inherited Feedz/NuGet publishers, release-event handling, and GitHub Pages
+deployment have been removed. Validation needs no publishing secrets, NuGet OIDC
+policy, or Pages site. All validation workflows request only `contents: read`;
+the separate stale workflow requests issue and pull-request write access for
+its maintenance job. Weekly Dependabot updates cover NuGet and GitHub Actions.
+
+The sections below record the performance work that established this validation
+graph. References to publishing in those historical findings predate the removal
+of inherited release automation.
+
 ## Success criteria
 
 - Preserve both `net10.0` and `net11.0` correctness tests, full-solution build validation,
-  aggregate coverage threshold, failure artifacts, and publishing gates.
+  aggregate coverage threshold, failure artifacts, and validation gates.
 - Reduce repeated dependency downloads and shorten the critical path without caching
   compiled outputs or bypassing restore on a cache hit.
 - Replace NSubstitute with the TUnit mocking alternative, preserving test behavior.
@@ -49,7 +74,7 @@ Older failed runs are unsuitable for claiming a current-main speedup.
 | Dependency locks | Adopt committed locks for executable/test entry points after validating the actual graph. They pin resolved transitives and package hashes; CPM alone does not do that. Keep explicit cache keys including locks and tool/restore configuration. |
 | `setup-dotnet` built-in cache | Applicable once locks exist. Keep the explicit shared cache action to give different solution filters and tool restores their own primary keys and controlled fallbacks. |
 | Framework-level PR parallelism | Both frameworks currently share two CPU-based MTP slots. Independent runners can shorten feedback time, with additional runner/build cost. Preserve full-solution compilation, including net10-only benchmarks. |
-| Main package build overlap | Build packages alongside tests; gate every publisher on successful aggregate coverage. This saves the serialized build interval on successful runs but also builds artifacts for commits whose tests fail. |
+| Main package build overlap | Build packages alongside tests; successful validation still requires the aggregate coverage gate. This saves the serialized build interval on successful runs but also builds artifacts for commits whose tests fail. |
 | Framework-specific test restore | Initial optimization rejected after the lock-file experiment: a two-target lock fails validation with a single-target restore. Restore the complete locked graph, then select the test framework with `--framework`. |
 | Cache `bin` / `obj` | Defer: Fody, generated code, framework selection, paths, and restore state complicate correctness. |
 | Increase MTP parallelism | Defer until CPU, memory, and container pressure are measured. MTP already defaults to processor count; more processes are not free capacity. |
@@ -173,3 +198,10 @@ review findings remain.
 Hosted Linux workflows, remote cache transfer costs, and package publication were
 not executed. The branch remains local; the rollout comparison above is still
 needed before claiming a CI speedup.
+
+The later publication-preparation workflow changes passed actionlint 1.7.12 and
+`git diff --check`. Structural comparison against `baeef4331` confirmed unchanged
+test jobs, framework matrices, raw coverage-count checks, aggregate coverage gate,
+and restore/build/pack commands. It also checked manual package artifact uploads,
+removed publishers/Pages, token permissions, and both Dependabot ecosystems.
+These workflow changes have not been executed on a hosted runner.
