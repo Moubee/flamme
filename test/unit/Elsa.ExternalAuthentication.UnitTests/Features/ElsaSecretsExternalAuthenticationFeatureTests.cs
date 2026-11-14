@@ -1,7 +1,6 @@
 using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Secrets.Services;
 using Microsoft.Extensions.DependencyInjection;
-using ElsaSecretsExternalAuthenticationShellFeature = Elsa.ExternalAuthentication.Secrets.ShellFeatures.ElsaSecretsExternalAuthenticationFeature;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Features;
@@ -9,12 +8,10 @@ namespace Elsa.ExternalAuthentication.UnitTests.Features;
 public class ElsaSecretsExternalAuthenticationFeatureTests
 {
     [Test]
-    public async Task ShellFeatureRegistersTheManagedSecretBridge()
+    public async Task ServiceRegistrationAddsTheManagedSecretBridge()
     {
         var services = new ServiceCollection();
-        var feature = new ElsaSecretsExternalAuthenticationShellFeature();
-
-        feature.ConfigureServices(services);
+        services.AddElsaSecretsExternalAuthentication();
 
         await Assert.That(services).Contains(descriptor =>
             descriptor.ServiceType == typeof(ISecretBindingResolver) &&

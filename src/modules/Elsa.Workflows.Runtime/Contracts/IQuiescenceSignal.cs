@@ -37,9 +37,8 @@ public interface IQuiescenceSignal
 
     /// <summary>
     /// Loads any persisted administrative pause state and re-applies it to the in-memory state. Called once per
-    /// runtime generation by the runtime's startup lifecycle (an <c>IStartupTask</c> in IModule deployments and
-    /// an <c>IShellInitializer</c> in shell-aware deployments) when the configured pause-persistence policy
-    /// requires across-reactivation persistence. Implementations that do not persist state can return a
+    /// runtime generation by an <c>IStartupTask</c> when the configured pause-persistence policy
+    /// requires across-restart persistence. Implementations that do not persist state can return a
     /// no-op task — the contract is intentionally lifecycle-aware so consumers don't need to type-check
     /// against a concrete implementation.
     /// </summary>

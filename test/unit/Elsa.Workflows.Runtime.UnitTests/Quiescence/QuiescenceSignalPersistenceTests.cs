@@ -288,10 +288,8 @@ public class QuiescenceSignalPersistenceTests
     [DisplayName("Persistence key is scoped to the supplied shell name (multi-shell isolation)")]
     public async Task PersistenceKeyIncludesShellName()
     {
-        // Regression: previously the DI registration did not pass a shellName, so all shells in a CShells
-        // deployment shared "elsa.quiescence.pause.default" — pausing shell A would re-pause shell B on next
-        // activation. The factory in ShellFeatures/WorkflowRuntimeFeature now injects ShellSettings.Id; this
-        // test locks in the constructor-level contract that shellName is reflected in the persistence key.
+        // Independently named runtime instances sharing a store must not restore one another's pause state.
+        // Preserve the existing named-key contract for consumers that supply a runtime name.
         var sutA = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv, shellName: "shell-a");
         var sutB = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv, shellName: "shell-b");
 

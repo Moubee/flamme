@@ -14,8 +14,7 @@ namespace Elsa.Workflows.Runtime.StartupTasks;
 /// <see cref="IQuiescenceSignal"/> is registered as a singleton in each node's DI container, so each node holds
 /// its own in-memory <see cref="QuiescenceState"/>. Gating the task to a single cluster winner would leave every
 /// other node starting with <see cref="QuiescenceReason.None"/> and dispatching new work, silently defeating the
-/// persisted pause. The per-shell counterpart for shell-aware deployments is
-/// <c>InitializePauseStateShellInitializer</c>, which fires per-shell (and therefore per-node) for the same reason.
+/// persisted pause.
 /// </remarks>
 [UsedImplicitly]
 public sealed class InitializePauseStateStartupTask(IQuiescenceSignal signal) : IStartupTask

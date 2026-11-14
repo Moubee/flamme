@@ -3,7 +3,6 @@ using Elsa.ExternalAuthentication.OpenIdConnect.Features;
 using Elsa.ExternalAuthentication.OpenIdConnect.Services;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
-using OpenIdConnectExternalAuthenticationShellFeature = Elsa.ExternalAuthentication.OpenIdConnect.ShellFeatures.OpenIdConnectExternalAuthenticationFeature;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Features;
@@ -19,17 +18,6 @@ public class OpenIdConnectExternalAuthenticationFeatureTests
         var feature = new OpenIdConnectExternalAuthenticationFeature(module);
 
         feature.Apply();
-
-        await AssertOpenIdConnectAdapterRegistered(services);
-    }
-
-    [Test]
-    public async Task ShellFeatureRegistersTheOpenIdConnectAdapter()
-    {
-        var services = new ServiceCollection();
-        var feature = new OpenIdConnectExternalAuthenticationShellFeature();
-
-        feature.ConfigureServices(services);
 
         await AssertOpenIdConnectAdapterRegistered(services);
     }

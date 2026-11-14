@@ -7,7 +7,6 @@ using Elsa.KeyValues.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Mocks;
 using ModuleKeyValueFeature = Elsa.KeyValues.Features.KeyValueFeature;
-using ShellKeyValueFeature = Elsa.KeyValues.ShellFeatures.KeyValueFeature;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -59,51 +58,6 @@ public class KeyValueFeatureTests
         };
 
         feature.Apply();
-
-        using var provider = _services.BuildServiceProvider();
-        var store = provider.GetRequiredService<IKeyValueStore>();
-        await Assert.That(store).IsOfType(typeof(CustomKeyValueStore));
-        _ = (CustomKeyValueStore)store;
-    }
-
-    [Test]
-    public async Task ShellFeature_DoesNotRegisterMemoryStore_WhenKeyValueStoreIsCustomized()
-    {
-        var feature = new ShellKeyValueFeature
-        {
-            KeyValueStore = _ => new CustomKeyValueStore()
-        };
-
-        feature.ConfigureServices(_services);
-
-        await Assert.That(_services).DoesNotContain(x => x.ServiceType == typeof(MemoryStore<SerializedKeyValuePair>));
-        await Assert.That(_services).Contains(x => x.ServiceType == typeof(IKeyValueStore));
-    }
-
-    [Test]
-    public async Task ShellFeature_CanExplicitlyRegisterMemoryStore_WhenKeyValueStoreIsCustomized()
-    {
-        var feature = new ShellKeyValueFeature
-        {
-            KeyValueStore = sp => ActivatorUtilities.CreateInstance<MemoryKeyValueStore>(sp),
-            RegisterMemoryStore = true
-        };
-
-        feature.ConfigureServices(_services);
-
-        await Assert.That(_services).Contains(x => x.ServiceType == typeof(MemoryStore<SerializedKeyValuePair>));
-    }
-
-    [Test]
-    public async Task ShellFeature_ConfiguredKeyValueStoreOverridesExistingRegistration()
-    {
-        _services.AddScoped<IKeyValueStore>(_ => new ExistingKeyValueStore());
-        var feature = new ShellKeyValueFeature
-        {
-            KeyValueStore = _ => new CustomKeyValueStore()
-        };
-
-        feature.ConfigureServices(_services);
 
         using var provider = _services.BuildServiceProvider();
         var store = provider.GetRequiredService<IKeyValueStore>();

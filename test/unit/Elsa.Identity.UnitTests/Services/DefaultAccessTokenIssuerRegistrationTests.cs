@@ -3,7 +3,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Identity.Services;
 using Microsoft.Extensions.DependencyInjection;
 using ModuleIdentityFeature = Elsa.Identity.Features.IdentityFeature;
-using ShellIdentityFeature = Elsa.Identity.ShellFeatures.IdentityFeature;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Services;
@@ -22,15 +21,6 @@ public class DefaultAccessTokenIssuerRegistrationTests
     }
 
     [Test]
-    public async Task ShellFeatureResolvesThePreferredAccessTokenIssuerConstructor()
-    {
-        var services = CreateServices();
-        new ShellIdentityFeature().ConfigureServices(services);
-
-        await AssertAccessTokenIssuerResolves(services);
-    }
-
-    [Test]
     public async Task ModuleFeatureRegistersUserDeletionCoordinator()
     {
         var services = CreateServices();
@@ -41,29 +31,12 @@ public class DefaultAccessTokenIssuerRegistrationTests
     }
 
     [Test]
-    public async Task ShellFeatureRegistersUserDeletionCoordinator()
-    {
-        var services = CreateServices();
-        new ShellIdentityFeature().ConfigureServices(services);
-        await AssertUserDeletionCoordinatorResolves(services);
-    }
-
-    [Test]
     public async Task ModuleFeatureRegistersInMemorySessionRevocation()
     {
         var services = CreateServices();
         var module = Mock.Of<IModule>().Object;
         Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
-
-        await AssertInMemorySessionRevocationResolves(services);
-    }
-
-    [Test]
-    public async Task ShellFeatureRegistersInMemorySessionRevocation()
-    {
-        var services = CreateServices();
-        new ShellIdentityFeature().ConfigureServices(services);
 
         await AssertInMemorySessionRevocationResolves(services);
     }
@@ -81,7 +54,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAccessTokenIssuer>()).IsOfType(typeof(DefaultAccessTokenIssuer));
     }
 
-    // SessionRevoker is checked by registration: resolving it binds the token options, which the shell feature reads from shell configuration.
+    // SessionRevoker is checked by registration; resolving it also binds token options.
     private static async Task AssertInMemorySessionRevocationResolves(IServiceCollection services)
     {
         await Assert.That(services).Contains(x => x.ServiceType == typeof(SessionRevoker));

@@ -3,18 +3,13 @@ using Microsoft.Extensions.Logging;
 namespace Elsa.Workflows.Runtime.Services;
 
 /// <summary>
-/// Shared invocation shell for drain triggers (host stop, shell deactivation, etc.). Calls
+/// Shared invocation helper for runtime drain triggers. Calls
 /// <see cref="IDrainOrchestrator.DrainAsync"/> with a uniform Information/Warning logging
 /// pattern and suppresses the parallel-drain <see cref="InvalidOperationException"/> the
 /// orchestrator throws when another trigger has already run for this generation.
 /// </summary>
 /// <remarks>
-/// Both <c>ElsaShellDrainHandler</c> (CShells <c>IDrainHandler</c>) and
-/// <c>DrainOrchestratorHostedService</c> (.NET <c>IHostedService.StopAsync</c>) used to inline
-/// near-identical try/catch/log shapes. They had already drifted (host-stop's success log
-/// omitted the <c>paused</c>/<c>waited</c> durations the shell-handler version included, and
-/// the "skipped" message disagreed on the trigger label). Centralising the shape here keeps
-/// the two — and any future trigger source — uniform.
+/// The host-stop adapter and other callers share the same outcome logging and parallel-drain handling.
 /// </remarks>
 internal static class DrainTriggerExecutor
 {
@@ -25,8 +20,8 @@ internal static class DrainTriggerExecutor
     /// <param name="trigger">Which trigger source initiated the drain.</param>
     /// <param name="logger">Logger to emit the outcome under (the caller's category).</param>
     /// <param name="contextLabel">
-    /// Human-readable label used verbatim in the log messages (e.g. <c>"Shell drain"</c>,
-    /// <c>"Graceful drain"</c>) so operators can tell at a glance which trigger produced an
+    /// Human-readable label used verbatim in the log messages (e.g. <c>"Graceful drain"</c>)
+    /// so operators can tell at a glance which trigger produced an
     /// entry without inspecting the log category.
     /// </param>
     /// <param name="cancellationToken">Cancellation propagated to the orchestrator.</param>

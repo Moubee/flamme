@@ -1,21 +1,21 @@
-using Elsa.Common;
-using Elsa.Common.ShellHandlers;
+using System.Threading.Tasks;
+using Elsa.Features.Services;
 using Elsa.Mediator;
 using Elsa.Mediator.Contracts;
+using Elsa.Mediator.HostedServices;
 using Elsa.Mediator.Models;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
-namespace Elsa.Common.UnitTests.ShellHandlers;
+namespace Elsa.Common.UnitTests.HostedServices;
 
-public class MediatorBackgroundTaskTests
+public class MediatorHostedServiceTests
 {
     [Test]
     public async Task StartAsync_StartsMediatorCommandProcessor()
     {
         // Arrange
         await using var serviceProvider = CreateServiceProvider();
-        var backgroundTask = GetMediatorBackgroundTask(serviceProvider);
+        var backgroundTask = GetMediatorHostedService(serviceProvider);
         var commandSender = serviceProvider.GetRequiredService<ICommandSender>();
         var sink = serviceProvider.GetRequiredService<CommandSink>();
 
@@ -37,51 +37,21 @@ public class MediatorBackgroundTaskTests
         }
     }
 
-    [Test]
-    public async Task StopAsync_KeepsProcessorRunning_UntilAllBackgroundTaskReferencesStop()
-    {
-        // Arrange
-        await using var serviceProvider = CreateServiceProvider();
-        await using var scope1 = serviceProvider.CreateAsyncScope();
-        await using var scope2 = serviceProvider.CreateAsyncScope();
-        var backgroundTask1 = GetMediatorBackgroundTask(scope1.ServiceProvider);
-        var backgroundTask2 = GetMediatorBackgroundTask(scope2.ServiceProvider);
-        var commandSender = serviceProvider.GetRequiredService<ICommandSender>();
-        var sink = serviceProvider.GetRequiredService<CommandSink>();
-
-        // Act
-        await backgroundTask1.StartAsync(CancellationToken.None);
-        await backgroundTask2.StartAsync(CancellationToken.None);
-        await backgroundTask1.StopAsync(CancellationToken.None);
-
-        try
-        {
-            await commandSender.SendAsync(new TestCommand("hello"), CommandStrategy.Background, CancellationToken.None);
-
-            // Assert
-            var completedTask = await Task.WhenAny(sink.Handled.Task, Task.Delay(TimeSpan.FromSeconds(5)));
-            await Assert.That(completedTask).IsSameReferenceAs(sink.Handled.Task);
-            await Assert.That(await sink.Handled.Task).IsEqualTo("hello");
-        }
-        finally
-        {
-            await backgroundTask2.StopAsync(CancellationToken.None);
-        }
-    }
-
     private static ServiceProvider CreateServiceProvider()
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        new ShellFeatures.MediatorFeature().ConfigureServices(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
+        new Elsa.Common.Features.MediatorFeature(module).Apply();
         services.AddSingleton<CommandSink>();
         services.AddCommandHandler<TestCommandHandler>();
         return services.BuildServiceProvider();
     }
 
-    private static MediatorBackgroundTask GetMediatorBackgroundTask(IServiceProvider serviceProvider)
+    private static BackgroundCommandSenderHostedService GetMediatorHostedService(IServiceProvider serviceProvider)
     {
-        return serviceProvider.GetServices<IBackgroundTask>().OfType<MediatorBackgroundTask>().Single();
+        return serviceProvider.GetServices<Microsoft.Extensions.Hosting.IHostedService>().OfType<BackgroundCommandSenderHostedService>().Single();
     }
 
     private sealed record TestCommand(string Message) : ICommand;
