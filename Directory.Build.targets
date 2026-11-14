@@ -3,12 +3,27 @@
     <!-- Keep the package artifact contract for both libraries and app packages. -->
     <PackageOutputPath>$(MSBuildThisFileDirectory)packages/</PackageOutputPath>
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' And '$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <!-- Lock executable entrypoints (including tests and benchmarks), rather than library graphs
+         whose dependency versions are resolved by their consuming applications. -->
+    <RestorePackagesWithLockFile Condition="'$(OutputType)' == 'Exe'">true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <!-- Use project references instead of NuGet packages for local development -->
   <PropertyGroup>
     <UseProjectReferences>true</UseProjectReferences>
   </PropertyGroup>
+
+  <!-- Locked mode otherwise creates a missing file, leaving a new entrypoint unpinned in CI. -->
+  <Target Name="ValidateNuGetLockFile" BeforeTargets="CollectPackageReferences"
+          Condition="'$(RestoreLockedMode)' == 'true' And '$(RestorePackagesWithLockFile)' == 'true'">
+    <PropertyGroup>
+      <_NuGetLockFileToValidate Condition="'$(NuGetLockFilePath)' == ''">$(MSBuildProjectDirectory)/packages.lock.json</_NuGetLockFileToValidate>
+      <_NuGetLockFileToValidate Condition="'$(NuGetLockFilePath)' != ''">$(NuGetLockFilePath)</_NuGetLockFileToValidate>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_NuGetLockFileToValidate)')"
+           Code="ELSA0003"
+           Text="$(MSBuildProjectName) requires a NuGet lock file at '$(_NuGetLockFileToValidate)'. Restore this project without --locked-mode and without selecting a single framework, then commit the generated lock file." />
+  </Target>
 
   <!--
     Guards the ConfigureAwait.Fody directive declared in src/Directory.Build.props.

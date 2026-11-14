@@ -7,23 +7,23 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Mappers;
 
 public class WorkflowDefinitionMapperOriginalSourceTests
 {
-    private readonly IActivitySerializer _activitySerializer = Substitute.For<IActivitySerializer>();
+    private readonly IActivitySerializer _activitySerializer = Mock.Of<IActivitySerializer>().Object;
     private readonly WorkflowDefinitionMapper _mapper;
 
     public WorkflowDefinitionMapperOriginalSourceTests()
     {
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
         var variableDefinitionMapper = new VariableDefinitionMapper(
             SerializationTypeRegistry.CreateDefault(),
             scopeFactory,
             NullLogger<VariableDefinitionMapper>.Instance);
-        var workflowDefinitionService = Substitute.For<IWorkflowDefinitionService>();
+        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
         _mapper = new(_activitySerializer, workflowDefinitionService, variableDefinitionMapper);
     }
 
@@ -32,13 +32,13 @@ public class WorkflowDefinitionMapperOriginalSourceTests
     {
         var fileRoot = new WriteLine("from-file");
         var editedRoot = new WriteLine("from-studio");
-        _activitySerializer.Deserialize<WorkflowDefinitionModel>("FILE_JSON")
-            .Returns(new WorkflowDefinitionModel
-            {
-                Name = "FromFile",
-                Root = fileRoot
-            });
-        _activitySerializer.Deserialize("EDITED_JSON").Returns(editedRoot);
+        Mock.Get(_activitySerializer).Deserialize<WorkflowDefinitionModel>("FILE_JSON")
+                    .Returns(new WorkflowDefinitionModel
+                    {
+                        Name = "FromFile",
+                        Root = fileRoot
+                    });
+        Mock.Get(_activitySerializer).Deserialize("EDITED_JSON").Returns(editedRoot);
 
         var definition = CreateDefinition(
             name: "Edited",
@@ -49,19 +49,19 @@ public class WorkflowDefinitionMapperOriginalSourceTests
 
         await Assert.That(workflow.Root).IsSameReferenceAs(editedRoot);
         await Assert.That(workflow.WorkflowMetadata.Name).IsEqualTo("Edited");
-        _activitySerializer.DidNotReceive().Deserialize<WorkflowDefinitionModel>("FILE_JSON");
+        Mock.Get(_activitySerializer).Deserialize<WorkflowDefinitionModel>("FILE_JSON").WasNeverCalled();
     }
 
     [Test]
     public async Task Map_WhenOnlyOriginalSourceIsPresent_UsesOriginalSource()
     {
         var sourceRoot = new WriteLine("from-elsascript-equivalent");
-        _activitySerializer.Deserialize<WorkflowDefinitionModel>("SOURCE")
-            .Returns(new WorkflowDefinitionModel
-            {
-                Name = "FromSource",
-                Root = sourceRoot
-            });
+        Mock.Get(_activitySerializer).Deserialize<WorkflowDefinitionModel>("SOURCE")
+                    .Returns(new WorkflowDefinitionModel
+                    {
+                        Name = "FromSource",
+                        Root = sourceRoot
+                    });
 
         var definition = CreateDefinition(
             name: "EntityName",
@@ -72,7 +72,7 @@ public class WorkflowDefinitionMapperOriginalSourceTests
 
         await Assert.That(workflow.Root).IsSameReferenceAs(sourceRoot);
         await Assert.That(workflow.WorkflowMetadata.Name).IsEqualTo("FromSource");
-        _activitySerializer.DidNotReceive().Deserialize(Arg.Any<string>());
+        Mock.Get(_activitySerializer).Deserialize(Arg.Any<string>()).WasNeverCalled();
     }
 
     private static WorkflowDefinition CreateDefinition(string name, string? stringData, string? originalSource)

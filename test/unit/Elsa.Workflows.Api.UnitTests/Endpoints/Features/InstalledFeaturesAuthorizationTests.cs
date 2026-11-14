@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
 
 namespace Elsa.Workflows.Api.UnitTests.Endpoints.Features;
@@ -39,9 +38,9 @@ public class InstalledFeaturesAuthorizationTests
         });
 
         var feature = new FeatureDescriptor("SecretsFeature", "Elsa.Secrets", "Secrets");
-        var installedFeatureProvider = Substitute.For<IInstalledFeatureProvider>();
-        installedFeatureProvider.List().Returns([feature]);
-        installedFeatureProvider.Find(FeatureFullName).Returns(feature);
+        var installedFeatureProvider = Mock.Of<IInstalledFeatureProvider>().Object;
+        Mock.Get(installedFeatureProvider).List().Returns([feature]);
+        Mock.Get(installedFeatureProvider).Find(FeatureFullName).Returns(feature);
         builder.Services.AddSingleton(installedFeatureProvider);
 
         builder.Services

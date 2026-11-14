@@ -3,14 +3,14 @@ using Elsa.Mediator;
 using Elsa.Mediator.Contracts;
 using Elsa.Workflows.Runtime.Commands;
 using Elsa.Workflows.Runtime.Requests;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundStimulusDispatcherTests
 {
-    private readonly ICommandSender _commandSender = Substitute.For<ICommandSender>();
-    private readonly ITenantAccessor _tenantAccessor = Substitute.For<ITenantAccessor>();
+    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
+    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
 
     [Test]
     public async Task SendAsync_DoesNotPropagateCallerToken()
@@ -24,11 +24,8 @@ public class BackgroundStimulusDispatcherTests
         await dispatcher.SendAsync(request, callerCts.Token);
 
         // Assert - background commands run independently of caller's lifecycle
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<DispatchStimulusCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchStimulusCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     private BackgroundStimulusDispatcher CreateDispatcher()

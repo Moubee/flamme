@@ -4,7 +4,7 @@ using Elsa.Workflows.Exceptions;
 using Elsa.Workflows.Memory;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.OutputConverters;
@@ -150,10 +150,10 @@ public class ActivityExecutionContextOutputConversionTests
     [Test]
     public async Task Set_WithoutConverter_UsesExistingPathWithoutConverterInfrastructureCalls()
     {
-        var registry = Substitute.For<IOutputConverterRegistry>();
-        var resolver = Substitute.For<IOutputBindingDestinationResolver>();
-        var validator = Substitute.For<IOutputConverterSettingsValidator>();
-        var invoker = Substitute.For<IOutputConverterInvoker>();
+        var registry = Mock.Of<IOutputConverterRegistry>().Object;
+        var resolver = Mock.Of<IOutputBindingDestinationResolver>().Object;
+        var validator = Mock.Of<IOutputConverterSettingsValidator>().Object;
+        var invoker = Mock.Of<IOutputConverterInvoker>().Object;
         var variable = new Variable<int>("Destination", 0);
         var activity = new TestActivity
         {
@@ -173,10 +173,10 @@ public class ActivityExecutionContextOutputConversionTests
         context.Set(activity.Result, 42, nameof(TestActivity.Result));
 
         await Assert.That(variable.Get(context.ExpressionExecutionContext)).IsEqualTo(42);
-        await Assert.That(registry.ReceivedCalls()).IsEmpty();
-        await Assert.That(resolver.ReceivedCalls()).IsEmpty();
-        await Assert.That(validator.ReceivedCalls()).IsEmpty();
-        await Assert.That(invoker.ReceivedCalls()).IsEmpty();
+        await Assert.That(Mock.Get(registry).Invocations).IsEmpty();
+        await Assert.That(Mock.Get(resolver).Invocations).IsEmpty();
+        await Assert.That(Mock.Get(validator).Invocations).IsEmpty();
+        await Assert.That(Mock.Get(invoker).Invocations).IsEmpty();
     }
 
     private static async Task<ActivityExecutionContext> CreateContextAsync(

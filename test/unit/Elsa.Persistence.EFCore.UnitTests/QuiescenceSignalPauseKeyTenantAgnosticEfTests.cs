@@ -16,7 +16,6 @@ using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Persistence.EFCore.UnitTests;
 
@@ -309,9 +308,9 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
         {
             var database = new PostgreSqlTestDatabase();
             var tenantAccessor = new DefaultTenantAccessor();
-            var clock = Substitute.For<ISystemClock>();
-            clock.UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-            var cycleRegistry = Substitute.For<IExecutionCycleRegistry>();
+            var clock = Mock.Of<ISystemClock>().Object;
+            Mock.Get(clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+            var cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
             var migrationsAssembly = typeof(RuntimeDbContextFactory).Assembly;
 
             var services = new ServiceCollection()

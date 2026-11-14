@@ -8,7 +8,6 @@ using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Notifications;
 using Elsa.Workflows.Management.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionVersioning;
 
@@ -306,13 +305,13 @@ public class Tests : IAsyncDisposable
         BatchFailurePoint failurePoint
     )
     {
-        var store = Substitute.For<IWorkflowDefinitionStore>();
+        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
 
-        store.FindLastVersionAsync(
+        Mock.Get(store).FindLastVersionAsync(
                 Arg.Any<WorkflowDefinitionFilter>(),
                 Arg.Any<CancellationToken>()
             )
-            .Returns(_ =>
+            .Returns(() =>
                 Task.FromResult(
                     persisted.Values
                         .OrderByDescending(x => x.Version)
@@ -321,11 +320,11 @@ public class Tests : IAsyncDisposable
                 )
             );
 
-        store.FindAsync(
+        Mock.Get(store).FindAsync(
                 Arg.Is<WorkflowDefinitionFilter>(x => x.VersionOptions!.Value.IsLatest),
                 Arg.Any<CancellationToken>()
             )
-            .Returns(_ =>
+            .Returns(() =>
                 Task.FromResult(
                     persisted.Values
                         .Where(x => x.IsLatest)
@@ -334,13 +333,13 @@ public class Tests : IAsyncDisposable
                 )
             );
 
-        store.SaveManyAsync(
+        Mock.Get(store).SaveManyAsync(
                 Arg.Any<IEnumerable<WorkflowDefinition>>(),
                 Arg.Any<CancellationToken>()
             )
-            .Returns(callInfo =>
+            .Returns((IEnumerable<WorkflowDefinition> records, CancellationToken cancellationToken) =>
             {
-                var definitions = callInfo.Arg<IEnumerable<WorkflowDefinition>>().ToList();
+                var definitions = records.ToList();
 
                 var snapshot = persisted.ToDictionary(
                     x => x.Key,

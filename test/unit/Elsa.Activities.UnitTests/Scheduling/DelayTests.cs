@@ -5,7 +5,6 @@ using Elsa.Scheduling.Bookmarks;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Scheduling;
@@ -69,8 +68,8 @@ public class DelayTests
 
     private static ISystemClock CreateClock(DateTimeOffset now)
     {
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(now);
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(now);
         return clock;
     }
 

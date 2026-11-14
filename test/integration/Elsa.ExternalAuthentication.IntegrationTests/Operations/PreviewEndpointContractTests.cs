@@ -12,7 +12,6 @@ using Elsa.ExternalAuthentication.Services;
 using Elsa.ExternalAuthentication.Stores.InMemory;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using Elsa.Identity.Contracts;
 using TUnit.AspNetCore;
@@ -29,20 +28,20 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
     private readonly ExternalAuthenticationOptions _options = new();
     private readonly TestHandleHasher _handleHasher = new();
     private readonly TestAdapter _adapter = new();
-    private readonly IIdentityProviderConnectionStore _store = Substitute.For<IIdentityProviderConnectionStore>();
-    private readonly IConnectionRegistryVersionStore _registryVersions = Substitute.For<IConnectionRegistryVersionStore>();
-    private readonly IUnlinkedIdentityPolicyRegistry _policies = Substitute.For<IUnlinkedIdentityPolicyRegistry>();
-    private readonly IExternalUserMatcherRegistry _matchers = Substitute.For<IExternalUserMatcherRegistry>();
-    private readonly IPermissionGrantSourceRegistry _grantSources = Substitute.For<IPermissionGrantSourceRegistry>();
-    private readonly IPermissionDelegationAuthorizer _delegation = Substitute.For<IPermissionDelegationAuthorizer>();
-    private readonly IRoleAuthorizationService _roles = Substitute.For<IRoleAuthorizationService>();
-    private readonly IExternalAuthenticationSessionStore _sessions = Substitute.For<IExternalAuthenticationSessionStore>();
-    private readonly IExternalIdentityProvisioner _provisioner = Substitute.For<IExternalIdentityProvisioner>();
-    private readonly IPermissionGrantResolver _permissionGrants = Substitute.For<IPermissionGrantResolver>();
-    private readonly ITenantAccessor _tenantAccessor = Substitute.For<ITenantAccessor>();
-    private readonly IIdentityProviderConnectionRegistry _connectionRegistry = Substitute.For<IIdentityProviderConnectionRegistry>();
-    private readonly IAdapterSettingsMigrationService _settingsMigrations = Substitute.For<IAdapterSettingsMigrationService>();
-    private readonly IIdentityProviderConnectionValidityAssessor _validityAssessor = Substitute.For<IIdentityProviderConnectionValidityAssessor>();
+    private readonly IIdentityProviderConnectionStore _store = Mock.Of<IIdentityProviderConnectionStore>().Object;
+    private readonly IConnectionRegistryVersionStore _registryVersions = Mock.Of<IConnectionRegistryVersionStore>().Object;
+    private readonly IUnlinkedIdentityPolicyRegistry _policies = Mock.Of<IUnlinkedIdentityPolicyRegistry>().Object;
+    private readonly IExternalUserMatcherRegistry _matchers = Mock.Of<IExternalUserMatcherRegistry>().Object;
+    private readonly IPermissionGrantSourceRegistry _grantSources = Mock.Of<IPermissionGrantSourceRegistry>().Object;
+    private readonly IPermissionDelegationAuthorizer _delegation = Mock.Of<IPermissionDelegationAuthorizer>().Object;
+    private readonly IRoleAuthorizationService _roles = Mock.Of<IRoleAuthorizationService>().Object;
+    private readonly IExternalAuthenticationSessionStore _sessions = Mock.Of<IExternalAuthenticationSessionStore>().Object;
+    private readonly IExternalIdentityProvisioner _provisioner = Mock.Of<IExternalIdentityProvisioner>().Object;
+    private readonly IPermissionGrantResolver _permissionGrants = Mock.Of<IPermissionGrantResolver>().Object;
+    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+    private readonly IIdentityProviderConnectionRegistry _connectionRegistry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+    private readonly IAdapterSettingsMigrationService _settingsMigrations = Mock.Of<IAdapterSettingsMigrationService>().Object;
+    private readonly IIdentityProviderConnectionValidityAssessor _validityAssessor = Mock.Of<IIdentityProviderConnectionValidityAssessor>().Object;
     private readonly InMemoryExternalAuthenticationStateStore _stateStore;
     private readonly InMemoryPreviewResultStore _previewResults;
 
@@ -53,18 +52,18 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
         _authentication.SetClaims(
             new Claim(PermissionNames.ClaimType, $"{ExternalAuthenticationResourcePermissions.Connections}:{ExternalAuthenticationVerbs.Preview}"),
             new Claim(ClaimTypes.NameIdentifier, "administrator-a"));
-        _tenantAccessor.TenantId.Returns("tenant-a");
+        Mock.Get(_tenantAccessor).TenantId.Returns("tenant-a");
         _stateStore = new InMemoryExternalAuthenticationStateStore(_clock);
         _previewResults = new InMemoryPreviewResultStore(_clock);
 
         var connection = CreateConnection();
         var effectiveConnection = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "test");
-        _connectionRegistry.FindByIdAsync("tenant-a", connection.Id, Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effectiveConnection));
-        _settingsMigrations.MigrateAsync(_adapter.Type, connection.AdapterSettingsVersion, Arg.Any<JsonElement>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new AdapterSettingsMigrationResult(connection.AdapterSettingsVersion, connection.AdapterSettings, false)));
-        _validityAssessor.AssessAsync(Arg.Any<EffectiveIdentityProviderConnection>(), Arg.Any<CancellationToken>())
-            .Returns(call => ValueTask.FromResult(call.Arg<EffectiveIdentityProviderConnection>()));
+        Mock.Get(_connectionRegistry).FindByIdAsync("tenant-a", connection.Id, Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effectiveConnection));
+        Mock.Get(_settingsMigrations).MigrateAsync(_adapter.Type, connection.AdapterSettingsVersion, Arg.Any<JsonElement>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new AdapterSettingsMigrationResult(connection.AdapterSettingsVersion, connection.AdapterSettings, false)));
+        Mock.Get(_validityAssessor).AssessAsync(Arg.Any<EffectiveIdentityProviderConnection>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveIdentityProviderConnection candidate, CancellationToken cancellationToken) => ValueTask.FromResult(candidate));
     }
 
     protected override async Task SetupAsync()

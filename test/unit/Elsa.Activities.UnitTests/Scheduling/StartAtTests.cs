@@ -4,7 +4,6 @@ using Elsa.Scheduling.Bookmarks;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Scheduling;
@@ -72,8 +71,8 @@ public class StartAtTests
 
     private static async Task<ActivityExecutionContext> ExecuteAsync(StartAt activity, DateTimeOffset? clockTime = null)
     {
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(clockTime ?? DateTimeOffset.UtcNow);
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(clockTime ?? DateTimeOffset.UtcNow);
 
         return await new ActivityTestFixture(activity)
             .ConfigureServices(services => services.AddSingleton(clock))

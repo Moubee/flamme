@@ -6,15 +6,15 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Recovery;
 
 public class InterruptedRecoveryScannerTests
 {
-    private readonly IWorkflowRestarter _restarter = Substitute.For<IWorkflowRestarter>();
-    private readonly IWorkflowInstanceStore _instanceStore = Substitute.For<IWorkflowInstanceStore>();
-    private readonly ILogger<InterruptedRecoveryScanner> _logger = Substitute.For<ILogger<InterruptedRecoveryScanner>>();
+    private readonly IWorkflowRestarter _restarter = Mock.Of<IWorkflowRestarter>().Object;
+    private readonly IWorkflowInstanceStore _instanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+    private readonly ILogger<InterruptedRecoveryScanner> _logger = Mock.Of<ILogger<InterruptedRecoveryScanner>>().Object;
     private readonly RuntimeOptions _runtimeOptions = new() { RestartInterruptedWorkflowsBatchSize = 10 };
 
     [Test]
@@ -26,12 +26,10 @@ public class InterruptedRecoveryScannerTests
 
         await sut.ScanAndRequeueAsync(CancellationToken.None);
 
-        await _instanceStore.Received().SummarizeManyAsync(
+        Mock.Get(_instanceStore).SummarizeManyAsync(
             Arg.Is<WorkflowInstanceFilter>(f =>
                 f.WorkflowSubStatus == WorkflowSubStatus.Interrupted
-                && f.WorkflowStatus == WorkflowStatus.Running),
-            Arg.Any<PageArgs>(),
-            Arg.Any<CancellationToken>());
+                && f.WorkflowStatus == WorkflowStatus.Running), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>()).WasCalled();
     }
 
     [Test]
@@ -44,9 +42,9 @@ public class InterruptedRecoveryScannerTests
         var count = await sut.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(count).IsEqualTo(3);
-        await _restarter.Received(1).RestartWorkflowAsync("a", Arg.Any<CancellationToken>());
-        await _restarter.Received(1).RestartWorkflowAsync("b", Arg.Any<CancellationToken>());
-        await _restarter.Received(1).RestartWorkflowAsync("c", Arg.Any<CancellationToken>());
+        Mock.Get(_restarter).RestartWorkflowAsync("a", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_restarter).RestartWorkflowAsync("b", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_restarter).RestartWorkflowAsync("c", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -54,15 +52,15 @@ public class InterruptedRecoveryScannerTests
     public async Task SwallowsPerInstanceFailures()
     {
         StubInstances(new[] { Summary("a"), Summary("b"), Summary("c") });
-        _restarter.RestartWorkflowAsync("b", Arg.Any<CancellationToken>())
-            .Returns(_ => throw new InvalidOperationException("boom"));
+        Mock.Get(_restarter).RestartWorkflowAsync("b", Arg.Any<CancellationToken>())
+                    .Returns(() => throw new InvalidOperationException("boom"));
         var sut = BuildSut();
 
         var count = await sut.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(count).IsEqualTo(2); // 'b' failed
-        await _restarter.Received(1).RestartWorkflowAsync("a", Arg.Any<CancellationToken>());
-        await _restarter.Received(1).RestartWorkflowAsync("c", Arg.Any<CancellationToken>());
+        Mock.Get(_restarter).RestartWorkflowAsync("a", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_restarter).RestartWorkflowAsync("c", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -75,7 +73,7 @@ public class InterruptedRecoveryScannerTests
         var count = await sut.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(count).IsEqualTo(0);
-        await _restarter.DidNotReceive().RestartWorkflowAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_restarter).RestartWorkflowAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -83,13 +81,11 @@ public class InterruptedRecoveryScannerTests
     public async Task PushesTenantContext()
     {
         StubInstances(new[] { Summary("a", tenantId: "tenant-1") });
-        var tenantService = Substitute.For<ITenantService>();
-        tenantService.FindAsync("tenant-1", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-1", Name = "Tenant 1" });
+        var tenantService = Mock.Of<ITenantService>().Object;
+        Mock.Get(tenantService).FindAsync("tenant-1", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-1", Name = "Tenant 1" });
         var tenantAccessor = new DefaultTenantAccessor();
         var observedTenant = (string?)null;
-        _restarter
-            .When(x => x.RestartWorkflowAsync("a", Arg.Any<CancellationToken>()))
-            .Do(_ => observedTenant = tenantAccessor.Tenant?.Id);
+        Mock.Get(_restarter).RestartWorkflowAsync("a", Arg.Any<CancellationToken>()).Callback(() => observedTenant = tenantAccessor.Tenant?.Id);
 
         var sut = BuildSut(tenantService, tenantAccessor);
         await sut.ScanAndRequeueAsync(CancellationToken.None);
@@ -106,18 +102,16 @@ public class InterruptedRecoveryScannerTests
     public async Task DefaultOrAgnosticTenant(string? tenantId)
     {
         StubInstances(new[] { Summary("a", tenantId: tenantId) });
-        var tenantService = Substitute.For<ITenantService>();
+        var tenantService = Mock.Of<ITenantService>().Object;
         var tenantAccessor = new DefaultTenantAccessor();
         var observedTenant = (Tenant?)tenantAccessor.Tenant;
-        _restarter
-            .When(x => x.RestartWorkflowAsync("a", Arg.Any<CancellationToken>()))
-            .Do(_ => observedTenant = tenantAccessor.Tenant);
+        Mock.Get(_restarter).RestartWorkflowAsync("a", Arg.Any<CancellationToken>()).Callback(() => observedTenant = tenantAccessor.Tenant);
 
         var sut = BuildSut(tenantService, tenantAccessor);
         await sut.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(observedTenant).IsNull();
-        await tenantService.DidNotReceive().FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(tenantService).FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     private InterruptedRecoveryScanner BuildSut(ITenantService? tenantService = null, ITenantAccessor? tenantAccessor = null) =>
@@ -125,16 +119,15 @@ public class InterruptedRecoveryScannerTests
 
     private void StubInstances(IReadOnlyList<WorkflowInstanceSummary> all)
     {
-        _instanceStore
-            .SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
-            .Returns(ci =>
-            {
-                var pageArgs = ci.ArgAt<PageArgs>(1);
-                ICollection<WorkflowInstanceSummary> items = pageArgs.Offset == 0
-                    ? all.ToList()
-                    : new List<WorkflowInstanceSummary>();
-                return new ValueTask<Page<WorkflowInstanceSummary>>(Page.Of(items, all.Count));
-            });
+        Mock.Get(_instanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    {
+                        var pageArgs = __arg1;
+                        ICollection<WorkflowInstanceSummary> items = pageArgs.Offset == 0
+                            ? all.ToList()
+                            : new List<WorkflowInstanceSummary>();
+                        return new ValueTask<Page<WorkflowInstanceSummary>>(Page.Of(items, all.Count));
+                    });
     }
 
     private static WorkflowInstanceSummary Summary(string id, string? tenantId = null) => new()

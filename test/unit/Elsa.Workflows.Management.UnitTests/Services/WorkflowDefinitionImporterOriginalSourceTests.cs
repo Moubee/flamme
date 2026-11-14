@@ -9,26 +9,26 @@ using Elsa.Workflows.Management.Services;
 using Elsa.Workflows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowDefinitionImporterOriginalSourceTests
 {
-    private readonly IActivitySerializer _serializer = Substitute.For<IActivitySerializer>();
-    private readonly IWorkflowDefinitionPublisher _publisher = Substitute.For<IWorkflowDefinitionPublisher>();
+    private readonly IActivitySerializer _serializer = Mock.Of<IActivitySerializer>().Object;
+    private readonly IWorkflowDefinitionPublisher _publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
     private readonly WorkflowDefinitionImporter _importer;
     private readonly WorkflowDefinitionMapper _mapper;
 
     public WorkflowDefinitionImporterOriginalSourceTests()
     {
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
         var variableDefinitionMapper = new VariableDefinitionMapper(
             SerializationTypeRegistry.CreateDefault(),
             scopeFactory,
             NullLogger<VariableDefinitionMapper>.Instance);
         _importer = new(_serializer, _publisher, variableDefinitionMapper);
-        _mapper = new(_serializer, Substitute.For<IWorkflowDefinitionService>(), variableDefinitionMapper);
+        _mapper = new(_serializer, Mock.Of<IWorkflowDefinitionService>().Object, variableDefinitionMapper);
     }
 
     [Test]
@@ -46,19 +46,18 @@ public class WorkflowDefinitionImporterOriginalSourceTests
         };
         var editedRoot = new Sequence { Id = "edited-root" };
         var mappedRoot = new WriteLine("from-studio");
-
-        _publisher.GetDraftAsync("def-1", VersionOptions.Latest, Arg.Any<CancellationToken>())
-            .Returns(fileImportedDraft);
-        _publisher.SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>())
-            .Returns(call => call.Arg<WorkflowDefinition>());
-        _serializer.Serialize(Arg.Any<IActivity>()).Returns("EDITED_JSON");
-        _serializer.Deserialize("EDITED_JSON").Returns(mappedRoot);
-        _serializer.Deserialize<WorkflowDefinitionModel>("FILE_JSON")
-            .Returns(new WorkflowDefinitionModel
-            {
-                Name = "FromFile",
-                Root = new WriteLine("from-file")
-            });
+        Mock.Get(_publisher).GetDraftAsync("def-1", VersionOptions.Latest, Arg.Any<CancellationToken>())
+                    .Returns(fileImportedDraft);
+        Mock.Get(_publisher).SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowDefinition __arg0, global::System.Threading.CancellationToken __arg1) => __arg0);
+        Mock.Get(_serializer).Serialize(Arg.Any<IActivity>()).Returns("EDITED_JSON");
+        Mock.Get(_serializer).Deserialize("EDITED_JSON").Returns(mappedRoot);
+        Mock.Get(_serializer).Deserialize<WorkflowDefinitionModel>("FILE_JSON")
+                    .Returns(new WorkflowDefinitionModel
+                    {
+                        Name = "FromFile",
+                        Root = new WriteLine("from-file")
+                    });
 
         var result = await _importer.ImportAsync(new SaveWorkflowDefinitionRequest
         {
@@ -81,6 +80,6 @@ public class WorkflowDefinitionImporterOriginalSourceTests
 
         await Assert.That(workflow.Root).IsSameReferenceAs(mappedRoot);
         await Assert.That(workflow.WorkflowMetadata.Name).IsEqualTo("Edited");
-        _serializer.DidNotReceive().Deserialize<WorkflowDefinitionModel>("FILE_JSON");
+        Mock.Get(_serializer).Deserialize<WorkflowDefinitionModel>("FILE_JSON").WasNeverCalled();
     }
 }

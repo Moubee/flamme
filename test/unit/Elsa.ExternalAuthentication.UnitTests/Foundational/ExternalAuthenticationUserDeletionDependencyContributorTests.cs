@@ -9,7 +9,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Identity.Entities;
 using Elsa.Identity.Models;
 using Elsa.Identity.Services;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
@@ -21,11 +20,11 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "external-user", Name = "external-user", TenantId = "tenant-a" });
-        var links = Substitute.For<IExternalIdentityLinkManagementStore>();
-        links.FindAsync(
+        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
+        Mock.Get(links).FindAsync(
                 Arg.Is<ExternalIdentityLinkFilter>(x => x.TenantId == "tenant-a" && x.UserId == "external-user"),
                 Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(Page.Of<ExternalIdentityLink>([
+            .ReturnsAsync(ValueTask.FromResult(Page.Of<ExternalIdentityLink>([
                 new ExternalIdentityLink("link-a", "tenant-a", "contoso", "https://issuer.example", "subject-hash", null, "external-user", DateTimeOffset.UtcNow, null)
             ], 1)));
         var coordinator = new UserDeletionCoordinator(
@@ -45,11 +44,11 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "local-user", Name = "local-user", TenantId = "tenant-a" });
-        var links = Substitute.For<IExternalIdentityLinkManagementStore>();
-        links.FindAsync(
+        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
+        Mock.Get(links).FindAsync(
                 Arg.Is<ExternalIdentityLinkFilter>(x => x.TenantId == "tenant-a" && x.UserId == "local-user"),
                 Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(Page.Of<ExternalIdentityLink>([], 0)));
+            .ReturnsAsync(ValueTask.FromResult(Page.Of<ExternalIdentityLink>([], 0)));
         var coordinator = new UserDeletionCoordinator(
             users,
             [new ExternalAuthenticationUserDeletionDependencyContributor(links)]);
@@ -65,10 +64,10 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "racing-user", Name = "racing-user", TenantId = "tenant-a" });
-        var links = Substitute.For<IExternalIdentityLinkManagementStore>();
+        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
         var inspectionCount = 0;
-        links.FindAsync(Arg.Any<ExternalIdentityLinkFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => ValueTask.FromResult(Interlocked.Increment(ref inspectionCount) == 1
+        Mock.Get(links).FindAsync(Arg.Any<ExternalIdentityLinkFilter>(), Arg.Any<CancellationToken>())
+            .Returns(() => ValueTask.FromResult(Interlocked.Increment(ref inspectionCount) == 1
                 ? Page.Of<ExternalIdentityLink>([], 0)
                 : Page.Of<ExternalIdentityLink>([
                     new ExternalIdentityLink("link-a", "tenant-a", "contoso", "https://issuer.example", "subject-hash", null, "racing-user", DateTimeOffset.UtcNow, null)

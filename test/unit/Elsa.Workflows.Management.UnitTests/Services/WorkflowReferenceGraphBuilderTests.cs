@@ -2,20 +2,19 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Management.Services;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowReferenceGraphBuilderTests
 {
-    private readonly IWorkflowReferenceQuery _query = Substitute.For<IWorkflowReferenceQuery>();
+    private readonly IWorkflowReferenceQuery _query = Mock.Of<IWorkflowReferenceQuery>().Object;
 
     [Test]
     public async Task BuildGraphAsync_WithNoConsumers_ReturnsEmptyGraph()
     {
-        _query
-            .ExecuteAsync("A", Arg.Any<CancellationToken>())
-            .Returns([]);
+        Mock.Get(_query).ExecuteAsync("A", Arg.Any<CancellationToken>())
+                    .Returns([]);
 
         var builder = CreateBuilder();
         var graph = await builder.BuildGraphAsync("A");
@@ -217,7 +216,7 @@ public class WorkflowReferenceGraphBuilderTests
     private void SetupGraph(params (string Source, string[] Consumers)[] definitions)
     {
         foreach (var (source, consumers) in definitions)
-            _query.ExecuteAsync(source, Arg.Any<CancellationToken>()).Returns(consumers);
+            Mock.Get(_query).ExecuteAsync(source, Arg.Any<CancellationToken>()).Returns(consumers);
     }
 
     private static async Task AssertEdges(WorkflowReferenceGraph graph, params (string Source, string Target)[] edges)

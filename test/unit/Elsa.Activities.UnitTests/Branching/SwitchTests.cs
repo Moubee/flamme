@@ -1,7 +1,6 @@
 using Elsa.Expressions.Models;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Branching;
@@ -16,13 +15,13 @@ public class SwitchTests
     public async Task Should_Handle_No_Matching_Cases_Correctly(SwitchMode mode, bool hasDefault)
     {
         // Arrange
-        var defaultActivity = hasDefault ? Substitute.For<IActivity>() : null;
+        var defaultActivity = hasDefault ? CreateActivityMock() : null;
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("False Case", Expression.LiteralExpression(false), Substitute.For<IActivity>())
+                new("False Case", Expression.LiteralExpression(false), CreateActivityMock())
             },
             Default = defaultActivity
         };
@@ -49,14 +48,14 @@ public class SwitchTests
     public async Task Should_Handle_Multiple_Matching_Cases_According_To_Mode(SwitchMode mode, int expectedScheduledCount)
     {
         // Arrange
-        var firstTrueActivity = Substitute.For<IActivity>();
-        var secondTrueActivity = Substitute.For<IActivity>();
+        var firstTrueActivity = CreateActivityMock();
+        var secondTrueActivity = CreateActivityMock();
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("False", Expression.LiteralExpression(false), Substitute.For<IActivity>()),
+                new("False", Expression.LiteralExpression(false), CreateActivityMock()),
                 new("First True", Expression.LiteralExpression(true), firstTrueActivity),
                 new("Second True", Expression.LiteralExpression(true), secondTrueActivity)
             }
@@ -84,8 +83,8 @@ public class SwitchTests
     public async Task Should_Use_MatchFirst_As_Default_Mode()
     {
         // Arrange
-        var firstTrueActivity = Substitute.For<IActivity>();
-        var secondTrueActivity = Substitute.For<IActivity>();
+        var firstTrueActivity = CreateActivityMock();
+        var secondTrueActivity = CreateActivityMock();
         var switchActivity = new Switch
         {
             // No Mode explicitly set - should default to MatchFirst
@@ -111,13 +110,13 @@ public class SwitchTests
     public async Task Should_Schedule_Default_When_Null_Case_Condition_Evaluates_False(SwitchMode mode)
     {
         // Arrange
-        var defaultActivity = Substitute.For<IActivity>();
+        var defaultActivity = CreateActivityMock();
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("Null condition", Expression.LiteralExpression(null), Substitute.For<IActivity>())
+                new("Null condition", Expression.LiteralExpression(null), CreateActivityMock())
             },
             Default = defaultActivity
         };
@@ -139,7 +138,7 @@ public class SwitchTests
     public async Task Should_Handle_Empty_Cases_Correctly(SwitchMode mode, bool hasDefault)
     {
         // Arrange
-        var defaultActivity = hasDefault ? Substitute.For<IActivity>() : null;
+        var defaultActivity = hasDefault ? CreateActivityMock() : null;
         var switchActivity = new Switch
         {
             Mode = new(mode),
@@ -173,7 +172,7 @@ public class SwitchTests
         await Assert.That(switchActivity.Cases).IsNotNull();
         await Assert.That(switchActivity.Cases).IsEmpty();
 
-        switchActivity.Cases.Add(new("Test", Expression.LiteralExpression(true), Substitute.For<IActivity>()));
+        switchActivity.Cases.Add(new("Test", Expression.LiteralExpression(true), CreateActivityMock()));
         await Assert.That(switchActivity.Cases).HasSingleItem();
     }
 
@@ -188,6 +187,13 @@ public class SwitchTests
         // The actual default value verification is handled by the mode-specific behavior tests
     }
     
+    private static IActivity CreateActivityMock()
+    {
+        var mock = Mock.Of<IActivity>();
+        mock.SetupAllProperties();
+        return mock.Object;
+    }
+
     private static Task<ActivityExecutionContext> ExecuteAsync(IActivity activity)
     {
         return new ActivityTestFixture(activity).ExecuteAsync();

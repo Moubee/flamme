@@ -11,7 +11,7 @@ using Elsa.Workflows.Runtime.Entities;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -31,25 +31,24 @@ public class TriggerIndexerTests
     public TriggerIndexerTests()
     {
         var typeRegistry = SerializationTypeRegistry.CreateDefault();
-        var serviceProvider = Substitute.For<IServiceProvider>();
-        var activityRegistry = Substitute.For<IActivityRegistry>();
-        var identityGenerator = Substitute.For<IIdentityGenerator>();
-
-        activityRegistry.Find(Arg.Any<string>(), Arg.Any<int>()).Returns(new ActivityDescriptor());
-        identityGenerator.GenerateId().Returns(_ => Guid.NewGuid().ToString("N"));
+        var serviceProvider = Mock.Of<IServiceProvider>().Object;
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns(new ActivityDescriptor());
+        Mock.Get(identityGenerator).GenerateId().Returns(() => Guid.NewGuid().ToString("N"));
         _hasher = new StimulusHasher(new Hasher(typeRegistry));
 
         _indexer = new(
             new ActivityVisitor([], serviceProvider),
-            Substitute.For<IWorkflowDefinitionService>(),
-            Substitute.For<IExpressionEvaluator>(),
+            Mock.Of<IWorkflowDefinitionService>().Object,
+            Mock.Of<IExpressionEvaluator>().Object,
             identityGenerator,
-            Substitute.For<ITriggerStore>(),
+            Mock.Of<ITriggerStore>().Object,
             activityRegistry,
-            Substitute.For<INotificationSender>(),
+            Mock.Of<INotificationSender>().Object,
             serviceProvider,
             _hasher,
-            Substitute.For<IDistributedLockProvider>(),
+            Mock.Of<IDistributedLockProvider>().Object,
             typeRegistry,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             NullLogger<TriggerIndexer>.Instance);

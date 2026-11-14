@@ -19,7 +19,7 @@ using Elsa.Workflows.State;
 using Elsa.Workflows.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.Telemetry;
@@ -217,25 +217,22 @@ public class WorkflowInstrumentationTests
         using var meterCapture = new MeterCapture();
         var activityExecutionContext = await BuildTelemetryContextAsync(new TestActivity());
         var context = activityExecutionContext.WorkflowExecutionContext;
-        var notificationSender = Substitute.For<INotificationSender>();
-        notificationSender
-            .SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo =>
-            {
-                if (callInfo.Arg<INotification>() is WorkflowExecuting)
-                    context.Cancel();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
+        Mock.Get(notificationSender).SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Mediator.Contracts.INotification __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    {
+                        if (__arg0 is WorkflowExecuting)
+                            context.Cancel();
 
-                return Task.CompletedTask;
-            });
+                        return Task.CompletedTask;
+                    });
         var runner = CreateWorkflowRunner(context, new NoopWorkflowExecutionPipeline(), notificationSender);
 
         await runner.RunAsync(context);
 
         await Assert.That(context.SubStatus).IsEqualTo(WorkflowSubStatus.Cancelled);
         await Assert.That(meterCapture.LongMeasurements).DoesNotContain(x => IsWorkflowMeasurement(x, "elsa.workflow.started", context));
-        await notificationSender
-            .DidNotReceive()
-            .SendAsync(Arg.Is<INotification>(notification => notification is WorkflowStarted), Arg.Any<CancellationToken>());
+        Mock.Get(notificationSender).SendAsync(Arg.Is<INotification>(notification => notification is WorkflowStarted), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -333,14 +330,13 @@ public class WorkflowInstrumentationTests
     {
         if (notificationSender == null)
         {
-            notificationSender = Substitute.For<INotificationSender>();
-            notificationSender
-                .SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
-                .Returns(Task.CompletedTask);
+            notificationSender = Mock.Of<INotificationSender>().Object;
+            Mock.Get(notificationSender).SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
+                            .Returns(() => Task.CompletedTask);
         }
 
-        var workflowStateExtractor = Substitute.For<IWorkflowStateExtractor>();
-        workflowStateExtractor.Extract(context).Returns(_ => new WorkflowState
+        var workflowStateExtractor = Mock.Of<IWorkflowStateExtractor>().Object;
+        Mock.Get(workflowStateExtractor).Extract(context).Returns(() => new WorkflowState
         {
             Id = context.Id,
             DefinitionId = context.Workflow.Identity.DefinitionId,
@@ -354,12 +350,12 @@ public class WorkflowInstrumentationTests
             context.ServiceProvider,
             pipeline,
             workflowStateExtractor,
-            Substitute.For<IWorkflowBuilderFactory>(),
-            Substitute.For<IWorkflowGraphBuilder>(),
-            Substitute.For<IIdentityGenerator>(),
+            Mock.Of<IWorkflowBuilderFactory>().Object,
+            Mock.Of<IWorkflowGraphBuilder>().Object,
+            Mock.Of<IIdentityGenerator>().Object,
             notificationSender,
             new WorkflowLoggerStateGenerator(),
-            Substitute.For<ICommitStateHandler>(),
+            Mock.Of<ICommitStateHandler>().Object,
             NullLogger<WorkflowRunner>.Instance);
     }
 
@@ -508,7 +504,7 @@ public class WorkflowInstrumentationTests
             var middleware = new DefaultActivitySchedulerMiddleware(
                 _ => ValueTask.CompletedTask,
                 new CompletingActivityInvoker(),
-                Substitute.For<ICommitStrategyRegistry>(),
+                Mock.Of<ICommitStrategyRegistry>().Object,
                 Microsoft.Extensions.Options.Options.Create(new CommitStateOptions()));
 
             await middleware.InvokeAsync(context);

@@ -9,7 +9,6 @@ using Elsa.Workflows.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Http;
@@ -155,21 +154,22 @@ public class WriteHttpResponseTests
     {
         // Arrange
         var activity = new WriteHttpResponse();
-        var mockHttpContext = Substitute.For<HttpContext>();
-        var mockResponse = Substitute.For<HttpResponse>();
+        var mockHttpContext = Mock.Of<HttpContext>().Object;
+        var mockResponse = Mock.Of<HttpResponse>().Object;
         var mockHeaders = new HeaderDictionary();
         var responseBody = new MemoryStream();
         
-        mockResponse.StatusCode.Returns(200);
-        mockResponse.Headers.Returns(mockHeaders);
-        mockResponse.Body.Returns(responseBody);
-        mockHttpContext.Response.Returns(mockResponse);
+        Mock.Get(mockResponse).StatusCode.Returns(200);
+        Mock.Get(mockResponse).Headers.Returns(mockHeaders);
+        Mock.Get(mockResponse).Body.Returns(responseBody);
+        Mock.Get(mockResponse).CompleteAsync().ReturnsAsync(Task.CompletedTask);
+        Mock.Get(mockHttpContext).Response.Returns(mockResponse);
 
         // Act
         await ExecuteActivityAsync(activity, mockHttpContext, writeResponseSynchronously: true);
 
         // Assert
-        await mockResponse.Received(1).CompleteAsync();
+        Mock.Get(mockResponse).CompleteAsync().WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -177,21 +177,22 @@ public class WriteHttpResponseTests
     {
         // Arrange
         var activity = new WriteHttpResponse();
-        var mockHttpContext = Substitute.For<HttpContext>();
-        var mockResponse = Substitute.For<HttpResponse>();
+        var mockHttpContext = Mock.Of<HttpContext>().Object;
+        var mockResponse = Mock.Of<HttpResponse>().Object;
         var mockHeaders = new HeaderDictionary();
         var responseBody = new MemoryStream();
         
-        mockResponse.StatusCode.Returns(200);
-        mockResponse.Headers.Returns(mockHeaders);
-        mockResponse.Body.Returns(responseBody);
-        mockHttpContext.Response.Returns(mockResponse);
+        Mock.Get(mockResponse).StatusCode.Returns(200);
+        Mock.Get(mockResponse).Headers.Returns(mockHeaders);
+        Mock.Get(mockResponse).Body.Returns(responseBody);
+        Mock.Get(mockResponse).CompleteAsync().ReturnsAsync(Task.CompletedTask);
+        Mock.Get(mockHttpContext).Response.Returns(mockResponse);
 
         // Act
         await ExecuteActivityAsync(activity, mockHttpContext, writeResponseSynchronously: false);
 
         // Assert
-        await mockResponse.DidNotReceive().CompleteAsync();
+        Mock.Get(mockResponse).CompleteAsync().WasNeverCalled();
     }
 
     [Test]
@@ -202,12 +203,12 @@ public class WriteHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-            mockHttpContextAccessor.HttpContext.Returns((HttpContext?)null);
+            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            Mock.Get(mockHttpContextAccessor).HttpContext.Returns((HttpContext?)null);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions());
             AddHttpContentFactories(services);
-            services.AddSingleton(Substitute.For<IStimulusHasher>());
+            services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
         });
 
         // Act + Assert
@@ -247,8 +248,8 @@ public class WriteHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-            mockHttpContextAccessor.HttpContext.Returns(httpContext);
+            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            Mock.Get(mockHttpContextAccessor).HttpContext.Returns(httpContext);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions(writeResponseSynchronously));
             AddHttpContentFactories(services);
@@ -265,8 +266,8 @@ public class WriteHttpResponseTests
         {
             WriteHttpResponseSynchronously = writeResponseSynchronously
         };
-        var mockOptions = Substitute.For<IOptions<HttpActivityOptions>>();
-        mockOptions.Value.Returns(options);
+        var mockOptions = Mock.Of<IOptions<HttpActivityOptions>>().Object;
+        Mock.Get(mockOptions).Value.Returns(options);
         return mockOptions;
     }
 

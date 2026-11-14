@@ -8,7 +8,7 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Core.UnitTests;
 
@@ -136,8 +136,8 @@ public class ExpressionExecutionContextExtensionsTests
     public async Task GetInput_ResolvesSerializerOptionsFromCurrentHostOnEachCall()
     {
         // Arrange
-        var serializer = Substitute.For<IJsonSerializer>();
-        serializer.GetOptions().Returns(CreateTaggedOptions("first"), CreateTaggedOptions("second"));
+        var serializer = Mock.Of<IJsonSerializer>().Object;
+        Mock.Get(serializer).GetOptions().ReturnsSequentially(CreateTaggedOptions("first"), CreateTaggedOptions("second"));
 
         var context = await CreateContextAsync(serializer);
         context.WorkflowExecutionContext.Input["payload"] = """{"token":"x"}""";

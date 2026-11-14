@@ -2,7 +2,6 @@ using Elsa.Features.Services;
 using Elsa.Identity.Contracts;
 using Elsa.Identity.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using ModuleIdentityFeature = Elsa.Identity.Features.IdentityFeature;
 using ShellIdentityFeature = Elsa.Identity.ShellFeatures.IdentityFeature;
 using System.Threading.Tasks;
@@ -15,8 +14,8 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureResolvesThePreferredAccessTokenIssuerConstructor()
     {
         var services = CreateServices();
-        var module = Substitute.For<IModule>();
-        module.Services.Returns(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
 
         await AssertAccessTokenIssuerResolves(services);
@@ -35,8 +34,8 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureRegistersUserDeletionCoordinator()
     {
         var services = CreateServices();
-        var module = Substitute.For<IModule>();
-        module.Services.Returns(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
         await AssertUserDeletionCoordinatorResolves(services);
     }
@@ -53,8 +52,8 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureRegistersInMemorySessionRevocation()
     {
         var services = CreateServices();
-        var module = Substitute.For<IModule>();
-        module.Services.Returns(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
 
         await AssertInMemorySessionRevocationResolves(services);
@@ -76,7 +75,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
 
     private static async Task AssertAccessTokenIssuerResolves(IServiceCollection services)
     {
-        services.AddScoped(_ => Substitute.For<IElsaTokenService>());
+        services.AddScoped(_ => Mock.Of<IElsaTokenService>().Object);
         using var serviceProvider = services.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAccessTokenIssuer>()).IsOfType(typeof(DefaultAccessTokenIssuer));

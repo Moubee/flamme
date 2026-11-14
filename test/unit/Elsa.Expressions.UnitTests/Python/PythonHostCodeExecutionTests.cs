@@ -7,7 +7,6 @@ using Elsa.Workflows.Activities;
 using Elsa.Workflows.Management.Services;
 using Elsa.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Expressions.UnitTests.Python;
@@ -18,7 +17,7 @@ public class PythonHostCodeExecutionTests
     public async Task Evaluator_BlocksExecution_WhenHostHasNotOptedIn()
     {
         var evaluator = new PythonNetPythonEvaluator(
-            Substitute.For<Elsa.Mediator.Contracts.INotificationSender>(),
+            Mock.Of<Elsa.Mediator.Contracts.INotificationSender>().Object,
             Microsoft.Extensions.Options.Options.Create(new PythonOptions()));
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();
 

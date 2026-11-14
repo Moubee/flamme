@@ -2,7 +2,7 @@ using Elsa.Common.Models;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Models;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Extensions;
 
@@ -12,7 +12,7 @@ public class WorkflowInstanceStoreExtensionsTests
     public async Task EnumerateSummariesAsync_AdvancesAcrossPagesWithoutRepeatingOffsets()
     {
         // Arrange
-        var store = Substitute.For<IWorkflowInstanceStore>();
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
         var filter = new WorkflowInstanceFilter();
         var requestedPages = new List<PageArgs>();
         var page1 = new List<WorkflowInstanceSummary>
@@ -25,23 +25,21 @@ public class WorkflowInstanceStoreExtensionsTests
             CreateSummary("workflow-3"),
             CreateSummary("workflow-4")
         };
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    {
+                        var pageArgs = __arg1;
+                        requestedPages.Add(pageArgs with { });
 
-        store
-            .SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo =>
-            {
-                var pageArgs = callInfo.ArgAt<PageArgs>(1);
-                requestedPages.Add(pageArgs with { });
+                        var items = pageArgs.Offset switch
+                        {
+                            0 => page1,
+                            2 => page2,
+                            _ => new List<WorkflowInstanceSummary>()
+                        };
 
-                var items = pageArgs.Offset switch
-                {
-                    0 => page1,
-                    2 => page2,
-                    _ => new List<WorkflowInstanceSummary>()
-                };
-
-                return new ValueTask<Page<WorkflowInstanceSummary>>(Page.Of(items, page1.Count + page2.Count));
-            });
+                        return new ValueTask<Page<WorkflowInstanceSummary>>(Page.Of(items, page1.Count + page2.Count));
+                    });
 
         // Act
         var results = new List<WorkflowInstanceSummary>();

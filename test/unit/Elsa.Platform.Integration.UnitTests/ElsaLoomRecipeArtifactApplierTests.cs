@@ -12,7 +12,6 @@ using Elsa.Workflows.Management.Entities;
 using Elsa.Workflows.Management.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 
 namespace Elsa.Platform.Integration.UnitTests;
 
@@ -21,17 +20,18 @@ public class ElsaLoomRecipeArtifactApplierTests
     [Test]
     public async Task ApplyAsync_WithInlineImportWorkflowDefinitionRecipe_ImportsWorkflowDefinition()
     {
-        var importer = Substitute.For<IWorkflowDefinitionImporter>();
-        var apiSerializer = Substitute.For<IApiSerializer>();
-        var shellRegistry = Substitute.For<IShellRegistry>();
+        var importer = Mock.Of<IWorkflowDefinitionImporter>().Object;
+        var apiSerializer = Mock.Of<IApiSerializer>().Object;
+        var shellRegistry = Mock.Of<IShellRegistry>().Object;
         SaveWorkflowDefinitionRequest? importedRequest = null;
         var model = new WorkflowDefinitionModel
         {
             DefinitionId = "workflow-1",
             Name = "Workflow 1"
         };
-        apiSerializer.Deserialize<WorkflowDefinitionModel>(Arg.Any<string>()).Returns(model);
-        importer.ImportAsync(Arg.Do<SaveWorkflowDefinitionRequest>(x => importedRequest = x), Arg.Any<CancellationToken>())
+        Mock.Get(apiSerializer).Deserialize<WorkflowDefinitionModel>(Arg.Any<string>()).Returns(model);
+        Mock.Get(importer).ImportAsync(Arg.Any<SaveWorkflowDefinitionRequest>(), Arg.Any<CancellationToken>())
+            .Callback((SaveWorkflowDefinitionRequest request, CancellationToken _) => importedRequest = request)
             .Returns(new ImportWorkflowResult(true, new WorkflowDefinition { DefinitionId = "workflow-1" }, []));
 
         var services = new ServiceCollection()
@@ -65,19 +65,19 @@ public class ElsaLoomRecipeArtifactApplierTests
         await Assert.That(importedRequest).IsNotNull();
         await Assert.That(importedRequest!.Publish).IsTrue();
         await Assert.That(importedRequest.Model).IsSameReferenceAs(model);
-        await shellRegistry.DidNotReceiveWithAnyArgs().ReloadAsync(default!, default);
+        Mock.Get(shellRegistry).ReloadAsync(AnyArgs()).WasNeverCalled();
     }
 
     [Test]
     public async Task ApplyAsync_WithMissingCapability_ReturnsRejected()
     {
         var services = new ServiceCollection()
-            .AddSingleton(Substitute.For<IWorkflowDefinitionImporter>())
-            .AddSingleton(Substitute.For<IApiSerializer>())
+            .AddSingleton(Mock.Of<IWorkflowDefinitionImporter>().Object)
+            .AddSingleton(Mock.Of<IApiSerializer>().Object)
             .AddSingleton(Microsoft.Extensions.Options.Options.Create(new ElsaPlatformIntegrationOptions()))
-            .AddSingleton(Substitute.For<Elsa.Features.Contracts.IInstalledFeatureProvider>())
+            .AddSingleton(Mock.Of<Elsa.Features.Contracts.IInstalledFeatureProvider>().Object)
             .BuildServiceProvider();
-        var sut = new ElsaLoomRecipeArtifactApplier(services, Substitute.For<IShellRegistry>());
+        var sut = new ElsaLoomRecipeArtifactApplier(services, Mock.Of<IShellRegistry>().Object);
         await using var artifactZip = CreateArtifact("""
             {
               "name": "verify-capability",

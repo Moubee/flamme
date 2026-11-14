@@ -10,7 +10,6 @@ using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Entities;
 using Elsa.Workflows.Runtime.Filters;
 using Elsa.Workflows.State;
-using NSubstitute;
 
 namespace Elsa.Workflows.Persistence.ConformanceTests;
 
@@ -167,10 +166,14 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
         var tenantAccessor = new TestTenantAccessor("tenant-b");
         IReadOnlyList<ActivityExecutionRecord>? savedActivities = null;
         IReadOnlyList<WorkflowExecutionLogRecord>? savedLogs = null;
-        var activityStore = Substitute.For<IActivityExecutionStore>();
-        activityStore.SaveManyAsync(Arg.Do<IEnumerable<ActivityExecutionRecord>>(records => savedActivities = records.ToList()), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
-        var logStore = Substitute.For<IWorkflowExecutionLogStore>();
-        logStore.SaveManyAsync(Arg.Do<IEnumerable<WorkflowExecutionLogRecord>>(records => savedLogs = records.ToList()), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        var activityStore = Mock.Of<IActivityExecutionStore>().Object;
+        Mock.Get(activityStore).SaveManyAsync(Arg.Any<IEnumerable<ActivityExecutionRecord>>(), Arg.Any<CancellationToken>())
+            .Callback((IEnumerable<ActivityExecutionRecord> records, CancellationToken cancellationToken) => savedActivities = records.ToList())
+            .ReturnsAsync(Task.CompletedTask);
+        var logStore = Mock.Of<IWorkflowExecutionLogStore>().Object;
+        Mock.Get(logStore).SaveManyAsync(Arg.Any<IEnumerable<WorkflowExecutionLogRecord>>(), Arg.Any<CancellationToken>())
+            .Callback((IEnumerable<WorkflowExecutionLogRecord> records, CancellationToken cancellationToken) => savedLogs = records.ToList())
+            .ReturnsAsync(Task.CompletedTask);
         var serializer = new ConformanceSafeSerializer();
 
         await ImportAsync(CreateImportEndpoint(tenantAccessor, activityStore, logStore), new ExportedWorkflowState(
@@ -245,24 +248,24 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
         IWorkflowExecutionLogStore executionLogs,
         IBookmarkStore? bookmarks = null)
     {
-        var stateSerializer = Substitute.For<IWorkflowStateSerializer>();
-        stateSerializer.Deserialize(Arg.Any<JsonElement>()).Returns(new WorkflowState
+        var stateSerializer = Mock.Of<IWorkflowStateSerializer>().Object;
+        Mock.Get(stateSerializer).Deserialize(Arg.Any<JsonElement>()).Returns(new WorkflowState
         {
             Id = "instance-1",
             DefinitionId = "workflow-1",
             DefinitionVersionId = "v1"
         });
 
-        var instanceManager = Substitute.For<IWorkflowInstanceManager>();
-        instanceManager.SaveAsync(Arg.Any<WorkflowState>(), Arg.Any<CancellationToken>())
+        var instanceManager = Mock.Of<IWorkflowInstanceManager>().Object;
+        Mock.Get(instanceManager).SaveAsync(Arg.Any<WorkflowState>(), Arg.Any<CancellationToken>())
             .Returns(new WorkflowInstance { Id = "instance-1" });
 
         return new Import(
             instanceManager,
-            Substitute.For<IWorkflowInstanceStore>(),
+            Mock.Of<IWorkflowInstanceStore>().Object,
             activityExecutions,
             executionLogs,
-            bookmarks ?? Substitute.For<IBookmarkStore>(),
+            bookmarks ?? Mock.Of<IBookmarkStore>().Object,
             stateSerializer,
             new ConformancePayloadSerializer(),
             new ConformanceSafeSerializer(),

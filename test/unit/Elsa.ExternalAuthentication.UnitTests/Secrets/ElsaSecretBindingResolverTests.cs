@@ -3,7 +3,6 @@ using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Secrets.Services;
 using Elsa.Secrets.Contracts;
 using Elsa.Secrets.Models;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Secrets;
@@ -13,8 +12,8 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task MissingBindingReportsOnlySafeState()
     {
-        var manager = Substitute.For<ISecretManager>();
-        manager.GetAsync("missing", Arg.Any<CancellationToken>()).Returns(Task.FromResult<Secret?>(null));
+        var manager = Mock.Of<ISecretManager>().Object;
+        Mock.Get(manager).GetAsync("missing", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
 
         var state = await resolver.GetStateAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "missing"));
@@ -26,9 +25,9 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task IncompatibleBindingDoesNotResolveOrTestTheSecret()
     {
-        var manager = Substitute.For<ISecretManager>();
+        var manager = Mock.Of<ISecretManager>().Object;
         var secret = CreateSecret();
-        manager.GetAsync(secret.Name, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Secret?>(secret));
+        Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
         var binding = new SecretBinding(ElsaSecretBindingResolver.ResolverType, secret.Name, "certificate", "other-scope");
 
@@ -36,18 +35,18 @@ public class ElsaSecretBindingResolverTests
 
         await Assert.That(state.IsConfigured).IsTrue();
         await Assert.That(state.IsResolvable).IsFalse();
-        await manager.DidNotReceive().TestAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(manager).TestAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => resolver.ResolveAsync(binding).AsTask());
     }
 
     [Test]
     public async Task ResolutionReturnsTransientValueAndOpaqueStableGenerationThatChangesOnRotation()
     {
-        var manager = Substitute.For<ISecretManager>();
+        var manager = Mock.Of<ISecretManager>().Object;
         var secret = CreateSecret();
-        manager.GetAsync(secret.Name, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Secret?>(secret));
-        manager.TestAsync(secret.Name, Arg.Any<CancellationToken>()).Returns(Task.FromResult(new SecretTestResponse { Succeeded = true }));
-        manager.ResolvePayloadAsync(secret, Arg.Any<CancellationToken>()).Returns(Task.FromResult(new SecretPayload { Value = "super-secret" }));
+        Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
+        Mock.Get(manager).TestAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(new SecretTestResponse { Succeeded = true }));
+        Mock.Get(manager).ResolvePayloadAsync(secret, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(new SecretPayload { Value = "super-secret" }));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
         var binding = new SecretBinding(ElsaSecretBindingResolver.ResolverType, secret.Name, SecretTypeNames.Text, "external-authentication");
 
@@ -82,9 +81,9 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task ManagedReplaceStagesUniqueManagedBindingWithoutExposingTheValue()
     {
-        var manager = Substitute.For<ISecretManager>();
-        manager.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<Secret?>(null));
-        manager.CreateAsync(Arg.Any<CreateSecretRequest>(), Arg.Any<CancellationToken>()).Returns(call => Task.FromResult(new Secret { Name = call.Arg<CreateSecretRequest>().Name }));
+        var manager = Mock.Of<ISecretManager>().Object;
+        Mock.Get(manager).GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
+        Mock.Get(manager).CreateAsync(Arg.Any<CreateSecretRequest>(), Arg.Any<CancellationToken>()).Returns((CreateSecretRequest request, CancellationToken _) => new Secret { Name = request.Name });
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
 
         using var value = new SensitiveString("super-secret");
@@ -97,22 +96,22 @@ public class ElsaSecretBindingResolverTests
         await Assert.That(Guid.TryParseExact(binding.Reference["external-authentication:".Length..], "N", out _)).IsTrue();
         await Assert.That(replacementBinding.Reference).IsNotEqualTo(binding.Reference);
         await Assert.That(binding.Reference).DoesNotContain("super-secret").WithComparison(StringComparison.Ordinal);
-        await manager.Received(2).CreateAsync(Arg.Is<CreateSecretRequest>(x => x.Value == "super-secret"), Arg.Any<CancellationToken>());
-        await manager.DidNotReceive().RotateAsync(Arg.Any<string>(), Arg.Any<RotateSecretRequest>(), Arg.Any<CancellationToken>());
+        Mock.Get(manager).CreateAsync(Arg.Is<CreateSecretRequest>(x => x.Value == "super-secret"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(2));
+        Mock.Get(manager).RotateAsync(Arg.Any<string>(), Arg.Any<RotateSecretRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task RemovingManagedBindingDeletesOnlyStudioOwnedSecretMaterial()
     {
-        var manager = Substitute.For<ISecretManager>();
-        manager.DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+        var manager = Mock.Of<ISecretManager>().Object;
+        Mock.Get(manager).DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(true));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
 
         await resolver.RemoveAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "managed-secret", Ownership: SecretBindingOwnership.Managed));
 
-        await manager.Received(1).DeleteAsync("managed-secret", Arg.Any<CancellationToken>());
+        Mock.Get(manager).DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => resolver.RemoveAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "deployment-secret")).AsTask());
-        await manager.DidNotReceive().DeleteAsync("deployment-secret", Arg.Any<CancellationToken>());
+        Mock.Get(manager).DeleteAsync("deployment-secret", Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     private static Secret CreateSecret() => new()

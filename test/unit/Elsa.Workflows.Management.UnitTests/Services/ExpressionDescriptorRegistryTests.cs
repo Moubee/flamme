@@ -1,7 +1,7 @@
 using Elsa.Expressions.Contracts;
 using Elsa.Expressions.Models;
 using Elsa.Workflows.Management.Services;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
@@ -111,8 +111,8 @@ public class ExpressionDescriptorRegistryTests
     public async Task Should_Handle_Duplicate_Registrations_Last_Wins()
     {
         // Arrange - Two providers register the same type
-        var handler1 = Substitute.For<IExpressionHandler>();
-        var handler2 = Substitute.For<IExpressionHandler>();
+        var handler1 = Mock.Of<IExpressionHandler>().Object;
+        var handler2 = Mock.Of<IExpressionHandler>().Object;
         var descriptor1 = CreateDescriptor("DuplicateType", handler1);
         var descriptor2 = CreateDescriptor("DuplicateType", handler2);
         var provider1 = CreateProvider(descriptor1);
@@ -195,10 +195,10 @@ public class ExpressionDescriptorRegistryTests
         await Assert.That(first).HasSingleItem();
         await Assert.That(second).HasSingleItem();
     }
-    
+
     private static ExpressionDescriptor CreateDescriptor(string type)
     {
-        var handler = Substitute.For<IExpressionHandler>();
+        var handler = Mock.Of<IExpressionHandler>().Object;
         return CreateDescriptor(type, handler);
     }
 
@@ -213,8 +213,8 @@ public class ExpressionDescriptorRegistryTests
 
     private static IExpressionDescriptorProvider CreateProvider(params ExpressionDescriptor[] descriptors)
     {
-        var provider = Substitute.For<IExpressionDescriptorProvider>();
-        provider.GetDescriptors().Returns(descriptors);
+        var provider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        Mock.Get(provider).GetDescriptors().Returns(descriptors);
         return provider;
     }
 

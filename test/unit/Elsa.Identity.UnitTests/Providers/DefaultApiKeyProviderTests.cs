@@ -4,7 +4,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Identity.Entities;
 using Elsa.Identity.Models;
 using Elsa.Identity.Providers;
-using NSubstitute;
 
 namespace Elsa.Identity.UnitTests.Providers;
 
@@ -33,11 +32,11 @@ public class DefaultApiKeyProviderTests
     private static async Task<IApiKey?> ProvideAsync(string roleId, IReadOnlyCollection<string> permissions)
     {
         var application = new Application { ClientId = $"client-{roleId}", Roles = [roleId] };
-        var validator = Substitute.For<IApplicationCredentialsValidator>();
-        validator.ValidateAsync("key", Arg.Any<CancellationToken>()).Returns(application);
+        var validator = Mock.Of<IApplicationCredentialsValidator>().Object;
+        Mock.Get(validator).ValidateAsync("key", Arg.Any<CancellationToken>()).Returns(application);
 
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
             .Returns([new Role { Id = roleId, Name = roleId, Permissions = permissions.ToList() }]);
 
         return await new DefaultApiKeyProvider(validator, roles).ProvideAsync("key");

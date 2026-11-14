@@ -7,10 +7,11 @@ using Elsa.Expressions.Helpers;
 using Elsa.Workflows.Memory;
 using Elsa.Workflows.Serialization.Converters;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.VariableStorageDrivers;
+
 public class WorkflowInstanceStorageDriverTests
 {
     private const string IsolatedTestMarker = "ELSA_WORKFLOW_INSTANCE_STORAGE_DRIVER_ISOLATED_TEST";
@@ -194,10 +195,10 @@ public class WorkflowInstanceStorageDriverTests
     private static Harness CreateHarness(Variable variable, ISerializationTypeRegistry? typeRegistry = null)
     {
         var properties = new Dictionary<string, object>();
-        var executionContext = Substitute.For<IExecutionContext>();
-        executionContext.Properties.Returns(properties);
-        var payloadSerializer = Substitute.For<IPayloadSerializer>();
-        payloadSerializer.GetOptions().Returns(CreatePayloadSerializerOptions(typeRegistry));
+        var executionContext = Mock.Of<IExecutionContext>().Object;
+        Mock.Get(executionContext).Properties.Returns(properties);
+        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        Mock.Get(payloadSerializer).GetOptions().Returns(CreatePayloadSerializerOptions(typeRegistry));
         var driver = new WorkflowInstanceStorageDriver(payloadSerializer, NullLogger<WorkflowInstanceStorageDriver>.Instance);
         var context = new StorageDriverContext(executionContext, variable, CancellationToken.None);
         return new(driver, context, properties);

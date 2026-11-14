@@ -5,7 +5,6 @@ using Elsa.Alterations.Services;
 using Elsa.Common.Multitenancy;
 using Elsa.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Alterations.IntegrationTests;
 
@@ -18,12 +17,11 @@ public class BackgroundAlterationJobDispatcherTests : IAsyncDisposable
 
     public BackgroundAlterationJobDispatcherTests()
     {
-        var jobQueue = Substitute.For<IJobQueue>();
-        jobQueue
+        var jobQueue = Mock.Of<IJobQueue>().Object;
+        Mock.Get(jobQueue)
             .Enqueue(Arg.Any<Func<CancellationToken, Task>>())
-            .Returns(callInfo =>
+            .Returns((Func<CancellationToken, Task> callback) =>
             {
-                var callback = callInfo.Arg<Func<CancellationToken, Task>>();
                 _queuedCallbacks.Add(callback);
                 return $"queued-job-{_queuedCallbacks.Count}";
             });

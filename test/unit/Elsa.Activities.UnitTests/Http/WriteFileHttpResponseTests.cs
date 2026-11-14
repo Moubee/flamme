@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.IO.Compression;
 using Elsa.Common;
@@ -13,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Elsa.Workflows.Exceptions;
 using System.Threading.Tasks;
 
@@ -288,8 +286,8 @@ public class WriteFileHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-            mockHttpContextAccessor.HttpContext.Returns((HttpContext?)null);
+            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            Mock.Get(mockHttpContextAccessor).HttpContext.Returns((HttpContext?)null);
             services.AddSingleton(mockHttpContextAccessor);
             AddMockServices(services);
         });
@@ -375,31 +373,26 @@ public class WriteFileHttpResponseTests
 
     private static IContentTypeProvider CreateContentTypeProviderMock()
     {
-        var mockContentTypeProvider = Substitute.For<IContentTypeProvider>();
-        mockContentTypeProvider.TryGetContentType(Arg.Any<string>(), out Arg.Any<string?>())
-            .Returns(callInfo =>
-            {
-                var filename = callInfo.ArgAt<string>(0);
-                var extension = Path.GetExtension(filename).ToLowerInvariant();
-                
-                var contentType = extension switch
-                {
-                    ".txt" => "text/plain",
-                    ".pdf" => "application/pdf", 
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".zip" => "application/zip",
-                    ".html" => "text/html",
-                    ".css" => "text/css",
-                    ".js" => "application/javascript",
-                    ".json" => "application/json",
-                    ".xml" => "application/xml",
-                    _ => null
-                };
-                
-                callInfo[1] = contentType;
-                return contentType != null;
-            });
+        var mockContentTypeProvider = Mock.Of<IContentTypeProvider>().Object;
+        var contentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [".txt"] = "text/plain",
+            [".pdf"] = "application/pdf",
+            [".jpg"] = "image/jpeg",
+            [".jpeg"] = "image/jpeg",
+            [".png"] = "image/png",
+            [".zip"] = "application/zip",
+            [".html"] = "text/html",
+            [".css"] = "text/css",
+            [".js"] = "application/javascript",
+            [".json"] = "application/json",
+            [".xml"] = "application/xml"
+        };
+        foreach (var (extension, contentType) in contentTypes)
+            Mock.Get(mockContentTypeProvider)
+                .TryGetContentType(Arg.Is<string>(filename => string.Equals(Path.GetExtension(filename), extension, StringComparison.OrdinalIgnoreCase)))
+                .Returns(true)
+                .SetsOutContentType(contentType);
         return mockContentTypeProvider;
     }
 
@@ -408,14 +401,14 @@ public class WriteFileHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-            mockHttpContextAccessor.HttpContext.Returns(httpContext);
+            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            Mock.Get(mockHttpContextAccessor).HttpContext.Returns(httpContext);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions());
             AddHttpContentFactories(services);
             AddHttpContentParsers(services);
             AddMockServices(services);
-            services.AddSingleton(Substitute.For<IStimulusHasher>());
+            services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
             services.AddLogging();
         });
 
@@ -428,8 +421,8 @@ public class WriteFileHttpResponseTests
         {
             WriteHttpResponseSynchronously = false
         };
-        var mockOptions = Substitute.For<Microsoft.Extensions.Options.IOptions<HttpActivityOptions>>();
-        mockOptions.Value.Returns(options);
+        var mockOptions = Mock.Of<Microsoft.Extensions.Options.IOptions<HttpActivityOptions>>().Object;
+        Mock.Get(mockOptions).Value.Returns(options);
         return mockOptions;
     }
 
@@ -454,10 +447,10 @@ public class WriteFileHttpResponseTests
     {
         services.AddSingleton(CreateDownloadableManagerMock());
         services.AddSingleton(CreateContentTypeProviderMock());
-        services.AddSingleton(Substitute.For<IFileCacheStorageProvider>());
+        services.AddSingleton(Mock.Of<IFileCacheStorageProvider>().Object);
         services.AddSingleton(CreateFileCacheOptionsMock());
         services.AddSingleton(CreateSystemClockMock());
-        services.AddSingleton(Substitute.For<IStimulusHasher>());
+        services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
         services.AddLogging();
         
         RegisterZipManager(services);
@@ -465,11 +458,10 @@ public class WriteFileHttpResponseTests
 
     private static IDownloadableManager CreateDownloadableManagerMock()
     {
-        var mock = Substitute.For<IDownloadableManager>();
-        mock.GetDownloadablesAsync(Arg.Any<object>(), Arg.Any<DownloadableOptions>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo =>
+        var mock = Mock.Of<IDownloadableManager>().Object;
+        Mock.Get(mock).GetDownloadablesAsync(Arg.Any<object>(), Arg.Any<DownloadableOptions?>(), Arg.Any<CancellationToken>())
+            .Returns((object content, DownloadableOptions? options, CancellationToken cancellationToken) =>
             {
-                var content = callInfo.ArgAt<object>(0);
                 return CreateMockDownloadables(content).Select(d => new Func<ValueTask<Downloadable>>(() => ValueTask.FromResult(d)));
             });
         return mock;
@@ -477,15 +469,15 @@ public class WriteFileHttpResponseTests
 
     private static Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions> CreateFileCacheOptionsMock()
     {
-        var mock = Substitute.For<Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>>();
-        mock.Value.Returns(new HttpFileCacheOptions { TimeToLive = TimeSpan.FromHours(1) });
+        var mock = Mock.Of<Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>>().Object;
+        Mock.Get(mock).Value.Returns(new HttpFileCacheOptions { TimeToLive = TimeSpan.FromHours(1) });
         return mock;
     }
 
     private static ISystemClock CreateSystemClockMock()
     {
-        var mock = Substitute.For<ISystemClock>();
-        mock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        var mock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(mock).UtcNow.Returns(DateTimeOffset.UtcNow);
         return mock;
     }
 
@@ -494,89 +486,12 @@ public class WriteFileHttpResponseTests
         var zipManagerType = typeof(WriteFileHttpResponse).Assembly.GetType("Elsa.Http.Services.ZipManager");
         if (zipManagerType != null)
         {
-            services.AddSingleton(zipManagerType, CreateZipManagerInstance);
+            services.AddSingleton(zipManagerType, zipManagerType);
         }
         else
         {
             services.AddSingleton<object>(_ => new());
         }
-    }
-
-    private static object CreateZipManagerInstance(IServiceProvider serviceProvider)
-    {
-        var zipManagerType = typeof(WriteFileHttpResponse).Assembly.GetType("Elsa.Http.Services.ZipManager");
-        if (zipManagerType == null) return new();
-
-        try
-        {
-            var constructor = zipManagerType.GetConstructors().FirstOrDefault();
-            if (constructor == null) return CreateZipManagerFallback(zipManagerType);
-
-            var parameters = constructor.GetParameters();
-            var args = new object[parameters.Length];
-
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                args[i] = ResolveConstructorParameter(serviceProvider, parameters[i].ParameterType);
-            }
-
-            return constructor.Invoke(args);
-        }
-        catch
-        {
-            return CreateZipManagerFallback(zipManagerType);
-        }
-    }
-
-    private static object ResolveConstructorParameter(IServiceProvider serviceProvider, Type paramType)
-    {
-        return paramType switch
-        {
-            _ when paramType == typeof(ISystemClock) => serviceProvider.GetRequiredService<ISystemClock>(),
-            _ when paramType == typeof(IFileCacheStorageProvider) => serviceProvider.GetRequiredService<IFileCacheStorageProvider>(),
-            _ when paramType == typeof(Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>) => serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>>(),
-            { IsGenericType: true } when paramType.GetGenericTypeDefinition() == typeof(ILogger<>) => CreateLoggerMock(paramType),
-            _ when paramType == typeof(ILogger) => Substitute.For<ILogger>(),
-            _ => CreateGenericMock(paramType)
-        };
-    }
-
-    [UnconditionalSuppressMessage("Trimming", "IL2060:Call to MakeGenericMethod can not be statically analyzed", Justification = "Test helper method that creates mocks dynamically for any logger type.")]
-    private static object CreateLoggerMock(Type loggerType)
-    {
-        try
-        {
-            var mockLoggerMethod = typeof(Substitute).GetMethods()
-                .FirstOrDefault(m => m is { Name: "For", IsGenericMethodDefinition: true } && m.GetParameters().Length == 0);
-
-            if (mockLoggerMethod != null)
-            {
-                var genericMethod = mockLoggerMethod.MakeGenericMethod(loggerType);
-                return genericMethod.Invoke(null, null) ?? Substitute.For<ILogger>();
-            }
-        }
-        catch
-        {
-            // Fall back to basic ILogger mock
-        }
-        return Substitute.For<ILogger>();
-    }
-
-    private static object CreateGenericMock(Type paramType)
-    {
-        try
-        {
-            return Substitute.For([paramType], []);
-        }
-        catch
-        {
-            return null!;
-        }
-    }
-
-    private static object CreateZipManagerFallback(Type zipManagerType)
-    {
-        return Substitute.For([zipManagerType], []);
     }
 
     private static IEnumerable<Downloadable> CreateMockDownloadables(object content)

@@ -5,7 +5,6 @@ using Elsa.Scheduling.Services;
 using Elsa.Workflows.Helpers;
 using Elsa.Workflows.Runtime.Entities;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 
 namespace Elsa.Scheduling.UnitTests.Services;
 
@@ -14,9 +13,9 @@ public class DefaultTriggerSchedulerTests
     [Test]
     public async Task ScheduleAsync_SchedulesPastDueStartAtTriggerForCatchUp()
     {
-        var workflowScheduler = Substitute.For<IWorkflowScheduler>();
-        var systemClock = Substitute.For<ISystemClock>();
-        var logger = Substitute.For<ILogger<DefaultTriggerScheduler>>();
+        var workflowScheduler = Mock.Of<IWorkflowScheduler>().Object;
+        var systemClock = Mock.Of<ISystemClock>().Object;
+        var logger = Mock.Of<ILogger<DefaultTriggerScheduler>>().Object;
         var scheduler = new DefaultTriggerScheduler(workflowScheduler, systemClock, logger);
         var now = new DateTimeOffset(2025, 11, 06, 22, 50, 00, TimeSpan.Zero);
         var executeAt = now.AddMinutes(-5);
@@ -29,12 +28,12 @@ public class DefaultTriggerSchedulerTests
             ActivityId = "activity-1",
             Payload = new StartAtPayload(executeAt)
         };
-        systemClock.UtcNow.Returns(now);
-        workflowScheduler.ScheduleAtAsync(trigger.Id, Arg.Do<ScheduleNewWorkflowInstanceRequest>(x => scheduledRequest = x), executeAt, Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+        Mock.Get(systemClock).UtcNow.Returns(now);
+        Mock.Get(workflowScheduler).ScheduleAtAsync(trigger.Id, Arg.Any<ScheduleNewWorkflowInstanceRequest>(), executeAt, Arg.Any<CancellationToken>()).Callback((string _, ScheduleNewWorkflowInstanceRequest request, DateTimeOffset _, CancellationToken _) => scheduledRequest = request);
 
         await scheduler.ScheduleAsync([trigger], CancellationToken.None);
 
-        await workflowScheduler.Received(1).ScheduleAtAsync(trigger.Id, Arg.Any<ScheduleNewWorkflowInstanceRequest>(), executeAt, Arg.Any<CancellationToken>());
+        Mock.Get(workflowScheduler).ScheduleAtAsync(trigger.Id, Arg.Any<ScheduleNewWorkflowInstanceRequest>(), executeAt, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(scheduledRequest).IsNotNull();
         await Assert.That(scheduledRequest.TriggerActivityId).IsEqualTo(trigger.ActivityId);
         await Assert.That(scheduledRequest.WorkflowDefinitionHandle.DefinitionVersionId).IsEqualTo(trigger.WorkflowDefinitionVersionId);

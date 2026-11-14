@@ -4,7 +4,6 @@ using Elsa.Scheduling.Bookmarks;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Timer = Elsa.Scheduling.Activities.Timer;
 using System.Threading.Tasks;
 
@@ -88,8 +87,8 @@ public class TimerTests
 
     private static ISystemClock CreateClock(DateTimeOffset now)
     {
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(now);
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(now);
         return clock;
     }
 

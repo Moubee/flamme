@@ -9,7 +9,6 @@ using Elsa.Identity.Notifications;
 using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
 using Elsa.Mediator.Contracts;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Services;
@@ -82,7 +81,7 @@ public class RoleDeletionCoordinatorTests
     [Test]
     public async Task OrdinaryDeletionIsBlockedByConfigurationDependency()
     {
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([
                 Dependency("configuration", RoleDeletionDependencyOwnership.Configuration, configurationPath: "ExternalAuthentication:Connections:0:UnlinkedPolicy:Settings:defaultRoleIds:0")
@@ -99,7 +98,7 @@ public class RoleDeletionCoordinatorTests
     [Test]
     public async Task SuccessfulDeletionPublishesDeletedRoleNotification()
     {
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(new StubContributor([]), notificationSender);
         // A cancellable request token is what makes the token assertion below mean anything: were the notification
         // published with the request's own token, that token could be cancelled and the assertion would fail.
@@ -118,7 +117,7 @@ public class RoleDeletionCoordinatorTests
         // What the loser of a race sees: the role is still there to be found, and the delete then removes no row
         // because a concurrent request got there first. Publishing here would credit this request with a deletion
         // it did not perform, and audit would record the role as deleted twice.
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (_, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -135,7 +134,7 @@ public class RoleDeletionCoordinatorTests
     {
         // A third-party store implementing only IRoleStore reports no affected-row count. The deletion must still
         // reach security subscribers over that legacy path rather than being dropped for want of the capability.
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -153,7 +152,7 @@ public class RoleDeletionCoordinatorTests
     {
         // Both requests are held until each has already found the role, so neither can be turned away by the
         // existence check and the store's own delete is the only thing that can separate them.
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -199,7 +198,7 @@ public class RoleDeletionCoordinatorTests
     public async Task SuccessfulRemediationRemovesDependenciesBeforeDeletingRole()
     {
         var contributor = new StubContributor([Dependency("connection-a", removesLastDefaultRole: true)]);
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(contributor, notificationSender);
         var inspection = await coordinator.InspectAsync("workflow-user", Administrator());
         await Assert.That(inspection).IsOfType(typeof(RoleDeletionInspectionResult.Success));
@@ -227,7 +226,7 @@ public class RoleDeletionCoordinatorTests
         var contributor = new StubContributor(
             [Dependency("connection-a"), Dependency("connection-b")],
             failAfterFirst: true);
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(contributor, notificationSender);
         var inspection = await coordinator.InspectAsync("workflow-user", Administrator());
         await Assert.That(inspection).IsOfType(typeof(RoleDeletionInspectionResult.Success));
@@ -404,24 +403,24 @@ public class RoleDeletionCoordinatorTests
         await store.SaveAsync(new Role { Id = "workflow-user", Name = "Workflow user", Permissions = [] });
         var roleStore = storeDecorator?.Invoke(store) ?? store;
         var roleProvider = new StoreBasedRoleProvider(roleStore);
-        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? Substitute.For<INotificationSender>(), TestTenantAccessor.Default, new SystemClock());
+        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? Mock.Of<INotificationSender>().Object, TestTenantAccessor.Default, new SystemClock());
         var coordinator = new RoleDeletionCoordinator(roleStore, new RoleAuthorizationService(roleProvider, new PermissionEvaluator()), [contributor], securityNotifier);
         return (store, coordinator);
     }
 
     private static async Task AssertRoleDeletedNotificationAsync(INotificationSender notificationSender) =>
-        await notificationSender.Received(1).SendAsync(
-            Arg.Is<RoleChanged>(notification =>
+        Mock.Get(notificationSender).SendAsync(
+            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is RoleChanged notification &&
                 notification.Operation == "deleted" &&
                 notification.RoleId == "workflow-user" &&
                 notification.RoleName == "Workflow user" &&
                 notification.Permissions.Count == 0),
             // The row is already gone by the time this is published, so a request that is cancelled or abandoned
             // must not be able to silence it. An uncancellable token is how that is guaranteed.
-            Arg.Is<CancellationToken>(token => !token.CanBeCanceled));
+            Arg.Is<CancellationToken>(token => !token.CanBeCanceled)).WasCalled(Times.Exactly(1));
 
     private static async Task AssertNoRoleNotificationAsync(INotificationSender notificationSender) =>
-        await notificationSender.DidNotReceive().SendAsync(Arg.Any<RoleChanged>(), Arg.Any<CancellationToken>());
+        Mock.Get(notificationSender).SendAsync(Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is RoleChanged), Arg.Any<CancellationToken>()).WasNeverCalled();
 
     private static ClaimsPrincipal Administrator() => new(new ClaimsIdentity([new Claim(PermissionNames.ClaimType, PermissionNames.All)]));
 

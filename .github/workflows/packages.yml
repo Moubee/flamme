@@ -48,15 +48,12 @@ jobs:
           dotnet --list-sdks
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: ./.github/actions/cache-nuget
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          workload: unit-integration
 
       - name: Restore unit and integration tests
-        run: dotnet restore Elsa.UnitIntegration.Tests.slnf --ignore-failed-sources
+        run: dotnet restore Elsa.UnitIntegration.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -126,15 +123,12 @@ jobs:
           dotnet --list-sdks
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: ./.github/actions/cache-nuget
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          workload: component
 
       - name: Restore component tests
-        run: dotnet restore Elsa.Component.Tests.slnf --ignore-failed-sources
+        run: dotnet restore Elsa.Component.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -212,6 +206,11 @@ jobs:
           pattern: component-test-results-*
           path: artifacts/test-results/component
 
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-nuget
+        with:
+          workload: tools
+
       - name: Restore .NET tools
         run: dotnet tool restore --tool-manifest .config/dotnet-tools.json
 
@@ -239,13 +238,10 @@ jobs:
 
   build:
     name: Build packages
-    needs:
-      - test_unit_integration
-      - test_component
-      - coverage_report
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ${{ github.event_name != 'pull_request' && needs.coverage_report.result == 'success' }}
+    # Compile while tests run; both publishers below still require their coverage gate.
+    if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Reclaim hosted runner disk space
         shell: bash
@@ -300,8 +296,13 @@ jobs:
           global-json-file: global.json
           dotnet-version: 10.0.x
 
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-nuget
+        with:
+          workload: solution
+
       - name: Restore
-        run: dotnet restore Elsa.slnx -p:Version="$VERSION"
+        run: dotnet restore Elsa.slnx --locked-mode -p:Version="$VERSION"
 
       - name: Build
         run: dotnet build Elsa.slnx --configuration Release --no-restore -p:Version="$VERSION"
@@ -318,13 +319,13 @@ jobs:
 
   publish_preview_feedz:
     name: Publish to feedz.io
-    needs: build
+    needs: [build, coverage_report]
     runs-on: ubuntu-latest
     # 30 minutes against the push action's 20-minute deadline: the action stops
     # starting pushes once its own deadline passes, so the runner never has to
     # cancel a publish half-done. Move the two together.
     timeout-minutes: 30
-    if: ${{ github.event_name == 'release' || github.event_name == 'push'}}
+    if: ${{ needs.coverage_report.result == 'success' && (github.event_name == 'release' || github.event_name == 'push') }}
     steps:
       - name: Check out the push action
         # Every third-party action in this job runs before a feed API key is handed
@@ -356,13 +357,13 @@ jobs:
 
   publish_nuget:
     name: Publish release to nuget.org
-    needs: build
+    needs: [build, coverage_report]
     runs-on: ubuntu-latest
     # 30 minutes against the push action's 20-minute deadline: the action stops
     # starting pushes once its own deadline passes, so the runner never has to
     # cancel a publish half-done. Move the two together.
     timeout-minutes: 30
-    if: ${{ github.event.action == 'published' }}
+    if: ${{ needs.coverage_report.result == 'success' && github.event.action == 'published' }}
     permissions:
       contents: read
       id-token: write # Required: lets this job request the OIDC token that nuget.org exchanges for a temporary API key.

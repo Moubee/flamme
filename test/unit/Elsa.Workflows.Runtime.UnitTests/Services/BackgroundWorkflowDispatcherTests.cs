@@ -3,15 +3,15 @@ using Elsa.Mediator;
 using Elsa.Mediator.Contracts;
 using Elsa.Workflows.Runtime.Commands;
 using Elsa.Workflows.Runtime.Requests;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundWorkflowDispatcherTests
 {
-    private readonly ICommandSender _commandSender = Substitute.For<ICommandSender>();
-    private readonly INotificationSender _notificationSender = Substitute.For<INotificationSender>();
-    private readonly ITenantAccessor _tenantAccessor = Substitute.For<ITenantAccessor>();
+    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
+    private readonly INotificationSender _notificationSender = Mock.Of<INotificationSender>().Object;
+    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
 
     [Test]
     public async Task DispatchWorkflowDefinition_DoesNotPropagateCallerToken()
@@ -25,11 +25,8 @@ public class BackgroundWorkflowDispatcherTests
         await dispatcher.DispatchAsync(request, cancellationToken: callerCts.Token);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<DispatchWorkflowDefinitionCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -44,11 +41,8 @@ public class BackgroundWorkflowDispatcherTests
         await dispatcher.DispatchAsync(request, cancellationToken: callerCts.Token);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<DispatchWorkflowInstanceCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowInstanceCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -63,11 +57,8 @@ public class BackgroundWorkflowDispatcherTests
         await dispatcher.DispatchAsync(request, cancellationToken: callerCts.Token);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<DispatchTriggerWorkflowsCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchTriggerWorkflowsCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -82,11 +73,8 @@ public class BackgroundWorkflowDispatcherTests
         await dispatcher.DispatchAsync(request, cancellationToken: callerCts.Token);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<DispatchResumeWorkflowsCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchResumeWorkflowsCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     private BackgroundWorkflowDispatcher CreateDispatcher()

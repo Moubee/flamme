@@ -18,7 +18,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
@@ -62,8 +61,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         _adapter = new TestAdapter();
         _settingsMigrations = new TestAdapterSettingsMigrationService();
         _roleAuthorizationService = new TestRoleAuthorizationService();
-        _notifications = Substitute.For<INotificationSender>();
-        _sessions = Substitute.For<IExternalAuthenticationSessionStore>();
+        _notifications = Mock.Of<INotificationSender>().Object;
+        _sessions = Mock.Of<IExternalAuthenticationSessionStore>().Object;
         _managedSecretWriter = new TestManagedSecretBindingWriter();
     }
 
@@ -93,16 +92,16 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         services.AddSingleton<IIdentityProviderConnectionValidityAssessor, IdentityProviderConnectionValidityAssessor>();
         services.AddSingleton<IUnlinkedIdentityPolicyRegistry>(new TestUnlinkedIdentityPolicyRegistry());
         services.AddSingleton<IExternalUserMatcherRegistry>(new TestExternalUserMatcherRegistry("allowed-matcher", "disallowed-matcher"));
-        services.AddScoped(_ => Substitute.For<IPermissionGrantSourceRegistry>());
-        services.AddSingleton<IPermissionDelegationAuthorizer>(Substitute.For<IPermissionDelegationAuthorizer>());
+        services.AddScoped(_ => Mock.Of<IPermissionGrantSourceRegistry>().Object);
+        services.AddSingleton<IPermissionDelegationAuthorizer>(Mock.Of<IPermissionDelegationAuthorizer>().Object);
         services.AddSingleton<IRoleAuthorizationService>(_roleAuthorizationService);
         services.AddSingleton(_notifications);
         services.AddSingleton<ISystemClock, SystemClock>();
         services.AddSingleton(_sessions);
         services.AddSingleton<IManagedSecretBindingWriter>(_managedSecretWriter);
         services.AddSingleton<ISecretBindingResolver>(new TestSecretBindingResolver());
-        var tenant = Substitute.For<ITenantAccessor>();
-        tenant.TenantId.Returns(_ => _tenantId);
+        var tenant = Mock.Of<ITenantAccessor>().Object;
+        Mock.Get(tenant).TenantId.Returns(() => _tenantId);
         services.AddSingleton(tenant);
         services.AddScoped<IdentityProviderConnectionManagementService>();
     }
@@ -465,7 +464,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed") { Content = JsonContent.Create(new { resolverType = "test-managed", value = "secret" }) };
         secret.Headers.TryAddWithoutValidation("If-Match", "\"2\"");
         await Assert.That((await client.SendAsync(secret)).StatusCode).IsEqualTo(HttpStatusCode.OK);
-        await _notifications.Received().SendAsync(Arg.Is<IdentityProviderConnectionSecretBindingChanged>(x => x.FieldName == "clientSecret" && x.ResolverType == "test-managed" && !x.IsConfigured), Arg.Any<CancellationToken>());
+        Mock.Get(_notifications).SendAsync(Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is IdentityProviderConnectionSecretBindingChanged x && x.FieldName == "clientSecret" && x.ResolverType == "test-managed" && !x.IsConfigured), Arg.Any<CancellationToken>()).WasCalled();
     }
 
     [Test]
@@ -534,21 +533,21 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         var connection = DatabaseConnection("disable-with-revoke", ConnectionScope.HostTenantId, "disable-with-revoke");
         connection.IsEnabled = true;
         await _store.CreateAsync(connection);
-        _sessions.RevokeActiveForConnectionAsync("disable-with-revoke", "connection_disabled", Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(2);
+        Mock.Get(_sessions).RevokeActiveForConnectionAsync("disable-with-revoke", "connection_disabled", Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(2);
         _authentication.SetPermissions($"{ExternalAuthenticationResourcePermissions.Connections}:{CoreVerbs.Update}");
 
         var forbidden = new HttpRequestMessage(HttpMethod.Post, "/external-authentication/connections/disable-with-revoke/disable?revokeActiveSessions=true");
         forbidden.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(forbidden)).StatusCode).IsEqualTo(HttpStatusCode.Forbidden);
-        await _sessions.DidNotReceive().RevokeActiveForConnectionAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
+        Mock.Get(_sessions).RevokeActiveForConnectionAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         _authentication.SetPermissions(PermissionNames.All);
         var allowed = new HttpRequestMessage(HttpMethod.Post, "/external-authentication/connections/disable-with-revoke/disable?revokeActiveSessions=true");
         allowed.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(allowed)).StatusCode).IsEqualTo(HttpStatusCode.OK);
-        await _notifications.Received().SendAsync(
-            Arg.Is<ExternalAuthenticationConnectionSessionsRevoked>(x => x.SessionCount == 2 && x.Reason == "connection_disabled"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_notifications).SendAsync(
+            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationConnectionSessionsRevoked x && x.SessionCount == 2 && x.Reason == "connection_disabled"),
+            Arg.Any<CancellationToken>()).WasCalled();
     }
 
     [Test]
@@ -559,9 +558,9 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         var connectionValue17 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
         await Assert.That(connectionValue17).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue17!;
-        _notifications
+        Mock.Get(_notifications)
             .SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromException(new InvalidOperationException("Notification failure")));
+            .Returns(() => Task.FromException(new InvalidOperationException("Notification failure")));
 
         var replace = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {

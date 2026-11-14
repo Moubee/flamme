@@ -6,7 +6,7 @@ using Elsa.Workflows.Memory;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Serialization.Converters;
 using Elsa.Workflows.Serialization.Helpers;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.Serialization.Helpers;
@@ -88,7 +88,7 @@ public sealed class SyntheticPropertiesWriterTests
         using (var writer = new Utf8JsonWriter(buffer))
         {
             writer.WriteStartObject();
-            var sut = new SyntheticPropertiesWriter(Substitute.For<IExpressionDescriptorRegistry>());
+            var sut = new SyntheticPropertiesWriter(Mock.Of<IExpressionDescriptorRegistry>().Object);
             sut.WriteSyntheticProperties(writer, activity, CreateActivityDescriptor(), CreateOptions());
             writer.WriteEndObject();
         }

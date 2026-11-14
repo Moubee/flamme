@@ -9,7 +9,6 @@ using Elsa.Identity.Services;
 using Elsa.Testing.Shared.Multitenancy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Services;
@@ -19,8 +18,8 @@ public class PermissionStampValidatorTests : IDisposable
     private const string SharedUserName = "admin";
 
     private readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-    private readonly IUserProvider _userProvider = Substitute.For<IUserProvider>();
-    private readonly IPermissionStampCalculator _calculator = Substitute.For<IPermissionStampCalculator>();
+    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
+    private readonly IPermissionStampCalculator _calculator = Mock.Of<IPermissionStampCalculator>().Object;
 
     private PermissionStampValidator CreateValidator(ITenantAccessor tenantAccessor) =>
         new(_userProvider, _calculator, _cache, tenantAccessor, MsOptions.Create(new PermissionStampOptions { IsEnabled = true }));
@@ -39,10 +38,10 @@ public class PermissionStampValidatorTests : IDisposable
     {
         var user = new User { Id = $"{tenantId}-user", Name = SharedUserName, TenantId = tenantId };
 
-        _userProvider
+        Mock.Get(_userProvider)
             .FindAsync(Arg.Is<UserFilter>(x => x.Name == SharedUserName && x.TenantId == tenantId), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<User?>(user));
-        _calculator.ComputeAsync(user, Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(stamp));
+            .ReturnsAsync(Task.FromResult<User?>(user));
+        Mock.Get(_calculator).ComputeAsync(user, Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(stamp));
     }
 
     [Test]
@@ -103,6 +102,6 @@ public class PermissionStampValidatorTests : IDisposable
             MsOptions.Create(new PermissionStampOptions { IsEnabled = false }));
 
         await Assert.That(await validator.IsCurrentAsync(Principal("anything"))).IsTrue();
-        await _userProvider.DidNotReceive().FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_userProvider).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 }

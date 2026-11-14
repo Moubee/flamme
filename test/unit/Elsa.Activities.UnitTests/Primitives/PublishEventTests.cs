@@ -3,7 +3,6 @@ using Elsa.Workflows;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Activities;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Primitives;
@@ -18,7 +17,7 @@ public class PublishEventTests
     public async Task ExecuteAsync_PublishesEvent_WithParameters(string eventName, string? correlationId, string? expectedCorrelationId, bool expectNullCorrelation)
     {
         // Arrange
-        var publisher = Substitute.For<IEventPublisher>();
+        var publisher = Mock.Of<IEventPublisher>().Object;
 
         // Act
         await ExecuteAsync(CreateActivity(eventName, correlationId), publisher);
@@ -38,7 +37,7 @@ public class PublishEventTests
     {
         // Arrange
         const string eventName = "TestEvent";
-        var publisher = Substitute.For<IEventPublisher>();
+        var publisher = Mock.Of<IEventPublisher>().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity(eventName, isLocalEvent: isLocalEvent), publisher);
@@ -57,7 +56,7 @@ public class PublishEventTests
         // Arrange
         const string eventName = "OrderCreated";
         var payload = new { OrderId = 123, Amount = 99.99m };
-        var publisher = Substitute.For<IEventPublisher>();
+        var publisher = Mock.Of<IEventPublisher>().Object;
 
         // Act
         await ExecuteAsync(CreateActivity(eventName, payload: payload), publisher);
@@ -70,7 +69,7 @@ public class PublishEventTests
     public async Task ExecuteAsync_CompletesActivity()
     {
         // Arrange
-        var publisher = Substitute.For<IEventPublisher>();
+        var publisher = Mock.Of<IEventPublisher>().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity("TestEvent"), publisher);
@@ -86,20 +85,20 @@ public class PublishEventTests
         const string eventName = "CompleteOrderEvent";
         const string correlationId = "correlation-456";
         var payload = new { Status = "Shipped" };
-        var publisher = Substitute.For<IEventPublisher>();
+        var publisher = Mock.Of<IEventPublisher>().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity(eventName, correlationId, isLocalEvent: true, payload: payload), publisher);
 
         // Assert
-        await publisher.Received(1).PublishAsync(
+        Mock.Get(publisher).PublishAsync(
             eventName,
             correlationId,
             context.WorkflowExecutionContext.Id,
-            null,
+            Arg.IsNull<string?>(),
             payload,
             true,
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private static PublishEvent CreateActivity(
@@ -137,13 +136,15 @@ public class PublishEventTests
             ? Arg.Is<string?>(x => x == null)
             : workflowInstanceId ?? Arg.Any<string?>();
 
-        await publisher.Received(1).PublishAsync(
+        var payloadArg = payload is null ? Arg.Any<object?>() : Arg.Is<object?>(payload);
+
+        Mock.Get(publisher).PublishAsync(
             eventName,
             correlationIdArg,
             workflowInstanceIdArg,
             Arg.Any<string?>(),
-            payload ?? Arg.Any<object?>(),
+            payloadArg,
             Arg.Any<bool>(),
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 }

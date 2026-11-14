@@ -14,7 +14,6 @@ using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
 
 namespace Elsa.Workflows.Api.UnitTests.Endpoints.Descriptors;
@@ -70,7 +69,7 @@ public class DescriptorCatalogAuthorizationTests
     public static IEnumerable<string> RefreshPermissions => [DefinitionsView, DescriptorsActivitiesView];
     public static IEnumerable<string> AuthenticatedOnlyPaths => [.. CatalogPathList, VersionsPath];
 
-    private readonly IActivityRegistryPopulator _registryPopulator = Substitute.For<IActivityRegistryPopulator>();
+    private readonly IActivityRegistryPopulator _registryPopulator = Mock.Of<IActivityRegistryPopulator>().Object;
     private AuthorizationTestHost _host = null!;
 
     [Before(Test)]
@@ -139,7 +138,7 @@ public class DescriptorCatalogAuthorizationTests
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(await response.Content.ReadAsStringAsync()).Contains(TypeName);
-        await _registryPopulator.DidNotReceiveWithAnyArgs().PopulateRegistryAsync(default);
+        Mock.Get(_registryPopulator).PopulateRegistryAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -150,7 +149,7 @@ public class DescriptorCatalogAuthorizationTests
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(await response.Content.ReadAsStringAsync()).Contains(TypeName);
-        await _registryPopulator.Received(1).PopulateRegistryAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_registryPopulator).PopulateRegistryAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -186,38 +185,38 @@ public class DescriptorCatalogAuthorizationTests
         var response = await SendAsync("/descriptors/activities?refresh=true", authenticated: true);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        await _registryPopulator.Received(1).PopulateRegistryAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_registryPopulator).PopulateRegistryAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private void ConfigureServices(IServiceCollection services)
     {
-        var activityRegistry = Substitute.For<IActivityRegistry>();
-        activityRegistry.ListAll().Returns([new ActivityDescriptor { TypeName = TypeName }]);
-        var activityLookup = Substitute.For<IActivityRegistryLookupService>();
-        activityLookup.FindAsync(TypeName).Returns(new ActivityDescriptor { TypeName = TypeName });
-        var expressionRegistry = Substitute.For<IExpressionDescriptorRegistry>();
-        expressionRegistry.ListAll().Returns([]);
-        var storageDrivers = Substitute.For<IStorageDriverManager>();
-        storageDrivers.List().Returns([]);
-        var logPersistence = Substitute.For<ILogPersistenceStrategyService>();
-        logPersistence.ListStrategies().Returns([]);
-        var commitStrategies = Substitute.For<ICommitStrategyRegistry>();
-        commitStrategies.ListWorkflowStrategyRegistrations().Returns([]);
-        commitStrategies.ListActivityStrategyRegistrations().Returns([]);
-        var definitionStore = Substitute.For<IWorkflowDefinitionStore>();
-        definitionStore.FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<WorkflowDefinitionOrder<int>>(), Arg.Any<CancellationToken>()).Returns([new WorkflowDefinition()]);
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        Mock.Get(activityRegistry).ListAll().Returns([new ActivityDescriptor { TypeName = TypeName }]);
+        var activityLookup = Mock.Of<IActivityRegistryLookupService>().Object;
+        Mock.Get(activityLookup).FindAsync(TypeName).Returns(new ActivityDescriptor { TypeName = TypeName });
+        var expressionRegistry = Mock.Of<IExpressionDescriptorRegistry>().Object;
+        Mock.Get(expressionRegistry).ListAll().Returns([]);
+        var storageDrivers = Mock.Of<IStorageDriverManager>().Object;
+        Mock.Get(storageDrivers).List().Returns([]);
+        var logPersistence = Mock.Of<ILogPersistenceStrategyService>().Object;
+        Mock.Get(logPersistence).ListStrategies().Returns([]);
+        var commitStrategies = Mock.Of<ICommitStrategyRegistry>().Object;
+        Mock.Get(commitStrategies).ListWorkflowStrategyRegistrations().Returns([]);
+        Mock.Get(commitStrategies).ListActivityStrategyRegistrations().Returns([]);
+        var definitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+        Mock.Get(definitionStore).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<WorkflowDefinitionOrder<int>>(), Arg.Any<CancellationToken>()).Returns([new WorkflowDefinition()]);
 
         services
             .AddSingleton(activityRegistry)
             .AddSingleton(_registryPopulator)
             .AddSingleton(activityLookup)
-            .AddSingleton(Substitute.For<IPropertyUIHandlerResolver>())
+            .AddSingleton(Mock.Of<IPropertyUIHandlerResolver>().Object)
             .AddSingleton(expressionRegistry)
             .AddSingleton(storageDrivers)
             .AddSingleton(logPersistence)
             .AddSingleton(commitStrategies)
-            .AddSingleton(Substitute.For<IOutputConverterRegistry>())
-            .AddSingleton(Substitute.For<IWellKnownTypeRegistry>())
+            .AddSingleton(Mock.Of<IOutputConverterRegistry>().Object)
+            .AddSingleton(Mock.Of<IWellKnownTypeRegistry>().Object)
             .AddSingleton(SerializationTypeRegistry.CreateDefault())
             .AddSingleton(definitionStore)
             .AddSingleton<IOptions<ManagementOptions>>(new OptionsWrapper<ManagementOptions>(new ManagementOptions()));

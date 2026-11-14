@@ -1,7 +1,6 @@
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 // ReSharper disable MethodHasAsyncOverload
 
@@ -14,9 +13,9 @@ public class WriteLineTests
 
     public WriteLineTests()
     {
-        _mockTextWriter = Substitute.For<TextWriter>();
-        _mockProvider = Substitute.For<IStandardOutStreamProvider>();
-        _mockProvider.GetTextWriter().Returns(_mockTextWriter);
+        _mockTextWriter = Mock.Of<TextWriter>().Object;
+        _mockProvider = Mock.Of<IStandardOutStreamProvider>().Object;
+        Mock.Get(_mockProvider).GetTextWriter().Returns(_mockTextWriter);
     }
     
     [Test]
@@ -31,7 +30,7 @@ public class WriteLineTests
         await ExecuteAsync(writeLine);
 
         // Assert
-        _mockTextWriter.Received(1).WriteLine(expectedText);
+        Mock.Get(_mockTextWriter).WriteLine(expectedText).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -44,7 +43,7 @@ public class WriteLineTests
         await ExecuteAsync(writeLine);
 
         // Assert
-        _mockTextWriter.Received(1).WriteLine(Arg.Is<string?>(s => s == null));
+        Mock.Get(_mockTextWriter).WriteLine(Arg.Is<string?>(s => s == null)).WasCalled(Times.Exactly(1));
     }
 
     [Test]

@@ -5,7 +5,7 @@ using Elsa.KeyValues.Entities;
 using Elsa.KeyValues.Models;
 using Elsa.KeyValues.Stores;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+using TUnit.Mocks;
 using ModuleKeyValueFeature = Elsa.KeyValues.Features.KeyValueFeature;
 using ShellKeyValueFeature = Elsa.KeyValues.ShellFeatures.KeyValueFeature;
 
@@ -14,11 +14,11 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 public class KeyValueFeatureTests
 {
     private readonly IServiceCollection _services = new ServiceCollection();
-    private readonly IModule _module = Substitute.For<IModule>();
+    private readonly IModule _module = Mock.Of<IModule>().Object;
 
     public KeyValueFeatureTests()
     {
-        _module.Services.Returns(_services);
+        Mock.Get(_module).Services.Returns(_services);
     }
 
     [Test]

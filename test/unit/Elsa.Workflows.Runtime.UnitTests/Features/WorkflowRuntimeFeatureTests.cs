@@ -10,7 +10,7 @@ using Elsa.Workflows.Options;
 using Elsa.Workflows.Runtime.ActivationValidators;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Providers;
-using NSubstitute;
+using TUnit.Mocks;
 using RuntimeFeature = Elsa.Workflows.Runtime.Features.WorkflowRuntimeFeature;
 using ShellRuntimeFeature = Elsa.Workflows.Runtime.ShellFeatures.WorkflowRuntimeFeature;
 
@@ -18,7 +18,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Features;
 
 public class WorkflowRuntimeFeatureTests
 {
-    private readonly RuntimeFeature _feature = new(Substitute.For<IModule>());
+    private readonly RuntimeFeature _feature = new(Mock.Of<IModule>().Object);
     private readonly ShellRuntimeFeature _shellFeature = new();
 
     [Test]
@@ -101,14 +101,14 @@ public class WorkflowRuntimeFeatureTests
     public async Task ClrWorkflowsProvider_MaterializesWorkflowOnce_WhenCanonicalAndLegacyKeysExist()
     {
         var createdCount = 0;
-        var builder = Substitute.For<IWorkflowBuilder>();
-        var builderFactory = Substitute.For<IWorkflowBuilderFactory>();
+        var builder = Mock.Of<IWorkflowBuilder>().Object;
+        var builderFactory = Mock.Of<IWorkflowBuilderFactory>().Object;
         var provider = new ClrWorkflowsProvider(
             Microsoft.Extensions.Options.Options.Create(new RuntimeOptions { Workflows = _feature.Workflows }),
             builderFactory,
-            Substitute.For<IServiceProvider>());
-        builderFactory.CreateBuilder().Returns(builder);
-        builder.BuildWorkflowAsync(Arg.Any<CancellationToken>()).Returns(new Workflow());
+            Mock.Of<IServiceProvider>().Object);
+        Mock.Get(builderFactory).CreateBuilder().Returns(builder);
+        Mock.Get(builder).BuildWorkflowAsync(Arg.Any<CancellationToken>()).Returns(new Workflow());
 
         var workflowType = typeof(CountingWorkflow);
         Func<IServiceProvider, ValueTask<IWorkflow>> factory = _ =>

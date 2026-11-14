@@ -5,7 +5,6 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Entities;
 using Elsa.Workflows.Management.Filters;
 using Microsoft.AspNetCore.SignalR;
-using NSubstitute;
 
 namespace Elsa.Workflows.Api.UnitTests.RealTime.Hubs;
 
@@ -27,10 +26,10 @@ public class WorkflowInstanceHubTests
 
     public WorkflowInstanceHubTests()
     {
-        _workflowInstanceStore = Substitute.For<IWorkflowInstanceStore>();
-        _tenantAccessor = Substitute.For<ITenantAccessor>();
-        _groups = Substitute.For<IGroupManager>();
-        _context = Substitute.For<HubCallerContext>();
+        _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+        _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        _groups = Mock.Of<IGroupManager>().Object;
+        _context = Mock.Of<HubCallerContext>().Object;
         _workflowInstance = CreateWorkflowInstance(TenantId);
         _hub = new WorkflowInstanceHub(_workflowInstanceStore, _tenantAccessor)
         {
@@ -38,9 +37,9 @@ public class WorkflowInstanceHubTests
             Groups = _groups
         };
 
-        _tenantAccessor.TenantId.Returns(TenantId);
-        _context.ConnectionId.Returns(ConnectionId);
-        _context.ConnectionAborted.Returns(_connectionAbortedTokenSource.Token);
+        Mock.Get(_tenantAccessor).TenantId.Returns(TenantId);
+        Mock.Get(_context).ConnectionId.Returns(ConnectionId);
+        Mock.Get(_context).ConnectionAborted.Returns(_connectionAbortedTokenSource.Token);
         UseUser(ReadWorkflowInstancesPermission);
         StubWorkflowInstance();
     }
@@ -50,7 +49,7 @@ public class WorkflowInstanceHubTests
     {
         await _hub.ObserveInstanceAsync(WorkflowInstanceId);
 
-        await _groups.Received(1).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token);
+        Mock.Get(_groups).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -62,7 +61,7 @@ public class WorkflowInstanceHubTests
 
         await _hub.ObserveInstanceAsync(WorkflowInstanceId);
 
-        await _groups.Received(1).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token);
+        Mock.Get(_groups).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -74,7 +73,7 @@ public class WorkflowInstanceHubTests
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));
 
-        await _groups.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_groups).AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -84,7 +83,7 @@ public class WorkflowInstanceHubTests
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));
 
-        await _groups.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_groups).AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -94,7 +93,7 @@ public class WorkflowInstanceHubTests
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));
 
-        await _groups.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_groups).AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -104,7 +103,7 @@ public class WorkflowInstanceHubTests
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));
 
-        await _groups.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_groups).AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -114,7 +113,7 @@ public class WorkflowInstanceHubTests
 
         await _hub.ObserveInstanceAsync(WorkflowInstanceId);
 
-        await _groups.Received(1).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token);
+        Mock.Get(_groups).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -128,32 +127,32 @@ public class WorkflowInstanceHubTests
 
         await hub.ObserveInstanceAsync(WorkflowInstanceId);
 
-        await _groups.Received(1).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token);
+        Mock.Get(_groups).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ObserveInstanceAsync_WithNonCanonicalCurrentTenant_NormalizesBeforeComparing()
     {
-        _tenantAccessor.TenantId.Returns(string.Empty);
+        Mock.Get(_tenantAccessor).TenantId.Returns(string.Empty);
         UseWorkflowInstanceTenant(null);
 
         await _hub.ObserveInstanceAsync(WorkflowInstanceId);
 
-        await _groups.Received(1).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token);
+        Mock.Get(_groups).AddToGroupAsync(ConnectionId, WorkflowInstanceId, _connectionAbortedTokenSource.Token).WasCalled(Times.Exactly(1));
     }
 
     private void UseUser(params string[] permissions)
     {
         var claims = permissions.Select(x => new Claim("permissions", x));
         var identity = new ClaimsIdentity(claims, "Test");
-        _context.User.Returns(new ClaimsPrincipal(identity));
+        Mock.Get(_context).User.Returns(new ClaimsPrincipal(identity));
     }
 
     private void UseUserClaim(string claimType, params string[] permissions)
     {
         var claims = permissions.Select(x => new Claim(claimType, x));
         var identity = new ClaimsIdentity(claims, "Test");
-        _context.User.Returns(new ClaimsPrincipal(identity));
+        Mock.Get(_context).User.Returns(new ClaimsPrincipal(identity));
     }
 
     private void UseWorkflowInstanceTenant(string? tenantId)
@@ -169,9 +168,9 @@ public class WorkflowInstanceHubTests
 
     private void StubWorkflowInstance()
     {
-        _workflowInstanceStore
+        Mock.Get(_workflowInstanceStore)
             .FindAsync(Arg.Is<WorkflowInstanceFilter>(x => x.Id == WorkflowInstanceId), Arg.Any<CancellationToken>())
-            .Returns(_ => new ValueTask<WorkflowInstance?>(_workflowInstance));
+            .Returns(() => new ValueTask<WorkflowInstance?>(_workflowInstance));
     }
 
     private static WorkflowInstance CreateWorkflowInstance(string? tenantId)

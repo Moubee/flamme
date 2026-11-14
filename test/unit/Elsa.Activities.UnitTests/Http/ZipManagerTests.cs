@@ -10,7 +10,6 @@ using FluentStorage;
 using FluentStorage.Blobs;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Http;
@@ -64,11 +63,11 @@ public class ZipManagerTests : IDisposable
     [Test]
     public async Task LoadAsync_ValidToken_OpensReturnedBlobFullPathWithinCacheDirectory()
     {
-        var provider = Substitute.For<IFileCacheStorageProvider>();
+        var provider = Mock.Of<IFileCacheStorageProvider>().Object;
         var blobPath = Path.Join(_cacheDirectory, "download.tmp");
         var blobStorage = new BlobStorageStub("download.tmp", blobPath, [1, 2, 3], _now.AddMinutes(5));
         var zipManager = CreateZipManager(provider);
-        provider.GetStorage().Returns(blobStorage);
+        Mock.Get(provider).GetStorage().Returns(blobStorage);
 
         var result = await LoadAsync("download", zipManager);
 
@@ -80,10 +79,10 @@ public class ZipManagerTests : IDisposable
     [Test]
     public async Task LoadAsync_RootedPathOutsideCacheDirectory_ReturnsNull()
     {
-        var provider = Substitute.For<IFileCacheStorageProvider>();
+        var provider = Mock.Of<IFileCacheStorageProvider>().Object;
         var blobStorage = new BlobStorageStub("download.tmp", Path.Join(Path.GetTempPath(), "download.tmp"), [1, 2, 3], _now.AddMinutes(5));
         var zipManager = CreateZipManager(provider);
-        provider.GetStorage().Returns(blobStorage);
+        Mock.Get(provider).GetStorage().Returns(blobStorage);
 
         var result = await LoadAsync("download", zipManager);
 
@@ -143,8 +142,8 @@ public class ZipManagerTests : IDisposable
     [UnconditionalSuppressMessage("Trimming", "IL2077:Target type is resolved by name for an internal test subject.")]
     private object CreateZipManager(IFileCacheStorageProvider? fileCacheStorageProvider = null)
     {
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(_now);
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(_now);
         fileCacheStorageProvider ??= new BlobFileCacheStorageProvider(_blobStorage);
         var options = Microsoft.Extensions.Options.Options.Create(new HttpFileCacheOptions
         {

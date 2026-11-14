@@ -3,7 +3,6 @@ using Elsa.ExternalAuthentication.OpenIdConnect.Features;
 using Elsa.ExternalAuthentication.OpenIdConnect.Services;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using OpenIdConnectExternalAuthenticationShellFeature = Elsa.ExternalAuthentication.OpenIdConnect.ShellFeatures.OpenIdConnectExternalAuthenticationFeature;
 using System.Threading.Tasks;
 
@@ -15,8 +14,8 @@ public class OpenIdConnectExternalAuthenticationFeatureTests
     public async Task ClassicFeatureRegistersTheOpenIdConnectAdapter()
     {
         var services = new ServiceCollection();
-        var module = Substitute.For<IModule>();
-        module.Services.Returns(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
         var feature = new OpenIdConnectExternalAuthenticationFeature(module);
 
         feature.Apply();

@@ -5,7 +5,7 @@ using Elsa.Workflows.Runtime.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
@@ -15,27 +15,27 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 /// </summary>
 public abstract class DrainOrchestratorTestsBase
 {
-    protected readonly ISystemClock Clock = Substitute.For<ISystemClock>();
-    protected readonly IQuiescenceSignal Signal = Substitute.For<IQuiescenceSignal>();
-    protected readonly IIngressSourceRegistry Registry = Substitute.For<IIngressSourceRegistry>();
-    protected readonly IExecutionCycleRegistry ExecutionCycleRegistry = Substitute.For<IExecutionCycleRegistry>();
-    protected readonly IWorkflowInstanceStore InstanceStore = Substitute.For<IWorkflowInstanceStore>();
-    protected readonly IWorkflowExecutionLogStore LogStore = Substitute.For<IWorkflowExecutionLogStore>();
+    protected readonly ISystemClock Clock = Mock.Of<ISystemClock>().Object;
+    protected readonly IQuiescenceSignal Signal = Mock.Of<IQuiescenceSignal>().Object;
+    protected readonly IIngressSourceRegistry Registry = Mock.Of<IIngressSourceRegistry>().Object;
+    protected readonly IExecutionCycleRegistry ExecutionCycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
+    protected readonly IWorkflowInstanceStore InstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+    protected readonly IWorkflowExecutionLogStore LogStore = Mock.Of<IWorkflowExecutionLogStore>().Object;
     protected readonly GracefulShutdownOptions Options = new();
     protected readonly HostOptions HostOptionsValue = new() { ShutdownTimeout = TimeSpan.FromSeconds(60) };
     private DateTimeOffset _now = DateTimeOffset.Parse("2026-04-25T10:00:00Z");
 
     protected DrainOrchestratorTestsBase()
     {
-        Clock.UtcNow.Returns(_ => _now);
-        Signal.CurrentState.Returns(QuiescenceState.Initial("gen-1"));
-        Signal.BeginDrainAsync(Arg.Any<CancellationToken>()).Returns(_ => new ValueTask<QuiescenceState>(QuiescenceState.Initial("gen-1")));
-        Registry.Sources.Returns(Array.Empty<IIngressSource>());
-        Registry.Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
-        ExecutionCycleRegistry.ActiveCount.Returns(0);
-        ExecutionCycleRegistry.ListActiveCycles().Returns(Array.Empty<ExecutionCycleHandle>());
-        InstanceStore.TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>())
-            .Returns(new ValueTask<bool>(true));
+        Mock.Get(Clock).UtcNow.Returns(() => _now);
+        Mock.Get(Signal).CurrentState.Returns(QuiescenceState.Initial("gen-1"));
+        Mock.Get(Signal).BeginDrainAsync(Arg.Any<CancellationToken>()).Returns(() => new ValueTask<QuiescenceState>(QuiescenceState.Initial("gen-1")));
+        Mock.Get(Registry).Sources.Returns(Array.Empty<IIngressSource>());
+        Mock.Get(Registry).Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
+        Mock.Get(ExecutionCycleRegistry).ActiveCount.Returns(0);
+        Mock.Get(ExecutionCycleRegistry).ListActiveCycles().Returns(Array.Empty<ExecutionCycleHandle>());
+        Mock.Get(InstanceStore).TryMarkInterruptedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>())
+                    .Returns(true);
     }
 
     protected void AdvanceTime(TimeSpan span) => _now += span;
@@ -44,16 +44,16 @@ public abstract class DrainOrchestratorTestsBase
 
     protected DrainOrchestrator BuildSut()
     {
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
-        var scope = Substitute.For<IServiceScope>();
-        var sp = Substitute.For<IServiceProvider>();
-        sp.GetService(typeof(IWorkflowInstanceStore)).Returns(InstanceStore);
-        sp.GetService(typeof(IWorkflowExecutionLogStore)).Returns(LogStore);
-        scope.ServiceProvider.Returns(sp);
-        scopeFactory.CreateScope().Returns(scope);
+        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
+        var scope = Mock.Of<IServiceScope>().Object;
+        var sp = Mock.Of<IServiceProvider>().Object;
+        Mock.Get(sp).GetService(typeof(IWorkflowInstanceStore)).Returns(InstanceStore);
+        Mock.Get(sp).GetService(typeof(IWorkflowExecutionLogStore)).Returns(LogStore);
+        Mock.Get(scope).ServiceProvider.Returns(sp);
+        Mock.Get(scopeFactory).CreateScope().Returns(scope);
 
-        var identityGenerator = Substitute.For<IIdentityGenerator>();
-        identityGenerator.GenerateId().Returns(_ => Guid.NewGuid().ToString("N"));
+        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        Mock.Get(identityGenerator).GenerateId().Returns(() => Guid.NewGuid().ToString("N"));
 
         return new DrainOrchestrator(
             Signal,
@@ -64,19 +64,19 @@ public abstract class DrainOrchestratorTestsBase
             Microsoft.Extensions.Options.Options.Create(HostOptionsValue),
             Clock,
             identityGenerator,
-            Substitute.For<ILogger<DrainOrchestrator>>());
+            Mock.Of<ILogger<DrainOrchestrator>>().Object);
     }
 
     protected static IIngressSource CreateSource(string name, TimeSpan? pauseTimeout = null, Func<CancellationToken, ValueTask>? pauseImpl = null)
     {
-        var source = Substitute.For<IIngressSource>();
-        source.Name.Returns(name);
-        source.PauseTimeout.Returns(pauseTimeout ?? TimeSpan.FromSeconds(5));
-        source.CurrentState.Returns(IngressSourceState.Running);
+        var source = Mock.Of<IIngressSource>().Object;
+        Mock.Get(source).Name.Returns(name);
+        Mock.Get(source).PauseTimeout.Returns(pauseTimeout ?? TimeSpan.FromSeconds(5));
+        Mock.Get(source).CurrentState.Returns(IngressSourceState.Running);
         if (pauseImpl is not null)
-            source.PauseAsync(Arg.Any<CancellationToken>()).Returns(ci => pauseImpl(ci.Arg<CancellationToken>()));
+            Mock.Get(source).PauseAsync(Arg.Any<CancellationToken>()).Returns((global::System.Threading.CancellationToken __arg0) => pauseImpl(__arg0));
         else
-            source.PauseAsync(Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+            Mock.Get(source).PauseAsync(Arg.Any<CancellationToken>()).Returns(() => ValueTask.CompletedTask);
         return source;
     }
 }

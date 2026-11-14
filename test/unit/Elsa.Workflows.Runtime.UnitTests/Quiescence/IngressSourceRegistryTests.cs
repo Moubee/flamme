@@ -1,6 +1,6 @@
 using Elsa.Common;
 using Elsa.Workflows.Runtime.Services;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
@@ -10,8 +10,8 @@ public class IngressSourceRegistryTests
 
     public IngressSourceRegistryTests()
     {
-        _clock = Substitute.For<ISystemClock>();
-        _clock.UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
     }
 
     [Test]
@@ -111,10 +111,10 @@ public class IngressSourceRegistryTests
 
     private static IIngressSource CreateSource(string name)
     {
-        var source = Substitute.For<IIngressSource>();
-        source.Name.Returns(name);
-        source.PauseTimeout.Returns(TimeSpan.FromSeconds(5));
-        source.CurrentState.Returns(IngressSourceState.Running);
+        var source = Mock.Of<IIngressSource>().Object;
+        Mock.Get(source).Name.Returns(name);
+        Mock.Get(source).PauseTimeout.Returns(TimeSpan.FromSeconds(5));
+        Mock.Get(source).CurrentState.Returns(IngressSourceState.Running);
         return source;
     }
 }

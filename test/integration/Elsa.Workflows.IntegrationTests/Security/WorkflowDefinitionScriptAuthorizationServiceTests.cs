@@ -7,7 +7,6 @@ using Elsa.Workflows.Management.Services;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.PortResolvers;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Workflows.IntegrationTests.Security;
 
@@ -166,19 +165,19 @@ public class WorkflowDefinitionScriptAuthorizationServiceTests
                 Type = "CSharp",
                 DisplayName = "C#",
                 IsBrowsable = hostAllowsCSharp,
-                HandlerFactory = _ => Substitute.For<IExpressionHandler>()
+                HandlerFactory = _ => Mock.Of<IExpressionHandler>().Object
             },
             new ExpressionDescriptor
             {
                 Type = "Python",
                 DisplayName = "Python",
                 IsBrowsable = hostAllowsPython,
-                HandlerFactory = _ => Substitute.For<IExpressionHandler>()
+                HandlerFactory = _ => Mock.Of<IExpressionHandler>().Object
             }
         };
 
-        var provider = Substitute.For<IExpressionDescriptorProvider>();
-        provider.GetDescriptors().Returns(expressionDescriptors);
+        var provider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        Mock.Get(provider).GetDescriptors().Returns(expressionDescriptors);
 
         var registry = new ExpressionDescriptorRegistry([provider]);
         var services = new ServiceCollection().BuildServiceProvider();

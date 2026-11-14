@@ -4,7 +4,6 @@ using CShells.Lifecycle;
 using Elsa.Workflows;
 using FastEndpoints;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using TUnit.AspNetCore;
 
 namespace Elsa.Shells.Api.Tests;
@@ -15,13 +14,13 @@ public abstract class ShellsApiTestBase : WebApplicationTest<ShellsApiWebApplica
 
     protected ShellsApiTestBase()
     {
-        ShellRegistry.ReloadActiveAsync(Arg.Any<ReloadOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult<IReadOnlyList<ReloadResult>>(Array.Empty<ReloadResult>()));
-        ShellRegistry.ReloadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(callInfo => Task.FromResult(new ReloadResult(callInfo.Arg<string>(), null, null, null)));
+        Mock.Get(ShellRegistry).ReloadActiveAsync(Arg.Any<ReloadOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(() => Task.FromResult<IReadOnlyList<ReloadResult>>(Array.Empty<ReloadResult>()));
+        Mock.Get(ShellRegistry).ReloadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((string shellId, CancellationToken _) => new ReloadResult(shellId, null, null, null));
     }
 
-    protected IShellRegistry ShellRegistry { get; } = Substitute.For<IShellRegistry>();
+    protected IShellRegistry ShellRegistry { get; } = Mock.Of<IShellRegistry>().Object;
 
     protected HttpClient HttpClient => _httpClient ??= Factory.CreateClient();
 
@@ -32,8 +31,8 @@ public abstract class ShellsApiTestBase : WebApplicationTest<ShellsApiWebApplica
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        var apiSerializer = Substitute.For<IApiSerializer>();
-        apiSerializer.GetOptions().Returns(JsonOptions);
+        var apiSerializer = Mock.Of<IApiSerializer>().Object;
+        Mock.Get(apiSerializer).GetOptions().Returns(JsonOptions);
 
         services.AddSingleton(ShellRegistry);
         services.AddSingleton(apiSerializer);

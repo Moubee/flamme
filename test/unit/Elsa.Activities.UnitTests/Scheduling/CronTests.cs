@@ -4,7 +4,6 @@ using Elsa.Scheduling.Bookmarks;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Scheduling;
@@ -97,8 +96,8 @@ public class CronTests
 
     private static ICronParser CreateCronParser(DateTimeOffset returnValue)
     {
-        var parser = Substitute.For<ICronParser>();
-        parser.GetNextOccurrence(Arg.Any<string>()).Returns(returnValue);
+        var parser = Mock.Of<ICronParser>().Object;
+        Mock.Get(parser).GetNextOccurrence(Arg.Any<string>()).Returns(returnValue);
         return parser;
     }
 

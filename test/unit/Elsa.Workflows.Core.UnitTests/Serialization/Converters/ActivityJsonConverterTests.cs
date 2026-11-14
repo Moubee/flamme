@@ -10,7 +10,7 @@ using Elsa.Workflows.Serialization.Configurators;
 using Elsa.Workflows.Serialization.Converters;
 using Elsa.Workflows.Serialization.Helpers;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
@@ -49,10 +49,9 @@ public sealed class ActivityJsonConverterTests
     public async Task When_DeserializeUnknownActivity_Then_ReturnsNotFoundActivity()
     {
         // Arrange
-        var activityRegistry = Substitute.For<IActivityRegistry>();
-        activityRegistry
-            .Find(NotFoundActivityTypeName)
-            .Returns(new ActivityDescriptor());
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        Mock.Get(activityRegistry).Find(NotFoundActivityTypeName)
+                    .Returns(new ActivityDescriptor());
 
         var sut = CreateSut(activityRegistry);
 
@@ -127,12 +126,12 @@ public sealed class ActivityJsonConverterTests
     static IActivityRegistry CreateActivityRegistry(string typeName, IActivity activity, int? version = null)
     {
         var descriptor = new ActivityDescriptor { Constructor = _ => new(activity) };
-        var activityRegistry = Substitute.For<IActivityRegistry>();
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
 
         if (version.HasValue)
-            activityRegistry.Find(typeName, version.Value).Returns(descriptor);
+            Mock.Get(activityRegistry).Find(typeName, version.Value).Returns(descriptor);
         else
-            activityRegistry.Find(typeName).Returns(descriptor);
+            Mock.Get(activityRegistry).Find(typeName).Returns(descriptor);
 
         return activityRegistry;
     }
@@ -145,15 +144,13 @@ public sealed class ActivityJsonConverterTests
             CustomProperties = { [customPropertyName] = customPropertyValue }
         };
 
-        var activityRegistry = Substitute.For<IActivityRegistry>();
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
 
         // Mock type name lookups to return null, ensuring the custom property lookup path is tested
-        activityRegistry.Find(Arg.Any<string>()).Returns((ActivityDescriptor?)null);
-        activityRegistry.Find(Arg.Any<string>(), Arg.Any<int>()).Returns((ActivityDescriptor?)null);
-
-        activityRegistry
-            .Find(Arg.Any<Func<ActivityDescriptor, bool>>())
-            .Returns(callInfo => callInfo.Arg<Func<ActivityDescriptor, bool>>()(descriptor) ? descriptor : null);
+        Mock.Get(activityRegistry).Find(Arg.Any<string>()).Returns((ActivityDescriptor?)null);
+        Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns((ActivityDescriptor?)null);
+        Mock.Get(activityRegistry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
+                    .Returns((global::System.Func<global::Elsa.Workflows.Models.ActivityDescriptor, bool> __arg0) => __arg0(descriptor) ? descriptor : null);
 
         return activityRegistry;
     }
@@ -335,9 +332,9 @@ public sealed class ActivityJsonConverterTests
     private static ActivityJsonConverter CreateSut(IActivityRegistry activityRegistry)
     {
         var expressionDescriptorRegistry = new ExpressionDescriptorRegistry([]);
-        var serviceProvider = Substitute.For<IServiceProvider>();
-        serviceProvider
-            .GetService(typeof(ILogger<ActivityJsonConverter>))!
+        var serviceProvider = Mock.Of<IServiceProvider>().Object;
+        Mock.Get(serviceProvider)
+            .GetService(typeof(ILogger<ActivityJsonConverter>))
             .Returns(CreateLogger<ActivityJsonConverter>());
 
         return new(

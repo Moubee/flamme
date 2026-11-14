@@ -8,7 +8,6 @@ using Elsa.Mediator.Contracts;
 using Elsa.Workflows.Memory;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Expressions.UnitTests.CSharp;
 
@@ -72,16 +71,15 @@ public class GenerateWorkflowVariableAccessorsTests
         var options = Microsoft.Extensions.Options.Options.Create(csharpOptions);
         var accessors = new GenerateWorkflowVariableAccessors(options);
         var assemblies = new AddAssembliesAndReferencesFromOptions(options);
-        var notificationSender = Substitute.For<INotificationSender>();
+        var notificationSender = Mock.Of<INotificationSender>().Object;
 
-        notificationSender
+        Mock.Get(notificationSender)
             .SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
-            .Returns(async callInfo =>
+            .Returns(async (INotification notification, CancellationToken cancellationToken) =>
             {
-                if (callInfo.Arg<INotification>() is not EvaluatingCSharp evaluating)
+                if (notification is not EvaluatingCSharp evaluating)
                     return;
 
-                var cancellationToken = callInfo.Arg<CancellationToken>();
                 await assemblies.HandleAsync(evaluating, cancellationToken);
                 await accessors.HandleAsync(evaluating, cancellationToken);
             });

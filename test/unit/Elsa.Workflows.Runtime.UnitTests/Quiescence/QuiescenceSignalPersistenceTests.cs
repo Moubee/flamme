@@ -7,7 +7,7 @@ using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
@@ -19,9 +19,9 @@ public class QuiescenceSignalPersistenceTests
 
     public QuiescenceSignalPersistenceTests()
     {
-        _clock = Substitute.For<ISystemClock>();
-        _clock.UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-        _cycleRegistry = Substitute.For<IExecutionCycleRegistry>();
+        _clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
         _kv = new FakeKeyValueStore();
     }
 

@@ -6,22 +6,21 @@ using Elsa.Resilience.Models;
 using Elsa.Resilience.Options;
 using Elsa.Resilience.Serialization;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Resilience.Core.UnitTests;
 
 public class ResilientActivityInvokerTests
 {
-    private readonly IResilienceStrategyConfigEvaluator _evaluator = Substitute.For<IResilienceStrategyConfigEvaluator>();
-    private readonly IRetryAttemptRecorder _recorder = Substitute.For<IRetryAttemptRecorder>();
-    private readonly IIdentityGenerator _identityGenerator = Substitute.For<IIdentityGenerator>();
+    private readonly IResilienceStrategyConfigEvaluator _evaluator = Mock.Of<IResilienceStrategyConfigEvaluator>().Object;
+    private readonly IRetryAttemptRecorder _recorder = Mock.Of<IRetryAttemptRecorder>().Object;
+    private readonly IIdentityGenerator _identityGenerator = Mock.Of<IIdentityGenerator>().Object;
     private readonly TestResilientActivity _activity = new();
     private readonly ResilientActivityInvoker _invoker;
 
     public ResilientActivityInvokerTests()
     {
-        _identityGenerator.GenerateId().Returns(_ => Guid.NewGuid().ToString("N"));
+        Mock.Get(_identityGenerator).GenerateId().Returns(() => Guid.NewGuid().ToString("N"));
 
         var options = Microsoft.Extensions.Options.Options.Create(new ResilienceOptions
         {
@@ -61,7 +60,7 @@ public class ResilientActivityInvokerTests
 
         await Assert.That(context.GetProperty<object>("ResilienceStrategy")).IsNull();
         await Assert.That(context.GetRetriesAttemptedFlag()).IsFalse();
-        await _recorder.DidNotReceive().RecordAsync(Arg.Any<RecordRetryAttemptsContext>());
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>()).WasNeverCalled();
     }
 
     [Test]
@@ -77,10 +76,10 @@ public class ResilientActivityInvokerTests
 
         await _invoker.InvokeAsync(_activity, context, () => Task.FromResult("done"));
 
-        await _evaluator.Received(1).EvaluateAsync(
-            Arg.Is<ResilienceStrategyConfig>(c => c.Mode == ResilienceStrategyConfigMode.Identifier && c.StrategyId == "my-strategy"),
+        Mock.Get(_evaluator).EvaluateAsync(
+            Arg.Is<ResilienceStrategyConfig?>(c => c != null && c.Mode == ResilienceStrategyConfigMode.Identifier && c.StrategyId == "my-strategy"),
             context.ExpressionExecutionContext,
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -91,7 +90,7 @@ public class ResilientActivityInvokerTests
 
         await _invoker.InvokeAsync(_activity, context, () => Task.FromResult("done"));
 
-        await _evaluator.Received(1).EvaluateAsync(null, context.ExpressionExecutionContext, Arg.Any<CancellationToken>());
+        Mock.Get(_evaluator).EvaluateAsync(null, context.ExpressionExecutionContext, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -119,7 +118,7 @@ public class ResilientActivityInvokerTests
         var result = await _invoker.InvokeAsync(_activity, context, () => Task.FromResult("done"));
 
         await Assert.That(result).IsEqualTo("done");
-        await _recorder.DidNotReceive().RecordAsync(Arg.Any<RecordRetryAttemptsContext>());
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>()).WasNeverCalled();
         await Assert.That(context.GetRetriesAttemptedFlag()).IsFalse();
     }
 
@@ -150,7 +149,8 @@ public class ResilientActivityInvokerTests
         SetupStrategy(new TestRetryStrategy { MaxRetryAttempts = 3 });
         var invocations = 0;
         RecordRetryAttemptsContext? recordContext = null;
-        await _recorder.RecordAsync(Arg.Do<RecordRetryAttemptsContext>(c => recordContext = c));
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>())
+            .Callback((RecordRetryAttemptsContext context) => recordContext = context);
 
         await _invoker.InvokeAsync(_activity, context, () =>
         {
@@ -172,9 +172,10 @@ public class ResilientActivityInvokerTests
     {
         var context = await CreateContextAsync();
         SetupStrategy(new TestRetryStrategy());
-        _identityGenerator.GenerateId().Returns("generated-id");
+        Mock.Get(_identityGenerator).GenerateId().Returns("generated-id");
         RecordRetryAttemptsContext? recordContext = null;
-        await _recorder.RecordAsync(Arg.Do<RecordRetryAttemptsContext>(c => recordContext = c));
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>())
+            .Callback((RecordRetryAttemptsContext context) => recordContext = context);
 
         await _invoker.InvokeAsync(_activity, context, FailOnceThenSucceed());
 
@@ -192,7 +193,8 @@ public class ResilientActivityInvokerTests
         var context = await CreateContextAsync();
         SetupStrategy(new TestRetryStrategy());
         RecordRetryAttemptsContext? recordContext = null;
-        await _recorder.RecordAsync(Arg.Do<RecordRetryAttemptsContext>(c => recordContext = c));
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>())
+            .Callback((RecordRetryAttemptsContext context) => recordContext = context);
 
         await _invoker.InvokeAsync(_activity, context, FailOnceThenSucceed());
 
@@ -230,7 +232,7 @@ public class ResilientActivityInvokerTests
         }));
 
         await Assert.That(invocations).IsEqualTo(3);
-        await _recorder.DidNotReceive().RecordAsync(Arg.Any<RecordRetryAttemptsContext>());
+        Mock.Get(_recorder).RecordAsync(Arg.Any<RecordRetryAttemptsContext>()).WasNeverCalled();
     }
 
     [Test]
@@ -264,7 +266,7 @@ public class ResilientActivityInvokerTests
 
     private void SetupStrategy(IResilienceStrategy? strategy)
     {
-        _evaluator.EvaluateAsync(Arg.Any<ResilienceStrategyConfig?>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<CancellationToken>()).Returns(strategy);
+        Mock.Get(_evaluator).EvaluateAsync(Arg.Any<ResilienceStrategyConfig?>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<CancellationToken>()).Returns(strategy);
     }
 
     private Task<ActivityExecutionContext> CreateContextAsync() => ContextFactory.CreateAsync(_activity);

@@ -9,7 +9,6 @@ using Elsa.Identity.Models;
 using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
@@ -26,7 +25,7 @@ public class InMemoryExternalIdentityProvisionerTests
         var provisioner = new InMemoryExternalIdentityProvisioner(
             users,
             provider,
-            Substitute.For<IRoleProvider>(),
+            Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
             new TestSystemClock(DateTimeOffset.UtcNow),
             hasher,
@@ -79,7 +78,7 @@ public class InMemoryExternalIdentityProvisionerTests
         InMemoryExternalIdentityProvisionerState state) => new(
         users,
         provider,
-        Substitute.For<IRoleProvider>(),
+        Mock.Of<IRoleProvider>().Object,
         new GuidIdentityGenerator(),
         new TestSystemClock(DateTimeOffset.UtcNow),
         hasher,

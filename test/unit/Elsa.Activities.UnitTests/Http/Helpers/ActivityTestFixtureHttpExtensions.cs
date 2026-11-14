@@ -7,7 +7,6 @@ using Elsa.Resilience;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Activities.UnitTests.Http.Helpers;
 
@@ -109,19 +108,15 @@ public static class ActivityTestFixtureHttpExtensions
     /// </summary>
     private static IResilientActivityInvoker CreateMockResilientActivityInvoker()
     {
-        var mock = Substitute.For<IResilientActivityInvoker>();
+        var mock = Mock.Of<IResilientActivityInvoker>().Object;
 
         // Configure the mock to simply execute the provided action directly
-        mock.InvokeAsync(
+        Mock.Get(mock).InvokeAsync(
                 Arg.Any<IResilientActivity>(),
                 Arg.Any<ActivityExecutionContext>(),
                 Arg.Any<Func<Task<HttpResponseMessage>>>(),
                 Arg.Any<CancellationToken>())
-            .Returns(callInfo =>
-            {
-                var action = callInfo.ArgAt<Func<Task<HttpResponseMessage>>>(2);
-                return action.Invoke();
-            });
+            .Returns((IResilientActivity activity, ActivityExecutionContext context, Func<Task<HttpResponseMessage>> action, CancellationToken cancellationToken) => action());
 
         return mock;
     }
@@ -132,10 +127,10 @@ public static class ActivityTestFixtureHttpExtensions
     private static IHttpClientFactory CreateMockHttpClientFactory(
         Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> responseHandler)
     {
-        var mockHttpClientFactory = Substitute.For<IHttpClientFactory>();
+        var mockHttpClientFactory = Mock.Of<IHttpClientFactory>().Object;
         var testHandler = new TestHttpMessageHandler(responseHandler);
         var httpClient = new HttpClient(testHandler);
-        mockHttpClientFactory.CreateClient(Arg.Any<string>()).Returns(httpClient);
+        Mock.Get(mockHttpClientFactory).CreateClient(Arg.Any<string>()).Returns(httpClient);
         return mockHttpClientFactory;
     }
 }

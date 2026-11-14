@@ -2,7 +2,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Identity.Endpoints.Users.Create;
 using Elsa.UnitTests.Shared;
 using FastEndpoints;
-using NSubstitute;
 
 namespace Elsa.Identity.UnitTests.Endpoints;
 
@@ -20,6 +19,6 @@ public class FastEndpointsResolverTests
         await host.InitializeAsync();
         await host.DisposeAsync();
 
-        await Assert.That(Factory.Create<Create>(Substitute.For<IUserManager>(), Substitute.For<IRoleAuthorizationService>())).IsNotNull();
+        await Assert.That(Factory.Create<Create>(Mock.Of<IUserManager>().Object, Mock.Of<IRoleAuthorizationService>().Object)).IsNotNull();
     }
 }

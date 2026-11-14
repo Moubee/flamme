@@ -5,7 +5,6 @@ using Elsa.Scheduling.ScheduledTasks;
 using Elsa.Scheduling.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
 namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
@@ -31,10 +30,10 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public ScheduledSpecificInstantTaskTests()
     {
         var services = new ServiceCollection();
-        _systemClock = Substitute.For<ISystemClock>();
-        _logger = Substitute.For<ILogger<ScheduledSpecificInstantTask>>();
+        _systemClock = Mock.Of<ISystemClock>().Object;
+        _logger = Mock.Of<ILogger<ScheduledSpecificInstantTask>>().Object;
 
-        services.AddSingleton(Substitute.For<ICommandSender>());
+        services.AddSingleton(Mock.Of<ICommandSender>().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -42,7 +41,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
         DateTimeOffset? startAt = null,
         ISystemClock? systemClock = null)
     {
-        var task = Substitute.For<ITask>();
+        var task = Mock.Of<ITask>().Object;
         var scheduledTask = new ScheduledSpecificInstantTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),
@@ -57,27 +56,27 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
 
     private void SetupSystemClock(params DateTimeOffset[] times)
     {
-        _systemClock.UtcNow.Returns(times[0], times.Skip(1).ToArray());
+        Mock.Get(_systemClock).UtcNow.ReturnsSequentially(times);
     }
 
     private void AssertNoErrorLogged()
     {
-        _logger.DidNotReceive().Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasNeverCalled();
     }
 
     private void AssertDebugLogged(int expectedCount = 1)
     {
-        _logger.Received(expectedCount).Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Debug,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasCalled(Times.Exactly(expectedCount));
     }
 
     [Test]
@@ -121,7 +120,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     }
 
     [Test]
-    public void Schedule_WithMultiplePastDueTasks_ShouldStaggerCatchUp()
+    public async Task Schedule_WithMultiplePastDueTasks_ShouldStaggerCatchUp()
     {
         SetupSystemClock(DefaultNow);
 
@@ -129,24 +128,13 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
 
-        _logger.Received(1).Log(
-            LogLevel.Debug,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(x => x.ToString()!.Contains("00:00:00.0100000")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
-        _logger.Received(1).Log(
-            LogLevel.Debug,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(x => x.ToString()!.Contains("00:00:00.0350000")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
-        _logger.Received(1).Log(
-            LogLevel.Debug,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(x => x.ToString()!.Contains("00:00:00.0600000")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+        var debugMessages = Mock.Get(_logger).Invocations
+            .Where(call => call.MemberName == nameof(ILogger.Log) && call.Arguments[0] is LogLevel.Debug)
+            .Select(call => call.Arguments[2]?.ToString())
+            .ToArray();
+        await Assert.That(debugMessages).HasSingleItem(message => message?.Contains("00:00:00.0100000") == true);
+        await Assert.That(debugMessages).HasSingleItem(message => message?.Contains("00:00:00.0350000") == true);
+        await Assert.That(debugMessages).HasSingleItem(message => message?.Contains("00:00:00.0600000") == true);
     }
 
     [Test]

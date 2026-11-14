@@ -5,7 +5,6 @@ using Elsa.Workflows.Activities.StateMachine.Models;
 using Elsa.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NSubstitute;
 using StateMachineActivity = Elsa.Workflows.Activities.StateMachine.Activities.StateMachine;
 using System.Threading.Tasks;
 
@@ -665,8 +664,8 @@ public class StateMachineTests
         {
             services.RemoveAll<IActivityExecutionContextSchedulerStrategy>();
             services.AddSingleton<IActivityExecutionContextSchedulerStrategy, ActivityExecutionContextSchedulerStrategy>();
-            services.AddSingleton<IMediator>(_ => Substitute.For<IMediator>());
-            services.AddSingleton<IVariablePersistenceManager>(_ => Substitute.For<IVariablePersistenceManager>());
+            services.AddSingleton<IMediator>(_ => Mock.Of<IMediator>().Object);
+            services.AddSingleton<IVariablePersistenceManager>(_ => Mock.Of<IVariablePersistenceManager>().Object);
         });
 
     private Task<ActivityExecutionContext> ExecuteAsync(StateMachineActivity? stateMachine = null) => CreateFixture(stateMachine ?? _stateMachine).ExecuteAsync();

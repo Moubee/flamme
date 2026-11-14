@@ -3,22 +3,21 @@ using Elsa.Identity.Entities;
 using Elsa.Identity.Services;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Services;
 
 public class UserManagerTests
 {
-    private readonly ISecretGenerator _secretGenerator = Substitute.For<ISecretGenerator>();
-    private readonly IUserStore _userStore = Substitute.For<IUserStore>();
+    private readonly ISecretGenerator _secretGenerator = Mock.Of<ISecretGenerator>().Object;
+    private readonly IUserStore _userStore = Mock.Of<IUserStore>().Object;
     private readonly UserManager _manager;
 
     public UserManagerTests()
     {
-        var identityGenerator = Substitute.For<IIdentityGenerator>();
-        identityGenerator.GenerateId().Returns("user-1");
-        _secretGenerator.Generate(Arg.Any<int>()).Returns("generated-secret");
+        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        Mock.Get(identityGenerator).GenerateId().Returns("user-1");
+        Mock.Get(_secretGenerator).Generate(Arg.Any<int>()).Returns("generated-secret");
         _manager = new(identityGenerator, _secretGenerator, new DefaultSecretHasher(), _userStore, new TestTenantAccessor("tenant-a"));
     }
 
@@ -29,7 +28,7 @@ public class UserManagerTests
 
         await Assert.That(result.IsPasswordGenerated).IsFalse();
         await Assert.That(result.Password).IsEqualTo("supplied-secret");
-        _secretGenerator.DidNotReceive().Generate(Arg.Any<int>());
+        Mock.Get(_secretGenerator).Generate(Arg.Any<int>()).WasNeverCalled();
         await AssertStoredCredentials(result.User);
     }
 

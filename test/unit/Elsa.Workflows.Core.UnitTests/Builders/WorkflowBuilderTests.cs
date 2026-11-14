@@ -1,6 +1,6 @@
 using Elsa.Workflows.Builders;
 using Elsa.Workflows.Memory;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Core.UnitTests.Builders;
 
@@ -56,7 +56,7 @@ public class WorkflowBuilderTests
 
     private static WorkflowBuilder CreateBuilder() =>
         new(
-            Substitute.For<IActivityVisitor>(),
-            Substitute.For<IIdentityGraphService>(),
-            Substitute.For<IActivityRegistry>());
+            Mock.Of<IActivityVisitor>().Object,
+            Mock.Of<IIdentityGraphService>().Object,
+            Mock.Of<IActivityRegistry>().Object);
 }

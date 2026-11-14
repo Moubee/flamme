@@ -7,7 +7,6 @@ using Elsa.Identity.Models;
 using Elsa.Identity.Options;
 using Elsa.Identity.Services;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.HostedServices;
@@ -61,10 +60,10 @@ public class AdminUserInitializerTests
             AdminRolePermissions = permissions
         });
         return new(
-            Substitute.For<IUserStore>(),
+            Mock.Of<IUserStore>().Object,
             roleStore,
-            Substitute.For<IUserManager>(),
-            Substitute.For<IRoleManager>(),
+            Mock.Of<IUserManager>().Object,
+            Mock.Of<IRoleManager>().Object,
             options,
             NullLogger<AdminUserInitializer>.Instance);
     }

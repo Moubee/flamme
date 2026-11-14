@@ -10,7 +10,6 @@ using Elsa.Workflows.Runtime.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Http.UnitTests.Middleware;
 
@@ -109,7 +108,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     public async Task InvokeAsync_WithMultiplePrefixSegmentsBeforeBasePath_SkipsRouteMatchingAndCallsNext()
     {
         var nextCalled = false;
-        var routeMatcher = Substitute.For<IRouteMatcher>();
+        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {
             nextCalled = true;
@@ -132,14 +131,14 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             new EmptyHttpWorkflowLookupService());
 
         await Assert.That(nextCalled).IsTrue();
-        routeMatcher.DidNotReceive().Match(Arg.Any<string>(), Arg.Any<string>());
+        Mock.Get(routeMatcher).Match(Arg.Any<string>(), Arg.Any<string>()).WasNeverCalled();
     }
 
     [Test]
     public async Task InvokeAsync_WithNonTenantPrefixedBasePathSegment_CallsNext()
     {
         var nextCalled = false;
-        var routeMatcher = Substitute.For<IRouteMatcher>();
+        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {
             nextCalled = true;
@@ -162,14 +161,14 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             new EmptyHttpWorkflowLookupService());
 
         await Assert.That(nextCalled).IsTrue();
-        routeMatcher.DidNotReceive().Match(Arg.Any<string>(), Arg.Any<string>());
+        Mock.Get(routeMatcher).Match(Arg.Any<string>(), Arg.Any<string>()).WasNeverCalled();
     }
 
     [Test]
     public async Task InvokeAsync_WithConfiguredBasePathAndMatchingPath_StillResolvesRoute()
     {
-        var routeMatcher = Substitute.For<IRouteMatcher>();
-        routeMatcher.Match("/workflows/colliding", "/workflows/colliding").Returns(new RouteValueDictionary());
+        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
+        Mock.Get(routeMatcher).Match("/workflows/colliding", "/workflows/colliding").Returns(new RouteValueDictionary());
         var bookmarkStore = new CapturingBookmarkStore(CurrentTenantId, CreateCollidingHttpEndpointBookmarks());
         await using var serviceProvider = new ServiceCollection()
             .AddSingleton<IBookmarkStore>(bookmarkStore)
@@ -190,7 +189,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             Microsoft.Extensions.Options.Options.Create(new HttpActivityOptions { BasePath = "/workflows" }),
             new EmptyHttpWorkflowLookupService());
 
-        routeMatcher.Received(1).Match("/workflows/colliding", "/workflows/colliding");
+        Mock.Get(routeMatcher).Match("/workflows/colliding", "/workflows/colliding").WasCalled(Times.Exactly(1));
         await Assert.That(bookmarkStore.LastFilter).IsNotNull();
     }
 
@@ -198,14 +197,14 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     public async Task InvokeAsync_WithResolvedTenantPath_StillResolvesRoute()
     {
         var nextCalled = false;
-        var routeMatcher = Substitute.For<IRouteMatcher>();
+        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
         var stimulusHasher = new CapturingStimulusHasher();
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
         });
-        routeMatcher.Match("/workflows/colliding", "/workflows/colliding").Returns(new RouteValueDictionary());
+        Mock.Get(routeMatcher).Match("/workflows/colliding", "/workflows/colliding").Returns(new RouteValueDictionary());
         var bookmarkStore = new CapturingBookmarkStore(CurrentTenantId, CreateCollidingHttpEndpointBookmarks());
         await using var serviceProvider = new ServiceCollection()
             .AddSingleton<IBookmarkStore>(bookmarkStore)
@@ -228,7 +227,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             new EmptyHttpWorkflowLookupService());
 
         await Assert.That(nextCalled).IsFalse();
-        routeMatcher.Received(1).Match("/workflows/colliding", "/workflows/colliding");
+        Mock.Get(routeMatcher).Match("/workflows/colliding", "/workflows/colliding").WasCalled(Times.Exactly(1));
         await Assert.That(stimulusHasher.LastPayload?.Path).IsEqualTo("/colliding");
         await Assert.That(bookmarkStore.LastFilter).IsNotNull();
     }

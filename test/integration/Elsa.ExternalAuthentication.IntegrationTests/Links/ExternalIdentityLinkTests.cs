@@ -17,7 +17,6 @@ using Elsa.Identity.Services;
 using Elsa.Mediator.Contracts;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
@@ -28,9 +27,9 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new();
     private readonly MemoryStore<User> _users = new();
-    private readonly ITenantAccessor _tenant = Substitute.For<ITenantAccessor>();
+    private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
     private readonly TestConnectionRegistry _connections = new();
-    private readonly INotificationSender _notifications = Substitute.For<INotificationSender>();
+    private readonly INotificationSender _notifications = Mock.Of<INotificationSender>().Object;
     private readonly ISystemClock _clock = new SteppingSystemClock(
         new DateTimeOffset(2026, 7, 26, 10, 0, 0, TimeSpan.Zero),
         new DateTimeOffset(2026, 7, 26, 10, 1, 0, TimeSpan.Zero),
@@ -45,7 +44,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         _authentication.SetClaims(
             new Claim(PermissionNames.ClaimType, PermissionNames.All),
             new Claim("sub", "admin"));
-        _tenant.TenantId.Returns("tenant-a");
+        Mock.Get(_tenant).TenantId.Returns("tenant-a");
         _users.SaveMany(
         [
             new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" },
@@ -64,7 +63,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
-        services.AddSingleton<IRoleProvider>(Substitute.For<IRoleProvider>());
+        services.AddSingleton<IRoleProvider>(Mock.Of<IRoleProvider>().Object);
         services.AddScoped<InMemoryExternalIdentityProvisioner>();
         services.AddScoped<IExternalIdentityProvisioner>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());
         services.AddScoped<IExternalIdentityLinkManagementStore>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());
@@ -122,7 +121,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     public async Task TenantIsolationRejectsCrossTenantUsersAndDoesNotRevealTheirLinks()
     {
         await Assert.That((await PrelinkAsync("subject-a")).StatusCode).IsEqualTo(HttpStatusCode.Created);
-        _tenant.TenantId.Returns("tenant-b");
+        Mock.Get(_tenant).TenantId.Returns("tenant-b");
 
         var crossTenantPrelink = await PrelinkAsync("subject-b", "user-a");
         await Assert.That(crossTenantPrelink.StatusCode).IsEqualTo(HttpStatusCode.NotFound);
@@ -150,7 +149,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That(link.LastSignedInAt).IsEqualTo(signedInAt);
         await Assert.That((await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=fabrikam"))!.Items).IsEmpty();
 
-        _tenant.TenantId.Returns("tenant-b");
+        Mock.Get(_tenant).TenantId.Returns("tenant-b");
         await Assert.That((await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=contoso"))!.Items).IsEmpty();
     }
 
@@ -181,7 +180,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That((await PrelinkAsync("host-subject")).StatusCode).IsEqualTo(HttpStatusCode.Created);
 
         _connections.UseHostConnection = false;
-        _tenant.TenantId.Returns("tenant-b");
+        Mock.Get(_tenant).TenantId.Returns("tenant-b");
         await Assert.That((await PrelinkAsync("other-tenant-subject", "user-b")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
     }
 
@@ -248,9 +247,9 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     {
         var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
 
-        _tenant.TenantId.Returns("tenant-b");
+        Mock.Get(_tenant).TenantId.Returns("tenant-b");
         await Assert.That((await ReplaceAsync(old!.Id, "cross-tenant-subject", "user-b")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
-        _tenant.TenantId.Returns("tenant-a");
+        Mock.Get(_tenant).TenantId.Returns("tenant-a");
 
         var responses = await Task.WhenAll(
             ReplaceAsync(old.Id, "winner-a"),
@@ -268,7 +267,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     {
         var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
         var conflicting = await (await PrelinkAsync("subject-conflict", "user-c")).Content.ReadFromJsonAsync<LinkDocument>();
-        _notifications.ClearReceivedCalls();
+        Mock.Get(_notifications).ClearCalls();
 
         var successfulResponse = await ReplaceAsync(old!.Id, "subject-new", "user-c", "fabrikam");
         var replacement = await successfulResponse.Content.ReadFromJsonAsync<LinkDocument>();
@@ -276,8 +275,8 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That((await ReplaceAsync(replacementToConflict!.Id, "subject-conflict", "user-c")).StatusCode).IsEqualTo(HttpStatusCode.Conflict);
         await Assert.That((await ReplaceAsync(replacement!.Id, "subject-invalid", issuer: "http://issuer.example")).StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
 
-        var notifications = _notifications.ReceivedCalls()
-            .Select(x => x.GetArguments()[0])
+        var notifications = Mock.Get(_notifications).Invocations
+            .Select(x => x.Arguments[0])
             .OfType<ExternalIdentityLinkReplaced>()
             .ToArray();
         await Assert.That(notifications.Length).IsEqualTo(2);

@@ -6,7 +6,6 @@ using Elsa.ExternalAuthentication.Options;
 using Elsa.ExternalAuthentication.Services;
 using Elsa.ExternalAuthentication.Stores.InMemory;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Operations;
 
@@ -15,8 +14,8 @@ public class RecoveryAndRevocationTests
     [Test]
     public async Task FinalNormalConnectionRequiresBreakGlassOrConfirmedPrivilegedOverride()
     {
-        var registry = Substitute.For<IIdentityProviderConnectionRegistry>();
-        registry.GetAsync("tenant-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(new EffectiveConnectionRegistry([], [], "1")));
+        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        Mock.Get(registry).GetAsync("tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new EffectiveConnectionRegistry([], [], "1")));
         var options = Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions { LocalLogin = new LocalLoginMethodOptions { IsEnabled = false } });
         var guard = new FinalLoginPathGuard(registry, options, new PermissionEvaluator());
         var existing = Connection(enabled: true);

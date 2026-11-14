@@ -5,8 +5,6 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 
 namespace Elsa.Workflows.IntegrationTests.Evaluation;
 
@@ -64,8 +62,8 @@ public class InputEvaluationErrorTests : EvaluationTestBase
         WriteLine writeLine,
         Exception thrownException)
     {
-        var mockHandler = Substitute.For<IExpressionHandler>();
-        mockHandler.EvaluateAsync(
+        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),
                 Arg.Any<ExpressionExecutionContext>(),
@@ -78,8 +76,8 @@ public class InputEvaluationErrorTests : EvaluationTestBase
             HandlerFactory = _ => mockHandler
         };
 
-        var mockProvider = Substitute.For<IExpressionDescriptorProvider>();
-        mockProvider.GetDescriptors().Returns([mockDescriptor]);
+        var mockProvider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        Mock.Get(mockProvider).GetDescriptors().Returns([mockDescriptor]);
 
         var fixture = new ActivityTestFixture(writeLine)
             .ConfigureServices(services =>

@@ -1,6 +1,6 @@
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Services;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
@@ -167,8 +167,8 @@ public class MaterializerRegistryTests
 
     private static IWorkflowMaterializer CreateMaterializer(string name)
     {
-        var materializer = Substitute.For<IWorkflowMaterializer>();
-        materializer.Name.Returns(name);
+        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        Mock.Get(materializer).Name.Returns(name);
         return materializer;
     }
 

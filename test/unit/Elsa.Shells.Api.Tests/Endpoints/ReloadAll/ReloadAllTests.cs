@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using CShells.Lifecycle;
-using NSubstitute;
 
 namespace Elsa.Shells.Api.Tests.Endpoints.ReloadAll;
 
@@ -22,9 +21,9 @@ public class ReloadAllTests : ShellsApiTestBase
     public async Task Post_WhenAnyShellFails_Returns503WithFailedStatus()
     {
         // CShells 0.0.15 surfaces per-shell failures via ReloadResult.Error rather than throwing.
-        ShellRegistry
+        Mock.Get(ShellRegistry)
             .ReloadActiveAsync(Arg.Any<ReloadOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<IReadOnlyList<ReloadResult>>(new[]
+            .ReturnsAsync(Task.FromResult<IReadOnlyList<ReloadResult>>(new[]
             {
                 new ReloadResult("shell-a", null, null, new InvalidOperationException("Shell reload failed"))
             }));

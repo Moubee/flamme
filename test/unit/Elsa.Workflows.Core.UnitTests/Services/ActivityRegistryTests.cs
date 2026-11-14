@@ -1,7 +1,7 @@
 using Elsa.Common.Multitenancy;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.Services;
@@ -20,13 +20,13 @@ public class ActivityRegistryTests
 
     public ActivityRegistryTests()
     {
-        var tenantAccessor = Substitute.For<ITenantAccessor>();
-        _activityDescriber = Substitute.For<IActivityDescriber>();
-        _logger = Substitute.For<ILogger<ActivityRegistry>>();
+        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        _activityDescriber = Mock.Of<IActivityDescriber>().Object;
+        _logger = Mock.Of<ILogger<ActivityRegistry>>().Object;
         _registry = new(_activityDescriber, [], tenantAccessor, _logger);
 
         // Set default tenant for all tests
-        tenantAccessor.TenantId.Returns(CurrentTenant);
+        Mock.Get(tenantAccessor).TenantId.Returns(CurrentTenant);
     }
 
     [Test]
@@ -202,8 +202,8 @@ public class ActivityRegistryTests
     public async Task GetDescriptorsAsync_ReturnsEmpty_WhenRegistryCleared()
     {
         // Arrange
-        _activityDescriber.DescribeActivityAsync(typeof(ActivityRegistryTests), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(CreateDescriptor(TestActivityType, 1, CurrentTenant)));
+        Mock.Get(_activityDescriber).DescribeActivityAsync(typeof(ActivityRegistryTests), Arg.Any<CancellationToken>())
+                    .Returns(CreateDescriptor(TestActivityType, 1, CurrentTenant));
 
         await _registry.RegisterAsync(typeof(ActivityRegistryTests), CancellationToken.None);
 
@@ -240,7 +240,7 @@ public class ActivityRegistryTests
     public async Task RefreshDescriptorsAsync_CalledTwice_DoesNotLogWarnings()
     {
         // Arrange
-        var mockProvider = Substitute.For<IActivityProvider>();
+        var mockProvider = Mock.Of<IActivityProvider>().Object;
         var descriptor1 = new ActivityDescriptor
         {
             TypeName = "TestActivity1",
@@ -260,9 +260,8 @@ public class ActivityRegistryTests
             Description = "Test Activity 2",
             IsBrowsable = true
         };
-
-        mockProvider.GetDescriptorsAsync(Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<IEnumerable<ActivityDescriptor>>([descriptor1, descriptor2]));
+        Mock.Get(mockProvider).GetDescriptorsAsync(Arg.Any<CancellationToken>())
+                    .Returns([descriptor1, descriptor2]);
 
         var providers = new[] { mockProvider };
 
@@ -273,12 +272,7 @@ public class ActivityRegistryTests
         await _registry.RefreshDescriptorsAsync(providers);
 
         // Assert - Verify no warning logs were made
-        _logger.DidNotReceive().Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(v => v.ToString()!.Contains("was already registered")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+        await Assert.That(Mock.Get(_logger).Invocations.Count(call => call.MemberName == "Log" && Equals(call.Arguments[0], LogLevel.Warning) && call.Arguments[2]!.ToString()!.Contains("was already registered"))).IsEqualTo(0);
 
         // Verify descriptors are still registered
         var allDescriptors = _registry.ListAll().ToList();
@@ -305,7 +299,7 @@ public class ActivityRegistryTests
         _registry.Register(manualDescriptor);
 
         // Create a provider descriptor
-        var mockProvider = Substitute.For<IActivityProvider>();
+        var mockProvider = Mock.Of<IActivityProvider>().Object;
         var providerDescriptor = new ActivityDescriptor
         {
             TypeName = "ProviderActivity",
@@ -315,9 +309,8 @@ public class ActivityRegistryTests
             Description = "Provider activity",
             IsBrowsable = true
         };
-
-        mockProvider.GetDescriptorsAsync(Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<IEnumerable<ActivityDescriptor>>([providerDescriptor]));
+        Mock.Get(mockProvider).GetDescriptorsAsync(Arg.Any<CancellationToken>())
+                    .Returns([providerDescriptor]);
 
         var providers = new[] { mockProvider };
 
@@ -331,12 +324,7 @@ public class ActivityRegistryTests
         await Assert.That(allDescriptors).Contains(d => d.TypeName == "ProviderActivity");
 
         // Verify no warnings about manual descriptor being replaced
-        _logger.DidNotReceive().Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(v => v.ToString()!.Contains("ManualActivity")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+        await Assert.That(Mock.Get(_logger).Invocations.Count(call => call.MemberName == "Log" && Equals(call.Arguments[0], LogLevel.Warning) && call.Arguments[2]!.ToString()!.Contains("ManualActivity"))).IsEqualTo(0);
     }
 
     [Test]
@@ -372,12 +360,7 @@ public class ActivityRegistryTests
         await _registry.RefreshDescriptorsAsync(providers);
 
         // Assert - Should log a warning for the duplicate
-        _logger.Received(1).Log(
-            LogLevel.Warning,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(v => v.ToString()!.Contains("DuplicateActivity") && v.ToString()!.Contains("was already registered")),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+        await Assert.That(Mock.Get(_logger).Invocations.Count(call => call.MemberName == "Log" && Equals(call.Arguments[0], LogLevel.Warning) && call.Arguments[2]!.ToString()!.Contains("DuplicateActivity") && call.Arguments[2]!.ToString()!.Contains("was already registered"))).IsEqualTo(1);
     }
 
     [Test]

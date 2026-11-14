@@ -15,11 +15,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ubuntu-latest:
-    name: ubuntu-latest
+  test:
+    name: Test (${{ matrix.framework }})
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [net10.0, net11.0]
     steps:
       - name: Reclaim hosted runner disk space
+        if: matrix.framework == 'net10.0'
         shell: bash
         run: |
           df -h /
@@ -32,9 +38,44 @@ jobs:
           global-json-file: global.json
           # Install the .NET 10 runtime alongside SDK 11 to test both supported targets.
           dotnet-version: 10.0.x
-      - name: 'Run: Restore'
-        run: dotnet restore Elsa.slnx
-      - name: 'Run: Build'
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-nuget
+        with:
+          workload: ${{ matrix.framework == 'net10.0' && 'solution' || 'correctness' }}
+
+      # One lane still validates every project and target, including the net10-only benchmarks.
+      - name: 'Run: Restore solution'
+        if: matrix.framework == 'net10.0'
+        run: dotnet restore Elsa.slnx --locked-mode
+      - name: 'Run: Build solution'
+        if: matrix.framework == 'net10.0'
         run: dotnet build Elsa.slnx --configuration Release --no-restore
-      - name: 'Run: Test'
-        run: dotnet test --solution Elsa.slnx --configuration Release --no-build
+      - name: 'Run: Test .NET 10'
+        if: matrix.framework == 'net10.0'
+        run: dotnet test --solution Elsa.slnx --framework net10.0 --configuration Release --no-build
+
+      # Locks describe both frameworks, while this lane only compiles and runs net11.
+      - name: 'Run: Restore .NET 11 tests'
+        if: matrix.framework == 'net11.0'
+        run: |
+          dotnet restore Elsa.UnitIntegration.Tests.slnf --locked-mode
+          dotnet restore Elsa.Component.Tests.slnf --locked-mode
+      - name: 'Run: Test .NET 11'
+        if: matrix.framework == 'net11.0'
+        run: |
+          dotnet test --solution Elsa.UnitIntegration.Tests.slnf --framework net11.0 --configuration Release --no-restore
+          dotnet test --solution Elsa.Component.Tests.slnf --framework net11.0 --configuration Release --no-restore
+
+  ubuntu-latest:
+    # Preserve the existing required check while both framework lanes must pass.
+    name: ubuntu-latest
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require both frameworks
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+        run: test "$TEST_RESULT" = success

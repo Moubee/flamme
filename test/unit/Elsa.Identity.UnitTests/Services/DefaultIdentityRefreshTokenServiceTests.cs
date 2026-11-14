@@ -7,7 +7,6 @@ using Elsa.Identity.Models;
 using Elsa.Identity.Options;
 using Elsa.Identity.Services;
 using Microsoft.IdentityModel.JsonWebTokens;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Services;
@@ -23,8 +22,8 @@ public class DefaultIdentityRefreshTokenServiceTests
         Issuer = "https://elsa.test",
         Audience = "elsa-api"
     };
-    private readonly IAccessTokenIssuer _accessTokenIssuer = Substitute.For<IAccessTokenIssuer>();
-    private readonly IUserProvider _userProvider = Substitute.For<IUserProvider>();
+    private readonly IAccessTokenIssuer _accessTokenIssuer = Mock.Of<IAccessTokenIssuer>().Object;
+    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
     private readonly DefaultElsaTokenService _tokenService;
     private readonly SessionRevoker _sessionRevoker;
     private readonly DefaultIdentityRefreshTokenService _service;
@@ -33,10 +32,10 @@ public class DefaultIdentityRefreshTokenServiceTests
     {
         var clock = new MutableSystemClock();
         var options = Microsoft.Extensions.Options.Options.Create(_options);
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Id == User.Id), Arg.Any<CancellationToken>()).Returns(User);
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Id == Victim.Id), Arg.Any<CancellationToken>()).Returns(Victim);
-        _accessTokenIssuer.IssueTokensAsync(User, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(RefreshedTokens);
-        _accessTokenIssuer.IssueTokensAsync(Victim, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-victim", "refresh-victim"));
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Id == User.Id), Arg.Any<CancellationToken>()).Returns(User);
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Id == Victim.Id), Arg.Any<CancellationToken>()).Returns(Victim);
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(User, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(RefreshedTokens);
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(Victim, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-victim", "refresh-victim"));
         _tokenService = new(clock, options);
         _sessionRevoker = new(new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()), clock, options);
         _service = new(_userProvider, _accessTokenIssuer, new DefaultTenantAccessor(), _sessionRevoker, options);
@@ -66,7 +65,7 @@ public class DefaultIdentityRefreshTokenServiceTests
         var refreshToken = await IssueRefreshTokenAsync(session);
 
         await Assert.That(await _service.RefreshAsync(refreshToken)).IsSameReferenceAs(RefreshedTokens);
-        await _accessTokenIssuer.Received(1).IssueTokensAsync(User, Arg.Is<SignInSession?>(x => x!.Id == session.Id && x.ExpiresAt == TruncateToSeconds(session.ExpiresAt)), Arg.Any<CancellationToken>());
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(User, Arg.Is<SignInSession?>(x => x!.Id == session.Id && x.ExpiresAt == TruncateToSeconds(session.ExpiresAt)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -83,9 +82,9 @@ public class DefaultIdentityRefreshTokenServiceTests
     public async Task RefreshAsyncRejectsATokenWhenTheUserIdNoLongerExistsEvenIfTheNameWasReused()
     {
         var replacement = new User { Id = "user-b", Name = User.Name };
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Id == User.Id), Arg.Any<CancellationToken>()).Returns((User?)null);
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(replacement);
-        _accessTokenIssuer.IssueTokensAsync(replacement, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-c", "refresh-c"));
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Id == User.Id), Arg.Any<CancellationToken>()).Returns((User?)null);
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(replacement);
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(replacement, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-c", "refresh-c"));
 
         await Assert.That(await _service.RefreshAsync(await IssueRefreshTokenAsync(new("session-a", DateTimeOffset.UtcNow)))).IsNull();
         await AssertNothingIssuedAsync();
@@ -96,7 +95,7 @@ public class DefaultIdentityRefreshTokenServiceTests
     [Arguments("   ")]
     public async Task RefreshAsyncRejectsATokenWithABlankSubjectEvenWhenTheNameWasReused(string subject)
     {
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(User);
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(User);
 
         await Assert.That(await _service.RefreshAsync(LegacyRefreshToken.CreateWithSubject(_options, User, subject))).IsNull();
         await AssertNothingIssuedAsync();
@@ -105,7 +104,7 @@ public class DefaultIdentityRefreshTokenServiceTests
     [Test]
     public async Task RefreshAsyncRejectsATokenWithoutASubjectEvenWhenTheNameWasReused()
     {
-        _userProvider.FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(User);
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Name == User.Name), Arg.Any<CancellationToken>()).Returns(User);
 
         await Assert.That(await _service.RefreshAsync(LegacyRefreshToken.CreateWithoutSubject(_options, User))).IsNull();
         await AssertNothingIssuedAsync();
@@ -161,7 +160,7 @@ public class DefaultIdentityRefreshTokenServiceTests
         var expectedSession = new SignInSession(SessionRevoker.GetSession(new ClaimsIdentity(), refreshToken).Id, ReadExpiry(refreshToken));
 
         await Assert.That(await _service.RefreshAsync(refreshToken)).IsSameReferenceAs(RefreshedTokens);
-        await _accessTokenIssuer.Received(1).IssueTokensAsync(User, expectedSession, Arg.Any<CancellationToken>());
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(User, expectedSession, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
 
         await _sessionRevoker.RevokeAsync(expectedSession);
 
@@ -178,7 +177,7 @@ public class DefaultIdentityRefreshTokenServiceTests
     // Both overloads: a check against only the one that is no longer called would pass without proving anything.
     private async Task AssertNothingIssuedAsync()
     {
-        await _accessTokenIssuer.DidNotReceive().IssueTokensAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
-        await _accessTokenIssuer.DidNotReceive().IssueTokensAsync(Arg.Any<User>(), Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>());
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(Arg.Any<User>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_accessTokenIssuer).IssueTokensAsync(Arg.Any<User>(), Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 }

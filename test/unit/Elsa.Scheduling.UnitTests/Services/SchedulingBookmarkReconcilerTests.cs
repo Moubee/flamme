@@ -9,7 +9,6 @@ using Elsa.Workflows.Runtime.Entities;
 using Elsa.Workflows.Runtime.Filters;
 using Elsa.Workflows.Runtime.Stores;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 
 namespace Elsa.Scheduling.UnitTests.Services;
 
@@ -26,7 +25,7 @@ public class SchedulingBookmarkReconcilerTests
             Instance("finished", WorkflowStatus.Finished, WorkflowSubStatus.Finished),
             Instance("cancelled", WorkflowStatus.Finished, WorkflowSubStatus.Cancelled),
             Instance("faulted", WorkflowStatus.Finished, WorkflowSubStatus.Faulted));
-        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Substitute.For<IBookmarkManager>());
+        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Mock.Of<IBookmarkManager>().Object);
 
         var result = await reconciler.ClassifyAsync(
         [
@@ -49,7 +48,7 @@ public class SchedulingBookmarkReconcilerTests
     public async Task ClassifyAsync_KeepsPastDueSuspendedDelayBookmarks()
     {
         var instanceStore = CreateInstanceStore(Instance("suspended", WorkflowStatus.Running, WorkflowSubStatus.Suspended));
-        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Substitute.For<IBookmarkManager>());
+        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Mock.Of<IBookmarkManager>().Object);
 
         var result = await reconciler.ClassifyAsync([Bookmark("past-due-delay", "suspended")]);
 
@@ -67,7 +66,7 @@ public class SchedulingBookmarkReconcilerTests
             Bookmark("orphan-2", "finished"),
             Bookmark("live", "suspended")
         ], CancellationToken.None);
-        var bookmarkManager = new DefaultBookmarkManager(bookmarkStore, Substitute.For<INotificationSender>(), NullLogger<DefaultBookmarkManager>.Instance);
+        var bookmarkManager = new DefaultBookmarkManager(bookmarkStore, Mock.Of<INotificationSender>().Object, NullLogger<DefaultBookmarkManager>.Instance);
         var reconciler = new SchedulingBookmarkReconciler(CreateInstanceStore(), bookmarkManager);
 
         await reconciler.PurgeAsync([Bookmark("orphan-1", "missing"), Bookmark("orphan-2", "finished")]);
@@ -79,25 +78,25 @@ public class SchedulingBookmarkReconcilerTests
     [Test]
     public async Task PurgeAsync_DoesNotDeleteWhenThereAreNoOrphans()
     {
-        var bookmarkManager = Substitute.For<IBookmarkManager>();
+        var bookmarkManager = Mock.Of<IBookmarkManager>().Object;
         var reconciler = new SchedulingBookmarkReconciler(CreateInstanceStore(), bookmarkManager);
 
         await reconciler.PurgeAsync([]);
 
-        await bookmarkManager.DidNotReceive().DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task PurgeAsync_DoesNotDeleteWhenInstanceBecameRunning()
     {
-        var bookmarkManager = Substitute.For<IBookmarkManager>();
+        var bookmarkManager = Mock.Of<IBookmarkManager>().Object;
         var reconciler = new SchedulingBookmarkReconciler(
             CreateInstanceStore(Instance("revived", WorkflowStatus.Running, WorkflowSubStatus.Suspended)),
             bookmarkManager);
 
         await reconciler.PurgeAsync([Bookmark("revived-bookmark", "revived")]);
 
-        await bookmarkManager.DidNotReceive().DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]

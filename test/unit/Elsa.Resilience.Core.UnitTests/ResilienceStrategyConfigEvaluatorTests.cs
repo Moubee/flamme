@@ -4,17 +4,16 @@ using Elsa.Resilience.Core.UnitTests.TestHelpers;
 using Elsa.Resilience.Models;
 using Elsa.Resilience.Options;
 using Elsa.Resilience.Serialization;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Resilience.Core.UnitTests;
 
 public class ResilienceStrategyConfigEvaluatorTests
 {
-    private readonly IResilienceStrategyCatalog _catalog = Substitute.For<IResilienceStrategyCatalog>();
-    private readonly IExpressionEvaluator _expressionEvaluator = Substitute.For<IExpressionEvaluator>();
+    private readonly IResilienceStrategyCatalog _catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
+    private readonly IExpressionEvaluator _expressionEvaluator = Mock.Of<IExpressionEvaluator>().Object;
     private readonly ResilienceStrategyConfigEvaluator _evaluator;
-    private readonly ExpressionExecutionContext _context = new(Substitute.For<IServiceProvider>(), null!);
+    private readonly ExpressionExecutionContext _context = new(Mock.Of<IServiceProvider>().Object, null!);
 
     public ResilienceStrategyConfigEvaluatorTests()
     {
@@ -43,7 +42,7 @@ public class ResilienceStrategyConfigEvaluatorTests
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.Id).IsEqualTo("test-strategy");
-        await _catalog.Received(1).GetAsync("test-strategy", Arg.Any<CancellationToken>());
+        Mock.Get(_catalog).GetAsync("test-strategy", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -58,7 +57,7 @@ public class ResilienceStrategyConfigEvaluatorTests
         var result = await _evaluator.EvaluateAsync(config, _context);
 
         await Assert.That(result).IsNull();
-        await _catalog.DidNotReceive().GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_catalog).GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -70,7 +69,7 @@ public class ResilienceStrategyConfigEvaluatorTests
         var result = await _evaluator.EvaluateAsync(config, _context);
 
         await Assert.That(result).IsNull();
-        await _expressionEvaluator.DidNotReceive().EvaluateAsync<object>(Arg.Any<Expression>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<ExpressionEvaluatorOptions>());
+        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(Arg.Any<Expression>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<ExpressionEvaluatorOptions?>()).WasNeverCalled();
     }
 
     [Test]
@@ -87,7 +86,7 @@ public class ResilienceStrategyConfigEvaluatorTests
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result.Id).IsEqualTo("test-strategy");
-        await _catalog.Received(1).GetAsync("test-strategy", Arg.Any<CancellationToken>());
+        Mock.Get(_catalog).GetAsync("test-strategy", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -103,7 +102,7 @@ public class ResilienceStrategyConfigEvaluatorTests
 
         await Assert.That(result).IsNotNull();
         await Assert.That(result).IsSameReferenceAs(strategy);
-        await _catalog.DidNotReceive().GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_catalog).GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -133,11 +132,11 @@ public class ResilienceStrategyConfigEvaluatorTests
 
     private void SetupCatalogStrategy(string id, IResilienceStrategy strategy)
     {
-        _catalog.GetAsync(id, Arg.Any<CancellationToken>()).Returns(strategy);
+        Mock.Get(_catalog).GetAsync(id, Arg.Any<CancellationToken>()).Returns(strategy);
     }
 
     private void SetupExpressionResult(Expression expression, object? result)
     {
-        _expressionEvaluator.EvaluateAsync<object>(expression, _context, Arg.Any<ExpressionEvaluatorOptions>()).Returns(result);
+        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(expression, _context, Arg.Any<ExpressionEvaluatorOptions?>()).Returns(result);
     }
 }

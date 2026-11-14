@@ -22,7 +22,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
 
@@ -433,7 +432,7 @@ public sealed class ExternalAuthenticationStoreScenario(
         var provisioner = new InMemoryExternalIdentityProvisioner(
             users,
             userProvider,
-            Substitute.For<IRoleProvider>(),
+            Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
             clock,
             hasher,
@@ -486,7 +485,7 @@ public sealed class ExternalAuthenticationStoreScenario(
                 dbContextFactory,
                 users,
                 userProvider,
-                Substitute.For<IRoleProvider>(),
+                Mock.Of<IRoleProvider>().Object,
                 hasher,
                 new GuidIdentityGenerator(),
                 clock,

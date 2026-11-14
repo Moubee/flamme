@@ -4,7 +4,6 @@ using Elsa.Extensions;
 using Elsa.Http;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Http;
@@ -236,13 +235,13 @@ public class SendHttpRequestTests
         // Create mock activities for expected status codes
         var expectedStatusCodeCases = expectedStatusCodes.Select(x => 
         {
-            var mockActivity = Substitute.For<IActivity>();
+            var mockActivity = Mock.Of<IActivity>().Object;
             childActivities[x.activityName] = mockActivity;
             return new HttpStatusCodeCase(x.statusCode, mockActivity);
         }).ToList();
         
         // Create mock activity for unmatched handler
-        var unmatchedActivity = Substitute.For<IActivity>();
+        var unmatchedActivity = Mock.Of<IActivity>().Object;
         if (unmatchedHandler is not null)
         {
             childActivities[unmatchedHandler] = unmatchedActivity;
@@ -270,13 +269,13 @@ public class SendHttpRequestTests
         
         if (failedToConnect != null)
         {
-            failedToConnectActivity = Substitute.For<IActivity>();
+            failedToConnectActivity = Mock.Of<IActivity>().Object;
             childActivities[failedToConnect] = failedToConnectActivity;
         }
         
         if (timeout != null)
         {
-            timeoutActivity = Substitute.For<IActivity>();
+            timeoutActivity = Mock.Of<IActivity>().Object;
             childActivities[timeout] = timeoutActivity;
         }
 

@@ -1,7 +1,6 @@
 using System.Net;
 using Elsa.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using TUnit.AspNetCore;
 
 namespace Elsa.Resilience.IntegrationTests;
@@ -19,8 +18,8 @@ public class SimulateResponseEndpointTests : WebApplicationTest<ResilienceWebApp
         services.AddScoped<IRetryAttemptReader>(_ => VoidRetryAttemptReader.Instance);
         services.AddScoped(_ =>
         {
-            var catalog = Substitute.For<IResilienceStrategyCatalog>();
-            catalog.ListAsync(Arg.Any<CancellationToken>()).Returns([]);
+            var catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
+            Mock.Get(catalog).ListAsync(Arg.Any<CancellationToken>()).Returns([]);
             return catalog;
         });
     }

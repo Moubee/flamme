@@ -1,7 +1,7 @@
 using System.Reflection;
 using Elsa.Workflows.Attributes;
 using Elsa.Workflows.Models;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Core.UnitTests.Services;
@@ -12,13 +12,11 @@ public class ActivityDescriberTests
 
     public ActivityDescriberTests()
     {
-        var defaultValueResolver = Substitute.For<IPropertyDefaultValueResolver>();
-        var propertyUIHandlerResolver = Substitute.For<IPropertyUIHandlerResolver>();
-
-        defaultValueResolver.GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
-        propertyUIHandlerResolver
-            .GetUIPropertiesAsync(Arg.Any<PropertyInfo>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));
+        var defaultValueResolver = Mock.Of<IPropertyDefaultValueResolver>().Object;
+        var propertyUIHandlerResolver = Mock.Of<IPropertyUIHandlerResolver>().Object;
+        Mock.Get(defaultValueResolver).GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
+        Mock.Get(propertyUIHandlerResolver).GetUIPropertiesAsync(Arg.Any<PropertyInfo>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));
 
         _describer = new ActivityDescriber(defaultValueResolver, propertyUIHandlerResolver);
     }

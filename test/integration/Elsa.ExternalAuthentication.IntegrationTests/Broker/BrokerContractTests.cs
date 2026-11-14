@@ -6,7 +6,6 @@ using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
@@ -75,16 +74,16 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
 {
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new();
-    private readonly IExternalAuthenticationBroker _broker = Substitute.For<IExternalAuthenticationBroker>();
-    private readonly ITenantAccessor _tenant = Substitute.For<ITenantAccessor>();
+    private readonly IExternalAuthenticationBroker _broker = Mock.Of<IExternalAuthenticationBroker>().Object;
+    private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
 
     private HttpClient Client => _client ??= Factory.CreateClient(new() { AllowAutoRedirect = false });
 
     public BrokerDiscoveryEndpointContractTests()
     {
         _authentication.SetClaims(new Claim(Elsa.Identity.Constants.CustomClaimTypes.ExternalAuthenticationSessionId, "session-a"));
-        _broker.DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<IReadOnlyCollection<LoginMethod>>([new("local", "local", LoginMethodKind.Local, "Elsa account", "elsa", 0, false, new Uri("/external-authentication/local/authorize", UriKind.Relative))]));
-        _tenant.TenantId.Returns("tenant-a");
+        Mock.Get(_broker).DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IReadOnlyCollection<LoginMethod>>([new("local", "local", LoginMethodKind.Local, "Elsa account", "elsa", 0, false, new Uri("/external-authentication/local/authorize", UriKind.Relative))]));
+        Mock.Get(_tenant).TenantId.Returns("tenant-a");
     }
 
     protected override void ConfigureTestServices(IServiceCollection services)
@@ -103,13 +102,13 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(response.Headers.CacheControl?.ToString()).IsEqualTo("no-store");
         await Assert.That(body).Contains("local");
-        await _broker.Received(1).DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>());
+        Mock.Get(_broker).DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ExternalAuthorizeReturnsProviderRedirect()
     {
-        _broker.InitiateExternalAsync(Arg.Any<BrokerAuthorizationRequest>(), "tenant-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerInitiationResult.Redirect(new Uri("https://issuer.example/authorize?state=opaque"))));
+        Mock.Get(_broker).InitiateExternalAsync(Arg.Any<BrokerAuthorizationRequest>(), "tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerInitiationResult.Redirect(new Uri("https://issuer.example/authorize?state=opaque"))));
 
         var response = await Client.GetAsync("/external-authentication/authorize/contoso?client_id=studio&redirect_uri=https%3A%2F%2Fstudio.example%2Fcallback&response_type=code&code_challenge=x&code_challenge_method=S256&return_path=%2Fworkflows");
 
@@ -120,7 +119,7 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
     [Test]
     public async Task ProviderCallbackReturnsTrustedClientRedirect()
     {
-        _broker.CompleteCallbackAsync("contoso", "opaque", Arg.Any<IReadOnlyDictionary<string, IReadOnlyCollection<string>>>(), Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/callback?code=one"))));
+        Mock.Get(_broker).CompleteCallbackAsync("contoso", "opaque", Arg.Any<IReadOnlyDictionary<string, IReadOnlyCollection<string>>>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/callback?code=one"))));
 
         var response = await Client.GetAsync("/external-authentication/callback/contoso?state=opaque&code=provider-code");
 
@@ -131,7 +130,7 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
     [Test]
     public async Task LocalAuthorizeReturnsRedirectUriJson()
     {
-        _broker.InitiateLocalAsync(Arg.Any<LocalBrokerAuthorizationRequest>(), "tenant-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/callback?code=one"))));
+        Mock.Get(_broker).InitiateLocalAsync(Arg.Any<LocalBrokerAuthorizationRequest>(), "tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/callback?code=one"))));
 
         var response = await Client.PostAsJsonAsync("/external-authentication/local/authorize", new { clientId = "studio", redirectUri = "https://studio.example/callback", responseType = "code", codeChallenge = "x", codeChallengeMethod = "S256", returnPath = "/workflows", username = "alice", password = "p" });
         var body = await response.Content.ReadAsStringAsync();
@@ -144,7 +143,7 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
     [Test]
     public async Task TokenFormExchangeReturnsTokenShape()
     {
-        _broker.ExchangeAsync(Arg.Any<BrokerTokenRequest>(), Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerTokenResult.Success(new ExternalTokenResponse("access", "Bearer", 3600, "refresh", 7200, 28800))));
+        Mock.Get(_broker).ExchangeAsync(Arg.Any<BrokerTokenRequest>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerTokenResult.Success(new ExternalTokenResponse("access", "Bearer", 3600, "refresh", 7200, 28800))));
 
         var response = await Client.PostAsync("/external-authentication/token", new FormUrlEncodedContent(new Dictionary<string, string> { ["grant_type"] = "authorization_code", ["client_id"] = "studio", ["redirect_uri"] = "https://studio.example/callback", ["code"] = "code", ["code_verifier"] = "verifier" }));
         var body = await response.Content.ReadAsStringAsync();
@@ -157,8 +156,8 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
     [Test]
     public async Task LogoutAndLogoutCallbackHonorBrokerResponses()
     {
-        _broker.LogoutAsync(Arg.Any<BrokerLogoutRequest>(), "session-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerLogoutResult.Complete(new Uri("https://studio.example/logout-callback"))));
-        _broker.CompleteLogoutAsync("contoso", "opaque", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/logout-callback"))));
+        Mock.Get(_broker).LogoutAsync(Arg.Any<BrokerLogoutRequest>(), "session-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerLogoutResult.Complete(new Uri("https://studio.example/logout-callback"))));
+        Mock.Get(_broker).CompleteLogoutAsync("contoso", "opaque", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/logout-callback"))));
 
         var logout = await Client.PostAsJsonAsync("/external-authentication/logout", new { clientId = "studio", postLogoutRedirectUri = "https://studio.example/logout-callback", mode = "local" });
         var callback = await Client.GetAsync("/external-authentication/logout/callback/contoso?state=opaque");

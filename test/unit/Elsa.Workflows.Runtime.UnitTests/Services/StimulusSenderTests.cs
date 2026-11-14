@@ -4,7 +4,7 @@ using Elsa.Workflows.Runtime.Filters;
 using Elsa.Workflows.Runtime.Messages;
 using Elsa.Workflows.Runtime.Options;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -17,21 +17,19 @@ public class StimulusSenderTests
     private const string BookmarkId = "bookmark-1";
     private const string CorrelationId = "correlation-1";
 
-    private readonly IStimulusHasher _stimulusHasher = Substitute.For<IStimulusHasher>();
-    private readonly ITriggerBoundWorkflowService _triggerBoundWorkflowService = Substitute.For<ITriggerBoundWorkflowService>();
-    private readonly IWorkflowResumer _workflowResumer = Substitute.For<IWorkflowResumer>();
-    private readonly IBookmarkQueue _bookmarkQueue = Substitute.For<IBookmarkQueue>();
-    private readonly ITriggerInvoker _triggerInvoker = Substitute.For<ITriggerInvoker>();
+    private readonly IStimulusHasher _stimulusHasher = Mock.Of<IStimulusHasher>().Object;
+    private readonly ITriggerBoundWorkflowService _triggerBoundWorkflowService = Mock.Of<ITriggerBoundWorkflowService>().Object;
+    private readonly IWorkflowResumer _workflowResumer = Mock.Of<IWorkflowResumer>().Object;
+    private readonly IBookmarkQueue _bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
+    private readonly ITriggerInvoker _triggerInvoker = Mock.Of<ITriggerInvoker>().Object;
 
     public StimulusSenderTests()
     {
-        _stimulusHasher.Hash(ActivityTypeName, Arg.Any<object>(), ActivityInstanceId).Returns(StimulusHash);
-        _workflowResumer
-            .ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions>(), Arg.Any<CancellationToken>())
-            .Returns([]);
-        _triggerBoundWorkflowService
-            .FindManyAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns([]);
+        Mock.Get(_stimulusHasher).Hash(ActivityTypeName, Arg.Any<object?>(), ActivityInstanceId).Returns(StimulusHash);
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns([]);
+        Mock.Get(_triggerBoundWorkflowService).FindManyAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                    .Returns([]);
     }
 
     [Test]
@@ -40,7 +38,7 @@ public class StimulusSenderTests
         var sender = CreateSender();
         var metadata = CreateMetadata();
         NewBookmarkQueueItem? enqueued = null;
-        await _bookmarkQueue.EnqueueAsync(Arg.Do<NewBookmarkQueueItem>(item => enqueued = item), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).Callback((NewBookmarkQueueItem item, CancellationToken _) => enqueued = item);
 
         await sender.SendAsync(ActivityTypeName, new object(), metadata);
 
@@ -64,7 +62,7 @@ public class StimulusSenderTests
         var sender = CreateSender();
         var metadata = CreateMetadata();
         NewBookmarkQueueItem? enqueued = null;
-        await _bookmarkQueue.EnqueueAsync(Arg.Do<NewBookmarkQueueItem>(item => enqueued = item), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).Callback((NewBookmarkQueueItem item, CancellationToken _) => enqueued = item);
 
         await sender.SendAsync(StimulusHash, metadata);
 
@@ -80,14 +78,13 @@ public class StimulusSenderTests
     [Test]
     public async Task SendAsync_WhenResumeMatches_DoesNotEnqueue()
     {
-        _workflowResumer
-            .ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions>(), Arg.Any<CancellationToken>())
-            .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = WorkflowInstanceId }]);
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = WorkflowInstanceId }]);
         var sender = CreateSender();
 
         await sender.SendAsync(ActivityTypeName, new object(), CreateMetadata());
 
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     private StimulusSender CreateSender()

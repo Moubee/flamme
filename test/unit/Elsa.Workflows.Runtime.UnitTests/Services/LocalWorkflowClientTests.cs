@@ -12,19 +12,19 @@ using Elsa.Workflows.Runtime.Messages;
 using Elsa.Workflows.Runtime.ActivationValidators;
 using Elsa.Workflows.State;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class LocalWorkflowClientTests
 {
-    private readonly IWorkflowInstanceManager _workflowInstanceManager = Substitute.For<IWorkflowInstanceManager>();
-    private readonly IWorkflowDefinitionService _workflowDefinitionService = Substitute.For<IWorkflowDefinitionService>();
-    private readonly IWorkflowRunner _workflowRunner = Substitute.For<IWorkflowRunner>();
-    private readonly IWorkflowCanceler _workflowCanceler = Substitute.For<IWorkflowCanceler>();
-    private readonly IWorkflowActivationGate _workflowActivationGate = Substitute.For<IWorkflowActivationGate>();
-    private readonly WorkflowStateMapper _workflowStateMapper = Substitute.For<WorkflowStateMapper>();
-    private readonly ILogger<LocalWorkflowClient> _logger = Substitute.For<ILogger<LocalWorkflowClient>>();
+    private readonly IWorkflowInstanceManager _workflowInstanceManager = Mock.Of<IWorkflowInstanceManager>().Object;
+    private readonly IWorkflowDefinitionService _workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+    private readonly IWorkflowRunner _workflowRunner = Mock.Of<IWorkflowRunner>().Object;
+    private readonly IWorkflowCanceler _workflowCanceler = Mock.Of<IWorkflowCanceler>().Object;
+    private readonly IWorkflowActivationGate _workflowActivationGate = Mock.Of<IWorkflowActivationGate>().Object;
+    private readonly WorkflowStateMapper _workflowStateMapper = Mock.Of<WorkflowStateMapper>().Object;
+    private readonly ILogger<LocalWorkflowClient> _logger = Mock.Of<ILogger<LocalWorkflowClient>>().Object;
 
     [Test]
     public async Task CreateInstanceAsync_ThrowsWorkflowDefinitionNotFoundException_WhenDefinitionDoesNotExist()
@@ -38,9 +38,8 @@ public class LocalWorkflowClientTests
         };
 
         var findResult = new WorkflowGraphFindResult(null, null);
-
-        _workflowDefinitionService.TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
-            .Returns(findResult);
+        Mock.Get(_workflowDefinitionService).TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
+                    .Returns(findResult);
 
         // Act & Assert
         await Assert.ThrowsExactlyAsync<WorkflowDefinitionNotFoundException>(() =>
@@ -66,9 +65,8 @@ public class LocalWorkflowClientTests
         };
 
         var findResult = new WorkflowGraphFindResult(definition, null); // Null graph indicates materializer not available
-
-        _workflowDefinitionService.TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
-            .Returns(findResult);
+        Mock.Get(_workflowDefinitionService).TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
+                    .Returns(findResult);
 
         // Act & Assert
         await Assert.ThrowsExactlyAsync<WorkflowMaterializerNotFoundException>(() => client.CreateInstanceAsync(request));
@@ -86,9 +84,8 @@ public class LocalWorkflowClientTests
         };
 
         var findResult = new WorkflowGraphFindResult(null, null);
-
-        _workflowDefinitionService.TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
-            .Returns(findResult);
+        Mock.Get(_workflowDefinitionService).TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
+                    .Returns(findResult);
 
         // Act & Assert
         await Assert.ThrowsExactlyAsync<WorkflowDefinitionNotFoundException>(() =>
@@ -114,9 +111,8 @@ public class LocalWorkflowClientTests
         };
 
         var findResult = new WorkflowGraphFindResult(definition, null);
-
-        _workflowDefinitionService.TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
-            .Returns(findResult);
+        Mock.Get(_workflowDefinitionService).TryFindWorkflowGraphAsync(definitionHandle, Arg.Any<CancellationToken>())
+                    .Returns(findResult);
 
         // Act & Assert
         await Assert.ThrowsExactlyAsync<WorkflowMaterializerNotFoundException>(() =>
@@ -137,7 +133,7 @@ public class LocalWorkflowClientTests
         var response = await client.CreateInstanceAsync(request);
 
         await Assert.That(response.CannotStart).IsTrue();
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -147,19 +143,19 @@ public class LocalWorkflowClientTests
         var lockHandle = new TrackingAsyncDisposable();
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowActivationGate.EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                handleLostSource.Cancel();
-                return Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token));
-            });
+        Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                    .Returns(() =>
+                    {
+                        handleLostSource.Cancel();
+                        return Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token));
+                    });
 
         await Assert.ThrowsAsync<OperationCanceledException>(() => client.CreateInstanceAsync(new CreateWorkflowInstanceRequest
         {
             WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId("test-definition")
         }));
 
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
         await Assert.That(lockHandle.DisposeCount).IsEqualTo(1);
     }
 
@@ -170,18 +166,18 @@ public class LocalWorkflowClientTests
         var lockHandle = new TrackingAsyncDisposable();
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowActivationGate.EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token)));
+        Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token)));
         var saveStarted = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _workflowInstanceManager.SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                var cancellationToken = call.Arg<CancellationToken>();
-                saveStarted.SetResult(cancellationToken);
-                var canceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-                cancellationToken.Register(() => canceled.TrySetCanceled(cancellationToken));
-                return canceled.Task;
-            });
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    {
+                        var cancellationToken = __arg1;
+                        saveStarted.SetResult(cancellationToken);
+                        var canceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                        cancellationToken.Register(() => canceled.TrySetCanceled(cancellationToken));
+                        return canceled.Task;
+                    });
 
         var save = client.CreateInstanceAsync(new CreateWorkflowInstanceRequest
         {
@@ -192,7 +188,7 @@ public class LocalWorkflowClientTests
 
         await Assert.ThrowsAsync<OperationCanceledException>(() => save);
         await Assert.That(persistenceToken.IsCancellationRequested).IsTrue();
-        await _workflowInstanceManager.Received(1).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(lockHandle.DisposeCount).IsEqualTo(1);
     }
 
@@ -202,18 +198,18 @@ public class LocalWorkflowClientTests
         using var cancellationSource = new CancellationTokenSource();
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowActivationGate.EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(new WorkflowActivationLease(true, null)));
+        Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                    .Returns(new WorkflowActivationLease(true, null));
         var saveStarted = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _workflowInstanceManager.SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                var cancellationToken = call.Arg<CancellationToken>();
-                saveStarted.SetResult(cancellationToken);
-                var canceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-                cancellationToken.Register(() => canceled.TrySetCanceled(cancellationToken));
-                return canceled.Task;
-            });
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    {
+                        var cancellationToken = __arg1;
+                        saveStarted.SetResult(cancellationToken);
+                        var canceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                        cancellationToken.Register(() => canceled.TrySetCanceled(cancellationToken));
+                        return canceled.Task;
+                    });
 
         var save = client.CreateInstanceAsync(new CreateWorkflowInstanceRequest
         {
@@ -241,8 +237,8 @@ public class LocalWorkflowClientTests
 
         await Assert.That(response.CannotStart).IsTrue();
         await Assert.That(response.WorkflowInstanceId).IsNull();
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().CreateAndCommitWorkflowInstanceAsync(default!, default, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
+        Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -261,8 +257,8 @@ public class LocalWorkflowClientTests
         var response = await client.CreateAndRunInstanceAsync(request);
 
         await Assert.That(response.CannotStart).IsTrue();
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().CreateAndCommitWorkflowInstanceAsync(default!, default, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
+        Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
         var entry = await Assert.That(logger.Entries).HasSingleItem();
         await Assert.That(entry.Level).IsEqualTo(LogLevel.Warning);
         await Assert.That(entry.Properties["WorkflowDefinitionId"]).IsEqualTo("test-definition");
@@ -279,10 +275,10 @@ public class LocalWorkflowClientTests
     {
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowInstanceManager.CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions>())
-            .Returns(CreateRunningInstance());
-        _workflowRunner.RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromException<RunWorkflowResult>(new InvalidOperationException("execution failed")));
+        Mock.Get(_workflowInstanceManager).CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions?>())
+                    .Returns(CreateRunningInstance());
+        Mock.Get(_workflowRunner).RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException<RunWorkflowResult>(new InvalidOperationException("execution failed")));
         var request = new CreateAndRunWorkflowInstanceRequest
         {
             WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId("test-definition"),
@@ -291,8 +287,8 @@ public class LocalWorkflowClientTests
 
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.CreateAndRunInstanceAsync(request));
 
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().CreateAndCommitWorkflowInstanceAsync(default!, default, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
+        Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -300,10 +296,10 @@ public class LocalWorkflowClientTests
     {
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowInstanceManager.CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions>())
-            .Returns(CreateRunningInstance());
-        _workflowRunner.RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions>(), Arg.Any<CancellationToken>())
-            .Returns(call => Task.FromCanceled<RunWorkflowResult>(call.Arg<CancellationToken>()));
+        Mock.Get(_workflowInstanceManager).CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions?>())
+                    .Returns(CreateRunningInstance());
+        Mock.Get(_workflowRunner).RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Models.WorkflowGraph __arg0, global::Elsa.Workflows.State.WorkflowState __arg1, global::Elsa.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) => Task.FromCanceled<RunWorkflowResult>(__arg3));
         var request = new CreateAndRunWorkflowInstanceRequest
         {
             WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId("test-definition"),
@@ -314,8 +310,8 @@ public class LocalWorkflowClientTests
 
         await Assert.ThrowsAsync<OperationCanceledException>(() => client.CreateAndRunInstanceAsync(request, cancellationSource.Token));
 
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().CreateAndCommitWorkflowInstanceAsync(default!, default, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
+        Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -325,21 +321,21 @@ public class LocalWorkflowClientTests
         var lockHandle = new TrackingAsyncDisposable();
         var client = CreateClient();
         SetupWorkflowGraph("test-definition");
-        _workflowInstanceManager.CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions>())
-            .Returns(CreateRunningInstance());
+        Mock.Get(_workflowInstanceManager).CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions?>())
+                    .Returns(CreateRunningInstance());
         var runnerStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var runnerCompletion = new TaskCompletionSource<RunWorkflowResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         CancellationToken runnerToken = default;
-        _workflowRunner.RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                runnerToken = call.Arg<CancellationToken>();
-                runnerToken.Register(() => runnerCompletion.TrySetCanceled(runnerToken));
-                runnerStarted.SetResult();
-                return runnerCompletion.Task;
-            });
-        _workflowActivationGate.EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token)));
+        Mock.Get(_workflowRunner).RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Models.WorkflowGraph __arg0, global::Elsa.Workflows.State.WorkflowState __arg1, global::Elsa.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) =>
+                    {
+                        runnerToken = __arg3;
+                        runnerToken.Register(() => runnerCompletion.TrySetCanceled(runnerToken));
+                        runnerStarted.SetResult();
+                        return runnerCompletion.Task;
+                    });
+        Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token)));
 
         var run = client.CreateAndRunInstanceAsync(new CreateAndRunWorkflowInstanceRequest
         {
@@ -354,8 +350,8 @@ public class LocalWorkflowClientTests
         await Assert.ThrowsAsync<OperationCanceledException>(() => run);
         await Assert.That(runnerObservedLeaseLoss).IsTrue();
         await Assert.That(lockHandle.DisposeCount).IsEqualTo(1);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().SaveAsync(default(WorkflowInstance)!, default);
-        await _workflowInstanceManager.DidNotReceiveWithAnyArgs().CreateAndCommitWorkflowInstanceAsync(default!, default, default);
+        Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
+        Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
     }
 
     private static WorkflowInstance CreateRunningInstance() => new()
@@ -382,17 +378,16 @@ public class LocalWorkflowClientTests
             Id = definitionId,
             DefinitionId = definitionId
         };
-
-        _workflowDefinitionService.TryFindWorkflowGraphAsync(Arg.Any<WorkflowDefinitionHandle>(), Arg.Any<CancellationToken>())
-            .Returns(new WorkflowGraphFindResult(definition, graph));
+        Mock.Get(_workflowDefinitionService).TryFindWorkflowGraphAsync(Arg.Any<WorkflowDefinitionHandle>(), Arg.Any<CancellationToken>())
+                    .Returns(new WorkflowGraphFindResult(definition, graph));
     }
 
     private LocalWorkflowClient CreateClient(bool canStart = true, ILogger<LocalWorkflowClient>? logger = null)
     {
-        _workflowActivationGate.EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(call => canStart
-                ? new WorkflowActivationLease(true, null, call.Arg<CancellationToken>())
-                : WorkflowActivationLease.Denied);
+        Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Activities.Workflow __arg0, string? __arg1, global::System.Threading.CancellationToken __arg2) => canStart
+                        ? new WorkflowActivationLease(true, null, __arg2)
+                        : WorkflowActivationLease.Denied);
 
         return new(
             "test-workflow-instance-id",

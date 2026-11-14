@@ -2,18 +2,17 @@ using System.IO.Compression;
 using Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.ImportFiles;
 using Elsa.Workflows.Management.Models;
 using Microsoft.AspNetCore.Http;
-using NSubstitute;
 
 namespace Elsa.Workflows.IntegrationTests.Security;
 
 public class WorkflowDefinitionImportFileReaderTests
 {
-    private readonly IApiSerializer _apiSerializer = Substitute.For<IApiSerializer>();
+    private readonly IApiSerializer _apiSerializer = Mock.Of<IApiSerializer>().Object;
 
     public WorkflowDefinitionImportFileReaderTests()
     {
-        _apiSerializer.Deserialize<WorkflowDefinitionModel>(Arg.Any<string>())
-            .Returns(call => new WorkflowDefinitionModel { DefinitionId = call.Arg<string>() });
+        Mock.Get(_apiSerializer).Deserialize<WorkflowDefinitionModel>(Arg.Any<string>())
+            .Returns((string json) => new WorkflowDefinitionModel { DefinitionId = json });
     }
 
     [Test]
@@ -39,11 +38,11 @@ public class WorkflowDefinitionImportFileReaderTests
             CreateZipFile(("workflow-a.json", "zip-a"), ("workflow-b.json", "zip-b"))
         };
 
-        _apiSerializer.Deserialize<WorkflowDefinitionModel>(Arg.Any<string>())
-            .Returns(call =>
+        Mock.Get(_apiSerializer).Deserialize<WorkflowDefinitionModel>(Arg.Any<string>())
+            .Returns((string json) =>
             {
                 hasResponseStarted = true;
-                return new WorkflowDefinitionModel { DefinitionId = call.Arg<string>() };
+                return new WorkflowDefinitionModel { DefinitionId = json };
             });
 
         var models = await WorkflowDefinitionImportFileReader.ReadAsync(files, _apiSerializer, () => hasResponseStarted, CancellationToken.None);

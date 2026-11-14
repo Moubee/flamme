@@ -8,7 +8,7 @@ using Elsa.Workflows.Runtime.Notifications;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Results;
 using Elsa.Workflows.Runtime.Stimuli;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
@@ -17,49 +17,47 @@ public class ResumeDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDenied_RoutesParentBookmarkResumeWithDefinedOutcome()
     {
-        var bookmarkQueue = Substitute.For<IBookmarkQueue>();
-        var stimulusHasher = Substitute.For<IStimulusHasher>();
-        var stimulusSender = Substitute.For<IStimulusSender>();
+        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
+        var stimulusHasher = Mock.Of<IStimulusHasher>().Object;
+        var stimulusSender = Mock.Of<IStimulusSender>().Object;
         var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, stimulusHasher, stimulusSender);
         StimulusMetadata? observedMetadata = null;
-        stimulusSender.SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                observedMetadata = call.Arg<StimulusMetadata>();
-                return Task.FromResult(new SendStimulusResult([]));
-            });
+        Mock.Get(stimulusSender).SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>())
+                    .Returns((string __arg0, global::Elsa.Workflows.Runtime.StimulusMetadata? __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    {
+                        observedMetadata = __arg1;
+                        return Task.FromResult(new SendStimulusResult([]));
+                    });
 
         await handler.HandleAsync(new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "dispatch-stimulus-hash"), CancellationToken.None);
 
-        await stimulusSender.Received(1).SendAsync(
-            "dispatch-stimulus-hash",
-            Arg.Any<StimulusMetadata>(),
-            Arg.Any<CancellationToken>());
+        Mock.Get(stimulusSender).SendAsync(
+            "dispatch-stimulus-hash", Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(observedMetadata).IsNotNull();
         await Assert.That(observedMetadata.WorkflowInstanceId).IsEqualTo("parent-1");
         var input = (await Assert.That(observedMetadata.Input).IsTypeOf<Dictionary<string, object>>())!;
         await Assert.That((bool)input["CannotStart"]!).IsTrue();
         await Assert.That(input["WorkflowInstanceId"]).IsEqualTo("child-1");
-        stimulusHasher.DidNotReceive().Hash(Arg.Any<string>(), Arg.Any<DispatchWorkflowStimulus>());
-        await bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(stimulusHasher).Hash(Arg.Any<string>(), Arg.Is<object?>(__value => __value is DispatchWorkflowStimulus), null).WasNeverCalled();
+        Mock.Get(bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task HandleAsync_ActivationDeniedBeforeParentBookmark_QueuesResumeForExactParentRoute()
     {
-        var bookmarkQueue = Substitute.For<IBookmarkQueue>();
+        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
         NewBookmarkQueueItem? enqueuedItem = null;
-        await bookmarkQueue.EnqueueAsync(Arg.Do<NewBookmarkQueueItem>(item => enqueuedItem = item), Arg.Any<CancellationToken>());
-        var workflowResumer = Substitute.For<IWorkflowResumer>();
-        workflowResumer.ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions>(), Arg.Any<CancellationToken>()).Returns([]);
+        Mock.Get(bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).Callback((NewBookmarkQueueItem item, CancellationToken _) => enqueuedItem = item);
+        var workflowResumer = Mock.Of<IWorkflowResumer>().Object;
+        Mock.Get(workflowResumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).Returns([]);
         var stimulusSender = new StimulusSender(
-            Substitute.For<IStimulusHasher>(),
-            Substitute.For<ITriggerBoundWorkflowService>(),
+            Mock.Of<IStimulusHasher>().Object,
+            Mock.Of<ITriggerBoundWorkflowService>().Object,
             workflowResumer,
             bookmarkQueue,
-            Substitute.For<ITriggerInvoker>(),
+            Mock.Of<ITriggerInvoker>().Object,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<StimulusSender>.Instance);
-        var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, Substitute.For<IStimulusHasher>(), stimulusSender);
+        var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, Mock.Of<IStimulusHasher>().Object, stimulusSender);
 
         await handler.HandleAsync(
             new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "dispatch-stimulus-hash"),
@@ -71,9 +69,7 @@ public class ResumeDispatchWorkflowActivityTests
         var input = (await Assert.That(enqueuedItem.Options!.Input).IsTypeOf<Dictionary<string, object>>())!;
         await Assert.That((bool)input["CannotStart"]!).IsTrue();
         await Assert.That(input["WorkflowInstanceId"]).IsEqualTo("child-1");
-        await workflowResumer.Received(1).ResumeAsync(
-            Arg.Is<BookmarkFilter>(filter => filter.WorkflowInstanceId == "parent-1" && filter.Hash == "dispatch-stimulus-hash"),
-            Arg.Any<ResumeBookmarkOptions>(),
-            Arg.Any<CancellationToken>());
+        Mock.Get(workflowResumer).ResumeAsync(
+            Arg.Is<BookmarkFilter>(filter => filter.WorkflowInstanceId == "parent-1" && filter.Hash == "dispatch-stimulus-hash"), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 }

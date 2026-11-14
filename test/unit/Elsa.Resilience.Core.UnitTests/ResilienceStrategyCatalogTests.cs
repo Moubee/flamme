@@ -1,5 +1,4 @@
 using Elsa.Resilience.Core.UnitTests.TestHelpers;
-using NSubstitute;
 using Open.Linq.AsyncExtensions;
 using System.Threading.Tasks;
 
@@ -106,7 +105,7 @@ public class ResilienceStrategyCatalogTests
         await catalog.ListAsync();
         await catalog.ListAsync();
 
-        await provider.Received(1).GetStrategiesAsync(Arg.Any<CancellationToken>());
+        Mock.Get(provider).GetStrategiesAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -120,6 +119,6 @@ public class ResilienceStrategyCatalogTests
         await catalog.ListAsync();
         await catalog.GetAsync("test");
 
-        await provider.Received(1).GetStrategiesAsync(Arg.Any<CancellationToken>());
+        Mock.Get(provider).GetStrategiesAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 }

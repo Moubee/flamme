@@ -43,6 +43,13 @@ to Debug; CI commands explicitly select Release. Pass `--configuration` to overr
 to `packages/`; build and intermediate outputs remain in each project's `bin/` and
 `obj/` directories. Set `-p:Version=<version>` explicitly for release or preview packages.
 
+Executable entry points (including tests and benchmarks) commit `packages.lock.json`.
+CI restores with `--locked-mode`. After dependency changes, run a full-target
+`dotnet restore Elsa.slnx --force-evaluate` and commit the reviewed lock updates.
+Restore standalone `test/TlsSmoke/TlsSmoke.csproj` separately. For targeted tests,
+restore all project targets first, then use `--framework <tfm> --no-restore`;
+a single-target restore would rewrite the complete lock. See `doc/ci-performance.md`.
+
 The root `global.json` also selects Microsoft Testing Platform (MTP). Options for the
 outer `dotnet test` command go before the literal `--`; options after it are
 forwarded to each TUnit test application. Prefer targeted
@@ -89,6 +96,9 @@ or cross-module behavior.
 - Use the existing shared testing helpers under `src/common/Elsa.Testing.Shared*` when they fit the scenario.
 - Write tests with TUnit attributes such as `[Test]` and `[Arguments(...)]`; use
   asynchronous assertions such as `await Assert.That(actual).IsEqualTo(expected)`.
+- Use `TUnit.Mocks` for generated mocks. Create `Mock.Of<T>().Object` for dependencies,
+  and use `Mock.Get(instance)` for setups and verification. Preserve async return,
+  argument capture, property storage, and generic argument matching when changing mocks.
 - For regressions, add a failing test that demonstrates the bug before or alongside the fix.
 - For multi-targeting issues, consider whether the test must run against all target frameworks or only the affected one.
 - Repository coverage uses the Microsoft Testing Platform coverage extension and

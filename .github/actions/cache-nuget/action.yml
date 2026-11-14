@@ -1,0 +1,24 @@
+name: Cache NuGet dependencies
+description: Reuse downloaded packages while restoring each job's project graph normally.
+
+inputs:
+  workload:
+    description: Package consumer, to keep caches populated by different solution filters separate.
+    required: true
+  framework:
+    description: Target framework restored by this consumer, or all for a complete solution restore.
+    required: false
+    default: all
+
+runs:
+  using: composite
+  steps:
+    - name: Cache NuGet packages
+      uses: actions/cache@v6
+      with:
+        path: ~/.nuget/packages
+        # Cache downloads only. Every consumer must still restore its own obj state.
+        key: nuget-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.workload }}-${{ inputs.framework }}-${{ hashFiles('global.json', 'NuGet.Config', '**/*.props', '**/*.targets', '**/*.csproj', '**/packages.lock.json', '*.slnx', '*.slnf', '.config/dotnet-tools.json') }}
+        restore-keys: |
+          nuget-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.workload }}-${{ inputs.framework }}-
+          ${{ inputs.workload != 'tools' && format('nuget-v1-{0}-{1}-', runner.os, runner.arch) || '' }}

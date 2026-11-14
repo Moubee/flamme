@@ -6,7 +6,6 @@ using Elsa.Identity.Models;
 using Elsa.UnitTests.Shared;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Endpoints;
@@ -65,11 +64,11 @@ public class CreateUserContractTests
     public async Task EndpointNeverSerializesCredentialMaterial(string? suppliedPassword, bool generated, string? expectedGeneratedPassword)
     {
         var plainText = suppliedPassword ?? "generated-secret";
-        var userManager = Substitute.For<IUserManager>();
-        userManager.CreateUserAsync("alice", suppliedPassword, Arg.Any<ICollection<string>?>(), Arg.Any<CancellationToken>())
+        var userManager = Mock.Of<IUserManager>().Object;
+        Mock.Get(userManager).CreateUserAsync("alice", suppliedPassword, Arg.Any<ICollection<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new CreateUserResult(StoredUser, plainText, generated));
-        var roleAuthorization = Substitute.For<IRoleAuthorizationService>();
-        roleAuthorization.CanAssignRolesAsync(Arg.Any<System.Security.Claims.ClaimsPrincipal>(), Arg.Any<IEnumerable<string>?>(), Arg.Any<CancellationToken>()).Returns(true);
+        var roleAuthorization = Mock.Of<IRoleAuthorizationService>().Object;
+        Mock.Get(roleAuthorization).CanAssignRolesAsync(Arg.Any<System.Security.Claims.ClaimsPrincipal>(), Arg.Any<IEnumerable<string>?>(), Arg.Any<CancellationToken>()).Returns(true);
         var body = new MemoryStream();
         var endpoint = Factory.Create<Create>(context => context.Response.Body = body, userManager, roleAuthorization);
 

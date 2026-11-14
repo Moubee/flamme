@@ -5,7 +5,7 @@ using Elsa.Workflows.Management.Providers;
 using Elsa.Workflows.Management.Services;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
@@ -61,13 +61,13 @@ public class ActivityRegistryPopulatorTests
 
     private static ActivityRegistry CreateRegistry()
     {
-        var tenantAccessor = Substitute.For<ITenantAccessor>();
-        tenantAccessor.TenantId.Returns("tenant-1");
+        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        Mock.Get(tenantAccessor).TenantId.Returns("tenant-1");
         return new ActivityRegistry(
-            Substitute.For<IActivityDescriber>(),
+            Mock.Of<IActivityDescriber>().Object,
             [],
             tenantAccessor,
-            Substitute.For<ILogger<ActivityRegistry>>());
+            Mock.Of<ILogger<ActivityRegistry>>().Object);
     }
 
     private sealed class CountingTenantAgnosticProvider(CallCounter callCounter) : ITenantAgnosticActivityProvider

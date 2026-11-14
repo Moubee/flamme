@@ -15,7 +15,6 @@ using Elsa.Workflows.PortResolvers;
 using Elsa.Workflows.Serialization.Serializers;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Testing.Shared;
 
@@ -204,8 +203,8 @@ public class ActivityTestFixture : IAsyncDisposable
     private static void AddCoreWorkflowServices(IServiceCollection services)
     {
         services.AddLogging();
-        services.AddSingleton<ISystemClock>(_ => Substitute.For<ISystemClock>());
-        services.AddSingleton<INotificationSender>(_ => Substitute.For<INotificationSender>());
+        services.AddSingleton<ISystemClock>(_ => Mock.Of<IFixtureSystemClock>().Object);
+        services.AddSingleton<INotificationSender>(_ => Mock.Of<IFixtureNotificationSender>().Object);
         services.AddSingleton<IActivityVisitor, ActivityVisitor>();
         services.AddScoped<IExpressionEvaluator, ExpressionEvaluator>();
         services.AddSingleton<IWellKnownTypeRegistry, WellKnownTypeRegistry>();
@@ -221,10 +220,10 @@ public class ActivityTestFixture : IAsyncDisposable
         services.AddScoped<DefaultActivityInputEvaluator>();
         services.AddSingleton<IExpressionDescriptorProvider, DefaultExpressionDescriptorProvider>();
         services.AddSingleton<IExpressionDescriptorRegistry, ExpressionDescriptorRegistry>();
-        services.AddSingleton<IIdentityGenerator>(_ => Substitute.For<IIdentityGenerator>());
-        services.AddSingleton<IHasher>(_ => Substitute.For<IHasher>());
+        services.AddSingleton<IIdentityGenerator>(_ => Mock.Of<IFixtureIdentityGenerator>().Object);
+        services.AddSingleton<IHasher>(_ => Mock.Of<IFixtureHasher>().Object);
         services.AddSingleton<IStimulusHasher, StimulusHasher>();
-        services.AddSingleton<ICommitStateHandler>(_ => Substitute.For<ICommitStateHandler>());
+        services.AddSingleton<ICommitStateHandler>(_ => Mock.Of<IFixtureCommitStateHandler>().Object);
         services.AddSingleton<IActivitySchedulerFactory, ActivitySchedulerFactory>();
         services.AddSingleton<IWorkflowExecutionContextSchedulerStrategy, FakeWorkflowExecutionContextSchedulerStrategy>();
         services.AddSingleton<IActivityExecutionContextSchedulerStrategy, FakeActivityExecutionContextSchedulerStrategy>();
@@ -234,4 +233,12 @@ public class ActivityTestFixture : IAsyncDisposable
         services.AddSingleton<ISerializationTypeRegistry, SerializationTypeRegistry>();
         services.AddSingleton<IPayloadSerializer, JsonPayloadSerializer>();
     }
+
+    // TUnit follows the target's visibility for generated setup extensions. Keep fixture
+    // defaults internal so consumers can mock the public interfaces without ambiguous extensions.
+    internal interface IFixtureSystemClock : ISystemClock;
+    internal interface IFixtureNotificationSender : INotificationSender;
+    internal interface IFixtureIdentityGenerator : IIdentityGenerator;
+    internal interface IFixtureHasher : IHasher;
+    internal interface IFixtureCommitStateHandler : ICommitStateHandler;
 }

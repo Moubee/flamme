@@ -6,14 +6,14 @@ using Elsa.Workflows.Options;
 using Elsa.Workflows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 using Elsa.Common.Serialization;
 
 namespace Elsa.Workflows.Management.UnitTests.Mappers;
 
 public class VariableDefinitionMapperTests
 {
-    private readonly IServiceScopeFactory _scopeFactory = Substitute.For<IServiceScopeFactory>();
+    private readonly IServiceScopeFactory _scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
     private readonly SerializationTypeOptions _workflowJsonTypeOptions = new();
     private readonly VariableDefinitionMapper _mapper;
 
