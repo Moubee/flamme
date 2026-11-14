@@ -4,16 +4,21 @@ Research date: 2026-11-14. Base: `origin/main` at `245760a22`.
 
 ## Current validation workflow
 
-The Packages workflow builds and uploads validation artifacts on branch pushes
-and manual runs. The full-solution package build runs alongside the unit/integration
+The Packages workflow builds and uploads validation artifacts on `main` pushes
+and manual runs. Development branches use PR validation; run Packages manually
+on a branch when coverage or package artifacts are needed. The full-solution package build runs alongside the unit/integration
 and component suites on both `net10.0` and `net11.0`. The aggregate report still
 requires both suites to pass and enforces 10% line coverage. A successful workflow
 requires the build, all test lanes, and coverage reporting to succeed; package
 artifacts from a failed workflow do not establish a validated release.
 
 Download `elsa-nuget-packages`, the framework-specific test-result artifacts, and
-`coverage-reports` from the Actions run. Manual Packages runs upload the same
-artifacts as push runs, and an empty package upload fails the build job. The PR
+`coverage-reports` from the Actions run. Manual Packages runs default to the same
+artifacts as push runs. Set `build_packages` to false for coverage validation
+without the separate build/pack job; all four test lanes and the coverage gate
+still run. An empty package upload fails the build job when enabled. Superseded
+automatic Packages and Docker runs are canceled; explicit manual requests stay
+independent. The PR
 and Docker certificate workflows can also be run manually, preserving their
 existing framework and image matrices.
 
@@ -21,7 +26,9 @@ The inherited Feedz/NuGet publishers, release-event handling, and GitHub Pages
 deployment have been removed. Validation needs no publishing secrets, NuGet OIDC
 policy, or Pages site. All validation workflows request only `contents: read`;
 the separate stale workflow requests issue and pull-request write access for
-its maintenance job. Weekly Dependabot updates cover NuGet and GitHub Actions.
+its maintenance job. Weekly Dependabot updates cover NuGet, npm, and GitHub Actions.
+See the [workflow run audit](ci-workflow-runs.md) for the hosted baseline and
+the reasoning behind the trigger and optional-package policy.
 
 The sections below record the performance work that established this validation
 graph. References to publishing in those historical findings predate the removal
