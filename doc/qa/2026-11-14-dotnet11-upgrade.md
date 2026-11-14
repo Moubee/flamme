@@ -1,6 +1,7 @@
 # .NET 10 and 11 upgrade
 
-Base: `origin/main` at `2b04e5a3f` (PostgreSQL and in-memory persistence only).
+Base: `origin/main` at `f43381a0d` (SLNX solution, PostgreSQL and in-memory persistence only).
+Originally implemented on `2b04e5a3f`, then rebased after the solution and metadata cleanup merged.
 
 ## Delivery steps
 
@@ -99,15 +100,41 @@ Local container validation covers .NET 11; CI also builds and smoke-tests the
 Reproduction commands from the repository root:
 
 ```sh
-dotnet restore Elsa.sln
-dotnet build Elsa.sln --configuration Release --no-restore
+dotnet restore Elsa.slnx
+dotnet build Elsa.slnx --configuration Release --no-restore
 dotnet test --solution Elsa.UnitIntegration.Tests.slnf --configuration Release --framework net10.0 --no-build
 dotnet test --solution Elsa.UnitIntegration.Tests.slnf --configuration Release --framework net11.0 --no-build
 dotnet test --solution Elsa.Component.Tests.slnf --configuration Release --framework net10.0 --no-build
 dotnet test --solution Elsa.Component.Tests.slnf --configuration Release --framework net11.0 --no-build
-dotnet pack Elsa.sln --configuration Release --no-build --no-restore --output packages
-dotnet package list --project Elsa.sln --vulnerable --include-transitive --no-restore
+dotnet pack Elsa.slnx --configuration Release --no-build --no-restore --output packages
+dotnet package list --project Elsa.slnx --vulnerable --include-transitive --no-restore
 ```
 
 The final compatibility fixes received a second independent review with no
 actionable findings.
+
+## Validation after rebasing onto the SLNX cleanup
+
+The rebase onto `f43381a0d` preserves all 135 SLNX projects, the two solution
+filters, fork package metadata, and upstream's removal of ten obsolete migration
+generators. Active instructions use `Elsa.slnx`; the surviving authentication
+migration generator retains its explicit .NET 10 framework selection.
+
+- Release restore/build passed with zero errors.
+- The complete SLNX suite ran both frameworks together: **9,190 passed, four
+  existing skips, zero failures** across 118 test modules.
+- All 63 release-helper tests passed. Workflow YAML, ADR TOC, and whitespace
+  checks passed, and independent rebase review found no actionable issues.
+- Packing produced 71 NuGet packages and 71 symbol packages. Every NuGet package
+  retains both framework assets and the updated `DenDeline/flamme` URLs.
+
+The first combined run encountered PostgreSQL SSL-handshake connection failures
+in the seven-test .NET 10 User Tasks EF module. All seven tests passed on an
+isolated retry, followed by the successful complete rerun recorded above. The
+two frameworks used separate containers; no speculative fixture change was made.
+
+The complete rerun used:
+
+```sh
+dotnet test --solution Elsa.slnx --configuration Release --no-build --max-parallel-test-modules 4 --timeout 10m -- --report-trx
+```
