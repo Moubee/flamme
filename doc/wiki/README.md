@@ -37,9 +37,10 @@ flowchart LR
 | --- | --- |
 | [Repository Map](repository-map.md) | Top-level folders, projects, and where to look first. |
 | [Architecture](architecture.md) | The main system layers and request/execution flow. |
-| [Module System](module-system.md) | How `IModule`, `FeatureBase`, feature dependencies, and shell features work. |
+| [Module System](module-system.md) | How `IModule`, `FeatureBase`, feature dependencies, and static host composition work. |
 | [Workflow Core](workflow-core.md) | Activities, execution contexts, pipelines, variables, bookmarks, graphs, and flowchart execution. |
 | [Workflow Management](workflow-management.md) | Workflow definitions, instances, import/export, materializers, validation, and activity descriptors. |
+| [BPMN integration removal](bpmn-workflows.md) | Migrate definitions and deployments that depended on retired BPMN execution and interchange. |
 | [Workflow Runtime](workflow-runtime.md) | Dispatch, triggers, bookmarks, queues, background activity scheduling, graceful shutdown, and recovery. |
 | [Workflow API](workflow-api.md) | FastEndpoints, route prefixing, API categories, SignalR, and client-facing contracts. |
 | [Activities And Authoring](activities-and-authoring.md) | How workflows are authored in C#, JSON, ElsaScript, and host methods. |

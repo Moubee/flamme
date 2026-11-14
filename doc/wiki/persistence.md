@@ -24,8 +24,6 @@ Shared EF Core infrastructure lives in [Elsa.Persistence.EFCore.Common](../../sr
 Important base types:
 
 - [PersistenceFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/PersistenceFeatureBase.cs)
-- [PersistenceShellFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/PersistenceShellFeatureBase.cs)
-- [CombinedPersistenceShellFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/CombinedPersistenceShellFeatureBase.cs)
 - [ElsaDbContextBase](../../src/modules/Elsa.Persistence.EFCore.Common/ElsaDbContextBase.cs)
 
 `PersistenceFeatureBase` registers `IDbContextFactory<TDbContext>`, migration options, tenant-aware context factory decoration, and tenant model handlers.
@@ -41,7 +39,7 @@ The shared EF Core module contains slices for:
 - [Labels](../../src/modules/Elsa.Persistence.EFCore/Modules/Labels)
 - [Alterations](../../src/modules/Elsa.Persistence.EFCore/Modules/Alterations)
 
-Each slice has a DbContext, configurations, store implementations, feature classes, and shell feature classes.
+Each slice has a DbContext, configurations, store implementations, and code-first feature classes.
 
 ## Provider Packages
 
@@ -49,7 +47,7 @@ Provider packages configure database-specific EF Core options and migrations:
 
 - [Elsa.Persistence.EFCore.PostgreSql](../../src/modules/Elsa.Persistence.EFCore.PostgreSql)
 
-Combined provider shell features such as `PostgreSqlWorkflowPersistenceFeature` let modular hosts configure workflow persistence once and share settings with dependent definition, instance, and runtime persistence features.
+Configure each required persistence slice through its code-first feature and PostgreSQL provider extension. Shell-based persistence feature classes have been removed; migrate their connection and migration settings to the host registrations below.
 
 ## Typical Host Configuration
 

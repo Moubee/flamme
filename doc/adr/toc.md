@@ -31,3 +31,4 @@
 * [27. Project User Tasks from committed workflow bookmarks](0027-project-user-tasks-from-committed-bookmarks.md)
 * [2026-08-25. Identify new ADRs by date instead of a sequential number](2026-08-25-date-prefixed-adr-identifiers.md)
 * [2026-09-15. Refuse duplicate running instances through activation strategies](2026-09-15-correlated-workflow-activation.md)
+* [2026-11-14. Compose hosts statically and retire inherited runtime integrations](2026-11-14-static-host-composition.md)

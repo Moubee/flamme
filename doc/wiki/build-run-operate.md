@@ -174,7 +174,7 @@ Configure operational telemetry through standard `OTEL_*` settings and your exte
 - Use `rg` to find feature registration and endpoint routes.
 - Keep package version changes centralized in [Directory.Packages.props](../../Directory.Packages.props).
 - Avoid provider-specific assumptions in core modules.
-- When changing middleware, verify both code-first host setup and shell-feature setup if applicable.
+- When changing middleware, verify the code-first host setup and its route and authorization smoke coverage.
 
 ## Release And Package Notes
 

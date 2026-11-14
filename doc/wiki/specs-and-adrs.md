@@ -49,7 +49,7 @@ Current ADRs:
 
 | Spec | Area | Why it matters |
 | --- | --- | --- |
-| [001 shell reload API](../../specs/001-shell-reload-api/spec.md) | Shell management | Explains reload behavior for modular/shell hosts. |
+| [001 shell reload API](../../specs/001-shell-reload-api/spec.md) | Historical hosting design | Superseded; shell hosting, runtime package loading, and reload APIs have been removed. See the [integration removal guide](../integration-removal.md). |
 | [002 graceful shutdown](../../specs/002-graceful-shutdown/spec.md) | Runtime | Defines quiescence, ingress sources, drain orchestration, interrupted recovery, and runtime admin endpoints. |
 | [003 live server logs](../../specs/003-live-server-logs/spec.md) | Historical diagnostics design | Superseded by host-owned logging and external observability; the custom diagnostics packages have been removed. |
 | [004 diagnostics structured logs](../../specs/004-diagnostics-structured-logs/spec.md) | Historical diagnostics design | Superseded; structured-log capture, storage, APIs, and dashboard adapters have been removed. |
@@ -157,14 +157,14 @@ The historical diagnostics specs above describe removed implementations and do n
 5. `Elsa.UserTasks` feature, contracts, and stores
 6. `Elsa.UserTasks.Persistence.EFCore` and `Elsa.UserTasks.Persistence.EFCore.PostgreSql`
 
-## Reading Order For BPMN Work
+## Migrating Removed BPMN Support
 
-1. [bpmn-workflows.md](bpmn-workflows.md)
-2. `Elsa.Bpmn/Activities/BpmnProcess.cs` — the scope activity
-3. `Elsa.Bpmn/Hosting/BpmnWorkLedger.cs` and `BpmnWorkBinder.cs` — work tracking and binding
-4. `Elsa.Bpmn.Interchange/Binding/BpmnActivityBindingFormat.cs` — `elsa:` vendor extension
-5. `Elsa.Bpmn.Interchange/Features/BpmnInterchangeFeature.cs` — feature registration
-6. `test/integration/Elsa.Bpmn.IntegrationTests` and `Elsa.Bpmn.Interchange.IntegrationTests`
+BPMN execution and interchange are no longer included. Read the
+[BPMN migration notice](bpmn-workflows.md) and the
+[integration removal guide](../integration-removal.md) before upgrading a host
+with BPMN-backed definitions or suspended instances. The older specifications
+and ADRs preserve historical design intent; they do not describe supported BPMN
+packages in the current tree.
 
 ## When To Write An ADR
 

@@ -1,6 +1,6 @@
 # Architecture
 
-Elsa Core is a modular workflow platform. The core engine is intentionally small compared with the full host surface: features add management stores, runtime dispatch, APIs, HTTP activities, expression languages, persistence, identity, tenants, diagnostics, and shell integration.
+Elsa Core is a modular workflow platform. The core engine is intentionally small compared with the full host surface: features add management stores, runtime dispatch, APIs, HTTP activities, expression languages, persistence, identity, tenants, and host-owned diagnostics integration.
 
 ## Layered View
 
