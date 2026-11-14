@@ -5,7 +5,7 @@
       "name": "core",
       "directory": "elsa-core",
       "github": "elsa-workflows/elsa-core",
-      "solution": "Elsa.sln",
+      "solution": "Elsa.slnx",
       "workflow": "packages.yml",
       "dependencies": [],
       "alignment": [],

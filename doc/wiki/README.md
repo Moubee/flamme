@@ -6,7 +6,7 @@ The source of truth is still the code, specs, ADRs, and tests. Each page links b
 
 ## Start Here
 
-Elsa Core is a modular .NET workflow engine. The main solution is [Elsa.sln](../../Elsa.sln). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
+Elsa Core is a modular .NET workflow engine. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
 
 The shortest mental model:
 
@@ -71,6 +71,6 @@ flowchart LR
 
 ## Contributor Workflow
 
-Use targeted reads first, then targeted tests. For most changes, start with the relevant module page, inspect the linked feature class and contracts, add or update tests in the matching `test/unit`, `test/integration`, or `test/component` project, and run `dotnet test --project <path-to-test.csproj>` for the narrowest project that proves the behavior. Use `dotnet test --solution Elsa.sln` for the full suite.
+Use targeted reads first, then targeted tests. For most changes, start with the relevant module page, inspect the linked feature class and contracts, add or update tests in the matching `test/unit`, `test/integration`, or `test/component` project, and run `dotnet test --project <path-to-test.csproj>` for the narrowest project that proves the behavior. Use `dotnet test --solution Elsa.slnx` for the full suite.
 
 When changing public behavior, update the related README, spec quickstart, or wiki page in the same PR. This repository is strongly modular, so the best changes keep ownership boundaries clear.

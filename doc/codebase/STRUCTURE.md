@@ -4,12 +4,12 @@
 
 | Path | Purpose | Evidence |
 |---|---|---|
-| `src/apps/` | Runnable application hosts | `Elsa.sln` |
-| `src/common/` | Shared infrastructure | `Elsa.sln` |
-| `src/modules/` | Feature and domain modules | `Elsa.sln` |
+| `src/apps/` | Runnable application hosts | `Elsa.slnx` |
+| `src/common/` | Shared infrastructure | `Elsa.slnx` |
+| `src/modules/` | Feature and domain modules | `Elsa.slnx` |
 | `src/clients/` | API client contracts | `src/clients/Elsa.Api.Client/` |
 | `test/` | Unit, integration, component, and performance tests | `test/Directory.Build.props` |
-| `Directory.Build.props`, `Directory.Build.targets` | Shared MSBuild build/package settings | `Elsa.sln`, `global.json` |
+| `Directory.Build.props`, `Directory.Build.targets` | Shared MSBuild build/package settings | `Elsa.slnx`, `global.json` |
 | `specs/` | Feature specifications and plans | `specs/012-weaver-grounding-tools/plan.md` |
 
 ## Entry Points
@@ -35,7 +35,7 @@
 
 ## Evidence
 
-- `Elsa.sln`
+- `Elsa.slnx`
 - `src/modules/Elsa.ExternalAuthentication/Extensions/ServiceCollectionExtensions.cs`
 - `src/modules/Elsa.ExternalAuthentication.Persistence.EFCore/Extensions/ServiceCollectionExtensions.cs`
 - `.editorconfig`

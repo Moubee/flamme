@@ -52,12 +52,12 @@ public class SecretDefaultTenantUniquenessMigrationTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Join(directory.FullName, "Elsa.sln")))
+            if (File.Exists(Path.Join(directory.FullName, "Elsa.slnx")))
                 return directory.FullName;
 
             directory = directory.Parent;
         }
 
-        throw new InvalidOperationException("Could not find Elsa.sln from the test output directory.");
+        throw new InvalidOperationException("Could not find Elsa.slnx from the test output directory.");
     }
 }

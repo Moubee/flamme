@@ -291,13 +291,13 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore Elsa.sln -p:Version="$VERSION"
+        run: dotnet restore Elsa.slnx -p:Version="$VERSION"
 
       - name: Build
-        run: dotnet build Elsa.sln --configuration Release --no-restore -p:Version="$VERSION"
+        run: dotnet build Elsa.slnx --configuration Release --no-restore -p:Version="$VERSION"
 
       - name: Pack
-        run: dotnet pack Elsa.sln --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
+        run: dotnet pack Elsa.slnx --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

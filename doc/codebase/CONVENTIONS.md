@@ -13,7 +13,7 @@
 
 - Formatter/rules: Roslyn `.editorconfig` settings.
 - Relevant rules: 4-space indentation, system usings first, braces required, file-scoped namespaces, `var` preferred.
-- Run commands: `dotnet format Elsa.sln` when formatting is explicitly required; normal validation uses `dotnet build` and `dotnet test`.
+- Run commands: `dotnet format Elsa.slnx` when formatting is explicitly required; normal validation uses `dotnet build` and `dotnet test`.
 
 ## Import and Module Conventions
 
@@ -35,7 +35,7 @@
 - Mark cases with `[Test]` or `[Arguments(...)]` and await TUnit assertions, for
   example `await Assert.That(actual).IsEqualTo(expected)`.
 - Run a focused project with `dotnet test --project <csproj>` and the complete
-  suite with `dotnet test --solution Elsa.sln`. Keep outer `dotnet test` options
+  suite with `dotnet test --solution Elsa.slnx`. Keep outer `dotnet test` options
   before the literal `--` and forwarded TUnit/MTP options after it.
 - Prefer real in-memory implementations; NSubstitute is used at external or expensive boundaries.
 - Microsoft coverage is collected and checked in aggregate; do not introduce

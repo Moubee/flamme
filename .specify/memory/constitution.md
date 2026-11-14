@@ -126,7 +126,7 @@ established patterns.
   readability.
 - Tests MUST NOT depend on external services or network access unless
   explicitly categorised as integration tests.
-- The complete suite MUST be run with `dotnet test --solution Elsa.sln`; a
+- The complete suite MUST be run with `dotnet test --solution Elsa.slnx`; a
   focused project MUST be run with `dotnet test --project <csproj>`.
 - Microsoft coverage MUST be collected and evaluated as a shared aggregate.
   Per-project Coverlet configuration and thresholds MUST NOT be introduced.
@@ -217,22 +217,22 @@ is harder to undo once entrenched.
 
 ```bash
 # Restore (always use --ignore-failed-sources for external feed resilience)
-dotnet restore Elsa.sln --ignore-failed-sources
+dotnet restore Elsa.slnx --ignore-failed-sources
 
 # Build the solution
-dotnet build Elsa.sln --no-restore
+dotnet build Elsa.slnx --no-restore
 
 # Clean outputs for the selected configuration
-dotnet clean Elsa.sln --configuration Release
+dotnet clean Elsa.slnx --configuration Release
 
 # Complete repository test suite
-dotnet test --solution Elsa.sln
+dotnet test --solution Elsa.slnx
 
 # Focused test project
 dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj
 
 # Package after validation with an explicit version
-dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
+dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
 
 Builds default to Debug and CI commands explicitly select Release;
