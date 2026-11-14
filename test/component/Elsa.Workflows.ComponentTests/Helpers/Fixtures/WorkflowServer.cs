@@ -533,7 +533,6 @@ internal sealed class ComponentPodHarness : WebApplicationTest<ComponentTestWebA
 
     protected override void ConfigureTestOptions(WebApplicationTestOptions options)
     {
-        options.AutoConfigureOpenTelemetry = false;
         options.AutoPropagateHttpClientFactory = false;
     }
 

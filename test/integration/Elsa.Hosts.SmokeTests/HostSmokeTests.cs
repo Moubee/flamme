@@ -119,7 +119,6 @@ public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest
 
     protected override void ConfigureTestOptions(WebApplicationTestOptions options)
     {
-        options.AutoConfigureOpenTelemetry = false;
         options.AutoPropagateHttpClientFactory = false;
     }
 
