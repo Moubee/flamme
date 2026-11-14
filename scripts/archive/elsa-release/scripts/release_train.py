@@ -20,7 +20,6 @@ from urllib.parse import quote, urlparse
 from release_support import parse_version
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_PROFILE = HERE.parent / 'references' / 'elsa-profile.json'
 SITE_TARGETS = ('website', 'documentation')
 VALID_SITE_STATUSES = {'completed', 'published', 'verified'}
 RECOVERY_REGISTRY = 'nuget.org'
@@ -258,6 +257,8 @@ def site_receipt_valid(state, target, record):
 
 
 def init(args):
+    if not getattr(args, 'profile', None):
+        raise ValueError('An explicit release profile is required; Flamme has no default publisher configuration')
     version = parse_version(args.version, args.kind)
     profile = read(args.profile)
     names = [r['name'] for r in profile['repositories']]
@@ -975,7 +976,9 @@ def adopt_post_refresh(state, args):
     """Explicitly upgrade a legacy checkpoint without claiming site work is complete."""
 
     if 'post_release_sites' not in state.get('profile', {}):
-        current_profile = read(DEFAULT_PROFILE)
+        if not getattr(args, 'profile', None):
+            raise ValueError('An explicit profile is required to adopt legacy post-release targets')
+        current_profile = read(args.profile)
         state.setdefault('profile', {})['post_release_sites'] = current_profile['post_release_sites']
     if post_refresh_configured(state):
         return state['post_refresh']
@@ -1070,7 +1073,7 @@ def main():
     p = sub.add_parser('init')
     p.add_argument('--version', required=True)
     p.add_argument('--kind', choices=['stable','rc','preview'])
-    p.add_argument('--profile', type=Path, default=DEFAULT_PROFILE)
+    p.add_argument('--profile', type=Path, required=True)
     p.add_argument('--repos-root', required=True)
     p.add_argument('--repositories', nargs='+', help='Repositories to publish; upstream dependencies are verification-only')
     p.add_argument('--source', action='append', help='Explicit source override, e.g. core=3.9.0-rc1')
@@ -1079,6 +1082,7 @@ def main():
     p.add_argument('--no-post-refresh', action='store_true', help='Skip the website/documentation refresh gate')
     sub.add_parser('status')
     p = sub.add_parser('adopt-post-refresh')
+    p.add_argument('--profile', type=Path, help='Explicit target configuration for a legacy checkpoint')
     p.add_argument('--no-post-refresh', action='store_true', help='Explicitly adopt the legacy checkpoint while keeping site refresh disabled')
     p.add_argument('--targets', nargs='+', choices=SITE_TARGETS, help='Site targets to adopt; use website for a website-only follow-up')
     p.add_argument('--website-only', action='store_true', help='Alias for --targets website')
@@ -1127,4 +1131,4 @@ def main():
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    raise SystemExit('Retired upstream automation: release-train execution is disabled in Flamme.')

@@ -21,9 +21,20 @@ class TrainTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
-        self.args=SimpleNamespace(version='3.9.0',kind=None,profile=train.DEFAULT_PROFILE,repositories=None,repos_root=str(self.root),pr=None,source=None,no_announcements=False,state=self.root/'state.json')
+        self.args=SimpleNamespace(version='3.9.0',kind=None,profile=Path(__file__).parent/'fixtures/legacy-elsa-profile.json',repositories=None,repos_root=str(self.root),pr=None,source=None,no_announcements=False,state=self.root/'state.json')
         self.state=train.init(self.args)
         self.remote_existing=False
+
+    def test_no_profile_is_loaded_implicitly(self):
+        self.args.profile = None
+        with patch.object(train, 'read') as read:
+            with self.assertRaisesRegex(ValueError, 'explicit release profile'):
+                train.init(self.args)
+            read.assert_not_called()
+        with patch.object(train, 'read') as read:
+            with self.assertRaisesRegex(ValueError, 'explicit profile'):
+                train.adopt_post_refresh({'profile': {}}, SimpleNamespace())
+            read.assert_not_called()
 
     def bind_fixture(self,name):
         path=self.root/name;path.mkdir(exist_ok=True)
@@ -591,7 +602,7 @@ class TrainTests(unittest.TestCase):
         self.state['schema'] = 1
         with patch.object(train, 'gh', side_effect=self.github):
             self.assertEqual('adopt-post-refresh', train.status(self.state)['next'])
-        train.adopt_post_refresh(self.state, SimpleNamespace(targets=['website'], website_only=False, no_post_refresh=False))
+        train.adopt_post_refresh(self.state, SimpleNamespace(profile=self.args.profile, targets=['website'], website_only=False, no_post_refresh=False))
         self.assertIn('post_release_sites', self.state['profile'])
         self.assertEqual(['website'], self.state['post_refresh']['targets'])
         self.state['post_refresh']['receipts'] = {}

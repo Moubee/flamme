@@ -59,7 +59,7 @@ CI=true dotnet pack Elsa.sln --configuration Release --no-build --no-restore \
 dotnet test --solution Elsa.sln --configuration Release --no-build \
   --max-parallel-test-modules 4 --timeout 10m \
   --results-directory artifacts/test-results/msbuild-migration -- --report-trx
-python3 -m unittest discover -s .agents/skills/elsa-release/tests -v
+python3 -m unittest discover -s scripts/archive/elsa-release/tests -v
 dotnet clean Elsa.sln --configuration Release -p:Version=3.9.0-preview.1 -m:1 -nr:false
 docker build --progress=plain -f docker/ElsaServer.Dockerfile -t flamme-msbuild-validation .
 scripts/adr/generate-toc.sh --check

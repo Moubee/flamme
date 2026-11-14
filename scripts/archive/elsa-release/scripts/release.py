@@ -512,4 +512,4 @@ def fail(message: str) -> None:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit("Retired upstream automation: release publication is disabled in Flamme.")

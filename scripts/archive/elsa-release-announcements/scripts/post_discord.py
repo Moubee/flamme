@@ -554,4 +554,4 @@ def atomic_write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit("Retired upstream automation: Discord publication is disabled in Flamme.")
