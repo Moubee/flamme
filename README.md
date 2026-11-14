@@ -99,11 +99,17 @@ Elsa is continually evolving, and while it offers powerful capabilities, there a
 
 - Documentation is still a work in progress.
 
+## Supported .NET Versions
+
+Libraries and app hosts support .NET 10 and .NET 11. .NET 8 and .NET 9 are no longer supported. Development requires the .NET 11 SDK selected by `global.json`; install the .NET 10 runtime to run both test targets.
+
+Repository Dockerfiles build with the .NET 11 SDK and run on .NET 11 by default. Pass `--build-arg DOTNET_RUNTIME_VERSION=10.0` to `docker build` to create a .NET 10 image.
+
 ## Features
 
 Elsa offers a wide range of features for building and executing workflows, including:
 
-- Execution of workflows in any .NET application with support for .NET 6 and beyond.
+- Execution of workflows in .NET 10 and .NET 11 applications.
 - Support for both short-running and long-running workflows.
 - A programming model loosely inspired by Windows Workflow Foundation.
 - Support for workflows authored in separately hosted visual designers.

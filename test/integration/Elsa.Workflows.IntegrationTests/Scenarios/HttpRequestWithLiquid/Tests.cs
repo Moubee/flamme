@@ -1,4 +1,5 @@
-﻿using Elsa.Extensions;
+﻿using System.Text.Json;
+using Elsa.Extensions;
 using Elsa.Testing.Shared;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,13 @@ public sealed class Tests : IAsyncDisposable
         var lines = _capturingTextWriter.Lines.ToList();
         await Assert.That(lines).Contains("First product id: 1");
         await Assert.That(lines).Contains("First product price rounded: 13");
-        await Assert.That(lines).Contains("First product as json: {\"id\":1,\"price\":12.99}");
+        // .NET 11 retains more precision when Fluid converts a JavaScript double
+        // to decimal. Check the JSON value rather than its runtime-specific spelling.
+        const string productJsonPrefix = "First product as json: ";
+        var productJsonLine = lines.Single(x => x.StartsWith(productJsonPrefix, StringComparison.Ordinal));
+        using var productJson = JsonDocument.Parse(productJsonLine[productJsonPrefix.Length..]);
+        await Assert.That(productJson.RootElement.GetProperty("id").GetInt32()).IsEqualTo(1);
+        await Assert.That(productJson.RootElement.GetProperty("price").GetDouble()).IsEqualTo(12.99);
         await Assert.That(lines).Contains("Second product id: 2");
 
         await Assert.That(lines).Contains("Single product id: 2");

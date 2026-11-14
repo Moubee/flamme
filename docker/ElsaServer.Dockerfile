@@ -1,4 +1,7 @@
-﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100 AS build
+ARG DOTNET_RUNTIME_VERSION=11.0
+
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100 AS build
+ARG DOTNET_RUNTIME_VERSION
 WORKDIR /source
 
 # copy sources.
@@ -11,11 +14,10 @@ RUN dotnet restore "./src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj"
 
 # build and publish (UseAppHost=false creates platform independent binaries).
 WORKDIR /source/src/apps/Elsa.Server.Web
-RUN dotnet build "Elsa.Server.Web.csproj" -c Release -o /app/build
-RUN dotnet publish "Elsa.Server.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-restore -f net10.0
+RUN dotnet publish "Elsa.Server.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-restore -f net${DOTNET_RUNTIME_VERSION}
 
 # move binaries into smaller base image.
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_RUNTIME_VERSION} AS base
 WORKDIR /app
 COPY --from=build /app/publish ./
 

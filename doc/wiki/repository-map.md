@@ -55,9 +55,9 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 ## Build And Package Files
 
 - [Directory.Build.props](../../Directory.Build.props) contains shared MSBuild settings.
-- [src/Directory.Build.props](../../src/Directory.Build.props) multi-targets source packages for `net8.0`, `net9.0`, and `net10.0`.
-- [Directory.Packages.props](../../Directory.Packages.props) centrally manages package versions, including conditional versions for .NET 8/9 versus .NET 10.
-- [global.json](../../global.json) selects the .NET SDK and Microsoft Testing Platform runner. Build and package commands use the standard .NET CLI; see [Build, Run, And Operate](build-run-operate.md).
+- [src/Directory.Build.props](../../src/Directory.Build.props) multi-targets source packages for `net10.0` and `net11.0`.
+- [Directory.Packages.props](../../Directory.Packages.props) centrally manages package versions, including framework-specific versions where necessary for .NET 10 and .NET 11.
+- [global.json](../../global.json) selects the .NET 11 SDK and Microsoft Testing Platform runner. Build and package commands use the standard .NET CLI; see [Build, Run, And Operate](build-run-operate.md).
 - TUnit tests run directly through Microsoft Testing Platform with `dotnet test --solution Elsa.slnx` or `dotnet test --project <path-to-test.csproj>`.
 
 ## How To Find Code Fast

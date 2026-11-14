@@ -46,7 +46,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
     private readonly InMemoryExternalAuthenticationStateStore _stateStore;
     private readonly InMemoryPreviewResultStore _previewResults;
 
-    private HttpClient Client => _client ??= Factory.CreateClient();
+    private HttpClient Client => _client ??= Factory.CreateClient(new() { AllowAutoRedirect = false });
 
     public PreviewEndpointContractTests()
     {

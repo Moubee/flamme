@@ -83,15 +83,8 @@ maybe_instrument_with_otel() {
     return
   fi
 
-  tmp_wrapper="/tmp/elsa-otel-wrapper.sh"
-  cat <<'WRAPPER' > "$tmp_wrapper"
-#!/usr/bin/env bash
-set -e
-. "${OTEL_DOTNET_AUTO_HOME%/}/instrument.sh"
-exec "$@"
-WRAPPER
-  chmod +x "$tmp_wrapper"
-  exec "$tmp_wrapper" "$@"
+  # Current OpenTelemetry scripts launch the application when executed directly.
+  exec bash "$instrument_script" "$@"
 }
 
 if [ -n "${EXTRA_CA_CERT:-}" ]; then

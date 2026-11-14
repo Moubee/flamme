@@ -36,7 +36,7 @@ Guidance for AI coding agents working in this repository.
 - Run ElsaScript DSL integration tests: `dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj`
 
 Install the .NET SDK selected by the root `global.json` (11.0.100 with patch roll-forward)
-and the .NET 10 SDK/runtime for test applications and app hosts. Builds default
+and the .NET 10 runtime to run tests and app hosts for both supported frameworks. Builds default
 to Debug; CI commands explicitly select Release. Pass `--configuration` to override. Packages go
 to `packages/`; build and intermediate outputs remain in each project's `bin/` and
 `obj/` directories. Set `-p:Version=<version>` explicitly for release or preview packages.
@@ -51,7 +51,7 @@ or cross-module behavior.
 ## Code Style
 
 - C# uses `LangVersion` `latest`, nullable reference types, and implicit usings from `Directory.Build.props`.
-- Projects under `src/` target `net8.0`, `net9.0`, and `net10.0` through `src/Directory.Build.props`.
+- Production libraries, app hosts, and correctness tests target `net10.0` and `net11.0`; library targets are centralized in `src/Directory.Build.props`. Performance benchmarks target `net10.0`. .NET 8 and .NET 9 are no longer supported.
 - Follow `.editorconfig`: 4-space indentation for C#, file-scoped namespaces, braces required, `var` preferred, usings outside namespaces, and sorted system directives.
 - Prefer clear domain names over abbreviations. Keep types small and responsibilities explicit.
 - Avoid suppressing warnings unless compatibility or framework constraints make the warning unavoidable; explain the reason near the suppression.

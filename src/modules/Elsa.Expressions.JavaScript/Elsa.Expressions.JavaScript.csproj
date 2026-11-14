@@ -11,11 +11,6 @@
         <PackageReference Include="Jint" />
     </ItemGroup>
 
-    <!-- System.Linq.Async only for .NET 8 and 9 - .NET 10 has native async LINQ support -->
-    <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
-        <PackageReference Include="System.Linq.Async" />
-    </ItemGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\..\common\Elsa.Api.Common\Elsa.Api.Common.csproj" />
       <ProjectReference Include="..\Elsa.Expressions\Elsa.Expressions.csproj" />
