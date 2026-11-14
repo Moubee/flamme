@@ -70,7 +70,7 @@ server startup, and operational guidance.
 ### Local development with Aspire
 
 Use Aspire CLI 13.6.5 to start the reference server and PostgreSQL together, with
-logs, traces, metrics, and health in the dashboard. Run `aspire run` from the
+logs, traces, metrics, and health in the dashboard. Run `aspire run --isolated` from the
 repository root for an interactive session. For agents or Git worktrees, use:
 
 ```bash

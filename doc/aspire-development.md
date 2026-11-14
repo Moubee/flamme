@@ -34,7 +34,7 @@ not required. Install the .NET 10 runtime as well when running the repository's
 From the repository root, an interactive local session can use:
 
 ```bash
-aspire run
+aspire run --isolated
 ```
 
 Open the dashboard login URL printed by the CLI. Select `server` to find its
@@ -130,7 +130,7 @@ Rediscover endpoints before reusing a saved URL.
 
 ## Stop and retain data
 
-Press Ctrl+C in an interactive `aspire run` session, or stop the exact background
+Press Ctrl+C in an interactive `aspire run --isolated` session, or stop the exact background
 AppHost:
 
 ```bash
@@ -142,7 +142,9 @@ shutdown stops the AppHost and server while retaining the database container and
 data for later development sessions. Treat `--force` as persistent-resource
 removal and `--force --volumes` as data deletion; neither belongs in routine
 shutdown. Keep Aspire's generated volume and container names so worktrees retain
-their own resource identity.
+their own resource identity. Use `--isolated` consistently to follow the verified
+workflow. When changing secret configuration with retained database data, preserve
+the existing PostgreSQL credentials.
 
 This graph runs one reference server and permits its existing single-host
 file-system locks in Development. It does not establish multi-node locking or a

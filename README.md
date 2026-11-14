@@ -53,7 +53,7 @@ selected by `global.json`, Aspire CLI 13.6.5, and a running Docker-compatible
 container runtime, then run from the repository root:
 
 ```bash
-aspire run
+aspire run --isolated
 ```
 
 Aspire starts PostgreSQL 17 and the reference server from source, and provides a
