@@ -113,6 +113,14 @@ Use component tests when host lifecycle, HTTP server behavior, actual persistenc
 
 TUnit owns test-run log capture, correlation, and telemetry. Shared integration hosts use the official TUnit logging provider, and TUnit ASP.NET Core integration configures application telemetry. Do not add Elsa log-capture providers, in-memory exporters, or telemetry receivers.
 
+`TestWebApplicationFactory` registers logging automatically for its application host.
+`TestApplicationBuilder` constructs a plain `ServiceCollection`, so it references
+`TUnit.Logging.Microsoft` and explicitly adds the official correlated provider. TUnit's
+automatic console capture alone does not register an `ILogger` provider in this container.
+Set both the logging filter and the provider minimum to Debug to retain diagnostic output.
+See TUnit's [standalone logging documentation](https://github.com/thomhurst/TUnit/blob/77453eab9cc452dbba8c53e77d12bf595f71cf30/docs/docs/extending/logging.md#standalone-no-aspnet-core),
+which matches the source commit of the installed TUnit 1.84.0 packages.
+
 The removed diagnostics modules and their test projects are no longer part of the solution. The retained [workflow instrumentation tests](../../test/unit/Elsa.Workflows.Core.UnitTests/Telemetry/WorkflowInstrumentationTests.cs) verify the `Elsa.Workflows` source and meter contract with native .NET listeners.
 
 ## Good Test Hygiene

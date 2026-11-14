@@ -98,3 +98,27 @@ instrumentation, trace propagation, execution journals, and retry history are un
 - All project-reference paths resolve, whitespace checks pass, and retained source
   and lock files contain no references to the removed diagnostics packages.
 - The original checkout's unrelated local changes were preserved.
+
+## TUnit logging follow-up
+
+The local TUnit reference was inspected read-only at commit
+`77453eab9cc452dbba8c53e77d12bf595f71cf30`, which matches the installed TUnit 1.84.0
+NuGet package source. Its official documentation distinguishes automatic logging for
+`TestWebApplicationFactory` from standalone `IHost` and plain dependency-injection
+containers. `TestApplicationBuilder` constructs the latter, so it retains a direct
+`TUnit.Logging.Microsoft` dependency and one official provider registration. Native
+console interception and activity collection do not install an `ILogger` provider
+into an independent container.
+
+This check found that setting the provider minimum to Debug alone had lost the old
+global Debug filter. A regression test confirmed Debug messages were absent on both
+frameworks while Information messages were captured. The builder now uses the
+official `AddLogging`/`AddCorrelatedTUnit` extensions with both minimum levels set to
+Debug. All 656 workflow integration tests pass, including actual Debug and Information
+capture assertions using TUnit's own output API. Independent review found no remaining
+issues in this correction.
+
+The full solution rebuild and test run also passed:
+`dotnet test --solution Elsa.slnx --no-restore --max-parallel-test-modules 2`
+completed with 8,887 passed, zero failed, and four existing skips across .NET 10 and
+.NET 11. No dependency or lock-file changes were needed.

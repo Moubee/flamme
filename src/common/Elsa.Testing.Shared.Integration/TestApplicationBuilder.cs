@@ -32,7 +32,9 @@ public class TestApplicationBuilder
         _services
             .AddSingleton(_testOutput)
             .AddSingleton<IConfiguration, ConfigurationManager>()
-            .AddCorrelatedTUnitLogging(LogLevel.Debug);
+            .AddLogging(logging => logging
+                .SetMinimumLevel(LogLevel.Debug)
+                .AddCorrelatedTUnit(LogLevel.Debug));
 
         _configureElsa += elsa => elsa
             .AddActivitiesFrom<WriteLine>()
