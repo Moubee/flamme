@@ -34,10 +34,8 @@
   </Folder>
   <Folder Name="/scripts/" />
   <Folder Name="/scripts/docker/">
-    <File Path="scripts/docker/build-and-run-all-in-one-web-docker.sh" />
     <File Path="scripts/docker/docker-compose-citus.yml" />
     <File Path="scripts/docker/docker-compose.yml" />
-    <File Path="scripts/docker/docker-run-all-in-one-web.ps1" />
   </Folder>
   <Folder Name="/scripts/k8s/" />
   <Folder Name="/scripts/k8s/elsa-server/">
@@ -60,13 +58,6 @@
     <File Path="scripts/k8s/trace-lens/service.yaml" />
   </Folder>
   <Folder Name="/scripts/migrations/">
-    <File Path="scripts/migrations/efcore-3.0.sh" />
-    <File Path="scripts/migrations/efcore-3.1-sql.sh" />
-    <File Path="scripts/migrations/efcore-3.1.sh" />
-    <File Path="scripts/migrations/efcore-3.2.sh" />
-    <File Path="scripts/migrations/efcore-3.3.sh" />
-    <File Path="scripts/migrations/efcore-3.4.sh" />
-    <File Path="scripts/migrations/efcore-3.5.sh" />
     <File Path="scripts/migrations/README.md" />
   </Folder>
   <Folder Name="/solution/">

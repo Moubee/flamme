@@ -42,7 +42,7 @@ dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Cor
 ElsaScript DSL tests:
 
 ```bash
-./run-dsl-tests.sh
+dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
 ```
 
 ## Build System

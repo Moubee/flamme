@@ -75,7 +75,7 @@ dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflow
 Run ElsaScript DSL tests:
 
 ```bash
-./run-dsl-tests.sh
+dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
 ```
 
 ## Activity Tests

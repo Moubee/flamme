@@ -33,7 +33,7 @@ Guidance for AI coding agents working in this repository.
 - Create versioned packages: `dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1`
 - Run the complete repository test suite: `dotnet test --solution Elsa.slnx`
 - Run a specific test project: `dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj`
-- Run ElsaScript DSL integration tests: `./run-dsl-tests.sh`
+- Run ElsaScript DSL integration tests: `dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj`
 
 Install the .NET SDK selected by the root `global.json` (11.0.100 with patch roll-forward)
 and the .NET 10 SDK/runtime for test applications and app hosts. Builds default
