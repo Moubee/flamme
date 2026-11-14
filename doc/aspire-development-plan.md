@@ -35,10 +35,10 @@ flowchart LR
 ## Steps and commits
 
 1. `docs: record Aspire development plan` — research, resource graph and acceptance criteria.
-2. `feat(aspire): orchestrate reference server and PostgreSQL` — current CLI configuration,
-   AppHost, stable hosting packages, dynamic endpoints and persistence.
-3. `feat(observability): export reference server telemetry to Aspire` — shared telemetry,
-   regression coverage and reviewed full-target lock files.
+2. `feat(aspire): scaffold PostgreSQL development AppHost` — current CLI configuration,
+   AppHost, stable hosting package and persistence.
+3. `feat(aspire): connect reference server and workflow telemetry` — dynamic server/tenant
+   configuration, shared telemetry, regression coverage and reviewed full-target locks.
 4. `docs(aspire): document and verify development demo` — quickstart, demonstration,
    daily development loop and recorded verification results.
 

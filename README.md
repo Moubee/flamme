@@ -48,6 +48,21 @@ The repository uses the **.NET SDK selected by [global.json](global.json)**: 11.
 
 ## Run locally
 
+For a coordinated development session or demonstration, install the .NET SDK
+selected by `global.json`, Aspire CLI 13.6.5, and a running Docker-compatible
+container runtime, then run from the repository root:
+
+```bash
+aspire run
+```
+
+Aspire starts PostgreSQL 17 and the reference server from source, and provides a
+dashboard for endpoints, health, logs, traces, and metrics. Follow the
+[Aspire development guide](doc/aspire-development.md) for certificate setup,
+isolated Git worktrees, the HTTP workflow demo, and database lifetime details.
+
+### Manual server startup
+
 Use the reference server to explore the backend. The commands below use a local PostgreSQL container and run the application on the host. Run them from the repository root with the selected .NET SDK and Docker installed, and port 5432 available locally.
 
 1. Start the development database:
@@ -113,6 +128,7 @@ Use separate liveness and readiness probes, configure PostgreSQL persistence, an
 | [Repository wiki](doc/wiki/README.md) | Architecture, modules, runtime behavior, and source landmarks. |
 | [Persistence migration](doc/postgres-inmemory-migration.md) | Removed providers and PostgreSQL configuration. |
 | [Server configuration](src/apps/Elsa.Server.Web/README.md) | Reference host settings, identity, and ingress rate limiting. |
+| [Aspire development](doc/aspire-development.md) | Coordinated server/database startup, workflow demo, telemetry, and isolated worktrees. |
 | [Upstream Elsa documentation](https://docs.elsaworkflows.io/) | Background on inherited concepts; verify differences against Flamme's code and documentation. |
 
 ## Contributing
