@@ -63,7 +63,7 @@ Primary references:
 - New behavior-focused regression tests pass on both .NET 10 and .NET 11 using
   the SDK's MTP `dotnet test --project` interface.
 - Legacy Zstandard frames decode on both targets; native .NET 11 frames decode
-  with the legacy reader, including empty, Unicode, and large inputs.
+  with the legacy reader, including empty text, Unicode, and large inputs.
 - Build the complete solution in Release with locked dependencies and capture
   a binary log. Run affected Core, HTTP, and Common unit suites on both targets.
 - Review after four commits, fix actionable findings, and keep the worktree
@@ -71,6 +71,83 @@ Primary references:
 
 ## Validation results
 
-Implementation, test results, and the independent review outcome will be recorded
-here as the steps complete. No performance improvement is claimed without
-measurement.
+All four planned commits are implemented. No dependency versions, lock files,
+framework targets, or runtime-async settings changed.
+
+Locked full-solution restore passed. The full Release solution build passed with
+zero errors and 191 warnings, all originating in untouched files. The build used
+SDK 11.0.100, four MSBuild workers, `--no-restore`, and a binary log at
+`/tmp/flamme-modernization-release.binlog`.
+
+Affected unit suites passed using MTP, Release configuration, and `--no-restore`:
+
+| Suite | .NET 10 | .NET 11 |
+| --- | ---: | ---: |
+| Workflows Core | 312 | 312 |
+| HTTP | 40 | 40 |
+| Common | 101 | 106 |
+| Total | 453 | 458 |
+
+All 911 affected-suite tests passed, with no failures or skips. The Common suites
+emitted no warnings. Core retained an existing fixture-cleanup warning in an
+untouched test. Logs are `/tmp/flamme-modernization-{core,http,common}-{net10.0,net11.0}.log`.
+
+The broader CI test lanes also passed locally on macOS arm64 with Docker-backed
+fixtures. Tests reused the Release solution build and limited MTP to four
+concurrent test modules:
+
+| Lane | Passed | Failed | Skipped |
+| --- | ---: | ---: | ---: |
+| .NET 10 complete solution | 4,613 | 0 | 2 |
+| .NET 11 unit/integration filter | 4,398 | 0 | 0 |
+| .NET 11 component filter | 220 | 0 | 2 |
+| Total | 9,231 | 0 | 4 |
+
+Both targets retain the existing skips for `ImportWorkflowActivity_ShouldUpdateOtherPods`
+(not implemented) and `DeleteWorkflow_Clustered` (interferes with event-driven tests).
+The commands, after the full-target locked restore and Release build, were:
+
+```sh
+dotnet test --solution Elsa.slnx --framework net10.0 --configuration Release --no-build --no-restore --max-parallel-test-modules 4
+dotnet test --solution Elsa.UnitIntegration.Tests.slnf --framework net11.0 --configuration Release --no-build --no-restore --max-parallel-test-modules 4
+dotnet test --solution Elsa.Component.Tests.slnf --framework net11.0 --configuration Release --no-build --no-restore --max-parallel-test-modules 4
+```
+
+Logs are `/tmp/flamme-modernization-all-net10.0.log`,
+`/tmp/flamme-modernization-unit-integration-net11.0.log`, and
+`/tmp/flamme-modernization-component-net11.0.log`.
+The .NET 11 filters exclude the .NET 10-only benchmark project, matching CI.
+
+### Zstandard compatibility findings
+
+- Valid base64 Zstandard payloads retain the UTF-8 text contract. Existing frames
+  decode on both targets; .NET 11 frames decode through the actual NuGet
+  IronCompress package, including empty text and roughly 610 KB of Unicode.
+- Native compression pledges the source byte length before writing, so its
+  frame header supports older readers that allocate from that size.
+- The final .NET 11 decoder validates the whole input with the one-shot decoder,
+  bounds the allocation, and decodes only `bytesWritten`. It rejects empty
+  compressed buffers, truncated frames, and garbage suffixes. Empty text remains
+  represented by a valid nonempty frame.
+- Invalid-input exception types can differ by target. The unchanged .NET 10
+  native IronCompress reader tolerates some malformed frames that .NET 11 now
+  rejects. IronCompress also has a managed fallback with different malformed-input
+  behavior. Early isolated probes omitted native package assets; repository
+  tests exposed that distinction, and the implementation/tests were corrected
+  before the codec commit. Compatibility claims concern valid persisted data.
+- No performance improvement is claimed without measurement. The third-party
+  package remains available for .NET 10 and compatibility tests.
+
+### Independent review
+
+A separate reviewer inspected the first three commits, then the complete four-step
+range `baeef4331..7a57a1010`. Both passes reported no actionable correctness
+findings. Review covered public property signatures/defaults, taint tracking,
+hierarchy registration, record equality/copy semantics, actual bookmark hash/JSON
+serialization, collection wire aliases, decoder bounds, output lengths,
+disposal, and cross-reader compatibility. The coordinator also reviewed each
+diff before committing.
+
+Optional future coverage identified in review is a fixed historical frame with
+compressed blocks or unknown content size. Existing large-input and cross-reader
+tests exercise compressed blocks dynamically; this is not a release blocker.
