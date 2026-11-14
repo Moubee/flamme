@@ -74,6 +74,17 @@ projects every Monday at 06:00 UTC (09:00 in Minsk). Update pull requests use
 Conventional Commits with the `chore` prefix and a dependency scope. Add any new
 npm manifest directory to the existing `directories` list so it receives updates.
 
+Minor and patch version updates are grouped by provider or package family (such
+as Microsoft, OpenTelemetry, TUnit, React, and the `actions` and `docker` action
+owners). Major upgrades and unmatched packages receive individual pull requests.
+Keep group patterns specific: `System.Linq.Dynamic.Core`, for example, is not a
+Microsoft package. Review framework-specific versions and EF Core/Npgsql
+compatibility even when packages arrive in a group.
+
+The GitHub Actions `directories` list includes the NuGet cache composite action,
+which is outside the default workflow scan. Add other composite action directories
+when they introduce external `uses:` dependencies.
+
 ### Architecture Decision Records
 
 Records live in `doc/adr/`. Name a new one `YYYY-MM-DD-slug.md` and give it a `# ` heading with the title
