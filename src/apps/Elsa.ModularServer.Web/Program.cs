@@ -47,7 +47,10 @@ var telemetry = services.AddOpenTelemetry()
         .AddHttpClientInstrumentation()
         .AddMeter(WorkflowInstrumentation.MeterName));
 
-if (!string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
+if (!string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]) ||
+    !string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"]) ||
+    !string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"]) ||
+    !string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"]))
 {
     telemetry.UseOtlpExporter();
 }
