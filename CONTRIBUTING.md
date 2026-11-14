@@ -67,6 +67,13 @@ clean outputs for the selected configuration.
 See [Build, Run, And Operate](doc/wiki/build-run-operate.md) for targeted commands,
 server startup, and operational guidance.
 
+### Dependency updates
+
+[Dependabot](.github/dependabot.yml) checks NuGet, GitHub Actions, and both npm
+projects every Monday at 06:00 UTC (09:00 in Minsk). Update pull requests use
+Conventional Commits with the `chore` prefix and a dependency scope. Add any new
+npm manifest directory to the existing `directories` list so it receives updates.
+
 ### Architecture Decision Records
 
 Records live in `doc/adr/`. Name a new one `YYYY-MM-DD-slug.md` and give it a `# ` heading with the title
