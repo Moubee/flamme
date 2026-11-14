@@ -342,7 +342,7 @@ public class QuiescenceSignalPersistenceTests
         var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
         var cancelled = new CancellationToken(canceled: true);
 
-        await Assert.ThrowsAsync(() =>
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
             sut.PauseAsync("migration", "op@ex.com", cancelled).AsTask());
 
         await Assert.That(sut.CurrentState.Reason.HasFlag(QuiescenceReason.AdministrativePause)).IsFalse();

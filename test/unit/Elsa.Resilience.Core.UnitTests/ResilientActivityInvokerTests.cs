@@ -77,7 +77,7 @@ public class ResilientActivityInvokerTests
         await _invoker.InvokeAsync(_activity, context, () => Task.FromResult("done"));
 
         Mock.Get(_evaluator).EvaluateAsync(
-            Arg.Is<ResilienceStrategyConfig>(c => c.Mode == ResilienceStrategyConfigMode.Identifier && c.StrategyId == "my-strategy"),
+            Arg.Is<ResilienceStrategyConfig?>(c => c != null && c.Mode == ResilienceStrategyConfigMode.Identifier && c.StrategyId == "my-strategy"),
             context.ExpressionExecutionContext,
             Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }

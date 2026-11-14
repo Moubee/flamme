@@ -156,7 +156,7 @@ public class WorkflowInstanceStorageDriverTests
         try
         {
             ObjectConverter.StrictMode = true;
-            await Assert.ThrowsAsync(() => harness.Driver.ReadAsync(id, harness.Context).AsTask());
+            await Assert.ThrowsAsync<Exception>(() => harness.Driver.ReadAsync(id, harness.Context).AsTask());
             await Assert.That(GetVariables(harness.Properties).ContainsKey(id)).IsTrue();
         }
         finally

@@ -71,7 +71,7 @@ public class WorkflowActivationGateTests
         var lockProvider = new InMemoryDistributedLockProvider();
         var gate = CreateGate(evaluator, lockProvider);
 
-        await Assert.ThrowsAsync(() => gate.EvaluateAsync(CreateWorkflow(typeof(SingletonStrategy)), null, cancellationSource.Token));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => gate.EvaluateAsync(CreateWorkflow(typeof(SingletonStrategy)), null, cancellationSource.Token));
 
         await Assert.That(lockProvider.HeldLocks).IsEqualTo(0);
     }
@@ -100,7 +100,7 @@ public class WorkflowActivationGateTests
         var strategyObservedCancellation = strategyToken.IsCancellationRequested;
         completeEvaluation.SetResult(true);
 
-        await Assert.ThrowsAsync(() => evaluation);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => evaluation);
         await Assert.That(strategyObservedCancellation).IsTrue();
         await Assert.That(lockProvider.HandleDisposeCount).IsEqualTo(1);
     }

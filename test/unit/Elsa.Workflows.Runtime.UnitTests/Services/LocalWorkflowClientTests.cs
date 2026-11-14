@@ -150,7 +150,7 @@ public class LocalWorkflowClientTests
                         return Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token));
                     });
 
-        await Assert.ThrowsAsync(() => client.CreateInstanceAsync(new CreateWorkflowInstanceRequest
+        await Assert.ThrowsAsync<OperationCanceledException>(() => client.CreateInstanceAsync(new CreateWorkflowInstanceRequest
         {
             WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId("test-definition")
         }));
@@ -186,7 +186,7 @@ public class LocalWorkflowClientTests
         var persistenceToken = await saveStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
         handleLostSource.Cancel();
 
-        await Assert.ThrowsAsync(() => save);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => save);
         await Assert.That(persistenceToken.IsCancellationRequested).IsTrue();
         Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(lockHandle.DisposeCount).IsEqualTo(1);
@@ -219,7 +219,7 @@ public class LocalWorkflowClientTests
         await Assert.That(persistenceToken).IsEqualTo(cancellationSource.Token);
         cancellationSource.Cancel();
 
-        await Assert.ThrowsAsync(() => save);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => save);
     }
 
     [Test]
@@ -308,7 +308,7 @@ public class LocalWorkflowClientTests
         using var cancellationSource = new CancellationTokenSource();
         cancellationSource.Cancel();
 
-        await Assert.ThrowsAsync(() => client.CreateAndRunInstanceAsync(request, cancellationSource.Token));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => client.CreateAndRunInstanceAsync(request, cancellationSource.Token));
 
         Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();
         Mock.Get(_workflowInstanceManager).CreateAndCommitWorkflowInstanceAsync(Any(), Any(), Any()).WasNeverCalled();
@@ -347,7 +347,7 @@ public class LocalWorkflowClientTests
         if (!runnerObservedLeaseLoss)
             runnerCompletion.TrySetException(new InvalidOperationException("The runner did not receive the lease-loss cancellation token."));
 
-        await Assert.ThrowsAsync(() => run);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => run);
         await Assert.That(runnerObservedLeaseLoss).IsTrue();
         await Assert.That(lockHandle.DisposeCount).IsEqualTo(1);
         Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Any()).WasNeverCalled();

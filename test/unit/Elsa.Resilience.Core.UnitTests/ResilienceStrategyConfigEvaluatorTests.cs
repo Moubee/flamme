@@ -69,7 +69,7 @@ public class ResilienceStrategyConfigEvaluatorTests
         var result = await _evaluator.EvaluateAsync(config, _context);
 
         await Assert.That(result).IsNull();
-        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(Arg.Any<Expression>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<ExpressionEvaluatorOptions>()).WasNeverCalled();
+        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(Arg.Any<Expression>(), Arg.Any<ExpressionExecutionContext>(), Arg.Any<ExpressionEvaluatorOptions?>()).WasNeverCalled();
     }
 
     [Test]
@@ -137,6 +137,6 @@ public class ResilienceStrategyConfigEvaluatorTests
 
     private void SetupExpressionResult(Expression expression, object? result)
     {
-        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(expression, _context, Arg.Any<ExpressionEvaluatorOptions>()).Returns(result);
+        Mock.Get(_expressionEvaluator).EvaluateAsync<object>(expression, _context, Arg.Any<ExpressionEvaluatorOptions?>()).Returns(result);
     }
 }
