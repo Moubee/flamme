@@ -119,6 +119,8 @@ Use separate liveness and readiness probes, configure PostgreSQL persistence, an
 
 Use [Flamme issues](https://github.com/DenDeline/flamme/issues) for bug reports, performance evidence, and proposals. Contributions should align with the [project direction](doc/project-direction.md); include representative workloads and measurements when proposing performance changes. Follow the [contribution guide](CONTRIBUTING.md) for the development workflow and validation commands.
 
+Report suspected vulnerabilities privately using the [security policy](SECURITY.md).
+
 ## License and attribution
 
 Flamme is licensed under the [MIT License](LICENSE) and retains the original copyright notice. Thanks to the [Elsa Workflows contributors](https://github.com/elsa-workflows/elsa-core) for the foundation on which this fork builds.

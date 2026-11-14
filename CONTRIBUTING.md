@@ -100,6 +100,8 @@ For persistence changes, verify PostgreSQL behavior when durable storage is invo
 
 ## Reporting bugs
 
+For a suspected vulnerability, follow the [security policy](SECURITY.md) and report privately instead of posting security details in an issue.
+
 Use [Flamme issues](https://github.com/DenDeline/flamme/issues) and include:
 
 - A clear summary, expected behavior, and actual behavior.
