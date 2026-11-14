@@ -6,7 +6,25 @@
     <!-- Lock executable entrypoints (including tests and benchmarks), rather than library graphs
          whose dependency versions are resolved by their consuming applications. -->
     <RestorePackagesWithLockFile Condition="'$(OutputType)' == 'Exe'">true</RestorePackagesWithLockFile>
+    <!-- Runtime async is a compiler opt-in for the supported .NET 11 CoreCLR targets. -->
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == '' And '$(TargetFramework)' == 'net11.0'
+                              And '$(UseMonoRuntime)' != 'true'
+                              And !$(RuntimeIdentifier.StartsWith('browser-'))
+                              And !$(RuntimeIdentifier.StartsWith('wasi-'))">true</UseRuntimeAsync>
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == ''">false</UseRuntimeAsync>
   </PropertyGroup>
+
+  <!-- Features is a compiler option. Scope it after each project's target framework is known. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0' And '$(UseRuntimeAsync)' == 'true'">
+    <Features>$(Features);runtime-async=on</Features>
+  </PropertyGroup>
+
+  <!-- The SDK cache omits Features. Track it so changing the async model recompiles incrementally. -->
+  <Target Name="IncludeCompilerFeaturesInCompileCache" BeforeTargets="_GenerateCompileDependencyCache">
+    <ItemGroup>
+      <CoreCompileCache Include="CompilerFeatures=$(Features)" />
+    </ItemGroup>
+  </Target>
 
   <!-- Use project references instead of NuGet packages for local development -->
   <PropertyGroup>

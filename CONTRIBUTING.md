@@ -22,6 +22,27 @@ patch roll-forward), plus the .NET 10 runtime to run both supported targets.
 Libraries, app hosts, and correctness tests target .NET 10 and .NET 11; performance
 benchmarks target .NET 10. .NET 8 and .NET 9 are no longer supported.
 
+.NET 11 server builds enable [runtime async](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime)
+centrally through the compiler's `runtime-async=on` feature. .NET 10 keeps the
+compiler-generated state machines. The existing ConfigureAwait.Fody policy
+applies to both models. No preview language version or environment switch is
+required. Runtime async remains a preview feature in the stable .NET 11 SDK.
+
+Use `-p:UseRuntimeAsync=false` on build, test, or pack commands to rebuild with
+the previous async compilation model. Rebuild affected projects when switching
+models; `--no-build` reuses whichever assemblies were built previously. For example:
+
+```bash
+dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --configuration Release --framework net11.0 --no-restore -p:UseRuntimeAsync=false
+```
+
+The default opt-in excludes Mono, browser/WASI runtime identifiers, and
+platform-specific target frameworks. The .NET 11 NuGet assets are intended for
+supported CoreCLR consumers; consumers on unsupported runtimes should use the
+.NET 10 assets or rebuild with runtime async disabled. NativeAOT and ReadyToRun
+remain supported compilation modes. See the [research and validation record](doc/qa/2026-11-14-runtime-async.md)
+for compatibility evidence and verification results.
+
 ```bash
 dotnet restore Elsa.slnx
 dotnet build Elsa.slnx --configuration Release --no-restore
