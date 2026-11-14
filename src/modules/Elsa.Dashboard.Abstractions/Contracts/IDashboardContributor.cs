@@ -89,7 +89,6 @@ public record DashboardOverviewContribution
 {
     public DashboardRuntimeStatus? Runtime { get; init; }
     public DashboardWorkflowInstanceMetrics? WorkflowInstances { get; init; }
-    public DashboardDiagnosticsSummary? Diagnostics { get; init; }
     public IReadOnlyCollection<DashboardMetricCard> Metrics { get; init; } = [];
     public IReadOnlyCollection<DashboardPanelSummary> Panels { get; init; } = [];
 }
@@ -103,9 +102,7 @@ public record DashboardOverviewPermissions
 {
     public DashboardPermission? Runtime { get; init; }
     public DashboardPermission? WorkflowInstances { get; init; }
-    public DashboardPermission? StructuredLogs { get; init; }
-    public DashboardPermission? ConsoleLogs { get; init; }
 
     /// <summary>The permissions declared for any section.</summary>
-    public IEnumerable<DashboardPermission> All() => new[] { Runtime, WorkflowInstances, StructuredLogs, ConsoleLogs }.OfType<DashboardPermission>();
+    public IEnumerable<DashboardPermission> All() => new[] { Runtime, WorkflowInstances }.OfType<DashboardPermission>();
 }

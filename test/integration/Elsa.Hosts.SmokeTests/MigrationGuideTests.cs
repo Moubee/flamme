@@ -62,8 +62,7 @@ public class MigrationGuideTests
     /// Two lazier approaches were tried and both under-report. <c>AppDomain.CurrentDomain.GetAssemblies()</c>
     /// describes whatever earlier tests happened to touch, so this class saw 29 resources as missing when run
     /// alone and none in a full run. Walking <c>GetReferencedAssemblies()</c> from the two hosts is no better:
-    /// the compiler drops references to assemblies whose types the app never names, so AI, OpenTelemetry and
-    /// Shells vanished despite being project references. The output directory has every module either host
+    /// the compiler drops references to assemblies whose types the app never names, so AI and Shells vanished despite being project references. The output directory has every module either host
     /// pulls in, regardless of whether its types are mentioned.
     /// </remarks>
     private static Dictionary<string, IReadOnlyCollection<string>> BuildCatalog() =>

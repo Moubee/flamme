@@ -111,12 +111,6 @@
     <Project Path="src/modules/Elsa.Dashboard.Api/Elsa.Dashboard.Api.csproj" />
   </Folder>
   <Folder Name="/src/modules/diagnostics/">
-    <Project Path="src/modules/Elsa.Diagnostics.ConsoleLogs.Dashboard/Elsa.Diagnostics.ConsoleLogs.Dashboard.csproj" />
-    <Project Path="src/modules/Elsa.Diagnostics.ConsoleLogs/Elsa.Diagnostics.ConsoleLogs.csproj" />
-    <Project Path="src/modules/Elsa.Diagnostics.OpenTelemetry/Elsa.Diagnostics.OpenTelemetry.csproj" />
-    <Project Path="src/modules/Elsa.Diagnostics.StructuredLogs.Dashboard/Elsa.Diagnostics.StructuredLogs.Dashboard.csproj" />
-    <Project Path="src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Relational/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.csproj" />
-    <Project Path="src/modules/Elsa.Diagnostics.StructuredLogs/Elsa.Diagnostics.StructuredLogs.csproj" />
   </Folder>
   <Folder Name="/src/modules/dsl/">
     <Project Path="src/modules/Elsa.Dsl.ElsaScript/Elsa.Dsl.ElsaScript.csproj" />
@@ -214,10 +208,6 @@
     <Project Path="test/integration/Elsa.Bpmn.IntegrationTests/Elsa.Bpmn.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Bpmn.Interchange.IntegrationTests/Elsa.Bpmn.Interchange.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Common.IntegrationTests/Elsa.Common.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Diagnostics.ConsoleLogs.IntegrationTests/Elsa.Diagnostics.ConsoleLogs.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Diagnostics.OpenTelemetry.IntegrationTests/Elsa.Diagnostics.OpenTelemetry.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests/Elsa.Diagnostics.StructuredLogs.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests/Elsa.Diagnostics.StructuredLogs.Persistence.ConformanceTests.csproj" />
     <Project Path="test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj" />
@@ -244,10 +234,6 @@
     <Project Path="test/unit/Elsa.Bpmn.UnitTests/Elsa.Bpmn.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Common.UnitTests/Elsa.Common.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Dashboard.Api.UnitTests/Elsa.Dashboard.Api.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Diagnostics.ConsoleLogs.UnitTests/Elsa.Diagnostics.ConsoleLogs.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Diagnostics.OpenTelemetry.UnitTests/Elsa.Diagnostics.OpenTelemetry.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests/Elsa.Diagnostics.StructuredLogs.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Expressions.UnitTests/Elsa.Expressions.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.ExternalAuthentication.UnitTests/Elsa.ExternalAuthentication.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Features.UnitTests/Elsa.Features.UnitTests.csproj" />

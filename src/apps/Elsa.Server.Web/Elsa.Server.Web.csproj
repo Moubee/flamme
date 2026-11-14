@@ -5,8 +5,6 @@
 		<ProjectReference Include="..\..\modules\Elsa.Caching\Elsa.Caching.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Common\Elsa.Common.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Dashboard.Api\Elsa.Dashboard.Api.csproj" />
-		<ProjectReference Include="..\..\modules\Elsa.Diagnostics.StructuredLogs.Dashboard\Elsa.Diagnostics.StructuredLogs.Dashboard.csproj" />
-		<ProjectReference Include="..\..\modules\Elsa.Diagnostics.StructuredLogs\Elsa.Diagnostics.StructuredLogs.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Dsl.ElsaScript\Elsa.Dsl.ElsaScript.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Expressions\Elsa.Expressions.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Persistence.EFCore.PostgreSql\Elsa.Persistence.EFCore.PostgreSql.csproj" />

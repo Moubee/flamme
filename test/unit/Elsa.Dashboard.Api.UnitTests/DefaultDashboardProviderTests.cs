@@ -1,10 +1,6 @@
 using Elsa.Dashboard.Abstractions.Contracts;
 using Elsa.Dashboard.Abstractions.Models;
 using Elsa.Dashboard.Api.Services;
-using Elsa.Diagnostics.ConsoleLogs.Dashboard;
-using Elsa.Diagnostics.ConsoleLogs.Dashboard.Extensions;
-using Elsa.Diagnostics.StructuredLogs.Dashboard;
-using Elsa.Diagnostics.StructuredLogs.Dashboard.Extensions;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Models;
@@ -31,28 +27,19 @@ public class DefaultDashboardProviderTests
         await Assert.That(overview.EnvironmentName).IsEqualTo("Integration");
         await Assert.That(overview.Runtime.Status).IsEqualTo(DashboardRuntimeStatusKeys.Unavailable);
         await Assert.That(overview.WorkflowInstances.Running).IsEqualTo(0);
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.NotInstalled.Status);
-        await Assert.That(overview.Diagnostics.ConsoleLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.NotInstalled.Status);
         await Assert.That(overview.Metrics).IsEmpty();
         await Assert.That(overview.Panels).IsEmpty();
     }
 
     [Test]
-    public async Task GetOverviewAsync_ComposesWorkflowAndDiagnosticsContributors()
+    public async Task GetOverviewAsync_ComposesWorkflowAndPanelContributors()
     {
         var provider = CreateProvider(
-            new TestContributor("diagnostics", 200)
+            new TestContributor("panels", 200)
             {
                 Overview = new()
                 {
-                    Diagnostics = new()
-                    {
-                        StructuredLogs = new()
-                        {
-                            Capability = DashboardCapabilityStatus.Available,
-                            SourceCount = 2
-                        }
-                    }
+                    Panels = [new() { Id = "custom", Title = "Custom" }]
                 }
             },
             new TestContributor("workflows", 100)
@@ -79,8 +66,7 @@ public class DefaultDashboardProviderTests
         await Assert.That(overview.WorkflowInstances.Running).IsEqualTo(3);
         await Assert.That(overview.WorkflowInstances.Completed).IsEqualTo(5);
         await Assert.That(overview.WorkflowInstances.Faulted).IsEqualTo(1);
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Available.Status);
-        await Assert.That(overview.Diagnostics.StructuredLogs.SourceCount).IsEqualTo(2);
+        await Assert.That(overview.Panels.Single().Id).IsEqualTo("custom");
     }
 
     public static IEnumerable<(DashboardPermission, SectionAccess)> SinglePermissions() => SectionAccess.BySinglePermission;
@@ -200,7 +186,6 @@ public class DefaultDashboardProviderTests
         await Assert.That(overview.EnvironmentName).IsNull();
         await Assert.That(overview.Runtime.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
         await Assert.That(overview.WorkflowInstances.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
     }
 
     [Test]
@@ -268,7 +253,7 @@ public class DefaultDashboardProviderTests
         var unreadable = new TestContributor("unreadable", 2)
         {
             Overview = new() { WorkflowInstances = new() { Running = 9 } },
-            OverviewPermissions = new() { WorkflowInstances = WholeOverview, StructuredLogs = InstancesView }
+            OverviewPermissions = new() { WorkflowInstances = WholeOverview, Runtime = InstancesView }
         };
         var provider = CreateProvider(new ThrowingContributor("broken", 1) { OverviewPermissions = new() { WorkflowInstances = InstancesView } }, unreadable);
 
@@ -350,19 +335,19 @@ public class DefaultDashboardProviderTests
     [Test]
     public async Task GetOverviewAsync_SkipsOnlyTheContributorsWhoseEveryDeclaredPermissionIsUnreadable()
     {
-        var logsOnly = new TestContributor("logs", 2)
+        var runtimeOnly = new TestContributor("runtime", 2)
         {
-            Overview = new() { Diagnostics = new() { StructuredLogs = new() { Capability = DashboardCapabilityStatus.Available, SourceCount = 2 } } },
-            OverviewPermissions = new() { StructuredLogs = StructuredLogsView }
+            Overview = new() { Runtime = new() { Status = DashboardRuntimeStatusKeys.AcceptingWork } },
+            OverviewPermissions = new() { Runtime = RuntimeView }
         };
         var declared = Declared();
-        var provider = CreateProvider(declared, logsOnly);
+        var provider = CreateProvider(declared, runtimeOnly);
 
         var overview = await provider.GetOverviewAsync(new() { CanRead = permission => permission == InstancesView });
 
         await Assert.That(declared.Invocations).IsEqualTo(1);
-        await Assert.That(logsOnly.Invocations).IsEqualTo(0);
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
+        await Assert.That(runtimeOnly.Invocations).IsEqualTo(0);
+        await Assert.That(overview.Runtime.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
     }
 
     [Test]
@@ -387,23 +372,6 @@ public class DefaultDashboardProviderTests
         await SectionAccess.None.AssertOn(overview);
         await Assert.That(overview.BackendName).IsNull();
         await Assert.That(overview.EnvironmentName).IsNull();
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
-        await Assert.That(overview.Diagnostics.ConsoleLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.Unauthorized.Status);
-    }
-
-    [Test]
-    public async Task GetOverviewAsync_WithCallerWhoMayReadTheWholeOverview_LeavesASectionNobodySuppliedNotInstalled()
-    {
-        var provider = CreateProvider(new TestContributor("workflows", 1)
-        {
-            Overview = new() { Runtime = new() { Status = DashboardRuntimeStatusKeys.AcceptingWork }, WorkflowInstances = new() { Running = 3 } },
-            OverviewPermissions = new() { Runtime = RuntimeView, WorkflowInstances = InstancesView }
-        });
-
-        var overview = await provider.GetOverviewAsync(new() { CanRead = _ => true });
-
-        await Assert.That(overview.BackendName).IsEqualTo("Elsa.TestHost");
-        await Assert.That(overview.Diagnostics.StructuredLogs.Capability.Status).IsEqualTo(DashboardCapabilityStatus.NotInstalled.Status);
     }
 
     [Test]
@@ -616,9 +584,7 @@ public class DefaultDashboardProviderTests
         var root = FindRepositoryRoot();
         var ownerProjects = new[]
         {
-            "src/modules/Elsa.Workflows.Runtime/Elsa.Workflows.Runtime.csproj",
-            "src/modules/Elsa.Diagnostics.ConsoleLogs/Elsa.Diagnostics.ConsoleLogs.csproj",
-            "src/modules/Elsa.Diagnostics.StructuredLogs/Elsa.Diagnostics.StructuredLogs.csproj"
+            "src/modules/Elsa.Workflows.Runtime/Elsa.Workflows.Runtime.csproj"
         };
 
         foreach (var ownerProject in ownerProjects)
@@ -633,15 +599,10 @@ public class DefaultDashboardProviderTests
     {
         var services = new ServiceCollection();
 
-        services
-            .AddWorkflowRuntimeDashboard()
-            .AddStructuredLogsDashboard()
-            .AddConsoleLogsDashboard();
+        services.AddWorkflowRuntimeDashboard();
 
         await AssertRegisteredContributor<WorkflowDashboardContributor>(services);
-        await AssertRegisteredContributor<StructuredLogsDashboardContributor>(services);
-        await AssertRegisteredContributor<ConsoleLogsDashboardContributor>(services);
-        await Assert.That(services.Count(x => x.ServiceType == typeof(IDashboardContributor))).IsEqualTo(3);
+        await Assert.That(services.Count(x => x.ServiceType == typeof(IDashboardContributor))).IsEqualTo(1);
     }
 
     private DefaultDashboardProvider CreateProvider(params IDashboardContributor[] contributors) =>

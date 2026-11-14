@@ -8,9 +8,7 @@
       "applicationUrl": "http://localhost:5002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web",
-        "Diagnostics__OpenTelemetry__Exporter__Endpoint": "http://localhost:5002/elsa/otlp",
-        "Diagnostics__OpenTelemetry__Exporter__Protocol": "http/protobuf"
+        "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web"
       }
     },
     "https": {
@@ -20,9 +18,7 @@
       "applicationUrl": "https://localhost:7294;http://localhost:5002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web",
-        "Diagnostics__OpenTelemetry__Exporter__Endpoint": "https://localhost:7294/elsa/otlp",
-        "Diagnostics__OpenTelemetry__Exporter__Protocol": "http/protobuf"
+        "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web"
       }
     },
     "http-aspire": {
@@ -33,8 +29,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web",
-        "Diagnostics__OpenTelemetry__Exporter__Endpoint": "http://localhost:4317",
-        "Diagnostics__OpenTelemetry__Exporter__Protocol": "grpc"
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
       }
     },
     "https-aspire": {
@@ -45,8 +41,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OTEL_SERVICE_NAME": "Elsa.ModularServer.Web",
-        "Diagnostics__OpenTelemetry__Exporter__Endpoint": "http://localhost:4317",
-        "Diagnostics__OpenTelemetry__Exporter__Protocol": "grpc"
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc"
       }
     }
   }

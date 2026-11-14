@@ -16,11 +16,6 @@
       <ProjectReference Include="..\..\modules\Elsa.AI.Host\Elsa.AI.Host.csproj" />
       <ProjectReference Include="..\..\modules\Elsa.AI.Persistence.EFCore\Elsa.AI.Persistence.EFCore.csproj" />
       <ProjectReference Include="..\..\modules\Elsa.Dashboard.Api\Elsa.Dashboard.Api.csproj" />
-      <ProjectReference Include="..\..\modules\Elsa.Diagnostics.ConsoleLogs.Dashboard\Elsa.Diagnostics.ConsoleLogs.Dashboard.csproj" />
-      <ProjectReference Include="..\..\modules\Elsa.Diagnostics.ConsoleLogs\Elsa.Diagnostics.ConsoleLogs.csproj" />
-      <ProjectReference Include="..\..\modules\Elsa.Diagnostics.OpenTelemetry\Elsa.Diagnostics.OpenTelemetry.csproj" />
-      <ProjectReference Include="..\..\modules\Elsa.Diagnostics.StructuredLogs.Dashboard\Elsa.Diagnostics.StructuredLogs.Dashboard.csproj" />
-      <ProjectReference Include="..\..\modules\Elsa.Diagnostics.StructuredLogs\Elsa.Diagnostics.StructuredLogs.csproj" />
       <ProjectReference Include="..\..\modules\Elsa.ExternalAuthentication.OpenIdConnect\Elsa.ExternalAuthentication.OpenIdConnect.csproj" />
       <ProjectReference Include="..\..\modules\Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql\Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.csproj" />
       <ProjectReference Include="..\..\modules\Elsa.ExternalAuthentication.Secrets\Elsa.ExternalAuthentication.Secrets.csproj" />

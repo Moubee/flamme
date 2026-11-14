@@ -1,10 +1,7 @@
-using ConsoleLogStreaming.Core.Capture;
 using CShells.AspNetCore.Configuration;
 using CShells.AspNetCore.Extensions;
 using CShells.DependencyInjection;
 using Elsa.Dashboard.Api.ShellFeatures;
-using Elsa.Diagnostics.ConsoleLogs.Dashboard.ShellFeatures;
-using Elsa.Diagnostics.StructuredLogs.Dashboard.ShellFeatures;
 using Elsa.ExternalAuthentication.OpenIdConnect.ShellFeatures;
 using Elsa.ExternalAuthentication.Secrets.ShellFeatures;
 using Elsa.UserTasks.Persistence.EFCore.PostgreSql.ShellFeatures;
@@ -23,41 +20,38 @@ using Elsa.Workflows.Telemetry;
 using Nuplane;
 using Nuplane.Loading.Hosting.Builder;
 using Nuplane.Sources.Directory.Configuration;
-using OpenTelemetry.Exporter;
+using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-
-ConsoleStreamHook.Install();
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 configuration.AddJsonFile(configuration["Elsa:PlatformIntegration:ShellOverlayPath"] ?? "platform-shell-overrides.json", optional: true, reloadOnChange: false);
-var serviceVersion = typeof(Program).Assembly.GetName().Version?.ToString();
 
 builder.Logging.AddOpenTelemetry(logging =>
 {
     logging.IncludeFormattedMessage = true;
     logging.IncludeScopes = true;
     logging.ParseStateValues = true;
-    logging.SetResourceBuilder(CreateOpenTelemetryResource(builder.Environment.ApplicationName, serviceVersion));
-    logging.AddOtlpExporter(options => ConfigureDiagnosticsOtlpExporter(options, configuration, "logs"));
 });
 
-services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName, serviceVersion: serviceVersion))
+var telemetry = services.AddOpenTelemetry()
     .WithTracing(tracing => tracing
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
-        .AddSource(WorkflowInstrumentation.ActivitySourceName)
-        .AddOtlpExporter(options => ConfigureDiagnosticsOtlpExporter(options, configuration, "traces")))
+        .AddSource(WorkflowInstrumentation.ActivitySourceName))
     .WithMetrics(metrics => metrics
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
-        .AddMeter(WorkflowInstrumentation.MeterName)
-        .AddOtlpExporter(options => ConfigureDiagnosticsOtlpExporter(options, configuration, "metrics")));
+        .AddMeter(WorkflowInstrumentation.MeterName));
+
+if (!string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
+{
+    telemetry.UseOtlpExporter();
+}
+
 var nuplaneConfiguration = configuration.GetSection("Nuplane");
 
 services.AddNuplane(nuplaneConfiguration, nuplane =>
@@ -88,8 +82,6 @@ builder.AddShells(shells => shells
             typeof(ElsaSecretsExternalAuthenticationFeature),
             typeof(DashboardApiFeature),
             typeof(WorkflowRuntimeDashboardFeature),
-            typeof(ConsoleLogsDashboardFeature),
-            typeof(StructuredLogsDashboardFeature),
             typeof(WorkflowsApiFeature),
             typeof(UserTasksFeature),
             typeof(PostgreSqlUserTasksPersistenceShellFeature));
@@ -109,39 +101,3 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapSampleCatalog();
 app.Run();
-
-static ResourceBuilder CreateOpenTelemetryResource(string serviceName, string? serviceVersion)
-{
-    return ResourceBuilder.CreateDefault().AddService(serviceName, serviceVersion: serviceVersion);
-}
-
-static void ConfigureDiagnosticsOtlpExporter(OtlpExporterOptions options, IConfiguration configuration, string signal)
-{
-    var protocol = configuration["Diagnostics:OpenTelemetry:Exporter:Protocol"];
-    options.Protocol = protocol?.Trim().ToLowerInvariant() switch
-    {
-        "grpc" => OtlpExportProtocol.Grpc,
-        "http/protobuf" or "httpprotobuf" => OtlpExportProtocol.HttpProtobuf,
-        _ => options.Protocol
-    };
-
-    var endpoint = configuration["Diagnostics:OpenTelemetry:Exporter:Endpoint"];
-    if (!string.IsNullOrWhiteSpace(endpoint))
-        options.Endpoint = new Uri(GetSignalEndpoint(endpoint, signal, options.Protocol), UriKind.Absolute);
-}
-
-static string GetSignalEndpoint(string endpoint, string signal, OtlpExportProtocol protocol)
-{
-    if (protocol != OtlpExportProtocol.HttpProtobuf)
-        return endpoint;
-
-    var trimmed = endpoint.TrimEnd('/');
-
-    if (trimmed.EndsWith($"/v1/{signal}", StringComparison.OrdinalIgnoreCase))
-        return trimmed;
-
-    if (trimmed.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
-        return $"{trimmed}/{signal}";
-
-    return $"{trimmed}/v1/{signal}";
-}

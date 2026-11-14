@@ -1,5 +1,3 @@
-using ConsoleLogStreaming.Core;
-using ConsoleLogStreaming.Core.Capture;
 using Elsa.Expressions.Helpers;
 using Elsa.ModularServer.Web;
 using Elsa.Server.Web;
@@ -75,14 +73,6 @@ public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFacto
         "/elsa/api/user-tasks"
     ];
 
-    protected override async Task SetupAsync()
-    {
-        // Recover from a previous partial host startup before Program installs the process-wide hook again.
-        await ConsoleLogStreamingHost.ShutdownAsync();
-        ConsoleStreamHook.Uninstall();
-        await base.SetupAsync();
-    }
-
     protected override IReadOnlyDictionary<string, string?> CreateTestConfiguration()
     {
         var connectionString = ConnectionString;
@@ -97,7 +87,6 @@ public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFacto
             ["CShells:Shells:Default:Features:PostgreSqlUserTasksPersistence:ConnectionString"] = connectionString,
             ["CShells:Shells:Default:Features:Http:HttpActivityOptions:BaseUrl"] = "https://localhost",
             ["CShells:Shells:Default:Features:ExternalAuthentication:Redirects:ExternalCallbackBaseUri"] = "https://localhost/elsa/api/",
-            ["Diagnostics:OpenTelemetry:Exporter:Endpoint"] = "http://127.0.0.1:1",
             ["Elsa:PlatformIntegration:Enabled"] = "false",
             ["Nuplane:Setup:AutomaticReconciliation"] = "false",
             ["Nuplane:Setup:UseInMemoryStore"] = "true",
@@ -114,25 +103,6 @@ public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFacto
         {
             ["Elsa:PlatformIntegration:ShellOverlayPath"] = shellOverlayPath
         };
-    }
-
-    protected override async ValueTask RestoreEntryPointProcessStateAsync()
-    {
-        try
-        {
-            await ConsoleLogStreamingHost.ShutdownAsync();
-        }
-        finally
-        {
-            try
-            {
-                ConsoleStreamHook.Uninstall();
-            }
-            finally
-            {
-                await base.RestoreEntryPointProcessStateAsync();
-            }
-        }
     }
 
     private static void WriteOverlay(string path, IReadOnlyDictionary<string, string?> configuration)

@@ -16,7 +16,6 @@ Returns:
 - Backend and environment names.
 - Runtime status, including whether the runtime is accepting work, active execution cycle count, ingress source count, and failed ingress source count.
 - Contributor-composed workflow instance metrics for running, completed, faulted, suspended, interrupted, incident-bearing, and average completed duration.
-- Contributor-composed structured log and console log diagnostic summaries.
 - Applied range and resolved `from`/`to` timestamps.
 
 ### `POST /dashboard/workflow-trends`
@@ -37,7 +36,7 @@ Query parameters:
 - `take`: Optional maximum number of findings. Clamped to `1..50`.
 - `includeSystem`: Optional boolean.
 
-Returns priority-ordered findings derived from runtime state, workflow metrics, and available diagnostics summaries. Consumers should preserve backend ordering.
+Returns priority-ordered findings derived from runtime state and workflow metrics. Consumers should preserve backend ordering.
 
 ### `GET /dashboard/recent-activity`
 
@@ -68,14 +67,13 @@ The workflow-trends, needs-attention, recent-activity and workflow-hotspots endp
 
 ## Capability States
 
-Diagnostics summaries carry a `capability` object:
+Runtime and workflow instance sections carry a `capability` object:
 
-- `Available`: The diagnostic provider is installed and returned data.
-- `NotInstalled`: The diagnostic provider is absent from the host.
-- `Unauthorized`: The provider rejected access.
-- `Unavailable`: The provider is installed but failed to produce a summary.
+- `Available`: The contributor returned data.
+- `Unauthorized`: The caller cannot read the section.
+- `Unavailable`: The contributor failed to produce a complete section.
 
-Dashboard overview degrades each diagnostics capability independently so a structured log failure does not prevent workflow metrics, runtime status, or console diagnostics from rendering.
+Dashboard overview degrades each section independently so an instance query failure does not prevent runtime status from rendering.
 
 ## Extension Model
 
@@ -83,17 +81,17 @@ Dashboard core owns the public `/dashboard/*` routes, permissions, range resolut
 
 - `Elsa.Dashboard.Api` references `Elsa.Dashboard.Abstractions`.
 - Feature modules reference `Elsa.Dashboard.Abstractions` and register one or more `IDashboardContributor` implementations.
-- Dashboard core does not reference workflow, diagnostics, or future feature modules.
+- Dashboard core does not reference workflow or future feature modules.
 
 `IDashboardContributor` is intentionally broad enough for a module to contribute only the surfaces it owns:
 
-- `GetOverviewAsync` for metric cards, panel summaries, runtime status, workflow metrics, and diagnostic summary slices.
+- `GetOverviewAsync` for metric cards, panel summaries, runtime status and workflow metrics.
 - `GetFindingsAsync` for priority-ordered findings.
 - `GetWorkflowTrendsAsync` for trend buckets.
 - `GetRecentActivityAsync` for compact activity rows.
 - `GetWorkflowHotspotsAsync` for hotspot rows.
 
-Each contributor declares the permission of the data it adds, so the dashboard can withhold it from callers who may not read it. A caller reads a section with the declared permission or with `dashboard:view`; anything supplied without a declaration needs `dashboard:view`. Set `IDashboardContributor.OverviewPermissions` for the runtime, workflow instance and diagnostics sections, and `Permission` on a metric card, panel, finding, or trend, recent-activity or hotspot response, so rows from a contribution that declares none reach only callers holding `dashboard:view`. `OverviewPermissions` lists the permissions of everything the contributor adds to the overview, that is its sections, metric cards and panels, and is used only to skip the overview call for a caller who can read none of them, so it must include every permission its cards and panels carry or a caller holding only that permission never receives them; an undeclared section still needs `dashboard:view`. Findings, trends, recent activity and hotspots always invoke every contributor and are filtered afterwards by the `Permission` on what it returns. A section the caller may not read is returned with `Capability = Unauthorized` and no data. When several contributors add to one section, contributions the caller may not read are ignored; if any contribution the caller may read failed, the section is returned with `Capability = Unavailable` and no figures, never partial totals and never `Unauthorized`. A caller whose permissions read nothing the contributors declared or supplied also gets every section as `Unauthorized`, so installed modules are not disclosed, and empty backend and environment names.
+Each contributor declares the permission of the data it adds, so the dashboard can withhold it from callers who may not read it. A caller reads a section with the declared permission or with `dashboard:view`; anything supplied without a declaration needs `dashboard:view`. Set `IDashboardContributor.OverviewPermissions` for the runtime and workflow instance sections, and `Permission` on a metric card, panel, finding, or trend, recent-activity or hotspot response, so rows from a contribution that declares none reach only callers holding `dashboard:view`. `OverviewPermissions` lists the permissions of everything the contributor adds to the overview, that is its sections, metric cards and panels, and is used only to skip the overview call for a caller who can read none of them, so it must include every permission its cards and panels carry or a caller holding only that permission never receives them; an undeclared section still needs `dashboard:view`. Findings, trends, recent activity and hotspots always invoke every contributor and are filtered afterwards by the `Permission` on what it returns. A section the caller may not read is returned with `Capability = Unauthorized` and no data. When several contributors add to one section, contributions the caller may not read are ignored; if any contribution the caller may read failed, the section is returned with `Capability = Unavailable` and no figures, never partial totals and never `Unauthorized`. A caller whose permissions read nothing the contributors declared or supplied also gets every section as `Unauthorized`, so installed modules are not disclosed, and empty backend and environment names.
 
 Contributor failures are isolated by the dashboard composer. A failed contributor does not break the whole dashboard response; request cancellation is still honored.
 
@@ -137,7 +135,7 @@ The example belongs in a hypothetical `Elsa.Weather.Dashboard` module or inside 
 
 ### Studio Widget Model
 
-Studio follows the same dependency direction. `Elsa.Studio.Dashboard` owns the dashboard route, refresh/range state, zone rendering, shared `DashboardWidgetContext`, and registration helpers. Feature modules register widgets into zones such as metrics, findings, primary panels, secondary panels, and diagnostics/status.
+Studio follows the same dependency direction. `Elsa.Studio.Dashboard` owns the dashboard route, refresh/range state, zone rendering, shared `DashboardWidgetContext`, and registration helpers. Feature modules register widgets into zones such as metrics, findings, primary panels, secondary panels, and status.
 
 Minimal Studio Weather widget registration:
 
@@ -152,17 +150,9 @@ services.AddDashboardWidget<WeatherDashboardWidget>(
 
 `WeatherDashboardWidget` can read the shared dashboard snapshot and navigation services from `DashboardWidgetContext`. The widget should live in `Elsa.Studio.Weather.Dashboard` or the Studio Weather module, not in `Elsa.Studio.Dashboard`.
 
-### Diagnostics Migration
-
-Structured-log and console-log dashboard behavior is diagnostics-owned:
-
-- Backend summaries and findings are contributed by the corresponding diagnostics modules.
-- Studio widgets are registered by the corresponding diagnostics Studio modules.
-- Installing Dashboard alone does not install diagnostics. Installing diagnostics plus Dashboard causes diagnostics summaries and widgets to appear.
-
 ## Studio Integration Notes
 
 - Studio should detect dashboard API support with a guarded dashboard call or feature metadata and show an explicit unavailable state when the endpoints are missing.
 - Studio should keep the last successful dashboard snapshot visible after a refresh failure.
-- Metric and finding targets should route to existing workflow instance, structured log, and console pages. Destination pages that do not yet support URL filters should still be linked and can add deep-link filters later.
+- Metric and finding targets should route to existing workflow instance pages. Destination pages that do not yet support URL filters should still be linked and can add deep-link filters later.
 - The API is read-only. Dashboard consumers must not add workflow write actions to the first dashboard slice.
