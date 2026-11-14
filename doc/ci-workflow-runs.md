@@ -80,6 +80,39 @@ groups, and individual major updates:
 Do not skip checks based on the Dependabot author, suppress security updates,
 merge unrelated majors, or change repository security settings.
 
+## Validation and review
+
+The first three signed conventional commits were independently reviewed. No
+actionable correctness or security findings remained. A documentation sentence
+was clarified to say the package build is required only when enabled.
+
+- actionlint 1.7.12 and `git diff --check` passed for the complete change.
+- Executed the exact classifier Bash against nine real two-parent merge commits
+  cloned at depth two: video-only, source-only, mixed, production ClientLib,
+  moving a production file into video, filenames containing newlines inside and
+  outside video, deleting a video file, and an empty diff.
+- Confirmed depth-one history fails classification without emitting a decision;
+  manual dispatch selects full .NET validation without a checkout.
+- Exercised all 64 result-gate combinations. Only successful classification
+  with `true` + successful tests or `false` + skipped tests succeeds.
+- Compared parsed workflows with the base: Packages retains every original job,
+  step, and coverage check apart from the optional build condition; PR retains
+  all test steps and both framework lanes; Docker changes only concurrency.
+  Existing event filters, permissions, and the `ubuntu-latest` name remain.
+- Dependabot configuration, package versions, and lockfiles are unchanged.
+
+This is a structural reduction: matching development-branch pushes lose the
+six-job Packages graph; each video-only PR avoids both expensive .NET lanes and
+uses path classification plus the existing result gate. Other PRs gain one short
+classification job. No elapsed-time or billing percentage is claimed.
+
+Hosted rollout checks remain: main Packages including coverage and artifacts,
+manual branch Packages with `build_packages` both true and false, a video-only
+PR with a successful result gate, a mixed PR with both frameworks, and
+superseding automatic runs without canceling manual requests. Local simulations
+do not establish GitHub scheduler or runner performance. The existing NuGet
+updater feed-access failure also remains outside this change.
+
 ## Sources
 
 - [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)

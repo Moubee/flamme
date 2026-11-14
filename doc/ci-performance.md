@@ -6,10 +6,11 @@ Research date: 2026-11-14. Base: `origin/main` at `245760a22`.
 
 The Packages workflow builds and uploads validation artifacts on `main` pushes
 and manual runs. Development branches use PR validation; run Packages manually
-on a branch when coverage or package artifacts are needed. The full-solution package build runs alongside the unit/integration
+on a branch when coverage or package artifacts are needed. The full-solution
+package build runs alongside the unit/integration
 and component suites on both `net10.0` and `net11.0`. The aggregate report still
 requires both suites to pass and enforces 10% line coverage. A successful workflow
-requires the build, all test lanes, and coverage reporting to succeed; package
+requires the build when enabled, all test lanes, and coverage reporting to succeed; package
 artifacts from a failed workflow do not establish a validated release.
 
 Download `elsa-nuget-packages`, the framework-specific test-result artifacts, and
@@ -18,8 +19,7 @@ artifacts as push runs. Set `build_packages` to false for coverage validation
 without the separate build/pack job; all four test lanes and the coverage gate
 still run. An empty package upload fails the build job when enabled. Superseded
 automatic Packages and Docker runs are canceled; explicit manual requests stay
-independent. The PR
-and Docker certificate workflows can also be run manually, preserving their
+independent. The PR and Docker certificate workflows can also be run manually, preserving their
 existing framework and image matrices.
 
 The inherited Feedz/NuGet publishers, release-event handling, and GitHub Pages

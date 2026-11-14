@@ -74,8 +74,7 @@ entirely within the isolated `design/video/elsa-readme-video/` project. Those PR
 still report the `ubuntu-latest` check with an explicit .NET skip decision; this
 does not validate the video's npm build. Mixed changes and production ClientLib
 updates run the complete .NET matrix. Manual PR runs always run it as well.
-Packages runs
-automatically after a push to `main`; development branches can request it from
+Packages runs automatically after a push to `main`; development branches can request it from
 Actions → Packages → Run workflow. Select the branch and leave `build_packages`
 enabled to produce NuGet artifacts, or disable it for coverage validation only.
 All four coverage test lanes and the aggregate coverage threshold run either way.
