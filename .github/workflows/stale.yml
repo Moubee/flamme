@@ -12,7 +12,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v11
         with:
           stale-issue-message: 'Hi there! This issue has been marked as stale due to inactivity. If this is still relevant or needs further discussion, please let us know. Otherwise, it will be closed in 7 days. Thank you for your understanding.'
           close-issue-message: 'This issue has been automatically closed due to prolonged inactivity. If you still encounter this problem or have further questions, please feel free to reopen the issue or create a new one. Thank you for your contributions!'
