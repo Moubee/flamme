@@ -260,8 +260,7 @@ The server will start on the configured ports (check `appsettings.json` or envir
 - **Contributing Guide**: See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines
 
 ### Community Support
-- **GitHub Issues**: [Report bugs and request features](https://github.com/DenDeline/flamme/issues)
-- **GitHub Discussions**: [Ask questions and discuss](https://github.com/DenDeline/flamme/discussions)
+- **GitHub Issues**: [Report bugs, request features, and ask questions](https://github.com/DenDeline/flamme/issues)
 - **Discord**: [Join the community chat](https://discord.gg/hhChk5H472)
 - **Stack Overflow**: [Tag: elsa-workflows](http://stackoverflow.com/questions/tagged/elsa-workflows)
 

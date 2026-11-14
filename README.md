@@ -208,8 +208,7 @@ There are various ways to get support for Elsa Workflows, ranging from community
 ### Community Support
 
 Elsa has an active and helpful community where you can find support through multiple channels:
-- [GitHub Issues](https://github.com/DenDeline/flamme/issues) for bug reports and feature requests.
-- [GitHub Discussions](https://github.com/DenDeline/flamme/discussions) for open-ended conversations, questions, and community-driven support.
+- [GitHub Issues](https://github.com/DenDeline/flamme/issues) for bug reports, feature requests, and questions.
 - [Discord](https://discord.gg/hhChk5H472) for real-time support and interaction with the Elsa community.
 - [StackOverflow](https://stackoverflow.com/questions/tagged/elsa-workflows) for searching or asking technical questions.
 

@@ -14,9 +14,6 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
 
-        <!-- For NuGet browsers that currently don't support <PackageIcon> yet -->
-        <PackageIconUrl>https://raw.githubusercontent.com/DenDeline/flamme/main/icon.png</PackageIconUrl>
-
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AnalysisModeDocumentation>Default</AnalysisModeDocumentation>
         <AnalysisLevelDocumentation>latest</AnalysisLevelDocumentation>
