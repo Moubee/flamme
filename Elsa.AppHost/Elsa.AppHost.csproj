@@ -8,5 +8,6 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+        <ProjectReference Include="../src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
     </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@ using Elsa.Persistence.EFCore.Modules.Runtime;
 using Elsa.Server.Web.Activities;
 using Elsa.Server.Web.ActivityHosts;
 using Elsa.Server.Web.Filters;
+using Elsa.ServiceDefaults;
 using Elsa.Tenants;
 using Elsa.Tenants.AspNetCore;
 using Elsa.Tenants.Extensions;
@@ -44,6 +45,7 @@ const string httpWorkflowRateLimitingPolicy = "elsa-http-workflows";
 ObjectConverter.StrictMode = true;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 var services = builder.Services;
 var configuration = builder.Configuration;
 var identitySection = configuration.GetSection("Identity");
