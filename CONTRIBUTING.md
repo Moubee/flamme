@@ -85,6 +85,13 @@ The GitHub Actions `directories` list includes the NuGet cache composite action,
 which is outside the default workflow scan. Add other composite action directories
 when they introduce external `uses:` dependencies.
 
+Routine version updates have an explicit seven-day release cooldown for every
+ecosystem, including major upgrades. A release becomes eligible after seven
+days, then waits for the next weekly scan; the cooldown does not trigger a scan
+itself. Dependabot security updates bypass the cooldown and weekly version-update
+schedule, provided security updates are enabled in the repository settings. See
+the [Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown).
+
 ### Architecture Decision Records
 
 Records live in `doc/adr/`. Name a new one `YYYY-MM-DD-slug.md` and give it a `# ` heading with the title
