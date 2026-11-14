@@ -19,10 +19,7 @@ namespace Elsa.Workflows;
 public partial class ActivityExecutionContext : IExecutionContext, IDisposable
 {
     private readonly ISystemClock _systemClock;
-    private ActivityStatus _status;
-    private Exception? _exception;
     private long _executionCount;
-    private ActivityExecutionContext? _parentActivityExecutionContext;
     
     // Bookmarks created during the lifetime of this activity. 
     private List<Bookmark> _newBookmarks = [];
@@ -113,11 +110,11 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
     /// </summary>
     public ActivityExecutionContext? ParentActivityExecutionContext
     {
-        get => _parentActivityExecutionContext;
+        get;
         internal set
         {
-            _parentActivityExecutionContext = value;
-            _parentActivityExecutionContext?.Children.Add(this);
+            field = value;
+            field?.Children.Add(this);
         }
     }
 
@@ -201,13 +198,13 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
     /// </summary>
     public ActivityStatus Status
     {
-        get => _status;
+        get;
         private set
         {
-            if (value == _status)
+            if (value == field)
                 return;
 
-            _status = value;
+            field = value;
             Taint();
         }
     }
@@ -230,10 +227,10 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
     /// </summary>
     public Exception? Exception
     {
-        get => _exception;
+        get;
         set
         {
-            _exception = value;
+            field = value;
             Taint();
         }
     }

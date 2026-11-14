@@ -8,9 +8,6 @@ namespace Elsa.Http.Bookmarks;
 /// </summary>
 public record HttpEndpointBookmarkPayload
 {
-    private readonly string _path = default!;
-    private readonly string _method = default!;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpEndpointBookmarkPayload"/> class.
     /// </summary>
@@ -37,18 +34,18 @@ public record HttpEndpointBookmarkPayload
     /// </summary>
     public string Path
     {
-        get => _path;
-        init => _path = value.ToLowerInvariant();
-    }
+        get;
+        init => field = value.ToLowerInvariant();
+    } = default!;
 
     /// <summary>
     /// Gets or sets the HTTP method of the endpoint.
     /// </summary>
     public string Method
     {
-        get => _method;
-        init => _method = value.ToLowerInvariant();
-    }
+        get;
+        init => field = value.ToLowerInvariant();
+    } = default!;
 
     /// <summary>
     /// Gets or sets the policy to use for authorization.
