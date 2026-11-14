@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -9,14 +10,18 @@ public class ConfigurationJsonConverter : JsonConverter<IConfiguration>
     public override IConfiguration? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var jsonElement = JsonElement.ParseValue(ref reader);
-        using var memoryStream = new MemoryStream();
-        using var writer = new Utf8JsonWriter(memoryStream);
+#if NET11_0_OR_GREATER
+        using var stream = new StringStream(jsonElement.GetRawText(), Encoding.UTF8);
+#else
+        using var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream);
         jsonElement.WriteTo(writer);
         writer.Flush();
-        memoryStream.Position = 0;
+        stream.Position = 0;
+#endif
 
         var configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddJsonStream(memoryStream);
+        configurationBuilder.AddJsonStream(stream);
         return configurationBuilder.Build();
     }
 

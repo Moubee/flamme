@@ -15,7 +15,11 @@ public class BinaryDownloadableContentHandler : DownloadableContentHandlerBase
     protected override Downloadable GetDownloadable(DownloadableContext context)
     {
         var bytes = (byte[]) context.Content;
-        var stream = new MemoryStream(bytes);
+#if NET11_0_OR_GREATER
+        var stream = new ReadOnlyMemoryStream(bytes);
+#else
+        var stream = new MemoryStream(bytes, writable: false);
+#endif
         var fileName = "file.bin";
         var contentType = "application/octet-stream";
         return new(stream, fileName, contentType);
