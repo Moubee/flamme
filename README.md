@@ -32,6 +32,12 @@ Flamme retains identifiers such as `Elsa.*`, `AddElsa(...)`, `Elsa.slnx`, and `/
 
 Current foundations include C# and JSON workflow definitions, composable activities, short- and long-running execution, triggers and bookmarks, HTTP APIs, scheduling, distributed runtime support, and workflow traces and metrics. The [repository wiki](doc/wiki/README.md) maps these capabilities to their source modules.
 
+Hosts compose modules statically with `AddElsa` and deploy versioned applications.
+Runtime package loading, shell hosting/reload, Platform recipes/catalog manifests,
+BPMN, and WebhooksCore integrations have been retired. Existing deployments should
+follow the [integration migration guide](doc/integration-removal.md), including
+the persisted pause-state migration before starting a replacement host.
+
 Elsa emits an `ActivitySource` and `Meter`; application hosts configure official OpenTelemetry packages and external observability backends. Custom diagnostics collectors, log buffers, exporters, and telemetry endpoints have been removed. See the [telemetry configuration and migration guide](doc/wiki/opentelemetry-workflows.md).
 
 ### Persistence

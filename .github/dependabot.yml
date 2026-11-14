@@ -1,6 +1,6 @@
 version: 2
 # Cooldown applies to version updates; security updates bypass the release delay.
-# NuGet version scans are disabled: the shared restore graph requires Feedz.
+# NuGet version scans remain disabled; NuGet updates are maintained manually.
 updates:
   - package-ecosystem: "github-actions"
     directories:

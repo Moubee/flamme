@@ -92,11 +92,10 @@ Minor and patch version updates are grouped by provider or package family, such
 as React, Remotion, webpack, and the `actions` and `docker` action owners. Major
 upgrades and unmatched packages receive individual pull requests.
 
-Routine NuGet version scans are disabled because the shared restore graph
-requires packages from `f.feedz.io`. This also stops routine nuget.org update
-PRs for the solution. Keep the Feedz sources and mappings in `NuGet.Config`:
-the pinned Loom and package-manifest generator versions require them. Update
-NuGet packages and regenerate complete lockfiles manually as described above.
+Routine NuGet version scans remain disabled. The retired Loom and manifest
+generator integrations no longer require Feedz; `NuGet.Config` now uses only
+nuget.org. Update NuGet packages and regenerate complete lockfiles manually as
+described above. Re-enabling scheduled NuGet scans is a separate CI policy change.
 Repository security-alert and security-update settings are managed separately.
 
 The GitHub Actions `directories` list includes the NuGet cache composite action,

@@ -8,6 +8,11 @@ Guidance for AI coding agents working in this repository.
 - Priorities are high-load performance, distributed production execution, PostgreSQL persistence, and Kubernetes hosting. UI work is secondary; see [project direction](doc/project-direction.md) and the [roadmap](ROADMAP.md).
 - PostgreSQL is the only supported durable database. In-memory stores are for development and tests; MySQL, SQLite, and Cassandra are future plans, not bundled providers.
 - Production code lives under `src/`.
+- Hosts use static `AddElsa` composition. Nuplane, CShells adapters/reload APIs,
+  Loom Platform recipes/catalog manifests, BPMN, and WebhooksCore are retired;
+  see `doc/integration-removal.md`. Historical specifications can mention them.
+- Preserve classic scripting, AI/blob, FastEndpoints, Fody, Newtonsoft.Json,
+  distributed locks, resilience, and PostgreSQL/in-memory persistence support.
 - Tests live under `test/`, grouped by `unit`, `integration`, `component`, and `performance`.
 - Build and package automation uses the .NET CLI and shared MSBuild settings in `Directory.Build.props` and `Directory.Build.targets`.
 

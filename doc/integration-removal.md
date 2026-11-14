@@ -25,6 +25,24 @@ scripting, AI, and blob-storage integrations remain available. Classic tenant
 activation, host drain, persisted administrative pause, authorization, and
 workflow execution remain required behavior.
 
+The old modular sample also opted into AI, UserTasks, Secrets, external
+authentication and resilience modules. Enable each required retained capability
+explicitly through its classic `Use...` registration in a custom `AddElsa` host;
+the reference server does not enable every module by default. Move tenant
+configuration to the classic `Multitenancy` section and each provider's classic
+registration; shell-specific connection settings are no longer read.
+
+Before starting a migrated deployment, preserve administrative pause state. Shell
+pause keys use the exact shell ID (often `Default`), while the classic runtime
+reads `elsa.quiescence.host-pause.default` and its legacy
+`elsa.quiescence.pause.default` fallback in the agnostic tenant. With every old
+and new runtime stopped, migrate the intended shell's existing pause value to
+the classic host-pause key using the configured key-value store tooling. Preserve
+the stored value and tenant context. Resolve multiple shell states explicitly;
+they cannot be merged automatically. Verify pause recovery before enabling
+ingress or background dispatch. Re-applying pause after an unrestricted startup
+does not close the interval in which workflows could already execute.
+
 ## Implementation and review gates
 
 1. Record scope, acceptance criteria, and the baseline in a conventional commit.
