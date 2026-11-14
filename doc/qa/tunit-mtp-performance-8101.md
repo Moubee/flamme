@@ -100,11 +100,11 @@ The two apparent 156–157-second test bodies were concurrency artefacts in the 
 
 Three `RelatedRecordsDeletionTests` cleanups each took about 33.08 seconds. Cancellation creates a replacement execution pipeline, while deletion removes the instance before that pipeline has another commit point at which its execution-cycle handle can be released. Host shutdown therefore waited for the default 30-second graceful-drain timeout.
 
-## Reference architecture and adaptation
+## Isolation boundary and adaptation
 
-[REDACTED: private-project reference]
+The historical per-invocation design reused session-scoped database infrastructure while keeping a unique database and fresh host/provider/scope/client state for each test. This isolation boundary was evaluated as part of the component-test fixture investigation.
 
-The intermediate per-invocation implementation kept that isolation boundary and changed how each unique database was provisioned: Elsa restored a schema-only, migrated session image rather than creating an empty database and running four schema migrations for every test. The accepted implementation makes a different tradeoff by sharing the complete App and serializing every consumer, matching the former xUnit collection lifetime.
+The intermediate per-invocation implementation changed how each unique database was provisioned: Elsa restored a schema-only, migrated session image rather than creating an empty database and running four schema migrations for every test. The accepted implementation makes a different tradeoff by sharing the complete App and serializing every consumer, matching the former xUnit collection lifetime.
 
 ## Historical per-invocation database lifecycle (superseded)
 
