@@ -21,4 +21,4 @@ runs:
         key: nuget-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.workload }}-${{ inputs.framework }}-${{ hashFiles('global.json', 'NuGet.Config', '**/*.props', '**/*.targets', '**/*.csproj', '**/packages.lock.json', '*.slnx', '*.slnf', '.config/dotnet-tools.json') }}
         restore-keys: |
           nuget-v1-${{ runner.os }}-${{ runner.arch }}-${{ inputs.workload }}-${{ inputs.framework }}-
-          nuget-v1-${{ runner.os }}-${{ runner.arch }}-
+          ${{ inputs.workload != 'tools' && format('nuget-v1-{0}-{1}-', runner.os, runner.arch) || '' }}

@@ -47,6 +47,7 @@ Older failed runs are unsuitable for claiming a current-main speedup.
 | --- | --- |
 | Dependency cache | Adopt for restore consumers. Key by OS, architecture, restore inputs, and workload/framework; broader fallback caches still require restore. Separate workloads avoid an immutable cache being permanently populated by the first, smallest matrix subset. |
 | Dependency locks | Adopt committed locks for executable/test entry points after validating the actual graph. They pin resolved transitives and package hashes; CPM alone does not do that. Keep explicit cache keys including locks and tool/restore configuration. |
+| `setup-dotnet` built-in cache | Applicable once locks exist. Keep the explicit shared cache action to give different solution filters and tool restores their own primary keys and controlled fallbacks. |
 | Framework-level PR parallelism | Both frameworks currently share two CPU-based MTP slots. Independent runners can shorten feedback time, with additional runner/build cost. Preserve full-solution compilation, including net10-only benchmarks. |
 | Main package build overlap | Build packages alongside tests; gate every publisher on successful aggregate coverage. This saves the serialized build interval on successful runs but also builds artifacts for commits whose tests fail. |
 | Framework-specific test restore | Initial optimization rejected after the lock-file experiment: a two-target lock fails validation with a single-target restore. Restore the complete locked graph, then select the test framework with `--framework`. |
@@ -112,6 +113,11 @@ For a focused test, first restore its complete project graph, then use
 `dotnet test --project <path> --framework net11.0 --no-restore` (or `net10.0`).
 Do not regenerate committed two-target locks with a single-target restore.
 
+The tools workload only falls back to other tools caches. Downloading a complete
+solution dependency cache into a report-tool job can exceed the cost of restoring
+the tool itself (the historical tool restore took 6s, while package-cache restores
+took 15–18s). Solution and test workloads retain broader package reuse.
+
 ## Sources
 
 - [TUnit engine modes](https://tunit.dev/docs/execution/engine-modes/)
@@ -133,3 +139,37 @@ caches, on the same runner class. Record setup/cache restore/save, NuGet restore
 build, tests per framework, report, package build, total elapsed time, and summed
 runner minutes. Check all expected modules and coverage files remain present.
 Local timings cannot establish a hosted Linux speedup; no percentage is claimed.
+
+## Validation and review
+
+Validated locally with SDK 11.0.100 on macOS ARM64 and Docker:
+
+- Complete versioned locked restore:
+  `dotnet restore Elsa.slnx --locked-mode -p:Version=3.9.0-preview.999`.
+- Release build of `Elsa.slnx` for all targets: successful, zero errors. Existing
+  nullable and analyzer warnings remain; the three nullable matcher warnings
+  identified during migration were corrected and their project rebuilt cleanly.
+- Complete MTP run of `Elsa.slnx`, Release, `--no-build`, two parallel modules:
+  **9,194 total; 9,190 passed; four existing skips; zero failures**.
+- Additional Runtime/Core reruns after restoring exception type assertions:
+  1,480 passing executions across both frameworks. Resilience rerun: 192 passed,
+  with zero build warnings/errors.
+- Coverage probe with two test projects on net11: 20 tests passed and two raw
+  Cobertura files remained at the result root. SDK-generated merged artifacts
+  reside in a subdirectory, preserving the workflow's raw report-count checks.
+- actionlint 1.7.12 and `git diff --check`: passed. Lock generation, missing-lock
+  failure, unlocked regeneration, transitive drift rejection, and package Version
+  overrides were exercised against the actual restore graph.
+
+Independent review followed the first four conventional commits. It found nine
+exception assertions whose generic type arguments had been lost during mechanical
+mock conversion. The original assertions were restored verbatim. An AST comparison
+confirmed all 1,717 original direct assertions in the affected three workflow test
+projects remain; logging verifications retain counts and message predicates.
+Review also identified the need to keep tools-cache fallbacks separate from large
+solution caches. These corrections were checked again. No unresolved actionable
+review findings remain.
+
+Hosted Linux workflows, remote cache transfer costs, and package publication were
+not executed. The branch remains local; the rollout comparison above is still
+needed before claiming a CI speedup.
