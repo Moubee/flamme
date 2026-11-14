@@ -101,7 +101,6 @@ services
             .UseFluentStorageProvider()
             .UseElsaScriptBlobStorage()
             .UseScheduling()
-            .UseBpmnInterchange()
             .UseCSharp(options =>
             {
                 configuration.GetSection("Scripting:CSharp").Bind(options);
