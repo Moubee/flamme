@@ -137,6 +137,11 @@ shell commands, and other important information, read `specs/013-user-tasks/plan
 <!-- SPECKIT END -->
 
 ## Active Technologies
+
+The feature-spec annotations below are historical. Some described modules and
+shell integrations have since been retired; use the Project Overview and
+`doc/integration-removal.md` for the current supported composition.
+
 - C# latest, nullable reference types enabled, implicit usings enabled. + `Microsoft.Extensions.Logging`, `Microsoft.AspNetCore.SignalR`, Elsa feature/module infrastructure, FastEndpoints through Elsa API endpoint patterns, existing Elsa identity/authorization features. (003-live-server-logs)
 - Bounded in-memory ring buffer for MVP; no EF Core schema changes. Provider abstraction allows external/shared log backends later. (003-live-server-logs)
 - C# latest, nullable reference types enabled, implicit usings enabled. + `Microsoft.Extensions.Logging`, `Microsoft.Extensions.Options`, `Microsoft.AspNetCore.SignalR`, Elsa feature/module infrastructure, FastEndpoints through Elsa API endpoint patterns, CShells shell feature infrastructure. (004-diagnostics-structured-logs)

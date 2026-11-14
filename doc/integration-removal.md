@@ -66,3 +66,7 @@ Tooling: .NET SDK 11.0.100 / MSBuild 18.12.2 and Aspire CLI 13.6.5. No AppHost i
 present on this baseline; adding orchestration infrastructure is outside the
 integration-removal change. Aspire's installed CLI is checked, and any lifecycle
 validation must target an existing AppHost using isolated worktree execution.
+
+Implementation and both review checkpoints are complete. See the
+[review evidence](integration-removal-review.md) for dependency, build, test and
+packaging results and the existing skipped component cases.

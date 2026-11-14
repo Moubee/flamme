@@ -41,7 +41,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
 
     /// <summary>
     /// Creates the signal. The generation id defaults to a new GUID per construction — when the container is torn
-    /// down and rebuilt (shell reactivation or host restart), a fresh id is minted, which is what scopes recovery
+    /// down and rebuilt on host restart, a fresh id is minted, which is what scopes recovery
     /// in <c>RecoverInterruptedWorkflowsStartupTask</c>.
     /// </summary>
     [ActivatorUtilitiesConstructor]

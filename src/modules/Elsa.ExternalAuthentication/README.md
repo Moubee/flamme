@@ -97,7 +97,7 @@ The equivalent environment variable is:
 Secrets__ExternalAuthentication__StudioServerClientSecret=<deployment-secret>
 ```
 
-Any standard `IConfiguration` provider can supply the referenced value, including environment variables, Kubernetes-mounted configuration, and cloud secret providers. In a CShells feature block, feature settings are exposed under the feature name; for example, a value nested at `Features:ExternalAuthentication:Secrets:StudioServerClientSecret` is referenced as `ExternalAuthentication:Secrets:StudioServerClientSecret`. After removing the value from `appsettings.json`, its environment-variable equivalent is `ExternalAuthentication__Secrets__StudioServerClientSecret`.
+Any standard `IConfiguration` provider can supply the referenced value, including environment variables, Kubernetes-mounted configuration, and cloud secret providers. The reference is a path in the host configuration; the example above resolves `Secrets:ExternalAuthentication:StudioServerClientSecret` from the root `IConfiguration`. Move values from former shell feature blocks into deployment-owned host configuration and update each binding reference to its new path.
 
 Configuration bindings use `ownership: external`: their values and lifecycle remain deployment-owned and read-only in Studio. The optional Elsa Secrets bridge instead uses `ownership: managed` with resolver type `elsa-secrets`; it resolves active Elsa Secrets by name and allows authorized administrators to manage their lifecycle through Elsa. Public responses expose only configured/resolvable state for either binding type and never return secret values.
 
