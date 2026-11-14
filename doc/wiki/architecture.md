@@ -116,10 +116,8 @@ In-memory stores are the default for many features. EF Core provider packages re
 
 PostgreSQL provider packages depend on the shared EF Core module and provide database setup and migrations. Core in-memory stores support development and tests.
 
-## Diagnostics Layer
+## Workflow Telemetry
 
-[Elsa.Diagnostics.StructuredLogs](../../src/modules/Elsa.Diagnostics.StructuredLogs) captures semantic `ILogger` events, redacts them, keeps recent events, exposes REST endpoints, and streams live events through SignalR. The bundled store is bounded and in-memory; no durable structured-log backend is bundled.
+[WorkflowInstrumentation](../../src/modules/Elsa.Workflows.Core/Telemetry/WorkflowInstrumentation.cs) emits workflow and activity spans and metrics through the `Elsa.Workflows` activity source and meter. Libraries log through `Microsoft.Extensions.Logging`.
 
-[Elsa.Diagnostics.ConsoleLogs](../../src/modules/Elsa.Diagnostics.ConsoleLogs) captures raw `stdout` and `stderr` from the host process, buffers recent lines, and streams live console output to authorized callers through SignalR. It is separate from structured logs and does not write to durable storage.
-
-See [Diagnostics Structured Logs](diagnostics-structured-logs.md) and [Diagnostics Console Logs](diagnostics-console-logs.md).
+The application host configures official OpenTelemetry SDKs and exporters. External observability platforms own operational telemetry collection, storage, retention, queries, and viewing. Elsa's custom diagnostics modules, buffers, APIs, hubs, and dashboard adapters have been removed; see the [configuration and migration guide](opentelemetry-workflows.md).

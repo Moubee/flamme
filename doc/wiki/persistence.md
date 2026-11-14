@@ -99,16 +99,9 @@ Tenant conventions are documented in ADRs:
 - [ADR 0008: Empty String As Default Tenant ID](../adr/0008-empty-string-as-default-tenant-id.md)
 - [ADR 0009: Asterisk Sentinel Value For Tenant-Agnostic Entities](../adr/0009-asterisk-sentinel-value-for-tenant-agnostic-entities.md)
 
-## Structured Log Persistence
+## Operational Log Storage
 
-Structured logs keep recent events in bounded process-local memory. The relational extension contracts remain separate from EF Core, but no durable structured-log provider is bundled.
-
-Packages:
-
-- [Elsa.Diagnostics.StructuredLogs](../../src/modules/Elsa.Diagnostics.StructuredLogs): core capture, API, hub, provider/store contracts, default in-memory store.
-- [Elsa.Diagnostics.StructuredLogs.Persistence.Relational](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Relational): provider-neutral relational store, SQL builder, mapper, retention service, write buffer.
-
-In-memory log history is lost when the process stops. Hosts that need durable operational logs should configure their existing external logging pipeline.
+Operational logs and telemetry are stored by the host's external logging and observability pipeline. Elsa's custom structured-log, console-log, and OpenTelemetry storage packages have been removed; see the [migration guide](opentelemetry-workflows.md#upgrading-from-elsa-diagnostics-packages). Workflow execution journals and persisted activity records remain domain data.
 
 ## Adding A Store
 

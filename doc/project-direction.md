@@ -55,8 +55,10 @@ their own design and operational validation before joining the supported set.
 
 This database policy covers engine and module persistence. It does not mean
 that a process cannot call an external database or other service as part of its
-work. Individual modules can have narrower storage support: for example, there
-is currently no bundled PostgreSQL backend for structured logs.
+work. Operational logs and telemetry are collected and stored by the host's
+external observability pipeline. Elsa supplies workflow activity sources and
+meters; official OpenTelemetry packages handle export. See the
+[telemetry configuration and migration guide](wiki/opentelemetry-workflows.md).
 
 ## Kubernetes and operations
 

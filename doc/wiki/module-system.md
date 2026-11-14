@@ -66,8 +66,8 @@ This is why feature classes are the best way to learn a module. They encode its 
 
 Many modules also have `ShellFeatures/*Feature.cs`. These implement CShells interfaces and allow modular server hosts to activate feature sets from configuration or packages. Shell features are parallel to code-first features:
 
-- Code-first feature: [Elsa.Diagnostics.StructuredLogs/Features/StructuredLogsFeature.cs](../../src/modules/Elsa.Diagnostics.StructuredLogs/Features/StructuredLogsFeature.cs)
-- Shell feature: [Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs](../../src/modules/Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs)
+- Code-first feature: [Elsa.Workflows.Core/Features/WorkflowsFeature.cs](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs)
+- Shell feature: [Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs](../../src/modules/Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs)
 
 Use shell features when working on modular hosting, package discovery, or `Elsa.ModularServer.Web`. Use code-first features for normal host configuration and tests.
 

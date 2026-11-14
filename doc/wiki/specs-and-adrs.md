@@ -51,13 +51,13 @@ Current ADRs:
 | --- | --- | --- |
 | [001 shell reload API](../../specs/001-shell-reload-api/spec.md) | Shell management | Explains reload behavior for modular/shell hosts. |
 | [002 graceful shutdown](../../specs/002-graceful-shutdown/spec.md) | Runtime | Defines quiescence, ingress sources, drain orchestration, interrupted recovery, and runtime admin endpoints. |
-| [003 live server logs](../../specs/003-live-server-logs/spec.md) | Diagnostics precursor | Earlier live server logs work that led to structured diagnostics. |
-| [004 diagnostics structured logs](../../specs/004-diagnostics-structured-logs/spec.md) | Diagnostics | Refactors server logs into structured log diagnostics with semantic `ILogger` capture. |
-| [005 structured log persistence](../../specs/005-structured-log-persistence/spec.md) | Historical diagnostics persistence design | Storage contracts and relational helpers remain; the former durable provider has been removed. |
-| [006 diagnostics console logs](../../specs/006-diagnostics-console-logs/spec.md) | Diagnostics | Defines capture, buffering, endpoints, SignalR hub, permissions, source identity, and redaction for raw console output. |
+| [003 live server logs](../../specs/003-live-server-logs/spec.md) | Historical diagnostics design | Superseded by host-owned logging and external observability; the custom diagnostics packages have been removed. |
+| [004 diagnostics structured logs](../../specs/004-diagnostics-structured-logs/spec.md) | Historical diagnostics design | Superseded; structured-log capture, storage, APIs, and dashboard adapters have been removed. |
+| [005 structured log persistence](../../specs/005-structured-log-persistence/spec.md) | Historical diagnostics persistence design | Superseded; structured-log storage contracts and relational helpers have been removed. |
+| [006 diagnostics console logs](../../specs/006-diagnostics-console-logs/spec.md) | Historical diagnostics design | Superseded; process console capture, buffering, endpoints, and dashboard adapters have been removed. |
 | [006 state machine activity](../../specs/006-state-machine-activity/spec.md) | Workflow core | Adds a state machine activity with named states and trigger-driven transitions to the workflow engine. |
 | [007 secrets module](../../specs/007-secrets-module/spec.md) | Secrets | Revamps the secrets module with named secrets, pluggable stores, extensible secret types, secret picker UX, permissions, import/export encryption support, and migration from existing sensitive fields. |
-| [008 diagnostics OpenTelemetry](../../specs/008-diagnostics-otel/spec.md) | Diagnostics | Defines the first-party OTLP ingestion backend, trace/metric/log storage and query APIs, live SignalR streaming, and Studio-facing telemetry investigation. |
+| [008 diagnostics OpenTelemetry](../../specs/008-diagnostics-otel/spec.md) | Historical diagnostics design | Superseded; hosts configure official OpenTelemetry packages and external backends. Elsa retains its workflow source and meter. |
 | [008 Weaver AI copilot](../../specs/008-weaver-ai-copilot/spec.md) | AI | Implements Weaver, an agentic workflow assistant with streaming chat, context resolution, reviewable proposals, audit, and Studio integration. |
 | [009 operational dashboard](../../specs/009-operational-dashboard/prd.md) | Dashboard API | PRD for a read-only backend dashboard API module exposing workflow activity aggregates, health signals, and operational summaries without requiring Studio to orchestrate many separate requests. |
 | [010 workflow JSON hardening](../../specs/010-workflow-json-hardening/spec.md) | Workflow core | Introduces dedicated type aliases for workflow JSON, rejects unknown/unsafe CLR names, and preserves backward-compatible reads for selected legacy identifiers. |
@@ -106,12 +106,12 @@ For runtime behavior, read in this order:
 
 ## Reading Order For Diagnostics Work
 
-1. [Diagnostics Structured Logs](diagnostics-structured-logs.md)
-2. [specs/004-diagnostics-structured-logs/plan.md](../../specs/004-diagnostics-structured-logs/plan.md)
-3. [specs/005-structured-log-persistence/plan.md](../../specs/005-structured-log-persistence/plan.md)
-4. structured logs core package
-5. shared relational extension contracts (no bundled durable provider)
-6. structured logs unit/integration tests
+1. [OpenTelemetry Workflow Instrumentation and migration](opentelemetry-workflows.md)
+2. [WorkflowInstrumentation](../../src/modules/Elsa.Workflows.Core/Telemetry/WorkflowInstrumentation.cs)
+3. [Workflow instrumentation tests](../../test/unit/Elsa.Workflows.Core.UnitTests/Telemetry/WorkflowInstrumentationTests.cs)
+4. [Testing Guide](testing-guide.md) for TUnit-owned logs and telemetry
+
+The historical diagnostics specs above describe removed implementations and do not define the current telemetry architecture.
 
 ## Reading Order For Secrets Work
 

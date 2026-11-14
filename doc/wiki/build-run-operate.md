@@ -76,7 +76,7 @@ Notable toggles in `Program.cs`:
 - `useMultitenancy`
 - `disableVariableWrappers`
 
-The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants/structured logs.
+The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants.
 
 When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings. Shell-based hosts use the shell feature path, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 
@@ -140,7 +140,6 @@ The reference server pipeline is a useful ordering guide:
 11. controllers
 12. Swagger UI in development
 13. SignalR workflow hubs if enabled
-14. structured logs hub if enabled
 
 See [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
 
@@ -153,16 +152,7 @@ With default route prefix `elsa/api`, runtime admin endpoints include:
 - `POST /elsa/api/admin/workflow-runtime/resume`: requires `ManageWorkflowRuntime`.
 - `POST /elsa/api/admin/workflow-runtime/force-drain`: requires `ManageWorkflowRuntime`.
 
-Structured log diagnostics endpoints include:
-
-- `GET|POST /elsa/api/diagnostics/structured-logs/recent`
-- `GET /elsa/api/diagnostics/structured-logs/sources`
-- `GET /elsa/api/diagnostics/structured-logs/storage`
-
-Console log diagnostics endpoints include (when `Elsa.Diagnostics.ConsoleLogs` is enabled):
-
-- `POST /elsa/api/diagnostics/console-logs/recent`
-- `GET /elsa/api/diagnostics/console-logs/sources`
+Custom structured-log, console-log, and OpenTelemetry ingestion/query endpoints and SignalR hubs have been removed. Hosts configure official OpenTelemetry exporters and external logging infrastructure; see the [telemetry configuration and migration guide](opentelemetry-workflows.md).
 
 Health checks are mapped to `/` and `/health/live` for process liveness and `/health/ready` for Elsa runtime readiness in the reference server. See [Health Checks](health-checks.md) for Kubernetes liveness/readiness recommendations and Elsa-specific runtime readiness probes.
 
@@ -176,7 +166,7 @@ Common runtime-related options in the reference host:
 - `IncidentOptions.DefaultIncidentStrategy`
 - recurring task schedules for trigger queue, bookmark queue purge, and interrupted workflow restart
 
-Structured logs options include recent log capacity, query size, source heartbeat timeout, redaction settings, and storage provider options.
+Configure operational telemetry through standard `OTEL_*` settings and your external observability platform. The former Elsa log capacity, query, heartbeat, redaction, and storage options have been removed.
 
 ## Local Development Notes
 

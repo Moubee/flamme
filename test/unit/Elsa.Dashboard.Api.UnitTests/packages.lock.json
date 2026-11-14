@@ -577,41 +577,6 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )"
         }
       },
-      "elsa.diagnostics.consolelogs": {
-        "type": "Project",
-        "dependencies": {
-          "CShells": "[0.0.31, )",
-          "ConsoleLogStreaming.Core": "[1.1.0, )",
-          "ConsoleLogStreaming.SignalR": "[1.1.0, )",
-          "Elsa.Api.Common": "[1.0.0, )",
-          "Elsa.Workflows.Core": "[1.0.0, )",
-          "Microsoft.Extensions.Options": "[10.0.15, )"
-        }
-      },
-      "elsa.diagnostics.consolelogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.ConsoleLogs": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Api.Common": "[1.0.0, )",
-          "Microsoft.Extensions.Logging": "[10.0.15, )",
-          "Microsoft.Extensions.Options": "[10.0.15, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.StructuredLogs": "[1.0.0, )"
-        }
-      },
       "elsa.expressions": {
         "type": "Project",
         "dependencies": {
@@ -759,37 +724,6 @@
           "Elsa.Dashboard.Api": "[1.0.0, )",
           "Elsa.Workflows.Api": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )"
-        }
-      },
-      "ConsoleLogStreaming.Contracts": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "QwIWLVARW+Sdt2ZBebcwAxT0b+Rbq5RUEQIkr6k3yRzJmakWFdTis2CKLkNOLzGqQJzp5ErPBDMDxBG1liIJiw==",
-        "dependencies": {
-          "ConsoleLogStreaming.Core": "1.1.0"
-        }
-      },
-      "ConsoleLogStreaming.Core": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "zNnvYqm9R6JJu+KcI9NJyOzuEc0KHquQbFSPpxWreIXcqUclLHaIMZBdEOZwjBjBnpcDyITUSXSeYec47EnJ+A==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
-          "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
-          "Microsoft.Extensions.Options": "8.0.2"
-        }
-      },
-      "ConsoleLogStreaming.SignalR": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "+yz6Ye4egS7cP82zxS+phlsrP8d/Bk99BhT/sdQ4YzCm95HCwzdFlqdUWkZcoWXT2YWrnqBxd2kubhrAYGtztQ==",
-        "dependencies": {
-          "ConsoleLogStreaming.Contracts": "1.1.0",
-          "ConsoleLogStreaming.Core": "1.1.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
         }
       },
       "Cronos": {
@@ -1775,39 +1709,6 @@
           "Elsa.Dashboard.Abstractions": "[1.0.0, )"
         }
       },
-      "elsa.diagnostics.consolelogs": {
-        "type": "Project",
-        "dependencies": {
-          "CShells": "[0.0.31, )",
-          "ConsoleLogStreaming.Core": "[1.1.0, )",
-          "ConsoleLogStreaming.SignalR": "[1.1.0, )",
-          "Elsa.Api.Common": "[1.0.0, )",
-          "Elsa.Workflows.Core": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.consolelogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.ConsoleLogs": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Api.Common": "[1.0.0, )",
-          "Microsoft.Extensions.Logging": "[11.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.StructuredLogs": "[1.0.0, )"
-        }
-      },
       "elsa.expressions": {
         "type": "Project",
         "dependencies": {
@@ -1943,31 +1844,6 @@
           "Elsa.Dashboard.Api": "[1.0.0, )",
           "Elsa.Workflows.Api": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )"
-        }
-      },
-      "ConsoleLogStreaming.Contracts": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "QwIWLVARW+Sdt2ZBebcwAxT0b+Rbq5RUEQIkr6k3yRzJmakWFdTis2CKLkNOLzGqQJzp5ErPBDMDxBG1liIJiw==",
-        "dependencies": {
-          "ConsoleLogStreaming.Core": "1.1.0"
-        }
-      },
-      "ConsoleLogStreaming.Core": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "zNnvYqm9R6JJu+KcI9NJyOzuEc0KHquQbFSPpxWreIXcqUclLHaIMZBdEOZwjBjBnpcDyITUSXSeYec47EnJ+A=="
-      },
-      "ConsoleLogStreaming.SignalR": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "+yz6Ye4egS7cP82zxS+phlsrP8d/Bk99BhT/sdQ4YzCm95HCwzdFlqdUWkZcoWXT2YWrnqBxd2kubhrAYGtztQ==",
-        "dependencies": {
-          "ConsoleLogStreaming.Contracts": "1.1.0",
-          "ConsoleLogStreaming.Core": "1.1.0"
         }
       },
       "Cronos": {

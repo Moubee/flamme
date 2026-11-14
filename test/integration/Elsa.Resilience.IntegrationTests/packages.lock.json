@@ -782,15 +782,6 @@
           "TUnit.Core": "1.84.0"
         }
       },
-      "TUnit.Logging.Microsoft": {
-        "type": "Transitive",
-        "resolved": "1.84.0",
-        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging": "10.0.15",
-          "TUnit.Core": "1.84.0"
-        }
-      },
       "TUnit.OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.84.0",
@@ -994,7 +985,8 @@
           "Elsa.Expressions.Liquid": "[1.0.0, )",
           "Elsa.Scheduling": "[1.0.0, )",
           "Elsa.Testing.Shared": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )"
+          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )",
+          "TUnit.Logging.Microsoft": "[1.84.0, )"
         }
       },
       "elsa.workflowproviders.blobstorage": {
@@ -1654,6 +1646,16 @@
         "requested": "[2.0.2, )",
         "resolved": "2.0.2",
         "contentHash": "SqGyo1Ihv/3Wvq4bjIhjQjFNZ+/6SUvxNIIvdXcDzdP9QRDfySneXtAt9+rkGrFvizjosJAN1jyl2f2vCcR30Q=="
+      },
+      "TUnit.Logging.Microsoft": {
+        "type": "CentralTransitive",
+        "requested": "[1.84.0, )",
+        "resolved": "1.84.0",
+        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "10.0.15",
+          "TUnit.Core": "1.84.0"
+        }
       }
     },
     "net11.0": {
@@ -2366,15 +2368,6 @@
           "TUnit.Core": "1.84.0"
         }
       },
-      "TUnit.Logging.Microsoft": {
-        "type": "Transitive",
-        "resolved": "1.84.0",
-        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging": "11.0.0",
-          "TUnit.Core": "1.84.0"
-        }
-      },
       "TUnit.OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.84.0",
@@ -2568,7 +2561,8 @@
           "Elsa.Expressions.Liquid": "[1.0.0, )",
           "Elsa.Scheduling": "[1.0.0, )",
           "Elsa.Testing.Shared": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )"
+          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )",
+          "TUnit.Logging.Microsoft": "[1.84.0, )"
         }
       },
       "elsa.workflowproviders.blobstorage": {
@@ -3118,6 +3112,16 @@
         "requested": "[2.0.2, )",
         "resolved": "2.0.2",
         "contentHash": "SqGyo1Ihv/3Wvq4bjIhjQjFNZ+/6SUvxNIIvdXcDzdP9QRDfySneXtAt9+rkGrFvizjosJAN1jyl2f2vCcR30Q=="
+      },
+      "TUnit.Logging.Microsoft": {
+        "type": "CentralTransitive",
+        "requested": "[1.84.0, )",
+        "resolved": "1.84.0",
+        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "11.0.0",
+          "TUnit.Core": "1.84.0"
+        }
       }
     }
   }

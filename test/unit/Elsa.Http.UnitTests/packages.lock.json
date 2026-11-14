@@ -680,15 +680,6 @@
           "TUnit.Core": "1.84.0"
         }
       },
-      "TUnit.Logging.Microsoft": {
-        "type": "Transitive",
-        "resolved": "1.84.0",
-        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging": "10.0.15",
-          "TUnit.Core": "1.84.0"
-        }
-      },
       "TUnit.OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.84.0",
@@ -1435,6 +1426,16 @@
         "requested": "[2.0.2, )",
         "resolved": "2.0.2",
         "contentHash": "SqGyo1Ihv/3Wvq4bjIhjQjFNZ+/6SUvxNIIvdXcDzdP9QRDfySneXtAt9+rkGrFvizjosJAN1jyl2f2vCcR30Q=="
+      },
+      "TUnit.Logging.Microsoft": {
+        "type": "CentralTransitive",
+        "requested": "[1.84.0, )",
+        "resolved": "1.84.0",
+        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "10.0.15",
+          "TUnit.Core": "1.84.0"
+        }
       }
     },
     "net11.0": {
@@ -2046,15 +2047,6 @@
           "Microsoft.Testing.Extensions.TrxReport.Abstractions": "2.5.3",
           "Microsoft.Testing.Platform": "2.5.3",
           "Microsoft.Testing.Platform.MSBuild": "2.5.3",
-          "TUnit.Core": "1.84.0"
-        }
-      },
-      "TUnit.Logging.Microsoft": {
-        "type": "Transitive",
-        "resolved": "1.84.0",
-        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging": "11.0.0",
           "TUnit.Core": "1.84.0"
         }
       },
@@ -2691,6 +2683,16 @@
         "requested": "[2.0.2, )",
         "resolved": "2.0.2",
         "contentHash": "SqGyo1Ihv/3Wvq4bjIhjQjFNZ+/6SUvxNIIvdXcDzdP9QRDfySneXtAt9+rkGrFvizjosJAN1jyl2f2vCcR30Q=="
+      },
+      "TUnit.Logging.Microsoft": {
+        "type": "CentralTransitive",
+        "requested": "[1.84.0, )",
+        "resolved": "1.84.0",
+        "contentHash": "EFD7IKQ3xvNJKvD9NU6qP24J8SyEmZZV7g6YooOx1/VoeJfrb35TPWqJkU+i5V2YBQyGhno1Z+NkQ1k+4bwDLg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "11.0.0",
+          "TUnit.Core": "1.84.0"
+        }
       }
     }
   }

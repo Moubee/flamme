@@ -121,7 +121,12 @@ keeping them would leave code that still compiles, still reads as a permission c
 nothing. A compile error names the site and can be fixed against the mapping table below; an obsolete constant
 gives a warning that is easy to suppress and a runtime failure that is not visible at all.
 
-Replace each with the module's `<Module>ResourcePermissions` constant and a verb. Classes still referenced by
+For retained modules, replace each with the module's `<Module>ResourcePermissions` constant and a verb. The console-log,
+structured-log, and OpenTelemetry diagnostics modules and their permission families have since been removed entirely;
+remove those grants and registrations rather than translating them. Their operational telemetry now belongs to the
+host's external observability platform; see the [telemetry migration guide](../wiki/opentelemetry-workflows.md).
+
+Classes still referenced by
 their own modules — `WorkflowPermissions`, `IdentityPermissions` and the rest — are untouched.
 
 ## Setting default roles now requires its own permission
@@ -294,8 +299,6 @@ refuses a caller who can read part of it. A section the caller may not read come
 | --- | --- |
 | `workflowInstances` | `workflows/instances:view` |
 | `runtime` | `workflows/runtime:view` |
-| `diagnostics.structuredLogs` | `diagnostics/structured-logs:view` |
-| `diagnostics.consoleLogs` | `diagnostics/console-logs:view` |
 
 `runtime` and `workflowInstances` carry a new `capability` field for this, which reads `Available` for a section the
 caller may read. Metric cards and panels follow the permission of the data they summarise, and a caller who may not read
@@ -307,11 +310,12 @@ them does not receive them. A caller holding no dashboard-related permission get
 They declare this with `RequireAnyPermission`, so `EndpointPermissionRegistry.FindRequirement` reports both permissions
 for them.
 Findings on `needs-attention` follow the same rule per finding, so a caller holding only `workflows/instances:view` sees the
-workflow findings but not the runtime or diagnostics ones.
+workflow findings but not the runtime ones. The former `diagnostics.structuredLogs` and `diagnostics.consoleLogs`
+overview fields and their contributors have been removed together with the custom diagnostics modules.
 
 Modules that add to the dashboard declare the permission of their data. A contributor can check
 `DashboardContext.CanRead` to skip queries for data the caller cannot read; `null` means unrestricted. A contributor declares
-`IDashboardContributor.OverviewPermissions` up front for the runtime, instance and diagnostics sections it supplies, and
+`IDashboardContributor.OverviewPermissions` up front for the runtime and instance sections it supplies, and
 sets `Permission` on each metric card, panel, finding, and trend, recent-activity or hotspot response it returns. Anything
 a contributor supplies without a declaration needs `dashboard:view`, so an existing third-party contributor keeps working
 and stays hidden from callers holding only a narrower permission until it declares one. That includes trend, recent
@@ -431,10 +435,10 @@ One caveat: PostgreSQL treats nulls as distinct in these composite unique indexe
 | `manage:user-tasks` | `user-tasks:supervise` |
 | `lookup:user-task-participants` | `user-tasks/participants:view` |
 | `read:dashboard` | `dashboard:view` |
-| `read:diagnostics:console-logs` | `diagnostics/console-logs:view` |
-| `read:diagnostics:structured-logs` | `diagnostics/structured-logs:view` |
-| `read:diagnostics:opentelemetry` | `diagnostics/opentelemetry:view` |
-| `ingest:diagnostics:opentelemetry` | *removed* — unused |
+| `read:diagnostics:console-logs` | *removed* — console capture and query APIs have been removed; no backend permission replacement |
+| `read:diagnostics:structured-logs` | *removed* — structured-log storage and query APIs have been removed; no backend permission replacement |
+| `read:diagnostics:opentelemetry` | *removed* — telemetry ingestion and query APIs have been removed; no backend permission replacement |
+| `ingest:diagnostics:opentelemetry` | *removed* — telemetry ingestion APIs have been removed; no backend permission replacement |
 | `read:resilience` | `resilience/*:view` |
 | `read:resilience:retries` | `resilience/retries:view` |
 | `read:resilience:strategies` | `resilience/strategies:view` |

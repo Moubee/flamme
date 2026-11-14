@@ -450,20 +450,6 @@
           "Elsa.Dashboard.Abstractions": "[1.0.0, )"
         }
       },
-      "elsa.diagnostics.structuredlogs": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Api.Common": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.StructuredLogs": "[1.0.0, )"
-        }
-      },
       "elsa.dsl.elsascript": {
         "type": "Project",
         "dependencies": {
@@ -1557,20 +1543,6 @@
           "CShells": "[0.0.31, )",
           "Elsa.Api.Common": "[1.0.0, )",
           "Elsa.Dashboard.Abstractions": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Api.Common": "[1.0.0, )"
-        }
-      },
-      "elsa.diagnostics.structuredlogs.dashboard": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dashboard.Abstractions": "[1.0.0, )",
-          "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Diagnostics.StructuredLogs": "[1.0.0, )"
         }
       },
       "elsa.dsl.elsascript": {
