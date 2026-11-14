@@ -59,7 +59,7 @@ Source libraries multi-target `net10.0` and `net11.0` through [src/Directory.Bui
 
 The main sample host is [src/apps/Elsa.Server.Web](../../src/apps/Elsa.Server.Web). It wires most major modules in [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
 
-Start PostgreSQL with `docker compose -f docker/docker-compose.yml up -d postgres` from the repository root. The checked-in `ConnectionStrings:PostgreSql` matches that development service; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
+Start the isolated PostgreSQL development container using the [root README setup](../../README.md#run-locally). The checked-in `ConnectionStrings:PostgreSql` matches that example; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
 
 Restore the project and run it with:
 

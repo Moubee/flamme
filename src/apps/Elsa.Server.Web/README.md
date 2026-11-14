@@ -5,10 +5,10 @@
 ## Persistence
 
 The reference host uses PostgreSQL for workflow management and runtime. Start the
-PostgreSQL service with `docker compose -f docker/docker-compose.yml up -d postgres`
-from the repository root. Configure `ConnectionStrings:PostgreSql` (or
+PostgreSQL development container using the [root README setup](../../../README.md#run-locally).
+Configure `ConnectionStrings:PostgreSql` (or
 `ConnectionStrings__PostgreSql`) for your environment. The checked-in connection
-string matches the local development service. Custom hosts can omit the EF Core
+string matches that local example. Custom hosts can omit the EF Core
 registrations to use the built-in in-memory stores, whose state is lost at restart.
 
 ## Secrets

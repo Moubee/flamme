@@ -48,18 +48,26 @@ The repository uses the **.NET SDK selected by [global.json](global.json)**: 11.
 
 ## Run locally
 
-Use the reference server to explore the backend. The commands below use a local PostgreSQL container and run the application on the host. Run them from the repository root with the selected .NET SDK, Docker, and Docker Compose installed.
+Use the reference server to explore the backend. The commands below use a local PostgreSQL container and run the application on the host. Run them from the repository root with the selected .NET SDK and Docker installed, and port 5432 available locally.
 
 1. Start the development database:
 
    ```bash
-   docker compose -f docker/docker-compose.yml up -d postgres
+   docker run --detach --name flamme-postgres \
+     --publish 127.0.0.1:5432:5432 \
+     --env POSTGRES_USER=elsa \
+     --env POSTGRES_PASSWORD=elsa \
+     --env POSTGRES_DB=elsa \
+     --volume flamme-postgres-17-data:/var/lib/postgresql/data \
+     postgres:17-alpine
    ```
 
-2. Wait until PostgreSQL reports that it is accepting connections:
+   This example uses a separate development volume and pins the PostgreSQL major version to match its data-directory layout. On later runs, use `docker start flamme-postgres` to reuse the container and its data.
+
+2. Repeat the readiness check until PostgreSQL reports that it is accepting connections:
 
    ```bash
-   docker compose -f docker/docker-compose.yml exec postgres pg_isready -U elsa -d elsa
+   docker exec flamme-postgres pg_isready -h localhost -U elsa -d elsa
    ```
 
 3. Run the server using the checked-in local database settings:
