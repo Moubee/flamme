@@ -24,13 +24,12 @@ public class RuntimeAsyncCompatibilityTests
         const MethodImplAttributes asyncFlag = (MethodImplAttributes)0x2000;
 #endif
 #if ELSA_RUNTIME_ASYNC
-        const bool runtimeAsyncExpected = true;
+        await Assert.That((method.GetMethodImplementationFlags() & asyncFlag) != 0).IsTrue();
+        await Assert.That(method.IsDefined(typeof(AsyncStateMachineAttribute), false)).IsFalse();
 #else
-        const bool runtimeAsyncExpected = false;
+        await Assert.That((method.GetMethodImplementationFlags() & asyncFlag) != 0).IsFalse();
+        await Assert.That(method.IsDefined(typeof(AsyncStateMachineAttribute), false)).IsTrue();
 #endif
-
-        await Assert.That((method.GetMethodImplementationFlags() & asyncFlag) != 0).IsEqualTo(runtimeAsyncExpected);
-        await Assert.That(method.IsDefined(typeof(AsyncStateMachineAttribute), false)).IsEqualTo(!runtimeAsyncExpected);
     }
 
     [Test]
