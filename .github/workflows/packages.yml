@@ -2,22 +2,22 @@ name: Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      build_packages:
+        description: 'Build and upload NuGet packages alongside coverage validation'
+        type: boolean
+        default: true
   push:
     branches:
       - 'main'
-      - 'bug/*'
-      - 'perf/*'
-      - 'patch/*'
-      - 'feat/*'
-      - 'enh/*'
-      - 'rc/*'
-      - 'develop/*'
-      - 'release/*'
-      - 'codex/*'
-      - 'chore/*'
 
 permissions:
   contents: read
+
+concurrency:
+  # Explicit manual validations remain independent of automatic main pushes.
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
+  cancel-in-progress: true
 
 env:
   base_version: '3.9.0'
@@ -231,6 +231,7 @@ jobs:
 
   build:
     name: Build packages
+    if: github.event_name != 'workflow_dispatch' || inputs.build_packages
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Build artifacts alongside tests; the workflow still requires every validation job.

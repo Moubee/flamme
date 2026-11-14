@@ -19,8 +19,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Check changed paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run_dotnet: ${{ steps.classify.outputs.run_dotnet }}
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'pull_request'
+        with:
+          # PR checkout selects the synthetic merge commit and its two parents.
+          fetch-depth: 2
+      - name: Decide whether .NET validation is needed
+        id: classify
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          run_dotnet=true
+          if [[ "$EVENT_NAME" == pull_request ]]; then
+            # Compare the merged result with its base, including deletions on moves.
+            # Write the diff first so a git failure cannot become a successful skip.
+            git diff --no-renames --name-only -z HEAD^1 HEAD > "$RUNNER_TEMP/pr-changed-paths"
+            has_changes=false
+            run_dotnet=false
+            while IFS= read -r -d '' path; do
+              has_changes=true
+              case "$path" in
+                design/video/elsa-readme-video/*) ;;
+                *) run_dotnet=true; break ;;
+              esac
+            done < "$RUNNER_TEMP/pr-changed-paths"
+            # An empty diff is not evidence that this is a design-only change.
+            if [[ "$has_changes" == false ]]; then
+              run_dotnet=true
+            fi
+          fi
+          echo "run_dotnet=$run_dotnet" >> "$GITHUB_OUTPUT"
+
   test:
     name: Test (${{ matrix.framework }})
+    needs: changes
+    if: needs.changes.outputs.run_dotnet == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -72,14 +114,24 @@ jobs:
           dotnet test --solution Elsa.Component.Tests.slnf --framework net11.0 --configuration Release --no-restore
 
   ubuntu-latest:
-    # Preserve the existing required check while both framework lanes must pass.
+    # Preserve the existing required check, including deliberate design-only skips.
     name: ubuntu-latest
-    needs: test
+    needs: [changes, test]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require both frameworks
+      - name: Require validation or an explicit design-only decision
         env:
+          CHANGE_RESULT: ${{ needs.changes.result }}
+          RUN_DOTNET: ${{ needs.changes.outputs.run_dotnet }}
           TEST_RESULT: ${{ needs.test.result }}
-        run: test "$TEST_RESULT" = success
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$CHANGE_RESULT" = success
+          case "$RUN_DOTNET" in
+            true) test "$TEST_RESULT" = success ;;
+            false) test "$TEST_RESULT" = skipped ;;
+            *) echo "Missing or invalid .NET validation decision." >&2; exit 1 ;;
+          esac

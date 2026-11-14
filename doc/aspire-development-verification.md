@@ -57,8 +57,11 @@ tenant settings, persistence, telemetry, lock files and developer instructions.
    verified development workflow.
 
 The reviewer found no additional actionable code defects. Upstream `origin/main`
-advanced independently during the task; review used the original merge base so
-unrelated upstream changes were not absorbed into this branch.
+advanced independently during the task; initial review used the original merge
+base. When publishing the pull request, current `main` was merged into the branch.
+Conflict resolution preserved upstream's removal of NuGet Dependabot scans and
+kept both the Aspire and CI sections in `CONTRIBUTING.md`; product source did not
+conflict.
 
 ## Observed existing diagnostics
 
