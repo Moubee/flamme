@@ -3,7 +3,6 @@ using Elsa.Mediator.Contracts;
 using Elsa.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 
 namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
 
@@ -24,11 +23,11 @@ public class ScheduledCronTaskTests : IDisposable
     public ScheduledCronTaskTests()
     {
         var services = new ServiceCollection();
-        _systemClock = Substitute.For<ISystemClock>();
-        _cronParser = Substitute.For<ICronParser>();
-        _logger = Substitute.For<ILogger<ScheduledCronTask>>();
+        _systemClock = Mock.Of<ISystemClock>().Object;
+        _cronParser = Mock.Of<ICronParser>().Object;
+        _logger = Mock.Of<ILogger<ScheduledCronTask>>().Object;
         
-        services.AddSingleton(Substitute.For<ICommandSender>());
+        services.AddSingleton(Mock.Of<ICommandSender>().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -37,7 +36,7 @@ public class ScheduledCronTaskTests : IDisposable
         ICronParser? cronParser = null,
         ISystemClock? systemClock = null)
     {
-        var task = Substitute.For<ITask>();
+        var task = Mock.Of<ITask>().Object;
         var scheduledTask = new ScheduledCronTask(
             task,
             cronExpression ?? DefaultCronExpression,
@@ -52,32 +51,32 @@ public class ScheduledCronTaskTests : IDisposable
 
     private void SetupCronParser(params DateTimeOffset[] occurrences)
     {
-        _cronParser.GetNextOccurrence(Arg.Any<string>()).Returns(occurrences[0], occurrences.Skip(1).ToArray());
+        Mock.Get(_cronParser).GetNextOccurrence(Arg.Any<string>()).ReturnsSequentially(occurrences);
     }
 
     private void SetupSystemClock(params DateTimeOffset[] times)
     {
-        _systemClock.UtcNow.Returns(times[0], times.Skip(1).ToArray());
+        Mock.Get(_systemClock).UtcNow.ReturnsSequentially(times);
     }
 
     private void AssertNoErrorLogged()
     {
-        _logger.DidNotReceive().Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasNeverCalled();
     }
 
     private void AssertWarningLogged(int expectedCount = 1)
     {
-        _logger.Received(expectedCount).Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Warning,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasCalled(Times.Exactly(expectedCount));
     }
 
     [Test]
@@ -110,9 +109,7 @@ public class ScheduledCronTaskTests : IDisposable
 
         // Assert - Should call GetNextOccurrence at least twice (initial + retry)
         // May be called more if timer fires before disposal in rare race conditions
-        _cronParser.Received().GetNextOccurrence(DefaultCronExpression);
-        var calls = _cronParser.ReceivedCalls().Count(c => c.GetMethodInfo().Name == nameof(_cronParser.GetNextOccurrence));
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to GetNextOccurrence, but got {calls}");
+        Mock.Get(_cronParser).GetNextOccurrence(DefaultCronExpression).WasCalled(Times.AtLeast(2));
     }
 
     [Test]
@@ -130,9 +127,7 @@ public class ScheduledCronTaskTests : IDisposable
         Thread.Sleep(5); // Brief wait to ensure disposal completes
 
         // Assert - Should call GetNextOccurrence at least twice
-        _cronParser.Received().GetNextOccurrence(DefaultCronExpression);
-        var calls = _cronParser.ReceivedCalls().Count(c => c.GetMethodInfo().Name == nameof(_cronParser.GetNextOccurrence));
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to GetNextOccurrence, but got {calls}");
+        Mock.Get(_cronParser).GetNextOccurrence(DefaultCronExpression).WasCalled(Times.AtLeast(2));
     }
 
     [Test]
@@ -153,9 +148,7 @@ public class ScheduledCronTaskTests : IDisposable
 
         // Assert - Should call GetNextOccurrence at least twice (initial + retry)
         // May be called more if timer fires before disposal and triggers Schedule() again
-        _cronParser.Received().GetNextOccurrence(DefaultCronExpression);
-        var calls = _cronParser.ReceivedCalls().Count(c => c.GetMethodInfo().Name == nameof(_cronParser.GetNextOccurrence));
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to GetNextOccurrence, but got {calls}");
+        Mock.Get(_cronParser).GetNextOccurrence(DefaultCronExpression).WasCalled(Times.AtLeast(2));
         AssertWarningLogged();
     }
 
@@ -187,8 +180,8 @@ public class ScheduledCronTaskTests : IDisposable
         
         // Arrange - Use the exact times from the issue that cause delay.Milliseconds to be 0
         var now = new DateTimeOffset(2025, 11, 06, 22, 50, 00, 0, TimeZoneInfo.Utc.GetUtcOffset(DateTimeOffset.UtcNow));
-        var systemClock = Substitute.For<ISystemClock>();
-        systemClock.UtcNow.Returns(now);
+        var systemClock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(systemClock).UtcNow.Returns(now);
         var realCronParser = new Elsa.Scheduling.Services.CronosCronParser(systemClock);
         
         // Act - Create scheduled task with real cron parser

@@ -5,23 +5,23 @@ using Elsa.Workflows.Runtime.Notifications;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.State;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
 public class ProcessWorkflowDispatchOutboxTests
 {
-    private readonly IWorkflowDispatchOutboxProcessor _processor = Substitute.For<IWorkflowDispatchOutboxProcessor>();
+    private readonly IWorkflowDispatchOutboxProcessor _processor = Mock.Of<IWorkflowDispatchOutboxProcessor>().Object;
     private readonly WorkflowDispatcherOptions _options = new()
     {
         UseTransactionalOutbox = true,
         ProcessOutboxAfterCommit = true
     };
-    private readonly IServiceProvider _serviceProvider = Substitute.For<IServiceProvider>();
+    private readonly IServiceProvider _serviceProvider = Mock.Of<IServiceProvider>().Object;
 
     public ProcessWorkflowDispatchOutboxTests()
     {
-        _serviceProvider.GetService(typeof(IWorkflowDispatchOutboxProcessor)).Returns(_processor);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowDispatchOutboxProcessor)).Returns(_processor);
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class ProcessWorkflowDispatchOutboxTests
 
         await handler.HandleAsync(notification, CancellationToken.None);
 
-        await _processor.DidNotReceive().TryProcessAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_processor).TryProcessAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class ProcessWorkflowDispatchOutboxTests
 
         await handler.HandleAsync(notification, CancellationToken.None);
 
-        await _processor.Received(1).TryProcessAsync(CancellationToken.None);
+        Mock.Get(_processor).TryProcessAsync(CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class ProcessWorkflowDispatchOutboxTests
                 }
             }
         });
-        _processor.TryProcessAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException<bool>(new InvalidOperationException("Store unavailable.")));
+        Mock.Get(_processor).TryProcessAsync(Arg.Any<CancellationToken>()).Returns(() => Task.FromException<bool>(new InvalidOperationException("Store unavailable.")));
 
         await handler.HandleAsync(notification, CancellationToken.None);
     }

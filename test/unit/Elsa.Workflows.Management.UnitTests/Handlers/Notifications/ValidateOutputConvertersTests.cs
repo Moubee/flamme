@@ -4,7 +4,7 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Management.Notifications;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Handlers.Notifications;
 
@@ -14,7 +14,7 @@ public class ValidateOutputConvertersTests
     public async Task HandleAsync_WhenConverterHasNoDestination_AddsValidationError()
     {
         var fixture = new Fixture();
-        fixture.DestinationResolver.Resolve(fixture.Graph, fixture.Node, fixture.Activity.Result).Returns((OutputBindingDestination?)null);
+        Mock.Get(fixture.DestinationResolver).Resolve(fixture.Graph, fixture.Node, fixture.Activity.Result).Returns((OutputBindingDestination?)null);
 
         var errors = await fixture.ValidateAsync();
 
@@ -38,8 +38,8 @@ public class ValidateOutputConvertersTests
     {
         var fixture = new Fixture();
         var descriptor = new OutputConverterDescriptor("test", typeof(int), typeof(string), "Test");
-        fixture.Registry.FindRegistration("test").Returns(new OutputConverterRegistration(descriptor, "test", ServiceLifetime.Singleton));
-        fixture.SettingsValidator.Validate(descriptor, Arg.Any<IOutputConverter>(), null).Returns([]);
+        Mock.Get(fixture.Registry).FindRegistration("test").Returns(new OutputConverterRegistration(descriptor, "test", ServiceLifetime.Singleton));
+        Mock.Get(fixture.SettingsValidator).Validate(descriptor, Arg.Any<IOutputConverter>(), null).Returns([]);
 
         var errors = await fixture.ValidateAsync();
 
@@ -61,21 +61,21 @@ public class ValidateOutputConvertersTests
             Node = new(Activity, "Body");
             var workflow = new Workflow();
             Graph = new(workflow, Node, [Node]);
-            GraphBuilder.BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(Graph);
-            ActivityRegistry.FindAsync(Activity.Type, Activity.Version).Returns(new ActivityDescriptor
+            Mock.Get(GraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(Graph);
+            Mock.Get(ActivityRegistry).FindAsync(Activity.Type, Activity.Version).Returns(new ActivityDescriptor
             {
                 Outputs =
-                [
-                    new(
+                            [
+                                new(
                         nameof(TestActivity.Result),
                         "Result",
                         typeof(int),
                         activity => ((TestActivity)activity).Result,
                         (activity, value) => ((TestActivity)activity).Result = (Output<int>)value!)
-                ]
+                            ]
             });
-            DestinationResolver.Resolve(Graph, Node, Activity.Result).Returns(
-                new OutputBindingDestination("workflow-result", typeof(string), true, OutputBindingDestinationKind.WorkflowOutput));
+            Mock.Get(DestinationResolver).Resolve(Graph, Node, Activity.Result).Returns(
+                            new OutputBindingDestination("workflow-result", typeof(string), true, OutputBindingDestinationKind.WorkflowOutput));
 
             var services = new ServiceCollection();
             services.AddKeyedSingleton<IOutputConverter, TestConverter>("test");
@@ -85,11 +85,11 @@ public class ValidateOutputConvertersTests
         public TestActivity Activity { get; }
         public ActivityNode Node { get; }
         public WorkflowGraph Graph { get; }
-        public IWorkflowGraphBuilder GraphBuilder { get; } = Substitute.For<IWorkflowGraphBuilder>();
-        public IActivityRegistryLookupService ActivityRegistry { get; } = Substitute.For<IActivityRegistryLookupService>();
-        public IOutputConverterRegistry Registry { get; } = Substitute.For<IOutputConverterRegistry>();
-        public IOutputBindingDestinationResolver DestinationResolver { get; } = Substitute.For<IOutputBindingDestinationResolver>();
-        public IOutputConverterSettingsValidator SettingsValidator { get; } = Substitute.For<IOutputConverterSettingsValidator>();
+        public IWorkflowGraphBuilder GraphBuilder { get; } = Mock.Of<IWorkflowGraphBuilder>().Object;
+        public IActivityRegistryLookupService ActivityRegistry { get; } = Mock.Of<IActivityRegistryLookupService>().Object;
+        public IOutputConverterRegistry Registry { get; } = Mock.Of<IOutputConverterRegistry>().Object;
+        public IOutputBindingDestinationResolver DestinationResolver { get; } = Mock.Of<IOutputBindingDestinationResolver>().Object;
+        public IOutputConverterSettingsValidator SettingsValidator { get; } = Mock.Of<IOutputConverterSettingsValidator>().Object;
         public ServiceProvider ServiceProvider { get; }
 
         public async Task<ICollection<WorkflowValidationError>> ValidateAsync()

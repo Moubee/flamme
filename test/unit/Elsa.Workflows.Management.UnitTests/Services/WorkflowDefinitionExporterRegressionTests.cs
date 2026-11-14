@@ -9,17 +9,17 @@ using Elsa.Workflows.Models;
 using Elsa.Workflows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 using Elsa.Common.Serialization;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowDefinitionExporterRegressionTests
 {
-    private readonly IWorkflowDefinitionStore _store = Substitute.For<IWorkflowDefinitionStore>();
-    private readonly IApiSerializer _serializer = Substitute.For<IApiSerializer>();
-    private readonly IWorkflowDefinitionService _workflowDefinitionService = Substitute.For<IWorkflowDefinitionService>();
-    private readonly IWorkflowReferenceGraphBuilder _workflowReferenceGraphBuilder = Substitute.For<IWorkflowReferenceGraphBuilder>();
+    private readonly IWorkflowDefinitionStore _store = Mock.Of<IWorkflowDefinitionStore>().Object;
+    private readonly IApiSerializer _serializer = Mock.Of<IApiSerializer>().Object;
+    private readonly IWorkflowDefinitionService _workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+    private readonly IWorkflowReferenceGraphBuilder _workflowReferenceGraphBuilder = Mock.Of<IWorkflowReferenceGraphBuilder>().Object;
 
     [Test]
     public async Task ExportManyAsync_WithSlashInWorkflowName_CreatesFlatZipEntry()
@@ -35,12 +35,11 @@ public class WorkflowDefinitionExporterRegressionTests
             IsPublished = true,
             MaterializerName = "Json"
         };
-
-        _serializer.GetOptions().Returns(new JsonSerializerOptions(JsonSerializerDefaults.Web));
-        _store.FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult<IEnumerable<WorkflowDefinition>>([definition]));
-        _workflowDefinitionService.MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(CreateWorkflowGraph()));
+        Mock.Get(_serializer).GetOptions().Returns(new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        Mock.Get(_store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromResult<IEnumerable<WorkflowDefinition>>([definition]));
+        Mock.Get(_workflowDefinitionService).MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>())
+                    .Returns(CreateWorkflowGraph());
 
         var sut = CreateExporter();
         var result = await Assert.That(await sut.ExportManyAsync([definition.Id])).IsNotNull();
@@ -58,8 +57,8 @@ public class WorkflowDefinitionExporterRegressionTests
 
     private WorkflowDefinitionExporter CreateExporter()
     {
-        var activitySerializer = Substitute.For<IActivitySerializer>();
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+        var activitySerializer = Mock.Of<IActivitySerializer>().Object;
+        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
         var workflowJsonTypeRegistry = SerializationTypeRegistry.CreateDefault();
         var variableDefinitionMapper = new VariableDefinitionMapper(workflowJsonTypeRegistry, scopeFactory, NullLogger<VariableDefinitionMapper>.Instance);
         var workflowDefinitionMapper = new WorkflowDefinitionMapper(activitySerializer, _workflowDefinitionService, variableDefinitionMapper);

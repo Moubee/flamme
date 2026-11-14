@@ -4,7 +4,6 @@ using Elsa.Models;
 using Elsa.Workflows.Api.Endpoints.OutputConverters.List;
 using Elsa.Workflows.Models;
 using FastEndpoints;
-using NSubstitute;
 
 namespace Elsa.Workflows.Api.UnitTests.OutputConverters;
 
@@ -13,7 +12,7 @@ public class OutputConverterEndpointTests
     [Test]
     public async Task Configure_ExposesTheDescriptorRouteWithoutRequiringAPermission()
     {
-        var endpoint = new List(Substitute.For<IOutputConverterRegistry>(), SerializationTypeRegistry.CreateDefault());
+        var endpoint = new List(Mock.Of<IOutputConverterRegistry>().Object, SerializationTypeRegistry.CreateDefault());
         var definition = new EndpointDefinition(typeof(List), typeof(EmptyRequest), typeof(ListResponse<OutputConverterDescriptorModel>));
 
         typeof(List).GetProperty("Definition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)!.SetValue(endpoint, definition);
@@ -35,8 +34,8 @@ public class OutputConverterEndpointTests
             "Convert to text",
             "Formats the source as text.",
             document.RootElement);
-        var registry = Substitute.For<IOutputConverterRegistry>();
-        registry.FindCompatible(typeof(string), typeof(int)).Returns([descriptor]);
+        var registry = Mock.Of<IOutputConverterRegistry>().Object;
+        Mock.Get(registry).FindCompatible(typeof(string), typeof(int)).Returns([descriptor]);
         var endpoint = new List(registry, SerializationTypeRegistry.CreateDefault());
 
         var listed = endpoint.TryListCompatible("String", "Int32", out var response, out var errors);
@@ -44,7 +43,7 @@ public class OutputConverterEndpointTests
 
         await Assert.That(listed).IsTrue();
         await Assert.That(errors).IsEmpty();
-        registry.Received(1).FindCompatible(typeof(string), typeof(int));
+        Mock.Get(registry).FindCompatible(typeof(string), typeof(int)).WasCalled(Times.Exactly(1));
         await Assert.That(model.Id).IsEqualTo("sample.to-text");
         await Assert.That(model.SourceTypeName).IsEqualTo("String");
         await Assert.That(model.ResultTypeName).IsEqualTo("String");
@@ -61,7 +60,7 @@ public class OutputConverterEndpointTests
     [Arguments("String", "Unsafe.Type", "The destinationType query parameter must be a registered type alias or resolvable safe type name.")]
     public async Task TryListCompatible_RejectsMissingOrUnsafeQueryTypes(string? sourceTypeName, string? destinationTypeName, string expectedError)
     {
-        var registry = Substitute.For<IOutputConverterRegistry>();
+        var registry = Mock.Of<IOutputConverterRegistry>().Object;
         var endpoint = new List(registry, SerializationTypeRegistry.CreateDefault());
 
         var listed = endpoint.TryListCompatible(sourceTypeName, destinationTypeName, out var response, out var errors);
@@ -69,6 +68,6 @@ public class OutputConverterEndpointTests
         await Assert.That(listed).IsFalse();
         await Assert.That(response.Items).IsEmpty();
         await Assert.That(errors).Contains(expectedError);
-        registry.DidNotReceive().FindCompatible(Arg.Any<Type>(), Arg.Any<Type>());
+        Mock.Get(registry).FindCompatible(Arg.Any<Type>(), Arg.Any<Type>()).WasNeverCalled();
     }
 }

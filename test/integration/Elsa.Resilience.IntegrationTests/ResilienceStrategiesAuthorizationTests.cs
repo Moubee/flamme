@@ -2,7 +2,6 @@ using System.Net;
 using Elsa.Http.Resilience;
 using Elsa.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using TUnit.AspNetCore;
 
 namespace Elsa.Resilience.IntegrationTests;
@@ -17,8 +16,8 @@ public class ResilienceStrategiesAuthorizationTests : WebApplicationTest<Resilie
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        var catalog = Substitute.For<IResilienceStrategyCatalog>();
-        catalog.ListAsync(Arg.Any<CancellationToken>()).Returns([new HttpResilienceStrategy()]);
+        var catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
+        Mock.Get(catalog).ListAsync(Arg.Any<CancellationToken>()).Returns([new HttpResilienceStrategy()]);
         services.AddSingleton(catalog);
         services.Configure<ResilienceOptions>(options => options.StrategyTypes.Add(typeof(HttpResilienceStrategy)));
     }

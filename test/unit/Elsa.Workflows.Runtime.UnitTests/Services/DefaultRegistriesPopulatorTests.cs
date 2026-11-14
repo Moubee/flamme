@@ -2,7 +2,7 @@ using Elsa.Mediator.Contracts;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Entities;
 using Elsa.Workflows.Runtime.Notifications;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -15,9 +15,9 @@ public class DefaultRegistriesPopulatorTests
 
     public DefaultRegistriesPopulatorTests()
     {
-        _workflowDefinitionStorePopulatorMock = Substitute.For<IWorkflowDefinitionStorePopulator>();
-        _activityRegistryPopulatorMock = Substitute.For<IActivityRegistryPopulator>();
-        _notificationSenderMock = Substitute.For<INotificationSender>();
+        _workflowDefinitionStorePopulatorMock = Mock.Of<IWorkflowDefinitionStorePopulator>().Object;
+        _activityRegistryPopulatorMock = Mock.Of<IActivityRegistryPopulator>().Object;
+        _notificationSenderMock = Mock.Of<INotificationSender>().Object;
 
         _populator = new(
             _workflowDefinitionStorePopulatorMock,
@@ -45,41 +45,37 @@ public class DefaultRegistriesPopulatorTests
                 Version = 1
             }
         };
-
-        _workflowDefinitionStorePopulatorMock
-            .PopulateStoreAsync(true, Arg.Any<CancellationToken>())
-            .Returns(workflowDefinitions);
+        Mock.Get(_workflowDefinitionStorePopulatorMock).PopulateStoreAsync(true, Arg.Any<CancellationToken>())
+                    .Returns(workflowDefinitions);
 
         // Act
         await _populator.PopulateAsync();
 
         // Assert
-        await _notificationSenderMock.Received(1).SendAsync(
-            Arg.Is<WorkflowDefinitionsReloaded>(n => n.ReloadedWorkflowDefinitions.Count == 2),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_notificationSenderMock).SendAsync(
+            Arg.Is<global::Elsa.Mediator.Contracts.INotification>(__value => __value is WorkflowDefinitionsReloaded __typed && (__typed.ReloadedWorkflowDefinitions.Count == 2)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task PopulateAsync_EnsuresActivityRegistryBeforeEachWorkflowDefinitionStorePopulation()
     {
         // Arrange
-        _workflowDefinitionStorePopulatorMock
-            .PopulateStoreAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<WorkflowDefinition>());
+        Mock.Get(_workflowDefinitionStorePopulatorMock).PopulateStoreAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>())
+                    .Returns(Array.Empty<WorkflowDefinition>());
 
         // Act
         await _populator.PopulateAsync();
 
         // Assert
-        Received.InOrder(() =>
-        {
-            _activityRegistryPopulatorMock.EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>());
-            _workflowDefinitionStorePopulatorMock.PopulateStoreAsync(false, Arg.Any<CancellationToken>());
-            _activityRegistryPopulatorMock.EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>());
-            _workflowDefinitionStorePopulatorMock.PopulateStoreAsync(true, Arg.Any<CancellationToken>());
-            _notificationSenderMock.SendAsync(Arg.Any<WorkflowDefinitionsReloaded>(), Arg.Any<CancellationToken>());
-        });
+        Mock.VerifyInOrder(() =>
+                {
+                    Mock.Get(_activityRegistryPopulatorMock).EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>()).WasCalled();
+                    Mock.Get(_workflowDefinitionStorePopulatorMock).PopulateStoreAsync(false, Arg.Any<CancellationToken>()).WasCalled();
+                    Mock.Get(_activityRegistryPopulatorMock).EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>()).WasCalled();
+                    Mock.Get(_workflowDefinitionStorePopulatorMock).PopulateStoreAsync(true, Arg.Any<CancellationToken>()).WasCalled();
+                    Mock.Get(_notificationSenderMock).SendAsync(Arg.Is<global::Elsa.Mediator.Contracts.INotification>(__value => __value is WorkflowDefinitionsReloaded), Arg.Any<CancellationToken>()).WasCalled();
+                });
 
-        await _activityRegistryPopulatorMock.Received(2).EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_activityRegistryPopulatorMock).EnsureRegistryPopulatedAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(2));
     }
 }

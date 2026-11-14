@@ -5,27 +5,23 @@ using Elsa.Workflows.Api.Endpoints.Bookmarks.Resume;
 using Elsa.Workflows.Runtime;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
-using NSubstitute;
 
 namespace Elsa.Workflows.IntegrationTests.Api.Bookmarks;
 
 public class ResumeEndpointSecurityTests
 {
     private const int MaxRequestBodySize = 1024 * 1024;
-    private readonly ITokenService _tokenService = Substitute.For<ITokenService>();
-    private readonly IPayloadSerializer _payloadSerializer = Substitute.For<IPayloadSerializer>();
-    private readonly IApiSerializer _apiSerializer = Substitute.For<IApiSerializer>();
-    private readonly IWorkflowResumer _workflowResumer = Substitute.For<IWorkflowResumer>();
-    private readonly IBookmarkQueue _bookmarkQueue = Substitute.For<IBookmarkQueue>();
+    private readonly ITokenService _tokenService = Mock.Of<ITokenService>().Object;
+    private readonly IPayloadSerializer _payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+    private readonly IApiSerializer _apiSerializer = Mock.Of<IApiSerializer>().Object;
+    private readonly IWorkflowResumer _workflowResumer = Mock.Of<IWorkflowResumer>().Object;
+    private readonly IBookmarkQueue _bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
 
     public ResumeEndpointSecurityTests()
     {
-        _tokenService.TryDecryptToken<BookmarkTokenPayload>(Arg.Any<string>(), out Arg.Any<BookmarkTokenPayload>())
-            .Returns(callInfo =>
-            {
-                callInfo[1] = new BookmarkTokenPayload("bookmark", "workflow");
-                return false;
-            });
+        Mock.Get(_tokenService).TryDecryptToken<BookmarkTokenPayload>(Arg.Any<string>())
+            .Returns(false)
+            .SetsOutPayload(new BookmarkTokenPayload("bookmark", "workflow"));
     }
 
     [Test]
@@ -38,10 +34,10 @@ public class ResumeEndpointSecurityTests
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        _payloadSerializer.Received(0).Deserialize<IDictionary<string, object>>(Arg.Any<string>());
-        _apiSerializer.Received(0).Deserialize<Request>(Arg.Any<string>());
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_payloadSerializer).Deserialize<IDictionary<string, object>>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_apiSerializer).Deserialize<Request>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -55,10 +51,10 @@ public class ResumeEndpointSecurityTests
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        _apiSerializer.Received(0).Deserialize<Request>(Arg.Any<string>());
-        _payloadSerializer.Received(0).Deserialize<IDictionary<string, object>>(Arg.Any<string>());
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_apiSerializer).Deserialize<Request>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_payloadSerializer).Deserialize<IDictionary<string, object>>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -70,10 +66,10 @@ public class ResumeEndpointSecurityTests
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        _apiSerializer.Received(0).Deserialize<Request>(Arg.Any<string>());
-        _payloadSerializer.Received(0).Deserialize<IDictionary<string, object>>(Arg.Any<string>());
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_apiSerializer).Deserialize<Request>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_payloadSerializer).Deserialize<IDictionary<string, object>>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -82,13 +78,13 @@ public class ResumeEndpointSecurityTests
         var context = CreateHttpContext(HttpMethods.Post, "?t=valid", "null");
         var sut = CreateEndpoint(context);
         ArrangeValidToken();
-        _apiSerializer.Deserialize<Request>("null").Returns((Request?)null);
+        Mock.Get(_apiSerializer).Deserialize<Request>("null").Returns((Request?)null);
 
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -97,13 +93,13 @@ public class ResumeEndpointSecurityTests
         var context = CreateHttpContext(HttpMethods.Get, "?t=valid&in=%7B%7D");
         var sut = CreateEndpoint(context);
         ArrangeValidToken();
-        _payloadSerializer.Deserialize<IDictionary<string, object>>("{}").Returns(_ => throw new ArgumentException("Invalid input."));
+        Mock.Get(_payloadSerializer).Deserialize<IDictionary<string, object>>("{}").Returns(() => throw new ArgumentException("Invalid input."));
 
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -112,13 +108,13 @@ public class ResumeEndpointSecurityTests
         var context = CreateHttpContext(HttpMethods.Post, "?t=valid", "{}");
         var sut = CreateEndpoint(context);
         ArrangeValidToken();
-        _apiSerializer.Deserialize<Request>("{}").Returns(_ => throw new ArgumentException("Invalid input."));
+        Mock.Get(_apiSerializer).Deserialize<Request>("{}").Returns(() => throw new ArgumentException("Invalid input."));
 
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -134,9 +130,9 @@ public class ResumeEndpointSecurityTests
         await sut.HandleAsync(CancellationToken.None);
 
         await Assert.That(context.Response.StatusCode).IsEqualTo((int)HttpStatusCode.BadRequest);
-        _apiSerializer.Received(0).Deserialize<Request>(Arg.Any<string>());
-        await _workflowResumer.DidNotReceive().ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>());
-        await _bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(_apiSerializer).Deserialize<Request>(Arg.Any<string>()).WasCalled(Times.Exactly(0));
+        Mock.Get(_workflowResumer).ResumeAsync(Arg.Any<ResumeBookmarkRequest>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     private Resume CreateEndpoint(DefaultHttpContext context)
@@ -146,12 +142,9 @@ public class ResumeEndpointSecurityTests
 
     private void ArrangeValidToken()
     {
-        _tokenService.TryDecryptToken<BookmarkTokenPayload>("valid", out Arg.Any<BookmarkTokenPayload>())
-            .Returns(callInfo =>
-            {
-                callInfo[1] = new BookmarkTokenPayload("bookmark", "workflow");
-                return true;
-            });
+        Mock.Get(_tokenService).TryDecryptToken<BookmarkTokenPayload>("valid")
+            .Returns(true)
+            .SetsOutPayload(new BookmarkTokenPayload("bookmark", "workflow"));
     }
 
     private static DefaultHttpContext CreateHttpContext(string method, string queryString, string? body = null, bool includeContentLength = true)

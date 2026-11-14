@@ -20,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using TUnit.Core.Interfaces;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
@@ -69,7 +68,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         new(dbContextFactory ?? _dbContextFactory,
             userStore ?? _userStore,
             userProvider ?? new StoreBasedUserProvider(userStore ?? _userStore),
-            Substitute.For<IRoleProvider>(),
+            Mock.Of<IRoleProvider>().Object,
             hasher,
             new GuidIdentityGenerator(),
             _clock,
@@ -770,12 +769,12 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task CallbackCompletionPersistsTheSessionBeforeAnyRefreshTokenIsIssued()
     {
-        var identityResolver = Substitute.For<IExternalIdentityResolver>();
-        identityResolver.ResolveAsync(Arg.Any<ExternalIdentityResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new ExternalIdentityResolution("user-a", false)));
-        var permissionGrantResolver = Substitute.For<IPermissionGrantResolver>();
-        permissionGrantResolver.ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new PermissionGrantResult([], [])));
+        var identityResolver = Mock.Of<IExternalIdentityResolver>().Object;
+        Mock.Get(identityResolver).ResolveAsync(Arg.Any<ExternalIdentityResolutionContext>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new ExternalIdentityResolution("user-a", false)));
+        var permissionGrantResolver = Mock.Of<IPermissionGrantResolver>().Object;
+        Mock.Get(permissionGrantResolver).ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new PermissionGrantResult([], [])));
         var adapter = new Broker.BrokerSecurityTests.RecordingAdapter
         {
             AuthenticationResult = new ExternalAuthenticationResult(new ExternalIdentity("https://issuer.example", "subject-a", EmptyClaims), EmptyClaims, [])

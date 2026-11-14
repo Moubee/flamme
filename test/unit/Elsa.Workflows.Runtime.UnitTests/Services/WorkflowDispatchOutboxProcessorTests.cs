@@ -14,22 +14,22 @@ using Elsa.Workflows.State;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class WorkflowDispatchOutboxProcessorTests
 {
-    private readonly IWorkflowDispatchOutboxStore _store = Substitute.For<IWorkflowDispatchOutboxStore>();
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Substitute.For<IWorkflowInstanceStore>();
-    private readonly ICommandSender _commandSender = Substitute.For<ICommandSender>();
-    private readonly ISystemClock _systemClock = Substitute.For<ISystemClock>();
+    private readonly IWorkflowDispatchOutboxStore _store = Mock.Of<IWorkflowDispatchOutboxStore>().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
+    private readonly ISystemClock _systemClock = Mock.Of<ISystemClock>().Object;
     private readonly WorkflowDispatcherOptions _options = new();
     private readonly WorkflowDispatchOutboxProcessor _processor;
 
     public WorkflowDispatchOutboxProcessorTests()
     {
-        _systemClock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        Mock.Get(_systemClock).UtcNow.Returns(DateTimeOffset.UtcNow);
         _processor = CreateProcessor();
     }
 
@@ -40,7 +40,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await processor.ProcessAsync();
 
-        await _store.DidNotReceiveWithAnyArgs().FindManyAsync(default, default);
+        Mock.Get(_store).FindManyAsync(Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await processor.ProcessAsync();
 
-        await _store.DidNotReceiveWithAnyArgs().FindManyAsync(default, default);
+        Mock.Get(_store).FindManyAsync(Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class WorkflowDispatchOutboxProcessorTests
         var result = await processor.TryProcessAsync();
 
         await Assert.That(result).IsFalse();
-        await _store.DidNotReceiveWithAnyArgs().FindManyAsync(default, default);
+        Mock.Get(_store).FindManyAsync(Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -72,17 +72,17 @@ public class WorkflowDispatchOutboxProcessorTests
         var processor = CreateProcessor(lockProvider, tenantAccessor);
         using var tenantScope = tenantAccessor.PushContext(new Tenant { Id = "tenant-a" });
         string? observedLockName = null;
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                observedLockName = lockProvider.CurrentLockName;
-                return [];
-            });
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+                    .Returns(() =>
+                    {
+                        observedLockName = lockProvider.CurrentLockName;
+                        return [];
+                    });
 
         await processor.ProcessAsync();
 
         await Assert.That(observedLockName).IsEqualTo("Elsa:WorkflowDispatchOutbox:Processor:tenant-a");
-        await _store.Received(1).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -93,18 +93,18 @@ public class WorkflowDispatchOutboxProcessorTests
         var processor = CreateProcessor(lockProvider, tenantAccessor);
         using var tenantScope = tenantAccessor.PushContext(new Tenant { Id = "tenant-a" });
         string? observedLockName = null;
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                observedLockName = lockProvider.CurrentLockName;
-                return [];
-            });
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+                    .Returns(() =>
+                    {
+                        observedLockName = lockProvider.CurrentLockName;
+                        return [];
+                    });
 
         var result = await processor.TryProcessAsync();
 
         await Assert.That(result).IsTrue();
         await Assert.That(observedLockName).IsEqualTo("Elsa:WorkflowDispatchOutbox:Processor:tenant-a");
-        await _store.Received(1).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private WorkflowDispatchOutboxProcessor CreateProcessor(IDistributedLockProvider? distributedLockProvider = null, ITenantAccessor? tenantAccessor = null)
@@ -125,15 +125,15 @@ public class WorkflowDispatchOutboxProcessorTests
     public async Task ProcessAsync_DoesNotDispatch_WhenOwnerWorkflowHasNotCommittedOutboxMarker()
     {
         var item = CreateItem();
-        _systemClock.UtcNow.Returns(item.CreatedAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: false)));
+        Mock.Get(_systemClock).UtcNow.Returns(item.CreatedAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
 
         await _processor.ProcessAsync();
 
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
-        await _store.DidNotReceive().DeleteAsync(item.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -141,15 +141,15 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        _systemClock.UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: false)));
+        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
 
         await _processor.ProcessAsync();
 
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
-        await _store.Received(1).DeleteAsync(item.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -157,18 +157,18 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        _systemClock.UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: false)));
-        _store.DeleteAsync(item.Id, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException(new InvalidOperationException("Delete failed.")));
+        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException(new InvalidOperationException("Delete failed.")));
 
         await _processor.ProcessAsync();
 
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
-        await _store.DidNotReceive().SaveAsync(item, Arg.Any<CancellationToken>());
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
+        Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -176,15 +176,15 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        _systemClock.UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>((WorkflowInstance?)null));
+        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns((WorkflowInstance?)null);
 
         await _processor.ProcessAsync();
 
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
-        await _store.DidNotReceive().DeleteAsync(item.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -192,15 +192,15 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        _systemClock.UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>((WorkflowInstance?)null));
+        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns((WorkflowInstance?)null);
 
         await _processor.ProcessAsync();
 
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
-        await _store.Received(1).DeleteAsync(item.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -208,18 +208,18 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        _systemClock.UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>((WorkflowInstance?)null));
-        _store.DeleteAsync(item.Id, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException(new InvalidOperationException("Delete failed.")));
+        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns((WorkflowInstance?)null);
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException(new InvalidOperationException("Delete failed.")));
 
         await _processor.ProcessAsync();
 
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
-        await _store.DidNotReceive().SaveAsync(item, Arg.Any<CancellationToken>());
-        await _commandSender.DidNotReceiveWithAnyArgs().SendAsync(default(DispatchWorkflowDefinitionCommand)!, default!, default!, default);
+        Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -227,21 +227,17 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var item = CreateItem();
         var owner = CreateOwnerWorkflowInstance(includeOutboxMarker: true);
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(owner));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(owner);
 
         await _processor.ProcessAsync();
 
-        await _commandSender.Received(1).SendAsync(
-            item.WorkflowDefinitionCommand!,
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
-        await _store.Received(1).DeleteAsync(item.Id, Arg.Any<CancellationToken>());
-        await _workflowInstanceStore.Received(1).SaveAsync(
-            Arg.Is<WorkflowInstance>(x => !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_workflowInstanceStore).SaveAsync(
+            Arg.Is<WorkflowInstance>(x => !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -251,17 +247,15 @@ public class WorkflowDispatchOutboxProcessorTests
         var staleOwner = CreateOwnerWorkflowInstance(includeOutboxMarker: true);
         var freshOwner = CreateOwnerWorkflowInstance(includeOutboxMarker: true);
         freshOwner.Name = "fresh owner";
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(
-                new ValueTask<WorkflowInstance?>(staleOwner),
-                new ValueTask<WorkflowInstance?>(freshOwner));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .ReturnsSequentially(
+        staleOwner, freshOwner);
 
         await _processor.ProcessAsync();
 
-        await _workflowInstanceStore.Received(1).SaveAsync(
-            Arg.Is<WorkflowInstance>(x => ReferenceEquals(x, freshOwner) && !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowInstanceStore).SaveAsync(
+            Arg.Is<WorkflowInstance>(x => ReferenceEquals(x, freshOwner) && !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -270,78 +264,73 @@ public class WorkflowDispatchOutboxProcessorTests
         var lockProvider = new RecordingDistributedSynchronizationProvider();
         var processor = CreateProcessor(lockProvider);
         var item = CreateItem();
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true)));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
         string? observedLockName = null;
-        _workflowInstanceStore.SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                observedLockName = lockProvider.CurrentLockName;
-                return ValueTask.CompletedTask;
-            });
+        Mock.Get(_workflowInstanceStore).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
+                    .Returns(() =>
+                    {
+                        observedLockName = lockProvider.CurrentLockName;
+                        return ValueTask.CompletedTask;
+                    });
 
         await processor.ProcessAsync();
 
         await Assert.That(observedLockName).IsEqualTo("workflow-instance:parent-1");
-        await _workflowInstanceStore.Received(1).SaveAsync(
-            Arg.Is<WorkflowInstance>(x => !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowInstanceStore).SaveAsync(
+            Arg.Is<WorkflowInstance>(x => !x.WorkflowState.HasWorkflowDispatchOutboxItem(item.Id)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ProcessAsync_DoesNotRecreateOutboxItem_WhenMarkerCleanupFails()
     {
         var item = CreateItem();
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true)));
-        _workflowInstanceStore.SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-            .Returns<ValueTask>(_ => throw new InvalidOperationException("Store unavailable."));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
+        Mock.Get(_workflowInstanceStore).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
+                    .Returns(() => throw new InvalidOperationException("Store unavailable."));
 
         await _processor.ProcessAsync();
 
-        await _store.Received(1).DeleteAsync(item.Id, Arg.Any<CancellationToken>());
-        await _store.DidNotReceive().SaveAsync(item, Arg.Any<CancellationToken>());
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task ProcessAsync_DoesNotCountDeliveryFailure_WhenDeleteAfterSendFails()
     {
         var item = CreateItem();
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true)));
-        _store.DeleteAsync(item.Id, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException(new InvalidOperationException("Delete failed.")));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException(new InvalidOperationException("Delete failed.")));
 
         await _processor.ProcessAsync();
 
-        await _commandSender.Received(1).SendAsync(
-            item.WorkflowDefinitionCommand!,
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
-        await _store.DidNotReceive().SaveAsync(item, Arg.Any<CancellationToken>());
-        await _workflowInstanceStore.DidNotReceive().SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
+        Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_workflowInstanceStore).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task ProcessAsync_KeepsOutboxItem_WhenDispatchFails()
     {
         var item = CreateItem();
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true)));
-        _commandSender
-            .SendAsync(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-            .Returns(Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
 
         await _processor.ProcessAsync();
 
-        await _store.DidNotReceive().DeleteAsync(item.Id, Arg.Any<CancellationToken>());
-        await _store.Received(1).SaveAsync(Arg.Is<WorkflowDispatchOutboxItem>(x => x.Id == item.Id && x.DeliveryAttempts == 1), Arg.Any<CancellationToken>());
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_store).SaveAsync(Arg.Is<WorkflowDispatchOutboxItem>(x => x.Id == item.Id && x.DeliveryAttempts == 1), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -349,26 +338,20 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var failedItem = CreateItem(id: "outbox-1");
         var nextItem = CreateItem(id: "outbox-2");
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([failedItem, nextItem]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id])),
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id])),
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id])));
-        _commandSender
-            .SendAsync(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-            .Returns(Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
-        _store.SaveAsync(failedItem, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException(new InvalidOperationException("Save failed.")));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([failedItem, nextItem]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .ReturnsSequentially(
+        CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]));
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_store).SaveAsync(failedItem, Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException(new InvalidOperationException("Save failed.")));
 
         await _processor.ProcessAsync();
 
-        await _commandSender.Received(1).SendAsync(
-            nextItem.WorkflowDefinitionCommand!,
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
-        await _store.Received(1).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            nextItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
+        Mock.Get(_store).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -376,16 +359,15 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var item = CreateItem();
         item.DeliveryAttempts = _options.MaxOutboxDeliveryAttempts - 1;
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true)));
-        _commandSender
-            .SendAsync(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-            .Returns(Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
 
         await _processor.ProcessAsync();
 
-        await _store.Received(1).DeleteAsync(item.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -394,27 +376,21 @@ public class WorkflowDispatchOutboxProcessorTests
         var failedItem = CreateItem(id: "outbox-1");
         var nextItem = CreateItem(id: "outbox-2");
         failedItem.DeliveryAttempts = _options.MaxOutboxDeliveryAttempts - 1;
-        _store.FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([failedItem, nextItem]);
-        _workflowInstanceStore.FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id])),
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id])),
-                new ValueTask<WorkflowInstance?>(CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id])));
-        _commandSender
-            .SendAsync(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-            .Returns(Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
-        _store.DeleteAsync(failedItem.Id, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException(new InvalidOperationException("Delete failed.")));
+        Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([failedItem, nextItem]);
+        Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .ReturnsSequentially(
+        CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]));
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_store).DeleteAsync(failedItem.Id, Arg.Any<CancellationToken>())
+                    .Returns(() => Task.FromException(new InvalidOperationException("Delete failed.")));
 
         await _processor.ProcessAsync();
 
-        await _commandSender.Received(1).SendAsync(
-            nextItem.WorkflowDefinitionCommand!,
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
-        await _store.Received(1).SaveAsync(Arg.Is<WorkflowDispatchOutboxItem>(x => x.Id == failedItem.Id && x.DeliveryAttempts == _options.MaxOutboxDeliveryAttempts), Arg.Any<CancellationToken>());
-        await _store.Received(1).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+            nextItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
+        Mock.Get(_store).SaveAsync(Arg.Is<WorkflowDispatchOutboxItem>(x => x.Id == failedItem.Id && x.DeliveryAttempts == _options.MaxOutboxDeliveryAttempts), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_store).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private static WorkflowDispatchOutboxItem CreateItem(DateTimeOffset? createdAt = null, string id = "outbox-1")

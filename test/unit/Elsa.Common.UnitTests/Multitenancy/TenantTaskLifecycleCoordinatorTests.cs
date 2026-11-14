@@ -3,7 +3,6 @@ using Elsa.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Common.UnitTests.Multitenancy;
@@ -125,7 +124,7 @@ public class TenantTaskLifecycleCoordinatorTests : IAsyncDisposable
 
     private static TenantTaskLifecycleCoordinator CreateCoordinator()
     {
-        var scheduleManager = new RecurringTaskScheduleManager(Microsoft.Extensions.Options.Options.Create(new RecurringTaskOptions()), Substitute.For<ISystemClock>());
+        var scheduleManager = new RecurringTaskScheduleManager(Microsoft.Extensions.Options.Options.Create(new RecurringTaskOptions()), Mock.Of<ISystemClock>().Object);
         return new TenantTaskLifecycleCoordinator(scheduleManager, NullLogger<TenantTaskLifecycleCoordinator>.Instance);
     }
 
@@ -150,10 +149,10 @@ public class TenantTaskLifecycleCoordinatorTests : IAsyncDisposable
 
     private static TenantScope CreateTenantScope(Tenant tenant, IServiceProvider serviceProvider)
     {
-        var serviceScope = Substitute.For<IServiceScope>();
-        serviceScope.ServiceProvider.Returns(serviceProvider);
-        var tenantAccessor = Substitute.For<ITenantAccessor>();
-        tenantAccessor.PushContext(Arg.Any<Tenant?>()).Returns(Substitute.For<IDisposable>());
+        var serviceScope = Mock.Of<IServiceScope>().Object;
+        Mock.Get(serviceScope).ServiceProvider.Returns(serviceProvider);
+        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        Mock.Get(tenantAccessor).PushContext(Arg.Any<Tenant?>()).Returns(Mock.Of<IDisposable>().Object);
         return new TenantScope(serviceScope, tenantAccessor, tenant);
     }
 

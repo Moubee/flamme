@@ -3,7 +3,6 @@ using Elsa.Mediator.Contracts;
 using Elsa.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 
 namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
 
@@ -23,10 +22,10 @@ public class ScheduledRecurringTaskTests : IDisposable
     public ScheduledRecurringTaskTests()
     {
         var services = new ServiceCollection();
-        _systemClock = Substitute.For<ISystemClock>();
-        _logger = Substitute.For<ILogger<ScheduledRecurringTask>>();
+        _systemClock = Mock.Of<ISystemClock>().Object;
+        _logger = Mock.Of<ILogger<ScheduledRecurringTask>>().Object;
 
-        services.AddSingleton(Substitute.For<ICommandSender>());
+        services.AddSingleton(Mock.Of<ICommandSender>().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -35,7 +34,7 @@ public class ScheduledRecurringTaskTests : IDisposable
         TimeSpan? interval = null,
         ISystemClock? systemClock = null)
     {
-        var task = Substitute.For<ITask>();
+        var task = Mock.Of<ITask>().Object;
         var scheduledTask = new ScheduledRecurringTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),
@@ -50,27 +49,27 @@ public class ScheduledRecurringTaskTests : IDisposable
 
     private void SetupSystemClock(params DateTimeOffset[] times)
     {
-        _systemClock.UtcNow.Returns(times[0], times.Skip(1).ToArray());
+        Mock.Get(_systemClock).UtcNow.ReturnsSequentially(times);
     }
 
     private void AssertNoErrorLogged()
     {
-        _logger.DidNotReceive().Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasNeverCalled();
     }
 
     private void AssertWarningLogged(int expectedCount = 1)
     {
-        _logger.Received(expectedCount).Log(
+        Mock.Get(_logger).Log<AnyType>(
             LogLevel.Warning,
             Arg.Any<EventId>(),
-            Arg.Any<object>(),
-            Arg.Any<Exception>(),
-            Arg.Any<Func<object, Exception?, string>>());
+            Arg.Any<AnyType>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<AnyType, Exception?, string>>()).WasCalled(Times.Exactly(expectedCount));
     }
 
     [Test]
@@ -103,9 +102,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
         // Assert - System clock should be called at least twice (initial + retry)
         // May be called more if timer fires before disposal in rare race conditions
-        _ = _systemClock.Received().UtcNow;
-        var calls = _systemClock.ReceivedCalls().Count(c => c.GetMethodInfo().Name == "get_UtcNow");
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to UtcNow, but got {calls}");
+        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
     }
 
     [Test]
@@ -123,9 +120,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
         // Assert - System clock should be called at least twice (initial + retry)
         // May be called more if timer fires before disposal in rare race conditions
-        _ = _systemClock.Received().UtcNow;
-        var calls = _systemClock.ReceivedCalls().Count(c => c.GetMethodInfo().Name == "get_UtcNow");
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to UtcNow, but got {calls}");
+        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
     }
 
     [Test]
@@ -145,9 +140,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
         // Assert - Should call UtcNow at least twice (initial + retry)
         // May be called more if timer fires before disposal
-        _ = _systemClock.Received().UtcNow;
-        var calls = _systemClock.ReceivedCalls().Count(c => c.GetMethodInfo().Name == "get_UtcNow");
-        await Assert.That(calls >= 2).IsTrue().Because($"Expected at least 2 calls to UtcNow, but got {calls}");
+        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
         AssertWarningLogged();
     }
 

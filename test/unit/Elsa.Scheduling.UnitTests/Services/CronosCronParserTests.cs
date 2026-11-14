@@ -1,6 +1,5 @@
 using Elsa.Common;
 using Elsa.Scheduling.Services;
-using NSubstitute;
 
 namespace Elsa.Scheduling.UnitTests.Services;
 
@@ -104,8 +103,8 @@ public class CronosCronParserTests
 
     private static CronosCronParser CreateParser(DateTimeOffset now)
     {
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(now);
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(now);
         return new CronosCronParser(clock);
     }
 }

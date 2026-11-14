@@ -1,6 +1,6 @@
 using Elsa.Mediator.Contracts;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -9,7 +9,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task SendAsync_WhenBuffering_DoesNotPublishUntilScopeIsFlushed()
     {
-        var mediator = Substitute.For<IMediator>();
+        var mediator = Mock.Of<IMediator>().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
@@ -17,30 +17,29 @@ public class WorkflowCommitNotificationBufferTests
         using var scope = buffer.Begin();
         await sender.SendAsync(notification);
 
-        await mediator.DidNotReceive().SendAsync(notification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
+        Mock.Get(mediator).SendAsync(notification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         await scope.FlushAsync();
 
-        await mediator.Received(1).SendAsync(notification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
+        Mock.Get(mediator).SendAsync(notification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task SendAsync_AfterScopeIsFlushed_PublishesImmediately()
     {
-        var mediator = Substitute.For<IMediator>();
+        var mediator = Mock.Of<IMediator>().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var bufferedNotification = new TestNotification();
         var subsequentNotification = new TestNotification();
         var notificationPublishingStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var continueNotificationPublishing = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        mediator
-            .SendAsync(bufferedNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
-            .Returns(async _ =>
-            {
-                notificationPublishingStarted.SetResult();
-                await continueNotificationPublishing.Task;
-            });
+        Mock.Get(mediator).SendAsync(bufferedNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
+                    .Returns(async () =>
+                    {
+                        notificationPublishingStarted.SetResult();
+                        await continueNotificationPublishing.Task;
+                    });
 
         using var scope = buffer.Begin();
         await sender.SendAsync(bufferedNotification);
@@ -50,14 +49,14 @@ public class WorkflowCommitNotificationBufferTests
         await flushTask;
         await sender.SendAsync(subsequentNotification);
 
-        await mediator.Received(1).SendAsync(bufferedNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
-        await mediator.Received(1).SendAsync(subsequentNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
+        Mock.Get(mediator).SendAsync(bufferedNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(mediator).SendAsync(subsequentNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task SendAsync_WhenBufferingScopeIsDisposedWithoutFlush_DiscardsNotifications()
     {
-        var mediator = Substitute.For<IMediator>();
+        var mediator = Mock.Of<IMediator>().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
@@ -67,20 +66,19 @@ public class WorkflowCommitNotificationBufferTests
             await sender.SendAsync(notification);
         }
 
-        await mediator.DidNotReceive().SendAsync(notification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
+        Mock.Get(mediator).SendAsync(notification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task FlushAsync_WhenNotificationFails_StillPublishesRemainingNotifications()
     {
-        var mediator = Substitute.For<IMediator>();
+        var mediator = Mock.Of<IMediator>().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var failingNotification = new TestNotification();
         var succeedingNotification = new TestNotification();
-        mediator
-            .SendAsync(failingNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
-            .Returns<Task>(_ => throw new InvalidOperationException("Handler failed"));
+        Mock.Get(mediator).SendAsync(failingNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => throw new InvalidOperationException("Handler failed"));
 
         using var scope = buffer.Begin();
         await sender.SendAsync(failingNotification);
@@ -88,20 +86,19 @@ public class WorkflowCommitNotificationBufferTests
 
         await Assert.ThrowsExactlyAsync<AggregateException>(() => scope.FlushAsync());
 
-        await mediator.Received(1).SendAsync(failingNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
-        await mediator.Received(1).SendAsync(succeedingNotification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>());
+        Mock.Get(mediator).SendAsync(failingNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(mediator).SendAsync(succeedingNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task FlushAsync_WhenNotificationIsCanceled_PropagatesCancellation()
     {
-        var mediator = Substitute.For<IMediator>();
+        var mediator = Mock.Of<IMediator>().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
-        mediator
-            .SendAsync(notification, Arg.Any<IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
-            .Returns<Task>(_ => throw new OperationCanceledException());
+        Mock.Get(mediator).SendAsync(notification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
+                    .Returns(() => throw new OperationCanceledException());
 
         using var scope = buffer.Begin();
         await sender.SendAsync(notification);
@@ -109,7 +106,7 @@ public class WorkflowCommitNotificationBufferTests
         await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => scope.FlushAsync());
     }
 
-    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, Substitute.For<ILogger<WorkflowCommitNotificationBuffer>>());
+    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, Mock.Of<ILogger<WorkflowCommitNotificationBuffer>>().Object);
 
     private class TestNotification : INotification;
 }

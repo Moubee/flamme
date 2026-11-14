@@ -7,7 +7,7 @@ using Elsa.Workflows.Runtime.Stores;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -32,28 +32,28 @@ public class WorkflowResumerConsumedBookmarkTests
         });
 
         var runCount = 0;
-        var client = Substitute.For<IWorkflowClient>();
-        client.RunInstanceAsync(Arg.Any<RunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                runCount++;
-                return new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-1" };
-            });
+        var client = Mock.Of<IWorkflowClient>().Object;
+        Mock.Get(client).RunInstanceAsync(Arg.Any<RunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Returns(() =>
+                    {
+                        runCount++;
+                        return new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-1" };
+                    });
 
-        var runtime = Substitute.For<IWorkflowRuntime>();
-        runtime.CreateClientAsync("instance-1", Arg.Any<CancellationToken>()).Returns(client);
+        var runtime = Mock.Of<IWorkflowRuntime>().Object;
+        Mock.Get(runtime).CreateClientAsync("instance-1", Arg.Any<CancellationToken>()).Returns(client);
 
-        var lockProvider = Substitute.For<IDistributedLockProvider>();
-        var distributedLock = Substitute.For<IDistributedLock>();
-        var lockHandle = Substitute.For<IDistributedSynchronizationHandle>();
-        lockProvider.CreateLock(Arg.Any<string>()).Returns(distributedLock);
-        distributedLock.AcquireAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(lockHandle));
+        var lockProvider = Mock.Of<IDistributedLockProvider>().Object;
+        var distributedLock = Mock.Of<IDistributedLock>().Object;
+        var lockHandle = Mock.Of<IDistributedSynchronizationHandle>().Object;
+        Mock.Get(lockProvider).CreateLock(Arg.Any<string>()).Returns(distributedLock);
+        Mock.Get(distributedLock).AcquireAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
+                    .Returns(lockHandle);
 
         var resumer = new WorkflowResumer(
             runtime,
             store,
-            Substitute.For<IStimulusHasher>(),
+            Mock.Of<IStimulusHasher>().Object,
             lockProvider,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             NullLogger<WorkflowResumer>.Instance);

@@ -3,14 +3,14 @@ using Elsa.Workflows.Runtime.Activities;
 using Elsa.Workflows.Runtime.Models;
 using Elsa.Workflows.Runtime.Requests;
 using Elsa.Workflows.Runtime.Stimuli;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class EventPublisherTests
 {
-    private readonly IStimulusSender _stimulusSender = Substitute.For<IStimulusSender>();
-    private readonly IWorkflowDispatcher _workflowDispatcher = Substitute.For<IWorkflowDispatcher>();
+    private readonly IStimulusSender _stimulusSender = Mock.Of<IStimulusSender>().Object;
+    private readonly IWorkflowDispatcher _workflowDispatcher = Mock.Of<IWorkflowDispatcher>().Object;
 
     [Test]
     public async Task PublishAsync_WhenAsynchronous_DispatchesThroughWorkflowDispatcher()
@@ -24,11 +24,9 @@ public class EventPublisherTests
 
         await publisher.PublishAsync(eventName, correlationId, workflowInstanceId, activityInstanceId, payload, asynchronous: true);
 
-        await _workflowDispatcher.Received(1).DispatchAsync(
-            Arg.Is<DispatchTriggerWorkflowsRequest>(request => IsMatchingTriggerRequest(request, eventName, correlationId, workflowInstanceId, activityInstanceId, payload)),
-            Arg.Any<DispatchWorkflowOptions?>(),
-            Arg.Any<CancellationToken>());
-        await _stimulusSender.DidNotReceiveWithAnyArgs().SendAsync(default!, default!, default, default);
+        Mock.Get(_workflowDispatcher).DispatchAsync(
+            Arg.Is<DispatchTriggerWorkflowsRequest>(request => IsMatchingTriggerRequest(request, eventName, correlationId, workflowInstanceId, activityInstanceId, payload)), Arg.Any<global::Elsa.Workflows.Runtime.DispatchWorkflowOptions?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_stimulusSender).SendAsync(Any(), Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -40,14 +38,11 @@ public class EventPublisherTests
 
         await publisher.PublishAsync(eventName, payload: payload, asynchronous: false);
 
-        await _stimulusSender.Received(1).SendAsync(
-            ActivityTypeNameHelper.GenerateTypeName<Event>(),
-            Arg.Is<EventStimulus>(stimulus => stimulus.EventName == eventName),
-            Arg.Is<StimulusMetadata>(metadata =>
-                metadata.Input != null &&
-                metadata.Input[Event.EventInputWorkflowInputKey] == payload),
-            Arg.Any<CancellationToken>());
-        await _workflowDispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default(DispatchTriggerWorkflowsRequest)!, default, default);
+        Mock.Get(_stimulusSender).SendAsync(
+            ActivityTypeNameHelper.GenerateTypeName<Event>(), Arg.Is<object>(__value => __value is EventStimulus __typed && (__typed.EventName == eventName)), Arg.Is<StimulusMetadata?>(metadata =>
+                metadata != null && metadata.Input != null &&
+                metadata.Input[Event.EventInputWorkflowInputKey] == payload), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_workflowDispatcher).DispatchAsync(Arg.Any<DispatchTriggerWorkflowsRequest>(), Any(), Any()).WasNeverCalled();
     }
 
     private EventPublisher CreatePublisher() => new(_stimulusSender, _workflowDispatcher);

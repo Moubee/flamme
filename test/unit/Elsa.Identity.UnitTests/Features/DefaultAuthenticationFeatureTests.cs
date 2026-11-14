@@ -1,7 +1,6 @@
 using Elsa.Features.Services;
 using Elsa.Identity.Features;
 using Microsoft.AspNetCore.Authorization;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Identity.UnitTests.Features;
@@ -13,7 +12,7 @@ namespace Elsa.Identity.UnitTests.Features;
 /// </summary>
 public class DefaultAuthenticationFeatureTests
 {
-    private readonly DefaultAuthenticationFeature _feature = new(Substitute.For<IModule>());
+    private readonly DefaultAuthenticationFeature _feature = new(Mock.Of<IModule>().Object);
     private readonly AuthorizationOptions _options = new();
 
     [Test]

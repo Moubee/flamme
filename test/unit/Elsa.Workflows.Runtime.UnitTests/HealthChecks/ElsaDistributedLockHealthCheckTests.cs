@@ -5,23 +5,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 
 public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
 {
     private static readonly TimeSpan ExpectedLockAcquisitionTimeout = TimeSpan.FromMilliseconds(250);
-    private readonly IDistributedLockProvider _distributedLockProvider = Substitute.For<IDistributedLockProvider>();
-    private readonly IDistributedLock _distributedLock = Substitute.For<IDistributedLock>();
+    private readonly IDistributedLockProvider _distributedLockProvider = Mock.Of<IDistributedLockProvider>().Object;
+    private readonly IDistributedLock _distributedLock = Mock.Of<IDistributedLock>().Object;
     private readonly ServiceProvider _serviceProvider;
     private readonly ElsaDistributedLockHealthCheck _sut;
 
     public ElsaDistributedLockHealthCheckTests()
     {
-        _distributedLockProvider.CreateLock(Arg.Any<string>()).Returns(_distributedLock);
-        _distributedLock.TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<IDistributedSynchronizationHandle?>(Substitute.For<IDistributedSynchronizationHandle>()));
+        Mock.Get(_distributedLockProvider).CreateLock(Arg.Any<string>()).Returns(_distributedLock);
+        Mock.Get(_distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+                    .Returns(Mock.Of<IDistributedSynchronizationHandle>().Object);
         _serviceProvider = CreateServiceProvider(_distributedLockProvider);
         _sut = new ElsaDistributedLockHealthCheck(_serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
     }
@@ -33,19 +33,19 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
 
         await Assert.That(result.Status).IsEqualTo(HealthStatus.Healthy);
         await Assert.That(result.Data["category"]).IsEqualTo("distributed-locks");
-        _distributedLockProvider.Received(1).CreateLock(Arg.Is<string>(x => IsProbeLockName(x)));
-        await _distributedLock.Received(1).TryAcquireAsync(ExpectedLockAcquisitionTimeout, Arg.Any<CancellationToken>());
+        Mock.Get(_distributedLockProvider).CreateLock(Arg.Is<string>(x => IsProbeLockName(x))).WasCalled(Times.Exactly(1));
+        Mock.Get(_distributedLock).TryAcquireAsync(ExpectedLockAcquisitionTimeout, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task UsesUniqueProbeLockNameForEachCheck()
     {
         var lockNames = new List<string>();
-        var distributedLockProvider = Substitute.For<IDistributedLockProvider>();
-        var distributedLock = Substitute.For<IDistributedLock>();
-        distributedLockProvider.CreateLock(Arg.Do<string>(lockNames.Add)).Returns(distributedLock);
-        distributedLock.TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<IDistributedSynchronizationHandle?>(Substitute.For<IDistributedSynchronizationHandle>()));
+        var distributedLockProvider = Mock.Of<IDistributedLockProvider>().Object;
+        var distributedLock = Mock.Of<IDistributedLock>().Object;
+        Mock.Get(distributedLockProvider).CreateLock(Arg.Any<string>()).Callback((string name) => lockNames.Add(name)).Returns(distributedLock);
+        Mock.Get(distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+                    .Returns(Mock.Of<IDistributedSynchronizationHandle>().Object);
         await using var serviceProvider = CreateServiceProvider(distributedLockProvider);
         var sut = new ElsaDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
 
@@ -63,8 +63,8 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
     [Test]
     public async Task ReturnsDegradedWhenProbeLockCannotBeAcquired()
     {
-        _distributedLock.TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-            .Returns(new ValueTask<IDistributedSynchronizationHandle?>((IDistributedSynchronizationHandle?)null));
+        Mock.Get(_distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+                    .Returns((IDistributedSynchronizationHandle?)null);
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -75,7 +75,7 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
     [Test]
     public async Task ReturnsUnhealthyWhenProviderThrows()
     {
-        _distributedLockProvider.CreateLock(Arg.Any<string>()).Returns<IDistributedLock>(_ => throw new InvalidOperationException("lock backend unavailable"));
+        Mock.Get(_distributedLockProvider).CreateLock(Arg.Any<string>()).Returns(() => throw new InvalidOperationException("lock backend unavailable"));
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 

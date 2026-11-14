@@ -8,7 +8,6 @@ using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Activities;
 using Elsa.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Composition;
@@ -43,9 +42,9 @@ public class ExecuteWorkflowTests
         var parentInstanceId = context.WorkflowExecutionContext.Id;
 
         // Assert
-        await workflowInvoker.Received(1).InvokeAsync(
+        Mock.Get(workflowInvoker).InvokeAsync(
             Arg.Any<WorkflowGraph>(),
-            Arg.Is<RunWorkflowOptions>(opts =>
+            Arg.Is<RunWorkflowOptions?>(opts => opts != null &&
                 opts.ParentWorkflowInstanceId == parentInstanceId &&
                 opts.WorkflowInstanceId == DefaultGeneratedId &&
                 opts.CorrelationId == DefaultCorrelationId &&
@@ -55,7 +54,7 @@ public class ExecuteWorkflowTests
                 (waitForCompletion ? opts.Properties.ContainsKey("WaitForCompletion") && (bool)opts.Properties["WaitForCompletion"] : !opts.Properties.ContainsKey("WaitForCompletion"))
             ),
             Arg.Any<CancellationToken>()
-        );
+        ).WasCalled(Times.Exactly(1));
 
         // Result is only set when either not waiting or child workflow finishes
         if (!waitForCompletion || childWorkflowStatus == WorkflowStatus.Finished)
@@ -111,8 +110,8 @@ public class ExecuteWorkflowTests
         // Arrange
         const string workflowDefinitionId = "non-existent-workflow";
 
-        var workflowDefinitionService = Substitute.For<IWorkflowDefinitionService>();
-        workflowDefinitionService
+        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+        Mock.Get(workflowDefinitionService)
             .FindWorkflowGraphAsync(workflowDefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>())
             .Returns((WorkflowGraph?)null);
 
@@ -138,15 +137,15 @@ public class ExecuteWorkflowTests
         var (_, workflowInvoker) = await ExecuteAsync(executeWorkflow);
 
         // Assert - Should create input with ParentInstanceId even when no input provided
-        await workflowInvoker.Received(1).InvokeAsync(
+        Mock.Get(workflowInvoker).InvokeAsync(
             Arg.Any<WorkflowGraph>(),
-            Arg.Is<RunWorkflowOptions>(opts =>
+            Arg.Is<RunWorkflowOptions?>(opts => opts != null &&
                 opts.Input != null &&
                 opts.Input.ContainsKey("ParentInstanceId") &&
                 opts.Input.Count == 1
             ),
             Arg.Any<CancellationToken>()
-        );
+        ).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -162,11 +161,11 @@ public class ExecuteWorkflowTests
         var (_, workflowInvoker) = await ExecuteAsync(executeWorkflow);
 
         // Assert
-        await workflowInvoker.Received(1).InvokeAsync(
+        Mock.Get(workflowInvoker).InvokeAsync(
             Arg.Any<WorkflowGraph>(),
-            Arg.Is<RunWorkflowOptions>(opts => opts.CorrelationId == null),
+            Arg.Is<RunWorkflowOptions?>(opts => opts != null && opts.CorrelationId == null),
             Arg.Any<CancellationToken>()
-        );
+        ).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -202,8 +201,8 @@ public class ExecuteWorkflowTests
 
     private static IWorkflowDefinitionService CreateWorkflowDefinitionService(string workflowDefinitionId, WorkflowGraph workflowGraph)
     {
-        var service = Substitute.For<IWorkflowDefinitionService>();
-        service
+        var service = Mock.Of<IWorkflowDefinitionService>().Object;
+        Mock.Get(service)
             .FindWorkflowGraphAsync(workflowDefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>())
             .Returns(workflowGraph);
         return service;
@@ -211,8 +210,8 @@ public class ExecuteWorkflowTests
 
     private static IIdentityGenerator CreateIdentityGenerator(string generatedId)
     {
-        var generator = Substitute.For<IIdentityGenerator>();
-        generator.GenerateId().Returns(generatedId);
+        var generator = Mock.Of<IIdentityGenerator>().Object;
+        Mock.Get(generator).GenerateId().Returns(generatedId);
         return generator;
     }
 
@@ -221,7 +220,7 @@ public class ExecuteWorkflowTests
         IDictionary<string, object>? output,
         WorkflowSubStatus subStatus = WorkflowSubStatus.Executing)
     {
-        var invoker = Substitute.For<IWorkflowInvoker>();
+        var invoker = Mock.Of<IWorkflowInvoker>().Object;
         var workflow = Workflow.FromActivity(new WriteLine("Test"));
         var workflowState = new WorkflowState
         {
@@ -231,8 +230,8 @@ public class ExecuteWorkflowTests
         };
         var workflowResult = new RunWorkflowResult(null!, workflowState, workflow, null, Journal.Empty);
 
-        invoker
-            .InvokeAsync(Arg.Any<WorkflowGraph>(), Arg.Any<RunWorkflowOptions>(), Arg.Any<CancellationToken>())
+        Mock.Get(invoker)
+            .InvokeAsync(Arg.Any<WorkflowGraph>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
             .Returns(workflowResult);
 
         return invoker;
@@ -259,7 +258,7 @@ public class ExecuteWorkflowTests
                 services.AddSingleton(workflowDefinitionService);
                 services.AddSingleton(workflowInvoker);
                 services.AddSingleton(identityGenerator);
-                services.AddSingleton<IStimulusHasher>(_ => Substitute.For<IStimulusHasher>());
+                services.AddSingleton<IStimulusHasher>(_ => Mock.Of<IStimulusHasher>().Object);
             })
             .ExecuteAsync();
 

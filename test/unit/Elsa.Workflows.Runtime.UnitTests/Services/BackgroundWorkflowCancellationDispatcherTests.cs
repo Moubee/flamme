@@ -5,14 +5,14 @@ using Elsa.Mediator.Options;
 using Elsa.Tenants.Mediator;
 using Elsa.Workflows.Runtime.Commands;
 using Elsa.Workflows.Runtime.Requests;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundWorkflowCancellationDispatcherTests
 {
-    private readonly ICommandSender _commandSender = Substitute.For<ICommandSender>();
-    private readonly ITenantAccessor _tenantAccessor = Substitute.For<ITenantAccessor>();
+    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
+    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
 
     [Test]
     public async Task DispatchAsync_SendsCommandWithBackgroundStrategy()
@@ -25,11 +25,8 @@ public class BackgroundWorkflowCancellationDispatcherTests
         await dispatcher.DispatchAsync(request);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Is<CancelWorkflowsCommand>(cmd => cmd.Request == request),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand __typed && (__typed.Request == request)), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -41,7 +38,7 @@ public class BackgroundWorkflowCancellationDispatcherTests
         {
             Id = tenantId
         };
-        _tenantAccessor.Tenant.Returns(tenant);
+        Mock.Get(_tenantAccessor).Tenant.Returns(tenant);
 
         var dispatcher = CreateDispatcher();
         var request = new DispatchCancelWorkflowRequest();
@@ -50,20 +47,17 @@ public class BackgroundWorkflowCancellationDispatcherTests
         await dispatcher.DispatchAsync(request);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<CancelWorkflowsCommand>(),
-            CommandStrategy.Background,
-            Arg.Is<IDictionary<object, object>>(headers =>
+        Mock.Get(_commandSender).SendAsync(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
                 headers.ContainsKey(TenantHeaders.TenantIdKey) &&
-                headers[TenantHeaders.TenantIdKey].ToString() == tenantId),
-            Arg.Any<CancellationToken>());
+                headers[TenantHeaders.TenantIdKey].ToString() == tenantId), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task DispatchAsync_DoesNotIncludeTenantIdInHeaders_WhenTenantIsNull()
     {
         // Arrange
-        _tenantAccessor.Tenant.Returns((Tenant?)null);
+        Mock.Get(_tenantAccessor).Tenant.Returns((Tenant?)null);
 
         var dispatcher = CreateDispatcher();
         var request = new DispatchCancelWorkflowRequest();
@@ -72,12 +66,9 @@ public class BackgroundWorkflowCancellationDispatcherTests
         await dispatcher.DispatchAsync(request);
 
         // Assert
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<CancelWorkflowsCommand>(),
-            CommandStrategy.Background,
-            Arg.Is<IDictionary<object, object>>(headers =>
-                !headers.ContainsKey(TenantHeaders.TenantIdKey)),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_commandSender).SendAsync(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
+                !headers.ContainsKey(TenantHeaders.TenantIdKey)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -106,11 +97,8 @@ public class BackgroundWorkflowCancellationDispatcherTests
         await dispatcher.DispatchAsync(request, callerCts.Token);
 
         // Assert - background commands run independently of caller's lifecycle
-        await _commandSender.Received(1).SendAsync(
-            Arg.Any<CancelWorkflowsCommand>(),
-            CommandStrategy.Background,
-            Arg.Any<IDictionary<object, object>>(),
-            CancellationToken.None);
+        Mock.Get(_commandSender).SendAsync(
+            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     private BackgroundWorkflowCancellationDispatcher CreateDispatcher()

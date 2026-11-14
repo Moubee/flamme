@@ -1,6 +1,5 @@
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Parallel;
@@ -52,7 +51,7 @@ public class ParallelTests
     public async Task Should_Execute_Single_Activity()
     {
         // Arrange
-        var activity = Substitute.For<IActivity>();
+        var activity = Mock.Of<IActivity>().Object;
         var parallel = new Workflows.Activities.Parallel(activity);
 
         // Act
@@ -70,7 +69,7 @@ public class ParallelTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = Substitute.For<IActivity>();
+        var mockActivity = Mock.Of<IActivity>().Object;
 
         var parallel = new Workflows.Activities.Parallel(writeLine, setVariable, mockActivity);
 

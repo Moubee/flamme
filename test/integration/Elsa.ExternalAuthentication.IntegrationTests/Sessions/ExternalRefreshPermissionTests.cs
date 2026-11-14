@@ -10,7 +10,6 @@ using Elsa.ExternalAuthentication.Stores.InMemory;
 using Elsa.Identity.Contracts;
 using Elsa.Identity.Entities;
 using Elsa.Identity.Models;
-using NSubstitute;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Sessions;
 
@@ -24,17 +23,18 @@ public class ExternalRefreshPermissionTests
         {
             AuthenticationResult = new ExternalAuthenticationResult(identity, new Dictionary<string, IReadOnlyCollection<string>> { ["groups"] = ["operators"] }, [])
         };
-        var identityResolver = Substitute.For<IExternalIdentityResolver>();
-        identityResolver.ResolveAsync(Arg.Any<ExternalIdentityResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new ExternalIdentityResolution("user-a", false)));
-        var permissionResolver = Substitute.For<IPermissionGrantResolver>();
+        var identityResolver = Mock.Of<IExternalIdentityResolver>().Object;
+        Mock.Get(identityResolver).ResolveAsync(Arg.Any<ExternalIdentityResolutionContext>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new ExternalIdentityResolution("user-a", false)));
+        var permissionResolver = Mock.Of<IPermissionGrantResolver>().Object;
         var expectedGrant = new PermissionGrant("workflows:manage", "group-mapping", "groups:operators");
-        permissionResolver.ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new PermissionGrantResult([expectedGrant], [])));
-        var sessions = Substitute.For<IExternalAuthenticationSessionStore>();
+        Mock.Get(permissionResolver).ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new PermissionGrantResult([expectedGrant], [])));
+        var sessions = Mock.Of<IExternalAuthenticationSessionStore>().Object;
         ExternalAuthenticationSession? savedSession = null;
-        sessions.SaveAsync(Arg.Do<ExternalAuthenticationSession>(session => savedSession = session), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.CompletedTask);
+        Mock.Get(sessions).SaveAsync(Arg.Any<ExternalAuthenticationSession>(), Arg.Any<CancellationToken>())
+            .Callback((ExternalAuthenticationSession session, CancellationToken cancellationToken) => savedSession = session)
+            .ReturnsAsync(ValueTask.CompletedTask);
         var broker = BrokerSecurityTests.CreateBroker(
             adapter,
             identityResolver: identityResolver,
@@ -60,13 +60,13 @@ public class ExternalRefreshPermissionTests
         await Assert.That(savedSession!.ExternalGrants).IsEquivalentTo(
             [expectedGrant],
             TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await permissionResolver.Received(1).ResolveAsync(
+        Mock.Get(permissionResolver).ResolveAsync(
             Arg.Is<PermissionGrantResolutionContext>(context =>
                 context.TargetTenantId == "tenant-a" &&
                 context.UserId == "user-a" &&
                 context.Identity == identity &&
                 context.ProjectedClaims.ContainsKey("groups")),
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -91,24 +91,28 @@ public class ExternalRefreshPermissionTests
             ConnectionValidity.Valid,
             false,
             "configuration");
-        var registry = Substitute.For<IIdentityProviderConnectionRegistry>();
-        registry.FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
+        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        Mock.Get(registry).FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
         var user = new User { Id = "user-a", Name = "alice", TenantId = "tenant-a", Roles = ["role-a"] };
         var role = new Role { Id = "role-a", Name = "Operators", TenantId = "tenant-a", Permissions = ["*"] };
         var tenantAccessor = new DefaultTenantAccessor();
-        var users = Substitute.For<IUserProvider>();
-        users.FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult(tenantAccessor.TenantId == "tenant-a" ? user : null));
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => ValueTask.FromResult<IEnumerable<Role>>(tenantAccessor.TenantId == "tenant-a" ? [role] : []));
+        var users = Mock.Of<IUserProvider>().Object;
+        Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>())
+            .Returns(() => Task.FromResult(tenantAccessor.TenantId == "tenant-a" ? user : null));
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
+            .Returns(() => ValueTask.FromResult<IEnumerable<Role>>(tenantAccessor.TenantId == "tenant-a" ? [role] : []));
         var issuanceContexts = new List<TokenIssuanceContext>();
-        var tokenService = Substitute.For<IElsaTokenService>();
-        tokenService.IssueAccessTokenAsync(
-                Arg.Do<TokenIssuanceContext>(context => issuanceContexts.Add(context)),
+        var tokenService = Mock.Of<IElsaTokenService>().Object;
+        Mock.Get(tokenService).IssueAccessTokenAsync(
+                Arg.Any<TokenIssuanceContext>(),
                 Arg.Any<CancellationToken>())
-            .Returns(_ => ValueTask.FromResult(new IssuedAccessToken($"access-{issuanceContexts.Count}", clock.UtcNow.AddHours(1))));
+            .Returns((TokenIssuanceContext context, CancellationToken cancellationToken) =>
+            {
+                issuanceContexts.Add(context);
+                return ValueTask.FromResult(new IssuedAccessToken($"access-{issuanceContexts.Count}", clock.UtcNow.AddHours(1)));
+            });
         var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, clock, Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
         var externalGrant = new PermissionGrant("reports:view", "claim-mapping", "department:engineering");
         var session = new ExternalAuthenticationSession
@@ -190,19 +194,23 @@ public class ExternalRefreshPermissionTests
             AdapterSettingsVersion = 1, DisplayName = "Contoso", MaterialRevision = "revision-a"
         };
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, new ConnectionScope(ConnectionScopeKind.Tenant, "tenant-a"), ConnectionValidity.Valid, false, "configuration");
-        var registry = Substitute.For<IIdentityProviderConnectionRegistry>();
-        registry.FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
+        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        Mock.Get(registry).FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
         var user = new User { Id = "user-a", Name = "alice", TenantId = "tenant-a", Roles = ["role-a"] };
         var role = new Role { Id = "role-a", Name = "Operators", TenantId = "tenant-a", Permissions = rolePermissions };
         var tenantAccessor = new DefaultTenantAccessor();
-        var users = Substitute.For<IUserProvider>();
-        users.FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).Returns(_ => Task.FromResult<User?>(user));
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).Returns(_ => ValueTask.FromResult<IEnumerable<Role>>([role]));
+        var users = Mock.Of<IUserProvider>().Object;
+        Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).Returns(() => Task.FromResult<User?>(user));
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).Returns(() => ValueTask.FromResult<IEnumerable<Role>>([role]));
         var contexts = new List<TokenIssuanceContext>();
-        var tokenService = Substitute.For<IElsaTokenService>();
-        tokenService.IssueAccessTokenAsync(Arg.Do<TokenIssuanceContext>(contexts.Add), Arg.Any<CancellationToken>())
-            .Returns(_ => ValueTask.FromResult(new IssuedAccessToken($"access-{contexts.Count}", clock.UtcNow.AddHours(1))));
+        var tokenService = Mock.Of<IElsaTokenService>().Object;
+        Mock.Get(tokenService).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>())
+            .Returns((TokenIssuanceContext context, CancellationToken cancellationToken) =>
+            {
+                contexts.Add(context);
+                return ValueTask.FromResult(new IssuedAccessToken($"access-{contexts.Count}", clock.UtcNow.AddHours(1)));
+            });
         var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, clock, Microsoft.Extensions.Options.Options.Create(options));
 
         await issuer.IssueAsync(new ExternalAuthenticationSession

@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="TUnit.Mocks"/>
         <PackageReference Include="TUnit"/>
     </ItemGroup>
 

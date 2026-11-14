@@ -10,7 +10,7 @@ using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.OrderDefinitions;
 using Elsa.Workflows.Runtime.Stores;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Stores;
 
@@ -31,14 +31,14 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
         var storeA = new MemoryBookmarkQueueStore(memory, accessorA);
         var storeB = new MemoryBookmarkQueueStore(memory, accessorB);
 
-        var identity = Substitute.For<IIdentityGenerator>();
-        identity.GenerateId().Returns("queue-a");
-        var clock = Substitute.For<ISystemClock>();
-        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        var identity = Mock.Of<IIdentityGenerator>().Object;
+        Mock.Get(identity).GenerateId().Returns("queue-a");
+        var clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(clock).UtcNow.Returns(DateTimeOffset.UtcNow);
 
         var queue = new StoreBookmarkQueue(
             storeA,
-            Substitute.For<IBookmarkQueueSignaler>(),
+            Mock.Of<IBookmarkQueueSignaler>().Object,
             clock,
             identity,
             NullLogger<StoreBookmarkQueue>.Instance,
@@ -59,13 +59,13 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
 
         await Assert.That(pageB.Items).IsEmpty();
 
-        var resumer = Substitute.For<IWorkflowResumer>();
-        resumer.ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
-            .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-b" }]);
+        var resumer = Mock.Of<IWorkflowResumer>().Object;
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-b" }]);
 
         var processor = new BookmarkQueueProcessor(
             storeB,
-            Substitute.For<IBookmarkQueueDeadLetterManager>(),
+            Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
             resumer,
             clock,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),
@@ -73,8 +73,7 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
 
         await processor.ProcessAsync();
 
-        await resumer.DidNotReceive()
-            .ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>());
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         var remaining = (await storeA.FindManyAsync(new BookmarkQueueFilter())).ToList();
         await Assert.That(remaining).HasSingleItem();

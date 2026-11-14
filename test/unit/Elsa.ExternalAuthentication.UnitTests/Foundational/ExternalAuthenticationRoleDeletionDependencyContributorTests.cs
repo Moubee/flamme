@@ -19,7 +19,6 @@ using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
 using Elsa.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
@@ -241,7 +240,7 @@ public class ExternalAuthenticationRoleDeletionDependencyContributorTests
             new ExternalAuthenticationSecurityNotifier(services),
             new PermissionEvaluator(),
             TestTenantAccessor.Default);
-        var securityNotifier = new RoleSecurityNotifier(Substitute.For<INotificationSender>(), TestTenantAccessor.Default, new SystemClock());
+        var securityNotifier = new RoleSecurityNotifier(Mock.Of<INotificationSender>().Object, TestTenantAccessor.Default, new SystemClock());
         var coordinator = new RoleDeletionCoordinator(roleStore, roleAuthorizationService, [contributor], securityNotifier);
         var impact = (await Assert.That(await coordinator.InspectAsync("workflow-user", Administrator())).IsTypeOf<RoleDeletionInspectionResult.Success>()).Impact;
 

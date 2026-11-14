@@ -2,7 +2,6 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Elsa.Workflows.Behaviors;
 using Elsa.Workflows.Exceptions;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Looping;
@@ -15,7 +14,7 @@ public class WhileTests
     public async Task Should_Schedule_Body_Based_On_Condition(bool conditionValue, int expectedScheduledCount)
     {
         // Arrange
-        var bodyActivity = Substitute.For<IActivity>();
+        var bodyActivity = Mock.Of<IActivity>().Object;
         var whileActivity = new While(new Input<bool>(conditionValue), bodyActivity);
 
         // Act
@@ -35,7 +34,7 @@ public class WhileTests
     public async Task Should_Use_True_Factory_Method()
     {
         // Arrange
-        var bodyActivity = Substitute.For<IActivity>();
+        var bodyActivity = Mock.Of<IActivity>().Object;
         var whileActivity = While.True(bodyActivity);
 
         // Act
@@ -55,7 +54,7 @@ public class WhileTests
         // Arrange - Create separate condition functions for each test case to verify 
         // that each execution of the While activity evaluates the condition exactly once
         var conditionEvaluationCount = 0;
-        var bodyActivity = Substitute.For<IActivity>();
+        var bodyActivity = Mock.Of<IActivity>().Object;
         
         // Create condition that tracks evaluation count across multiple While activity executions
         var condition = new Input<bool>(_ => 

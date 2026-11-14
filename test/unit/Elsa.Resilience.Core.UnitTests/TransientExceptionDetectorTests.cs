@@ -1,4 +1,3 @@
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Resilience.Core.UnitTests;
@@ -43,10 +42,10 @@ public class TransientExceptionDetectorTests
     public async Task IsTransient_AllDetectorsReturnFalse_ReturnsFalse()
     {
         var exception = new Exception("test");
-        var strategy1 = Substitute.For<ITransientExceptionStrategy>();
-        var strategy2 = Substitute.For<ITransientExceptionStrategy>();
-        strategy1.IsTransient(Arg.Any<Exception>()).Returns(false);
-        strategy2.IsTransient(Arg.Any<Exception>()).Returns(false);
+        var strategy1 = Mock.Of<ITransientExceptionStrategy>().Object;
+        var strategy2 = Mock.Of<ITransientExceptionStrategy>().Object;
+        Mock.Get(strategy1).IsTransient(Arg.Any<Exception>()).Returns(false);
+        Mock.Get(strategy2).IsTransient(Arg.Any<Exception>()).Returns(false);
         var detector = CreateDetector(strategy1, strategy2);
 
         await Assert.That(detector.IsTransient(exception)).IsFalse();
@@ -57,9 +56,9 @@ public class TransientExceptionDetectorTests
     [MethodDataSource(nameof(InnerExceptionChainTestCases))]
     public async Task IsTransient_InnerExceptionChainHasTransient_ReturnsTrue(Exception exception, Exception transientException)
     {
-        var strategy = Substitute.For<ITransientExceptionStrategy>();
-        strategy.IsTransient(transientException).Returns(true);
-        strategy.IsTransient(Arg.Is<Exception>(e => e != transientException)).Returns(false);
+        var strategy = Mock.Of<ITransientExceptionStrategy>().Object;
+        Mock.Get(strategy).IsTransient(transientException).Returns(true);
+        Mock.Get(strategy).IsTransient(Arg.Is<Exception>(e => e != transientException)).Returns(false);
         var detector = CreateDetector(strategy);
 
         await Assert.That(detector.IsTransient(exception)).IsTrue();
@@ -73,7 +72,7 @@ public class TransientExceptionDetectorTests
         Action<ITransientExceptionStrategy> configureDetector,
         bool expectedResult)
     {
-        var strategy = Substitute.For<ITransientExceptionStrategy>();
+        var strategy = Mock.Of<ITransientExceptionStrategy>().Object;
         configureDetector(strategy);
         var detector = CreateDetector(strategy);
 
@@ -128,8 +127,8 @@ public class TransientExceptionDetectorTests
                 new AggregateException("aggregate", timeoutException),
                 (Action<ITransientExceptionStrategy>)(detector =>
                 {
-                    detector.IsTransient(Arg.Is<TimeoutException>(e => e.Message == "timeout")).Returns(true);
-                    detector.IsTransient(Arg.Is<Exception>(e => e.GetType() != typeof(TimeoutException))).Returns(false);
+                    Mock.Get(detector).IsTransient(Arg.Is<Exception>(e => e is TimeoutException && e.Message == "timeout")).Returns(true);
+                    Mock.Get(detector).IsTransient(Arg.Is<Exception>(e => e.GetType() != typeof(TimeoutException))).Returns(false);
                 }),
                 true
             ];
@@ -140,7 +139,7 @@ public class TransientExceptionDetectorTests
                 new AggregateException("aggregate", new InvalidOperationException("error1"), new ArgumentException("error2")),
                 (Action<ITransientExceptionStrategy>)(detector =>
                 {
-                    detector.IsTransient(Arg.Any<Exception>()).Returns(false);
+                    Mock.Get(detector).IsTransient(Arg.Any<Exception>()).Returns(false);
                 }),
                 false
             ];
@@ -149,9 +148,9 @@ public class TransientExceptionDetectorTests
 
     private static ITransientExceptionStrategy CreateStrategy(params (Exception exception, bool isTransient)[] behaviors)
     {
-        var detector = Substitute.For<ITransientExceptionStrategy>();
+        var detector = Mock.Of<ITransientExceptionStrategy>().Object;
         foreach (var (exception, isTransient) in behaviors)
-            detector.IsTransient(exception).Returns(isTransient);
+            Mock.Get(detector).IsTransient(exception).Returns(isTransient);
         return detector;
     }
 

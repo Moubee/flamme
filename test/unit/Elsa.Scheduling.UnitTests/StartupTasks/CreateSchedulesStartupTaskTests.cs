@@ -10,7 +10,6 @@ using Elsa.Workflows.Runtime.Entities;
 using Elsa.Workflows.Runtime.Filters;
 using Elsa.Workflows.Runtime.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
 namespace Elsa.Scheduling.UnitTests.StartupTasks;
@@ -23,22 +22,22 @@ public class CreateSchedulesStartupTaskTests
     ];
 
     private readonly StoredBookmark[] _bookmarks = [new() { Id = "bookmark-1", Hash = "hash", WorkflowInstanceId = "instance" }];
-    private readonly ITriggerStore _triggerStore = Substitute.For<ITriggerStore>();
-    private readonly IBookmarkStore _bookmarkStore = Substitute.For<IBookmarkStore>();
-    private readonly ITriggerScheduler _triggerScheduler = Substitute.For<ITriggerScheduler>();
-    private readonly IBookmarkScheduler _bookmarkScheduler = Substitute.For<IBookmarkScheduler>();
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Substitute.For<IWorkflowInstanceStore>();
-    private readonly IBookmarkManager _bookmarkManager = Substitute.For<IBookmarkManager>();
+    private readonly ITriggerStore _triggerStore = Mock.Of<ITriggerStore>().Object;
+    private readonly IBookmarkStore _bookmarkStore = Mock.Of<IBookmarkStore>().Object;
+    private readonly ITriggerScheduler _triggerScheduler = Mock.Of<ITriggerScheduler>().Object;
+    private readonly IBookmarkScheduler _bookmarkScheduler = Mock.Of<IBookmarkScheduler>().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+    private readonly IBookmarkManager _bookmarkManager = Mock.Of<IBookmarkManager>().Object;
     private readonly SchedulingOptions _options = new() { StartupSchedulePageSize = 1000 };
 
     public CreateSchedulesStartupTaskTests()
     {
-        _triggerStore.FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_triggerStore).FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredTrigger>(_triggers, _triggers.Length));
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(_bookmarks, _bookmarks.Length));
-        _workflowInstanceStore.FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(call => RunningIds(call.Arg<WorkflowInstanceFilter>()));
+        Mock.Get(_workflowInstanceStore).FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+            .Returns((WorkflowInstanceFilter filter, CancellationToken _) => RunningIds(filter));
     }
 
     [Test]
@@ -56,29 +55,30 @@ public class CreateSchedulesStartupTaskTests
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _triggerScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(_triggers)), Arg.Any<CancellationToken>());
-        await _bookmarkScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(_bookmarks)), Arg.Any<CancellationToken>());
+        Mock.Get(_triggerScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(_triggers)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(_bookmarks)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ExecuteAsync_WithTenantBackgroundQueue_EnqueuesScheduleCreation()
     {
         TenantBackgroundWorkItem? workItem = null;
-        var workQueue = Substitute.For<ITenantBackgroundWorkQueue>();
-        workQueue.EnqueueAsync(Arg.Do<TenantBackgroundWorkItem>(x => workItem = x), Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+        var workQueue = Mock.Of<ITenantBackgroundWorkQueue>().Object;
+        Mock.Get(workQueue).EnqueueAsync(Arg.Any<TenantBackgroundWorkItem>(), Arg.Any<CancellationToken>())
+            .Callback((TenantBackgroundWorkItem item, CancellationToken _) => workItem = item);
         var serviceProvider = CreateServiceProvider(services => services.AddSingleton(workQueue));
         var task = new CreateSchedulesStartupTask(serviceProvider, OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await workQueue.Received(1).EnqueueAsync(Arg.Any<TenantBackgroundWorkItem>(), Arg.Any<CancellationToken>());
-        await _triggerScheduler.DidNotReceive().ScheduleAsync(Arg.Any<IEnumerable<StoredTrigger>>(), Arg.Any<CancellationToken>());
+        Mock.Get(workQueue).EnqueueAsync(Arg.Any<TenantBackgroundWorkItem>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_triggerScheduler).ScheduleAsync(Arg.Any<IEnumerable<StoredTrigger>>(), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         await Assert.That(workItem).IsNotNull();
         await workItem(serviceProvider, CancellationToken.None);
 
-        await _triggerScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(_triggers)), Arg.Any<CancellationToken>());
-        await _bookmarkScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(_bookmarks)), Arg.Any<CancellationToken>());
+        Mock.Get(_triggerScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(_triggers)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(_bookmarks)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -89,22 +89,22 @@ public class CreateSchedulesStartupTaskTests
         var firstBookmarkPage = new[] { _bookmarks[0] };
         var secondBookmarkPage = new[] { new StoredBookmark { Id = "bookmark-2", Hash = "hash", WorkflowInstanceId = "instance" } };
         _options.StartupSchedulePageSize = 1;
-        _triggerStore.FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_triggerStore).FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredTrigger>(firstTriggerPage, 2));
-        _triggerStore.FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_triggerStore).FindManyAsync(Arg.Any<TriggerFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredTrigger>(secondTriggerPage, 2));
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(firstBookmarkPage, 2));
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(secondBookmarkPage, 2));
         var task = new CreateSchedulesStartupTask(CreateServiceProvider(), OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _triggerScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(firstTriggerPage)), Arg.Any<CancellationToken>());
-        await _triggerScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(secondTriggerPage)), Arg.Any<CancellationToken>());
-        await _bookmarkScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(firstBookmarkPage)), Arg.Any<CancellationToken>());
-        await _bookmarkScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(secondBookmarkPage)), Arg.Any<CancellationToken>());
+        Mock.Get(_triggerScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(firstTriggerPage)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_triggerScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredTrigger>>(x => x.SequenceEqual(secondTriggerPage)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(firstBookmarkPage)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(secondBookmarkPage)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -121,21 +121,22 @@ public class CreateSchedulesStartupTaskTests
             missingInstance, finishedInstance, cancelledInstance, faultedInstance, emptyInstanceId, suspendedInstance
         };
         BookmarkFilter? purgedFilter = null;
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(bookmarks, bookmarks.Length));
         StubBookmarkReload(bookmarks);
-        _workflowInstanceStore.FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+        Mock.Get(_workflowInstanceStore).FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
             .Returns(["suspended-instance"]);
-        _bookmarkManager.DeleteManyAsync(Arg.Do<BookmarkFilter>(x => purgedFilter = x), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
+            .Callback((BookmarkFilter filter, CancellationToken _) => purgedFilter = filter)
             .Returns(5);
         var task = new CreateSchedulesStartupTask(CreateServiceProvider(), OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkScheduler.Received(1).ScheduleAsync(
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(
             Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(new[] { suspendedInstance })),
-            Arg.Any<CancellationToken>());
-        await _bookmarkManager.Received(1).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(purgedFilter).IsNotNull();
         await Assert.That(purgedFilter.BookmarkIds?.OrderBy(x => x, StringComparer.Ordinal).ToArray()).IsEquivalentTo(new[]
             {
@@ -150,21 +151,22 @@ public class CreateSchedulesStartupTaskTests
         var stillMissing = Bookmark("missing-bookmark", "missing-instance");
         var bookmarks = new[] { revived, stillMissing };
         BookmarkFilter? purgedFilter = null;
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(bookmarks, bookmarks.Length));
         StubBookmarkReload(bookmarks);
-        _workflowInstanceStore.FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Array.Empty<string>(), _ => new[] { "revived-instance" });
-        _bookmarkManager.DeleteManyAsync(Arg.Do<BookmarkFilter>(x => purgedFilter = x), Arg.Any<CancellationToken>())
+        Mock.Get(_workflowInstanceStore).FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+            .ReturnsSequentially(Array.Empty<string>(), new[] { "revived-instance" });
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
+            .Callback((BookmarkFilter filter, CancellationToken _) => purgedFilter = filter)
             .Returns(1);
         var task = new CreateSchedulesStartupTask(CreateServiceProvider(), OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkScheduler.Received(1).ScheduleAsync(
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(
             Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(new[] { revived })),
-            Arg.Any<CancellationToken>());
-        await _bookmarkManager.Received(1).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(purgedFilter).IsNotNull();
         await Assert.That(purgedFilter.BookmarkIds).IsEquivalentTo(["missing-bookmark"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
@@ -178,26 +180,27 @@ public class CreateSchedulesStartupTaskTests
         var purgedFilters = new List<BookmarkFilter>();
         var reloadedIdBatches = new List<ICollection<string>>();
         _options.StartupSchedulePageSize = 1;
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 0 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>([firstOrphan], 2));
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Is<PageArgs>(x => x.Offset == 1 && x.Limit == 1), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>([secondOrphan], 2));
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
+            .Returns((BookmarkFilter filter, CancellationToken _) =>
             {
-                var ids = call.Arg<BookmarkFilter>().BookmarkIds ?? [];
+                var ids = filter.BookmarkIds ?? [];
                 reloadedIdBatches.Add(ids.ToList());
                 return bookmarks.Where(x => ids.Contains(x.Id));
             });
-        _workflowInstanceStore.FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+        Mock.Get(_workflowInstanceStore).FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<string>());
-        _bookmarkManager.DeleteManyAsync(Arg.Do<BookmarkFilter>(x => purgedFilters.Add(x)), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
+            .Callback((BookmarkFilter filter, CancellationToken _) => purgedFilters.Add(filter))
             .Returns(1);
         var task = new CreateSchedulesStartupTask(CreateServiceProvider(), OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkScheduler.DidNotReceive().ScheduleAsync(Arg.Any<IEnumerable<StoredBookmark>>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Any<IEnumerable<StoredBookmark>>(), Arg.Any<CancellationToken>()).WasNeverCalled();
         await Assert.That(reloadedIdBatches.Count).IsEqualTo(2);
         foreach (var batch in reloadedIdBatches)
         {
@@ -216,14 +219,14 @@ public class CreateSchedulesStartupTaskTests
     {
         var missingInstance = Bookmark("missing-bookmark", "missing-instance");
         var bookmarks = new[] { missingInstance, _bookmarks[0] };
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(bookmarks, bookmarks.Length));
         var task = new CreateSchedulesStartupTask(CreateServiceProvider(registerReconcileServices: false), OptionsFactory.Create(_options));
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkScheduler.Received(1).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(bookmarks)), Arg.Any<CancellationToken>());
-        await _bookmarkManager.DidNotReceive().DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(bookmarks)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -232,10 +235,10 @@ public class CreateSchedulesStartupTaskTests
         var missingInstance = Bookmark("missing-bookmark", "missing-instance");
         var suspendedInstance = Bookmark("suspended-bookmark", "suspended-instance");
         var bookmarks = new[] { missingInstance, suspendedInstance };
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
             .Returns(new Page<StoredBookmark>(bookmarks, bookmarks.Length));
         StubBookmarkReload(bookmarks);
-        _workflowInstanceStore.FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+        Mock.Get(_workflowInstanceStore).FindManyIdsAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
             .Returns(["suspended-instance"]);
         var task = new CreateSchedulesStartupTask(
             CreateServiceProvider(services => services.AddSingleton(_workflowInstanceStore), registerReconcileServices: false),
@@ -243,10 +246,10 @@ public class CreateSchedulesStartupTaskTests
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkScheduler.Received(1).ScheduleAsync(
+        Mock.Get(_bookmarkScheduler).ScheduleAsync(
             Arg.Is<IEnumerable<StoredBookmark>>(x => x.SequenceEqual(new[] { suspendedInstance })),
-            Arg.Any<CancellationToken>());
-        await _bookmarkManager.DidNotReceive().DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -256,7 +259,7 @@ public class CreateSchedulesStartupTaskTests
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await _bookmarkManager.DidNotReceive().DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkManager).DeleteManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     private ServiceProvider CreateServiceProvider(Action<IServiceCollection>? configureServices = null, bool registerReconcileServices = true)
@@ -280,10 +283,10 @@ public class CreateSchedulesStartupTaskTests
     private void StubBookmarkReload(IEnumerable<StoredBookmark> bookmarks)
     {
         var bookmarkList = bookmarks.ToList();
-        _bookmarkStore.FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
+        Mock.Get(_bookmarkStore).FindManyAsync(Arg.Any<BookmarkFilter>(), Arg.Any<CancellationToken>())
+            .Returns((BookmarkFilter filter, CancellationToken _) =>
             {
-                var ids = call.Arg<BookmarkFilter>().BookmarkIds;
+                var ids = filter.BookmarkIds;
                 if (ids == null)
                     return bookmarkList.AsEnumerable();
 

@@ -7,7 +7,6 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Enums;
 using Elsa.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using TUnit.AspNetCore;
 
 namespace Elsa.Alterations.IntegrationTests;
@@ -30,16 +29,16 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        services.AddSingleton(Substitute.For<IWorkflowInstanceFinder>());
-        services.AddSingleton(Substitute.For<IAlterationPlanScheduler>());
-        services.AddSingleton(Substitute.For<IAlterationRunner>());
-        services.AddSingleton(Substitute.For<IAlteredWorkflowDispatcher>());
-        services.AddSingleton(Substitute.For<IAlterationPlanStore>());
-        services.AddSingleton(Substitute.For<IAlterationJobStore>());
-        services.AddSingleton(Substitute.For<IWorkflowDispatcher>());
-        services.AddSingleton(Substitute.For<IWorkflowInstanceStore>());
-        services.AddSingleton(Substitute.For<IIdentityGenerator>());
-        services.AddSingleton(Substitute.For<ISystemClock>());
+        services.AddSingleton(Mock.Of<IWorkflowInstanceFinder>().Object);
+        services.AddSingleton(Mock.Of<IAlterationPlanScheduler>().Object);
+        services.AddSingleton(Mock.Of<IAlterationRunner>().Object);
+        services.AddSingleton(Mock.Of<IAlteredWorkflowDispatcher>().Object);
+        services.AddSingleton(Mock.Of<IAlterationPlanStore>().Object);
+        services.AddSingleton(Mock.Of<IAlterationJobStore>().Object);
+        services.AddSingleton(Mock.Of<IWorkflowDispatcher>().Object);
+        services.AddSingleton(Mock.Of<IWorkflowInstanceStore>().Object);
+        services.AddSingleton(Mock.Of<IIdentityGenerator>().Object);
+        services.AddSingleton(Mock.Of<ISystemClock>().Object);
     }
 
     [Test]

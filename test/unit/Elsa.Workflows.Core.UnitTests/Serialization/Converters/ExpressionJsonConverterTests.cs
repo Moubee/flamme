@@ -2,7 +2,7 @@ using System.Text.Json;
 using Elsa.Expressions.Contracts;
 using Elsa.Expressions.Models;
 using Elsa.Workflows.Serialization.Converters;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
 
@@ -69,10 +69,10 @@ public sealed class ExpressionJsonConverterTests
 
     private static JsonSerializerOptions CreateOptions(ExpressionDescriptor? descriptor = null)
     {
-        var registry = Substitute.For<IExpressionDescriptorRegistry>();
+        var registry = Mock.Of<IExpressionDescriptorRegistry>().Object;
 
         if (descriptor != null)
-            registry.Find(descriptor.Type).Returns(descriptor);
+            Mock.Get(registry).Find(descriptor.Type).Returns(descriptor);
 
         return new()
         {

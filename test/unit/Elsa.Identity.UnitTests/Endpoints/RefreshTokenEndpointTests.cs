@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using NSubstitute;
 
 namespace Elsa.Identity.UnitTests.Endpoints;
 
@@ -41,8 +40,8 @@ public sealed class RefreshTokenEndpointTests
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseTestServer();
-        var module = Substitute.For<IModule>();
-        module.Services.Returns(builder.Services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(builder.Services);
         new IdentityFeature(module) { TokenOptions = options => options.SigningKey = IdentityTokenTestConstants.SigningKey }.Apply();
         new DefaultAuthenticationFeature(module).Apply();
 

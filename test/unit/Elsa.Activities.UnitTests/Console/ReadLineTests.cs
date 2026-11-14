@@ -2,7 +2,6 @@ using Elsa.Extensions;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Console;
@@ -17,9 +16,9 @@ public class ReadLineTests
 
     public ReadLineTests()
     {
-        _mockTextReader = Substitute.For<TextReader>();
-        _mockProvider = Substitute.For<IStandardInStreamProvider>();
-        _mockProvider.GetTextReader().Returns(_mockTextReader);
+        _mockTextReader = Mock.Of<TextReader>().Object;
+        _mockProvider = Mock.Of<IStandardInStreamProvider>().Object;
+        Mock.Get(_mockProvider).GetTextReader().Returns(_mockTextReader);
     }
 
     [Test]
@@ -51,8 +50,8 @@ public class ReadLineTests
         await ExecuteAsync(new ReadLine());
 
         // Assert
-        _mockProvider.Received(1).GetTextReader();
-        _mockTextReader.Received(1).ReadLine();
+        Mock.Get(_mockProvider).GetTextReader().WasCalled(Times.Exactly(1));
+        Mock.Get(_mockTextReader).ReadLine().WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -101,7 +100,7 @@ public class ReadLineTests
 
     private Task<ActivityExecutionContext> ExecuteAsync(ReadLine readLine, string? inputText = "Test")
     {
-        _mockTextReader.ReadLine().Returns(inputText);
+        Mock.Get(_mockTextReader).ReadLine().Returns(inputText);
         return new ActivityTestFixture(readLine)
             .ConfigureServices(services => services.AddSingleton(_mockProvider))
             .ExecuteAsync();

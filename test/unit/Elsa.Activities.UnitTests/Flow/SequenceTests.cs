@@ -1,6 +1,5 @@
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Flow;
@@ -104,7 +103,7 @@ public class SequenceTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = Substitute.For<IActivity>();
+        var mockActivity = Mock.Of<IActivity>().Object;
         var sequence = CreateSequenceWithActivities(writeLine, setVariable, mockActivity);
 
         // Act

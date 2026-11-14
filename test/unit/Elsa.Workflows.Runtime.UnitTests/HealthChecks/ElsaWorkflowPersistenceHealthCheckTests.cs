@@ -5,29 +5,29 @@ using Elsa.Workflows.Runtime.HealthChecks;
 using Elsa.Workflows.Runtime.Options;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 
 public class ElsaWorkflowPersistenceHealthCheckTests
 {
-    private readonly IServiceProvider _serviceProvider = Substitute.For<IServiceProvider>();
-    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Substitute.For<IWorkflowDefinitionStore>();
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Substitute.For<IWorkflowInstanceStore>();
-    private readonly ITriggerStore _triggerStore = Substitute.For<ITriggerStore>();
-    private readonly IBookmarkQueueStore _bookmarkQueueStore = Substitute.For<IBookmarkQueueStore>();
+    private readonly IServiceProvider _serviceProvider = Mock.Of<IServiceProvider>().Object;
+    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+    private readonly ITriggerStore _triggerStore = Mock.Of<ITriggerStore>().Object;
+    private readonly IBookmarkQueueStore _bookmarkQueueStore = Mock.Of<IBookmarkQueueStore>().Object;
     private readonly ElsaWorkflowPersistenceHealthCheck _sut;
 
     public ElsaWorkflowPersistenceHealthCheckTests()
     {
-        _workflowDefinitionStore.FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<Elsa.Workflows.Management.Entities.WorkflowDefinition?>(null));
-        _workflowInstanceStore.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(new ValueTask<long>(0));
-        _triggerStore.FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns(new ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>((Elsa.Workflows.Runtime.Entities.StoredTrigger?)null));
-        _bookmarkQueueStore.FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<Elsa.Workflows.Runtime.Entities.BookmarkQueueItem?>(null));
-        _serviceProvider.GetService(typeof(IWorkflowDefinitionStore)).Returns(_workflowDefinitionStore);
-        _serviceProvider.GetService(typeof(IWorkflowInstanceStore)).Returns(_workflowInstanceStore);
-        _serviceProvider.GetService(typeof(ITriggerStore)).Returns(_triggerStore);
-        _serviceProvider.GetService(typeof(IBookmarkQueueStore)).Returns(_bookmarkQueueStore);
+        Mock.Get(_workflowDefinitionStore).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(() => null);
+        Mock.Get(_workflowInstanceStore).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(0);
+        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns((Elsa.Workflows.Runtime.Entities.StoredTrigger?)null);
+        Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>()).Returns(() => null);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowDefinitionStore)).Returns(_workflowDefinitionStore);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowInstanceStore)).Returns(_workflowInstanceStore);
+        Mock.Get(_serviceProvider).GetService(typeof(ITriggerStore)).Returns(_triggerStore);
+        Mock.Get(_serviceProvider).GetService(typeof(IBookmarkQueueStore)).Returns(_bookmarkQueueStore);
         _sut = CreateSut();
     }
 
@@ -40,23 +40,22 @@ public class ElsaWorkflowPersistenceHealthCheckTests
         await Assert.That(result.Data["category"]).IsEqualTo("persistence");
         await Assert.That(result.Data["successfulProbes"]).IsEqualTo("workflow-definitions,workflow-instances,triggers,bookmark-queue");
         await Assert.That(result.Data["attemptedProbes"]).IsEqualTo("workflow-definitions,workflow-instances,triggers,bookmark-queue");
-        await _workflowDefinitionStore.Received(1).FindAsync(
-            Arg.Is<WorkflowDefinitionFilter>(x => x.Id == "00000000-0000-0000-0000-000000000000"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowDefinitionStore).FindAsync(
+            Arg.Is<WorkflowDefinitionFilter>(x => x.Id == "00000000-0000-0000-0000-000000000000"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ProbesStoresSequentially()
     {
         var tracker = new ProbeConcurrencyTracker();
-        _workflowDefinitionStore.FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => TrackProbeAsync<Elsa.Workflows.Management.Entities.WorkflowDefinition?>(tracker, null));
-        _workflowInstanceStore.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => new ValueTask<long>(TrackProbeAsync(tracker, 0L)));
-        _triggerStore.FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => new ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(TrackProbeAsync<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(tracker, null)));
-        _bookmarkQueueStore.FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => TrackProbeAsync<Elsa.Workflows.Runtime.Entities.BookmarkQueueItem?>(tracker, null));
+        Mock.Get(_workflowDefinitionStore).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(() => TrackProbeAsync<Elsa.Workflows.Management.Entities.WorkflowDefinition?>(tracker, null));
+        Mock.Get(_workflowInstanceStore).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(() => new ValueTask<long>(TrackProbeAsync(tracker, 0L)));
+        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(() => new ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(TrackProbeAsync<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(tracker, null)));
+        Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(() => TrackProbeAsync<Elsa.Workflows.Runtime.Entities.BookmarkQueueItem?>(tracker, null));
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -67,7 +66,7 @@ public class ElsaWorkflowPersistenceHealthCheckTests
     [Test]
     public async Task ReturnsUnhealthyWithFailedStoreAndStopsProbingWhenAStoreProbeFails()
     {
-        _triggerStore.FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns<ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>>(_ => throw new InvalidOperationException("store unavailable"));
+        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns(() => throw new InvalidOperationException("store unavailable"));
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -79,14 +78,14 @@ public class ElsaWorkflowPersistenceHealthCheckTests
         await Assert.That(result.Data["successfulProbes"]).IsEqualTo("workflow-definitions,workflow-instances");
         await Assert.That(result.Data["attemptedProbes"]).IsEqualTo("workflow-definitions,workflow-instances,triggers");
         await Assert.That(result.Data["failedProbes"]).IsEqualTo("triggers");
-        await _bookmarkQueueStore.DidNotReceive().FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task ReturnsUnhealthyWithAllProbeDataWhenContinuationIsEnabled()
     {
         var sut = CreateSut(continueAfterFailure: true);
-        _triggerStore.FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns<ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>>(_ => throw new InvalidOperationException("store unavailable"));
+        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns(() => throw new InvalidOperationException("store unavailable"));
 
         var result = await sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -94,14 +93,14 @@ public class ElsaWorkflowPersistenceHealthCheckTests
         await Assert.That(result.Data["successfulProbes"]).IsEqualTo("workflow-definitions,workflow-instances,bookmark-queue");
         await Assert.That(result.Data["attemptedProbes"]).IsEqualTo("workflow-definitions,workflow-instances,triggers,bookmark-queue");
         await Assert.That(result.Data["failedProbes"]).IsEqualTo("triggers");
-        await _bookmarkQueueStore.Received(1).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ReturnsHealthyWithSkippedProbesWhenOptionalManagementStoresAreMissing()
     {
-        _serviceProvider.GetService(typeof(IWorkflowDefinitionStore)).Returns((object?)null);
-        _serviceProvider.GetService(typeof(IWorkflowInstanceStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowDefinitionStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowInstanceStore)).Returns((object?)null);
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -115,10 +114,10 @@ public class ElsaWorkflowPersistenceHealthCheckTests
     [Test]
     public async Task ReturnsDegradedWithSkippedProbesWhenNoStoresAreRegistered()
     {
-        _serviceProvider.GetService(typeof(IWorkflowDefinitionStore)).Returns((object?)null);
-        _serviceProvider.GetService(typeof(IWorkflowInstanceStore)).Returns((object?)null);
-        _serviceProvider.GetService(typeof(ITriggerStore)).Returns((object?)null);
-        _serviceProvider.GetService(typeof(IBookmarkQueueStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowDefinitionStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(IWorkflowInstanceStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(ITriggerStore)).Returns((object?)null);
+        Mock.Get(_serviceProvider).GetService(typeof(IBookmarkQueueStore)).Returns((object?)null);
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 

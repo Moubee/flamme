@@ -23,7 +23,6 @@ using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using NSubstitute;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Broker;
 
@@ -40,19 +39,19 @@ public class BrokerSecurityTests
         var tenantAccessor = new DefaultTenantAccessor();
         var user = new User { Id = "user-a", Name = "admin", TenantId = "tenant-a", Roles = ["admin"] };
         var role = new Role { Id = "admin", Name = "Administrator", TenantId = "tenant-a", Permissions = ["*"] };
-        var credentials = Substitute.For<IUserCredentialsValidator>();
-        credentials.ValidateAsync("admin", "password", Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<User?>(user));
-        var users = Substitute.For<IUserProvider>();
-        users.FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => Task.FromResult(tenantAccessor.TenantId == "tenant-a" ? user : null));
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
-            .Returns(_ => ValueTask.FromResult<IEnumerable<Role>>(tenantAccessor.TenantId == "tenant-a" ? [role] : []));
+        var credentials = Mock.Of<IUserCredentialsValidator>().Object;
+        Mock.Get(credentials).ValidateAsync("admin", "password", Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult<User?>(user));
+        var users = Mock.Of<IUserProvider>().Object;
+        Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>())
+            .Returns(() => Task.FromResult(tenantAccessor.TenantId == "tenant-a" ? user : null));
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
+            .Returns(() => ValueTask.FromResult<IEnumerable<Role>>(tenantAccessor.TenantId == "tenant-a" ? [role] : []));
         var local = CreateLocalIdentityServices(users, roles, tenantAccessor);
-        var externalTokenIssuer = Substitute.For<IExternalAuthenticationTokenIssuer>();
-        externalTokenIssuer.RefreshAsync("studio", Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromException<ExternalTokenResponse>(new InvalidOperationException("A local refresh token must not use the external-session issuer.")));
+        var externalTokenIssuer = Mock.Of<IExternalAuthenticationTokenIssuer>().Object;
+        Mock.Get(externalTokenIssuer).RefreshAsync("studio", Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromException<ExternalTokenResponse>(new InvalidOperationException("A local refresh token must not use the external-session issuer.")));
         var broker = CreateBroker(
             new RecordingAdapter(),
             tokenIssuer: externalTokenIssuer,
@@ -116,17 +115,17 @@ public class BrokerSecurityTests
         var refreshedAccessToken = new JsonWebTokenHandler().ReadJsonWebToken(refresh.Token.AccessToken);
         await Assert.That(refreshedAccessToken.Claims).Contains(claim => claim.Type == "permissions" && claim.Value == "workflows:manage");
         await Assert.That(refreshedAccessToken.Claims).DoesNotContain(claim => claim.Type == "permissions" && claim.Value == "*");
-        await externalTokenIssuer.DidNotReceive().RefreshAsync(Arg.Any<string>(), Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>());
+        Mock.Get(externalTokenIssuer).RefreshAsync(Arg.Any<string>(), Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task LocalRefreshGrantRefusesARevokedSession()
     {
         var user = new User { Id = "user-a", Name = "admin" };
-        var users = Substitute.For<IUserProvider>();
-        users.FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<User?>(user));
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<IEnumerable<Role>>([]));
+        var users = Mock.Of<IUserProvider>().Object;
+        Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<User?>(user));
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IEnumerable<Role>>([]));
         var tenantAccessor = new DefaultTenantAccessor();
         var local = CreateLocalIdentityServices(users, roles, tenantAccessor);
         var broker = CreateBroker(
@@ -151,9 +150,9 @@ public class BrokerSecurityTests
     [Test]
     public async Task LocalInitiationTreatsNullUserTenantAsTheDefaultTenant()
     {
-        var credentials = Substitute.For<IUserCredentialsValidator>();
-        credentials.ValidateAsync("admin", "password", Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<User?>(new User { Id = "admin", Name = "admin" }));
+        var credentials = Mock.Of<IUserCredentialsValidator>().Object;
+        Mock.Get(credentials).ValidateAsync("admin", "password", Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult<User?>(new User { Id = "admin", Name = "admin" }));
         var broker = CreateBroker(new RecordingAdapter(), credentialsValidator: credentials);
         var request = new LocalBrokerAuthorizationRequest(
             "studio", new Uri("https://studio.example/authentication/external/callback"), "code", "challenge", "S256", "/workflows", "admin", "password", "state");
@@ -169,9 +168,9 @@ public class BrokerSecurityTests
     public async Task OpaqueRefreshTokensContinueToUseTheExternalSessionIssuer()
     {
         var expected = new ExternalTokenResponse("access", "Bearer", 300, "session.rotated", 600, 600);
-        var externalTokenIssuer = Substitute.For<IExternalAuthenticationTokenIssuer>();
-        externalTokenIssuer.RefreshAsync("studio", Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>()).Returns(expected);
-        var identityRefreshTokenService = Substitute.For<IIdentityRefreshTokenService>();
+        var externalTokenIssuer = Mock.Of<IExternalAuthenticationTokenIssuer>().Object;
+        Mock.Get(externalTokenIssuer).RefreshAsync("studio", Arg.Any<SensitiveString>(), Arg.Any<CancellationToken>()).Returns(expected);
+        var identityRefreshTokenService = Mock.Of<IIdentityRefreshTokenService>().Object;
         var broker = CreateBroker(
             new RecordingAdapter(),
             tokenIssuer: externalTokenIssuer,
@@ -188,7 +187,7 @@ public class BrokerSecurityTests
 
         await Assert.That(result.Error).IsNull();
         await Assert.That(result.Token).IsSameReferenceAs(expected);
-        await identityRefreshTokenService.DidNotReceive().RefreshAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(identityRefreshTokenService).RefreshAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -345,14 +344,14 @@ public class BrokerSecurityTests
         var store = new InMemoryExternalAuthenticationSessionStore(clock);
         var connection = new IdentityProviderConnection { Id = "connection-a", TenantId = "tenant-a", Key = "contoso", AdapterType = "fake", DisplayName = "Contoso", IsEnabled = true, MaterialRevision = "revision-a" };
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, new(ConnectionScopeKind.Tenant, "tenant-a"), ConnectionValidity.Valid, false, "test");
-        var registry = Substitute.For<IIdentityProviderConnectionRegistry>();
-        registry.FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
-        var users = Substitute.For<IUserProvider>();
-        users.FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<User?>(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" }));
-        var roles = Substitute.For<IRoleProvider>();
-        roles.FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<IEnumerable<Role>>([]));
-        var tokens = Substitute.For<IElsaTokenService>();
-        tokens.IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(new IssuedAccessToken("access", clock.UtcNow.AddHours(1))));
+        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        Mock.Get(registry).FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
+        var users = Mock.Of<IUserProvider>().Object;
+        Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<User?>(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" }));
+        var roles = Mock.Of<IRoleProvider>().Object;
+        Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IEnumerable<Role>>([]));
+        var tokens = Mock.Of<IElsaTokenService>().Object;
+        Mock.Get(tokens).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new IssuedAccessToken("access", clock.UtcNow.AddHours(1))));
         var issuer = new DefaultExternalAuthenticationTokenIssuer(store, registry, [], users, roles, tokens, new DefaultTenantAccessor(), clock, Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
         var session = new ExternalAuthenticationSession { Id = "session-a", AuthenticationClientId = "studio", TenantId = "tenant-a", UserId = "user-a", ConnectionKey = "contoso", ConnectionMaterialRevision = "revision-a", SecretGenerationFingerprint = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData([])), Issuer = "issuer", SubjectHash = "subject", StartedAt = clock.UtcNow, LastRefreshedAt = clock.UtcNow, ExpiresAt = clock.UtcNow.AddHours(1), RefreshExpiresAt = clock.UtcNow.AddHours(1) };
 
@@ -424,7 +423,7 @@ public class BrokerSecurityTests
     [Test]
     public async Task RejectedBrokerOutcomesPublishTheirSafePublicCategory()
     {
-        var sender = Substitute.For<INotificationSender>();
+        var sender = Mock.Of<INotificationSender>().Object;
         await using var services = new ServiceCollection().AddSingleton(sender).BuildServiceProvider();
         var notifier = new ExternalAuthenticationSecurityNotifier(services);
         var broker = CreateBroker(new RecordingAdapter(), notifier: notifier);
@@ -432,19 +431,19 @@ public class BrokerSecurityTests
         var result = await broker.InitiateExternalAsync(Request("//attacker.example"), "tenant-a");
 
         await Assert.That(result.Error?.Error).IsEqualTo("invalid_request");
-        await sender.Received(1).SendAsync(
-            Arg.Is<ExternalAuthenticationOutcomeRecorded>(notification =>
+        Mock.Get(sender).SendAsync(
+            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
                 notification.Flow == "external" &&
                 notification.Stage == "initiate" &&
                 notification.Category == "invalid_request" &&
                 notification.Context.Outcome == SecurityEventOutcome.Rejected),
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task AdapterInitiationFailureReturnsASafeObservedOutcome()
     {
-        var sender = Substitute.For<INotificationSender>();
+        var sender = Mock.Of<INotificationSender>().Object;
         await using var services = new ServiceCollection().AddSingleton(sender).BuildServiceProvider();
         var broker = CreateBroker(
             new RecordingAdapter { ThrowOnInitiation = true },
@@ -453,11 +452,11 @@ public class BrokerSecurityTests
         var result = await broker.InitiateExternalAsync(Request("/workflows"), "tenant-a");
 
         await Assert.That(result.Error?.Error).IsEqualTo("temporarily_unavailable");
-        await sender.Received(1).SendAsync(
-            Arg.Is<ExternalAuthenticationOutcomeRecorded>(notification =>
+        Mock.Get(sender).SendAsync(
+            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
                 notification.Category == "temporarily_unavailable" &&
                 notification.Context.Outcome == SecurityEventOutcome.Failed),
-            Arg.Any<CancellationToken>());
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     internal static ExternalAuthenticationBroker CreateBroker(
@@ -490,18 +489,18 @@ public class BrokerSecurityTests
         };
         configureConnection?.Invoke(connection);
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, new(ConnectionScopeKind.Tenant, "tenant-a"), connectionValidity, false, "test");
-        var registry = Substitute.For<IIdentityProviderConnectionRegistry>();
-        registry.FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
-        registry.FindByIdAsync("tenant-a", "connection-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
+        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        Mock.Get(registry).FindByKeyAsync("tenant-a", "contoso", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
+        Mock.Get(registry).FindByIdAsync("tenant-a", "connection-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<EffectiveIdentityProviderConnection?>(effective));
         IReadOnlyCollection<LoginMethod> loginMethods = includeLoginMethod
             ? [new LoginMethod(connection.Id, connection.Key, LoginMethodKind.External, connection.DisplayName, null, 0, false, new Uri($"/external-authentication/authorize/{connection.Key}", UriKind.Relative))]
             : [];
-        registry.GetAsync("tenant-a", Arg.Any<CancellationToken>()).Returns(ValueTask.FromResult(new EffectiveConnectionRegistry([effective], loginMethods, "v1")));
-        var validityAssessor = Substitute.For<IIdentityProviderConnectionValidityAssessor>();
-        validityAssessor.AssessAsync(Arg.Any<EffectiveIdentityProviderConnection>(), Arg.Any<CancellationToken>())
-            .Returns(call => ValueTask.FromResult(call.Arg<EffectiveIdentityProviderConnection>() with
+        Mock.Get(registry).GetAsync("tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new EffectiveConnectionRegistry([effective], loginMethods, "v1")));
+        var validityAssessor = Mock.Of<IIdentityProviderConnectionValidityAssessor>().Object;
+        Mock.Get(validityAssessor).AssessAsync(Arg.Any<EffectiveIdentityProviderConnection>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveIdentityProviderConnection candidate, CancellationToken cancellationToken) => ValueTask.FromResult(candidate with
             {
-                Validity = assessedValidity ?? call.Arg<EffectiveIdentityProviderConnection>().Validity
+                Validity = assessedValidity ?? candidate.Validity
             }));
         var options = Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions
         {
@@ -509,7 +508,7 @@ public class BrokerSecurityTests
                 new HashSet<Uri> { new("https://studio.example/authentication/external/callback") }, new HashSet<Uri>(), new HashSet<string> { "https://studio.example" }, new HashSet<string> { "/workflows" }, null, true)]
         });
         var brokerClock = clock ?? new TestClock();
-        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? Substitute.For<IExternalIdentityResolver>(), permissionGrantResolver ?? Substitute.For<IPermissionGrantResolver>(), new InMemoryExternalAuthenticationStateStore(brokerClock), grants ?? new InMemoryAuthorizationGrantStore(brokerClock), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(brokerClock), tokenIssuer ?? Substitute.For<IExternalAuthenticationTokenIssuer>(), credentialsValidator ?? Substitute.For<IUserCredentialsValidator>(), userProvider ?? Substitute.For<IUserProvider>(), roleProvider ?? Substitute.For<IRoleProvider>(), tokenService ?? Substitute.For<IElsaTokenService>(), identityRefreshTokenService ?? Substitute.For<IIdentityRefreshTokenService>(), tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
+        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? Mock.Of<IExternalIdentityResolver>().Object, permissionGrantResolver ?? Mock.Of<IPermissionGrantResolver>().Object, new InMemoryExternalAuthenticationStateStore(brokerClock), grants ?? new InMemoryAuthorizationGrantStore(brokerClock), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(brokerClock), tokenIssuer ?? Mock.Of<IExternalAuthenticationTokenIssuer>().Object, credentialsValidator ?? Mock.Of<IUserCredentialsValidator>().Object, userProvider ?? Mock.Of<IUserProvider>().Object, roleProvider ?? Mock.Of<IRoleProvider>().Object, tokenService ?? Mock.Of<IElsaTokenService>().Object, identityRefreshTokenService ?? Mock.Of<IIdentityRefreshTokenService>().Object, tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
     }
 
     private static BrokerAuthorizationRequest Request(string returnPath) => new("studio", new Uri("https://studio.example/authentication/external/callback"), "code", "challenge", "S256", returnPath, "contoso");
@@ -523,7 +522,7 @@ public class BrokerSecurityTests
         var provisioner = new InMemoryExternalIdentityProvisioner(
             users,
             new StoreBasedUserProvider(users),
-            Substitute.For<IRoleProvider>(),
+            Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
             clock,
             new FixedHasher(),
@@ -535,9 +534,9 @@ public class BrokerSecurityTests
             {
                 UnlinkedIdentityPolicy = new UnlinkedIdentityPolicyOptions { DefaultType = "create-user" }
             }));
-        var permissionGrantResolver = Substitute.For<IPermissionGrantResolver>();
-        permissionGrantResolver.ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(new PermissionGrantResult([], [])));
+        var permissionGrantResolver = Mock.Of<IPermissionGrantResolver>().Object;
+        Mock.Get(permissionGrantResolver).ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(new PermissionGrantResult([], [])));
         var adapter = new RecordingAdapter
         {
             ThrowOnCallback = throwOnCallback,

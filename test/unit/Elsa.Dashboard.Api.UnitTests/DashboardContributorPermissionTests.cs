@@ -10,7 +10,6 @@ using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Dashboard;
-using NSubstitute;
 using static Elsa.Dashboard.Api.UnitTests.TestContributor;
 
 namespace Elsa.Dashboard.Api.UnitTests;
@@ -27,8 +26,8 @@ public class DashboardContributorPermissionTests
     public async Task WorkflowContributor_GuardsRuntimeAndInstancesAndTheirFindings()
     {
         var store = CreateStore();
-        var runtime = Substitute.For<IWorkflowRuntimeAdminService>();
-        runtime.GetStatus().Returns(new RuntimeAdminStatus(
+        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(
             QuiescenceState.Initial("generation") with { Reason = QuiescenceReason.AdministrativePause },
             [new("source", IngressSourceState.Running, new InvalidOperationException(), null)],
             0));
@@ -43,7 +42,7 @@ public class DashboardContributorPermissionTests
     [Test]
     public async Task WorkflowContributor_GuardsItsTrendsRecentActivityAndHotspotsWithInstancesView()
     {
-        var contributor = new WorkflowDashboardContributor(CreateStore(), Substitute.For<IWorkflowRuntimeAdminService>());
+        var contributor = new WorkflowDashboardContributor(CreateStore(), Mock.Of<IWorkflowRuntimeAdminService>().Object);
         var range = _context.Range;
 
         var trends = await contributor.GetWorkflowTrendsAsync(new(range, DashboardTrendGranularity.Hour, false, CancellationToken.None));
@@ -58,27 +57,27 @@ public class DashboardContributorPermissionTests
     [Test]
     public async Task StructuredLogsContributor_GuardsItsSummaryAndFindings() =>
         await AssertGuardsAsync(
-            new StructuredLogsDashboardContributor(Substitute.For<IStructuredLogProvider>(), []),
+            new StructuredLogsDashboardContributor(Mock.Of<IStructuredLogProvider>().Object, []),
             async permissions => await Assert.That(permissions.StructuredLogs).IsEqualTo(StructuredLogsView),
             StructuredLogsView);
 
     [Test]
     public async Task ConsoleLogsContributor_GuardsItsSummaryAndFindings() =>
         await AssertGuardsAsync(
-            new ConsoleLogsDashboardContributor(Substitute.For<IConsoleLogProvider>()),
+            new ConsoleLogsDashboardContributor(Mock.Of<IConsoleLogProvider>().Object),
             async permissions => await Assert.That(permissions.ConsoleLogs).IsEqualTo(ConsoleLogsView),
             ConsoleLogsView);
 
     [Test]
     public async Task BuiltInContributors_DeclareEveryPermissionTheirOverviewCardsAndPanelsUse()
     {
-        var runtime = Substitute.For<IWorkflowRuntimeAdminService>();
-        runtime.GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
+        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
         var contributors = new IDashboardContributor[]
         {
             new WorkflowDashboardContributor(CreateStore(), runtime),
-            new StructuredLogsDashboardContributor(Substitute.For<IStructuredLogProvider>(), []),
-            new ConsoleLogsDashboardContributor(Substitute.For<IConsoleLogProvider>())
+            new StructuredLogsDashboardContributor(Mock.Of<IStructuredLogProvider>().Object, []),
+            new ConsoleLogsDashboardContributor(Mock.Of<IConsoleLogProvider>().Object)
         };
 
         foreach (var contributor in contributors)
@@ -97,17 +96,17 @@ public class DashboardContributorPermissionTests
     [Test]
     public async Task WorkflowContributor_WithRuntimeOnlyCaller_DoesNotQueryTheInstanceStore()
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
-        store.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(99L);
-        store.SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(Array.Empty<WorkflowInstanceSummary>());
-        var runtime = Substitute.For<IWorkflowRuntimeAdminService>();
-        runtime.GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(99L);
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(Array.Empty<WorkflowInstanceSummary>());
+        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
         var context = _context with { CanRead = permission => permission == RuntimeView };
 
         var overview = await new WorkflowDashboardContributor(store, runtime).GetOverviewAsync(context);
 
-        await store.DidNotReceive().CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>());
-        await store.DidNotReceive().SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).WasNeverCalled();
         await Assert.That(overview!.Runtime!.Status).IsEqualTo(DashboardRuntimeStatusKeys.AcceptingWork);
         await Assert.That(overview.WorkflowInstances!.Running).IsEqualTo(0);
     }
@@ -115,11 +114,11 @@ public class DashboardContributorPermissionTests
     [Test]
     public async Task WorkflowContributor_WithFailingInstanceStore_KeepsRuntimeAndReportsInstancesUnavailable()
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
-        store.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns<long>(_ => throw new InvalidOperationException("secret connection string"));
-        store.SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns<IEnumerable<WorkflowInstanceSummary>>(_ => throw new InvalidOperationException("secret connection string"));
-        var runtime = Substitute.For<IWorkflowRuntimeAdminService>();
-        runtime.GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("secret connection string"));
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("secret connection string"));
+        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
 
         var overview = await new WorkflowDashboardContributor(store, runtime).GetOverviewAsync(_context);
 
@@ -130,10 +129,10 @@ public class DashboardContributorPermissionTests
 
     private static IWorkflowInstanceStore CreateStore()
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
-        store.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(1L);
-        store.SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(Array.Empty<WorkflowInstanceSummary>());
-        store.SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<WorkflowInstanceOrder<DateTimeOffset?>>(), Arg.Any<CancellationToken>())
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(1L);
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(Array.Empty<WorkflowInstanceSummary>());
+        Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<WorkflowInstanceOrder<DateTimeOffset?>>(), Arg.Any<CancellationToken>())
             .Returns(new Page<WorkflowInstanceSummary>([], 0));
         return store;
     }

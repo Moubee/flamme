@@ -4,24 +4,24 @@ using Elsa.Workflows.Runtime.Commands;
 using Elsa.Workflows.Runtime.Handlers;
 using Elsa.Workflows.Runtime.Messages;
 using Elsa.Workflows.Runtime.Notifications;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
 public class DispatchWorkflowCommandHandlerTests
 {
-    private readonly IStimulusSender _stimulusSender = Substitute.For<IStimulusSender>();
-    private readonly IWorkflowRuntime _workflowRuntime = Substitute.For<IWorkflowRuntime>();
-    private readonly IWorkflowClient _workflowClient = Substitute.For<IWorkflowClient>();
-    private readonly INotificationSender _notificationSender = Substitute.For<INotificationSender>();
+    private readonly IStimulusSender _stimulusSender = Mock.Of<IStimulusSender>().Object;
+    private readonly IWorkflowRuntime _workflowRuntime = Mock.Of<IWorkflowRuntime>().Object;
+    private readonly IWorkflowClient _workflowClient = Mock.Of<IWorkflowClient>().Object;
+    private readonly INotificationSender _notificationSender = Mock.Of<INotificationSender>().Object;
     private readonly DispatchWorkflowCommandHandler _handler;
 
     public DispatchWorkflowCommandHandlerTests()
     {
         _handler = new(_stimulusSender, _workflowRuntime, _notificationSender);
-        _workflowRuntime.CreateClientAsync("child-1", Arg.Any<CancellationToken>()).Returns(new ValueTask<IWorkflowClient>(_workflowClient));
-        _workflowClient.CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new RunWorkflowInstanceResponse());
+        Mock.Get(_workflowRuntime).CreateClientAsync("child-1", Arg.Any<CancellationToken>()).Returns(_workflowClient);
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Returns(new RunWorkflowInstanceResponse());
     }
 
     [Test]
@@ -32,14 +32,13 @@ public class DispatchWorkflowCommandHandlerTests
             InstanceId = "child-1",
             SkipIfInstanceExists = false
         };
-        _workflowClient.InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(true);
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(true);
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
-        await _workflowClient.DidNotReceive().InstanceExistsAsync(Arg.Any<CancellationToken>());
-        await _workflowClient.Received(1).CreateAndRunInstanceAsync(
-            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(
+            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -60,10 +59,10 @@ public class DispatchWorkflowCommandHandlerTests
             SchedulingCallStackDepth = 4
         };
         CreateAndRunWorkflowInstanceRequest? observedRequest = null;
-        _workflowClient.CreateAndRunInstanceAsync(
-                Arg.Do<CreateAndRunWorkflowInstanceRequest>(request => observedRequest = request),
-                Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(new RunWorkflowInstanceResponse()));
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(
+                        Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Callback((CreateAndRunWorkflowInstanceRequest request, CancellationToken _) => observedRequest = request)
+                    .Returns(new RunWorkflowInstanceResponse());
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
@@ -87,12 +86,12 @@ public class DispatchWorkflowCommandHandlerTests
             InstanceId = "child-1",
             SkipIfInstanceExists = true
         };
-        _workflowClient.InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(true);
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(true);
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
-        await _workflowClient.Received(1).InstanceExistsAsync(Arg.Any<CancellationToken>());
-        await _workflowClient.DidNotReceiveWithAnyArgs().CreateAndRunInstanceAsync(default!, default);
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -103,14 +102,13 @@ public class DispatchWorkflowCommandHandlerTests
             InstanceId = "child-1",
             SkipIfInstanceExists = true
         };
-        _workflowClient.InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(false);
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).Returns(false);
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
-        await _workflowClient.Received(1).InstanceExistsAsync(Arg.Any<CancellationToken>());
-        await _workflowClient.Received(1).CreateAndRunInstanceAsync(
-            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(
+            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -124,15 +122,15 @@ public class DispatchWorkflowCommandHandlerTests
             ParentWorkflowInstanceId = "parent-1",
             Properties = properties
         };
-        _workflowClient.CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new RunWorkflowInstanceResponse { CannotStart = true });
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Returns(new RunWorkflowInstanceResponse { CannotStart = true });
 
         var result = await _handler.HandleAsync(command, CancellationToken.None);
 
         await Assert.That(result).IsSameReferenceAs(Unit.Instance);
-        await _notificationSender.Received(1).SendAsync(
-            Arg.Is<DispatchWorkflowActivationDenied>(notification => notification.ParentWorkflowInstanceId == "parent-1" && notification.WorkflowInstanceId == "child-1" && notification.ActivityTypeName == "Elsa.DispatchWorkflow" && notification.StimulusHash == "dispatch-hash"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_notificationSender).SendAsync(
+            Arg.Is<INotification>(value => value is DispatchWorkflowActivationDenied notification && notification.ParentWorkflowInstanceId == "parent-1" && notification.WorkflowInstanceId == "child-1" && notification.ActivityTypeName == "Elsa.DispatchWorkflow" && notification.StimulusHash == "dispatch-hash"),
+            Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
 
         await Assert.That(properties["__elsa.internal.dispatch-activation-denied.activity-type-name"]).IsEqualTo("Elsa.DispatchWorkflow");
         await Assert.That(properties["__elsa.internal.dispatch-activation-denied.stimulus-hash"]).IsEqualTo("dispatch-hash");
@@ -147,12 +145,12 @@ public class DispatchWorkflowCommandHandlerTests
             ParentWorkflowInstanceId = "parent-1",
             Properties = new Dictionary<string, object> { ["WaitForCompletion"] = false }
         };
-        _workflowClient.CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new RunWorkflowInstanceResponse { CannotStart = true });
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Returns(new RunWorkflowInstanceResponse { CannotStart = true });
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
-        await _notificationSender.DidNotReceive().SendAsync(Arg.Any<DispatchWorkflowActivationDenied>(), Arg.Any<CancellationToken>());
+        Mock.Get(_notificationSender).SendAsync(Arg.Is<INotification>(value => value is DispatchWorkflowActivationDenied), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -167,10 +165,10 @@ public class DispatchWorkflowCommandHandlerTests
             Properties = properties
         };
         CreateAndRunWorkflowInstanceRequest? observedRequest = null;
-        _workflowClient.CreateAndRunInstanceAsync(
-                Arg.Do<CreateAndRunWorkflowInstanceRequest>(request => observedRequest = request),
-                Arg.Any<CancellationToken>())
-            .Returns(new RunWorkflowInstanceResponse());
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(
+                        Arg.Any<CreateAndRunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
+                    .Callback((CreateAndRunWorkflowInstanceRequest request, CancellationToken _) => observedRequest = request)
+                    .Returns(new RunWorkflowInstanceResponse());
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
@@ -192,13 +190,12 @@ public class DispatchWorkflowCommandHandlerTests
             InstanceId = instanceId,
             SkipIfInstanceExists = true
         };
-        _workflowRuntime.CreateClientAsync(instanceId, Arg.Any<CancellationToken>()).Returns(new ValueTask<IWorkflowClient>(_workflowClient));
+        Mock.Get(_workflowRuntime).CreateClientAsync(instanceId, Arg.Any<CancellationToken>()).Returns(_workflowClient);
 
         await _handler.HandleAsync(command, CancellationToken.None);
 
-        await _workflowClient.DidNotReceive().InstanceExistsAsync(Arg.Any<CancellationToken>());
-        await _workflowClient.Received(1).CreateAndRunInstanceAsync(
-            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"),
-            Arg.Any<CancellationToken>());
+        Mock.Get(_workflowClient).InstanceExistsAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_workflowClient).CreateAndRunInstanceAsync(
+            Arg.Is<CreateAndRunWorkflowInstanceRequest>(x => x.WorkflowDefinitionHandle.DefinitionVersionId == "definition-version-1"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 }

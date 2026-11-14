@@ -1,4 +1,4 @@
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
@@ -23,14 +23,14 @@ public class DrainOrchestratorPauseTests : DrainOrchestratorTestsBase
     {
         var a = CreateSource("a");
         var b = CreateSource("b");
-        Registry.Sources.Returns(new[] { a, b });
+        Mock.Get(Registry).Sources.Returns(new[] { a, b });
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.CompletedWithinDeadline);
-        await a.Received(1).PauseAsync(Arg.Any<CancellationToken>());
-        await b.Received(1).PauseAsync(Arg.Any<CancellationToken>());
+        Mock.Get(a).PauseAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(b).PauseAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -39,14 +39,14 @@ public class DrainOrchestratorPauseTests : DrainOrchestratorTestsBase
     {
         var ok = CreateSource("ok");
         var bad = CreateSource("bad", pauseImpl: _ => throw new InvalidOperationException("bad day"));
-        Registry.Sources.Returns(new[] { ok, bad });
+        Mock.Get(Registry).Sources.Returns(new[] { ok, bad });
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.CompletedWithinDeadline);
-        await Registry.Received(1).MarkPauseFailedAsync("bad", "exception", Arg.Any<Exception>());
-        await ok.Received(1).PauseAsync(Arg.Any<CancellationToken>());
+        Mock.Get(Registry).MarkPauseFailedAsync("bad", "exception", Arg.Any<Exception?>()).WasCalled(Times.Exactly(1));
+        Mock.Get(ok).PauseAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -61,32 +61,32 @@ public class DrainOrchestratorPauseTests : DrainOrchestratorTestsBase
                 // Awaits the linked CT — when it fires, we observe the cancellation.
                 return new ValueTask(Task.Delay(TimeSpan.FromSeconds(30), ct));
             });
-        Registry.Sources.Returns(new[] { hanger });
+        Mock.Get(Registry).Sources.Returns(new[] { hanger });
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.CompletedWithinDeadline);
-        await Registry.Received(1).MarkPauseFailedAsync("hanger", "timeout", Arg.Any<Exception>());
+        Mock.Get(Registry).MarkPauseFailedAsync("hanger", "timeout", Arg.Any<Exception?>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     [DisplayName("Source that implements IForceStoppable is force-stopped after pause timeout")]
     public async Task ForceStoppableSourceIsEscalated()
     {
-        var combined = Substitute.For<IIngressSource, IForceStoppable>();
-        combined.Name.Returns("kafka");
-        combined.PauseTimeout.Returns(TimeSpan.FromMilliseconds(50));
-        combined.CurrentState.Returns(IngressSourceState.Running);
-        combined.PauseAsync(Arg.Any<CancellationToken>()).Returns(ci => new ValueTask(Task.Delay(TimeSpan.FromSeconds(30), ci.Arg<CancellationToken>())));
-        ((IForceStoppable)combined).ForceStopAsync(Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
-        Registry.Sources.Returns(new[] { combined });
+        var combined = Mock.Of<IIngressSource, IForceStoppable>().Object;
+        Mock.Get(combined).Name.Returns("kafka");
+        Mock.Get(combined).PauseTimeout.Returns(TimeSpan.FromMilliseconds(50));
+        Mock.Get(combined).CurrentState.Returns(IngressSourceState.Running);
+        Mock.Get(combined).PauseAsync(Arg.Any<CancellationToken>()).Returns((global::System.Threading.CancellationToken __arg0) => new ValueTask(Task.Delay(TimeSpan.FromSeconds(30), __arg0)));
+        Mock.Get(combined).ForceStopAsync(Arg.Any<CancellationToken>()).Returns(() => ValueTask.CompletedTask);
+        Mock.Get(Registry).Sources.Returns(new[] { combined });
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.CompletedWithinDeadline);
-        await ((IForceStoppable)combined).Received(1).ForceStopAsync(Arg.Any<CancellationToken>());
+        Mock.Get(combined).ForceStopAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -94,13 +94,13 @@ public class DrainOrchestratorPauseTests : DrainOrchestratorTestsBase
     public async Task NonForceStoppableSourceNotEscalated()
     {
         var bad = CreateSource("bad", pauseImpl: _ => throw new InvalidOperationException("nope"));
-        Registry.Sources.Returns(new[] { bad });
+        Mock.Get(Registry).Sources.Returns(new[] { bad });
 
         var sut = BuildSut();
         var outcome = await sut.DrainAsync(DrainTrigger.HostStopSignal);
 
         await Assert.That(outcome.OverallResult).IsEqualTo(DrainResult.CompletedWithinDeadline);
         // No force-stop interface means no escalation possible — drain still completes.
-        await Registry.Received(1).MarkPauseFailedAsync("bad", "exception", Arg.Any<Exception>());
+        Mock.Get(Registry).MarkPauseFailedAsync("bad", "exception", Arg.Any<Exception?>()).WasCalled(Times.Exactly(1));
     }
 }

@@ -2,7 +2,6 @@ using Elsa.Common.Multitenancy;
 using Elsa.Tenants.AspNetCore.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace Elsa.Tenants.UnitTests.Middleware;
 
@@ -24,10 +23,10 @@ public class TenantResolutionMiddlewareTests
         var middleware = new TenantResolutionMiddleware(
             _ => Task.FromException(expectedException),
             tenantScopeFactory);
-        var tenantResolverPipelineInvoker = Substitute.For<ITenantResolverPipelineInvoker>();
-        tenantResolverPipelineInvoker
+        var tenantResolverPipelineInvoker = Mock.Of<ITenantResolverPipelineInvoker>().Object;
+        Mock.Get(tenantResolverPipelineInvoker)
             .InvokePipelineAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult<Tenant?>(null));
+            .ReturnsAsync(Task.FromResult<Tenant?>(null));
 
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(
             () => middleware.InvokeAsync(context, tenantResolverPipelineInvoker));

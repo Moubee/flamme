@@ -3,7 +3,6 @@ using Bpmn.Semantics;
 using Elsa.Bpmn.Activities;
 using Elsa.Workflows;
 using Elsa.Workflows.Models;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Bpmn.UnitTests;
@@ -14,13 +13,13 @@ public class BpmnProcessDescriptorTests
     [DisplayName("BpmnProcess's descriptor declares Done and Cancelled as its only flow ports")]
     public async Task DescribeActivityAsync_DeclaresDoneAndCancelledAsOnlyFlowPorts()
     {
-        var defaultValueResolver = Substitute.For<IPropertyDefaultValueResolver>();
-        var propertyUIHandlerResolver = Substitute.For<IPropertyUIHandlerResolver>();
+        var defaultValueResolver = Mock.Of<IPropertyDefaultValueResolver>().Object;
+        var propertyUIHandlerResolver = Mock.Of<IPropertyUIHandlerResolver>().Object;
 
-        defaultValueResolver.GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
-        propertyUIHandlerResolver
+        Mock.Get(defaultValueResolver).GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
+        Mock.Get(propertyUIHandlerResolver)
             .GetUIPropertiesAsync(Arg.Any<PropertyInfo>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));
+            .Returns(() => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));
 
         var describer = new ActivityDescriber(defaultValueResolver, propertyUIHandlerResolver);
 

@@ -8,7 +8,7 @@ using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -22,7 +22,7 @@ public class BookmarkQueueTenantIsolationTests
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
         var resumed = new List<string>();
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
 
         var (workerA, processorA) = CreateResumingWorker(signaler, accessor, tenantA, "bookmark-a", resumed, tenantsProvider);
         var (workerB, processorB) = CreateResumingWorker(signaler, accessor, tenantB, "bookmark-b", resumed, tenantsProvider);
@@ -45,7 +45,7 @@ public class BookmarkQueueTenantIsolationTests
             await Assert.That(resumed).Contains("bookmark-b");
             await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             await Assert.That(processorB.AmbientTenantIds).IsEquivalentTo(["tenant-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-            await tenantsProvider.DidNotReceive().ListAsync(Arg.Any<CancellationToken>());
+            Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
         {
@@ -59,7 +59,7 @@ public class BookmarkQueueTenantIsolationTests
     {
         var accessor = new DefaultTenantAccessor();
         var signaler = new BookmarkQueueSignaler(accessor);
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
         var (worker, scopes) = CreateRecordingWorker(signaler, accessor, Tenant("tenant-a"), tenantsProvider);
 
         try
@@ -70,7 +70,7 @@ public class BookmarkQueueTenantIsolationTests
             await Task.Delay(50);
 
             await Assert.That(scopes.OpenedTenantIds).IsEmpty();
-            await tenantsProvider.DidNotReceive().ListAsync(Arg.Any<CancellationToken>());
+            Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
         {
@@ -85,7 +85,7 @@ public class BookmarkQueueTenantIsolationTests
         var signaler = new BookmarkQueueSignaler(accessor);
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
         var (workerA, processorA, scopesA) = CreateCountingWorker(signaler, accessor, tenantA, tenantsProvider);
         var (workerB, processorB, scopesB) = CreateCountingWorker(signaler, accessor, tenantB, tenantsProvider);
 
@@ -106,7 +106,7 @@ public class BookmarkQueueTenantIsolationTests
             await Assert.That(processorB.Calls).IsEqualTo(0);
             await Assert.That(processorB.AmbientTenantIds).IsEmpty();
             await Assert.That(scopesB.OpenedTenantIds).IsEmpty();
-            await tenantsProvider.DidNotReceive().ListAsync(Arg.Any<CancellationToken>());
+            Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
         {
@@ -122,7 +122,7 @@ public class BookmarkQueueTenantIsolationTests
         var signaler = new BookmarkQueueSignaler(accessor);
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
         var (workerA, processorA, scopesA) = CreateCountingWorker(signaler, accessor, tenantA, tenantsProvider);
         var (workerB, processorB, _) = CreateCountingWorker(signaler, accessor, tenantB, tenantsProvider);
 
@@ -142,7 +142,7 @@ public class BookmarkQueueTenantIsolationTests
             await Assert.That(processorB.Calls).IsEqualTo(0);
             await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             await Assert.That(scopesA.OpenedTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-            await tenantsProvider.DidNotReceive().ListAsync(Arg.Any<CancellationToken>());
+            Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
         {
@@ -181,7 +181,7 @@ public class BookmarkQueueTenantIsolationTests
     {
         var accessor = new DefaultTenantAccessor();
         var signaler = new BookmarkQueueSignaler(accessor);
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
         var (worker, processor, _) = CreateCountingWorker(signaler, accessor, Elsa.Common.Multitenancy.Tenant.Default, tenantsProvider);
 
         try
@@ -218,23 +218,23 @@ public class BookmarkQueueTenantIsolationTests
             CreatedAt = DateTimeOffset.UtcNow
         }).GetAwaiter().GetResult();
 
-        var resumer = Substitute.For<IWorkflowResumer>();
-        resumer.ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                lock (resumed)
-                    resumed.Add(call.Arg<BookmarkFilter>().BookmarkId!);
-                return new[]
-                {
+        var resumer = Mock.Of<IWorkflowResumer>().Object;
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Runtime.Filters.BookmarkFilter __arg0, global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions? __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    {
+                        lock (resumed)
+                            resumed.Add(__arg0.BookmarkId!);
+                        return new[]
+                        {
                     new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-" + bookmarkId }
-                };
-            });
+                        };
+                    });
 
         var inner = new BookmarkQueueProcessor(
             store,
-            Substitute.For<IBookmarkQueueDeadLetterManager>(),
+            Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
             resumer,
-            Substitute.For<ISystemClock>(),
+            Mock.Of<ISystemClock>().Object,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),
             NullLogger<BookmarkQueueProcessor>.Instance);
         var processor = new TenantRecordingProcessor(accessor, inner);

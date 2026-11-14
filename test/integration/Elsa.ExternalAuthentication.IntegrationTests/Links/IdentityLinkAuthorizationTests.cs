@@ -12,7 +12,6 @@ using Elsa.Identity.Providers;
 using Elsa.Identity.Services;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
@@ -34,13 +33,13 @@ public class IdentityLinkAuthorizationTests : WebApplicationTest<IdentityLinkAut
         services.AddSingleton<Elsa.Common.ISystemClock, Elsa.Common.Services.SystemClock>();
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
-        services.AddSingleton<IIdentityProviderConnectionRegistry>(Substitute.For<IIdentityProviderConnectionRegistry>());
-        var tenant = Substitute.For<ITenantAccessor>();
-        tenant.TenantId.Returns("tenant-a");
+        services.AddSingleton<IIdentityProviderConnectionRegistry>(Mock.Of<IIdentityProviderConnectionRegistry>().Object);
+        var tenant = Mock.Of<ITenantAccessor>().Object;
+        Mock.Get(tenant).TenantId.Returns("tenant-a");
         services.AddSingleton(tenant);
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
-        services.AddSingleton<IRoleProvider>(Substitute.For<IRoleProvider>());
+        services.AddSingleton<IRoleProvider>(Mock.Of<IRoleProvider>().Object);
         services.AddScoped<InMemoryExternalIdentityProvisioner>();
         services.AddScoped<IExternalIdentityProvisioner>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());
         services.AddScoped<IExternalIdentityLinkManagementStore>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());

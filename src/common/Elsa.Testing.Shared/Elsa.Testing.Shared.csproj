@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.TestHost" />
-        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="TUnit.Mocks" />
         <PackageReference Include="Npgsql" />
         <PackageReference Include="Testcontainers.PostgreSql" />
     </ItemGroup>

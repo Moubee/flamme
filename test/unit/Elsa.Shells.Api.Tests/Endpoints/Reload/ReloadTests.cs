@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using CShells.Lifecycle;
-using NSubstitute;
 
 namespace Elsa.Shells.Api.Tests.Endpoints.Reload;
 
@@ -23,9 +22,9 @@ public class ReloadTests : ShellsApiTestBase
     [Test]
     public async Task Post_WhenShellNotFound_Returns404WithNotFoundStatus()
     {
-        ShellRegistry
+        Mock.Get(ShellRegistry)
             .ReloadAsync(ShellId, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<ReloadResult>(new ShellBlueprintNotFoundException(ShellId)));
+            .ReturnsAsync(Task.FromException<ReloadResult>(new ShellBlueprintNotFoundException(ShellId)));
 
         using var response = await HttpClient.PostAsync($"/shells/{ShellId}/reload", null);
 
@@ -40,9 +39,9 @@ public class ReloadTests : ShellsApiTestBase
     [Test]
     public async Task Post_WhenReloadFails_Returns503WithFailedStatus()
     {
-        ShellRegistry
+        Mock.Get(ShellRegistry)
             .ReloadAsync(ShellId, Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(new ReloadResult(ShellId, null, null, new InvalidOperationException("Shell reload failed"))));
+            .ReturnsAsync(Task.FromResult(new ReloadResult(ShellId, null, null, new InvalidOperationException("Shell reload failed"))));
 
         using var response = await HttpClient.PostAsync($"/shells/{ShellId}/reload", null);
 
@@ -56,9 +55,9 @@ public class ReloadTests : ShellsApiTestBase
     [Test]
     public async Task Post_WhenBlueprintUnavailable_Returns503WithFailedStatus()
     {
-        ShellRegistry
+        Mock.Get(ShellRegistry)
             .ReloadAsync(ShellId, Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<ReloadResult>(new ShellBlueprintUnavailableException(ShellId, new InvalidOperationException())));
+            .ReturnsAsync(Task.FromException<ReloadResult>(new ShellBlueprintUnavailableException(ShellId, new InvalidOperationException())));
 
         using var response = await HttpClient.PostAsync($"/shells/{ShellId}/reload", null);
 

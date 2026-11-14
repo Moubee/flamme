@@ -6,7 +6,6 @@ using Elsa.Identity.Contracts;
 using Elsa.Identity.Entities;
 using Elsa.Identity.Models;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
@@ -17,9 +16,9 @@ namespace Elsa.ExternalAuthentication.IntegrationTests.Compatibility;
 /// </summary>
 public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdentityEndpointWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {
-    private readonly IUserCredentialsValidator _credentialsValidator = Substitute.For<IUserCredentialsValidator>();
-    private readonly IUserProvider _userProvider = Substitute.For<IUserProvider>();
-    private readonly IAccessTokenIssuer _tokenIssuer = Substitute.For<IAccessTokenIssuer>();
+    private readonly IUserCredentialsValidator _credentialsValidator = Mock.Of<IUserCredentialsValidator>().Object;
+    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
+    private readonly IAccessTokenIssuer _tokenIssuer = Mock.Of<IAccessTokenIssuer>().Object;
     private readonly TestAuthenticationState _authentication = new();
     private HttpClient? _client;
 
@@ -38,8 +37,8 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
     public async Task IdentityLoginRetainsItsRouteCredentialValidationAndResponseShape()
     {
         var user = new User { Id = "user-a", Name = "admin" };
-        _credentialsValidator.ValidateAsync("admin", "password", Arg.Any<CancellationToken>()).Returns(user);
-        _tokenIssuer.IssueTokensAsync(user, Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-a", "refresh-a"));
+        Mock.Get(_credentialsValidator).ValidateAsync("admin", "password", Arg.Any<CancellationToken>()).Returns(user);
+        Mock.Get(_tokenIssuer).IssueTokensAsync(user, Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-a", "refresh-a"));
 
         var response = await Client.PostAsJsonAsync("/identity/login", new { username = " admin ", password = " password " });
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -48,13 +47,13 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
         await Assert.That(document.RootElement.GetProperty("isAuthenticated").GetBoolean()).IsTrue();
         await Assert.That(document.RootElement.GetProperty("accessToken").GetString()).IsEqualTo("access-a");
         await Assert.That(document.RootElement.GetProperty("refreshToken").GetString()).IsEqualTo("refresh-a");
-        await _credentialsValidator.Received(1).ValidateAsync("admin", "password", Arg.Any<CancellationToken>());
+        Mock.Get(_credentialsValidator).ValidateAsync("admin", "password", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task IdentityLoginRetainsItsGenericUnauthenticatedResponse()
     {
-        _credentialsValidator.ValidateAsync("unknown", "wrong", Arg.Any<CancellationToken>()).Returns((User?)null);
+        Mock.Get(_credentialsValidator).ValidateAsync("unknown", "wrong", Arg.Any<CancellationToken>()).Returns((User?)null);
 
         var response = await Client.PostAsJsonAsync("/identity/login", new { username = "unknown", password = "wrong" });
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -69,8 +68,8 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
     public async Task IdentityRefreshTokenRetainsItsRouteAndLocalTokenContract()
     {
         var user = new User { Id = "user-a", Name = "admin" };
-        _userProvider.FindAsync(Arg.Is<UserFilter>(filter => filter.Id == user.Id), Arg.Any<CancellationToken>()).Returns(user);
-        _tokenIssuer.IssueTokensAsync(user, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-b", "refresh-b"));
+        Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(filter => filter.Id == user.Id), Arg.Any<CancellationToken>()).Returns(user);
+        Mock.Get(_tokenIssuer).IssueTokensAsync(user, Arg.Any<SignInSession?>(), Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-b", "refresh-b"));
 
         var response = await Client.PostAsync("/identity/refresh-token", null);
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());

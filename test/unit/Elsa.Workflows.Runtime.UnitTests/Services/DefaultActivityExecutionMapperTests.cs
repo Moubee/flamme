@@ -5,7 +5,7 @@ using Elsa.Workflows.LogPersistence;
 using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Runtime.Entities;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
@@ -23,41 +23,41 @@ public class DefaultActivityExecutionMapperTests
     public async Task MapAsync_MapsCallStackDepth_Correctly()
     {
         // Arrange
-        var safeSerializer = Substitute.For<ISafeSerializer>();
-        safeSerializer.Serialize(Arg.Any<object>()).Returns("serialized");
-        
-        var payloadSerializer = Substitute.For<IPayloadSerializer>();
-        payloadSerializer.Serialize(Arg.Any<object>()).Returns("serialized");
-        
-        var compressionCodecResolver = Substitute.For<ICompressionCodecResolver>();
-        var compressionCodec = Substitute.For<ICompressionCodec>();
-        compressionCodecResolver.Resolve(Arg.Any<string>()).Returns(compressionCodec);
-        compressionCodec.CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("compressed"));
-        
-        var managementOptions = Substitute.For<IOptions<ManagementOptions>>();
-        managementOptions.Value.Returns(new ManagementOptions());
-        
+        var safeSerializer = Mock.Of<ISafeSerializer>().Object;
+        Mock.Get(safeSerializer).Serialize(Arg.Any<object?>()).Returns("serialized");
+
+        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        Mock.Get(payloadSerializer).Serialize(Arg.Any<object>()).Returns("serialized");
+
+        var compressionCodecResolver = Mock.Of<ICompressionCodecResolver>().Object;
+        var compressionCodec = Mock.Of<ICompressionCodec>().Object;
+        Mock.Get(compressionCodecResolver).Resolve(Arg.Any<string>()).Returns(compressionCodec);
+        Mock.Get(compressionCodec).CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("compressed");
+
+        var managementOptions = Mock.Of<IOptions<ManagementOptions>>().Object;
+        Mock.Get(managementOptions).Value.Returns(new ManagementOptions());
+
         var mapper = new DefaultActivityExecutionMapper(
             safeSerializer,
             payloadSerializer,
             compressionCodecResolver,
             managementOptions);
-        
+
         // Use ActivityTestFixture to create real context objects
         var activity = new WriteLine("Test");
         var fixture = new ActivityTestFixture(activity);
         var activityExecutionContext = await fixture.BuildAsync();
         await using var serviceProvider = (IAsyncDisposable)activityExecutionContext.WorkflowExecutionContext.ServiceProvider;
         using var _ = activityExecutionContext;
-        
+
         // Set the properties we want to test
         activityExecutionContext.CallStackDepth = 2;
         activityExecutionContext.SchedulingActivityExecutionId = "context-b";
         activityExecutionContext.SchedulingActivityId = "activity-b";
-        
+
         // Act
         var record = await mapper.MapAsync(activityExecutionContext);
-        
+
         // Assert
         await Assert.That(record).IsNotNull();
         await Assert.That(record.CallStackDepth).IsEqualTo(2);
@@ -113,19 +113,19 @@ public class DefaultActivityExecutionMapperTests
 
     private static DefaultActivityExecutionMapper CreateMapper()
     {
-        var safeSerializer = Substitute.For<ISafeSerializer>();
-        safeSerializer.Serialize(Arg.Any<object>()).Returns("serialized");
+        var safeSerializer = Mock.Of<ISafeSerializer>().Object;
+        Mock.Get(safeSerializer).Serialize(Arg.Any<object?>()).Returns("serialized");
 
-        var payloadSerializer = Substitute.For<IPayloadSerializer>();
-        payloadSerializer.Serialize(Arg.Any<object>()).Returns("serialized");
+        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        Mock.Get(payloadSerializer).Serialize(Arg.Any<object>()).Returns("serialized");
 
-        var compressionCodecResolver = Substitute.For<ICompressionCodecResolver>();
-        var compressionCodec = Substitute.For<ICompressionCodec>();
-        compressionCodecResolver.Resolve(Arg.Any<string>()).Returns(compressionCodec);
-        compressionCodec.CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("compressed"));
+        var compressionCodecResolver = Mock.Of<ICompressionCodecResolver>().Object;
+        var compressionCodec = Mock.Of<ICompressionCodec>().Object;
+        Mock.Get(compressionCodecResolver).Resolve(Arg.Any<string>()).Returns(compressionCodec);
+        Mock.Get(compressionCodec).CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("compressed");
 
-        var managementOptions = Substitute.For<IOptions<ManagementOptions>>();
-        managementOptions.Value.Returns(new ManagementOptions());
+        var managementOptions = Mock.Of<IOptions<ManagementOptions>>().Object;
+        Mock.Get(managementOptions).Value.Returns(new ManagementOptions());
 
         return new DefaultActivityExecutionMapper(
             safeSerializer,

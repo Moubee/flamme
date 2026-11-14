@@ -1,21 +1,21 @@
 using Elsa.Workflows.Runtime.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 
 public class ElsaRuntimeHealthCheckTests
 {
-    private readonly IWorkflowRuntime _workflowRuntime = Substitute.For<IWorkflowRuntime>();
-    private readonly IQuiescenceSignal _quiescenceSignal = Substitute.For<IQuiescenceSignal>();
+    private readonly IWorkflowRuntime _workflowRuntime = Mock.Of<IWorkflowRuntime>().Object;
+    private readonly IQuiescenceSignal _quiescenceSignal = Mock.Of<IQuiescenceSignal>().Object;
     private readonly ElsaRuntimeHealthCheck _sut;
 
     public ElsaRuntimeHealthCheckTests()
     {
-        _workflowRuntime.CreateClientAsync(Arg.Any<CancellationToken>()).Returns(new ValueTask<IWorkflowClient>(Substitute.For<IWorkflowClient>()));
-        _quiescenceSignal.CurrentState.Returns(QuiescenceState.Initial("test"));
-        _quiescenceSignal.ActiveExecutionCycleCount.Returns(0);
+        Mock.Get(_workflowRuntime).CreateClientAsync(Arg.Any<CancellationToken>()).Returns(Mock.Of<IWorkflowClient>().Object);
+        Mock.Get(_quiescenceSignal).CurrentState.Returns(QuiescenceState.Initial("test"));
+        Mock.Get(_quiescenceSignal).ActiveExecutionCycleCount.Returns(0);
         _sut = new ElsaRuntimeHealthCheck(_workflowRuntime, _quiescenceSignal, NullLogger<ElsaRuntimeHealthCheck>.Instance);
     }
 
@@ -32,7 +32,7 @@ public class ElsaRuntimeHealthCheckTests
     [Test]
     public async Task ReturnsDegradedWhenRuntimeIsPaused()
     {
-        _quiescenceSignal.CurrentState.Returns(QuiescenceState.Initial("test") with
+        Mock.Get(_quiescenceSignal).CurrentState.Returns(QuiescenceState.Initial("test") with
         {
             Reason = QuiescenceReason.AdministrativePause
         });
@@ -47,7 +47,7 @@ public class ElsaRuntimeHealthCheckTests
     [Test]
     public async Task ReturnsUnhealthyWhenRuntimeClientCannotBeCreated()
     {
-        _workflowRuntime.CreateClientAsync(Arg.Any<CancellationToken>()).Returns<ValueTask<IWorkflowClient>>(_ => throw new InvalidOperationException("boom"));
+        Mock.Get(_workflowRuntime).CreateClientAsync(Arg.Any<CancellationToken>()).Returns(() => throw new InvalidOperationException("boom"));
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 

@@ -2,7 +2,6 @@ using Elsa.Common.Multitenancy;
 using Elsa.Common.Multitenancy.EventHandlers;
 using Elsa.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Common.UnitTests.Multitenancy;
@@ -125,16 +124,16 @@ public class DefaultTenantServiceTests
         var tenantList = tenants.ToList();
         var getTenants = tenantsFactory ?? (() => tenantList);
 
-        var tenantsProvider = Substitute.For<ITenantsProvider>();
-        tenantsProvider.ListAsync(Arg.Any<CancellationToken>()).Returns(_ => getTenants());
+        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).Returns(() => getTenants());
 
         var services = new ServiceCollection();
         services.AddSingleton(_ => tenantsProvider);
         services.AddSingleton<ITenantScopeFactory, DefaultTenantScopeFactory>();
         services.AddSingleton<ITenantAccessor, DefaultTenantAccessor>();
-        services.AddSingleton<ITenantActivatedEvent>(Substitute.For<ITenantActivatedEvent>());
-        services.AddSingleton<ITenantDeactivatedEvent>(Substitute.For<ITenantDeactivatedEvent>());
-        services.AddSingleton<ITenantDeletedEvent>(Substitute.For<ITenantDeletedEvent>());
+        services.AddSingleton<ITenantActivatedEvent>(Mock.Of<ITenantActivatedEvent>().Object);
+        services.AddSingleton<ITenantDeactivatedEvent>(Mock.Of<ITenantDeactivatedEvent>().Object);
+        services.AddSingleton<ITenantDeletedEvent>(Mock.Of<ITenantDeletedEvent>().Object);
         services.AddSingleton<TenantEventsManager>();
         services.AddSingleton<RecurringTaskScheduleManager>();
         services.AddSingleton<ITenantService, DefaultTenantService>();

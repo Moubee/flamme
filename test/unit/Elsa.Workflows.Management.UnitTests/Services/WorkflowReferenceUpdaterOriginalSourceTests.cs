@@ -12,7 +12,7 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Management.Services;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
@@ -29,8 +29,8 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         var elsaScriptGraph = CreateConsumerGraph(elsaScriptConsumer, target, "elsa-consumer-workflow");
         var jsonGraph = CreateConsumerGraph(jsonConsumer, target, "json-consumer-workflow");
         var logger = new CollectingLogger();
-        var publisher = Substitute.For<IWorkflowDefinitionPublisher>();
-        var activityRegistry = Substitute.For<IActivityRegistry>();
+        var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
         var updater = CreateUpdater(target, [elsaScriptConsumer, jsonConsumer], [elsaScriptGraph, jsonGraph], publisher, logger, activityRegistry, out _);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
@@ -46,17 +46,17 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         await Assert.That(elsaScriptConsumer.MaterializerName).IsEqualTo("ElsaScript");
         await Assert.That(elsaScriptConsumer.Id).IsEqualTo("consumer-elsascript-v1");
 
-        var compiler = Substitute.For<IElsaScriptCompiler>();
-        compiler.CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new Workflow());
+        var compiler = Mock.Of<IElsaScriptCompiler>().Object;
+        Mock.Get(compiler).CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                    .Returns(new Workflow());
         var materializer = new ElsaScriptWorkflowMaterializer(compiler);
         await materializer.MaterializeAsync(elsaScriptConsumer, CancellationToken.None);
-        await compiler.Received(1).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>());
+        Mock.Get(compiler).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
 
-        await publisher.DidNotReceive().GetDraftAsync(elsaScriptConsumer.DefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>());
-        await publisher.DidNotReceive().SaveDraftAsync(elsaScriptConsumer, Arg.Any<CancellationToken>());
-        await publisher.DidNotReceive().PublishAsync(elsaScriptConsumer, Arg.Any<CancellationToken>());
-        await publisher.Received(1).SaveDraftAsync(jsonConsumer, Arg.Any<CancellationToken>());
+        Mock.Get(publisher).GetDraftAsync(elsaScriptConsumer.DefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).SaveDraftAsync(elsaScriptConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).PublishAsync(elsaScriptConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).SaveDraftAsync(jsonConsumer, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(logger.Messages).Contains(message =>
             message.Contains(elsaScriptConsumer.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.DefinitionId, StringComparison.Ordinal)
@@ -71,8 +71,8 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         var elsaScriptConsumer = CreateElsaScriptConsumer(isPublished: true);
         var consumerGraph = CreateConsumerGraph(elsaScriptConsumer, target, "elsa-consumer-workflow");
         var logger = new CollectingLogger();
-        var publisher = Substitute.For<IWorkflowDefinitionPublisher>();
-        var activityRegistry = Substitute.For<IActivityRegistry>();
+        var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
+        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
         var updater = CreateUpdater(target, [elsaScriptConsumer], [consumerGraph], publisher, logger, activityRegistry, out var store);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
@@ -91,19 +91,19 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         await Assert.That(stored!.IsPublished).IsTrue();
         await Assert.That(stored.Version).IsEqualTo(1);
 
-        await publisher.DidNotReceive().GetDraftAsync(Arg.Any<string>(), Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>());
-        await publisher.DidNotReceive().SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>());
-        await publisher.DidNotReceive().PublishAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>());
-        activityRegistry.DidNotReceive().Add(Arg.Any<Type>(), Arg.Any<ActivityDescriptor>());
+        Mock.Get(publisher).GetDraftAsync(Arg.Any<string>(), Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).PublishAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(activityRegistry).Add(Arg.Any<Type>(), Arg.Any<ActivityDescriptor>()).WasNeverCalled();
         await Assert.That(logger.Messages).Contains(message =>
             message.Contains(elsaScriptConsumer.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.DefinitionId, StringComparison.Ordinal));
 
-        var compiler = Substitute.For<IElsaScriptCompiler>();
-        compiler.CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new Workflow());
+        var compiler = Mock.Of<IElsaScriptCompiler>().Object;
+        Mock.Get(compiler).CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                    .Returns(new Workflow());
         await new ElsaScriptWorkflowMaterializer(compiler).MaterializeAsync(elsaScriptConsumer, CancellationToken.None);
-        await compiler.Received(1).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>());
+        Mock.Get(compiler).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private static WorkflowReferenceUpdater CreateUpdater(
@@ -115,44 +115,39 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         IActivityRegistry? activityRegistry,
         out IWorkflowDefinitionStore store)
     {
-        var workflowDefinitionService = Substitute.For<IWorkflowDefinitionService>();
-        store = Substitute.For<IWorkflowDefinitionStore>();
-        var graphBuilder = Substitute.For<IWorkflowReferenceGraphBuilder>();
-        var serializer = Substitute.For<IApiSerializer>();
+        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+        store = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var graphBuilder = Mock.Of<IWorkflowReferenceGraphBuilder>().Object;
+        var serializer = Mock.Of<IApiSerializer>().Object;
         var consumersById = consumers.ToDictionary(c => c.DefinitionId);
-        activityRegistry ??= Substitute.For<IActivityRegistry>();
-
-        graphBuilder.BuildGraphAsync(target.DefinitionId, Arg.Any<CancellationToken>())
-            .Returns(new WorkflowReferenceGraph(
-                [target.DefinitionId],
-                consumers.Select(c => new WorkflowReferenceEdge(c.DefinitionId, target.DefinitionId)).ToList()));
-
-        workflowDefinitionService.FindWorkflowGraphsAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(consumerGraphs);
+        activityRegistry ??= Mock.Of<IActivityRegistry>().Object;
+        Mock.Get(graphBuilder).BuildGraphAsync(target.DefinitionId, Arg.Any<CancellationToken>())
+                    .Returns(new WorkflowReferenceGraph(
+                        [target.DefinitionId],
+                        consumers.Select(c => new WorkflowReferenceEdge(c.DefinitionId, target.DefinitionId)).ToList()));
+        Mock.Get(workflowDefinitionService).FindWorkflowGraphsAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(consumerGraphs);
 
         foreach (var (consumer, graph) in consumers.Zip(consumerGraphs))
         {
-            workflowDefinitionService.MaterializeWorkflowAsync(consumer, Arg.Any<CancellationToken>())
-                .Returns(graph);
-            publisher.GetDraftAsync(consumer.DefinitionId, VersionOptions.Latest, Arg.Any<CancellationToken>())
-                .Returns(consumer);
+            Mock.Get(workflowDefinitionService).MaterializeWorkflowAsync(consumer, Arg.Any<CancellationToken>())
+                            .Returns(graph);
+            Mock.Get(publisher).GetDraftAsync(consumer.DefinitionId, VersionOptions.Latest, Arg.Any<CancellationToken>())
+                            .Returns(consumer);
         }
-
-        store.FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns([target]);
-        store.FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                var filter = call.Arg<WorkflowDefinitionFilter>();
-                return filter.DefinitionId != null && consumersById.TryGetValue(filter.DefinitionId, out var consumer)
-                    ? consumer
-                    : consumers.First();
-            });
-
-        publisher.SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>())
-            .Returns(call => call.Arg<WorkflowDefinition>());
-
-        serializer.Serialize(Arg.Any<object>()).Returns("serialized-root");
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns([target]);
+        Mock.Get(store).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowDefinitionFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    {
+                        var filter = __arg0;
+                        return filter.DefinitionId != null && consumersById.TryGetValue(filter.DefinitionId, out var consumer)
+                            ? consumer
+                            : consumers.First();
+                    });
+        Mock.Get(publisher).SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowDefinition __arg0, global::System.Threading.CancellationToken __arg1) => __arg0);
+        Mock.Get(serializer).Serialize(Arg.Any<object>()).Returns("serialized-root");
 
         return new(
             publisher,

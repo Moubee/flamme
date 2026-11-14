@@ -11,7 +11,7 @@ using Elsa.Workflows.Runtime.Requests;
 using Elsa.Workflows.Runtime.Stores;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
@@ -19,15 +19,15 @@ public class BookmarkQueueDeadLetterTests
 {
     private readonly DateTimeOffset _now = new(2026, 5, 20, 10, 0, 0, TimeSpan.Zero);
     private readonly TestClock _clock;
-    private readonly IIdentityGenerator _identityGenerator = Substitute.For<IIdentityGenerator>();
-    private readonly IBookmarkQueueSignaler _signaler = Substitute.For<IBookmarkQueueSignaler>();
+    private readonly IIdentityGenerator _identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+    private readonly IBookmarkQueueSignaler _signaler = Mock.Of<IBookmarkQueueSignaler>().Object;
     private readonly MemoryBookmarkQueueStore _queueStore;
     private readonly MemoryBookmarkQueueDeadLetterStore _deadLetterStore;
 
     public BookmarkQueueDeadLetterTests()
     {
         _clock = new(_now);
-        _identityGenerator.GenerateId().Returns("generated-1", "generated-2", "generated-3");
+        Mock.Get(_identityGenerator).GenerateId().ReturnsSequentially("generated-1", "generated-2", "generated-3");
         _queueStore = new(new MemoryStore<BookmarkQueueItem>());
         _deadLetterStore = new(new MemoryStore<BookmarkQueueDeadLetterItem>());
     }
@@ -106,7 +106,7 @@ public class BookmarkQueueDeadLetterTests
         await Assert.That(replayResult.Succeeded).IsFalse();
         await Assert.That(replayResult.Reason).IsEqualTo(ReplayBookmarkQueueDeadLetterResult.ReasonNotReplayable);
         await Assert.That(await _queueStore.FindManyAsync(new BookmarkQueueFilter())).IsEmpty();
-        await _signaler.DidNotReceive().TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class BookmarkQueueDeadLetterTests
         await Assert.That(replayResult.QueueItemId).IsEqualTo("generated-1");
         var replayedItem = await _queueStore.FindAsync(new BookmarkQueueFilter { Id = "generated-1" });
         await Assert.That(replayedItem).IsNotNull();
-        await _signaler.Received(1).TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -334,13 +334,13 @@ public class BookmarkQueueDeadLetterTests
         await Assert.That(result.QueueItemId).IsEqualTo("generated-1");
         var queueItem = await Assert.That(await _queueStore.FindAsync(new BookmarkQueueFilter { Id = "generated-1" })).IsNotNull();
         await Assert.That(queueItem.WorkflowInstanceId).IsEqualTo("workflow-instance");
-        await _signaler.Received(1).TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
 
         var secondResult = await manager.ReplayAsync("dead-letter");
 
         await Assert.That(secondResult.Succeeded).IsFalse();
         await Assert.That(secondResult.Reason).IsEqualTo("NotReplayable");
-        await _signaler.Received(1).TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -369,7 +369,7 @@ public class BookmarkQueueDeadLetterTests
         await Assert.That(results.Count(x => !x.Succeeded && x.Reason == ReplayBookmarkQueueDeadLetterResult.ReasonNotReplayable)).IsEqualTo(1);
         var queueItems = await _queueStore.FindManyAsync(new BookmarkQueueFilter());
         await Assert.That(queueItems).HasSingleItem();
-        await _signaler.Received(1).TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -410,7 +410,7 @@ public class BookmarkQueueDeadLetterTests
         await Assert.That(deadLetter.ReplayedAt).IsNull();
         await Assert.That(deadLetter.ReplayedQueueItemId).IsNull();
         await Assert.That(await _queueStore.FindManyAsync(new BookmarkQueueFilter())).IsEmpty();
-        await _signaler.DidNotReceive().TriggerAsync(Arg.Any<CancellationToken>());
+        Mock.Get(_signaler).TriggerAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
 
         var retryResult = await CreateManager().ReplayAsync("dead-letter");
 

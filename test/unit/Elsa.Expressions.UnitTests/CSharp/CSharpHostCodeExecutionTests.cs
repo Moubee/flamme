@@ -7,7 +7,6 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Expressions.UnitTests.CSharp;
@@ -19,7 +18,7 @@ public class CSharpHostCodeExecutionTests
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var evaluator = new CSharpEvaluator(
-            Substitute.For<Elsa.Mediator.Contracts.INotificationSender>(),
+            Mock.Of<Elsa.Mediator.Contracts.INotificationSender>().Object,
             Microsoft.Extensions.Options.Options.Create(new CSharpOptions()),
             memoryCache);
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();

@@ -5,7 +5,7 @@ using Elsa.Workflows.Runtime.Handlers;
 using Elsa.Workflows.Runtime.Notifications;
 using Elsa.Workflows.Runtime.Results;
 using Elsa.Workflows.Runtime.Stimuli;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
@@ -14,16 +14,16 @@ public class ResumeBulkDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDenied_RoutesFaultedChildCompletionToParentBookmark()
     {
-        var bookmarkQueue = Substitute.For<IBookmarkQueue>();
-        var stimulusHasher = Substitute.For<IStimulusHasher>();
-        var stimulusSender = Substitute.For<IStimulusSender>();
+        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
+        var stimulusHasher = Mock.Of<IStimulusHasher>().Object;
+        var stimulusSender = Mock.Of<IStimulusSender>().Object;
         StimulusMetadata? observedMetadata = null;
-        stimulusSender.SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                observedMetadata = call.Arg<StimulusMetadata>();
-                return Task.FromResult(new SendStimulusResult([]));
-            });
+        Mock.Get(stimulusSender).SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>())
+                    .Returns((string __arg0, global::Elsa.Workflows.Runtime.StimulusMetadata? __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    {
+                        observedMetadata = __arg1;
+                        return Task.FromResult(new SendStimulusResult([]));
+                    });
         var handler = new ResumeBulkDispatchWorkflowActivity(bookmarkQueue, stimulusHasher, stimulusSender);
         var activityTypeName = ActivityTypeNameHelper.GenerateTypeName<BulkDispatchWorkflows>();
 
@@ -31,10 +31,8 @@ public class ResumeBulkDispatchWorkflowActivityTests
             new DispatchWorkflowActivationDenied("parent-1", "child-1", activityTypeName, "bulk-stimulus-hash"),
             CancellationToken.None);
 
-        await stimulusSender.Received(1).SendAsync(
-            "bulk-stimulus-hash",
-            Arg.Any<StimulusMetadata>(),
-            Arg.Any<CancellationToken>());
+        Mock.Get(stimulusSender).SendAsync(
+            "bulk-stimulus-hash", Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(observedMetadata).IsNotNull();
         await Assert.That(observedMetadata.WorkflowInstanceId).IsEqualTo("parent-1");
         var input = (await Assert.That(observedMetadata.Input).IsTypeOf<Dictionary<string, object>>())!;
@@ -43,25 +41,23 @@ public class ResumeBulkDispatchWorkflowActivityTests
         await Assert.That(input["WorkflowStatus"]).IsEqualTo(WorkflowStatus.Finished);
         await Assert.That(input["WorkflowSubStatus"]).IsEqualTo(WorkflowSubStatus.Faulted);
         await Assert.That(input["WorkflowOutput"]).IsTypeOf<Dictionary<string, object>>();
-        await bookmarkQueue.DidNotReceive().EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>());
+        Mock.Get(bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
     public async Task HandleAsync_ActivationDeniedForAnotherActivity_DoesNotRouteToParent()
     {
-        var stimulusSender = Substitute.For<IStimulusSender>();
+        var stimulusSender = Mock.Of<IStimulusSender>().Object;
         var handler = new ResumeBulkDispatchWorkflowActivity(
-            Substitute.For<IBookmarkQueue>(),
-            Substitute.For<IStimulusHasher>(),
+            Mock.Of<IBookmarkQueue>().Object,
+            Mock.Of<IStimulusHasher>().Object,
             stimulusSender);
 
         await handler.HandleAsync(
             new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "single-stimulus-hash"),
             CancellationToken.None);
 
-        await stimulusSender.DidNotReceive().SendAsync(
-            Arg.Any<string>(),
-            Arg.Any<StimulusMetadata>(),
-            Arg.Any<CancellationToken>());
+        Mock.Get(stimulusSender).SendAsync(
+            Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 }

@@ -3,7 +3,6 @@ using Elsa.Platform.Integration.Options;
 using Elsa.Platform.Integration.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using NSubstitute;
 using TUnit.Core.Interfaces;
 
 namespace Elsa.Platform.Integration.UnitTests;
@@ -17,8 +16,8 @@ public class FileShellConfigurationOverlayStoreTests : IAsyncInitializer, IAsync
     public FileShellConfigurationOverlayStoreTests()
     {
         _overlayPath = Path.Combine(_directory, "platform-shell-overrides.json");
-        var environment = Substitute.For<IHostEnvironment>();
-        environment.ContentRootPath.Returns(_directory);
+        var environment = Mock.Of<IHostEnvironment>().Object;
+        Mock.Get(environment).ContentRootPath.Returns(_directory);
         _store = new FileShellConfigurationOverlayStore(
             Microsoft.Extensions.Options.Options.Create(new ElsaPlatformIntegrationOptions
             {

@@ -16,7 +16,6 @@ using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Management.Stores;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
-using NSubstitute;
 namespace Elsa.Workflows.Api.UnitTests.Endpoints.WorkflowDefinitions;
 
 [NotInParallel(nameof(FastEndpointsCollection))]
@@ -89,9 +88,9 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithLabelFilter_RequiresLabelPermissionBeforeQuerying()
     {
-        var workflowDefinitionStore = Substitute.For<IWorkflowDefinitionStore>();
+        var workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
         ConfigureEmptyPage(workflowDefinitionStore);
-        var labelStore = Substitute.For<IWorkflowDefinitionLabelStore, IWorkflowDefinitionLabelQuery>();
+        var labelStore = Mock.Of<IWorkflowDefinitionLabelStore, IWorkflowDefinitionLabelQuery>().Object;
         var labelProvider = new WorkflowDefinitionLabelFilterProvider(labelStore);
         var endpoint = Factory.Create<List>(
             CreateHttpContext("workflows/definitions:view"),
@@ -102,14 +101,14 @@ public class WorkflowDefinitionLabelFilterTests
         await endpoint.ExecuteAsync(new Request { Labels = ["red"] }, CancellationToken.None);
 
         await Assert.That(endpoint.HttpContext.Response.StatusCode).IsEqualTo(StatusCodes.Status403Forbidden);
-        await Assert.That(labelStore.ReceivedCalls()).IsEmpty();
-        await Assert.That(workflowDefinitionStore.ReceivedCalls()).IsEmpty();
+        await Assert.That(Mock.Get(labelStore).Invocations).IsEmpty();
+        await Assert.That(Mock.Get(workflowDefinitionStore).Invocations).IsEmpty();
     }
 
     [Test]
     public async Task List_WithUnrelatedApplicableProvider_LeavesLabelFilterUnsupported()
     {
-        var workflowDefinitionStore = Substitute.For<IWorkflowDefinitionStore>();
+        var workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
         ConfigureEmptyPage(workflowDefinitionStore);
         var endpoint = Factory.Create<List>(
             CreateHttpContext("workflows/definitions:view", "workflows/definitions/labels:view"),
@@ -120,13 +119,13 @@ public class WorkflowDefinitionLabelFilterTests
         await endpoint.ExecuteAsync(new Request { Labels = ["red"] }, CancellationToken.None);
 
         await Assert.That(endpoint.HttpContext.Response.StatusCode).IsEqualTo(StatusCodes.Status501NotImplemented);
-        await Assert.That(workflowDefinitionStore.ReceivedCalls()).IsEmpty();
+        await Assert.That(Mock.Get(workflowDefinitionStore).Invocations).IsEmpty();
     }
 
     [Test]
     public async Task LabelFilterProvider_WithUnsupportedStoreThrowsExplicitly()
     {
-        var provider = new WorkflowDefinitionLabelFilterProvider(Substitute.For<IWorkflowDefinitionLabelStore>());
+        var provider = new WorkflowDefinitionLabelFilterProvider(Mock.Of<IWorkflowDefinitionLabelStore>().Object);
         var filter = new WorkflowDefinitionFilter { LabelIds = ["red"] };
 
         await Assert.ThrowsExactlyAsync<WorkflowDefinitionFilterNotSupportedException>(() => provider.ApplyAsync(filter));
@@ -135,20 +134,20 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithoutLabelProvider_ReturnsNotImplemented()
     {
-        var store = Substitute.For<IWorkflowDefinitionStore>();
+        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
         var endpoint = Factory.Create<List>(new DefaultHttpContext(), store, new TestWorkflowDefinitionLinker(), Array.Empty<IWorkflowDefinitionFilterProvider>());
 
         await endpoint.ExecuteAsync(new Request { Labels = ["red"] }, CancellationToken.None);
 
         await Assert.That(endpoint.HttpContext.Response.StatusCode).IsEqualTo(StatusCodes.Status501NotImplemented);
-        await Assert.That(store.ReceivedCalls()).IsEmpty();
+        await Assert.That(Mock.Get(store).Invocations).IsEmpty();
     }
 
     [Test]
     public async Task List_WithUnsupportedLabelStore_ReturnsNotImplemented()
     {
-        var store = Substitute.For<IWorkflowDefinitionStore>();
-        var labelStore = Substitute.For<IWorkflowDefinitionLabelStore>();
+        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var labelStore = Mock.Of<IWorkflowDefinitionLabelStore>().Object;
         var provider = new WorkflowDefinitionLabelFilterProvider(labelStore);
         var endpoint = Factory.Create<List>(
             CreateHttpContext("workflows/definitions:view", "workflows/definitions/labels:view"),
@@ -159,7 +158,7 @@ public class WorkflowDefinitionLabelFilterTests
         await endpoint.ExecuteAsync(new Request { Labels = ["red"] }, CancellationToken.None);
 
         await Assert.That(endpoint.HttpContext.Response.StatusCode).IsEqualTo(StatusCodes.Status501NotImplemented);
-        await Assert.That(store.ReceivedCalls()).IsEmpty();
+        await Assert.That(Mock.Get(store).Invocations).IsEmpty();
     }
 
     private static async Task<PagedListResponse<LinkedWorkflowDefinitionSummary>> ExecuteAsync(string[]? labels, string[]? ids = null, int? page = 0, int? pageSize = null, string[]? permissions = null)
@@ -224,10 +223,10 @@ public class WorkflowDefinitionLabelFilterTests
     };
 
     private static void ConfigureEmptyPage(IWorkflowDefinitionStore store) =>
-        store.FindSummariesAsync(
+        Mock.Get(store).FindSummariesAsync(
                 Arg.Any<WorkflowDefinitionFilter>(),
                 Arg.Any<WorkflowDefinitionOrder<string>>(),
                 Arg.Any<PageArgs>(),
                 Arg.Any<CancellationToken>())
-            .Returns(Task.FromResult(Page.Empty<WorkflowDefinitionSummary>()));
+            .ReturnsAsync(Task.FromResult(Page.Empty<WorkflowDefinitionSummary>()));
 }

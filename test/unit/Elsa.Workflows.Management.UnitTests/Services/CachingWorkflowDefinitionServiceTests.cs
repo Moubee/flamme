@@ -9,7 +9,7 @@ using Elsa.Workflows.Management.Services;
 using Elsa.Workflows.Management.UnitTests.Helpers;
 using Elsa.Workflows.Models;
 using Microsoft.Extensions.Caching.Memory;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Management.UnitTests.Services;
 
@@ -19,11 +19,11 @@ public class CachingWorkflowDefinitionServiceTests
     private const string DefaultVersionId = "version-id-1";
     private const string DefaultMaterializerName = "materializer";
 
-    private readonly IWorkflowDefinitionService _decoratedService = Substitute.For<IWorkflowDefinitionService>();
-    private readonly IWorkflowDefinitionCacheManager _cacheManager = Substitute.For<IWorkflowDefinitionCacheManager>();
-    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Substitute.For<IWorkflowDefinitionStore>();
-    private readonly IMaterializerRegistry _materializerRegistry = Substitute.For<IMaterializerRegistry>();
-    private readonly ICacheManager _cache = Substitute.For<ICacheManager>();
+    private readonly IWorkflowDefinitionService _decoratedService = Mock.Of<IWorkflowDefinitionService>().Object;
+    private readonly IWorkflowDefinitionCacheManager _cacheManager = Mock.Of<IWorkflowDefinitionCacheManager>().Object;
+    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+    private readonly IMaterializerRegistry _materializerRegistry = Mock.Of<IMaterializerRegistry>().Object;
+    private readonly ICacheManager _cache = Mock.Of<ICacheManager>().Object;
 
     public CachingWorkflowDefinitionServiceTests()
     {
@@ -36,7 +36,7 @@ public class CachingWorkflowDefinitionServiceTests
         // Arrange
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, DefaultMaterializerName);
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
-        _decoratedService.MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>()).Returns(workflowGraph);
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>()).Returns(workflowGraph);
         var service = CreateService();
 
         // Act
@@ -44,7 +44,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(workflowGraph);
-        await _decoratedService.Received(1).MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -52,8 +52,8 @@ public class CachingWorkflowDefinitionServiceTests
     {
         // Arrange
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, DefaultMaterializerName);
-        _cacheManager.CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).Returns("cache-key");
-        _decoratedService.FindWorkflowDefinitionAsync(DefaultDefinitionId, VersionOptions.Published, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).Returns("cache-key");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(DefaultDefinitionId, VersionOptions.Published, Arg.Any<CancellationToken>()).Returns(definition);
         var service = CreateService();
 
         // Act
@@ -61,7 +61,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(definition);
-        _cacheManager.Received(1).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -70,8 +70,8 @@ public class CachingWorkflowDefinitionServiceTests
         // Arrange
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, DefaultMaterializerName);
         definition.Id = DefaultVersionId;
-        _cacheManager.CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).Returns("cache-key");
-        _decoratedService.FindWorkflowDefinitionAsync(DefaultVersionId, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).Returns("cache-key");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(DefaultVersionId, Arg.Any<CancellationToken>()).Returns(definition);
         var service = CreateService();
 
         // Act
@@ -79,7 +79,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(definition);
-        _cacheManager.Received(1).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -89,10 +89,9 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition("def-1", "materializer");
         var handle = WorkflowDefinitionHandle.ByDefinitionId("def-1", VersionOptions.Latest);
         var cacheKey = "cache-key-filter";
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns(cacheKey);
-        _decoratedService.FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns(cacheKey);
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+                    .Returns(definition);
 
         var service = CreateService();
 
@@ -101,7 +100,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(definition);
-        await _decoratedService.Received(1).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -111,9 +110,8 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition("def-1", "materializer");
         var filter = new WorkflowDefinitionFilter { DefinitionId = "def-1" };
         var cacheKey = "cache-key-filter";
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(filter).Returns(cacheKey);
-        _decoratedService.FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).Returns(cacheKey);
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
 
         var service = CreateService();
 
@@ -122,7 +120,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(definition);
-        _cacheManager.Received(1).CreateWorkflowDefinitionFilterCacheKey(filter);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -131,10 +129,9 @@ public class CachingWorkflowDefinitionServiceTests
         // Arrange
         var (_, workflowGraph) = CreateWorkflowAndGraph("def-1");
         var cacheKey = "cache-key-graph";
-
-        _cacheManager.CreateWorkflowVersionCacheKey("def-1", VersionOptions.Published).Returns(cacheKey);
-        _decoratedService.FindWorkflowGraphAsync("def-1", VersionOptions.Published, Arg.Any<CancellationToken>())
-            .Returns(workflowGraph);
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("def-1", VersionOptions.Published).Returns(cacheKey);
+        Mock.Get(_decoratedService).FindWorkflowGraphAsync("def-1", VersionOptions.Published, Arg.Any<CancellationToken>())
+                    .Returns(workflowGraph);
 
         var service = CreateService();
 
@@ -143,7 +140,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey("def-1", VersionOptions.Published);
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("def-1", VersionOptions.Published).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -152,9 +149,8 @@ public class CachingWorkflowDefinitionServiceTests
         // Arrange
         var (_, workflowGraph) = CreateWorkflowAndGraph("def-1");
         var cacheKey = "cache-key-graph-version";
-
-        _cacheManager.CreateWorkflowVersionCacheKey("version-id-1").Returns(cacheKey);
-        _decoratedService.FindWorkflowGraphAsync("version-id-1", Arg.Any<CancellationToken>()).Returns(workflowGraph);
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("version-id-1").Returns(cacheKey);
+        Mock.Get(_decoratedService).FindWorkflowGraphAsync("version-id-1", Arg.Any<CancellationToken>()).Returns(workflowGraph);
 
         var service = CreateService();
 
@@ -163,7 +159,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey("version-id-1");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("version-id-1").WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -174,10 +170,9 @@ public class CachingWorkflowDefinitionServiceTests
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
         var handle = WorkflowDefinitionHandle.ByDefinitionId(DefaultDefinitionId, VersionOptions.Latest);
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -186,7 +181,7 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(workflowGraph);
-        await _decoratedService.Received(1).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -197,10 +192,9 @@ public class CachingWorkflowDefinitionServiceTests
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
         var filter = new WorkflowDefinitionFilter { DefinitionId = DefaultDefinitionId };
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -209,8 +203,8 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowDefinitionFilterCacheKey(filter);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey(DefaultVersionId);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).WasCalled(Times.Exactly(1));
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -221,10 +215,9 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, unavailableMaterializer);
         definition.Id = DefaultVersionId;
         var filter = new WorkflowDefinitionFilter { DefinitionId = DefaultDefinitionId };
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key");
-        _decoratedService.FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
-        _materializerRegistry.IsMaterializerAvailable(unavailableMaterializer).Returns(false);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable(unavailableMaterializer).Returns(false);
         var service = CreateService();
 
         // Act
@@ -232,8 +225,8 @@ public class CachingWorkflowDefinitionServiceTests
 
         // Assert
         await Assert.That(result).IsNull();
-        _cacheManager.Received(1).CreateWorkflowDefinitionFilterCacheKey(filter);
-        await _decoratedService.DidNotReceive().MaterializeWorkflowAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>());
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).WasCalled(Times.Exactly(1));
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -247,10 +240,9 @@ public class CachingWorkflowDefinitionServiceTests
         var (_, graph1) = CreateWorkflowAndGraph("def-1");
         var (_, graph2) = CreateWorkflowAndGraph("def-2");
         var filter = new WorkflowDefinitionFilter();
-
-        _workflowDefinitionStore.FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition1, definition2 });
-        _cacheManager.CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
-        _cacheManager.CreateWorkflowVersionCacheKey("id-2").Returns("cache-key-2");
+        Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition1, definition2 });
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-2").Returns("cache-key-2");
         SetupDefinitionAndGraphMaterialization(definition1, graph1);
         SetupDefinitionAndGraphMaterialization(definition2, graph2);
         var service = CreateService();
@@ -263,8 +255,8 @@ public class CachingWorkflowDefinitionServiceTests
         await Assert.That(graphs.Count).IsEqualTo(2);
         await Assert.That(graphs).Contains(graph1);
         await Assert.That(graphs).Contains(graph2);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey("id-1");
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey("id-2");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").WasCalled(Times.Exactly(1));
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-2").WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -280,12 +272,11 @@ public class CachingWorkflowDefinitionServiceTests
         var (_, graph1) = CreateWorkflowAndGraph("def-1");
 
         var filter = new WorkflowDefinitionFilter();
-        _workflowDefinitionStore.FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(definitions);
-
-        _cacheManager.CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
-        _materializerRegistry.IsMaterializerAvailable("available-materializer").Returns(true);
-        _materializerRegistry.IsMaterializerAvailable("unavailable-materializer").Returns(false);
-        _decoratedService.MaterializeWorkflowAsync(definition1, Arg.Any<CancellationToken>()).Returns(graph1);
+        Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(definitions);
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable("available-materializer").Returns(true);
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable("unavailable-materializer").Returns(false);
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition1, Arg.Any<CancellationToken>()).Returns(graph1);
 
         var service = CreateService();
 
@@ -296,7 +287,7 @@ public class CachingWorkflowDefinitionServiceTests
         var graphs = result.ToList();
         await Assert.That(graphs).HasSingleItem();
         await Assert.That(graphs[0]).IsSameReferenceAs(graph1);
-        await _decoratedService.DidNotReceive().MaterializeWorkflowAsync(definition2, Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition2, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -306,10 +297,9 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, DefaultMaterializerName);
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
-
-        _cacheManager.CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(DefaultDefinitionId, VersionOptions.Published, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(DefaultDefinitionId, VersionOptions.Published, Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -319,8 +309,8 @@ public class CachingWorkflowDefinitionServiceTests
         // Assert
         await Assert.That(result.WorkflowDefinition).IsSameReferenceAs(definition);
         await Assert.That(result.WorkflowGraph).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey(DefaultVersionId);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultDefinitionId, VersionOptions.Published).WasCalled(Times.Exactly(1));
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -330,10 +320,9 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, DefaultMaterializerName);
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
-
-        _cacheManager.CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(DefaultVersionId, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(DefaultVersionId, Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -343,8 +332,8 @@ public class CachingWorkflowDefinitionServiceTests
         // Assert
         await Assert.That(result.WorkflowDefinition).IsSameReferenceAs(definition);
         await Assert.That(result.WorkflowGraph).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey(DefaultVersionId);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -355,10 +344,9 @@ public class CachingWorkflowDefinitionServiceTests
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
         var handle = WorkflowDefinitionHandle.ByDefinitionId(DefaultDefinitionId, VersionOptions.Latest);
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(Arg.Any<WorkflowDefinitionFilter>()).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -368,7 +356,7 @@ public class CachingWorkflowDefinitionServiceTests
         // Assert
         await Assert.That(result.WorkflowDefinition).IsSameReferenceAs(definition);
         await Assert.That(result.WorkflowGraph).IsSameReferenceAs(workflowGraph);
-        await _decoratedService.Received(1).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -379,10 +367,9 @@ public class CachingWorkflowDefinitionServiceTests
         definition.Id = DefaultVersionId;
         var (_, workflowGraph) = CreateWorkflowAndGraph(DefaultDefinitionId);
         var filter = new WorkflowDefinitionFilter { DefinitionId = DefaultDefinitionId };
-
-        _cacheManager.CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key-def");
-        _cacheManager.CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
-        _decoratedService.FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).Returns("cache-key-def");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).Returns("cache-key-graph");
+        Mock.Get(_decoratedService).FindWorkflowDefinitionAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
         SetupDefinitionAndGraphMaterialization(definition, workflowGraph);
         var service = CreateService();
 
@@ -392,8 +379,8 @@ public class CachingWorkflowDefinitionServiceTests
         // Assert
         await Assert.That(result.WorkflowDefinition).IsSameReferenceAs(definition);
         await Assert.That(result.WorkflowGraph).IsSameReferenceAs(workflowGraph);
-        _cacheManager.Received(1).CreateWorkflowDefinitionFilterCacheKey(filter);
-        _cacheManager.Received(1).CreateWorkflowVersionCacheKey(DefaultVersionId);
+        Mock.Get(_cacheManager).CreateWorkflowDefinitionFilterCacheKey(filter).WasCalled(Times.Exactly(1));
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey(DefaultVersionId).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -404,9 +391,8 @@ public class CachingWorkflowDefinitionServiceTests
         definition.Id = "id-1";
         var (_, graph) = CreateWorkflowAndGraph(DefaultDefinitionId);
         var filter = new WorkflowDefinitionFilter();
-
-        _workflowDefinitionStore.FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition });
-        _cacheManager.CreateWorkflowVersionCacheKey("id-1").Returns("cache-key");
+        Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition });
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").Returns("cache-key");
         SetupDefinitionAndGraphMaterialization(definition, graph);
         var service = CreateService();
 
@@ -428,10 +414,9 @@ public class CachingWorkflowDefinitionServiceTests
         var definition = TestHelpers.CreateWorkflowDefinition(DefaultDefinitionId, unavailableMaterializer);
         definition.Id = "id-1";
         var filter = new WorkflowDefinitionFilter();
-
-        _workflowDefinitionStore.FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition });
-        _cacheManager.CreateWorkflowVersionCacheKey("id-1").Returns("cache-key");
-        _materializerRegistry.IsMaterializerAvailable(unavailableMaterializer).Returns(false);
+        Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(new[] { definition });
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").Returns("cache-key");
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable(unavailableMaterializer).Returns(false);
         var service = CreateService();
 
         // Act
@@ -442,7 +427,7 @@ public class CachingWorkflowDefinitionServiceTests
         await Assert.That(results).HasSingleItem();
         await Assert.That(results[0].WorkflowDefinition).IsSameReferenceAs(definition);
         await Assert.That(results[0].WorkflowGraph).IsNull();
-        await _decoratedService.DidNotReceive().MaterializeWorkflowAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>());
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -458,13 +443,12 @@ public class CachingWorkflowDefinitionServiceTests
         var (_, graph1) = CreateWorkflowAndGraph("def-1");
 
         var filter = new WorkflowDefinitionFilter();
-        _workflowDefinitionStore.FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(definitions);
-
-        _cacheManager.CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
-        _cacheManager.CreateWorkflowVersionCacheKey("id-2").Returns("cache-key-2");
-        _materializerRegistry.IsMaterializerAvailable("available-materializer").Returns(true);
-        _materializerRegistry.IsMaterializerAvailable("unavailable-materializer").Returns(false);
-        _decoratedService.MaterializeWorkflowAsync(definition1, Arg.Any<CancellationToken>()).Returns(graph1);
+        Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(definitions);
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-1").Returns("cache-key-1");
+        Mock.Get(_cacheManager).CreateWorkflowVersionCacheKey("id-2").Returns("cache-key-2");
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable("available-materializer").Returns(true);
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable("unavailable-materializer").Returns(false);
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition1, Arg.Any<CancellationToken>()).Returns(graph1);
 
         var service = CreateService();
 
@@ -498,26 +482,22 @@ public class CachingWorkflowDefinitionServiceTests
     /// </summary>
     private void SetupCacheManager()
     {
-        _cacheManager.Cache.Returns(_cache);
+        Mock.Get(_cacheManager).Cache.Returns(_cache);
 
         var cachingOptions = Microsoft.Extensions.Options.Options.Create(new CachingOptions { CacheDuration = TimeSpan.FromMinutes(10) });
-        _cache.CachingOptions.Returns(cachingOptions);
+        Mock.Get(_cache).CachingOptions.Returns(cachingOptions);
 
         // Setup cache to call factory functions for all types
-        _cache.GetOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Any<Func<ICacheEntry, Task<WorkflowDefinition>>>())
-            .Returns(async callInfo => await callInfo.Arg<Func<ICacheEntry, Task<WorkflowDefinition>>>()(Substitute.For<ICacheEntry>()));
-
-        _cache.GetOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Any<Func<ICacheEntry, Task<WorkflowGraph>>>())
-            .Returns(async callInfo => await callInfo.Arg<Func<ICacheEntry, Task<WorkflowGraph>>>()(Substitute.For<ICacheEntry>()));
-
-        _cache.GetOrCreateAsync<WorkflowGraphFindResult>(Arg.Any<object>(), Arg.Any<Func<ICacheEntry, Task<WorkflowGraphFindResult>>>())
-            .Returns(async callInfo => await callInfo.Arg<Func<ICacheEntry, Task<WorkflowGraphFindResult>>>()(Substitute.For<ICacheEntry>()));
-
-        _cache.FindOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Any<Func<ICacheEntry, Task<WorkflowDefinition>>>())
-            .Returns(async callInfo => (WorkflowDefinition?)await callInfo.Arg<Func<ICacheEntry, Task<WorkflowDefinition>>>()(Substitute.For<ICacheEntry>()));
-
-        _cache.FindOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Any<Func<ICacheEntry, Task<WorkflowGraph>>>())
-            .Returns(async callInfo => (WorkflowGraph?)await callInfo.Arg<Func<ICacheEntry, Task<WorkflowGraph>>>()(Substitute.For<ICacheEntry>()));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => await __arg1(Mock.Of<ICacheEntry>().Object));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>> __arg1) => await __arg1(Mock.Of<ICacheEntry>().Object));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraphFindResult>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Models.WorkflowGraphFindResult>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraphFindResult>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Models.WorkflowGraphFindResult>> __arg1) => await __arg1(Mock.Of<ICacheEntry>().Object));
+        Mock.Get(_cache).FindOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => (WorkflowDefinition?)await __arg1(Mock.Of<ICacheEntry>().Object));
+        Mock.Get(_cache).FindOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>> __arg1) => (WorkflowGraph?)await __arg1(Mock.Of<ICacheEntry>().Object));
     }
 
     /// <summary>
@@ -540,7 +520,7 @@ public class CachingWorkflowDefinitionServiceTests
         string? materializerName = null)
     {
         materializerName ??= definition.MaterializerName;
-        _materializerRegistry.IsMaterializerAvailable(materializerName).Returns(true);
-        _decoratedService.MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>()).Returns(workflowGraph);
+        Mock.Get(_materializerRegistry).IsMaterializerAvailable(materializerName).Returns(true);
+        Mock.Get(_decoratedService).MaterializeWorkflowAsync(definition, Arg.Any<CancellationToken>()).Returns(workflowGraph);
     }
 }

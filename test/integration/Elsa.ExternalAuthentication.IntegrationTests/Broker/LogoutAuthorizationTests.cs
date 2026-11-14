@@ -6,7 +6,6 @@ using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Services;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using TUnit.AspNetCore;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Broker;
@@ -20,16 +19,16 @@ public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWe
 {
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new() { IsAuthenticated = false };
-    private readonly IExternalAuthenticationBroker _broker = Substitute.For<IExternalAuthenticationBroker>();
-    private readonly ITenantAccessor _tenant = Substitute.For<ITenantAccessor>();
+    private readonly IExternalAuthenticationBroker _broker = Mock.Of<IExternalAuthenticationBroker>().Object;
+    private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
 
     private HttpClient Client => _client ??= Factory.CreateClient(new() { AllowAutoRedirect = false });
 
     public LogoutAuthorizationTests()
     {
-        _broker.ContinueLogoutAsync("handle-a", Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(BrokerLogoutResult.Navigate(new Uri("https://idp.example/end-session"))));
-        _tenant.TenantId.Returns("tenant-a");
+        Mock.Get(_broker).ContinueLogoutAsync("handle-a", Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(BrokerLogoutResult.Navigate(new Uri("https://idp.example/end-session"))));
+        Mock.Get(_tenant).TenantId.Returns("tenant-a");
     }
 
     protected override void ConfigureTestServices(IServiceCollection services)
@@ -47,14 +46,14 @@ public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWe
         await Assert.That(response.StatusCode).IsNotEqualTo(HttpStatusCode.Unauthorized);
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Found);
         await Assert.That(response.Headers.Location?.AbsoluteUri).IsEqualTo("https://idp.example/end-session");
-        await _broker.Received(1).ContinueLogoutAsync("handle-a", Arg.Any<CancellationToken>());
+        Mock.Get(_broker).ContinueLogoutAsync("handle-a", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task ContinueLogoutRejectsAnUnknownHandleWithoutCredentials()
     {
-        _broker.ContinueLogoutAsync("unknown", Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult(BrokerLogoutResult.Fail(BrokerErrorFactory.Create(BrokerErrorCategory.InvalidRequest))));
+        Mock.Get(_broker).ContinueLogoutAsync("unknown", Arg.Any<CancellationToken>())
+            .ReturnsAsync(ValueTask.FromResult(BrokerLogoutResult.Fail(BrokerErrorFactory.Create(BrokerErrorCategory.InvalidRequest))));
 
         var response = await Client.GetAsync("/external-authentication/logout/continue/unknown");
 
@@ -72,6 +71,6 @@ public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWe
         });
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Unauthorized);
-        await _broker.DidNotReceive().LogoutAsync(Arg.Any<BrokerLogoutRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Mock.Get(_broker).LogoutAsync(Arg.Any<BrokerLogoutRequest>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 }

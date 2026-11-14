@@ -6,7 +6,6 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Http;
@@ -23,8 +22,8 @@ public class HttpEndpointTests
             .ConfigureServices(services =>
             {
                 // Don't provide HttpContextAccessor, simulating non-HTTP context
-                var mockAccessor = Substitute.For<IHttpContextAccessor>();
-                mockAccessor.HttpContext.Returns((HttpContext?)null);
+                var mockAccessor = Mock.Of<IHttpContextAccessor>().Object;
+                Mock.Get(mockAccessor).HttpContext.Returns((HttpContext?)null);
                 services.AddSingleton(mockAccessor);
             });
 

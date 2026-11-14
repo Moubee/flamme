@@ -4,7 +4,6 @@ using Elsa.Workflows.Api.UnitTests.Endpoints.Descriptors;
 using Elsa.Workflows.Api.UnitTests.Endpoints.Features;
 using Elsa.Workflows.Management;
 using FastEndpoints;
-using NSubstitute;
 
 namespace Elsa.Workflows.Api.UnitTests.Endpoints;
 
@@ -46,6 +45,6 @@ public class FastEndpointsResolverTests
                 throw new InvalidOperationException($"Unsupported endpoint host test class: {hostTestClass}.");
         }
 
-        await Assert.That(Factory.Create<List>(Substitute.For<IWorkflowDefinitionStore>(), Substitute.For<IWorkflowDefinitionLinker>(), Array.Empty<IWorkflowDefinitionFilterProvider>())).IsNotNull();
+        await Assert.That(Factory.Create<List>(Mock.Of<IWorkflowDefinitionStore>().Object, Mock.Of<IWorkflowDefinitionLinker>().Object, Array.Empty<IWorkflowDefinitionFilterProvider>())).IsNotNull();
     }
 }

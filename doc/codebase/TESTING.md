@@ -2,8 +2,8 @@
 
 ## Test Stack and Commands
 
-- Runner and framework: Microsoft Testing Platform with TUnit 1.66.27.
-- Assertion/mocking: TUnit assertions, NSubstitute 5.3.0, ASP.NET Core TestServer, in-memory stores, and PostgreSQL integration fixtures.
+- Runner and framework: Microsoft Testing Platform with TUnit 1.84.0.
+- Assertion/mocking: TUnit assertions and TUnit.Mocks 1.84.0, ASP.NET Core TestServer, in-memory stores, and PostgreSQL integration fixtures.
 
 ```bash
 dotnet test --solution Elsa.slnx
@@ -38,6 +38,13 @@ are forwarded to each TUnit test application.
 
 - Prefer real in-memory provisioners and stores for state assertions.
 - Substitute adapters, role providers, and notification senders at boundaries.
+- Create generated dependencies with `Mock.Of<IService>().Object`, and configure or
+  verify them with `Mock.Get(service).Method(Arg.Any<T>()).Returns(value)` and
+  `.WasCalled(Times.Exactly(1))`. Use `.ReturnsAsync(...)` for prebuilt tasks,
+  `.Callback(...)` for argument capture, and `.ReturnsSequentially(...)` for sequences.
+- Use `SetupAllProperties()` when a test needs property setters to retain state.
+  Generic argument matchers are invariant; use `AnyType` for generic logger state
+  rather than assuming `Log<object>` matches every `Log<TState>` call.
 - Use a dedicated PostgreSQL test database for durable-store tests. EF Core InMemory is suitable only for provider-independent behavior; it does not verify relational constraints or transactions.
 
 ## Coverage and Quality Signals

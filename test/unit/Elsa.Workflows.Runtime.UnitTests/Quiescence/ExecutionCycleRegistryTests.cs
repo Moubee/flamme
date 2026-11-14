@@ -1,6 +1,6 @@
 using Elsa.Common;
 using Elsa.Workflows.Runtime.Services;
-using NSubstitute;
+using TUnit.Mocks;
 using System.Threading.Tasks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
@@ -12,10 +12,10 @@ public class ExecutionCycleRegistryTests
 
     public ExecutionCycleRegistryTests()
     {
-        _clock = Substitute.For<ISystemClock>();
-        _clock.UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-        _sources = Substitute.For<IIngressSourceRegistry>();
-        _sources.Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
+        _clock = Mock.Of<ISystemClock>().Object;
+        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _sources = Mock.Of<IIngressSourceRegistry>().Object;
+        Mock.Get(_sources).Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ExecutionCycleRegistryTests
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: null, CancellationToken.None);
 
-        _sources.DidNotReceive().MarkPauseFailedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Exception?>());
+        Mock.Get(_sources).MarkPauseFailedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<global::System.Exception?>()).WasNeverCalled();
     }
 
     [Test]
@@ -56,12 +56,12 @@ public class ExecutionCycleRegistryTests
     {
         var now = _clock.UtcNow;
         var snapshot = new[] { new IngressSourceSnapshot("http.trigger", IngressSourceState.Paused, null, now) };
-        _sources.Snapshot().Returns(snapshot);
+        Mock.Get(_sources).Snapshot().Returns(snapshot);
         var sut = new ExecutionCycleRegistry(_sources, _clock);
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: "http.trigger", CancellationToken.None);
 
-        _sources.Received(1).MarkPauseFailedAsync("http.trigger", "delivered-while-paused", Arg.Any<Exception?>());
+        Mock.Get(_sources).MarkPauseFailedAsync("http.trigger", "delivered-while-paused", Arg.Any<global::System.Exception?>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -70,12 +70,12 @@ public class ExecutionCycleRegistryTests
     {
         var now = _clock.UtcNow;
         var snapshot = new[] { new IngressSourceSnapshot("http.trigger", IngressSourceState.Running, null, now) };
-        _sources.Snapshot().Returns(snapshot);
+        Mock.Get(_sources).Snapshot().Returns(snapshot);
         var sut = new ExecutionCycleRegistry(_sources, _clock);
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: "http.trigger", CancellationToken.None);
 
-        _sources.DidNotReceive().MarkPauseFailedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Exception?>());
+        Mock.Get(_sources).MarkPauseFailedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<global::System.Exception?>()).WasNeverCalled();
     }
 
     [Test]

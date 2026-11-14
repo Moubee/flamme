@@ -3,7 +3,6 @@ using Elsa.Authorization;
 using Elsa.Workflows.Api.Permissions;
 using Elsa.Workflows.Runtime;
 using FastEndpoints;
-using NSubstitute;
 using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
 namespace Elsa.Workflows.Api.UnitTests.Endpoints.RuntimeAdmin;
 
@@ -39,7 +38,7 @@ public class RuntimeAdminAuthorizationTests
             endpointType,
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             null,
-            [Substitute.For<IWorkflowRuntimeAdminService>()],
+            [Mock.Of<IWorkflowRuntimeAdminService>().Object],
             null)!;
         var (requestDtoType, responseDtoType) = GetEndpointDtoTypes(endpointType);
         var definition = new EndpointDefinition(endpointType, requestDtoType, responseDtoType);

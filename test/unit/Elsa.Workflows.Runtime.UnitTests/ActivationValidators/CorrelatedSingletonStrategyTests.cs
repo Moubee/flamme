@@ -3,7 +3,7 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Runtime.ActivationValidators;
-using NSubstitute;
+using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.ActivationValidators;
 
@@ -15,38 +15,37 @@ public class CorrelatedSingletonStrategyTests
     [Arguments(" ")]
     public async Task Throws_WhenCorrelationIdIsBlank(string? correlationId)
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
         var strategy = new CorrelatedSingletonStrategy(store);
 
         await Assert.ThrowsExactlyAsync<ArgumentException>(async () =>
             await strategy.GetAllowActivationAsync(new(CreateWorkflow(), correlationId, CancellationToken.None)));
 
-        await store.DidNotReceiveWithAnyArgs().CountAsync(default!, default);
+        Mock.Get(store).CountAsync(Any(), Any()).WasNeverCalled();
     }
 
     [Test]
     public async Task AllowsActivation_WhenNoRunningInstanceExistsForDefinitionAndCorrelation()
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
-        store.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(0);
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(0);
         var strategy = new CorrelatedSingletonStrategy(store);
 
         var allowed = await strategy.GetAllowActivationAsync(new(CreateWorkflow("def-1"), "order-1", CancellationToken.None));
 
         await Assert.That(allowed).IsTrue();
-        await store.Received(1).CountAsync(
+        Mock.Get(store).CountAsync(
             Arg.Is<WorkflowInstanceFilter>(filter =>
                 filter.DefinitionId == "def-1" &&
                 filter.CorrelationId == "order-1" &&
-                filter.WorkflowStatus == WorkflowStatus.Running),
-            Arg.Any<CancellationToken>());
+                filter.WorkflowStatus == WorkflowStatus.Running), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
     public async Task DeniesActivation_WhenRunningInstanceExistsForDefinitionAndCorrelation()
     {
-        var store = Substitute.For<IWorkflowInstanceStore>();
-        store.CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(1);
+        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(1);
         var strategy = new CorrelatedSingletonStrategy(store);
 
         var allowed = await strategy.GetAllowActivationAsync(new(CreateWorkflow(), "order-1", CancellationToken.None));

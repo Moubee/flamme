@@ -1,10 +1,13 @@
 using System.Reflection;
 using Elsa.Authorization;
+using Elsa.Common;
 using Elsa.Permissions;
+using Elsa.UserTasks.Contracts;
+using Elsa.UserTasks.Options;
 using Elsa.UserTasks.Permissions;
 using Elsa.UserTasks.Services;
 using FastEndpoints;
-using NSubstitute;
+using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
 namespace Elsa.UserTasks.UnitTests.Authorization;
@@ -112,7 +115,7 @@ public class EndpointPermissionTests
         var arguments = endpointType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Single()
             .GetParameters()
-            .Select(x => Substitute.For([x.ParameterType], []))
+            .Select(x => CreateDependency(x.ParameterType))
             .ToArray();
         var endpoint = Activator.CreateInstance(endpointType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, arguments, null)!;
         var (requestType, responseType) = DtoTypes(endpointType);
@@ -125,6 +128,18 @@ public class EndpointPermissionTests
 
         await Assert.That(permission.HasValue).IsTrue().Because($"{endpointName} declares no permission.");
         return permission!.Value;
+    }
+
+    private static object CreateDependency(Type type)
+    {
+        if (type == typeof(IUserTaskIdentityResolver)) return Mock.Of<IUserTaskIdentityResolver>().Object;
+        if (type == typeof(IOptions<UserTasksOptions>)) return Mock.Of<IOptions<UserTasksOptions>>().Object;
+        if (type == typeof(IUserTaskParticipantDirectory)) return Mock.Of<IUserTaskParticipantDirectory>().Object;
+        if (type == typeof(IUserTaskManager)) return Mock.Of<IUserTaskManager>().Object;
+        if (type == typeof(ISystemClock)) return Mock.Of<ISystemClock>().Object;
+        if (type == typeof(IUserTaskAccessPolicy)) return Mock.Of<IUserTaskAccessPolicy>().Object;
+        if (type == typeof(IUserTaskInvitationService)) return Mock.Of<IUserTaskInvitationService>().Object;
+        throw new InvalidOperationException($"No generated mock registered for endpoint dependency '{type}'.");
     }
 
     private static (Type Request, Type Response) DtoTypes(Type endpointType)

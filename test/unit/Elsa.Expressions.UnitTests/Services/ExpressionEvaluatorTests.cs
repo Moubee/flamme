@@ -5,8 +5,6 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using System.Threading.Tasks;
 
 namespace Elsa.Expressions.UnitTests.Services;
@@ -78,11 +76,11 @@ public class ExpressionEvaluatorTests
 
         // Assert
         await Assert.That(result).IsEqualTo("Mocked Result");
-        await mockHandler.Received(1).EvaluateAsync(
+        Mock.Get(mockHandler).EvaluateAsync(
             Arg.Is<Expression>(e => e.Type == "CustomType" && e.Value as string == "test"),
             Arg.Any<Type>(),
             Arg.Any<ExpressionExecutionContext>(),
-            Arg.Any<ExpressionEvaluatorOptions>());
+            Arg.Any<ExpressionEvaluatorOptions>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -99,11 +97,11 @@ public class ExpressionEvaluatorTests
         await evaluator.EvaluateAsync<string>(expression, context.ExpressionExecutionContext);
 
         // Assert
-        await mockHandler.Received(1).EvaluateAsync(
+        Mock.Get(mockHandler).EvaluateAsync(
             Arg.Any<Expression>(),
             Arg.Any<Type>(),
             Arg.Any<ExpressionExecutionContext>(),
-            Arg.Is<ExpressionEvaluatorOptions>(o => o != null));
+            Arg.Is<ExpressionEvaluatorOptions>(o => o != null)).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -137,8 +135,8 @@ public class ExpressionEvaluatorTests
             HandlerFactory = _ => mockHandler
         };
 
-        var mockProvider = Substitute.For<IExpressionDescriptorProvider>();
-        mockProvider.GetDescriptors().Returns([mockDescriptor]);
+        var mockProvider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        Mock.Get(mockProvider).GetDescriptors().Returns([mockDescriptor]);
 
         var activity = new WriteLine("Hello, World!");
         var fixture = new ActivityTestFixture(activity)
@@ -153,8 +151,8 @@ public class ExpressionEvaluatorTests
 
     private static IExpressionHandler CreateMockHandler(object returnValue)
     {
-        var mockHandler = Substitute.For<IExpressionHandler>();
-        mockHandler.EvaluateAsync(
+        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),
                 Arg.Any<ExpressionExecutionContext>(),
@@ -165,8 +163,8 @@ public class ExpressionEvaluatorTests
 
     private static IExpressionHandler CreateMockHandlerThatThrows(Exception exception)
     {
-        var mockHandler = Substitute.For<IExpressionHandler>();
-        mockHandler.EvaluateAsync(
+        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),
                 Arg.Any<ExpressionExecutionContext>(),
