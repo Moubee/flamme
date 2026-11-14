@@ -71,12 +71,9 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <File Path="src/PackageManifest.props" />
-    <File Path="src/PackageManifestHints.cs" />
   </Folder>
   <Folder Name="/src/apps/">
     <File Path="src/apps/Directory.Build.props" />
-    <Project Path="src/apps/Elsa.ModularServer.Web/Elsa.ModularServer.Web.csproj" />
     <Project Path="src/apps/Elsa.Server.LoadBalancer/Elsa.Server.LoadBalancer.csproj" />
     <Project Path="src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
   </Folder>
@@ -98,10 +95,6 @@
   <Folder Name="/src/modules/alterations/">
     <Project Path="src/modules/Elsa.Alterations.Core/Elsa.Alterations.Core.csproj" />
     <Project Path="src/modules/Elsa.Alterations/Elsa.Alterations.csproj" />
-  </Folder>
-  <Folder Name="/src/modules/bpmn/">
-    <Project Path="src/modules/Elsa.Bpmn.Interchange/Elsa.Bpmn.Interchange.csproj" />
-    <Project Path="src/modules/Elsa.Bpmn/Elsa.Bpmn.csproj" />
   </Folder>
   <Folder Name="/src/modules/caching/">
     <Project Path="src/modules/Elsa.Caching/Elsa.Caching.csproj" />
@@ -127,7 +120,6 @@
     <Project Path="src/modules/Elsa.Hosting.Management/Elsa.Hosting.Management.csproj" />
   </Folder>
   <Folder Name="/src/modules/http/">
-    <Project Path="src/modules/Elsa.Http.Webhooks/Elsa.Http.Webhooks.csproj" />
     <Project Path="src/modules/Elsa.Http/Elsa.Http.csproj" />
   </Folder>
   <Folder Name="/src/modules/keyvalues/">
@@ -144,9 +136,6 @@
     <Project Path="src/modules/Elsa.Persistence.EFCore.Common/Elsa.Persistence.EFCore.Common.csproj" />
     <Project Path="src/modules/Elsa.Persistence.EFCore.PostgreSql/Elsa.Persistence.EFCore.PostgreSql.csproj" />
     <Project Path="src/modules/Elsa.Persistence.EFCore/Elsa.Persistence.EFCore.csproj" />
-  </Folder>
-  <Folder Name="/src/modules/platform/">
-    <Project Path="src/modules/Elsa.Platform.Integration/Elsa.Platform.Integration.csproj" />
   </Folder>
   <Folder Name="/src/modules/resilience/">
     <Project Path="src/modules/Elsa.Resilience.Core/Elsa.Resilience.Core.csproj" />
@@ -169,9 +158,6 @@
     <Project Path="src/modules/Elsa.ExternalAuthentication/Elsa.ExternalAuthentication.csproj" />
     <Project Path="src/modules/Elsa.Identity/Elsa.Identity.csproj" />
     <Project Path="src/modules/Elsa.SasTokens/Elsa.SasTokens.csproj" />
-  </Folder>
-  <Folder Name="/src/modules/shells/">
-    <Project Path="src/modules/Elsa.Shells.Api/Elsa.Shells.Api.csproj" />
   </Folder>
   <Folder Name="/src/modules/weaver/">
     <Project Path="src/modules/Elsa.AI.Abstractions/Elsa.AI.Abstractions.csproj" />
@@ -205,8 +191,6 @@
     <Project Path="test/integration/Elsa.AI.IntegrationTests/Elsa.AI.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Alterations.IntegrationTests/Elsa.Alterations.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Alterations.Persistence.ConformanceTests/Elsa.Alterations.Persistence.ConformanceTests.csproj" />
-    <Project Path="test/integration/Elsa.Bpmn.IntegrationTests/Elsa.Bpmn.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Bpmn.Interchange.IntegrationTests/Elsa.Bpmn.Interchange.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Common.IntegrationTests/Elsa.Common.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj" />
@@ -230,8 +214,6 @@
     <Project Path="test/unit/Elsa.AI.Persistence.EFCore.UnitTests/Elsa.AI.Persistence.EFCore.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Alterations.Core.UnitTests/Elsa.Alterations.Core.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Api.Common.UnitTests/Elsa.Api.Common.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Bpmn.Interchange.UnitTests/Elsa.Bpmn.Interchange.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Bpmn.UnitTests/Elsa.Bpmn.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Common.UnitTests/Elsa.Common.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Dashboard.Api.UnitTests/Elsa.Dashboard.Api.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Expressions.UnitTests/Elsa.Expressions.UnitTests.csproj" />
@@ -243,12 +225,10 @@
     <Project Path="test/unit/Elsa.Labels.UnitTests/Elsa.Labels.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Persistence.EFCore.UnitTests/Elsa.Persistence.EFCore.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Platform.Integration.UnitTests/Elsa.Platform.Integration.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Resilience.Core.UnitTests/Elsa.Resilience.Core.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.SasTokens.UnitTests/Elsa.SasTokens.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Scheduling.UnitTests/Elsa.Scheduling.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Secrets.UnitTests/Elsa.Secrets.UnitTests.csproj" />
-    <Project Path="test/unit/Elsa.Shells.Api.Tests/Elsa.Shells.Api.Tests.csproj" />
     <Project Path="test/unit/Elsa.Tenants.UnitTests/Elsa.Tenants.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.UserTasks.Persistence.ConformanceTests/Elsa.UserTasks.Persistence.ConformanceTests.csproj" />
     <Project Path="test/unit/Elsa.UserTasks.Persistence.EFCore.UnitTests/Elsa.UserTasks.Persistence.EFCore.UnitTests.csproj" />

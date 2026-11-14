@@ -79,32 +79,13 @@
     </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="AspNetCore.Authentication.ApiKey" Version="9.0.0"/>
-        <PackageVersion Include="AutoMapper" Version="16.3.0" PrivateAssets="All"/>
-        <PackageVersion Include="Azure.Identity" Version="1.21.0"/>
-        <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.21.0"/>
-        <PackageVersion Include="Azure.ResourceManager" Version="1.14.0"/>
-        <PackageVersion Include="Azure.ResourceManager.AppContainers" Version="1.6.0"/>
-        <PackageVersion Include="Azure.ResourceManager.Resources" Version="1.12.0"/>
-        <PackageVersion Include="Azure.ResourceManager.ServiceBus" Version="1.2.0"/>
         <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
         <PackageVersion Include="Bogus" Version="35.6.5"/>
-        <PackageVersion Include="Bpmn.Interchange" Version="0.2.0"/>
-        <PackageVersion Include="Bpmn.Model" Version="0.2.0"/>
-        <PackageVersion Include="Bpmn.Semantics" Version="0.2.0"/>
         <PackageVersion Include="ConfigureAwait.Fody" Version="3.4.1" PrivateAssets="All"/>
         <PackageVersion Include="Cronos" Version="0.11.1"/>
-        <PackageVersion Include="CShells" Version="0.0.31"/>
-        <PackageVersion Include="CShells.Abstractions" Version="0.0.31"/>
-        <PackageVersion Include="CShells.AspNetCore" Version="0.0.31"/>
-        <PackageVersion Include="CShells.AspNetCore.Abstractions" Version="0.0.31"/>
-        <PackageVersion Include="CShells.FastEndpoints" Version="0.0.31"/>
-        <PackageVersion Include="CShells.FastEndpoints.Abstractions" Version="0.0.31"/>
-        <PackageVersion Include="Elsa.Platform.PackageManifest.Generator" Version="0.0.1-preview.53"/>
-        <PackageVersion Include="Datadog.Trace.Bundle" Version="3.57.0"/>
         <PackageVersion Include="DistributedLock" Version="2.8.4"/>
         <PackageVersion Include="DistributedLock.Core" Version="1.0.9"/>
         <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.3"/>
-        <PackageVersion Include="Elastic.Clients.Elasticsearch" Version="9.5.3"/>
         <PackageVersion Include="FluentStorage" Version="6.0.4"/>
         <PackageVersion Include="FluentStorage.Azure.Blobs" Version="6.0.4"/>
         <PackageVersion Include="FluentMigrator" Version="8.0.1"/>
@@ -117,14 +98,6 @@
         <PackageVersion Include="Jint" Version="4.18.0"/>
         <PackageVersion Include="JsonSchema.Net" Version="9.7.0"/>
         <PackageVersion Include="LinqKit.Core" Version="1.3.2"/>
-        <PackageVersion Include="Loom" Version="0.0.1-preview.10"/>
-        <PackageVersion Include="Loom.Abstractions" Version="0.0.1-preview.10"/>
-        <PackageVersion Include="Loom.Serialization.Json" Version="0.0.1-preview.10"/>
-        <PackageVersion Include="MailKit" Version="4.18.2"/>
-        <PackageVersion Include="MassTransit" Version="8.5.12"/>
-        <PackageVersion Include="MassTransit.Azure.ServiceBus.Core" Version="8.5.12"/>
-        <PackageVersion Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1"/>
-        <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.12"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.12.0"/>
         <PackageVersion Include="Microsoft.Identity.Client" Version="4.92.0"/>
         <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.23.0"/>
@@ -132,14 +105,6 @@
         <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.3"/>
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageVersion Include="Npgsql" Version="10.0.3"/>
-        <PackageVersion Include="NuGet.Packaging" Version="7.9.0"/>
-        <PackageVersion Include="NuGet.Protocol" Version="7.9.0"/>
-        <PackageVersion Include="Nuplane" Version="0.0.13"/>
-        <PackageVersion Include="Nuplane.Abstractions" Version="0.0.13"/>
-        <PackageVersion Include="Nuplane.Admin" Version="0.0.13"/>
-        <PackageVersion Include="Nuplane.Loading" Version="0.0.13"/>
-        <PackageVersion Include="Nuplane.Loading.Abstractions" Version="0.0.13"/>
-        <PackageVersion Include="Nuplane.Sources.Directory" Version="0.0.13"/>
         <PackageVersion Include="Open.Linq.AsyncExtensions" Version="1.2.0"/>
         <PackageVersion Include="OpenTelemetry" Version="1.21.0"/>
         <PackageVersion Include="OpenTelemetry.AutoInstrumentation" Version="1.19.1"/>
@@ -157,13 +122,8 @@
         <PackageVersion Include="pythonnet" Version="3.2.1"/>
         <PackageVersion Include="Refit" Version="9.0.2"/>
         <PackageVersion Include="Refit.HttpClientFactory" Version="9.0.2"/>
-        <PackageVersion Include="Serilog" Version="4.4.0"/>
-        <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0"/>
-        <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0"/>
-        <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0"/>
         <PackageVersion Include="ShortGuid" Version="2.0.1"/>
         <PackageVersion Include="Snappier" Version="1.3.1"/>
-        <PackageVersion Include="StackExchange.Redis" Version="2.13.23"/>
         <PackageVersion Include="System.CommandLine" Version="2.0.15"/>
         <PackageVersion Include="System.Linq.Async" Version="7.0.1"/>
         <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.4"/>
@@ -179,7 +139,6 @@
         <PackageVersion Include="TUnit.Logging.Microsoft" Version="1.84.0"/>
         <PackageVersion Include="TUnit.Mocks" Version="1.84.0"/>
         <PackageVersion Include="TUnit.AspNetCore" Version="1.84.0"/>
-        <PackageVersion Include="WebhooksCore" Version="0.0.1"/>
         <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0"/>
     </ItemGroup>
 </Project>
