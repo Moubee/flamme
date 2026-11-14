@@ -6,7 +6,7 @@
 - Assertion/mocking: TUnit assertions, NSubstitute 5.3.0, ASP.NET Core TestServer, in-memory stores, and PostgreSQL integration fixtures.
 
 ```bash
-dotnet test --solution Elsa.sln
+dotnet test --solution Elsa.slnx
 dotnet test --project test/unit/Elsa.ExternalAuthentication.UnitTests/Elsa.ExternalAuthentication.UnitTests.csproj
 dotnet test --project test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj
 ```

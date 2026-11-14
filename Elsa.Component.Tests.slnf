@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "Elsa.sln",
+    "path": "Elsa.slnx",
     "projects": [
       "test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj"
     ]

@@ -27,7 +27,7 @@ each repository whose workflow publishes to NuGet. Check only secret metadata;
 never print or copy a secret value:
 
 ```bash
-for repository in elsa-workflows/elsa-core elsa-workflows/elsa-studio elsa-workflows/elsa-extensions elsa-workflows/elsa-templates; do
+for repository in DenDeline/flamme elsa-workflows/elsa-studio elsa-workflows/elsa-extensions elsa-workflows/elsa-templates; do
   gh secret list --repo "$repository" --json name --jq '.[].name' \
     | grep -Fx NUGET_API_KEY >/dev/null \
     || { echo "Missing NUGET_API_KEY metadata in $repository" >&2; exit 1; }

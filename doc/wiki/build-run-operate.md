@@ -9,27 +9,27 @@ Install the SDK selected by [global.json](../../global.json): .NET SDK 11.0.100 
 Restore first when working from a clean checkout or after dependency changes. Use `--ignore-failed-sources` when packages are available from other configured sources despite an unavailable feed:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
+dotnet restore Elsa.slnx --ignore-failed-sources
 ```
 
 Build the solution (restore is implicit unless `--no-restore` is supplied):
 
 ```bash
-dotnet build Elsa.sln
+dotnet build Elsa.slnx
 ```
 
 For an explicit restore/build sequence:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
-dotnet build Elsa.sln --no-restore
+dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet build Elsa.slnx --no-restore
 ```
 
 Run the TUnit suite directly through Microsoft Testing Platform:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
-dotnet test --solution Elsa.sln --no-restore
+dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet test --solution Elsa.slnx --no-restore
 ```
 
 Targeted test project:
@@ -42,16 +42,16 @@ dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Cor
 ElsaScript DSL tests:
 
 ```bash
-./run-dsl-tests.sh
+dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
 ```
 
 ## Build System
 
 The .NET CLI invokes MSBuild directly. Shared settings live in [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets). Builds default to Debug, while the CI workflows explicitly select Release. Pass `--configuration Debug` or `--configuration Release` to select a configuration explicitly.
 
-Clean the selected configuration with `dotnet clean Elsa.sln --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
+Clean the selected configuration with `dotnet clean Elsa.slnx --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
 
-Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.sln`, or select one test project with `dotnet test --project <path-to-test.csproj>`.
+Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.slnx`, or select one test project with `dotnet test --project <path-to-test.csproj>`.
 
 Source projects multi-target `net8.0`, `net9.0`, and `net10.0` through [src/Directory.Build.props](../../src/Directory.Build.props). Central package versions are in [Directory.Packages.props](../../Directory.Packages.props), including conditional version blocks for .NET 8/9 and .NET 10.
 
@@ -176,7 +176,7 @@ Structured logs options include recent log capacity, query size, source heartbea
 Create packages with an explicit version using the standard pack command:
 
 ```bash
-dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
+dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
 
 This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.

@@ -1,7 +1,7 @@
 # Copilot Playbook: Elsa Core Release Notes (GitHub Release + PR/commit links)
 
 ## Goal
-Generate consistent GitHub Release notes for `elsa-workflows/elsa-core` between two tags/refs, including:
+Generate consistent GitHub Release notes for `DenDeline/flamme` between two tags/refs, including:
 - a short **Highlights** section up top
 - standard grouped sections (Breaking/Features/Improvements/Fixes/Tests/CI)
 - **GitHub-style** PR/commit references at the end of bullets: `(#1234)` or `(abcd123)`
@@ -9,13 +9,13 @@ Generate consistent GitHub Release notes for `elsa-workflows/elsa-core` between 
 - optional **Known issues** section when applicable
 
 ## Inputs to provide (required)
-- Repository: `elsa-workflows/elsa-core`
+- Repository: `DenDeline/flamme`
 - From tag/ref: `<FROM>`
 - To tag/ref: `<TO>`
 
 Also provide ONE of:
 - `git log --oneline <FROM>..<TO>` output (preferred), OR
-- compare URL: `https://github.com/elsa-workflows/elsa-core/compare/<FROM>...<TO>`
+- compare URL: `https://github.com/DenDeline/flamme/compare/<FROM>...<TO>`
 
 Optionally provide:
 - whether merges are squash (often include `(#NNNN)` in subject) vs merge commits
@@ -103,4 +103,4 @@ If none are provided, omit the section entirely.
 - Optional sections (Developer-facing / Tests / CI / Known issues) are omitted if empty
 
 ## Example prompt for a new session
-“Generate GitHub Release notes for `elsa-workflows/elsa-core` from `<FROM>` to `<TO>`. Use the template with **Highlights** and **Known issues** (only if I provide them). Prefer PR titles when available, otherwise use commit subjects. Use GitHub-style `(#NNNN)` references and include a short Full changelog. Here is `git log --oneline <FROM>..<TO>`: …”
+“Generate GitHub Release notes for `DenDeline/flamme` from `<FROM>` to `<TO>`. Use the template with **Highlights** and **Known issues** (only if I provide them). Prefer PR titles when available, otherwise use commit subjects. Use GitHub-style `(#NNNN)` references and include a short Full changelog. Here is `git log --oneline <FROM>..<TO>`: …”

@@ -131,7 +131,7 @@ No migration scaffold is required — the obsolete declaration path (T027) trans
 - [x] T060 Record the model in `doc/adr/0025-two-axis-authorization-model.md`: both axes open, wildcards as the only forward reach, no aggregates and no verb implication, and the rejection of a closed verb enumeration. **Done 2026-08-24** — `doc/adr/0025-two-axis-authorization-model.md`.
 - [x] T061 [P] Update `doc/wiki/identity-tenancy-security.md`, replacing the Secrets-only route table with a pointer to the catalog endpoint as the authoritative source. **Done 2026-08-24**
 - [x] T062 Resolve the five module-owner questions and fold the answers into the vocabulary. **Done 2026-08-23** — outcomes recorded at the end of `contracts/permissions.md` and as D25/D26 in `research.md`. Produced #7976 and #7977, and added FR-019's third declaration state (T026a).
-- [ ] T063 Run `dotnet build Elsa.sln` and the full test suite, confirm T041 passes with zero exemptions beyond documented anonymous endpoints, and verify the quickstart scenario end to end. **Still open (verified 2026-08-27)** — full `dotnet build Elsa.sln` + full suite run not recorded.
+- [ ] T063 Run `dotnet build Elsa.slnx` and the full test suite, confirm T041 passes with zero exemptions beyond documented anonymous endpoints, and verify the quickstart scenario end to end. **Still open (verified 2026-08-27)** — full `dotnet build Elsa.slnx` + full suite run not recorded.
 
 ---
 

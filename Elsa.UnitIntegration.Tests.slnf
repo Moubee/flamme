@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "Elsa.sln",
+    "path": "Elsa.slnx",
     "projects": [
       "test/integration/Elsa.AI.IntegrationTests/Elsa.AI.IntegrationTests.csproj",
       "test/integration/Elsa.Activities.IntegrationTests/Elsa.Activities.IntegrationTests.csproj",

@@ -7,7 +7,7 @@
 | Primary language | C# (`LangVersion` latest) | `Directory.Build.props` |
 | Runtime | .NET 8, 9, and 10 for source projects | `src/Directory.Build.props` |
 | Package manager | NuGet with central package management | `Directory.Packages.props` |
-| Build system | .NET CLI and MSBuild; SDK 11.0.100 with patch roll-forward | `Elsa.sln`, `Directory.Build.props`, `global.json` |
+| Build system | .NET CLI and MSBuild; SDK 11.0.100 with patch roll-forward | `Elsa.slnx`, `Directory.Build.props`, `global.json` |
 | Test runner | Microsoft Testing Platform | `global.json` |
 
 ## Production Frameworks and Dependencies
@@ -29,8 +29,8 @@
 ## Key Commands
 
 ```bash
-dotnet build Elsa.sln
-dotnet test --solution Elsa.sln
+dotnet build Elsa.slnx
+dotnet test --solution Elsa.slnx
 dotnet test --project test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj
 ```
 

@@ -41,21 +41,21 @@ Shared helpers:
 Use the SDK selected by [global.json](../../global.json) and install the .NET 10 SDK/runtime for test applications. Restore first when starting from a clean checkout or after dependency changes:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
+dotnet restore Elsa.slnx --ignore-failed-sources
 ```
 
 Build the solution with direct `dotnet` commands:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
-dotnet build Elsa.sln --no-restore
+dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet build Elsa.slnx --no-restore
 ```
 
 Run all tests with direct `dotnet` commands:
 
 ```bash
-dotnet restore Elsa.sln --ignore-failed-sources
-dotnet test --solution Elsa.sln --no-restore
+dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet test --solution Elsa.slnx --no-restore
 ```
 
 Run targeted projects:
@@ -75,7 +75,7 @@ dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflow
 Run ElsaScript DSL tests:
 
 ```bash
-./run-dsl-tests.sh
+dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
 ```
 
 ## Activity Tests

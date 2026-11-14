@@ -356,7 +356,7 @@ dotnet test --project test/unit/Elsa.ExternalAuthentication.UnitTests/Elsa.Exter
 dotnet test --project test/unit/Elsa.Identity.UnitTests/Elsa.Identity.UnitTests.csproj
 dotnet test --project test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj
 dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj
-dotnet build Elsa.sln
+dotnet build Elsa.slnx
 ```
 
 Studio:

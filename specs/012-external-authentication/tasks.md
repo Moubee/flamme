@@ -319,7 +319,7 @@
 - [x] T132 Generate/update all supported EF Identity migrations and snapshots for durable link/session Connection Key, retained record IDs, override provenance, secret ownership, matcher-policy/static create-user roles, and minimal logout material; document migration and rollback.
 - [x] T133 Run targeted Core unit/integration suites for T117–T124, including configuration-first and all supported persistence providers.
 - [x] T134 Run Studio component and browser suites for T125–T131 in both Server and WebAssembly hosts.
-- [ ] T135 Run `dotnet build Elsa.sln`, `dotnet build Elsa.Studio.sln`, cross-node broker tests, sensitive-data leakage tests, and the quickstart scenario; only then mark the approved revision implemented.
+- [ ] T135 Run `dotnet build Elsa.slnx`, `dotnet build Elsa.Studio.sln`, cross-node broker tests, sensitive-data leakage tests, and the quickstart scenario; only then mark the approved revision implemented.
 - [x] T136 Add an extensible Identity Role-deletion dependency coordinator and External Authentication contributor; enumerate all database/configuration CreateUser and matcher no-match `defaultRoleIds` references across lifecycle states, return sanitized configuration paths, block ordinary deletion, and implement authorized dependency-version/revision-prevalidated atomic-or-safe-best-effort editable-reference remediation with empty-default-role confirmation, partial-progress retry diagnostics, REST/runtime contract tests, and no new Studio page, covering FR-063A–FR-063F and SC-016.
 
 ---

@@ -61,19 +61,19 @@ docker/                 # Docker configurations
 dotnet build --help
 
 # Clean build artifacts
-dotnet clean Elsa.sln
+dotnet clean Elsa.slnx
 
 # Restore packages (may show warnings for inaccessible feeds)
-dotnet restore Elsa.sln --ignore-failed-sources
+dotnet restore Elsa.slnx --ignore-failed-sources
 
 # Build the solution
-dotnet build Elsa.sln --no-restore
+dotnet build Elsa.slnx --no-restore
 
 # Create versioned NuGet packages (restores and builds implicitly)
-dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1
+dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
 
 # Run the complete repository test suite through Microsoft Testing Platform
-dotnet test --solution Elsa.sln
+dotnet test --solution Elsa.slnx
 ```
 
 Builds default to Debug, and CI commands explicitly select Release. Pass
@@ -116,7 +116,7 @@ dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Cor
 ### Running Tests
 ```bash
 # Complete repository suite
-dotnet test --solution Elsa.sln
+dotnet test --solution Elsa.slnx
 
 # Focused project while iterating
 dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj
@@ -163,8 +163,8 @@ coverage thresholds.
 - **Trigger**: Pull requests to `main` branch
 - **Runner**: ubuntu-latest  
 - **.NET SDK**: selected by `global.json`, plus .NET 10 for test runtime support
-- **Commands**: `dotnet restore Elsa.sln`, `dotnet build Elsa.sln --configuration Release --no-restore`,
-  then `dotnet test --solution Elsa.sln --configuration Release --no-build`
+- **Commands**: `dotnet restore Elsa.slnx`, `dotnet build Elsa.slnx --configuration Release --no-restore`,
+  then `dotnet test --solution Elsa.slnx --configuration Release --no-build`
 - **File**: `.github/workflows/pr.yml`
 
 ### CI Pipeline Steps
@@ -185,7 +185,7 @@ coverage gate after the runs complete.
 - **Dependencies**: `Directory.Packages.props` (central package management)
 - **Global settings**: `Directory.Build.props`
 - **NuGet**: `NuGet.Config` (package sources and mapping)
-- **Solution**: `Elsa.sln` (119 projects)
+- **Solution**: `Elsa.slnx` (119 projects)
 - **Docker**: `docker/` directory with multiple Dockerfiles
 - **GitHub Actions**: `.github/workflows/`
 
@@ -200,10 +200,10 @@ Multiple Docker configurations available:
 
 1. **Clone and build core components**:
    ```bash
-   git clone [repo-url]
-   cd elsa-core
-   dotnet restore Elsa.sln --ignore-failed-sources
-   dotnet build Elsa.sln --no-restore
+   git clone https://github.com/DenDeline/flamme.git
+   cd flamme
+   dotnet restore Elsa.slnx --ignore-failed-sources
+   dotnet build Elsa.slnx --no-restore
    ```
 
 2. **Work with core modules**:
@@ -260,8 +260,7 @@ The server will start on the configured ports (check `appsettings.json` or envir
 - **Contributing Guide**: See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines
 
 ### Community Support
-- **GitHub Issues**: [Report bugs and request features](https://github.com/elsa-workflows/elsa-core/issues)
-- **GitHub Discussions**: [Ask questions and discuss](https://github.com/elsa-workflows/elsa-core/discussions)
+- **GitHub Issues**: [Report bugs, request features, and ask questions](https://github.com/DenDeline/flamme/issues)
 - **Discord**: [Join the community chat](https://discord.gg/hhChk5H472)
 - **Stack Overflow**: [Tag: elsa-workflows](http://stackoverflow.com/questions/tagged/elsa-workflows)
 
@@ -273,7 +272,7 @@ The server will start on the configured ports (check `appsettings.json` or envir
 1. **Always use `--ignore-failed-sources`** when restoring packages
 2. **Focus on core workflow functionality**
 3. **Build warnings are normal** - don't try to fix NU1900/NU1801 warnings
-4. **Use `dotnet test --project <csproj>` while iterating and `dotnet test --solution Elsa.sln` before broad changes are handed off**
+4. **Use `dotnet test --project <csproj>` while iterating and `dotnet test --solution Elsa.slnx` before broad changes are handed off**
 5. **Use targeted dotnet commands** for individual components while iterating
 6. **Check project references** before attempting builds - some projects have conditional references
 7. **Start with core modules** like `Elsa.Workflows.Core`, `Elsa.Workflows.Runtime` which are more likely to build successfully

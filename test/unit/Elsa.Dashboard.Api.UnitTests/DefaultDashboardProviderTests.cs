@@ -671,7 +671,7 @@ public class DefaultDashboardProviderTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory != null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Elsa.sln")))
+            if (File.Exists(Path.Combine(directory.FullName, "Elsa.slnx")))
                 return directory;
 
             directory = directory.Parent;

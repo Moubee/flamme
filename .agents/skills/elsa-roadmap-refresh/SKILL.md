@@ -1,6 +1,6 @@
 ---
 name: elsa-roadmap-refresh
-description: Refresh the Elsa roadmap from current evidence. Use when Codex needs to update ROADMAP.md or the public roadmap issue by researching elsa-core, elsa-studio, and elsa-extensions source code, specs, releases, commits, issues, pull requests, and discussions; classify shipped foundations, partial/productization work, roadmap candidates, stale items, and recommendations; then update the roadmap checklist and GitHub issue coherently.
+description: Refresh the Elsa roadmap from current evidence. Use when Codex needs to update ROADMAP.md or the public roadmap issue by researching flamme, elsa-studio, and elsa-extensions source code, specs, releases, commits, issues, pull requests, and discussions; classify shipped foundations, partial/productization work, roadmap candidates, stale items, and recommendations; then update the roadmap checklist and GitHub issue coherently.
 ---
 
 # Elsa Roadmap Refresh
@@ -9,7 +9,7 @@ description: Refresh the Elsa roadmap from current evidence. Use when Codex need
 
 Use this skill to refresh Elsa's roadmap from evidence across the Elsa product surface:
 
-- `elsa-workflows/elsa-core`
+- `DenDeline/flamme`
 - `elsa-workflows/elsa-studio`
 - `elsa-workflows/elsa-extensions`
 
@@ -17,12 +17,12 @@ The output should be a coherent product roadmap, not a raw issue digest. Ground 
 
 ## Safety Rules
 
-- Before editing, run `git status --short` in `elsa-core`.
+- Before editing, run `git status --short` in `flamme`.
 - Never revert unrelated user changes.
 - If `ROADMAP.md` or `README.md` already has uncommitted user edits, stop and report the conflict unless the user explicitly asked to work through it.
 - Edit only roadmap-related files unless the user asks for more.
 - Do not commit, push, or publish unless the user or automation prompt explicitly asks for it.
-- If updating GitHub issue `elsa-core#3232`, use the final `ROADMAP.md` body as the issue body.
+- When asked to mirror the roadmap, use the user-specified issue in `DenDeline/flamme` and the final `ROADMAP.md` body. Upstream `elsa-workflows/elsa-core#3232` is historical evidence, not this fork's publishing target.
 
 ## Evidence Workflow
 
@@ -31,7 +31,7 @@ The output should be a coherent product roadmap, not a raw issue digest. Ground 
    - `README.md` roadmap link, if relevant
    - GitHub issue `elsa-workflows/elsa-core#3232`
 
-2. Inspect `elsa-core`.
+2. Inspect `flamme`.
    - Source modules under `src/modules`
    - App hosts under `src/apps`
    - Specs under `specs`
@@ -98,13 +98,13 @@ Be explicit when a conclusion is an inference from evidence rather than a direct
 
 ```bash
 gh issue view 3232 --repo elsa-workflows/elsa-core --json title,body,updatedAt,url
-gh issue list --repo elsa-workflows/elsa-core --state open --limit 200 --json number,title,labels,updatedAt,url
+gh issue list --repo DenDeline/flamme --state open --limit 200 --json number,title,labels,updatedAt,url
 gh issue list --repo elsa-workflows/elsa-studio --state open --limit 200 --json number,title,labels,updatedAt,url
 gh issue list --repo elsa-workflows/elsa-extensions --state open --limit 200 --json number,title,labels,updatedAt,url
-gh pr list --repo elsa-workflows/elsa-core --state open --limit 100 --json number,title,updatedAt,url
+gh pr list --repo DenDeline/flamme --state open --limit 100 --json number,title,updatedAt,url
 gh pr list --repo elsa-workflows/elsa-studio --state open --limit 100 --json number,title,updatedAt,url
 gh pr list --repo elsa-workflows/elsa-extensions --state open --limit 100 --json number,title,updatedAt,url
-gh release list --repo elsa-workflows/elsa-core --limit 10
+gh release list --repo DenDeline/flamme --limit 10
 gh release list --repo elsa-workflows/elsa-studio --limit 10
 gh release list --repo elsa-workflows/elsa-extensions --limit 10
 ```
@@ -114,13 +114,13 @@ gh release list --repo elsa-workflows/elsa-extensions --limit 10
 When asked to mirror the roadmap to GitHub:
 
 ```bash
-gh issue edit 3232 --repo elsa-workflows/elsa-core --body-file ROADMAP.md
+gh issue edit <ROADMAP_ISSUE_NUMBER> --repo DenDeline/flamme --body-file ROADMAP.md
 ```
 
 After publishing, verify:
 
 ```bash
-gh issue view 3232 --repo elsa-workflows/elsa-core --json title,url,updatedAt
+gh issue view <ROADMAP_ISSUE_NUMBER> --repo DenDeline/flamme --json title,url,updatedAt
 ```
 
 Final response should summarize changed themes, whether the GitHub issue was updated, and any files left modified.

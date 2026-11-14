@@ -55,7 +55,7 @@ Each test layer has distinct goals and clear boundaries — see [**Which parts o
     - Changed activity logic or created a new activity? → See [Activities](#activities)
     - Changed workflow execution? → See [Workflows execution](#workflow-execution-invoker-middleware-bookmarks)
 - [ ] Follow steps and code patterns in that section
-- [ ] Run the full suite locally: `dotnet test --solution Elsa.sln`
+- [ ] Run the full suite locally: `dotnet test --solution Elsa.slnx`
 - [ ] While iterating, run the narrowest project: `dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj`
 - [ ] Verify no flaky behavior by running that targeted project command 10 times with `--no-build`
 

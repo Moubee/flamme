@@ -3,8 +3,8 @@
         <Authors>Elsa Workflows Community</Authors>
         <Copyright>2025</Copyright>
 
-        <PackageProjectUrl>https://github.com/elsa-workflows/elsa-core</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/elsa-workflows/elsa-core</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/DenDeline/flamme</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/DenDeline/flamme</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
         <LangVersion>latest</LangVersion>
@@ -13,9 +13,6 @@
 
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
-
-        <!-- For NuGet browsers that currently don't support <PackageIcon> yet -->
-        <PackageIconUrl>https://v3.elsaworkflows.io/nuget-icon.png</PackageIconUrl>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AnalysisModeDocumentation>Default</AnalysisModeDocumentation>

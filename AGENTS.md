@@ -4,7 +4,7 @@ Guidance for AI coding agents working in this repository.
 
 ## Project Overview
 
-- Elsa Core is a .NET solution centered on `Elsa.sln`.
+- Elsa Core is a .NET solution centered on `Elsa.slnx`.
 - Production code lives under `src/`.
 - Tests live under `test/`, grouped by `unit`, `integration`, `component`, and `performance`.
 - Build and package automation uses the .NET CLI and shared MSBuild settings in `Directory.Build.props` and `Directory.Build.targets`.
@@ -27,13 +27,13 @@ Guidance for AI coding agents working in this repository.
 
 ## Build And Test Commands
 
-- Restore dependencies: `dotnet restore Elsa.sln`
-- Build the solution: `dotnet build Elsa.sln`
-- Clean build outputs: `dotnet clean Elsa.sln`
-- Create versioned packages: `dotnet pack Elsa.sln --configuration Release --output packages -p:Version=3.9.0-preview.1`
-- Run the complete repository test suite: `dotnet test --solution Elsa.sln`
+- Restore dependencies: `dotnet restore Elsa.slnx`
+- Build the solution: `dotnet build Elsa.slnx`
+- Clean build outputs: `dotnet clean Elsa.slnx`
+- Create versioned packages: `dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1`
+- Run the complete repository test suite: `dotnet test --solution Elsa.slnx`
 - Run a specific test project: `dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj`
-- Run ElsaScript DSL integration tests: `./run-dsl-tests.sh`
+- Run ElsaScript DSL integration tests: `dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj`
 
 Install the .NET SDK selected by the root `global.json` (11.0.100 with patch roll-forward)
 and the .NET 10 SDK/runtime for test applications and app hosts. Builds default
@@ -45,7 +45,7 @@ The root `global.json` also selects Microsoft Testing Platform (MTP). Options fo
 outer `dotnet test` command go before the literal `--`; options after it are
 forwarded to each TUnit test application. Prefer targeted
 `dotnet test --project <csproj>` commands while iterating, then run
-`dotnet test --solution Elsa.sln` when the change affects shared infrastructure
+`dotnet test --solution Elsa.slnx` when the change affects shared infrastructure
 or cross-module behavior.
 
 ## Code Style
