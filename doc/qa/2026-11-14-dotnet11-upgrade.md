@@ -56,3 +56,58 @@ is corrected to its latest published stable version, 10.0.0.
 System.Text.Json is provided by both supported runtimes, so redundant explicit
 references in HTTP and blob-storage modules are removed in response to the
 .NET 11 SDK's NU1510 package-pruning diagnostic.
+
+## Review after three commits
+
+An independent review of the framework, dependency, and CI commits found no
+additional actionable defects. Validation identified two compatibility changes:
+
+- TUnit.AspNetCore 1.84 honors the client's redirect options. Authentication
+  contract tests now explicitly disable automatic redirects when asserting the
+  broker's original response and Location header.
+- [.NET 11 changes floating-point to decimal conversions](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/11/decimal-biginteger-floating-point-conversions).
+  Fluid's JSON filter can render additional digits for JavaScript floating-point
+  values: `12.99` can render as `12.990000000000000213162820728`. The integration
+  test now parses JSON and verifies the product ID and numeric value on both
+  runtimes. No global rounding or workflow data conversion is introduced.
+
+The updated OpenTelemetry archive also supports launching the application
+directly through `instrument.sh`; the Docker entrypoint uses this supported path.
+
+## Final validation
+
+| Check | Result |
+| --- | --- |
+| Release solution build, .NET 10 and 11 | Passed, zero errors; nullable and obsolete API warnings remain |
+| Unit/integration filter, .NET 10 | 4,375 passed, zero failures/skips |
+| Unit/integration filter, .NET 11 | 4,375 passed, zero failures/skips |
+| PostgreSQL component suite, each runtime | 220 passed, zero failures, two existing skips |
+| Testing extension and TLS smoke builds | Passed on both frameworks |
+| .NET 11 TUnit coverage smoke | 10 passed; Cobertura and TRX generated |
+| Local tools | EF 10.0.15 and ReportGenerator 5.6.0 restored and executed |
+| Native solution pack | 71 packages and 71 symbol packages; every package has .NET 10/11 assets |
+| SDK vulnerability audit, including transitive dependencies | 135 projects checked; zero audit problems or vulnerable packages reported |
+| .NET 11 server and Datadog container builds | Passed; OpenTelemetry 1.19.1 archive checksum verified |
+| TLS/CA smoke checks, each .NET 11 image | All four passed, including enabled OpenTelemetry on the Datadog image |
+| ADR TOC, workflow YAML, migration shell syntax, diff whitespace | Passed |
+
+The existing component skips are `ImportWorkflowActivity_ShouldUpdateOtherPods`
+(not implemented) and `DeleteWorkflow_Clustered` (interferes with other tests).
+Local container validation covers .NET 11; CI also builds and smoke-tests the
+.NET 10 variants. CI itself has not been run from this local branch.
+
+Reproduction commands from the repository root:
+
+```sh
+dotnet restore Elsa.sln
+dotnet build Elsa.sln --configuration Release --no-restore
+dotnet test --solution Elsa.UnitIntegration.Tests.slnf --configuration Release --framework net10.0 --no-build
+dotnet test --solution Elsa.UnitIntegration.Tests.slnf --configuration Release --framework net11.0 --no-build
+dotnet test --solution Elsa.Component.Tests.slnf --configuration Release --framework net10.0 --no-build
+dotnet test --solution Elsa.Component.Tests.slnf --configuration Release --framework net11.0 --no-build
+dotnet pack Elsa.sln --configuration Release --no-build --no-restore --output packages
+dotnet package list --project Elsa.sln --vulnerable --include-transitive --no-restore
+```
+
+The final compatibility fixes received a second independent review with no
+actionable findings.

@@ -23,7 +23,7 @@ public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWe
     private readonly IExternalAuthenticationBroker _broker = Substitute.For<IExternalAuthenticationBroker>();
     private readonly ITenantAccessor _tenant = Substitute.For<ITenantAccessor>();
 
-    private HttpClient Client => _client ??= Factory.CreateClient();
+    private HttpClient Client => _client ??= Factory.CreateClient(new() { AllowAutoRedirect = false });
 
     public LogoutAuthorizationTests()
     {
