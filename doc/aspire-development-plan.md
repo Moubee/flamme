@@ -1,0 +1,70 @@
+# Aspire development plan
+
+## Research and scope
+
+Baseline: `origin/main` at `8c50b8669`, researched on 2026-11-14. The repository already
+selects .NET SDK 11.0.100 and supports .NET 10/11 application targets. The latest stable
+Aspire release is 13.6.5. Keep package versions in Central Package Management and
+commit executable lock files.
+
+The first useful local graph is the existing reference server, `Elsa.Server.Web`,
+connected to PostgreSQL 17 with a retained data volume. Aspire manages readiness,
+dynamic ports, configuration injection, logs, traces, metrics, and the dashboard.
+The server already has liveness/readiness endpoints and sample workflows. Its
+root and three tenant database/HTTP settings must all use the Aspire resources.
+Disable Python execution as in the existing quickstart.
+
+Use stable C# project-based AppHost APIs. New experimental .NET project resource
+and persistence APIs are unnecessary for this graph. A small shared telemetry
+project will instrument the reference server without duplicating its health routes.
+The AppHost runs on .NET 11; the server and shared telemetry retain .NET 10/11.
+
+Studio lives in a separate repository. The modular host needs additional shell,
+plugin and exporter configuration; the load balancer assumes several nodes with
+distributed locks. These are follow-up integrations rather than dependencies of
+the reference-server demo.
+
+```mermaid
+flowchart LR
+    AppHost["Aspire AppHost (.NET 11)"] --> PostgreSQL["PostgreSQL 17 + data volume"]
+    AppHost --> Server["Elsa.Server.Web (.NET 11)"]
+    Server --> PostgreSQL
+    Server --> Dashboard["Aspire dashboard: logs, traces, metrics"]
+```
+
+## Steps and commits
+
+1. `docs: record Aspire development plan` — research, resource graph and acceptance criteria.
+2. `feat(aspire): orchestrate reference server and PostgreSQL` — current CLI configuration,
+   AppHost, stable hosting packages, dynamic endpoints and persistence.
+3. `feat(observability): export reference server telemetry to Aspire` — shared telemetry,
+   regression coverage and reviewed full-target lock files.
+4. `docs(aspire): document and verify development demo` — quickstart, demonstration,
+   daily development loop and recorded verification results.
+
+After steps 3–4, an independent reviewer checks the complete diff, configuration,
+package compatibility, lifecycle and developer instructions. Fix findings in
+separate conventional commits and repeat affected checks.
+
+## Acceptance criteria
+
+- New worktree and branch start from freshly fetched `origin/main`.
+- .NET 11.0.100 and Aspire 13.6.5 are used; no obsolete Aspire workload is installed.
+- Restore in locked mode and build the AppHost and server; both server TFMs compile.
+- Start through `aspire start --non-interactive --isolated` in the worktree;
+  `aspire wait` confirms the PostgreSQL and server resources are healthy.
+- Readiness and a sample HTTP workflow work through the discovered endpoint;
+  dashboard telemetry includes server requests and workflow execution.
+- A normal stop/start retains database data. Dynamic ports avoid fixed-port conflicts.
+- Documentation covers prerequisites, authentication, endpoint discovery, development
+  reload/rebuild, shutdown, retained data and the single-host demo scope.
+- Run relevant existing host smoke tests and an independent review after 3–4 steps.
+
+## Primary sources
+
+- [.NET downloads](https://dotnet.microsoft.com/en-us/download): SDK 11.0.100.
+- [Aspire releases](https://github.com/microsoft/aspire/releases/tag/v13.6.5): current patch.
+- [Aspire PostgreSQL integration](https://aspire.dev/integrations/databases/postgres/).
+- [Aspire resource lifetimes](https://aspire.dev/app-host/resource-lifetimes/).
+- Aspire CLI `docs search`, `docs api search` and local `--help` for exact installed contracts.
+- Repository `AGENTS.md`, `README.md`, host configuration and existing host smoke tests.
