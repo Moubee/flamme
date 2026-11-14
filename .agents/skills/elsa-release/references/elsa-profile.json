@@ -3,8 +3,8 @@
   "repositories": [
     {
       "name": "core",
-      "directory": "elsa-core",
-      "github": "elsa-workflows/elsa-core",
+      "directory": "flamme",
+      "github": "DenDeline/flamme",
       "solution": "Elsa.slnx",
       "workflow": "packages.yml",
       "dependencies": [],

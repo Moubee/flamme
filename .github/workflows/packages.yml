@@ -381,7 +381,7 @@ jobs:
 
       # Exchanges a GitHub OIDC token for a temporary nuget.org API key (valid 1 hour).
       # Requires a Trusted Publishing policy on nuget.org matching:
-      #   Repository Owner: elsa-workflows | Repository: elsa-core | Workflow File: packages.yml
+      #   Repository Owner: DenDeline | Repository: flamme | Workflow File: packages.yml
       # Keep this step immediately before the push so the key cannot expire in between.
       - name: NuGet login (OIDC)
         uses: NuGet/login@v1

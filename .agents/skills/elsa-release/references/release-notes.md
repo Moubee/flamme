@@ -94,6 +94,6 @@ If the GitHub release already exists and only the notes need improvement, update
 
 ```bash
 gh release edit 3.7.0 \
-  --repo elsa-workflows/elsa-core \
+  --repo DenDeline/flamme \
   --notes-file doc/changelogs/3.7.0.md
 ```
