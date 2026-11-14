@@ -88,3 +88,6 @@ docker/docker-compose-datadog.yml
 TestResults/
 artifacts/
 BenchmarkDotNet.Artifacts/
+
+# Aspire local state (includes isolation state and dashboard history)
+.aspire/
