@@ -22,7 +22,7 @@ public sealed class InMemoryUserTaskRepository : IUserTaskRepository
     /// </summary>
     private static readonly StringComparer TitleComparer = StringComparer.Ordinal;
 
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<string, UserTask> _tasks = new(StringComparer.Ordinal);
 
     public Task<UserTask?> GetAsync(string tenantId, string taskId, CancellationToken cancellationToken = default)

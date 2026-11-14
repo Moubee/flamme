@@ -7,7 +7,7 @@ namespace Elsa.Diagnostics.OpenTelemetry.Services;
 
 public class OpenTelemetrySourceRegistry : IOpenTelemetrySourceRegistry
 {
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private readonly Dictionary<string, TelemetryResource> _resources = new(StringComparer.OrdinalIgnoreCase);
     private readonly int _capacity;
     private long _droppedCount;

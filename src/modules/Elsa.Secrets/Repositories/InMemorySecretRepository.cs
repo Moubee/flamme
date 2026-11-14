@@ -48,7 +48,7 @@ public class InMemorySecretRepository : ISecretRepository
     }
 
     private readonly Dictionary<string, Secret> _secrets = new(StringComparer.Ordinal);
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
 
     public Task<Secret?> GetAsync(string normalizedName, CancellationToken cancellationToken = default)
     {

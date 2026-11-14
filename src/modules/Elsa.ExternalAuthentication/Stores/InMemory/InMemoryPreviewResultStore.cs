@@ -6,7 +6,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryPreviewResultStore(ISystemClock clock) : IPreviewResultStore
 {
-    private readonly object _syncRoot = new();
+    private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, PreviewEntry> _entries = new(StringComparer.Ordinal);
 
     public ValueTask SaveAsync(PreviewResult result, CancellationToken cancellationToken = default)

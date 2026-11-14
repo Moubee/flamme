@@ -12,7 +12,7 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
     private readonly ConcurrentDictionary<string, Entry> _entries = new(StringComparer.Ordinal);
     private readonly Lazy<IEnumerable<IIngressSource>> _sourcesFactory;
     private readonly ISystemClock _clock;
-    private readonly object _materializeSync = new();
+    private readonly Lock _materializeSync = new();
     private volatile bool _materialized;
 
     /// <summary>
@@ -106,7 +106,7 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
 
     private sealed class Entry(IIngressSource source)
     {
-        public readonly object Sync = new();
+        public readonly Lock Sync = new();
         public IIngressSource Source { get; } = source;
         public IngressSourceState State { get; set; } = IngressSourceState.Running;
         public Exception? LastError { get; set; }

@@ -10,7 +10,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 /// </summary>
 public sealed class InMemoryIdentityProviderConnectionStore : IIdentityProviderConnectionStore
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<string, IdentityProviderConnection> _connections = new(StringComparer.Ordinal);
 
     public ValueTask<Page<IdentityProviderConnection>> FindAsync(ConnectionFilter filter, CancellationToken cancellationToken = default)

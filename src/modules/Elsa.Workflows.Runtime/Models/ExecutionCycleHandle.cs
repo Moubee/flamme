@@ -14,7 +14,7 @@ public sealed class ExecutionCycleHandle : IDisposable
     private readonly Action<ExecutionCycleHandle>? _onDisposed;
     private readonly Action? _cancelCallback;
     private readonly TaskCompletionSource _disposedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly object _cycleCtsGate = new();
+    private readonly Lock _cycleCtsGate = new();
     private int _cycleCtsCancellationInProgress;
     private bool _cycleCtsDisposeRequested;
     private bool _cycleCtsDisposed;

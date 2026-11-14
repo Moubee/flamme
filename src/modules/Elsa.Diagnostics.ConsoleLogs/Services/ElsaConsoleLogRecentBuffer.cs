@@ -5,7 +5,7 @@ namespace Elsa.Diagnostics.ConsoleLogs.Services;
 
 internal sealed class ElsaConsoleLogRecentBuffer
 {
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private readonly Queue<ConsoleLogLine> _lines = new();
     private readonly int _capacity;
     private readonly int _maxQuerySize;

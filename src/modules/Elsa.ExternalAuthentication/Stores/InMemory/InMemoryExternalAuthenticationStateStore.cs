@@ -6,7 +6,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryExternalAuthenticationStateStore(ISystemClock clock) : IExternalAuthenticationStateStore
 {
-    private readonly object _syncRoot = new();
+    private readonly Lock _syncRoot = new();
     private readonly Dictionary<(string Purpose, string HandleHash), StateEntry> _entries = new();
 
     public ValueTask PutAsync<T>(string purpose, string handleHash, T value, DateTimeOffset expiresAt, CancellationToken cancellationToken = default)

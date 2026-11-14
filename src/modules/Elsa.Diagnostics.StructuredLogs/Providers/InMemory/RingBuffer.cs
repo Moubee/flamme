@@ -3,7 +3,7 @@ namespace Elsa.Diagnostics.StructuredLogs.Providers.InMemory;
 public class RingBuffer<T>
 {
     private readonly Queue<T> _items = new();
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private readonly int _capacity;
     
     public RingBuffer(int capacity)

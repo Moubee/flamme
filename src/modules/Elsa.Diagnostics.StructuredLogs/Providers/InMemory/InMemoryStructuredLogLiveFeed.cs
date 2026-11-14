@@ -11,7 +11,7 @@ namespace Elsa.Diagnostics.StructuredLogs.Providers.InMemory;
 public class InMemoryStructuredLogLiveFeed(IOptions<StructuredLogsOptions> options) : IStructuredLogLiveFeed
 {
     private readonly StructuredLogsOptions _options = options.Value;
-    private readonly object _subscribersLock = new();
+    private readonly Lock _subscribersLock = new();
     private readonly Dictionary<Guid, StructuredLogSubscriber> _subscribers = new();
 
     public ValueTask PublishAsync(StructuredLogEvent logEvent, CancellationToken cancellationToken = default)
@@ -51,7 +51,7 @@ public class InMemoryStructuredLogLiveFeed(IOptions<StructuredLogsOptions> optio
 
     private sealed class StructuredLogSubscriber(StructuredLogFilter filter)
     {
-        private readonly object _lock = new();
+        private readonly Lock _lock = new();
         private int _pendingItemCount;
         private long _droppedSinceLastSummary;
         private bool _summaryQueued;

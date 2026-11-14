@@ -7,7 +7,7 @@ namespace Elsa.AI.Host.Services;
 
 public class AIToolRegistry(IServiceScopeFactory scopeFactory, AIToolEnablementService enablementService) : IAIToolRegistry
 {
-    private readonly object _definitionCacheLock = new();
+    private readonly Lock _definitionCacheLock = new();
     private readonly ConcurrentDictionary<string, Type> _toolTypes = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, bool> _uncacheableToolNames = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<Type, bool> _uncacheableToolTypes = new();

@@ -14,7 +14,8 @@ public class StructuredLogWriteBuffer(
     IStructuredLogSourceRegistry sourceRegistry,
     IOptions<RelationalStructuredLogOptions> options) : IStructuredLogStore, IStructuredLogWriteBuffer, IHostedService, IAsyncDisposable
 {
-    private readonly object _lifecycleLock = new();
+    private readonly Lock _lifecycleLock = new();
+    private readonly Lock _queueLock = new();
     private readonly Queue<StructuredLogEvent> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
     private CancellationTokenSource _stopTokenSource = new();
@@ -29,7 +30,7 @@ public class StructuredLogWriteBuffer(
     {
         var shouldSignal = false;
 
-        lock (_queue)
+        lock (_queueLock)
         {
             if (_queue.Count >= Math.Max(1, options.Value.WriteQueue.Capacity))
             {
@@ -230,7 +231,7 @@ public class StructuredLogWriteBuffer(
         var batchSize = Math.Max(1, options.Value.WriteQueue.BatchSize);
         var batch = new List<StructuredLogEvent>(batchSize);
 
-        lock (_queue)
+        lock (_queueLock)
         {
             while (_queue.Count > 0 && batch.Count < batchSize)
                 batch.Add(_queue.Dequeue());
@@ -241,7 +242,7 @@ public class StructuredLogWriteBuffer(
 
     private void CountPendingWritesAsDropped()
     {
-        lock (_queue)
+        lock (_queueLock)
         {
             if (_queue.Count == 0)
                 return;

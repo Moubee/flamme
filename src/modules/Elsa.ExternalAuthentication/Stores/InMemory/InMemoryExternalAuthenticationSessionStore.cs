@@ -7,7 +7,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryExternalAuthenticationSessionStore(ISystemClock clock) : IExternalAuthenticationSessionStore
 {
-    private readonly object _syncRoot = new();
+    private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, ExternalAuthenticationSession> _sessions = new(StringComparer.Ordinal);
 
     public ValueTask<IReadOnlyCollection<ExternalAuthenticationSession>> FindAsync(ExternalAuthenticationSessionFilter filter, CancellationToken cancellationToken = default)

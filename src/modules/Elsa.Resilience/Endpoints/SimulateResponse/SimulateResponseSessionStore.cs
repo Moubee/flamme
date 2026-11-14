@@ -6,7 +6,7 @@ namespace Elsa.Resilience.Endpoints.SimulateResponse;
 public class SimulateResponseSessionStore(IOptions<SimulateResponseOptions> options, TimeProvider timeProvider)
 {
     private readonly Dictionary<string, SessionState> _sessions = new(StringComparer.Ordinal);
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private readonly SimulateResponseOptions _options = options.Value;
 
     public bool TryGetNextIndex(string sessionId, int statusCodeCount, out int nextIndex)

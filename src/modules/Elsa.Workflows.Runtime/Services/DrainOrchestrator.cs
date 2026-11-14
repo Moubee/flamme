@@ -49,7 +49,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
     private readonly IIdentityGenerator _identityGenerator;
     private readonly ILogger<DrainOrchestrator> _logger;
 
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private DrainOutcome? _previousOutcome;
     private bool _drainInProgress;
 

@@ -16,7 +16,7 @@ public class MemoryWorkflowInstanceStore : IWorkflowInstanceStore
 {
     private readonly MemoryStore<WorkflowInstance> _store;
     private readonly ITenantAccessor? _tenantAccessor;
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
 
     /// <summary>
     /// Constructor.

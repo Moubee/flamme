@@ -17,7 +17,7 @@ public class InMemoryOpenTelemetryStore : IOpenTelemetryStore
     private readonly RingBuffer<TelemetrySpan> _spans;
     private readonly RingBuffer<MetricPoint> _metricPoints;
     private readonly RingBuffer<OtlpLogRecord> _logs;
-    private readonly object _instrumentLock = new();
+    private readonly Lock _instrumentLock = new();
     private readonly Dictionary<string, MetricInstrument> _instruments = new(StringComparer.OrdinalIgnoreCase);
 
     public InMemoryOpenTelemetryStore(IOptions<OpenTelemetryDiagnosticsOptions> options, IOpenTelemetrySourceRegistry sourceRegistry)

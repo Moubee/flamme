@@ -19,7 +19,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
     private const string PersistenceKeyPrefix = "elsa.quiescence.host-pause.";
     private const string LegacyPersistenceKeyPrefix = "elsa.quiescence.pause.";
 
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     // Held across the whole Pause/Resume (fast-path, transition, persist, revert). Pause/resume aren't hot paths.
     private readonly SemaphoreSlim _persistenceMutex = new(1, 1);
     private readonly IOptions<GracefulShutdownOptions> _options;

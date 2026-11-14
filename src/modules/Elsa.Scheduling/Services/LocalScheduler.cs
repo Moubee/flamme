@@ -20,7 +20,7 @@ public class LocalScheduler : IScheduler
     // 2. Methods return ValueTask.CompletedTask (not truly async)
     // 3. No await inside critical sections
     // 4. lock has zero allocation overhead, perfect for fast synchronous operations
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalScheduler"/> class.

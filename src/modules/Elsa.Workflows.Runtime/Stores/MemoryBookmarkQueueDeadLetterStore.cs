@@ -13,7 +13,7 @@ namespace Elsa.Workflows.Runtime.Stores;
 [UsedImplicitly]
 public class MemoryBookmarkQueueDeadLetterStore(MemoryStore<BookmarkQueueDeadLetterItem> store) : IBookmarkQueueDeadLetterStore
 {
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     /// <inheritdoc />
     public Task SaveAsync(BookmarkQueueDeadLetterItem record, CancellationToken cancellationToken = default)

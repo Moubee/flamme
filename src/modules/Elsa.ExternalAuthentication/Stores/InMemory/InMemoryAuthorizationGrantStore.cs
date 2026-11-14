@@ -6,7 +6,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryAuthorizationGrantStore(ISystemClock clock) : IAuthorizationGrantStore
 {
-    private readonly object _syncRoot = new();
+    private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, GrantEntry> _entries = new(StringComparer.Ordinal);
 
     public ValueTask SaveAsync(AuthorizationGrant grant, CancellationToken cancellationToken = default)

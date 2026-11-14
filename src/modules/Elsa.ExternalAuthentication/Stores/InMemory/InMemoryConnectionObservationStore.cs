@@ -5,7 +5,7 @@ namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryConnectionObservationStore : IConnectionObservationStore
 {
-    private readonly object _syncRoot = new();
+    private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, ConnectionObservation> _observations = new(StringComparer.Ordinal);
 
     public ValueTask<ConnectionObservation?> FindLatestAsync(string connectionId, CancellationToken cancellationToken = default)

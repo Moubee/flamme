@@ -10,7 +10,7 @@ namespace Elsa.Diagnostics.OpenTelemetry.Providers.InMemory;
 public class InMemoryOpenTelemetryLiveFeed(IOptions<OpenTelemetryDiagnosticsOptions> options) : IOpenTelemetryLiveFeed
 {
     private readonly OpenTelemetryDiagnosticsOptions _options = options.Value;
-    private readonly object _subscribersLock = new();
+    private readonly Lock _subscribersLock = new();
     private readonly List<OpenTelemetrySubscriber> _subscribers = [];
 
     public ValueTask PublishAsync(OpenTelemetryBatch batch, CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public class InMemoryOpenTelemetryLiveFeed(IOptions<OpenTelemetryDiagnosticsOpti
 
     private sealed class OpenTelemetrySubscriber(OpenTelemetryTraceFilter filter, int channelCapacity)
     {
-        private readonly object _lock = new();
+        private readonly Lock _lock = new();
         private readonly int _capacity = Math.Max(1, channelCapacity);
         private int _pendingItemCount;
         private readonly Dictionary<OpenTelemetrySignalType, long> _droppedSinceLastSummary = [];
