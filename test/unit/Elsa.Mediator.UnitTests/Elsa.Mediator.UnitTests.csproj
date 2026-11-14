@@ -9,4 +9,11 @@
         <ProjectReference Include="..\..\..\src\common\Elsa.Mediator\Elsa.Mediator.csproj"/>
     </ItemGroup>
 
+    <Target Name="DefineRuntimeAsyncTestExpectation" BeforeTargets="_GenerateCompileDependencyCache;CoreCompile"
+            Condition="'$(TargetFramework)' == 'net11.0' And '$(UseRuntimeAsync)' == 'true'">
+        <PropertyGroup>
+            <DefineConstants>$(DefineConstants);ELSA_RUNTIME_ASYNC</DefineConstants>
+        </PropertyGroup>
+    </Target>
+
 </Project>
