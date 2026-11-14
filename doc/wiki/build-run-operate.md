@@ -4,7 +4,7 @@ This page collects day-to-day build, run, and operational notes for Elsa Core co
 
 ## Build Commands
 
-Install the SDK selected by [global.json](../../global.json): .NET SDK 11.0.100 with patch roll-forward and prereleases disabled. Install the .NET 10 SDK/runtime alongside it to run tests and application hosts. Library target frameworks remain `net8.0`, `net9.0`, and `net10.0`.
+Install the SDK selected by [global.json](../../global.json): .NET SDK 11.0.100 with patch roll-forward and prereleases disabled. Install the .NET 10 runtime alongside it to run both supported targets. Libraries, app hosts, and correctness tests target `net10.0` and `net11.0`; performance benchmarks target `net10.0`. .NET 8 and .NET 9 are no longer supported.
 
 Restore first when working from a clean checkout or after dependency changes. Use `--ignore-failed-sources` when packages are available from other configured sources despite an unavailable feed:
 
@@ -51,9 +51,9 @@ The .NET CLI invokes MSBuild directly. Shared settings live in [Directory.Build.
 
 Clean the selected configuration with `dotnet clean Elsa.slnx --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
 
-Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.slnx`, or select one test project with `dotnet test --project <path-to-test.csproj>`.
+Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.slnx`, or select one test project with `dotnet test --project <path-to-test.csproj>`. Add `--framework net10.0` or `--framework net11.0` to run one target.
 
-Source projects multi-target `net8.0`, `net9.0`, and `net10.0` through [src/Directory.Build.props](../../src/Directory.Build.props). Central package versions are in [Directory.Packages.props](../../Directory.Packages.props), including conditional version blocks for .NET 8/9 and .NET 10.
+Source libraries multi-target `net10.0` and `net11.0` through [src/Directory.Build.props](../../src/Directory.Build.props). Central package versions are in [Directory.Packages.props](../../Directory.Packages.props), including framework-specific package versions where necessary for .NET 10 and .NET 11.
 
 ## Run The Reference Server
 
@@ -65,7 +65,7 @@ Restore the project and run it with:
 
 ```bash
 dotnet restore src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj --ignore-failed-sources
-dotnet run --project src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj --no-restore
+dotnet run --project src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj --framework net11.0 --no-restore
 ```
 
 Notable toggles in `Program.cs`:
@@ -94,6 +94,8 @@ docker run --rm -it \
   -p 13000:8080 \
   elsa-server:local
 ```
+
+Dockerfiles run on .NET 11 by default. Pass `--build-arg DOTNET_RUNTIME_VERSION=10.0` to build a .NET 10 image.
 
 Host [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) separately when a visual designer is needed.
 
@@ -181,4 +183,4 @@ dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0
 
 This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.
 
-Because source projects multi-target three frameworks, package upgrades should be checked against all target frameworks and provider packages. Persistence changes usually need extra scrutiny because each provider package may need migrations or compatibility updates.
+Because source libraries multi-target .NET 10 and .NET 11, package upgrades should be checked against all target frameworks and provider packages. Persistence changes usually need extra scrutiny because each provider package may need migrations or compatibility updates.

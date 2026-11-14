@@ -27,10 +27,10 @@ jobs:
           sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
           df -h /
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
-          # Test applications target .NET 10 and need its runtime alongside SDK 11.
+          # Install the .NET 10 runtime alongside SDK 11 to test both supported targets.
           dotnet-version: 10.0.x
       - name: 'Run: Restore'
         run: dotnet restore Elsa.slnx

@@ -2,15 +2,15 @@
 
 ## Repository Overview
 
-**Elsa Workflows** is a powerful .NET workflow library that enables workflow execution within any .NET application. This is version 3.0, supporting .NET 8.0, .NET 9.0 and .NET 10.0 and providing server APIs and programmatic workflow definition capabilities. This repository builds backend libraries and reference servers. Elsa Studio is maintained and hosted separately; Studio applications and deployment artifacts are not included here.
+**Elsa Workflows** is a powerful .NET workflow library that enables workflow execution within any .NET application. This is version 3.0, supporting .NET 10.0 and .NET 11.0 and providing server APIs and programmatic workflow definition capabilities. This repository builds backend libraries and reference servers. Elsa Studio is maintained and hosted separately; Studio applications and deployment artifacts are not included here.
 
 ### Key Statistics
-- **Language**: C# (.NET 10.0)
+- **Language**: C# (.NET 11 SDK)
 - **Architecture**: Modular library with 104+ projects
 - **Code Size**: ~3,500 C# files across modules
 - **License**: MIT
 - **Build System**: .NET CLI and MSBuild for build/package automation; Microsoft Testing Platform for tests
-- **Target Frameworks**: .NET 10.0 (primary)
+- **Target Frameworks**: .NET 10.0 and .NET 11.0
 
 ## High-Level Architecture
 
@@ -49,7 +49,7 @@ docker/                 # Docker configurations
 
 ### Prerequisites
 - **.NET SDK 11.0.100**, selected by `global.json` with patch roll-forward and prereleases disabled
-- **.NET 10 SDK/runtime** alongside the build SDK for tests and app hosts
+- **.NET 10 runtime** alongside the build SDK to run both supported test and app targets
 - **Build time**: Initial restore ~1-2 minutes, full compile ~5-10 minutes
 
 ### Build Commands
@@ -123,7 +123,7 @@ dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Cor
 ```
 
 The root `global.json` selects Microsoft Testing Platform (MTP), and all test
-projects use TUnit 1.66.27. Use `[Test]` for a test case,
+projects use the TUnit version managed in `Directory.Packages.props`. Use `[Test]` for a test case,
 `[Arguments(...)]` for parameterized cases, and await TUnit assertions, for
 example `await Assert.That(actual).IsEqualTo(expected)`.
 
@@ -141,7 +141,7 @@ coverage thresholds.
 
 ### Code Standards
 - **Language version**: C# latest
-- **Target framework**: .NET 10.0  
+- **Target frameworks**: .NET 10.0 and .NET 11.0
 - **Nullable reference types**: Enabled
 - **Implicit usings**: Enabled
 - **EditorConfig**: Configured (4-space indentation, CRLF line endings)
@@ -162,21 +162,21 @@ coverage thresholds.
 ### GitHub Actions Workflow
 - **Trigger**: Pull requests to `main` branch
 - **Runner**: ubuntu-latest  
-- **.NET SDK**: selected by `global.json`, plus .NET 10 for test runtime support
+- **.NET SDK**: selected by `global.json`, plus the .NET 10 runtime to run both test targets
 - **Commands**: `dotnet restore Elsa.slnx`, `dotnet build Elsa.slnx --configuration Release --no-restore`,
   then `dotnet test --solution Elsa.slnx --configuration Release --no-build`
 - **File**: `.github/workflows/pr.yml`
 
 ### CI Pipeline Steps
 1. Checkout code
-2. Set up the SDK selected by `global.json` and .NET 10
+2. Set up the SDK selected by `global.json` and the .NET 10 runtime
 3. Restore and build with the .NET CLI
 4. Run all TUnit applications through the root MTP entry point
 5. Expected warnings for external feed access
 
-The packages workflow uses the native unit/integration and component solution
-filters, collects Microsoft Cobertura coverage, and applies the shared aggregate
-coverage gate after the runs complete.
+The packages workflow runs the native unit/integration and component solution
+filters in a .NET 10/.NET 11 matrix, collects Microsoft Cobertura coverage in
+separate artifacts, and applies the shared aggregate coverage gate after the runs complete.
 
 ## Key Configuration Files
 
@@ -228,7 +228,7 @@ To run the workflow server for development:
 ```bash
 cd src/apps/Elsa.Server.Web
 dotnet restore --ignore-failed-sources
-dotnet run
+dotnet run --framework net11.0
 ```
 
 The server will start on the configured ports (check `appsettings.json` or environment variables).

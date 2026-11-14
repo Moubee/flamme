@@ -25,15 +25,19 @@ env:
 
 jobs:
   test_unit_integration:
-    name: Test unit/integration with coverage
+    name: Test unit/integration with coverage (${{ matrix.framework }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [net10.0, net11.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
           dotnet-version: 10.0.x
@@ -63,6 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           dotnet test --solution Elsa.UnitIntegration.Tests.slnf \
+            --framework ${{ matrix.framework }} \
             --configuration Release \
             --no-restore \
             --results-directory artifacts/test-results/unit-integration \
@@ -94,19 +99,23 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-integration-test-results
+          name: unit-integration-test-results-${{ matrix.framework }}
           path: artifacts/test-results/unit-integration
 
   test_component:
-    name: Test component with coverage
+    name: Test component with coverage (${{ matrix.framework }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [net10.0, net11.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
           dotnet-version: 10.0.x
@@ -136,6 +145,7 @@ jobs:
         run: |
           set -euo pipefail
           dotnet test --solution Elsa.Component.Tests.slnf \
+            --framework ${{ matrix.framework }} \
             --configuration Release \
             --no-restore \
             --results-directory artifacts/test-results/component \
@@ -169,7 +179,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: component-test-results
+          name: component-test-results-${{ matrix.framework }}
           path: artifacts/test-results/component
 
   coverage_report:
@@ -185,7 +195,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
           dotnet-version: 10.0.x
@@ -193,13 +203,13 @@ jobs:
       - name: Download unit and integration test results
         uses: actions/download-artifact@v4
         with:
-          name: unit-integration-test-results
+          pattern: unit-integration-test-results-*
           path: artifacts/test-results/unit-integration
 
       - name: Download component test results
         uses: actions/download-artifact@v4
         with:
-          name: component-test-results
+          pattern: component-test-results-*
           path: artifacts/test-results/component
 
       - name: Restore .NET tools
@@ -285,7 +295,7 @@ jobs:
             echo "VERSION=${{env.base_version}}-preview.${{github.run_number}}" >> $GITHUB_ENV
           fi
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json
           dotnet-version: 10.0.x
@@ -334,7 +344,7 @@ jobs:
 
       - name: Set up .NET SDK
         # Pinned for the reason given on the checkout above.
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
 
@@ -375,7 +385,7 @@ jobs:
 
       - name: Set up .NET SDK
         # Pinned for the reason given on the checkout above.
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
 

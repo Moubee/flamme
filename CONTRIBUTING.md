@@ -30,8 +30,9 @@ All changes happen through Pull Requests targeting the `main` branch.
 ### Build And Test
 
 Install the SDK selected by [global.json](global.json) (.NET SDK 11.0.100 with
-patch roll-forward), plus the .NET 10 SDK/runtime for test applications and app
-hosts. Source libraries continue to target .NET 8, 9, and 10.
+patch roll-forward), plus the .NET 10 runtime to run both supported targets.
+Libraries, app hosts, and correctness tests target .NET 10 and .NET 11; performance
+benchmarks target .NET 10. .NET 8 and .NET 9 are no longer supported.
 
 ```bash
 dotnet restore Elsa.slnx
@@ -40,7 +41,8 @@ dotnet test --solution Elsa.slnx --configuration Release --no-build
 ```
 
 While iterating, use `dotnet test --project <test.csproj>` to select a test
-project. Create versioned packages with:
+project. Add `--framework net10.0` or `--framework net11.0` to run one target.
+Create versioned packages with:
 
 ```bash
 dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
