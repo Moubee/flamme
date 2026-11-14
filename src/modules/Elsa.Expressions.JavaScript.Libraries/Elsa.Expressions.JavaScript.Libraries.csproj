@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides the following JavaScript libraries for Elsa:
+            Provides the following JavaScript libraries for Flamme:
             - lodash
             - moment
         </Description>

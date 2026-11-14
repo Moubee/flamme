@@ -1,31 +1,19 @@
-# Contributing to Elsa
+# Contributing to Flamme
 
-Thank you for your interest in contributing to Elsa.
+Flamme focuses on process orchestration for high-load, distributed production systems. Read the [project direction](doc/project-direction.md) and [roadmap](ROADMAP.md) when proposing work.
 
-We value clarity, discipline, and maintainability in our codebase. Well-scoped pull requests and high-quality bug reports help us maintain velocity without sacrificing quality.
+Contributions to runtime correctness, measured performance, PostgreSQL persistence, Kubernetes operations, tests, and documentation are welcome. UI and visual-designer work are secondary. Existing `Elsa.*` identifiers remain in the source; see the [README](README.md) for the project's origin and current scope.
 
-Whether you're:
-- Reporting a bug
-- Proposing a feature
-- Submitting a fix
-- Improving documentation
-- Becoming a maintainer
+## Development workflow
 
-— your contributions are welcome.
+Pull requests target `main`. Keep each change focused so its behavior and verification are easy to review.
 
----
-
-## Development Workflow
-
-Elsa follows **Trunk Based Development**.
-
-All changes happen through Pull Requests targeting the `main` branch.
-
-1. Fork the repository and create your branch from `main`.
-2. If you've added code that should be tested, add tests.
-3. If you've changed APIs, update documentation.
-4. Ensure the test suite passes.
-5. Open a Pull Request.
+1. Fork the [Flamme repository](https://github.com/DenDeline/flamme) and create a branch from the current `main`.
+2. Implement the change, adding or updating relevant tests when behavior changes.
+3. Update documentation for public APIs, configuration, or operational behavior.
+4. Run the checks appropriate to the change and report the results.
+5. Make commits in [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) style, such as `docs: clarify persistence scope` or `fix(runtime): preserve workflow recovery state`.
+6. Open a pull request describing the problem, resulting behavior, and verification.
 
 ### Build And Test
 
@@ -74,124 +62,38 @@ scripts/adr/generate-toc.sh
 and commit the result. CI runs `scripts/adr/generate-toc.sh --check` and fails a pull request whose index
 is out of date, so the index is never hand-edited.
 
----
+## Pull requests
 
-## Pull Requests
+Keep one concern per pull request. Put unrelated refactoring, formatting, and dependency upgrades in separate changes.
 
-We aim for PRs that are easy to review, easy to reason about, and safe to merge.
+A useful description includes:
 
-### 1) One PR = One Concern
+- The concrete problem and expected behavior.
+- Steps to reproduce a bug or exercise the new behavior.
+- Tests or other checks run, including any relevant prerequisites or limitations.
+- Configuration, API, migration, or operational implications.
 
-Keep PRs focused on a single logical change:
+Performance changes should include reproducible workloads, environment details, and before/after measurements. Distributed-runtime changes should explain the concurrency or failure scenario tested, such as competing workers, interrupted execution, or rolling restarts. See the [roadmap](ROADMAP.md) for measurement and reliability priorities.
 
-- ✅ Bug fix
-- ✅ Refactor (no behavior change)
-- ✅ Formatting
-- ✅ Dependency update
-- ✅ Documentation change
-- ❌ Mixing unrelated cleanups with functional changes
+For persistence changes, verify PostgreSQL behavior when durable storage is involved. In-memory tests do not establish database transaction, migration, restart, or concurrency guarantees. MySQL, SQLite, and Cassandra are future plans rather than currently supported providers; see the [migration guide](doc/postgres-inmemory-migration.md).
 
-**Why:** Mixed concerns increase cognitive load, slow reviews, and increase merge risk.
+## Reporting bugs
 
-If you notice cleanup opportunities while fixing a bug:
-- Prefer a follow-up PR titled `refactor: ...` or `chore: ...`
-- Or keep cleanup strictly limited to what is required for the fix
+Use [Flamme issues](https://github.com/DenDeline/flamme/issues) and include:
 
-PRs that mix unrelated concerns may be asked to split before review continues.
+- A clear summary, expected behavior, and actual behavior.
+- Reproduction steps and a minimal workflow or sample where practical.
+- Relevant versions, hosting topology, persistence configuration, and workload details.
+- Logs or diagnostics with secrets and sensitive process data removed.
 
----
+For load-related failures, include concurrency, replica count, queue behavior, and resource observations when available.
 
-### 2) Make Reviews Fast
+## Feature proposals and priorities
 
-A good PR includes:
+Describe the production scenario, the behavior needed, and how the result could be verified. Substantial proposals benefit from an issue discussion before implementation.
 
-- A clear problem statement
-- Expected behavior
-- Steps to reproduce (if applicable)
-- Steps to verify the change
-- Screenshots or video for UI changes (if applicable)
-
-The easier your PR is to review, the faster it can be merged.
-
----
-
-### 3) Prefer Small PRs
-
-Smaller PRs are:
-- Easier to review
-- Less risky to merge
-- More likely to receive timely feedback
-
-If a change is large, consider splitting it into incremental PRs.
-
----
-
-## Reporting Bugs
-
-We use GitHub Issues to track bugs and feature requests.
-
-When reporting a bug, please include:
-
-- A clear summary
-- Steps to reproduce
-- Expected behavior
-- Actual behavior
-- Relevant logs or screenshots
-- Sample code (if applicable)
-
-Thorough bug reports significantly increase the chance of a fast and accurate resolution.
-
----
-
-## Feature Requests & Prioritization
-
-Elsa Workflows is an open source project, and as such, not all feature requests can be implemented immediately or on demand.
-
-Feature development is prioritized based on a combination of the following factors:
-
-### 1. Project Vision & Roadmap
-
-Some features align closely with the long-term direction of Elsa and are prioritized accordingly.
-
-### 2. Real-World Demand
-
-Features that are backed by concrete use cases, especially in production environments, are more likely to be prioritized.
-
-If a feature is important for your scenario, providing context about how you plan to use it is extremely helpful.
-
-### 3. Community Contributions
-
-Contributions from the community are strongly encouraged.
-
-If you are able to propose a design or submit a pull request, it can significantly accelerate progress. Maintainers are happy to collaborate and review contributions.
-
-### 4. Available Time & Maintainer Bandwidth
-
-Elsa is actively maintained, but development capacity is limited. As a result, some features may take time to be implemented.
-
-### 5. Sponsored / Paid Work
-
-Organizations that require specific features or timelines can engage through commercial support.
-
-This allows dedicated time to be allocated to specific work items and can accelerate development significantly.
-
----
-
-### What This Means in Practice
-
-- There are no guaranteed timelines for feature requests
-- Some features may remain open until one of the above factors changes
-- The best way to move a feature forward is to:
-  - Contribute a proposal or implementation
-  - Provide a strong real-world use case
-  - Sponsor or fund the work
-
----
-
-We appreciate all feature requests and feedback — they help shape the direction of Elsa Workflows.
-
----
+Priority goes to process-orchestration correctness, measured performance, distributed reliability, Kubernetes operations, and PostgreSQL hardening. Scope and maintainer capacity determine sequencing; there are no guaranteed delivery dates. A focused proposal, reproducible case, or implementation helps move work forward.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the project's MIT License.
+By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).

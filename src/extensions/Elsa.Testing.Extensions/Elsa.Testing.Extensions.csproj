@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Extensions for testing Elsa Workflows in integration tests.
+            Extensions for testing Flamme in integration tests.
         </Description>
         <PackageTags>elsa testing integration</PackageTags>
     </PropertyGroup>

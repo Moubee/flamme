@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Bundles the most commonly-used packages when building an Elsa workflows application.
+            Bundles the core Flamme process orchestration packages for .NET applications.
         </Description>
         <RootNamespace>Elsa</RootNamespace>
         <PackageTags>elsa bundle</PackageTags>

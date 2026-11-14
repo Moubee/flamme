@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Adapts the GitHub Copilot SDK and headless CLI to Elsa AI provider contracts.
+            Adapts the GitHub Copilot SDK and headless CLI to Flamme AI provider contracts.
         </Description>
         <PackageTags>elsa module ai copilot</PackageTags>
     </PropertyGroup>

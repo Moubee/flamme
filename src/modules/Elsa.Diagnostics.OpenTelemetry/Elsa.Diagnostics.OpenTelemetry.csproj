@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Provides OpenTelemetry diagnostics collection and query services for Elsa hosts.</Description>
+        <Description>Provides OpenTelemetry diagnostics collection and query services for Flamme hosts.</Description>
         <PackageTags>elsa module diagnostics opentelemetry otel otlp signalr operations</PackageTags>
     </PropertyGroup>
 

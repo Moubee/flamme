@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides common Entity Framework Core types for implementing EF Core persistence of varipus ELsa modules.
+            Provides common Entity Framework Core types for implementing Flamme module persistence.
         </Description>
         <PackageTags>elsa extension module persistence efcore</PackageTags>
         <RootNamespace>Elsa.Persistence.EFCore</RootNamespace>

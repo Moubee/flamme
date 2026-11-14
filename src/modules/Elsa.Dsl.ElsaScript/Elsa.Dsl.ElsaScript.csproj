@@ -6,7 +6,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides a JavaScript-inspired textual DSL (ElsaScript) for authoring Elsa 3 workflows.
+            Provides a JavaScript-inspired textual DSL (ElsaScript) for authoring Flamme workflows.
         </Description>
         <PackageTags>elsa module dsl elsascript workflows</PackageTags>
     </PropertyGroup>

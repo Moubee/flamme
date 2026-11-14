@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides API endpoints for client applications such as the Elsa Designer web component.
+            Provides REST API endpoints for managing and executing Flamme workflows.
         </Description>
         <PackageTags>elsa module workflows api</PackageTags>
     </PropertyGroup>

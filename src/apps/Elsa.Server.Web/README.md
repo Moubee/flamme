@@ -1,6 +1,6 @@
-# Server
+# Flamme reference server
 
-This project represents an Elsa application that hosts workflows and exposes API endpoints to manage & execute workflows.
+`Elsa.Server.Web` is the Flamme reference ASP.NET Core host for managing and executing workflows through APIs. Its project name and `Elsa.*` identifiers remain unchanged. It is a development host; production orchestration and Kubernetes operations guide the [project direction](../../../doc/project-direction.md), while UI work is secondary. See the [root README](../../../README.md) for local setup.
 
 ## Persistence
 

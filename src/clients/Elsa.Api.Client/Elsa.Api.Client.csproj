@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides HTTP clients for the Elsa Workflows REST API.
+            Provides HTTP clients for the Flamme REST API.
         </Description>
         <PackageTags>elsa api client</PackageTags>
     </PropertyGroup>

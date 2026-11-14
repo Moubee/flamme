@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides caching services and utility functions common to Elsa modules.
+            Provides caching services and utility functions common to Flamme modules.
         </Description>
         <PackageTags>elsa module caching</PackageTags>
     </PropertyGroup>

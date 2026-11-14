@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Provides shared dashboard contracts and contribution abstractions for Elsa modules.</Description>
+        <Description>Provides shared dashboard contracts and contribution abstractions for Flamme modules.</Description>
         <PackageTags>elsa dashboard abstractions contributors operations</PackageTags>
     </PropertyGroup>
 

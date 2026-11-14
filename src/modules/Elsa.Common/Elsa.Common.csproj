@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides services and utility functions common to Elsa modules.
+            Provides services and utility functions common to Flamme modules.
             For example, it provides a system clock and a memory store implementation.
         </Description>
         <PackageTags>elsa module common</PackageTags>

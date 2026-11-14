@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Integrates Elsa workflow runtimes with Elsa Platform deployment commands.
+            Integrates Flamme workflow runtimes with Elsa Platform deployment commands.
         </Description>
         <PackageTags>elsa module platform integration deployment workflows</PackageTags>
     </PropertyGroup>

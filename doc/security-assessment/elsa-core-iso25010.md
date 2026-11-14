@@ -907,7 +907,6 @@ Reviewed by: ___ · Date: ___
 - Assumption: whether Elsa can be gradually replaced by a different workflow engine in an existing deployment (partial migration) depends on host application integration patterns and is not assessable from code.
 
 **Human completion required:**
-- [ ] Document a migration guide for moving from Elsa 2.x to 3.x and from earlier 3.x versions to 3.7.0 (DOCS)
 - [ ] Assess whether workflow state stored in earlier schema versions can be migrated to v3.7.0 without data loss (RUNTIME)
 - [ ] Gather feedback from adopters who have swapped persistence providers or upgraded from earlier versions (OPS)
 

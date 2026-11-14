@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides PostgreSQL EF Core migrations for Elsa external authentication.
+            Provides PostgreSQL EF Core migrations for Flamme external authentication.
         </Description>
         <PackageTags>elsa extension module external-authentication persistence efcore postgresql</PackageTags>
     </PropertyGroup>

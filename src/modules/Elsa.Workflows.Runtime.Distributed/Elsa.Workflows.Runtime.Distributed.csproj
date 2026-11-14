@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides distributed workflow runtime functionality.
+            Provides distributed workflow runtime services for Flamme process orchestration.
         </Description>
         <PackageTags>elsa extensions module workflows distributed runtime</PackageTags>
     </PropertyGroup>

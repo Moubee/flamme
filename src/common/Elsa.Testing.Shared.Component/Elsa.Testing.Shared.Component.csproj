@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>
-            Provides common utilities that are helpful when writing component tests against Elsa Workflows functionality.
+            Provides common utilities that are helpful when writing component tests against Flamme functionality.
         </Description>
         <PackageTags>elsa, component testing</PackageTags>
         <RootNamespace>Elsa.Testing.Shared</RootNamespace>
