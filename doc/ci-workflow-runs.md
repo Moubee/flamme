@@ -31,8 +31,11 @@ Research date: 2026-11-14. Base: `origin/main` at `8c50b8669`, after
   so they do not establish that a webpack major upgrade can rebuild the bundles.
 - The NuGet Dependabot scan
   [43626825502](https://github.com/DenDeline/flamme/actions/runs/43626825502)
-  failed, while the npm and Actions scans succeeded. This is a separate updater
-  issue, not evidence that NuGet needs no CI.
+  failed, while the npm and Actions scans succeeded. Job logs show the proxy
+  rejecting `f.feedz.io` with `egress not allowlisted`, HTTP 403, then
+  `private_source_authentication_failure`. Review Dependabot access to the
+  configured Feedz sources separately; do not remove those sources or infer that
+  NuGet needs no CI. This branch does not change feed credentials or access.
 - The branch-protection API returned HTTP 403 because this private repository's
   plan does not expose that feature. Preserve the existing `ubuntu-latest` check
   name and its failure behavior regardless of settings visibility.

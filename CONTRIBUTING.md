@@ -69,7 +69,12 @@ server startup, and operational guidance.
 
 ### CI validation and package artifacts
 
-Pull requests run .NET validation on both supported frameworks. Packages runs
+Pull requests run .NET validation on both supported frameworks, except changes
+entirely within the isolated `design/video/elsa-readme-video/` project. Those PRs
+still report the `ubuntu-latest` check with an explicit .NET skip decision; this
+does not validate the video's npm build. Mixed changes and production ClientLib
+updates run the complete .NET matrix. Manual PR runs always run it as well.
+Packages runs
 automatically after a push to `main`; development branches can request it from
 Actions → Packages → Run workflow. Select the branch and leave `build_packages`
 enabled to produce NuGet artifacts, or disable it for coverage validation only.

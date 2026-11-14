@@ -30,6 +30,14 @@ its maintenance job. Weekly Dependabot updates cover NuGet, npm, and GitHub Acti
 See the [workflow run audit](ci-workflow-runs.md) for the hosted baseline and
 the reasoning behind the trigger and optional-package policy.
 
+PRs changing only `design/video/elsa-readme-video/**` skip the .NET matrix while
+retaining the `ubuntu-latest` check. A lightweight job compares the synthetic
+merge with its first parent using a depth-two checkout, NUL-separated paths,
+and rename detection disabled so moves include deleted source paths. Mixed,
+unknown, empty, and production ClientLib diffs run the full matrix. Failed
+classification fails the result gate; manual runs always validate .NET.
+This decision does not establish that the video's npm build succeeds.
+
 The sections below record the performance work that established this validation
 graph. References to publishing in those historical findings predate the removal
 of inherited release automation.
