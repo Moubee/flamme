@@ -1,7 +1,5 @@
 using Elsa.Expressions.Helpers;
-using Elsa.ModularServer.Web;
 using Elsa.Server.Web;
-using System.Text.Json.Nodes;
 
 namespace Elsa.Hosts.SmokeTests;
 
@@ -52,86 +50,4 @@ public class ClassicHostSmokeTests : HostSmokeTests<ClassicHostWebApplicationFac
     }
 }
 
-/// <summary>Elsa.ModularServer.Web, which registers its modules through the CShells <c>ShellFeatures/</c> path.</summary>
-[InheritsTests]
-[NotInParallel(HostSmokeTestConstraints.EntryPointProcessState)]
-public class ShellHostSmokeTests : HostSmokeTests<ModularHostWebApplicationFactory, ModularServerHost>
-{
-    /// <inheritdoc />
-    /// <remarks>
-    /// The two route sets overlap but are not identical: each lists what its own host actually configures,
-    /// and External Authentication and User Tasks are enabled only here. Keeping them separate is the point --
-    /// a route that disappears from one host and not the other is the divergence these tests are looking for.
-    /// </remarks>
-    protected override IReadOnlyCollection<string> GatedRoutes =>
-    [
-        "/elsa/api/workflow-definitions",
-        "/elsa/api/workflow-instances",
-        "/elsa/api/identity/permissions",
-        "/elsa/api/external-authentication/connections",
-        "/elsa/api/external-authentication/descriptors/adapters",
-        "/elsa/api/user-tasks"
-    ];
-
-    protected override IReadOnlyDictionary<string, string?> CreateTestConfiguration()
-    {
-        var connectionString = ConnectionString;
-        var packageStore = CreateDirectory("package-store");
-        var shellOverlayPath = Path.Join(TestRoot, "platform-shell-overrides.json");
-        var overlayConfiguration = new Dictionary<string, string?>
-        {
-            ["CShells:Shells:Default:Features:PostgreSqlWorkflowPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:PostgreSqlIdentityPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:PostgreSqlExternalAuthenticationPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:PostgreSqlAlterationsPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:PostgreSqlUserTasksPersistence:ConnectionString"] = connectionString,
-            ["CShells:Shells:Default:Features:Http:HttpActivityOptions:BaseUrl"] = "https://localhost",
-            ["CShells:Shells:Default:Features:ExternalAuthentication:Redirects:ExternalCallbackBaseUri"] = "https://localhost/elsa/api/",
-            ["Elsa:PlatformIntegration:Enabled"] = "false",
-            ["Nuplane:Setup:AutomaticReconciliation"] = "false",
-            ["Nuplane:Setup:UseInMemoryStore"] = "true",
-            ["Nuplane:Setup:Feeds:0:DirectoryPath"] = CreateDirectory("packages"),
-            ["Nuplane:Setup:Feeds:0:Directory:Watch"] = "false",
-            ["Nuplane:FeedResolution:PackageInstallRoot"] = packageStore,
-            ["Nuplane:LockFile:Path"] = Path.Join(TestRoot, "nuplane.lock.json"),
-            ["Nuplane:Loading:Enabled"] = "false",
-            ["Nuplane:Loading:ActiveStoreRoot"] = packageStore
-        };
-
-        WriteOverlay(shellOverlayPath, overlayConfiguration);
-        return new Dictionary<string, string?>
-        {
-            ["Elsa:PlatformIntegration:ShellOverlayPath"] = shellOverlayPath
-        };
-    }
-
-    private static void WriteOverlay(string path, IReadOnlyDictionary<string, string?> configuration)
-    {
-        var root = new JsonObject();
-
-        foreach (var (key, value) in configuration)
-        {
-            var segments = key.Split(':');
-            var section = root;
-
-            foreach (var segment in segments[..^1])
-            {
-                if (section[segment] is not JsonObject child)
-                {
-                    child = new JsonObject();
-                    section[segment] = child;
-                }
-
-                section = child;
-            }
-
-            section[segments[^1]] = value;
-        }
-
-        File.WriteAllText(path, root.ToJsonString());
-    }
-}
-
 public sealed class ClassicHostWebApplicationFactory : HostWebApplicationFactory<ClassicServerHost>;
-
-public sealed class ModularHostWebApplicationFactory : HostWebApplicationFactory<ModularServerHost>;

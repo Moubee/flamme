@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-        <PackageReference Include="TUnit.AspNetCore" />
-        <ProjectReference Include="..\..\..\src\modules\Elsa.Shells.Api\Elsa.Shells.Api.csproj" />
-    </ItemGroup>
-
-</Project>

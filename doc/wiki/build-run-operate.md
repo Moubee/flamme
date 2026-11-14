@@ -78,7 +78,7 @@ Notable toggles in `Program.cs`:
 
 The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants.
 
-When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings. Shell-based hosts use the shell feature path, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
+When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings.
 
 ## Build a container image
 

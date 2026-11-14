@@ -7,7 +7,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\apps\Elsa.Server.Web\Elsa.Server.Web.csproj" />
-        <ProjectReference Include="..\..\..\src\apps\Elsa.ModularServer.Web\Elsa.ModularServer.Web.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.AI.Host\Elsa.AI.Host.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.Alterations\Elsa.Alterations.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.ExternalAuthentication\Elsa.ExternalAuthentication.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.Resilience\Elsa.Resilience.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.Secrets\Elsa.Secrets.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Elsa.UserTasks\Elsa.UserTasks.csproj" />
         <ProjectReference Include="..\..\..\src\common\Elsa.Testing.Shared\Elsa.Testing.Shared.csproj" />
     </ItemGroup>
 

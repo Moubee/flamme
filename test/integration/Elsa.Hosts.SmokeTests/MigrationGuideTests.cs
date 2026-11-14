@@ -2,8 +2,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Elsa.Authorization;
 using Elsa.Permissions;
-using Elsa.ModularServer.Web;
-using Elsa.Server.Web;
 
 namespace Elsa.Hosts.SmokeTests;
 
@@ -56,14 +54,11 @@ public class MigrationGuideTests
     private static bool IsAdvertised(IReadOnlyDictionary<string, IReadOnlyCollection<string>> catalog, Permission permission) =>
         catalog.TryGetValue(permission.Resource, out var verbs) && verbs.Contains(permission.Verb, StringComparer.Ordinal);
 
-    /// <summary>The resources and verbs every Elsa module shipped alongside these tests contributes.</summary>
+    /// <summary>The resources and verbs every retained module shipped alongside these tests contributes.</summary>
     /// <remarks>
-    /// Built by loading every <c>Elsa.*.dll</c> in the output directory, which is deterministic and complete.
-    /// Two lazier approaches were tried and both under-report. <c>AppDomain.CurrentDomain.GetAssemblies()</c>
-    /// describes whatever earlier tests happened to touch, so this class saw 29 resources as missing when run
-    /// alone and none in a full run. Walking <c>GetReferencedAssemblies()</c> from the two hosts is no better:
-    /// the compiler drops references to assemblies whose types the app never names, so AI and Shells vanished despite being project references. The output directory has every module either host
-    /// pulls in, regardless of whether its types are mentioned.
+    /// Loads every <c>Elsa.*.dll</c> in the output directory. The project explicitly references retained
+    /// modules whose permission descriptors are documented even when the reference server does not enable them.
+    /// This keeps the catalog deterministic without depending on which assemblies earlier tests touched.
     /// </remarks>
     private static Dictionary<string, IReadOnlyCollection<string>> BuildCatalog() =>
         Directory.GetFiles(AppContext.BaseDirectory, "Elsa.*.dll")

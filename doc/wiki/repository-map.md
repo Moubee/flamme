@@ -6,7 +6,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 | Path | Purpose |
 | --- | --- |
-| [src/apps](../../src/apps) | Runnable reference hosts, load-balancer host, and modular server host. |
+| [src/apps](../../src/apps) | Runnable code-first reference server and load-balancer host. |
 | [src/modules](../../src/modules) | Elsa product modules: workflow engine, runtime, management, APIs, HTTP, identity, persistence, diagnostics, scripting, scheduling, tenants, labels, resilience, and more. |
 | [src/common](../../src/common) | Shared infrastructure such as feature/module plumbing, mediator, API helpers, and test helpers. |
 | [src/clients](../../src/clients) | Client packages, currently including the Elsa API client. |
@@ -31,8 +31,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 | Alterations | [Elsa.Alterations](../../src/modules/Elsa.Alterations), [Elsa.Alterations.Core](../../src/modules/Elsa.Alterations.Core) | Bulk alteration of running workflow instances: alteration plans, jobs, dispatching, and in-memory stores; PostgreSQL EF Core persistence lives alongside the core. |
 | Workflow API | [Elsa.Workflows.Api](../../src/modules/Elsa.Workflows.Api) and [Elsa.Api.Common](../../src/common/Elsa.Api.Common) | FastEndpoints registration, workflow endpoints, real-time workflow updates, API serialization. |
 | Expression languages | [Elsa.Expressions](../../src/modules/Elsa.Expressions), [CSharp](../../src/modules/Elsa.Expressions.CSharp), [JavaScript](../../src/modules/Elsa.Expressions.JavaScript), [Python](../../src/modules/Elsa.Expressions.Python), [Liquid](../../src/modules/Elsa.Expressions.Liquid) | Expression evaluation and language-specific activities/descriptors. |
-| Transport/activity packages | [Elsa.Http](../../src/modules/Elsa.Http), [Elsa.Http.Webhooks](../../src/modules/Elsa.Http.Webhooks), [Elsa.Scheduling](../../src/modules/Elsa.Scheduling), [Elsa.Resilience](../../src/modules/Elsa.Resilience) | HTTP triggers and calls, outbound webhook sinks and activity-driven webhook sources (`WebhooksFeature`), scheduled triggers, resilience strategies. |
-| BPMN | [Elsa.Bpmn](../../src/modules/Elsa.Bpmn), [Elsa.Bpmn.Interchange](../../src/modules/Elsa.Bpmn.Interchange) | BPMN 2.0 process execution: `BpmnProcess` scope activity, work ledger, scope signals; and the `elsa:` XML interchange format that binds BPMN document elements to Elsa activities. See [bpmn-workflows.md](bpmn-workflows.md). |
+| Transport/activity packages | [Elsa.Http](../../src/modules/Elsa.Http), [Elsa.Scheduling](../../src/modules/Elsa.Scheduling), [Elsa.Resilience](../../src/modules/Elsa.Resilience) | HTTP triggers and calls, scheduled triggers, resilience strategies. |
 | Persistence (EF Core) | [Elsa.Persistence.EFCore](../../src/modules/Elsa.Persistence.EFCore) and provider packages under `Elsa.Persistence.EFCore.*` | EF Core stores and provider-specific configuration/migrations. |
 | Key-value store | [Elsa.KeyValues](../../src/modules/Elsa.KeyValues) | Generic key-value storage (`IKeyValueStore`) with a default in-memory backing store; used by other modules for ephemeral or cross-request state. |
 | Caching | [Elsa.Caching](../../src/modules/Elsa.Caching) | `ICacheManager` and `IChangeTokenSignaler`; provides memory-cache helpers and signal-based cache invalidation used internally by other Elsa modules. |
@@ -41,7 +40,6 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 | Secrets | [Elsa.Secrets](../../src/modules/Elsa.Secrets), [Elsa.Secrets.Persistence.EFCore](../../src/modules/Elsa.Secrets.Persistence.EFCore), [Elsa.Secrets.JavaScript](../../src/modules/Elsa.Secrets.JavaScript) | Named secrets with pluggable stores, extensible secret types (text, RSA key, X.509 certificate), versioning, rotation, revocation, secret resolver, management endpoints, PostgreSQL EF Core persistence, and JavaScript expression access. |
 | Workflow telemetry | [WorkflowInstrumentation](../../src/modules/Elsa.Workflows.Core/Telemetry/WorkflowInstrumentation.cs) | `Elsa.Workflows` activity source and meter. Hosts and external observability platforms own collection, export, storage, and viewing; see the [migration guide](opentelemetry-workflows.md). |
 | User Tasks | [Elsa.UserTasks](../../src/modules/Elsa.UserTasks), PostgreSQL EF Core persistence (`Elsa.UserTasks.Persistence.EFCore.PostgreSql`) | Identity-neutral durable human-task module: workflow pause/resume for human decisions, a secure task queue, typed outcomes, participant references independent of `Elsa.Identity`. See [specs/013-user-tasks/spec.md](../../specs/013-user-tasks/spec.md). |
-| Shells and modular hosting | [Elsa.Shells.Api](../../src/modules/Elsa.Shells.Api), CShells-facing shell feature classes throughout modules | Runtime-configurable feature loading for modular hosts. |
 | Operational dashboard | [Elsa.Dashboard.Api](../../src/modules/Elsa.Dashboard.Api) | Read-only aggregate endpoints for the Studio operational dashboard: overview, trends, needs-attention findings, recent activity, and workflow hotspots. |
 | Application clustering | [Elsa.Hosting.Management](../../src/modules/Elsa.Hosting.Management) | Application instance naming, heartbeat-based cluster membership, and instance-aware hosted service support for multi-node deployments. |
 | AI / Weaver | [Elsa.AI.Abstractions](../../src/modules/Elsa.AI.Abstractions), [Elsa.AI.Copilot](../../src/modules/Elsa.AI.Copilot), [Elsa.AI.Host](../../src/modules/Elsa.AI.Host), [Elsa.AI.Persistence.EFCore](../../src/modules/Elsa.AI.Persistence.EFCore) | Weaver AI copilot: streaming chat, context resolution, reviewable proposals, audit, and provider abstraction for AI-assisted workflow authoring. |
@@ -49,7 +47,6 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 ## Reference Hosts
 
 - [Elsa.Server.Web](../../src/apps/Elsa.Server.Web) is the most useful all-up ASP.NET Core sample. Its [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs) shows typical module composition with identity, PostgreSQL EF Core persistence, runtime, management, HTTP, scheduling, scripting, and multitenancy.
-- [Elsa.ModularServer.Web](../../src/apps/Elsa.ModularServer.Web) demonstrates modular package loading through Nuplane and shell features.
 - [Elsa.Server.LoadBalancer](../../src/apps/Elsa.Server.LoadBalancer) is a load-balancer host.
 
 ## Build And Package Files
@@ -62,7 +59,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 ## How To Find Code Fast
 
-Use the feature class first. Most modules have a `Features/*Feature.cs` and often a parallel `ShellFeatures/*Feature.cs`. The feature class tells you what the module registers and what other features it depends on. After that, follow contracts and service registrations into implementation files.
+Use the feature class first. Modules expose code-first `Features/*Feature.cs` registration. The feature class tells you what the module registers and what other features it depends on. After that, follow contracts and service registrations into implementation files.
 
 Good first searches:
 

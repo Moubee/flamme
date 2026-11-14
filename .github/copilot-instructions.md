@@ -19,7 +19,6 @@
 src/
 ├── apps/               # Reference servers
 │   ├── Elsa.Server.Web            # Workflow server only
-│   ├── Elsa.ModularServer.Web     # Shell-based workflow server
 │   └── Elsa.Server.LoadBalancer   # Load balancer
 ├── common/             # Shared libraries (8 projects)
 ├── modules/            # Core functionality modules (70+ projects)
@@ -237,10 +236,9 @@ The server will start on the configured ports (check `appsettings.json` or envir
 
 ### Common Issues
 
-1. **Build Fails on Server Apps**: If `Elsa.Server.Web` fails due to WebhooksCore:
-   - This is a known issue with external package feeds
-   - Try building individual core modules instead
-   - Use `--ignore-failed-sources` flag consistently
+1. **Restore Fails**: Verify the configured NuGet source is reachable and that the selected SDK is installed.
+   - Use `dotnet restore Elsa.slnx --locked-mode` for reproducible CI validation
+   - Regenerate and review locks after intentional dependency changes
 
 2. **Test Failures**: If many tests fail to run:
    - External package dependencies may be unavailable

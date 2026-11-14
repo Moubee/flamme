@@ -10,24 +10,9 @@ namespace Elsa.Hosts.SmokeTests;
 /// Boots a host the way its own entry point does and asserts it comes up serving gated routes.
 /// </summary>
 /// <remarks>
-/// This repo runs two parallel feature systems -- the classic <c>Features/</c> path and the CShells
-/// <c>ShellFeatures/</c> path -- and every module must register in both. Nothing exercised either until
-/// now: the unit and integration suites construct services directly, so a service missing from one path,
-/// or a feature registered in one and not the other, passes every test and fails only when a host starts.
-/// Three such bugs in #7980 were found by running these two hosts by hand.
-/// <para>
-/// Each host is booted through <see cref="TestWebApplicationFactory{TEntryPoint}"/>, which runs the real
-/// <c>Program</c> with its full feature registration. Assembling a service collection here instead would
-/// reproduce exactly the blind spot these tests exist to close.
-/// </para>
-/// <para>
-/// The assertions go through HTTP rather than by resolving services out of the container. The two hosts
-/// have genuinely different container topologies -- the classic host is flat, while CShells gives each
-/// shell its own provider, so the module services are simply not in the root one -- and a test that
-/// reached into either would have to encode that difference and would break whenever CShells changed its
-/// internals. Behaviour at the edge is both host-agnostic and the thing actually worth pinning: whichever
-/// feature system a host uses, the observable result has to be the same.
-/// </para>
+/// The factory runs the real <c>Program</c> with its complete code-first feature registration.
+/// HTTP assertions catch missing endpoint registration, activation failures, and absent permission gates
+/// that service-construction tests cannot detect.
 /// </remarks>
 public abstract class HostSmokeTests<TFactory, TEntryPoint> : WebApplicationTest<TFactory, TEntryPoint>, IAsyncDisposable
     where TFactory : HostWebApplicationFactory<TEntryPoint>, new()
@@ -194,7 +179,7 @@ public abstract class HostWebApplicationFactory<TEntryPoint> : TestWebApplicatio
     {
         base.ConfigureWebHost(builder);
 
-        // Both hosts refuse to start outside Development while the signing key is a known default. That is
+        // The host refuses to start outside Development while the signing key is a known default. That is
         // the guard working as intended, so the test satisfies it rather than configuring around it.
         builder.UseEnvironment(Environments.Development);
     }
@@ -203,7 +188,7 @@ public abstract class HostWebApplicationFactory<TEntryPoint> : TestWebApplicatio
     {
         // These are host-configuration values, not a deferred application-configuration callback. For a
         // minimal top-level Program, WebApplicationFactory turns them into command-line arguments before
-        // invoking the entry point, so startup code sees the isolated paths before registering Nuplane feeds.
+        // invoking the entry point, so startup code sees the isolated database configuration.
         builder.ConfigureHostConfiguration(configurationBuilder =>
         {
             configurationBuilder.AddInMemoryCollection(_startupConfiguration);

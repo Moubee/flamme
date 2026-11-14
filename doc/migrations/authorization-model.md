@@ -455,7 +455,7 @@ One caveat: PostgreSQL treats nulls as distinct in these composite unique indexe
 | `delete:tenants` | `tenants:delete` |
 | `execute:tenants:refresh` | `tenants:refresh` |
 | `read:installed-features` | `system/features:view` |
-| `actions:shells:reload` | `system/shells:reload` |
+| `actions:shells:reload` | *removed* — shell hosting and reload APIs have been removed |
 | `ai:chat` | `ai/chat:execute` |
 | `ai:tools:view` | `ai/tools:view` |
 | `ai:capabilities:view` | `ai/capabilities:view` |

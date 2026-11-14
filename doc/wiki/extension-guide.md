@@ -15,17 +15,9 @@ Elsa is designed to be extended by adding modules, features, activities, stores,
 
 Use [HttpFeature](../../src/modules/Elsa.Http/Features/HttpFeature.cs), [SchedulingFeature](../../src/modules/Elsa.Scheduling/Features/SchedulingFeature.cs), and [WorkflowsFeature](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs) as examples.
 
-## Add A Shell Feature
+## Deploy A Feature
 
-Shell features live in `ShellFeatures` and implement CShells interfaces such as `IShellFeature`, `IFastEndpointsShellFeature`, or `IMiddlewareShellFeature`.
-
-Use shell features when modular server/package configuration needs to activate the feature without code-first `AddElsa` calls.
-
-Examples:
-
-- [Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs](../../src/modules/Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs)
-- [Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs](../../src/modules/Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs)
-- [EF Core provider shell features](../../src/modules/Elsa.Persistence.EFCore.PostgreSql/ShellFeatures)
+Register the feature through `AddElsa` in the host and include its project or package as a build-time reference. Deploy a new application version to change the feature set. Runtime package discovery and shell feature activation/reload are no longer supported.
 
 ## Add An Activity
 

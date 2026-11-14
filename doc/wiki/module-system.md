@@ -62,14 +62,9 @@ This is why feature classes are the best way to learn a module. They encode its 
 
 `IModule.Properties` is used as a shared bag during feature configuration. A concrete example is FastEndpoints assembly collection in [Elsa.Api.Common/Extensions/ModuleExtensions.cs](../../src/common/Elsa.Api.Common/Extensions/ModuleExtensions.cs). Features call `AddFastEndpointsAssembly`, and later `AddFastEndpointsFromModule` registers all collected assemblies with FastEndpoints.
 
-## Shell Features
+## Static Host Composition
 
-Many modules also have `ShellFeatures/*Feature.cs`. These implement CShells interfaces and allow modular server hosts to activate feature sets from configuration or packages. Shell features are parallel to code-first features:
-
-- Code-first feature: [Elsa.Workflows.Core/Features/WorkflowsFeature.cs](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs)
-- Shell feature: [Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs](../../src/modules/Elsa.Workflows.Core/ShellFeatures/WorkflowsFeature.cs)
-
-Use shell features when working on modular hosting, package discovery, or `Elsa.ModularServer.Web`. Use code-first features for normal host configuration and tests.
+Hosts select modules through code-first `AddElsa` registration and deploy the resulting application as a versioned image. The former configuration-driven shell feature system, runtime package loading, and independent shell reload APIs have been removed. Register custom activities and modules at build time and roll out a new host version when composition changes.
 
 ## Extension Method Pattern
 
@@ -86,7 +81,6 @@ public static IModule UseWorkflowsApi(this IModule module, Action<WorkflowsApiFe
 When adding a new module, follow this shape:
 
 - one `Features/*Feature.cs`
-- one `ShellFeatures/*Feature.cs` if the module must work with CShells
 - one `Extensions/ModuleExtensions.cs`
 - tests that prove the feature registers its core contracts
 
