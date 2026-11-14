@@ -86,6 +86,32 @@ record NativeAOT and ReadyToRun support. These deployment modes must not be
 disabled solely because runtime async is enabled. This task does not convert
 the application to NativeAOT or change its publishing model.
 
+### Implemented compilation policy
+
+`Directory.Build.targets` applies the opt-in after each project's framework is
+known, covering both production props roots and the correctness tests. It
+defaults `UseRuntimeAsync` to `true` for exactly `net11.0` when `UseMonoRuntime`
+is not `true` and the runtime identifier does not start with `browser-` or
+`wasi-`; other builds default to `false`. This also leaves platform-specific
+TFMs outside the default opt-in. An explicit property value is respected, and
+the compiler feature is appended only for `net11.0` with `UseRuntimeAsync=true`.
+The existing Fody package references and configuration guards remain in place.
+
+The mapping preserves project-defined compiler feature entries. Standard
+MSBuild global-property precedence still applies: supplying `Features` on the
+command line overrides ordinary project assignments, including this appended
+feature. A caller that overrides `Features` therefore controls the complete
+compiler feature list; `UseRuntimeAsync` is the supported repository switch
+when changing just the async compilation model.
+
+SDK 11.0.100's `_GenerateCompileDependencyCache` hashes inputs such as
+`DefineConstants` and `LangVersion`, but omits `Features`. Without an additional
+cache input, changing the opt-in could reuse production assemblies compiled
+with the previous model. `IncludeCompilerFeaturesInCompileCache` adds the
+effective feature list to `CoreCompileCache` immediately before the SDK target
+generates its hash. Ordinary incremental builds can then switch models without
+requiring a clean build; `--no-build` still reuses existing assemblies.
+
 ### Metadata and compiler fallbacks
 
 The [Roslyn design](https://github.com/dotnet/roslyn/blob/main/docs/compilers/CSharp/Runtime%20Async%20Design.md)
@@ -110,9 +136,29 @@ A local probe with the released 3.4.1/6.9.3 packages, SDK 11.0.100, `net11.0`,
 and `runtime-async=on` built and ran successfully. Its forced incomplete `Task`
 await retained `MethodImplFlags=Async`, produced no nested state-machine type,
 and resumed without the tracking synchronization context (`Captured=False`,
-`Posts=0`). This demonstrates both code-generation and context behavior for the
-probe; the existing Fody configuration can remain in place. Controls without
-the feature/weaving and production regression tests remain part of validation.
+`Posts=0`). Its IL contains `ConfigureAwait(Boolean)` followed by
+`AsyncHelpers.Await(ConfiguredTaskAwaitable)`, showing that the weaver changed
+the runtime-async await while retaining the new compilation model.
+
+The same forced-suspension probe produced these controls:
+
+| Compilation and weaving | Emitted metadata | Captured context | Context posts |
+| --- | --- | --- | --- |
+| Runtime async, Fody enabled | `Async`, no nested state machine | `false` | 0 |
+| Runtime async, Fody disabled | `Async`, no nested state machine | `true` | 1 |
+| Compiler state machine, Fody enabled | `IL`, `AsyncStateMachineAttribute` | `false` | 0 |
+
+The negative weaving control establishes that the context probe detects a
+missing rewrite. The existing Fody configuration can therefore remain in place
+without changing the default context behavior.
+
+With the compile-cache hook applied, three ordinary incremental `dotnet build`
+invocations of the scratch project toggled `UseRuntimeAsync` from `true` to
+`false` and back to `true`. They emitted `Async`, then
+`IL` with `AsyncStateMachineAttribute`, then `Async` again. All three runs
+retained zero context posts. No clean or `Rebuild` target was used for this
+toggle sequence, demonstrating that the effective compiler option invalidates
+the cached compilation.
 
 ## Planned validation
 
@@ -138,5 +184,53 @@ the feature/weaving and production regression tests remain part of validation.
 
 ## Validation results
 
-Pending implementation and execution. No benchmark, NativeAOT publish, or remote
-CI result is implied by this research record.
+Verified on macOS Arm64 with SDK 11.0.100, MSBuild 18.12.2, .NET 11.0.0,
+.NET 10.0.11, and Docker 29.9.3.
+
+| Check | Result |
+| --- | --- |
+| Full solution locked restore | Passed; no dependency or lock-file changes |
+| Release solution build, both frameworks | Passed; zero errors, 191 existing warnings |
+| Complete solution suite, both frameworks | 9,198 passed, zero failures, four existing skips across 118 modules |
+| Focused mediator suite, Release and Debug | 28 passed per configuration, 14 on each runtime |
+| .NET 11 opt-out, ordinary incremental build | 14 passed without cleaning; production methods used state machines |
+| Return to the default compilation model | Full solution build and metadata tests passed after the opt-out run |
+| Standalone testing extension and TLS smoke builds | Passed on both frameworks, zero warnings or errors |
+| NuGet packaging | 71 packages and 71 symbol packages; every package retains .NET 10/11 assemblies |
+| Configuration evaluation | Library, host, and tests opt in on .NET 11; .NET 10/benchmarks, browser RID, and Mono default out; existing Razor features retained |
+| Whitespace | `git diff --check` passed |
+
+The complete suite includes the PostgreSQL component and persistence tests.
+The existing skips are `ImportWorkflowActivity_ShouldUpdateOtherPods` and
+`DeleteWorkflow_Clustered`, each skipped on both runtimes. No test failures
+required retries or production-code changes.
+
+Independent review followed commits `7196e6598`, `30b66d730`, and `7b7e45040`
+and found no actionable defects. It checked framework/platform defaults,
+explicit MSBuild overrides, compile-cache invalidation, production metadata,
+and forced-suspension context behavior. The subsequent test-only correction
+uses TUnit's boolean assertion helpers to remove newly introduced analyzer
+warnings; the full build and suite include that correction.
+
+Key reproduction commands, from the repository root:
+
+```sh
+dotnet restore Elsa.slnx --locked-mode
+dotnet build Elsa.slnx --configuration Release --no-restore
+dotnet test --solution Elsa.slnx --configuration Release --no-build --max-parallel-test-modules 4 --timeout 10m -- --report-trx
+dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --configuration Release --framework net11.0 --no-restore -p:UseRuntimeAsync=false
+dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --configuration Release --framework net11.0 --no-restore
+dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --configuration Debug --no-restore
+dotnet pack Elsa.slnx --configuration Release --no-build --no-restore --output packages
+```
+
+Restore and build `src/extensions/Elsa.Testing.Extensions/Elsa.Testing.Extensions.csproj`
+and `test/TlsSmoke/TlsSmoke.csproj` separately; they are outside the solution.
+Keep the full-target locked restore before selecting a framework for testing.
+The local sandbox required normal build-process access; disabling the MSBuild
+server avoided a sandbox connection timeout. `--disable-build-servers` is a
+build/restore option and must not be passed to the MTP test application.
+
+No benchmark, NativeAOT/ReadyToRun publish, container image rebuild, or remote
+CI run was performed. Performance and deployment-mode claims remain limited
+to the primary platform guidance above.
