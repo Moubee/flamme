@@ -43,6 +43,11 @@ to Debug; CI commands explicitly select Release. Pass `--configuration` to overr
 to `packages/`; build and intermediate outputs remain in each project's `bin/` and
 `obj/` directories. Set `-p:Version=<version>` explicitly for release or preview packages.
 
+Supported .NET 11 builds enable runtime async centrally in `Directory.Build.targets`;
+.NET 10 retains compiler-generated state machines. Keep the shared ConfigureAwait.Fody
+policy for both models. Rebuild with `-p:UseRuntimeAsync=false` to verify the opt-out;
+`--no-build` cannot change the compilation model. See `CONTRIBUTING.md` for platform limits.
+
 Executable entry points (including tests and benchmarks) commit `packages.lock.json`.
 CI restores with `--locked-mode`. After dependency changes, run a full-target
 `dotnet restore Elsa.slnx --force-evaluate` and commit the reviewed lock updates.

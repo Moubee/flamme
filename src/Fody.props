@@ -15,6 +15,9 @@
     Directory.Build.targets in the repository root fails the build for any project that
     references ConfigureAwait.Fody without an effective directive, or that reintroduces a
     FodyWeavers.xml alongside it.
+
+    ConfigureAwait.Fody 3.4.1 also rewrites .NET 11 runtime-async awaits. Keep this directive
+    for both compilation models so runtime async preserves the existing context behavior.
   -->
   <PropertyGroup>
     <WeaverConfiguration>
