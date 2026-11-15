@@ -17,13 +17,12 @@ follow-up section records validation for that later revision separately.
 | `dotnet restore Elsa.slnx --locked-mode` | Passed with committed locks. |
 | `dotnet build Elsa.slnx --no-restore -m:1` | Passed for both supported frameworks; 159 warnings in existing code, zero errors. |
 | `dotnet test --project test/integration/Elsa.Hosts.SmokeTests/Elsa.Hosts.SmokeTests.csproj --no-build --no-restore` | 14 passed, zero failed/skipped: seven on each framework. |
-| New telemetry exporter regression | Workflow span exported; workflow counter exported with value 7 without requiring an OTLP collector. |
 | `git diff --check` | Passed. |
 
 The initial parallel solution build was cancelled while dependency setup was
 taking time. The serial solution build completed, including the existing Copilot
 CLI download. The complete solution test suite was not run; the relevant real-host
-smoke suite covers both reference hosts and the new telemetry test.
+smoke suite covered both reference hosts at that revision.
 
 ## Runtime demonstration
 
@@ -36,8 +35,8 @@ smoke suite covers both reference hosts and the new telemetry test.
   `Message: Hello World from DSL via Expressions!`, including after restart.
 - Aspire telemetry contained request spans with HTTP 200, nested `workflow.execute`
   and `activity.execute` spans, completed workflow status and no workflow faults.
-  Structured startup logs were also exported. Metric export is covered by the
-  exporter regression test; the dashboard metric UI was not manually inspected.
+  Structured startup logs were also exported. The dashboard metric UI was not
+  manually inspected.
 - Development `admin` / `password` login returned authenticated status and a token;
   an authenticated `/elsa/api/workflow-definitions` request returned 200. Tokens
   and generated resource credentials are not included in this report.
@@ -89,11 +88,14 @@ relocated AppHost uses a different volume. The original volume and its data are
 left intact; no data migration is implied by the move. The historical restart
 check above applies to the original path.
 
+The standalone ServiceDefaults test was subsequently removed at the user's
+request; the existing host smoke tests remain.
+
 | Follow-up check | Result |
 | --- | --- |
 | Full-target and locked solution restores; solution build after merge and relocation | Passed; build completed with 189 existing warnings and zero errors. |
 | AppHost MSBuild boundary | `TargetFramework=net11.0`, empty `TargetFrameworks`, no inherited Fody/JetBrains references; dependency lock is byte-identical. |
-| Current host smoke tests on .NET 10 and .NET 11 | 10 passed, zero failures/skips: five per framework. Upstream removed the modular host, so the historical 14-test total does not describe the current suite. |
+| Current host smoke tests on .NET 10 and .NET 11 | Rebuilt and passed after removing the standalone ServiceDefaults test: eight passed, four per framework, zero failures/skips. Historical counts above describe earlier revisions. |
 | Isolated Aspire start and PostgreSQL/server readiness at the new path | Passed using `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`. |
 | Discovered server endpoint health and HTTP workflow demo | HTTP and HTTPS checks passed with the expected workflow response; request/workflow spans reached Aspire without workflow faults. |
 | Data volume preservation | New path uses a different generated volume; the original volume was confirmed to still exist. |
