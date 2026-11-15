@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
@@ -22,7 +23,9 @@ public class ZipManagerTests : IDisposable
     private readonly string _cacheDirectory = Path.Join(Path.GetTempPath(), "elsa-zip-manager-tests", Guid.NewGuid().ToString("N"));
     private readonly IBlobStorage _blobStorage;
     private readonly object _zipManager;
-    private readonly DateTimeOffset _now = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _now = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+    private readonly FakeTimeProvider _timeProvider = new(_now);
 
     public ZipManagerTests()
     {
@@ -47,6 +50,18 @@ public class ZipManagerTests : IDisposable
         await using var entryStream = entry.Open();
         using var reader = new StreamReader(entryStream);
         await Assert.That(await reader.ReadToEndAsync()).IsEqualTo("cached zip");
+    }
+
+    [Test]
+    public async Task LoadAsync_PreservesStrictExpiryBoundary()
+    {
+        await CreateCachedZipAsync("expiry", "cached zip");
+        _timeProvider.Advance(TimeSpan.FromHours(1) - TimeSpan.FromTicks(1));
+        await Assert.That((await LoadAsync("expiry")).HasValue).IsTrue();
+        _timeProvider.Advance(TimeSpan.FromTicks(1));
+        await Assert.That((await LoadAsync("expiry")).HasValue).IsTrue();
+        _timeProvider.Advance(TimeSpan.FromTicks(1));
+        await Assert.That(await LoadAsync("expiry")).IsNull();
     }
 
     [Test]
@@ -142,8 +157,6 @@ public class ZipManagerTests : IDisposable
     [UnconditionalSuppressMessage("Trimming", "IL2077:Target type is resolved by name for an internal test subject.")]
     private object CreateZipManager(IFileCacheStorageProvider? fileCacheStorageProvider = null)
     {
-        var clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(clock).UtcNow.Returns(_now);
         fileCacheStorageProvider ??= new BlobFileCacheStorageProvider(_blobStorage);
         var options = Microsoft.Extensions.Options.Options.Create(new HttpFileCacheOptions
         {
@@ -152,7 +165,7 @@ public class ZipManagerTests : IDisposable
         });
         var logger = typeof(NullLogger<>).MakeGenericType(ZipManagerType).GetRequiredField("Instance").GetValue(null)!;
 
-        return Activator.CreateInstance(ZipManagerType, clock, fileCacheStorageProvider, options, logger)!;
+        return Activator.CreateInstance(ZipManagerType, _timeProvider, fileCacheStorageProvider, options, logger)!;
     }
 
     private async Task CreateCachedZipAsync(string downloadId, string content)

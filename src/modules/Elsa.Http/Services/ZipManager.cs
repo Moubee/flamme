@@ -15,7 +15,7 @@ internal class ZipManager
 {
     private const int MaxDownloadCorrelationIdLength = 128;
     private static readonly SearchValues<char> DownloadCorrelationIdCharacters = SearchValues.Create("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.");
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _timeProvider;
     private readonly IFileCacheStorageProvider _fileCacheStorageProvider;
     private readonly IOptions<HttpFileCacheOptions> _fileCacheOptions;
     private readonly ILogger<ZipManager> _logger;
@@ -23,9 +23,9 @@ internal class ZipManager
     /// <summary>
     /// Initializes a new instance of the <see cref="ZipManager"/> class.
     /// </summary>
-    public ZipManager(ISystemClock clock, IFileCacheStorageProvider fileCacheStorageProvider, IOptions<HttpFileCacheOptions> fileCacheOptions, ILogger<ZipManager> logger)
+    public ZipManager(TimeProvider timeProvider, IFileCacheStorageProvider fileCacheStorageProvider, IOptions<HttpFileCacheOptions> fileCacheOptions, ILogger<ZipManager> logger)
     {
-        _clock = clock;
+        _timeProvider = timeProvider;
         _fileCacheStorageProvider = fileCacheStorageProvider;
         _fileCacheOptions = fileCacheOptions;
         _logger = logger;
@@ -85,7 +85,7 @@ internal class ZipManager
         // Check if the blob has expired.
         var expiresAt = DateTimeOffset.Parse(blob.Metadata["ExpiresAt"]);
 
-        if (_clock.UtcNow > expiresAt)
+        if (_timeProvider.GetUtcNow() > expiresAt)
         {
             // File expired. Try to delete it.
             try
@@ -146,7 +146,7 @@ internal class ZipManager
         }
 
         var fileCacheStorage = _fileCacheStorageProvider.GetStorage();
-        var expiresAt = _clock.UtcNow.Add(_fileCacheOptions.Value.TimeToLive);
+        var expiresAt = _timeProvider.GetUtcNow().Add(_fileCacheOptions.Value.TimeToLive);
         var cachedBlob = CreateBlob(fileCacheFilename, downloadAsFilename, contentType, expiresAt);
         await fileCacheStorage.WriteFileAsync(fileCacheFilename, localPath, cancellationToken);
         await fileCacheStorage.SetBlobAsync(cachedBlob, cancellationToken: cancellationToken);
@@ -164,7 +164,7 @@ internal class ZipManager
     {
         (downloadAsFilename, contentType) = GetDownloadableMetadata(downloadAsFilename, contentType);
 
-        var now = _clock.UtcNow;
+        var now = _timeProvider.GetUtcNow();
         
         var blob = new Blob(fullPath)
         {

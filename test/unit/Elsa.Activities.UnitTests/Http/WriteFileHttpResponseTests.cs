@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Text;
 using System.IO.Compression;
 using Elsa.Common;
@@ -449,7 +450,7 @@ public class WriteFileHttpResponseTests
         services.AddSingleton(CreateContentTypeProviderMock());
         services.AddSingleton(Mock.Of<IFileCacheStorageProvider>().Object);
         services.AddSingleton(CreateFileCacheOptionsMock());
-        services.AddSingleton(CreateSystemClockMock());
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
         services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
         services.AddLogging();
         
@@ -471,13 +472,6 @@ public class WriteFileHttpResponseTests
     {
         var mock = Mock.Of<Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>>().Object;
         Mock.Get(mock).Value.Returns(new HttpFileCacheOptions { TimeToLive = TimeSpan.FromHours(1) });
-        return mock;
-    }
-
-    private static ISystemClock CreateSystemClockMock()
-    {
-        var mock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(mock).UtcNow.Returns(DateTimeOffset.UtcNow);
         return mock;
     }
 
