@@ -85,10 +85,14 @@ an SDK upgrade or solution conversion is not part of this migration.
 
 [`FakeTimeProvider`](https://learn.microsoft.com/en-us/dotnet/core/extensions/timeprovider-testing)
 comes from the test-only `Microsoft.Extensions.TimeProvider.Testing` package.
-Select a stable version compatible with both targets through central package
-management when introducing it, and regenerate all executable dependency locks
-according to [contributor guidance](../../CONTRIBUTING.md#dependency-updates).
-The package and its version are not added by this design record.
+Use stable [version 11.0.0](https://www.nuget.org/packages/Microsoft.Extensions.TimeProvider.Testing/11.0.0),
+which includes both target frameworks, through `Directory.Packages.props`.
+Add versionless references in `Elsa.Testing.Shared` for the fixture and in test
+projects that directly use the fake. Do not add it to production modules or
+hosts. Regenerate all executable dependency locks according to
+[contributor guidance](../../CONTRIBUTING.md#dependency-updates). Adding this
+dependency and replacing legacy clock mocks are explicitly in the migration's
+scope; the package itself is not added by this design record.
 
 ## Decision
 
@@ -293,6 +297,27 @@ concrete type. Call `Advance` deliberately between operations. Where existing
 tests verify sequential clock reads, retain the scenario with a small scripted
 provider; replacing every sequential mock with a frozen clock would lose coverage.
 
+Use the namespace `Microsoft.Extensions.Time.Testing`. For example, replace a
+mock configured to return one UTC instant with this fixture arrangement:
+
+```csharp
+var initialUtc = new DateTimeOffset(2026, 11, 15, 12, 0, 0, TimeSpan.Zero);
+var fakeTime = new FakeTimeProvider(initialUtc)
+{
+    AutoAdvanceAmount = TimeSpan.Zero
+};
+services.AddSingleton<TimeProvider>(fakeTime);
+// Build the fixture/container, perform the operation, and assert its timestamp.
+fakeTime.Advance(TimeSpan.FromMinutes(5));
+// Perform the next operation and assert its timestamp or expiration outcome.
+```
+
+Await TUnit assertions against observable domain results. Replace tests that
+directly construct a migrated service with `new ServiceUnderTest(fakeTime, ...)`;
+DI-based tests supply the same instance through the fixture configuration hook.
+Remove each old mock when its consumer changes. Do not replace an unrelated mock
+or introduce `Task.Delay` just to make a time assertion pass.
+
 | Contract | Acceptance checks |
 | --- | --- |
 | Composition | Full `AddElsa` and minimal fixture containers resolve the same provider for all consumers. Defaults, repeated feature application, both Resilience orders and host overrides before/after `AddElsa` pass. Use `ValidateOnBuild` and `ValidateScopes`, and explicitly resolve factory-created singletons: build validation alone cannot inspect dependencies inside factories. |
@@ -364,14 +389,15 @@ shared fixtures. Any remaining hit must be removed or explained by a genuinely
 unrelated external contract; there is no Elsa compatibility allowlist:
 
 ```bash
-git grep -n -E '\b(ISystemClock|SystemClock|SystemClockFeature)\b' -- '*.cs'
-git grep -n -E '\.Clock\b|\bTimeProvider\b' -- '*.cs'
+git grep -n -w -E 'ISystemClock|SystemClock|SystemClockFeature' -- '*.cs'
+git grep -n -F '.Clock' -- '*.cs'
+git grep -n -w 'TimeProvider' -- '*.cs'
 git diff --check
 scripts/adr/generate-toc.sh --check
 ```
 
 The first search should return no Elsa legacy usages (exit code 1 means no
-matches). Inspect the second search's record callers, registrations and any
+matches). Inspect the remaining searches' record callers, registrations and any
 `TimeProvider.System` uses; production services should consume DI, while defaults
 belong at composition boundaries. Update live code examples; retain historical
 mentions in this ADR and the release's upgrade guidance as explanations.
