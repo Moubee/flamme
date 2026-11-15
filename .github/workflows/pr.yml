@@ -36,7 +36,7 @@ jobs:
           # These preinstalled toolchains are unused by the .NET build and tests.
           sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
           df -h /
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v6.1.0
         with:
           global-json-file: global.json

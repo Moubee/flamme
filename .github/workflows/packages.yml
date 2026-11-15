@@ -33,7 +33,7 @@ jobs:
         framework: [net10.0, net11.0]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v6.1.0
@@ -108,7 +108,7 @@ jobs:
         framework: [net10.0, net11.0]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v6.1.0
@@ -185,7 +185,7 @@ jobs:
     if: always() && !cancelled() && needs.test_unit_integration.result == 'success' && needs.test_component.result == 'success'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v6.1.0
@@ -244,7 +244,7 @@ jobs:
           sudo rm -rf -- /usr/local/lib/android /usr/local/.ghcup /opt/ghc /usr/share/swift /opt/hostedtoolcache/CodeQL
           df -h /
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set VERSION variable
         run: echo "VERSION=${{ env.base_version }}-preview.${{ github.run_number }}" >> "$GITHUB_ENV"
