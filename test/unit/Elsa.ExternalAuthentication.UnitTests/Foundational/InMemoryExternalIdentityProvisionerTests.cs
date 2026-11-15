@@ -28,7 +28,7 @@ public class InMemoryExternalIdentityProvisionerTests
             provider,
             Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
-            new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
+            new FakeTimeProvider(DateTimeOffset.UtcNow),
             hasher,
             new InMemoryExternalIdentityProvisionerState());
         var request = new ProvisioningRequest(
@@ -81,7 +81,7 @@ public class InMemoryExternalIdentityProvisionerTests
         provider,
         Mock.Of<IRoleProvider>().Object,
         new GuidIdentityGenerator(),
-        new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
+        new FakeTimeProvider(DateTimeOffset.UtcNow),
         hasher,
         state);
 

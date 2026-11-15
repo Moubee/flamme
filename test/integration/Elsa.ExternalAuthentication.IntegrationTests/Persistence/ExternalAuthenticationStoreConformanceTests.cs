@@ -435,16 +435,16 @@ public sealed class ExternalAuthenticationStoreScenario(
             userProvider,
             Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
-            new Elsa.Common.Services.SystemClock(clock),
+            clock,
             hasher,
             new InMemoryExternalIdentityProvisionerState());
 
         return new(
             clock,
-            new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(clock)),
-            new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(clock)),
-            new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock)),
-            new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryExternalAuthenticationStateStore(clock),
+            new InMemoryAuthorizationGrantStore(clock),
+            new InMemoryExternalAuthenticationSessionStore(clock),
+            new InMemoryPreviewResultStore(clock),
             new InMemoryIdentityProviderConnectionStore(),
             provisioner,
             new InMemoryConnectionRegistryVersionStore(),

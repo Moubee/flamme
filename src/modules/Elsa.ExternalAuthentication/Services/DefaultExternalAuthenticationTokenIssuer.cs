@@ -20,7 +20,7 @@ public sealed class DefaultExternalAuthenticationTokenIssuer(
     IRoleProvider roleProvider,
     IElsaTokenService tokenService,
     ITenantAccessor tenantAccessor,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options) : IExternalAuthenticationTokenIssuer
 {
     public async ValueTask<ExternalTokenResponse> IssueAsync(ExternalAuthenticationSession session, CancellationToken cancellationToken = default)
@@ -43,13 +43,13 @@ public sealed class DefaultExternalAuthenticationTokenIssuer(
         if (session is null || !string.Equals(session.AuthenticationClientId, clientId, StringComparison.Ordinal))
             throw new InvalidOperationException("The external refresh token is invalid.");
         var connection = await connectionRegistry.FindByKeyAsync(session.TenantId, session.ConnectionKey, cancellationToken);
-        if (session.RevokedAt != null || session.ExpiresAt <= clock.UtcNow || connection is null || connection.IsShadowed || !connection.Connection.IsEnabled || connection.Connection.ArchivedAt is not null || !string.Equals(connection.Connection.MaterialRevision, session.ConnectionMaterialRevision, StringComparison.Ordinal))
+        if (session.RevokedAt != null || session.ExpiresAt <= timeProvider.GetUtcNow() || connection is null || connection.IsShadowed || !connection.Connection.IsEnabled || connection.Connection.ArchivedAt is not null || !string.Equals(connection.Connection.MaterialRevision, session.ConnectionMaterialRevision, StringComparison.Ordinal))
             throw new InvalidOperationException("The external authentication session is no longer valid.");
         if (!string.Equals(session.SecretGenerationFingerprint, await GetSecretFingerprintAsync(connection.Connection.SecretBindings, cancellationToken), StringComparison.Ordinal))
             throw new InvalidOperationException("The external authentication session secrets changed.");
 
         var nextToken = CreateRefreshToken(session.Id);
-        var rotation = await sessionStore.TryRotateRefreshTokenAsync(session.Id, currentHash, session.RefreshGeneration, Hash(nextToken), clock.UtcNow, cancellationToken);
+        var rotation = await sessionStore.TryRotateRefreshTokenAsync(session.Id, currentHash, session.RefreshGeneration, Hash(nextToken), timeProvider.GetUtcNow(), cancellationToken);
         if (rotation is not ExternalAuthenticationSessionRotationResult.Rotated { Session: var rotated })
             throw new InvalidOperationException("The external refresh token cannot be used.");
 
@@ -78,7 +78,7 @@ public sealed class DefaultExternalAuthenticationTokenIssuer(
             .Distinct(StringComparer.Ordinal)
             .ToArray();
         var accessToken = await tokenService.IssueAccessTokenAsync(new(user, roles.Select(x => x.Name).ToArray(), permissions, [], session.Id), cancellationToken);
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         return new(
             accessToken.Token,
             "Bearer",

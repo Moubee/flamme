@@ -10,7 +10,7 @@ public class PreviewSignInTests
     public async Task PreviewResultIsAdministratorBoundOneTimeAndDoesNotCreateSessionOrCredentials()
     {
         var clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        var previews = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(clock));
+        var previews = new InMemoryPreviewResultStore(clock);
         var preview = new PreviewResult("handle", "admin-a", "tenant-a", "connection-a", "revision", "https://issuer.example", "su***ct", new Dictionary<string, IReadOnlyCollection<string>> { ["email"] = ["[REDACTED]"] }, "would_reject_unlinked_identity", [], [], clock.GetUtcNow().AddMinutes(1), null);
         await previews.SaveAsync(preview);
 

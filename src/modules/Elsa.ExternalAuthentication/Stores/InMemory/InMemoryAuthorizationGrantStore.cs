@@ -4,7 +4,7 @@ using Elsa.ExternalAuthentication.Models;
 
 namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
-public sealed class InMemoryAuthorizationGrantStore(ISystemClock clock) : IAuthorizationGrantStore
+public sealed class InMemoryAuthorizationGrantStore(TimeProvider timeProvider) : IAuthorizationGrantStore
 {
     private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, GrantEntry> _entries = new(StringComparer.Ordinal);
@@ -33,7 +33,7 @@ public sealed class InMemoryAuthorizationGrantStore(ISystemClock clock) : IAutho
             if (!_entries.TryGetValue(codeHash, out var entry))
                 return ValueTask.FromResult<TakeResult<AuthorizationGrant>>(new TakeResult<AuthorizationGrant>.NotFound());
 
-            if (entry.Grant.ExpiresAt <= clock.UtcNow)
+            if (entry.Grant.ExpiresAt <= timeProvider.GetUtcNow())
                 return ValueTask.FromResult<TakeResult<AuthorizationGrant>>(new TakeResult<AuthorizationGrant>.Expired());
 
             if (entry.IsConsumed)

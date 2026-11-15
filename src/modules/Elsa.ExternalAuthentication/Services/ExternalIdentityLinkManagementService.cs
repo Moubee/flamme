@@ -19,7 +19,7 @@ public sealed class ExternalIdentityLinkManagementService(
     IExternalIdentityLinkManagementStore links,
     IIdentityProviderConnectionRegistry connections,
     IUserStore users,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IServiceProvider services)
 {
     public async ValueTask<Page<ExternalIdentityLink>> ListAsync(string tenantId, ExternalIdentityLinkFilter filter, CancellationToken cancellationToken = default)
@@ -183,7 +183,7 @@ public sealed class ExternalIdentityLinkManagementService(
             link.TenantId,
             link.ConnectionKey,
             link.UserId,
-            clock.UtcNow,
+            timeProvider.GetUtcNow(),
             SecurityEventOutcome.Succeeded,
             Guid.NewGuid().ToString("N"),
             "External identity link management operation completed.");
@@ -209,7 +209,7 @@ public sealed class ExternalIdentityLinkManagementService(
             oldLink.TenantId,
             targetConnectionKey,
             targetUserId,
-            clock.UtcNow,
+            timeProvider.GetUtcNow(),
             outcome,
             Guid.NewGuid().ToString("N"),
             outcome == SecurityEventOutcome.Succeeded

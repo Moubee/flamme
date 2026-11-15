@@ -12,7 +12,7 @@ public class ExternalAuthenticationSessionAdministrationTests
     {
         var now = DateTimeOffset.UtcNow;
         var clock = new FakeTimeProvider(now);
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
+        var store = new InMemoryExternalAuthenticationSessionStore(clock);
         var active = ExternalAuthenticationTestData.CreateSession(now);
         await store.SaveAsync(active);
         var other = ExternalAuthenticationTestData.CreateSession(now);

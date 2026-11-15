@@ -17,7 +17,7 @@ public sealed class InMemoryExternalIdentityProvisioner(
     IUserProvider userProvider,
     IRoleProvider roleProvider,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IExternalAuthenticationHandleHasher handleHasher,
     InMemoryExternalIdentityProvisionerState state) : IExternalIdentityProvisioner, IExternalIdentityLinkManagementStore, IExternalIdentitySignInTracker
 {
@@ -61,7 +61,7 @@ public sealed class InMemoryExternalIdentityProvisioner(
                 subjectHash,
                 null,
                 user.Id,
-                clock.UtcNow,
+                timeProvider.GetUtcNow(),
                 null);
             state.Links[key] = link;
             if (!await _userProvisioningService.ExistsAsync(user, wasCreated, CancellationToken.None))
@@ -135,7 +135,7 @@ public sealed class InMemoryExternalIdentityProvisioner(
                 replacementKey.SubjectHash,
                 null,
                 user.Id,
-                clock.UtcNow,
+                timeProvider.GetUtcNow(),
                 null);
             state.Links.Remove(oldEntry.Key);
             state.Links[replacementKey] = replacement;

@@ -5,7 +5,7 @@ using Elsa.ExternalAuthentication.Services;
 
 namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
-public sealed class InMemoryExternalAuthenticationSessionStore(ISystemClock clock) : IExternalAuthenticationSessionStore
+public sealed class InMemoryExternalAuthenticationSessionStore(TimeProvider timeProvider) : IExternalAuthenticationSessionStore
 {
     private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, ExternalAuthenticationSession> _sessions = new(StringComparer.Ordinal);
@@ -74,9 +74,9 @@ public sealed class InMemoryExternalAuthenticationSessionStore(ISystemClock cloc
             if (session.RevokedAt != null)
                 return ValueTask.FromResult<ExternalAuthenticationSessionRotationResult>(new ExternalAuthenticationSessionRotationResult.Revoked());
 
-            if (session.ExpiresAt <= clock.UtcNow || session.RefreshExpiresAt <= clock.UtcNow)
+            if (session.ExpiresAt <= timeProvider.GetUtcNow() || session.RefreshExpiresAt <= timeProvider.GetUtcNow())
             {
-                session.RevokedAt = clock.UtcNow;
+                session.RevokedAt = timeProvider.GetUtcNow();
                 session.RevocationReason = "expired";
                 session.ProtectedUpstreamLogoutHint = null;
                 return ValueTask.FromResult<ExternalAuthenticationSessionRotationResult>(new ExternalAuthenticationSessionRotationResult.Expired());
@@ -84,7 +84,7 @@ public sealed class InMemoryExternalAuthenticationSessionStore(ISystemClock cloc
 
             if (session.CurrentRefreshTokenHash is null || !string.Equals(session.CurrentRefreshTokenHash, refreshTokenHash, StringComparison.Ordinal) || session.RefreshGeneration != expectedGeneration)
             {
-                session.RevokedAt = clock.UtcNow;
+                session.RevokedAt = timeProvider.GetUtcNow();
                 session.RevocationReason = "refresh_token_reuse";
                 session.ProtectedUpstreamLogoutHint = null;
                 return ValueTask.FromResult<ExternalAuthenticationSessionRotationResult>(new ExternalAuthenticationSessionRotationResult.Reused());

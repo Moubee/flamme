@@ -54,8 +54,8 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
             new Claim(PermissionNames.ClaimType, $"{ExternalAuthenticationResourcePermissions.Connections}:{ExternalAuthenticationVerbs.Preview}"),
             new Claim(ClaimTypes.NameIdentifier, "administrator-a"));
         Mock.Get(_tenantAccessor).TenantId.Returns("tenant-a");
-        _stateStore = new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(_clock));
-        _previewResults = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(_clock));
+        _stateStore = new InMemoryExternalAuthenticationStateStore(_clock);
+        _previewResults = new InMemoryPreviewResultStore(_clock);
 
         var connection = CreateConnection();
         var effectiveConnection = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "test");
@@ -101,7 +101,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
         services.AddSingleton(_delegation);
         services.AddSingleton<IPermissionEvaluator, PermissionEvaluator>();
         services.AddSingleton<ConnectionRevisionCalculator>();
-        services.AddSingleton<TimeProvider>(_clock).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton<TimeProvider>(_clock);
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(_options));
         services.AddSingleton(_roles);
         services.AddSingleton(_sessions);

@@ -31,7 +31,7 @@ public class IdentityLinkAuthorizationTests : WebApplicationTest<IdentityLinkAut
         services.AddSingleton(_authentication);
         services.AddSingleton<MemoryStore<User>>();
         services.AddSingleton<IIdentityGenerator, GuidIdentityGenerator>();
-        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow)).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddSingleton<IIdentityProviderConnectionRegistry>(Mock.Of<IIdentityProviderConnectionRegistry>().Object);

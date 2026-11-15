@@ -12,7 +12,7 @@ public class InMemoryOneTimeStoresTests
     [Test]
     public async Task StateStoreConsumesExactlyOneConcurrentAttempt()
     {
-        var store = new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationStateStore(new FakeTimeProvider(_now));
         await store.PutAsync("sign-in", "state-hash", "payload", _now.AddMinutes(1));
 
         var results = await Task.WhenAll(Enumerable.Range(0, 16).Select(_ => store.TryTakeAsync<string>("sign-in", "state-hash").AsTask()));
@@ -25,7 +25,7 @@ public class InMemoryOneTimeStoresTests
     public async Task StateStoreReturnsExpiredWithoutRearmingTheHandle()
     {
         var clock = new FakeTimeProvider(_now);
-        var store = new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(clock));
+        var store = new InMemoryExternalAuthenticationStateStore(clock);
         await store.PutAsync("sign-in", "state-hash", "payload", _now.AddSeconds(1));
         clock.SetUtcNow(_now.AddSeconds(1));
 
@@ -38,7 +38,7 @@ public class InMemoryOneTimeStoresTests
     [Test]
     public async Task AuthorizationGrantStoreConsumesAClonedGrantOnlyOnce()
     {
-        var store = new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryAuthorizationGrantStore(new FakeTimeProvider(_now));
         var grant = ExternalAuthenticationTestData.CreateGrant(_now.AddMinutes(1));
         await store.SaveAsync(grant);
         grant.UserId = "changed-after-save";
@@ -55,7 +55,7 @@ public class InMemoryOneTimeStoresTests
     [Test]
     public async Task AuthorizationGrantStoreConsumesExactlyOneConcurrentAttempt()
     {
-        var store = new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryAuthorizationGrantStore(new FakeTimeProvider(_now));
         var grant = ExternalAuthenticationTestData.CreateGrant(_now.AddMinutes(1));
         await store.SaveAsync(grant);
 
@@ -68,7 +68,7 @@ public class InMemoryOneTimeStoresTests
     [Test]
     public async Task PreviewResultStoreRestrictsResultsToTheInitiatingAdministratorAndConsumesOnce()
     {
-        var store = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryPreviewResultStore(new FakeTimeProvider(_now));
         var preview = ExternalAuthenticationTestData.CreatePreview(_now.AddMinutes(1));
         await store.SaveAsync(preview);
 
@@ -84,7 +84,7 @@ public class InMemoryOneTimeStoresTests
     [Test]
     public async Task PreviewResultStoreConsumesExactlyOneConcurrentAuthorizedAttempt()
     {
-        var store = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryPreviewResultStore(new FakeTimeProvider(_now));
         var preview = ExternalAuthenticationTestData.CreatePreview(_now.AddMinutes(1));
         await store.SaveAsync(preview);
 
@@ -102,9 +102,9 @@ public class InMemoryOneTimeStoresTests
     {
         var fakeTime = new FakeTimeProvider(_now);
         var expiresAt = _now.AddSeconds(1).AddTicks(7);
-        var stateStore = new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(fakeTime));
-        var grantStore = new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(fakeTime));
-        var previewStore = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(fakeTime));
+        var stateStore = new InMemoryExternalAuthenticationStateStore(fakeTime);
+        var grantStore = new InMemoryAuthorizationGrantStore(fakeTime);
+        var previewStore = new InMemoryPreviewResultStore(fakeTime);
         var grant = ExternalAuthenticationTestData.CreateGrant(expiresAt);
         var preview = ExternalAuthenticationTestData.CreatePreview(expiresAt);
         await stateStore.PutAsync("sign-in", "state", "payload", expiresAt);

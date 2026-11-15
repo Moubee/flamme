@@ -154,7 +154,7 @@ public class JustInTimeProvisioningTests
         var services = new ServiceCollection();
         services.AddSingleton<MemoryStore<User>>();
         services.AddSingleton<IIdentityGenerator>(new Elsa.Workflows.GuidIdentityGenerator());
-        services.AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero))).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero)));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddSingleton<Elsa.Common.Multitenancy.ITenantAccessor>(new TestTenantAccessor("tenant-a"));
@@ -193,7 +193,7 @@ public class JustInTimeProvisioningTests
         new StoreBasedUserProvider(userStore),
         roleProvider ?? Mock.Of<IRoleProvider>().Object,
         identityGenerator ?? new Elsa.Workflows.GuidIdentityGenerator(),
-        new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
+        new FakeTimeProvider(DateTimeOffset.UtcNow),
         new HmacExternalAuthenticationHandleHasher(),
         new InMemoryExternalIdentityProvisionerState());
 

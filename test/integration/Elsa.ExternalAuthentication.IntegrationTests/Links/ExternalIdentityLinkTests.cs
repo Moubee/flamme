@@ -58,7 +58,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         services.AddSingleton(_authentication);
         services.AddSingleton(_users);
         services.AddSingleton<IIdentityGenerator, GuidIdentityGenerator>();
-        services.AddSingleton(_clock).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton(_clock);
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddScoped<IUserStore, MemoryUserStore>();

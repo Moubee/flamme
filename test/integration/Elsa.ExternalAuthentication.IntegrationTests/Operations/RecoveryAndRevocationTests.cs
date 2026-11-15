@@ -33,7 +33,7 @@ public class RecoveryAndRevocationTests
     public async Task RevokedExternalSessionCannotRemainActive()
     {
         var now = DateTimeOffset.UtcNow;
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(now));
         var session = new ExternalAuthenticationSession { Id = "s", TenantId = "tenant-a", UserId = "u", ConnectionKey = "idp", AuthenticationClientId = "client", ConnectionMaterialRevision = "r", Issuer = "https://issuer", SubjectHash = "h", StartedAt = now, LastRefreshedAt = now, ExpiresAt = now.AddHours(1), RefreshExpiresAt = now.AddHours(1), CurrentRefreshTokenHash = "refresh" };
         await store.SaveAsync(session);
         await Assert.That(await store.RevokeAsync(session.Id, "administrator_revoked", now)).IsTrue();

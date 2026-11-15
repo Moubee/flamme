@@ -4,7 +4,7 @@ using Elsa.ExternalAuthentication.Models;
 
 namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
-public sealed class InMemoryPreviewResultStore(ISystemClock clock) : IPreviewResultStore
+public sealed class InMemoryPreviewResultStore(TimeProvider timeProvider) : IPreviewResultStore
 {
     private readonly Lock _syncRoot = new();
     private readonly Dictionary<string, PreviewEntry> _entries = new(StringComparer.Ordinal);
@@ -33,7 +33,7 @@ public sealed class InMemoryPreviewResultStore(ISystemClock clock) : IPreviewRes
             if (!_entries.TryGetValue(handleHash, out var entry) || !string.Equals(entry.Result.AdministratorId, administratorId, StringComparison.Ordinal))
                 return ValueTask.FromResult<TakeResult<PreviewResult>>(new TakeResult<PreviewResult>.NotFound());
 
-            if (entry.Result.ExpiresAt <= clock.UtcNow)
+            if (entry.Result.ExpiresAt <= timeProvider.GetUtcNow())
                 return ValueTask.FromResult<TakeResult<PreviewResult>>(new TakeResult<PreviewResult>.Expired());
 
             if (entry.IsConsumed)

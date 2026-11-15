@@ -12,7 +12,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task RotateRefreshTokenAtomicallyUpdatesGenerationAndReturnsACopy()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         await store.SaveAsync(ExternalAuthenticationTestData.CreateSession(_now));
 
         var result = await store.TryRotateRefreshTokenAsync("session-a", "refresh-1", 0, "refresh-2", _now.AddMinutes(1));
@@ -33,7 +33,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task SessionWithoutAnIssuedRefreshTokenCannotBeFoundByARefreshTokenHash()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         var session = ExternalAuthenticationTestData.CreateSession(_now);
         session.CurrentRefreshTokenHash = null!;
         await store.SaveAsync(session);
@@ -48,7 +48,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task SavingASessionWithAnExistingRefreshTokenHashIsRejectedAcrossTenants()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         var first = ExternalAuthenticationTestData.CreateSession(_now);
         var second = ExternalAuthenticationTestData.CreateSession(_now);
         second.Id = "session-b";
@@ -64,7 +64,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task SavingASessionWithAnExistingRefreshTokenHashFailsWithoutMutatingEitherSession()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         var first = ExternalAuthenticationTestData.CreateSession(_now);
         var second = ExternalAuthenticationTestData.CreateSession(_now);
         second.Id = "session-b";
@@ -89,7 +89,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task RotatingToAnExistingRefreshTokenHashFailsWithoutMutatingEitherSession()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         var first = ExternalAuthenticationTestData.CreateSession(_now);
         var second = ExternalAuthenticationTestData.CreateSession(_now);
         second.Id = "session-b";
@@ -116,7 +116,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     public async Task ReusingASupersededRefreshTokenRevokesTheSession()
     {
         var clock = new FakeTimeProvider(_now);
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
+        var store = new InMemoryExternalAuthenticationSessionStore(clock);
         await store.SaveAsync(ExternalAuthenticationTestData.CreateSession(_now));
         await store.TryRotateRefreshTokenAsync("session-a", "refresh-1", 0, "refresh-2", _now.AddMinutes(1));
 
@@ -138,7 +138,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
         var clock = new FakeTimeProvider(_now);
         var session = ExternalAuthenticationTestData.CreateSession(_now);
         session.RefreshExpiresAt = _now.AddSeconds(1);
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
+        var store = new InMemoryExternalAuthenticationSessionStore(clock);
         await store.SaveAsync(session);
         clock.SetUtcNow(_now.AddSeconds(1));
 
@@ -150,7 +150,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task ExplicitRevocationIsACompareAndSetOperation()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         await store.SaveAsync(ExternalAuthenticationTestData.CreateSession(_now));
 
         var first = await store.RevokeAsync("session-a", "administrator", _now.AddMinutes(1));
@@ -163,7 +163,7 @@ public class InMemoryExternalAuthenticationSessionStoreTests
     [Test]
     public async Task ConcurrentRefreshRotationsPermitOnlyOneWinner()
     {
-        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(_now)));
+        var store = new InMemoryExternalAuthenticationSessionStore(new FakeTimeProvider(_now));
         await store.SaveAsync(ExternalAuthenticationTestData.CreateSession(_now));
 
         var results = await Task.WhenAll(Enumerable.Range(0, 16).Select(index =>

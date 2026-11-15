@@ -4,7 +4,7 @@ using Elsa.ExternalAuthentication.Models;
 
 namespace Elsa.ExternalAuthentication.Stores.InMemory;
 
-public sealed class InMemoryExternalAuthenticationStateStore(ISystemClock clock) : IExternalAuthenticationStateStore
+public sealed class InMemoryExternalAuthenticationStateStore(TimeProvider timeProvider) : IExternalAuthenticationStateStore
 {
     private readonly Lock _syncRoot = new();
     private readonly Dictionary<(string Purpose, string HandleHash), StateEntry> _entries = new();
@@ -34,7 +34,7 @@ public sealed class InMemoryExternalAuthenticationStateStore(ISystemClock clock)
             if (!_entries.TryGetValue((purpose, handleHash), out var entry) || entry.Value is not T value)
                 return ValueTask.FromResult<TakeResult<T>>(new TakeResult<T>.NotFound());
 
-            if (entry.ExpiresAt <= clock.UtcNow)
+            if (entry.ExpiresAt <= timeProvider.GetUtcNow())
                 return ValueTask.FromResult<TakeResult<T>>(new TakeResult<T>.Expired());
 
             if (entry.IsConsumed)
