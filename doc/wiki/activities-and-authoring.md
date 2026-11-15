@@ -1,6 +1,6 @@
 # Activities And Authoring
 
-Elsa supports several workflow authoring paths: C# workflow classes, JSON definitions, visual designer definitions, host method activities, workflow-definition activities, and the experimental ElsaScript DSL.
+Flamme supports C# workflow classes, JSON definitions, visual designer definitions, host method activities, and workflow-definition activities. See the [ElsaScript migration guide](../migrations/elsascript.md) when upgrading a host that used the retired DSL.
 
 ## C# Workflows
 
@@ -25,7 +25,7 @@ JSON definitions are materialized by [JsonWorkflowMaterializer](../../src/module
 - [test/component/Elsa.Workflows.ComponentTests/Scenarios](../../test/component/Elsa.Workflows.ComponentTests/Scenarios)
 - [test/integration/Elsa.Workflows.IntegrationTests/Scenarios](../../test/integration/Elsa.Workflows.IntegrationTests/Scenarios)
 
-JSON workflows are important for designer compatibility and import/export tests.
+JSON workflows are important for designer compatibility and import/export tests. The [blob storage workflow provider](../../src/modules/Elsa.WorkflowProviders.BlobStorage) loads `.json` files through its built-in JSON format handler; register it with `UseFluentStorageProvider()`.
 
 ## Designer Authored Workflows
 
@@ -43,21 +43,6 @@ Relevant code:
 - [WorkflowDefinitions endpoints](../../src/modules/Elsa.Workflows.Api/Endpoints/WorkflowDefinitions)
 - [WorkflowDefinitionManager](../../src/modules/Elsa.Workflows.Management/Services/WorkflowDefinitionManager.cs)
 - [ActivityRegistryPopulator](../../src/modules/Elsa.Workflows.Management/Services/ActivityRegistryPopulator.cs)
-
-## ElsaScript DSL
-
-[Elsa.Dsl.ElsaScript](../../src/modules/Elsa.Dsl.ElsaScript) is an experimental JavaScript-inspired textual DSL for authoring workflows.
-
-The module README is the best current guide: [ElsaScript README](../../src/modules/Elsa.Dsl.ElsaScript/README.md).
-
-Current shape:
-
-- parser creates AST nodes from ElsaScript source
-- compiler maps AST nodes to Elsa activities
-- expression prefixes map into Elsa expression providers
-- integration tests cover parser and compiler basics
-
-Known limitations are documented in the README; do not assume full language coverage yet.
 
 ## Host Method Activities
 
@@ -147,5 +132,4 @@ If an activity property needs dynamic options, add an `IPropertyUIHandler` and e
 | Designer-created or imported workflow | JSON workflow definition |
 | Host app method as activity | Host method activity |
 | Reusable workflow composition | Workflow definition activity |
-| Text DSL experiment or code-centric workflow file | ElsaScript |
 | Module-specific trigger or IO | Custom activity in the owning module |

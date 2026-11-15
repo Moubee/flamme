@@ -46,7 +46,7 @@ flowchart LR
 | [BPMN integration removal](bpmn-workflows.md) | Migrate definitions and deployments that depended on retired BPMN execution and interchange. |
 | [Workflow Runtime](workflow-runtime.md) | Dispatch, triggers, bookmarks, queues, background activity scheduling, graceful shutdown, and recovery. |
 | [Workflow API](workflow-api.md) | FastEndpoints, route prefixing, API categories, SignalR, and client-facing contracts. |
-| [Activities And Authoring](activities-and-authoring.md) | How workflows are authored in C#, JSON, ElsaScript, and host methods. |
+| [Activities And Authoring](activities-and-authoring.md) | How workflows are authored in C#, JSON, and host methods. |
 | [Output Converters](output-converters.md) | How to register, configure, validate, discover, and operate bound-value converters. |
 | [Expressions And Scripting](expressions-and-scripting.md) | Expression evaluators and language feature packages. |
 | [HTTP, Scheduling, And Resilience](http-scheduling-resilience.md) | Inbound HTTP workflows, outbound HTTP, scheduled triggers, and resilience strategies. |

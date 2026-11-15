@@ -39,12 +39,6 @@ dotnet restore test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitT
 dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj --no-restore
 ```
 
-ElsaScript DSL tests:
-
-```bash
-dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
-```
-
 ## Build System
 
 The .NET CLI invokes MSBuild directly. Shared settings live in [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets). Builds default to Debug, while the CI workflows explicitly select Release. Pass `--configuration Debug` or `--configuration Release` to select a configuration explicitly.
@@ -76,7 +70,7 @@ Notable toggles in `Program.cs`:
 - `useMultitenancy`
 - `disableVariableWrappers`
 
-The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, fluent storage, ElsaScript blob storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants.
+The sample configures identity, default authentication, workflow management/runtime with PostgreSQL, workflow API, JSON workflow loading through fluent storage, scheduling, C#, JavaScript, Python, Liquid, HTTP, and optional tenants.
 
 When running outside the explicit `Development` or `Demo` environments, configure a secure random JWT signing key with at least 32 ASCII characters. For the code-first reference server, prefer `Identity__Tokens__SigningKey` from an environment variable or secrets manager instead of committing the value to appsettings.
 

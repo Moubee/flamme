@@ -93,10 +93,7 @@ Existing first-party examples are HTTP and Scheduling ingress source registratio
 
 ## Add A Workflow Provider
 
-Workflow providers bring definitions from external storage. Existing examples:
-
-- [Elsa.WorkflowProviders.BlobStorage](../../src/modules/Elsa.WorkflowProviders.BlobStorage)
-- [Elsa.WorkflowProviders.BlobStorage.ElsaScript](../../src/modules/Elsa.WorkflowProviders.BlobStorage.ElsaScript)
+Workflow providers bring definitions from external storage. [Elsa.WorkflowProviders.BlobStorage](../../src/modules/Elsa.WorkflowProviders.BlobStorage) includes a JSON format handler and supports custom formats through `IBlobWorkflowFormatHandler`. Register the provider with `UseFluentStorageProvider()`.
 
 Keep provider modules focused on discovery/materialization and leave execution to runtime.
 

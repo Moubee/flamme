@@ -101,17 +101,12 @@ The API exposes descriptors under `/elsa/api/descriptors/expression-descriptors`
 
 Expression modules and activity modules register type aliases through `ExpressionOptions`. HTTP, for example, adds aliases such as `HttpRequest`, `HttpResponse`, `RouteData`, `FormFile`, and `Downloadable` in [HttpFeature](../../src/modules/Elsa.Http/Features/HttpFeature.cs).
 
-## ElsaScript Relationship
-
-ElsaScript does not replace expression languages. It uses Elsa's expression providers through language prefixes such as `js =>`, `cs =>`, `py =>`, and `liquid =>`. See [ElsaScript README](../../src/modules/Elsa.Dsl.ElsaScript/README.md).
-
 ## Testing
 
 Expression tests are split by concern:
 
 - [test/unit/Elsa.Expressions.UnitTests](../../test/unit/Elsa.Expressions.UnitTests)
 - [test/integration/Elsa.JavaScript.IntegrationTests](../../test/integration/Elsa.JavaScript.IntegrationTests)
-- [test/integration/Elsa.Dsl.ElsaScript.IntegrationTests](../../test/integration/Elsa.Dsl.ElsaScript.IntegrationTests)
 - workflow integration tests under [test/integration/Elsa.Workflows.IntegrationTests/Evaluation](../../test/integration/Elsa.Workflows.IntegrationTests/Evaluation)
 
 Prefer unit tests for parser/evaluator behavior and integration tests when expression evaluation interacts with workflow variables, activity outputs, or designer descriptors.

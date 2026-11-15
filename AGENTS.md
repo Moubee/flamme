@@ -17,8 +17,10 @@ Use the [ranked documentation index](doc/README.md) to find guidance for a task.
 - Hosts use static `AddElsa` composition. Nuplane, CShells adapters/reload APIs,
   Loom Platform recipes/catalog manifests, BPMN, and WebhooksCore are retired.
   See the [integration migration guide](doc/integration-removal.md).
-- Preserve classic scripting, AI/blob, FastEndpoints, Fody, Newtonsoft.Json,
-  distributed locks, resilience, and PostgreSQL/in-memory persistence support.
+- Preserve C#, JavaScript, Python, and Liquid scripting, AI/blob, FastEndpoints,
+  Fody, Newtonsoft.Json, distributed locks, resilience, and PostgreSQL/in-memory
+  persistence support. The ElsaScript workflow DSL is retired; see its
+  [migration guide](doc/migrations/elsascript.md).
 - Keep modules under `src/modules/`, shared infrastructure under `src/common/`,
   and runnable hosts under `src/apps/`. Cross-module dependencies use public
   contracts; follow existing activity metadata and `Input<T>`/`Output<T>` patterns.

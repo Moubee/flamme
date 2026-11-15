@@ -71,12 +71,6 @@ dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflow
 
 ```
 
-Run ElsaScript DSL tests:
-
-```bash
-dotnet test --project test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj
-```
-
 ## Activity Tests
 
 Use `ActivityTestFixture` from [Elsa.Testing.Shared](../../src/common/Elsa.Testing.Shared). Activity tests should assert activity outputs, variables, scheduled child activities, outcomes, and fault behavior without needing a host.
