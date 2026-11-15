@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Permissions;
 using Elsa.Authorization;
 using Elsa.Common;
@@ -23,7 +24,7 @@ public class ExternalAuthenticationServiceCollectionTests
     public async Task AddsTheConfigurationFirstBrokerFoundation()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<ISystemClock>(new TestSystemClock(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero)));
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero))).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddExternalAuthenticationServices(options =>
         {
             options.AllowedUnlinkedIdentityPolicyTypes.Clear();
@@ -69,7 +70,7 @@ public class ExternalAuthenticationServiceCollectionTests
     public async Task RoleDeletionContributorResolvesWhenIdentityIsNotRegistered()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<ISystemClock>(new TestSystemClock(DateTimeOffset.UnixEpoch));
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch)).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddExternalAuthenticationServices(options =>
         {
             options.AllowedUnlinkedIdentityPolicyTypes.Clear();

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Common;
 using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
@@ -25,7 +26,7 @@ public class IdentityProviderConnectionValidityAssessorTests
             new TestAdapterRegistry(new RequiredSecretAdapter()),
             new PassThroughSettingsMigrationService(),
             [],
-            new FixedClock());
+            new FakeTimeProvider(new DateTimeOffset(2026, 8, 2, 0, 0, 0, TimeSpan.Zero)));
 
         var result = await assessor.AssessAsync(effective);
 
@@ -49,7 +50,7 @@ public class IdentityProviderConnectionValidityAssessorTests
             new TestAdapterRegistry(new RequiredSecretAdapter()),
             new PassThroughSettingsMigrationService(),
             [new ThrowingSecretBindingResolver()],
-            new FixedClock());
+            new FakeTimeProvider(new DateTimeOffset(2026, 8, 2, 0, 0, 0, TimeSpan.Zero)));
 
         var result = await assessor.AssessAsync(effective);
 
@@ -109,8 +110,4 @@ public class IdentityProviderConnectionValidityAssessorTests
             throw new NotSupportedException();
     }
 
-    private sealed class FixedClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow => new(2026, 8, 2, 0, 0, 0, TimeSpan.Zero);
-    }
 }

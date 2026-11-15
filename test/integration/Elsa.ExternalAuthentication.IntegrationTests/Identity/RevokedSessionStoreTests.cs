@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Data.Common;
 using Elsa.Common;
 using Elsa.Common.Multitenancy;
@@ -26,7 +27,7 @@ namespace Elsa.ExternalAuthentication.IntegrationTests.Identity;
 public abstract class RevokedSessionStoreTests
 {
     protected static readonly DateTimeOffset Now = new(2026, 9, 29, 12, 0, 0, TimeSpan.Zero);
-    private readonly MutableClock _clock = new() { UtcNow = Now };
+    private readonly FakeTimeProvider _clock = new(Now);
     private SessionRevoker _revoker = null!;
 
     protected TestTenantAccessor TenantAccessor { get; } = new("tenant-a");
@@ -67,7 +68,7 @@ public abstract class RevokedSessionStoreTests
     public async Task RevokingASessionAgainSucceeds()
     {
         await _revoker.RevokeAsync(new("session-a", Now));
-        _clock.UtcNow += TimeSpan.FromMinutes(1);
+        _clock.Advance(TimeSpan.FromMinutes(1));
 
         await _revoker.RevokeAsync(new("session-a", Now));
 
@@ -122,10 +123,6 @@ public abstract class RevokedSessionStoreTests
     protected static RevokedSession Revocation(string sessionId, DateTimeOffset expiresAt) =>
         new() { Id = sessionId, TenantId = Tenant.AgnosticTenantId, RevokedAt = Now, ExpiresAt = expiresAt };
 
-    private sealed class MutableClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; set; }
-    }
 }
 
 [InheritsTests]

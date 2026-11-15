@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Testing.Shared.Multitenancy;
 using System.Security.Cryptography;
 using System.Text;
@@ -242,7 +243,7 @@ public class BrokerSecurityTests
         var scenario = CreateIdentityLinkTrackingScenario();
         var existing = await scenario.Provisioner.CreateLinkOrGetExistingAsync(new ProvisioningRequest("tenant-a", "contoso", scenario.Identity, new UserCreationProposal("external")));
         var signedInAt = new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero);
-        scenario.Clock.UtcNow = signedInAt;
+        scenario.Clock.SetUtcNow(signedInAt);
 
         var result = await CompleteExternalSignInAsync(scenario);
         var link = await scenario.Provisioner.FindLinkAsync("tenant-a", "contoso", scenario.Identity);
@@ -257,7 +258,7 @@ public class BrokerSecurityTests
     {
         var scenario = CreateIdentityLinkTrackingScenario();
         var signedInAt = new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero);
-        scenario.Clock.UtcNow = signedInAt;
+        scenario.Clock.SetUtcNow(signedInAt);
 
         var result = await CompleteExternalSignInAsync(scenario);
         var link = await scenario.Provisioner.FindLinkAsync("tenant-a", "contoso", scenario.Identity);
@@ -273,10 +274,10 @@ public class BrokerSecurityTests
         var scenario = CreateIdentityLinkTrackingScenario();
         await scenario.Provisioner.CreateLinkOrGetExistingAsync(new ProvisioningRequest("tenant-a", "contoso", scenario.Identity, new UserCreationProposal("external")));
         var firstSignInAt = new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero);
-        scenario.Clock.UtcNow = firstSignInAt;
+        scenario.Clock.SetUtcNow(firstSignInAt);
         await CompleteExternalSignInAsync(scenario);
         var secondSignInAt = firstSignInAt.AddMinutes(1);
-        scenario.Clock.UtcNow = secondSignInAt;
+        scenario.Clock.SetUtcNow(secondSignInAt);
 
         var result = await CompleteExternalSignInAsync(scenario);
         var link = await scenario.Provisioner.FindLinkAsync("tenant-a", "contoso", scenario.Identity);
@@ -290,7 +291,7 @@ public class BrokerSecurityTests
     {
         var scenario = CreateIdentityLinkTrackingScenario(throwOnCallback: true);
         await scenario.Provisioner.CreateLinkOrGetExistingAsync(new ProvisioningRequest("tenant-a", "contoso", scenario.Identity, new UserCreationProposal("external")));
-        scenario.Clock.UtcNow = new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero);
+        scenario.Clock.SetUtcNow(new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero));
 
         var result = await CompleteExternalSignInAsync(scenario);
         var link = await scenario.Provisioner.FindLinkAsync("tenant-a", "contoso", scenario.Identity);
@@ -340,8 +341,8 @@ public class BrokerSecurityTests
     [Test]
     public async Task RefreshRotationRevokesTheSessionWhenAnOlderTokenIsReused()
     {
-        var clock = new TestClock();
-        var store = new InMemoryExternalAuthenticationSessionStore(clock);
+        var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"));
+        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
         var connection = new IdentityProviderConnection { Id = "connection-a", TenantId = "tenant-a", Key = "contoso", AdapterType = "fake", DisplayName = "Contoso", IsEnabled = true, MaterialRevision = "revision-a" };
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, new(ConnectionScopeKind.Tenant, "tenant-a"), ConnectionValidity.Valid, false, "test");
         var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
@@ -351,9 +352,9 @@ public class BrokerSecurityTests
         var roles = Mock.Of<IRoleProvider>().Object;
         Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IEnumerable<Role>>([]));
         var tokens = Mock.Of<IElsaTokenService>().Object;
-        Mock.Get(tokens).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new IssuedAccessToken("access", clock.UtcNow.AddHours(1))));
-        var issuer = new DefaultExternalAuthenticationTokenIssuer(store, registry, [], users, roles, tokens, new DefaultTenantAccessor(), clock, Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
-        var session = new ExternalAuthenticationSession { Id = "session-a", AuthenticationClientId = "studio", TenantId = "tenant-a", UserId = "user-a", ConnectionKey = "contoso", ConnectionMaterialRevision = "revision-a", SecretGenerationFingerprint = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData([])), Issuer = "issuer", SubjectHash = "subject", StartedAt = clock.UtcNow, LastRefreshedAt = clock.UtcNow, ExpiresAt = clock.UtcNow.AddHours(1), RefreshExpiresAt = clock.UtcNow.AddHours(1) };
+        Mock.Get(tokens).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new IssuedAccessToken("access", clock.GetUtcNow().AddHours(1))));
+        var issuer = new DefaultExternalAuthenticationTokenIssuer(store, registry, [], users, roles, tokens, new DefaultTenantAccessor(), new Elsa.Common.Services.SystemClock(clock), Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
+        var session = new ExternalAuthenticationSession { Id = "session-a", AuthenticationClientId = "studio", TenantId = "tenant-a", UserId = "user-a", ConnectionKey = "contoso", ConnectionMaterialRevision = "revision-a", SecretGenerationFingerprint = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData([])), Issuer = "issuer", SubjectHash = "subject", StartedAt = clock.GetUtcNow(), LastRefreshedAt = clock.GetUtcNow(), ExpiresAt = clock.GetUtcNow().AddHours(1), RefreshExpiresAt = clock.GetUtcNow().AddHours(1) };
 
         var first = await issuer.IssueAsync(session);
         var second = await issuer.RefreshAsync("studio", new SensitiveString(first.RefreshToken));
@@ -368,7 +369,7 @@ public class BrokerSecurityTests
     [Test]
     public async Task PkceMismatchConsumesTheAuthorizationCode()
     {
-        var grants = new InMemoryAuthorizationGrantStore(new TestClock());
+        var grants = new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"))));
         var broker = CreateBroker(new RecordingAdapter(), grants, new FixedHasher());
         await grants.SaveAsync(new AuthorizationGrant { CodeHash = "hash:code", ClientId = "studio", CallbackUri = new Uri("https://studio.example/authentication/external/callback"), TenantId = "tenant-a", UserId = "user-a", PkceChallenge = "expected", ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(1) });
 
@@ -480,7 +481,7 @@ public class BrokerSecurityTests
         ConnectionValidity connectionValidity = ConnectionValidity.Valid,
         ConnectionValidity? assessedValidity = null,
         bool includeLoginMethod = false,
-        ISystemClock? clock = null)
+        TimeProvider? clock = null)
     {
         var connection = new IdentityProviderConnection
         {
@@ -507,8 +508,8 @@ public class BrokerSecurityTests
             Clients = clients?.ToList() ?? [new AuthenticationClient("studio", "Studio", AuthenticationClientType.Public,
                 new HashSet<Uri> { new("https://studio.example/authentication/external/callback") }, new HashSet<Uri>(), new HashSet<string> { "https://studio.example" }, new HashSet<string> { "/workflows" }, null, true)]
         });
-        var brokerClock = clock ?? new TestClock();
-        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? Mock.Of<IExternalIdentityResolver>().Object, permissionGrantResolver ?? Mock.Of<IPermissionGrantResolver>().Object, new InMemoryExternalAuthenticationStateStore(brokerClock), grants ?? new InMemoryAuthorizationGrantStore(brokerClock), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(brokerClock), tokenIssuer ?? Mock.Of<IExternalAuthenticationTokenIssuer>().Object, credentialsValidator ?? Mock.Of<IUserCredentialsValidator>().Object, userProvider ?? Mock.Of<IUserProvider>().Object, roleProvider ?? Mock.Of<IRoleProvider>().Object, tokenService ?? Mock.Of<IElsaTokenService>().Object, identityRefreshTokenService ?? Mock.Of<IIdentityRefreshTokenService>().Object, tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
+        var brokerClock = clock ?? new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"));
+        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? Mock.Of<IExternalIdentityResolver>().Object, permissionGrantResolver ?? Mock.Of<IPermissionGrantResolver>().Object, new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(brokerClock)), grants ?? new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(brokerClock)), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(brokerClock)), tokenIssuer ?? Mock.Of<IExternalAuthenticationTokenIssuer>().Object, credentialsValidator ?? Mock.Of<IUserCredentialsValidator>().Object, userProvider ?? Mock.Of<IUserProvider>().Object, roleProvider ?? Mock.Of<IRoleProvider>().Object, tokenService ?? Mock.Of<IElsaTokenService>().Object, identityRefreshTokenService ?? Mock.Of<IIdentityRefreshTokenService>().Object, tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
     }
 
     private static BrokerAuthorizationRequest Request(string returnPath) => new("studio", new Uri("https://studio.example/authentication/external/callback"), "code", "challenge", "S256", returnPath, "contoso");
@@ -516,7 +517,7 @@ public class BrokerSecurityTests
 
     private static IdentityLinkTrackingScenario CreateIdentityLinkTrackingScenario(bool throwOnCallback = false)
     {
-        var clock = new MutableClock(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         var identity = new ExternalIdentity("https://issuer.example", "subject-a", new Dictionary<string, IReadOnlyCollection<string>>());
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         var provisioner = new InMemoryExternalIdentityProvisioner(
@@ -524,7 +525,7 @@ public class BrokerSecurityTests
             new StoreBasedUserProvider(users),
             Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
-            clock,
+            new Elsa.Common.Services.SystemClock(clock),
             new FixedHasher(),
             new InMemoryExternalIdentityProvisionerState());
         var identityResolver = new DefaultExternalIdentityResolver(
@@ -561,9 +562,9 @@ public class BrokerSecurityTests
             Issuer = "https://elsa.test",
             Audience = "elsa-api"
         });
-        var tokens = new DefaultElsaTokenService(new CurrentTestClock(), options);
+        var tokens = new DefaultElsaTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options);
         var accessTokenIssuer = new DefaultAccessTokenIssuer(roles, tokens);
-        var sessionRevoker = new SessionRevoker(new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()), new CurrentTestClock(), options);
+        var sessionRevoker = new SessionRevoker(new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()), new FakeTimeProvider(DateTimeOffset.UtcNow), options);
         return new(tokens, accessTokenIssuer, sessionRevoker, new DefaultIdentityRefreshTokenService(users, accessTokenIssuer, tenantAccessor, sessionRevoker, options));
     }
 
@@ -573,16 +574,13 @@ public class BrokerSecurityTests
         SessionRevoker SessionRevoker,
         DefaultIdentityRefreshTokenService RefreshTokens);
 
-    private sealed class TestClock : ISystemClock { public DateTimeOffset UtcNow => DateTimeOffset.Parse("2026-01-01T00:00:00Z"); }
-    private sealed class CurrentTestClock : ISystemClock { public DateTimeOffset UtcNow => DateTimeOffset.UtcNow; }
-    private sealed class MutableClock(DateTimeOffset utcNow) : ISystemClock { public DateTimeOffset UtcNow { get; set; } = utcNow; }
 
     private sealed record IdentityLinkTrackingScenario(
         ExternalAuthenticationBroker Broker,
         InMemoryExternalIdentityProvisioner Provisioner,
         RecordingAdapter Adapter,
         ExternalIdentity Identity,
-        MutableClock Clock);
+        FakeTimeProvider Clock);
 
     internal sealed class RecordingAdapter : IExternalAuthenticationAdapter
     {

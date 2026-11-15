@@ -30,7 +30,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
     private readonly TestConnectionRegistry _connections = new();
     private readonly INotificationSender _notifications = Mock.Of<INotificationSender>().Object;
-    private readonly ISystemClock _clock = new SteppingSystemClock(
+    private readonly TimeProvider _clock = new ScriptedTimeProvider(
         new DateTimeOffset(2026, 7, 26, 10, 0, 0, TimeSpan.Zero),
         new DateTimeOffset(2026, 7, 26, 10, 1, 0, TimeSpan.Zero),
         new DateTimeOffset(2026, 7, 26, 10, 2, 0, TimeSpan.Zero),
@@ -58,7 +58,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         services.AddSingleton(_authentication);
         services.AddSingleton(_users);
         services.AddSingleton<IIdentityGenerator, GuidIdentityGenerator>();
-        services.AddSingleton(_clock);
+        services.AddSingleton(_clock).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddScoped<IUserStore, MemoryUserStore>();
@@ -343,9 +343,9 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         }, ConnectionSourceOwnership.Database, new ConnectionScope(ConnectionScopeKind.Tenant, "tenant-a"), Validity, false, "test");
     }
 
-    private sealed class SteppingSystemClock(params DateTimeOffset[] instants) : ISystemClock
+    private sealed class ScriptedTimeProvider(params DateTimeOffset[] instants) : TimeProvider
     {
         private int _index;
-        public DateTimeOffset UtcNow => instants[Math.Min(_index++, instants.Length - 1)];
+        public override DateTimeOffset GetUtcNow() => instants[Math.Min(_index++, instants.Length - 1)];
     }
 }

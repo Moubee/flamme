@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Stores.InMemory;
 using System.Threading.Tasks;
@@ -10,8 +11,8 @@ public class ExternalAuthenticationSessionAdministrationTests
     public async Task ListsOnlyRequestedTenantAndSafeStatus()
     {
         var now = DateTimeOffset.UtcNow;
-        var clock = new TestSystemClock(now);
-        var store = new InMemoryExternalAuthenticationSessionStore(clock);
+        var clock = new FakeTimeProvider(now);
+        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
         var active = ExternalAuthenticationTestData.CreateSession(now);
         await store.SaveAsync(active);
         var other = ExternalAuthenticationTestData.CreateSession(now);

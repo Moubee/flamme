@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Security.Cryptography;
 using Elsa.Common;
 using Elsa.Common.Multitenancy;
@@ -72,8 +73,8 @@ public class ExternalRefreshPermissionTests
     [Test]
     public async Task RefreshRetainsBoundedExternalSnapshotAndReevaluatesCurrentElsaRoles()
     {
-        var clock = new TestClock();
-        var sessionStore = new InMemoryExternalAuthenticationSessionStore(clock);
+        var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-07-24T12:00:00Z"));
+        var sessionStore = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
         var connection = new IdentityProviderConnection
         {
             Id = "connection-a",
@@ -111,9 +112,9 @@ public class ExternalRefreshPermissionTests
             .Returns((TokenIssuanceContext context, CancellationToken cancellationToken) =>
             {
                 issuanceContexts.Add(context);
-                return ValueTask.FromResult(new IssuedAccessToken($"access-{issuanceContexts.Count}", clock.UtcNow.AddHours(1)));
+                return ValueTask.FromResult(new IssuedAccessToken($"access-{issuanceContexts.Count}", clock.GetUtcNow().AddHours(1)));
             });
-        var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, clock, Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
+        var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, new Elsa.Common.Services.SystemClock(clock), Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
         var externalGrant = new PermissionGrant("reports:view", "claim-mapping", "department:engineering");
         var session = new ExternalAuthenticationSession
         {
@@ -127,10 +128,10 @@ public class ExternalRefreshPermissionTests
             Issuer = "https://issuer.example",
             SubjectHash = "subject-hash",
             ExternalGrants = [externalGrant],
-            StartedAt = clock.UtcNow,
-            LastRefreshedAt = clock.UtcNow,
-            ExpiresAt = clock.UtcNow.AddHours(8),
-            RefreshExpiresAt = clock.UtcNow.AddHours(8)
+            StartedAt = clock.GetUtcNow(),
+            LastRefreshedAt = clock.GetUtcNow(),
+            ExpiresAt = clock.GetUtcNow().AddHours(8),
+            RefreshExpiresAt = clock.GetUtcNow().AddHours(8)
         };
 
         using (tenantAccessor.PushContext(new Tenant { Id = "tenant-b", Name = "Tenant B" }))
@@ -186,8 +187,8 @@ public class ExternalRefreshPermissionTests
 
     private static async Task<IReadOnlyList<TokenIssuanceContext>> IssueWithAsync(ExternalAuthenticationOptions options, string[] rolePermissions)
     {
-        var clock = new TestClock();
-        var sessionStore = new InMemoryExternalAuthenticationSessionStore(clock);
+        var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-07-24T12:00:00Z"));
+        var sessionStore = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock));
         var connection = new IdentityProviderConnection
         {
             Id = "connection-a", TenantId = "tenant-a", Key = "contoso", AdapterType = "oidc",
@@ -209,9 +210,9 @@ public class ExternalRefreshPermissionTests
             .Returns((TokenIssuanceContext context, CancellationToken cancellationToken) =>
             {
                 contexts.Add(context);
-                return ValueTask.FromResult(new IssuedAccessToken($"access-{contexts.Count}", clock.UtcNow.AddHours(1)));
+                return ValueTask.FromResult(new IssuedAccessToken($"access-{contexts.Count}", clock.GetUtcNow().AddHours(1)));
             });
-        var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, clock, Microsoft.Extensions.Options.Options.Create(options));
+        var issuer = new DefaultExternalAuthenticationTokenIssuer(sessionStore, registry, [], users, roles, tokenService, tenantAccessor, new Elsa.Common.Services.SystemClock(clock), Microsoft.Extensions.Options.Options.Create(options));
 
         await issuer.IssueAsync(new ExternalAuthenticationSession
         {
@@ -220,15 +221,11 @@ public class ExternalRefreshPermissionTests
             SecretGenerationFingerprint = Convert.ToHexString(SHA256.HashData([])),
             Issuer = "https://issuer.example", SubjectHash = "subject-hash",
             ExternalGrants = [new PermissionGrant("reports:view", "claim-mapping", "department:engineering")],
-            StartedAt = clock.UtcNow, LastRefreshedAt = clock.UtcNow,
-            ExpiresAt = clock.UtcNow.AddHours(8), RefreshExpiresAt = clock.UtcNow.AddHours(8)
+            StartedAt = clock.GetUtcNow(), LastRefreshedAt = clock.GetUtcNow(),
+            ExpiresAt = clock.GetUtcNow().AddHours(8), RefreshExpiresAt = clock.GetUtcNow().AddHours(8)
         });
 
         return contexts;
     }
 
-    private sealed class TestClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow => DateTimeOffset.Parse("2026-07-24T12:00:00Z");
-    }
 }

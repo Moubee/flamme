@@ -273,15 +273,15 @@ public sealed record EffectiveConnectionRegistry(
     IReadOnlyCollection<LoginMethod> LoginMethods,
     string SourceVersion);
 
-public sealed record ConnectionValidationContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, ISystemClock Clock);
+public sealed record ConnectionValidationContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, TimeProvider TimeProvider);
 
-public sealed record ExternalAuthorizationContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, ISystemClock Clock);
+public sealed record ExternalAuthorizationContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, TimeProvider TimeProvider);
 
-public sealed record ExternalCallbackContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, IReadOnlyDictionary<string, IReadOnlyCollection<string>> Parameters, ISystemClock Clock);
+public sealed record ExternalCallbackContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, IReadOnlyDictionary<string, IReadOnlyCollection<string>> Parameters, TimeProvider TimeProvider);
 
-public sealed record ConnectionTestContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, ISystemClock Clock);
+public sealed record ConnectionTestContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, TimeProvider TimeProvider);
 
-public sealed record ExternalLogoutContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, ISystemClock Clock, SensitiveString? UpstreamLogoutHint = null);
+public sealed record ExternalLogoutContext(EffectiveIdentityProviderConnection Connection, IReadOnlyDictionary<string, ResolvedSecretBinding> Secrets, BrokerTransaction Transaction, string CorrelationState, TimeProvider TimeProvider, SensitiveString? UpstreamLogoutHint = null);
 
 public sealed record UnlinkedIdentityContext(string TargetTenantId, EffectiveIdentityProviderConnection Connection, ExternalIdentity Identity, IReadOnlyDictionary<string, IReadOnlyCollection<string>> ProjectedClaims, JsonElement Settings);
 public sealed record ExternalUserMatcherContext(string TargetTenantId, EffectiveIdentityProviderConnection Connection, ExternalIdentity Identity, IReadOnlyDictionary<string, IReadOnlyCollection<string>> ProjectedClaims, JsonElement Settings);

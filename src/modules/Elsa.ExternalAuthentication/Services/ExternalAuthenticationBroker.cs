@@ -35,7 +35,7 @@ public sealed class ExternalAuthenticationBroker(
     IElsaTokenService elsaTokenService,
     IIdentityRefreshTokenService identityRefreshTokenService,
     ITenantAccessor tenantAccessor,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options,
     ExternalAuthenticationSecurityNotifier? notifier = null) : IExternalAuthenticationBroker
 {
@@ -132,7 +132,7 @@ public sealed class ExternalAuthenticationBroker(
             ConnectionKey = ConnectionRevisionCalculator.NormalizeKey(connection.Connection.Key),
             ConnectionMaterialRevision = connection.Connection.MaterialRevision,
             PkceChallenge = request.CodeChallenge,
-            ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.BrokerTransactionLifetime)
+            ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.BrokerTransactionLifetime)
         };
         IReadOnlyDictionary<string, ResolvedSecretBinding> secrets = new Dictionary<string, ResolvedSecretBinding>();
         ExternalAuthorizationRequest adapterRequest;
@@ -140,7 +140,7 @@ public sealed class ExternalAuthenticationBroker(
         {
             secrets = await ResolveSecretsAsync(connection.Connection.SecretBindings, cancellationToken);
             transaction.SecretGenerationFingerprint = GetSecretFingerprint(secrets);
-            adapterRequest = await adapter.CreateAuthorizationRequestAsync(new(connection, secrets, transaction, state, clock), cancellationToken);
+            adapterRequest = await adapter.CreateAuthorizationRequestAsync(new(connection, secrets, transaction, state, timeProvider), cancellationToken);
             transaction.ProtectedPayload = dataProtectionProvider.CreateProtector("Elsa.ExternalAuthentication.AdapterPayload.v1").Protect(adapterRequest.ProtectedAdapterState);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -193,7 +193,7 @@ public sealed class ExternalAuthenticationBroker(
                 ExternalAuthenticationResult authentication;
                 try
                 {
-                    authentication = await adapter.AuthenticateCallbackAsync(new(connection, secrets, transaction, state, parameters, clock), cancellationToken);
+                    authentication = await adapter.AuthenticateCallbackAsync(new(connection, secrets, transaction, state, parameters, timeProvider), cancellationToken);
                 }
                 finally
                 {
@@ -223,15 +223,15 @@ public sealed class ExternalAuthenticationBroker(
                     ProtectedUpstreamLogoutHint = connection.Connection.UpstreamLogoutMode == UpstreamLogoutMode.Disabled || upstreamLogoutHint is null
                         ? null
                         : dataProtectionProvider.CreateProtector("Elsa.ExternalAuthentication.UpstreamLogoutHint.v1").Protect(Encoding.UTF8.GetBytes(upstreamLogoutHint.Reveal())),
-                    StartedAt = clock.UtcNow,
-                    LastRefreshedAt = clock.UtcNow,
-                    ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.MaximumSessionAge),
-                    RefreshExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.MaximumSessionAge)
+                    StartedAt = timeProvider.GetUtcNow(),
+                    LastRefreshedAt = timeProvider.GetUtcNow(),
+                    ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.MaximumSessionAge),
+                    RefreshExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.MaximumSessionAge)
                 };
                 await sessionStore.SaveAsync(session, cancellationToken);
                 var code = CreateOpaqueValue();
                 await grantStore.SaveAsync(new()
-                    { CodeHash = Hash(code), ClientId = transaction.ClientId, CallbackUri = transaction.CallbackUri, TenantId = transaction.TenantId, UserId = resolution.UserId, ExternalSessionId = session.Id, PkceChallenge = transaction.PkceChallenge, ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.CompletionCodeLifetime) }, cancellationToken);
+                    { CodeHash = Hash(code), ClientId = transaction.ClientId, CallbackUri = transaction.CallbackUri, TenantId = transaction.TenantId, UserId = resolution.UserId, ExternalSessionId = session.Id, PkceChallenge = transaction.PkceChallenge, ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.CompletionCodeLifetime) }, cancellationToken);
                 if (notifier is not null)
                     await notifier.PublishAsync(new ExternalSignInCompleted(
                     ExternalAuthenticationSecurityNotifier.Context(null, transaction.TenantId, connection.Connection.Id, resolution.UserId, SecurityEventOutcome.Succeeded, "External sign-in completed."),
@@ -245,7 +245,7 @@ public sealed class ExternalAuthenticationBroker(
                         connection.Connection.Key,
                         authentication.Identity,
                         resolution.UserId,
-                        clock.UtcNow,
+                        timeProvider.GetUtcNow(),
                         cancellationToken);
                     if (!signInRecorded)
                         throw new InvalidOperationException("The external identity link changed while sign-in was completing.");
@@ -299,7 +299,7 @@ public sealed class ExternalAuthenticationBroker(
 
         var code = CreateOpaqueValue();
         await grantStore.SaveAsync(new()
-            { CodeHash = Hash(code), ClientId = request.ClientId, CallbackUri = request.RedirectUri, TenantId = targetTenantId, UserId = user.Id, PkceChallenge = request.CodeChallenge, ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.CompletionCodeLifetime) }, cancellationToken);
+            { CodeHash = Hash(code), ClientId = request.ClientId, CallbackUri = request.RedirectUri, TenantId = targetTenantId, UserId = user.Id, PkceChallenge = request.CodeChallenge, ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.CompletionCodeLifetime) }, cancellationToken);
         return await CallbackOutcomeAsync(BrokerCallbackResult.Redirect(AppendCallbackParameters(request.RedirectUri, code, request.ClientState)), "local", "initiate", targetTenantId, null, cancellationToken);
     }
 
@@ -348,7 +348,7 @@ public sealed class ExternalAuthenticationBroker(
         if (grant.ExternalSessionId is { } sessionId)
         {
             var session = await sessionStore.FindByIdAsync(sessionId, cancellationToken);
-            if (session is null || session.RevokedAt != null || session.ExpiresAt <= clock.UtcNow || !string.Equals(session.AuthenticationClientId, client.ClientId, StringComparison.Ordinal))
+            if (session is null || session.RevokedAt != null || session.ExpiresAt <= timeProvider.GetUtcNow() || !string.Equals(session.AuthenticationClientId, client.ClientId, StringComparison.Ordinal))
                 return await TokenOutcomeAsync(BrokerTokenResult.Fail(BrokerErrorFactory.Create(BrokerErrorCategory.AccessDenied)), "token_exchange", "validate_session", cancellationToken);
             var connection = await connectionRegistry.FindByKeyAsync(session.TenantId, session.ConnectionKey, cancellationToken);
             if (connection is null || connection.IsShadowed || !connection.Connection.IsEnabled || connection.Connection.ArchivedAt != null || !string.Equals(connection.Connection.MaterialRevision, session.ConnectionMaterialRevision, StringComparison.Ordinal))
@@ -414,7 +414,7 @@ public sealed class ExternalAuthenticationBroker(
     }
 
     private long SecondsUntil(DateTimeOffset? expiresAt) =>
-        expiresAt is null ? 0 : Math.Max(0, (long)(expiresAt.Value - clock.UtcNow).TotalSeconds);
+        expiresAt is null ? 0 : Math.Max(0, (long)(expiresAt.Value - timeProvider.GetUtcNow()).TotalSeconds);
 
     private static DateTimeOffset GetExpiresAt(string token) =>
         new(new JsonWebTokenHandler().ReadJsonWebToken(token).ValidTo, TimeSpan.Zero);
@@ -441,7 +441,7 @@ public sealed class ExternalAuthenticationBroker(
         if (session is null || !string.Equals(session.AuthenticationClientId, request.ClientId, StringComparison.Ordinal))
             return await LogoutOutcomeAsync(BrokerLogoutResult.Fail(BrokerErrorFactory.Create(BrokerErrorCategory.AccessDenied)), "session", cancellationToken);
 
-        var revoked = await sessionStore.RevokeAsync(session.Id, "logout", clock.UtcNow, cancellationToken);
+        var revoked = await sessionStore.RevokeAsync(session.Id, "logout", timeProvider.GetUtcNow(), cancellationToken);
         if (revoked && notifier is not null)
             await notifier.PublishAsync(new ExternalAuthenticationSessionRevoked(
                 ExternalAuthenticationSecurityNotifier.Context(null, session.TenantId, session.ConnectionKey, session.UserId, SecurityEventOutcome.Succeeded, "External authentication session revoked."),
@@ -472,7 +472,7 @@ public sealed class ExternalAuthenticationBroker(
             ConnectionKey = ConnectionRevisionCalculator.NormalizeKey(connection.Connection.Key),
             ConnectionMaterialRevision = session.ConnectionMaterialRevision,
             PkceChallenge = string.Empty,
-            ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.BrokerTransactionLifetime)
+            ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.BrokerTransactionLifetime)
         };
         IReadOnlyDictionary<string, ResolvedSecretBinding> logoutSecrets = new Dictionary<string, ResolvedSecretBinding>();
         ExternalLogoutRequest? upstream;
@@ -482,7 +482,7 @@ public sealed class ExternalAuthenticationBroker(
             using var upstreamLogoutHint = session.ProtectedUpstreamLogoutHint is { Length: > 0 }
                 ? new SensitiveString(Encoding.UTF8.GetString(dataProtectionProvider.CreateProtector("Elsa.ExternalAuthentication.UpstreamLogoutHint.v1").Unprotect(session.ProtectedUpstreamLogoutHint)))
                 : null;
-            upstream = await adapter.CreateLogoutRequestAsync(new(connection, logoutSecrets, transaction, state, clock, upstreamLogoutHint), cancellationToken);
+            upstream = await adapter.CreateLogoutRequestAsync(new(connection, logoutSecrets, transaction, state, timeProvider, upstreamLogoutHint), cancellationToken);
             transaction.ProtectedPayload = dataProtectionProvider.CreateProtector("Elsa.ExternalAuthentication.AdapterPayload.v1").Protect(upstream?.ProtectedAdapterState ?? []);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

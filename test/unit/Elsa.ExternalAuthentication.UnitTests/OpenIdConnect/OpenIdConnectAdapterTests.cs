@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Text.Json;
 using System.Security.Claims;
 using System.Text;
@@ -46,7 +47,7 @@ public class OpenIdConnectAdapterTests
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
         var transaction = new BrokerTransaction { HandleHash = "stored-hash", ProviderNonce = "nonce", PkceChallenge = "client-pkce", CallbackUri = new Uri("https://studio.example/callback"), ClientId = "studio", ReturnPath = "/", TenantId = "tenant-a" };
 
-        var request = await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "provider-state", new TestSystemClock(DateTimeOffset.UtcNow)));
+        var request = await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "provider-state", new FakeTimeProvider(DateTimeOffset.UtcNow)));
         var query = ParseQuery(request.NavigationUri);
 
         await Assert.That(query["response_type"]).IsEqualTo("code");
@@ -88,7 +89,7 @@ public class OpenIdConnectAdapterTests
 
         try
         {
-            await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, secrets, CreateTransaction(), "provider-state", new Dictionary<string, IReadOnlyCollection<string>> { ["state"] = ["provider-state"], ["code"] = ["provider-code"] }, new TestSystemClock(DateTimeOffset.UtcNow)));
+            await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, secrets, CreateTransaction(), "provider-state", new Dictionary<string, IReadOnlyCollection<string>> { ["state"] = ["provider-state"], ["code"] = ["provider-code"] }, new FakeTimeProvider(DateTimeOffset.UtcNow)));
 
             await Assert.That(handler.Authorization).IsEqualTo("Basic Y2xpZW50JTNBaWQ6c2VjcmV0KyUyQiUyRiUyNg==");
             await Assert.That(handler.Body).DoesNotContain("client_id").WithComparison(StringComparison.Ordinal);
@@ -111,7 +112,7 @@ public class OpenIdConnectAdapterTests
         var connection = CreateConnection(CreateManualSettings());
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
 
-        var result = await adapter.ValidateAsync(new ConnectionValidationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), new TestSystemClock(DateTimeOffset.UtcNow)));
+        var result = await adapter.ValidateAsync(new ConnectionValidationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), new FakeTimeProvider(DateTimeOffset.UtcNow)));
 
         await Assert.That(result.IsValid).IsFalse();
         await Assert.That(result.Errors).Contains(error => error.Field == "redirects.externalCallbackBaseUri");
@@ -126,7 +127,7 @@ public class OpenIdConnectAdapterTests
         var transaction = new BrokerTransaction { HandleHash = "state", PkceChallenge = "client-pkce", CallbackUri = new Uri("https://studio.example/callback"), ClientId = "studio", ReturnPath = "/", TenantId = "tenant-a" };
         var parameters = new Dictionary<string, IReadOnlyCollection<string>> { ["error"] = ["access_denied"] };
 
-        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "state", parameters, new TestSystemClock(DateTimeOffset.UtcNow))).AsTask());
+        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "state", parameters, new FakeTimeProvider(DateTimeOffset.UtcNow))).AsTask());
     }
 
     [Test]
@@ -137,7 +138,7 @@ public class OpenIdConnectAdapterTests
         var parameters = new Dictionary<string, IReadOnlyCollection<string>> { ["state"] = ["unexpected-state"] };
         var adapter = CreateAdapter(new StaticResponseHandler());
 
-        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding>(), CreateTransaction(), "provider-state", parameters, new TestSystemClock(DateTimeOffset.UtcNow))).AsTask());
+        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding>(), CreateTransaction(), "provider-state", parameters, new FakeTimeProvider(DateTimeOffset.UtcNow))).AsTask());
     }
 
     [Test]
@@ -188,7 +189,7 @@ public class OpenIdConnectAdapterTests
         var adapter = CreateAdapter(new StaticResponseHandler(), new Uri(callbackBaseUri));
         var connection = CreateConnection(CreateManualSettings());
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
-        var clock = new TestSystemClock(DateTimeOffset.UtcNow);
+        var clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
         var signIn = await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), CreateTransaction(), "sign-in-state", clock));
         var previewTransaction = CreateTransaction();
         previewTransaction.Purpose = BrokerTransactionPurpose.Preview;
@@ -211,13 +212,13 @@ public class OpenIdConnectAdapterTests
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
         var transaction = CreateTransaction();
         transaction.Purpose = BrokerTransactionPurpose.Preview;
-        var authorization = await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "provider-state", new TestSystemClock(DateTimeOffset.UtcNow)));
+        var authorization = await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "provider-state", new FakeTimeProvider(DateTimeOffset.UtcNow)));
         transaction.ProtectedPayload = authorization.ProtectedAdapterState;
         var secret = new SensitiveString("secret");
 
         try
         {
-            await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding> { ["clientSecret"] = new(secret, "generation") }, transaction, "provider-state", new Dictionary<string, IReadOnlyCollection<string>> { ["state"] = ["provider-state"], ["code"] = ["provider-code"] }, new TestSystemClock(DateTimeOffset.UtcNow)));
+            await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, new Dictionary<string, ResolvedSecretBinding> { ["clientSecret"] = new(secret, "generation") }, transaction, "provider-state", new Dictionary<string, IReadOnlyCollection<string>> { ["state"] = ["provider-state"], ["code"] = ["provider-code"] }, new FakeTimeProvider(DateTimeOffset.UtcNow)));
 
             await Assert.That(handler.Body).Contains("redirect_uri=https%3A%2F%2Felsa.example%2Fexternal-authentication%2Fpreviews%2Fcallback%2Fconnection").WithComparison(StringComparison.Ordinal);
         }
@@ -238,7 +239,7 @@ public class OpenIdConnectAdapterTests
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
         var transaction = CreateTransaction();
 
-        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "state", new TestSystemClock(DateTimeOffset.UtcNow))).AsTask());
+        await Assert.ThrowsExactlyAsync<OpenIdConnectAuthenticationException>(() => adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), transaction, "state", new FakeTimeProvider(DateTimeOffset.UtcNow))).AsTask());
     }
 
     private static JsonElement Parse(string json) => JsonDocument.Parse(json).RootElement.Clone();
@@ -265,7 +266,7 @@ public class OpenIdConnectAdapterTests
         try
         {
             var secrets = new Dictionary<string, ResolvedSecretBinding> { ["clientSecret"] = new(secret, "generation") };
-            return await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, secrets, CreateTransaction(), "provider-state", parameters, new TestSystemClock(DateTimeOffset.UtcNow)));
+            return await adapter.AuthenticateCallbackAsync(new ExternalCallbackContext(effective, secrets, CreateTransaction(), "provider-state", parameters, new FakeTimeProvider(DateTimeOffset.UtcNow)));
         }
         finally
         {
@@ -278,7 +279,7 @@ public class OpenIdConnectAdapterTests
         var connection = CreateConnection(CreateManualSettings());
         var adapter = CreateAdapter(new StaticResponseHandler());
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
-        return await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), CreateTransaction(), "provider-state", new TestSystemClock(DateTimeOffset.UtcNow)));
+        return await adapter.CreateAuthorizationRequestAsync(new ExternalAuthorizationContext(effective, new Dictionary<string, ResolvedSecretBinding>(), CreateTransaction(), "provider-state", new FakeTimeProvider(DateTimeOffset.UtcNow)));
     }
 
     private static IdentityProviderConnection CreateConnection(JsonElement settings)

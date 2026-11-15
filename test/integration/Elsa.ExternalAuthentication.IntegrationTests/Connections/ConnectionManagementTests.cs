@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Authorization;
 using Elsa.Extensions;
 using System.Net;
@@ -96,7 +97,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         services.AddSingleton<IPermissionDelegationAuthorizer>(Mock.Of<IPermissionDelegationAuthorizer>().Object);
         services.AddSingleton<IRoleAuthorizationService>(_roleAuthorizationService);
         services.AddSingleton(_notifications);
-        services.AddSingleton<ISystemClock, SystemClock>();
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow)).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton(_sessions);
         services.AddSingleton<IManagedSecretBindingWriter>(_managedSecretWriter);
         services.AddSingleton<ISecretBindingResolver>(new TestSecretBindingResolver());

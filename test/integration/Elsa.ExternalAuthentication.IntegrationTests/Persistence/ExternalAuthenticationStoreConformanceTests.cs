@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Data.Common;
 using Elsa.Common;
 using Elsa.Common.Models;
@@ -83,7 +84,7 @@ public abstract class ExternalAuthenticationStoreConformanceTests
         await Assert.That(previewTaken.Value.HandleHash).IsEqualTo(preview.HandleHash);
         await Assert.That(await scenario.PreviewStore.TryTakeAsync(preview.HandleHash, preview.AdministratorId)).IsTypeOf<TakeResult<PreviewResult>.AlreadyConsumed>();
 
-        scenario.Clock.UtcNow = expiresAt;
+        scenario.Clock.SetUtcNow(expiresAt);
         var expiredTransaction = CreateTransaction("expired-state", expiresAt);
         await scenario.StateStore.PutAsync("ExternalSignIn", expiredTransaction.HandleHash, expiredTransaction, expiresAt);
         await Assert.That(await scenario.StateStore.TryTakeAsync<BrokerTransaction>("ExternalSignIn", expiredTransaction.HandleHash)).IsTypeOf<TakeResult<BrokerTransaction>.Expired>();
@@ -398,7 +399,7 @@ public enum ConformanceRacePoint
 }
 
 public sealed class ExternalAuthenticationStoreScenario(
-    ConformanceClock clock,
+    FakeTimeProvider clock,
     IExternalAuthenticationStateStore stateStore,
     IAuthorizationGrantStore grantStore,
     IExternalAuthenticationSessionStore sessionStore,
@@ -410,7 +411,7 @@ public sealed class ExternalAuthenticationStoreScenario(
     ExternalAuthenticationStoreScenario.ConformanceRaceCoordinator races,
     Func<ValueTask> disposeAsync) : IAsyncDisposable
 {
-    public ConformanceClock Clock { get; } = clock;
+    public FakeTimeProvider Clock { get; } = clock;
     public IExternalAuthenticationStateStore StateStore { get; } = stateStore;
     public IAuthorizationGrantStore GrantStore { get; } = grantStore;
     public IExternalAuthenticationSessionStore SessionStore { get; } = sessionStore;
@@ -425,7 +426,7 @@ public sealed class ExternalAuthenticationStoreScenario(
 
     public static async Task<ExternalAuthenticationStoreScenario> CreateInMemoryAsync()
     {
-        var clock = new ConformanceClock();
+        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 9, 13, 12, 0, 0, TimeSpan.Zero));
         var (users, userProvider) = await CreateUsersAsync();
         var hasher = new HmacExternalAuthenticationHandleHasher();
         var races = new ConformanceRaceCoordinator(false);
@@ -434,16 +435,16 @@ public sealed class ExternalAuthenticationStoreScenario(
             userProvider,
             Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
-            clock,
+            new Elsa.Common.Services.SystemClock(clock),
             hasher,
             new InMemoryExternalIdentityProvisionerState());
 
         return new(
             clock,
-            new InMemoryExternalAuthenticationStateStore(clock),
-            new InMemoryAuthorizationGrantStore(clock),
-            new InMemoryExternalAuthenticationSessionStore(clock),
-            new InMemoryPreviewResultStore(clock),
+            new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(clock)),
             new InMemoryIdentityProviderConnectionStore(),
             provisioner,
             new InMemoryConnectionRegistryVersionStore(),
@@ -462,7 +463,7 @@ public sealed class ExternalAuthenticationStoreScenario(
         var hasher = new HmacExternalAuthenticationHandleHasher();
         var races = new ConformanceRaceCoordinator(true);
         ServiceProvider? services = null;
-        var clock = new ConformanceClock();
+        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 9, 13, 12, 0, 0, TimeSpan.Zero));
 
         try
         {
@@ -488,15 +489,15 @@ public sealed class ExternalAuthenticationStoreScenario(
                 Mock.Of<IRoleProvider>().Object,
                 hasher,
                 new GuidIdentityGenerator(),
-                clock,
+                new Elsa.Common.Services.SystemClock(clock),
                 NullLogger<EFCoreExternalIdentityProvisioner>.Instance);
 
             return new(
                 clock,
-                new EFCoreExternalAuthenticationStateStore(leaseFactory, clock),
-                new EFCoreAuthorizationGrantStore(leaseFactory, clock),
-                new EFCoreExternalAuthenticationSessionStore(leaseFactory, clock),
-                new EFCorePreviewResultStore(leaseFactory, clock),
+                new EFCoreExternalAuthenticationStateStore(leaseFactory, new Elsa.Common.Services.SystemClock(clock)),
+                new EFCoreAuthorizationGrantStore(leaseFactory, new Elsa.Common.Services.SystemClock(clock)),
+                new EFCoreExternalAuthenticationSessionStore(leaseFactory, new Elsa.Common.Services.SystemClock(clock)),
+                new EFCorePreviewResultStore(leaseFactory, new Elsa.Common.Services.SystemClock(clock)),
                 new EFCoreIdentityProviderConnectionStore(leaseFactory),
                 provisioner,
                 new EFCoreConnectionRegistryVersionStore(leaseFactory),
@@ -680,9 +681,4 @@ public sealed class ExternalAuthenticationStoreScenario(
         public ExternalAuthenticationElsaDbContext CreateDbContext() => new(options, serviceProvider);
         public Task<ExternalAuthenticationElsaDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
     }
-}
-
-public sealed class ConformanceClock : ISystemClock
-{
-    public DateTimeOffset UtcNow { get; set; } = new(2026, 9, 13, 12, 0, 0, TimeSpan.Zero);
 }

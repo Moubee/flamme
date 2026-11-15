@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Authorization;
 using System.Net;
 using System.Security.Claims;
@@ -24,7 +25,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
     private static readonly Uri ProviderAuthorizationUri = new("https://provider.example/authorize?state=provider-state");
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new();
-    private readonly TestClock _clock = new(DateTimeOffset.Parse("2026-07-30T00:00:00Z"));
+    private readonly FakeTimeProvider _clock = new(DateTimeOffset.Parse("2026-07-30T00:00:00Z"));
     private readonly ExternalAuthenticationOptions _options = new();
     private readonly TestHandleHasher _handleHasher = new();
     private readonly TestAdapter _adapter = new();
@@ -53,8 +54,8 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
             new Claim(PermissionNames.ClaimType, $"{ExternalAuthenticationResourcePermissions.Connections}:{ExternalAuthenticationVerbs.Preview}"),
             new Claim(ClaimTypes.NameIdentifier, "administrator-a"));
         Mock.Get(_tenantAccessor).TenantId.Returns("tenant-a");
-        _stateStore = new InMemoryExternalAuthenticationStateStore(_clock);
-        _previewResults = new InMemoryPreviewResultStore(_clock);
+        _stateStore = new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(_clock));
+        _previewResults = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(_clock));
 
         var connection = CreateConnection();
         var effectiveConnection = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "test");
@@ -69,7 +70,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
     protected override async Task SetupAsync()
     {
         var connection = CreateConnection();
-        var expiresAt = _clock.UtcNow.AddMinutes(5);
+        var expiresAt = _clock.GetUtcNow().AddMinutes(5);
         await _stateStore.PutAsync("PreviewStart", _handleHasher.Hash(PreviewHandle), new BrokerTransaction
         {
             HandleHash = _handleHasher.Hash(PreviewHandle),
@@ -100,7 +101,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
         services.AddSingleton(_delegation);
         services.AddSingleton<IPermissionEvaluator, PermissionEvaluator>();
         services.AddSingleton<ConnectionRevisionCalculator>();
-        services.AddSingleton<ISystemClock>(_clock);
+        services.AddSingleton<TimeProvider>(_clock).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton(Microsoft.Extensions.Options.Options.Create(_options));
         services.AddSingleton(_roles);
         services.AddSingleton(_sessions);
@@ -149,10 +150,6 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
         Revision = 1
     };
 
-    private sealed class TestClock(DateTimeOffset now) : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = now;
-    }
 
     private sealed class TestHandleHasher : IExternalAuthenticationHandleHasher
     {

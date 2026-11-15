@@ -11,7 +11,7 @@ public sealed class IdentityProviderConnectionValidityAssessor(
     IExternalAuthenticationAdapterRegistry adapters,
     IAdapterSettingsMigrationService settingsMigrations,
     IEnumerable<ISecretBindingResolver> secretBindingResolvers,
-    ISystemClock clock) : IIdentityProviderConnectionValidityAssessor
+    TimeProvider timeProvider) : IIdentityProviderConnectionValidityAssessor
 {
     private readonly IReadOnlyDictionary<string, ISecretBindingResolver> _secretBindingResolvers =
         secretBindingResolvers.ToDictionary(x => x.Type, StringComparer.Ordinal);
@@ -78,7 +78,7 @@ public sealed class IdentityProviderConnectionValidityAssessor(
         var validation = await adapter.ValidateAsync(new(
             effective with { Connection = connection, Validity = ConnectionValidity.Unknown },
             new Dictionary<string, ResolvedSecretBinding>(),
-            clock), cancellationToken);
+            timeProvider), cancellationToken);
         return effective with { Validity = validation.IsValid ? ConnectionValidity.Valid : ConnectionValidity.Invalid };
     }
 

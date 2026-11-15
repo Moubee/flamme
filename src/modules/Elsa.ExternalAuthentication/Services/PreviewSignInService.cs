@@ -23,7 +23,7 @@ public sealed class PreviewSignInService(
     IPreviewResultStore results,
     IExternalAuthenticationHandleHasher handles,
     IDataProtectionProvider dataProtection,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options,
     ExternalAuthenticationSecurityNotifier notifier)
 {
@@ -45,7 +45,7 @@ public sealed class PreviewSignInService(
             CallbackUri = new($"/external-authentication/previews/{Uri.EscapeDataString(handle)}/authorize", UriKind.Relative),
             ReturnPath = "/", TenantId = tenantId, ConnectionId = connection.Connection.Id,
             ConnectionMaterialRevision = connection.Connection.MaterialRevision, PkceChallenge = string.Empty,
-            ExpiresAt = clock.UtcNow.Add(options.Value.Lifetimes.PreviewLifetime)
+            ExpiresAt = timeProvider.GetUtcNow().Add(options.Value.Lifetimes.PreviewLifetime)
         };
         await stateStore.PutAsync(StartPurpose, transaction.HandleHash, transaction, transaction.ExpiresAt, cancellationToken);
         return new PreviewInitiationResult.Started(handle, transaction.ExpiresAt);
@@ -71,7 +71,7 @@ public sealed class PreviewSignInService(
         try
         {
             transaction.SecretGenerationFingerprint = SecretFingerprint(secrets);
-            var request = await adapter.CreateAuthorizationRequestAsync(new(connection, secrets, transaction, state, clock), cancellationToken);
+            var request = await adapter.CreateAuthorizationRequestAsync(new(connection, secrets, transaction, state, timeProvider), cancellationToken);
             transaction.ProtectedPayload = dataProtection.CreateProtector("Elsa.ExternalAuthentication.AdapterPayload.v1").Protect(request.ProtectedAdapterState);
             await stateStore.PutAsync(BrokerTransactionPurpose.Preview.ToString(), transaction.HandleHash, transaction, transaction.ExpiresAt, cancellationToken);
             return new PreviewAuthorizeResult.Redirect(request.NavigationUri);
@@ -94,7 +94,7 @@ public sealed class PreviewSignInService(
             var protectedPayload = transaction.ProtectedPayload;
             transaction.ProtectedPayload = dataProtection.CreateProtector("Elsa.ExternalAuthentication.AdapterPayload.v1").Unprotect(protectedPayload);
             ExternalAuthenticationResult authentication;
-            try { authentication = await adapter.AuthenticateCallbackAsync(new(connection, secrets, transaction, state, parameters, clock), cancellationToken); }
+            try { authentication = await adapter.AuthenticateCallbackAsync(new(connection, secrets, transaction, state, parameters, timeProvider), cancellationToken); }
             finally { transaction.ProtectedPayload = protectedPayload; }
             var existingLink = await provisioner.FindLinkAsync(transaction.TenantId, ConnectionRevisionCalculator.NormalizeKey(connection.Connection.Key), authentication.Identity, cancellationToken);
             var decision = existingLink is null ? await DescribePolicyAsync(connection, authentication, cancellationToken) : "would_sign_in_existing_link";

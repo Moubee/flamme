@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Common.Services;
 using Elsa.ExternalAuthentication.Contracts;
@@ -27,7 +28,7 @@ public class InMemoryExternalIdentityProvisionerTests
             provider,
             Mock.Of<IRoleProvider>().Object,
             new GuidIdentityGenerator(),
-            new TestSystemClock(DateTimeOffset.UtcNow),
+            new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
             hasher,
             new InMemoryExternalIdentityProvisionerState());
         var request = new ProvisioningRequest(
@@ -80,7 +81,7 @@ public class InMemoryExternalIdentityProvisionerTests
         provider,
         Mock.Of<IRoleProvider>().Object,
         new GuidIdentityGenerator(),
-        new TestSystemClock(DateTimeOffset.UtcNow),
+        new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
         hasher,
         state);
 

@@ -13,7 +13,7 @@ public sealed class ConnectionTestService(
     IExternalAuthenticationAdapterRegistry adapters,
     IEnumerable<ISecretBindingResolver> secretBindingResolvers,
     IConnectionObservationStore observations,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     ExternalAuthenticationSecurityNotifier notifier)
 {
     private readonly IReadOnlyDictionary<string, ISecretBindingResolver> _resolvers = secretBindingResolvers.ToDictionary(x => x.Type, StringComparer.Ordinal);
@@ -34,7 +34,7 @@ public sealed class ConnectionTestService(
         try
         {
             secrets = await ResolveSecretsAsync(connection.Connection.SecretBindings, cancellationToken);
-            test = await adapter.TestAsync(new(connection, secrets, clock), cancellationToken);
+            test = await adapter.TestAsync(new(connection, secrets, timeProvider), cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -54,7 +54,7 @@ public sealed class ConnectionTestService(
         var observation = new ConnectionObservation(
             connection.Connection.Id,
             connection.Connection.MaterialRevision,
-            clock.UtcNow,
+            timeProvider.GetUtcNow(),
             test.Status,
             SafeCategory(test.Category),
             timer.Elapsed,

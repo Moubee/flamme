@@ -68,9 +68,9 @@ public class ExternalAuthenticationBenchmarks
             new EphemeralDataProtectionProvider(),
             unused,
             unused,
-            new InMemoryExternalAuthenticationStateStore(clock),
-            new InMemoryAuthorizationGrantStore(clock),
-            new InMemoryExternalAuthenticationSessionStore(clock),
+            new InMemoryExternalAuthenticationStateStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryAuthorizationGrantStore(new Elsa.Common.Services.SystemClock(clock)),
+            new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(clock)),
             unused,
             unused,
             unused,
@@ -171,8 +171,8 @@ public class ExternalAuthenticationBenchmarks
         public ValueTask<IssuedTokens?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 
-    private sealed class FixedClock : ISystemClock
+    private sealed class FixedClock : TimeProvider
     {
-        public DateTimeOffset UtcNow => new(2026, 7, 24, 0, 0, 0, TimeSpan.Zero);
+        public override DateTimeOffset GetUtcNow() => new(2026, 7, 24, 0, 0, 0, TimeSpan.Zero);
     }
 }

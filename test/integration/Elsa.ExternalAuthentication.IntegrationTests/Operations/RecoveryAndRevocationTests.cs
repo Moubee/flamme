@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Authorization;
 using System.Security.Claims;
 using Elsa.ExternalAuthentication.Contracts;
@@ -32,7 +33,7 @@ public class RecoveryAndRevocationTests
     public async Task RevokedExternalSessionCannotRemainActive()
     {
         var now = DateTimeOffset.UtcNow;
-        var store = new InMemoryExternalAuthenticationSessionStore(new TestClock(now));
+        var store = new InMemoryExternalAuthenticationSessionStore(new Elsa.Common.Services.SystemClock(new FakeTimeProvider(now)));
         var session = new ExternalAuthenticationSession { Id = "s", TenantId = "tenant-a", UserId = "u", ConnectionKey = "idp", AuthenticationClientId = "client", ConnectionMaterialRevision = "r", Issuer = "https://issuer", SubjectHash = "h", StartedAt = now, LastRefreshedAt = now, ExpiresAt = now.AddHours(1), RefreshExpiresAt = now.AddHours(1), CurrentRefreshTokenHash = "refresh" };
         await store.SaveAsync(session);
         await Assert.That(await store.RevokeAsync(session.Id, "administrator_revoked", now)).IsTrue();
@@ -40,5 +41,5 @@ public class RecoveryAndRevocationTests
     }
 
     private static IdentityProviderConnection Connection(bool enabled) => new() { Id = "connection-a", TenantId = "tenant-a", Key = "idp", AdapterType = "test", DisplayName = "IdP", IsEnabled = enabled };
-    private sealed class TestClock(DateTimeOffset now) : Elsa.Common.ISystemClock { public DateTimeOffset UtcNow { get; set; } = now; }
+
 }

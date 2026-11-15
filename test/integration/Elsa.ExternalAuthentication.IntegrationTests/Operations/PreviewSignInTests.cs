@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Stores.InMemory;
 
@@ -8,9 +9,9 @@ public class PreviewSignInTests
     [Test]
     public async Task PreviewResultIsAdministratorBoundOneTimeAndDoesNotCreateSessionOrCredentials()
     {
-        var clock = new TestClock(DateTimeOffset.UtcNow);
-        var previews = new InMemoryPreviewResultStore(clock);
-        var preview = new PreviewResult("handle", "admin-a", "tenant-a", "connection-a", "revision", "https://issuer.example", "su***ct", new Dictionary<string, IReadOnlyCollection<string>> { ["email"] = ["[REDACTED]"] }, "would_reject_unlinked_identity", [], [], clock.UtcNow.AddMinutes(1), null);
+        var clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        var previews = new InMemoryPreviewResultStore(new Elsa.Common.Services.SystemClock(clock));
+        var preview = new PreviewResult("handle", "admin-a", "tenant-a", "connection-a", "revision", "https://issuer.example", "su***ct", new Dictionary<string, IReadOnlyCollection<string>> { ["email"] = ["[REDACTED]"] }, "would_reject_unlinked_identity", [], [], clock.GetUtcNow().AddMinutes(1), null);
         await previews.SaveAsync(preview);
 
         var wrongAdministrator = await previews.TryTakeAsync("handle", "admin-b");
@@ -25,5 +26,4 @@ public class PreviewSignInTests
         await Assert.That(value.ProjectedClaims.SelectMany(x => x.Value)).DoesNotContain(x => x.Contains("token", StringComparison.OrdinalIgnoreCase));
     }
 
-    private sealed class TestClock(DateTimeOffset now) : Elsa.Common.ISystemClock { public DateTimeOffset UtcNow { get; set; } = now; }
 }

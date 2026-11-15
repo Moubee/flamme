@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Text.Json;
 using Elsa.Common;
 using Elsa.ExternalAuthentication.Contracts;
@@ -77,7 +78,7 @@ public class ConformanceExtensionTests
             transaction,
             "state",
             new Dictionary<string, IReadOnlyCollection<string>> { ["subject"] = ["subject-a"] },
-            new TestClock()));
+            new FakeTimeProvider(DateTimeOffset.Parse("2026-07-24T12:00:00Z"))));
         await Assert.That(policyRegistry.TryGet(ConformanceUnlinkedIdentityPolicy.PolicyType, out var policy)).IsTrue();
         var decision = await policy.EvaluateAsync(new UnlinkedIdentityContext(
             "tenant-a",
@@ -102,8 +103,4 @@ public class ConformanceExtensionTests
         await Assert.That(grant.Permission).IsEqualTo("conformance:read");
     }
 
-    private sealed class TestClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow => DateTimeOffset.Parse("2026-07-24T12:00:00Z");
-    }
 }

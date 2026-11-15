@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Authorization;
 using System.Net;
 using Elsa.ExternalAuthentication.Contracts;
@@ -30,7 +31,7 @@ public class IdentityLinkAuthorizationTests : WebApplicationTest<IdentityLinkAut
         services.AddSingleton(_authentication);
         services.AddSingleton<MemoryStore<User>>();
         services.AddSingleton<IIdentityGenerator, GuidIdentityGenerator>();
-        services.AddSingleton<Elsa.Common.ISystemClock, Elsa.Common.Services.SystemClock>();
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow)).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddSingleton<IIdentityProviderConnectionRegistry>(Mock.Of<IIdentityProviderConnectionRegistry>().Object);

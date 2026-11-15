@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Testing.Shared.Multitenancy;
 using System.Text.Json;
 using Elsa.Common.Services;
@@ -153,7 +154,7 @@ public class JustInTimeProvisioningTests
         var services = new ServiceCollection();
         services.AddSingleton<MemoryStore<User>>();
         services.AddSingleton<IIdentityGenerator>(new Elsa.Workflows.GuidIdentityGenerator());
-        services.AddSingleton<ISystemClock>(new FixedSystemClock(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero)));
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero))).AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddSingleton<Elsa.Common.Multitenancy.ITenantAccessor>(new TestTenantAccessor("tenant-a"));
@@ -192,7 +193,7 @@ public class JustInTimeProvisioningTests
         new StoreBasedUserProvider(userStore),
         roleProvider ?? Mock.Of<IRoleProvider>().Object,
         identityGenerator ?? new Elsa.Workflows.GuidIdentityGenerator(),
-        new Elsa.Common.Services.SystemClock(),
+        new Elsa.Common.Services.SystemClock(new FakeTimeProvider(DateTimeOffset.UtcNow)),
         new HmacExternalAuthenticationHandleHasher(),
         new InMemoryExternalIdentityProvisionerState());
 
@@ -278,8 +279,4 @@ public class JustInTimeProvisioningTests
         public string GenerateId() => _ids.Dequeue();
     }
 
-    private sealed class FixedSystemClock(DateTimeOffset utcNow) : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = utcNow;
-    }
 }

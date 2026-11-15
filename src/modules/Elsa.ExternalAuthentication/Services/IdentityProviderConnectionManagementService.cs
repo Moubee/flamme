@@ -34,7 +34,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
     IPermissionDelegationAuthorizer delegationAuthorizer,
     IPermissionEvaluator permissionEvaluator,
     ConnectionRevisionCalculator revisionCalculator,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options,
     Elsa.Identity.Contracts.IRoleAuthorizationService roleAuthorizationService,
     IExternalAuthenticationSessionStore sessions,
@@ -168,7 +168,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
                 break;
             case ConnectionLifecycle.Archived:
                 candidate.IsEnabled = false;
-                candidate.ArchivedAt = clock.UtcNow;
+                candidate.ArchivedAt = timeProvider.GetUtcNow();
                 break;
             case ConnectionLifecycle.Draft:
                 if (!candidate.ArchivedAt.HasValue)
@@ -180,7 +180,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
                 return new ManagementConnectionMutationResult.Conflict("invalid_lifecycle_action");
         }
 
-        candidate.UpdatedAt = clock.UtcNow;
+        candidate.UpdatedAt = timeProvider.GetUtcNow();
         candidate.MaterialRevision = revisionCalculator.CalculateMaterialRevision(candidate);
         if (await IsBlockedByFinalLoginPathGuardAsync(existing, candidate, targetTenantId, actor, confirmFinalLoginPathOverride, cancellationToken))
             return new ManagementConnectionMutationResult.Conflict("final_login_path_guard");
@@ -189,7 +189,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
         if (processed is ManagementConnectionMutationResult.Success && action == ConnectionLifecycle.Disabled && revokeActiveSessions)
         {
             var connectionKey = ConnectionRevisionCalculator.NormalizeKey(candidate.Key);
-            var revokedCount = await sessions.RevokeActiveForConnectionAsync(connectionKey, "connection_disabled", clock.UtcNow, cancellationToken);
+            var revokedCount = await sessions.RevokeActiveForConnectionAsync(connectionKey, "connection_disabled", timeProvider.GetUtcNow(), cancellationToken);
             await PublishBulkSessionRevocationAsync(candidate, actor, revokedCount);
         }
         return processed;
@@ -243,7 +243,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
             return new(errors.Count == 0, errors, warnings);
 
         var effective = ToEffective(connection);
-        var adapterValidation = await adapter.ValidateAsync(new(effective, new Dictionary<string, ResolvedSecretBinding>(), clock), cancellationToken);
+        var adapterValidation = await adapter.ValidateAsync(new(effective, new Dictionary<string, ResolvedSecretBinding>(), timeProvider), cancellationToken);
         errors.AddRange(adapterValidation.Errors);
         warnings.AddRange(adapterValidation.Warnings);
         return new(errors.Count == 0 && adapterValidation.IsValid, errors, warnings);
@@ -341,7 +341,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
                 connection.TenantId,
                 connection.Id,
                 null,
-                clock.UtcNow,
+                timeProvider.GetUtcNow(),
                 SecurityEventOutcome.Succeeded,
                 Guid.NewGuid().ToString("N"),
                 "Active external authentication sessions were revoked when the connection was disabled.");
@@ -364,7 +364,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
             connection.TenantId,
             connection.Id,
             null,
-            clock.UtcNow,
+            timeProvider.GetUtcNow(),
             SecurityEventOutcome.Succeeded,
             Guid.NewGuid().ToString("N"),
             "Identity provider connection management operation completed.");
@@ -449,8 +449,8 @@ public sealed partial class IdentityProviderConnectionManagementService(
         connection.IsEnabled = false;
         connection.ArchivedAt = null;
         connection.Revision = 1;
-        connection.CreatedAt = clock.UtcNow;
-        connection.UpdatedAt = clock.UtcNow;
+        connection.CreatedAt = timeProvider.GetUtcNow();
+        connection.UpdatedAt = timeProvider.GetUtcNow();
         connection.MaterialRevision = revisionCalculator.CalculateMaterialRevision(connection);
     }
 
@@ -459,7 +459,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
         candidate.Key = candidate.Key?.Trim() ?? string.Empty;
         candidate.TenantId = ConnectionScope.HostTenantId;
         candidate.IsEnabled = existing.IsEnabled;
-        candidate.UpdatedAt = clock.UtcNow;
+        candidate.UpdatedAt = timeProvider.GetUtcNow();
         candidate.SecretBindings ??= new Dictionary<string, SecretBinding>(StringComparer.Ordinal);
         candidate.PermissionGrantSources ??= [];
         candidate.ClaimProjection ??= ClaimProjection.Empty;
