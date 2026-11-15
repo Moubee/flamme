@@ -12,7 +12,7 @@ namespace Elsa.Scheduling.ScheduledTasks;
 /// </summary>
 public class ScheduledCronTask : IScheduledTask, IDisposable
 {
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly ILogger _logger;
     private Timer? _timer;
     private readonly ITask _task;
@@ -29,13 +29,13 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
     /// <summary>
     /// Initializes a new instance of <see cref="ScheduledCronTask"/>.
     /// </summary>
-    public ScheduledCronTask(ITask task, string cronExpression, ICronParser cronParser, IServiceScopeFactory scopeFactory, ISystemClock systemClock, ILogger<ScheduledCronTask> logger)
+    public ScheduledCronTask(ITask task, string cronExpression, ICronParser cronParser, IServiceScopeFactory scopeFactory, TimeProvider timeProvider, ILogger<ScheduledCronTask> logger)
     {
         _task = task;
         _cronExpression = cronExpression;
         _cronParser = cronParser;
         _scopeFactory = scopeFactory;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _logger = logger;
         _cancellationTokenSource = new();
         _cancellationToken = _cancellationTokenSource.Token;
@@ -63,7 +63,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
 
         while (true)
         {
-            var now = _systemClock.UtcNow;
+            var now = _timeProvider.GetUtcNow();
             var nextOccurence = _cronParser.GetNextOccurrence(_cronExpression);
             var delay = nextOccurence - now;
 
@@ -80,7 +80,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
 
     private void TrySetupTimer(TimeSpan delay)
     {
-        // Handle edge cases where delay is zero or negative (e.g., due to clock drift, fast execution, or time alignment)
+        // Handle edge cases where delay is zero or negative (e.g., due to timeProvider drift, fast execution, or time alignment)
         // Instead of silently returning, use a minimum delay to ensure the timer fires and workflow continues scheduling
         if (delay <= TimeSpan.Zero)
         {

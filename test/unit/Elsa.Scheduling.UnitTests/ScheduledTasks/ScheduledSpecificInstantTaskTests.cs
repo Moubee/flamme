@@ -5,6 +5,7 @@ using Elsa.Scheduling.ScheduledTasks;
 using Elsa.Scheduling.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
 namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
@@ -17,7 +18,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     private static readonly DateTimeOffset DefaultNow = new(2025, 11, 06, 22, 50, 00, 0, TimeSpan.Zero);
 
     private readonly ServiceProvider _serviceProvider;
-    private readonly ISystemClock _systemClock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly ILogger<ScheduledSpecificInstantTask> _logger;
     private readonly PastDueScheduleStaggerer _pastDueScheduleStaggerer = new(OptionsFactory.Create(new SchedulingOptions
     {
@@ -30,7 +31,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public ScheduledSpecificInstantTaskTests()
     {
         var services = new ServiceCollection();
-        _systemClock = Mock.Of<ISystemClock>().Object;
+        _timeProvider = new FakeTimeProvider(DefaultNow);
         _logger = Mock.Of<ILogger<ScheduledSpecificInstantTask>>().Object;
 
         services.AddSingleton(Mock.Of<ICommandSender>().Object);
@@ -39,13 +40,13 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
 
     private ScheduledSpecificInstantTask CreateScheduledTask(
         DateTimeOffset? startAt = null,
-        ISystemClock? systemClock = null)
+        TimeProvider? timeProvider = null)
     {
         var task = Mock.Of<ITask>().Object;
         var scheduledTask = new ScheduledSpecificInstantTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),
-            systemClock ?? _systemClock,
+            timeProvider ?? _timeProvider,
             _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
             _logger,
             _pastDueScheduleStaggerer
@@ -54,9 +55,9 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
         return scheduledTask;
     }
 
-    private void SetupSystemClock(params DateTimeOffset[] times)
+    private void SetupTimeProvider(DateTimeOffset now)
     {
-        Mock.Get(_systemClock).UtcNow.ReturnsSequentially(times);
+        _timeProvider.SetUtcNow(now);
     }
 
     private void AssertNoErrorLogged()
@@ -83,7 +84,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public void Schedule_WithVerySmallDelay_ShouldStillSetupTimer()
     {
         // Arrange - simulate a case where the delay is very small (1 tick = 100ns)
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow.AddTicks(1); // Only 1 tick in the future (100 nanoseconds)
 
         // Act
@@ -97,7 +98,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public void Schedule_WithZeroDelay_ShouldUseCatchUpDelay()
     {
         // Arrange - simulate a case where startAt is exactly now
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow; // delay = 0
 
         // Act - Should adjust to a bounded catch-up delay
@@ -110,7 +111,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public void Schedule_WithNegativeDelay_ShouldUseCatchUpDelay()
     {
         // Arrange - simulate a case where startAt is in the past
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow.AddMinutes(-1); // Past time
 
         // Act - Should adjust to a bounded catch-up delay
@@ -122,7 +123,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     [Test]
     public async Task Schedule_WithMultiplePastDueTasks_ShouldStaggerCatchUp()
     {
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
 
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
@@ -141,7 +142,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     public void DisposeDuringTimerCallback_ShouldNotCrash()
     {
         // Arrange - set up a very short delay so timer fires quickly
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow; // Will use 1ms minimum delay
 
         // Act - Create task and immediately dispose it (simulating race condition)

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Reflection;
 using Elsa.Common;
 using Elsa.Mediator.Contracts;
@@ -13,7 +14,7 @@ public class ScheduledTaskDisposalTests : IDisposable
     private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
     private readonly IServiceScopeFactory _scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
     private readonly IServiceScope _scope = Mock.Of<IServiceScope>().Object;
-    private readonly ISystemClock _systemClock = Mock.Of<ISystemClock>().Object;
+    private readonly FakeTimeProvider _timeProvider = new(Now);
     private readonly ICronParser _cronParser = Mock.Of<ICronParser>().Object;
     private readonly ServiceProvider _services;
 
@@ -22,7 +23,6 @@ public class ScheduledTaskDisposalTests : IDisposable
         _services = new ServiceCollection().AddSingleton(_commandSender).BuildServiceProvider();
         Mock.Get(_scope).ServiceProvider.Returns(_services);
         Mock.Get(_scopeFactory).CreateScope().Returns(_scope);
-        Mock.Get(_systemClock).UtcNow.Returns(Now);
         Mock.Get(_cronParser).GetNextOccurrence(Arg.Any<string>()).Returns(Now.AddHours(1));
     }
 
@@ -100,9 +100,9 @@ public class ScheduledTaskDisposalTests : IDisposable
         var task = Mock.Of<ITask>().Object;
         return kind switch
         {
-            ScheduledTaskKind.Cron => new ScheduledCronTask(task, "0 * * * * *", _cronParser, _scopeFactory, _systemClock, NullLogger<ScheduledCronTask>.Instance),
-            ScheduledTaskKind.Recurring => new ScheduledRecurringTask(task, Now.AddHours(1), TimeSpan.FromHours(1), _systemClock, _scopeFactory, NullLogger<ScheduledRecurringTask>.Instance),
-            ScheduledTaskKind.SpecificInstant => new ScheduledSpecificInstantTask(task, Now.AddHours(1), _systemClock, _scopeFactory, NullLogger<ScheduledSpecificInstantTask>.Instance),
+            ScheduledTaskKind.Cron => new ScheduledCronTask(task, "0 * * * * *", _cronParser, _scopeFactory, _timeProvider, NullLogger<ScheduledCronTask>.Instance),
+            ScheduledTaskKind.Recurring => new ScheduledRecurringTask(task, Now.AddHours(1), TimeSpan.FromHours(1), _timeProvider, _scopeFactory, NullLogger<ScheduledRecurringTask>.Instance),
+            ScheduledTaskKind.SpecificInstant => new ScheduledSpecificInstantTask(task, Now.AddHours(1), _timeProvider, _scopeFactory, NullLogger<ScheduledSpecificInstantTask>.Instance),
             _ => throw new ArgumentOutOfRangeException(nameof(kind))
         };
     }

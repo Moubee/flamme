@@ -17,7 +17,7 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
 {
     private static readonly PastDueScheduleStaggerer DefaultPastDueScheduleStaggerer = new(OptionsFactory.Create(new SchedulingOptions()));
     private readonly ITask _task;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ScheduledSpecificInstantTask> _logger;
     private readonly PastDueScheduleStaggerer _pastDueScheduleStaggerer;
@@ -36,10 +36,10 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
     public ScheduledSpecificInstantTask(
         ITask task,
         DateTimeOffset startAt,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         IServiceScopeFactory scopeFactory,
         ILogger<ScheduledSpecificInstantTask> logger)
-        : this(task, startAt, systemClock, scopeFactory, logger, DefaultPastDueScheduleStaggerer)
+        : this(task, startAt, timeProvider, scopeFactory, logger, DefaultPastDueScheduleStaggerer)
     {
     }
 
@@ -50,13 +50,13 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
     public ScheduledSpecificInstantTask(
         ITask task,
         DateTimeOffset startAt,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         IServiceScopeFactory scopeFactory,
         ILogger<ScheduledSpecificInstantTask> logger,
         PastDueScheduleStaggerer pastDueScheduleStaggerer)
     {
         _task = task;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _scopeFactory = scopeFactory;
         _logger = logger;
         _pastDueScheduleStaggerer = pastDueScheduleStaggerer;
@@ -83,7 +83,7 @@ public class ScheduledSpecificInstantTask : IScheduledTask, IDisposable
 
     private void Schedule()
     {
-        var now = _systemClock.UtcNow;
+        var now = _timeProvider.GetUtcNow();
         var delay = _startAt - now;
         var adjustedDelay = _pastDueScheduleStaggerer.GetDelay(delay);
 

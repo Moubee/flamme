@@ -3,6 +3,7 @@ using Elsa.Mediator.Contracts;
 using Elsa.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
 
@@ -15,14 +16,14 @@ public class ScheduledRecurringTaskTests : IDisposable
     private static readonly TimeSpan DefaultInterval = TimeSpan.FromMinutes(5);
 
     private readonly ServiceProvider _serviceProvider;
-    private readonly ISystemClock _systemClock;
+    private readonly RecordingTimeProvider _timeProvider;
     private readonly ILogger<ScheduledRecurringTask> _logger;
     private readonly List<ScheduledRecurringTask> _tasksToDispose = new();
 
     public ScheduledRecurringTaskTests()
     {
         var services = new ServiceCollection();
-        _systemClock = Mock.Of<ISystemClock>().Object;
+        _timeProvider = new RecordingTimeProvider(DefaultNow);
         _logger = Mock.Of<ILogger<ScheduledRecurringTask>>().Object;
 
         services.AddSingleton(Mock.Of<ICommandSender>().Object);
@@ -32,14 +33,14 @@ public class ScheduledRecurringTaskTests : IDisposable
     private ScheduledRecurringTask CreateScheduledTask(
         DateTimeOffset? startAt = null,
         TimeSpan? interval = null,
-        ISystemClock? systemClock = null)
+        TimeProvider? timeProvider = null)
     {
         var task = Mock.Of<ITask>().Object;
         var scheduledTask = new ScheduledRecurringTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),
             interval ?? DefaultInterval,
-            systemClock ?? _systemClock,
+            timeProvider ?? _timeProvider,
             _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
             _logger
         );
@@ -47,9 +48,9 @@ public class ScheduledRecurringTaskTests : IDisposable
         return scheduledTask;
     }
 
-    private void SetupSystemClock(params DateTimeOffset[] times)
+    private void SetupTimeProvider(DateTimeOffset now)
     {
-        Mock.Get(_systemClock).UtcNow.ReturnsSequentially(times);
+        _timeProvider.SetUtcNow(now);
     }
 
     private void AssertNoErrorLogged()
@@ -76,7 +77,7 @@ public class ScheduledRecurringTaskTests : IDisposable
     public void Schedule_WithVerySmallDelay_ShouldStillSetupTimer()
     {
         // Arrange - simulate a case where the delay is very small (1 tick = 100ns)
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow.AddTicks(1); // Only 1 tick in the future (100 nanoseconds)
 
         // Act
@@ -91,7 +92,7 @@ public class ScheduledRecurringTaskTests : IDisposable
     {
         // Arrange - simulate a case where the first call returns exactly now
         // but the second call returns a proper future time
-        SetupSystemClock(DefaultNow, DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow; // First: delay=0
 
         // Act
@@ -100,16 +101,16 @@ public class ScheduledRecurringTaskTests : IDisposable
         // Dispose immediately to prevent timer from firing
         ((IDisposable)task).Dispose();
 
-        // Assert - System clock should be called at least twice (initial + retry)
+        // Assert - System timeProvider should be called at least twice (initial + retry)
         // May be called more if timer fires before disposal in rare race conditions
-        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
+        await Assert.That(_timeProvider.ReadCount >= 2).IsTrue();
     }
 
     [Test]
     public async Task Schedule_WithNegativeDelay_ShouldRetryAndSetupTimer()
     {
         // Arrange - simulate a case where the first call returns a time in the past
-        SetupSystemClock(DefaultNow, DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow.AddMinutes(-1); // Past time
 
         // Act
@@ -118,17 +119,17 @@ public class ScheduledRecurringTaskTests : IDisposable
         // Dispose immediately to prevent timer from firing
         ((IDisposable)task).Dispose();
 
-        // Assert - System clock should be called at least twice (initial + retry)
+        // Assert - System timeProvider should be called at least twice (initial + retry)
         // May be called more if timer fires before disposal in rare race conditions
-        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
+        await Assert.That(_timeProvider.ReadCount >= 2).IsTrue();
     }
 
     [Test]
     public async Task Schedule_WithPersistentZeroDelay_ShouldLogWarningAndUseMinimumDelay()
     {
         // Arrange - simulate the bug scenario: both attempts return zero/negative delay
-        // This can happen if the system clock doesn't advance or if there's clock drift
-        SetupSystemClock(DefaultNow);
+        // This can happen if the system timeProvider doesn't advance or if there's timeProvider drift
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow; // Both calls return exactly now (delay = 0)
 
         // Act - This should not crash and should set up a timer with minimum delay
@@ -140,7 +141,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
         // Assert - Should call UtcNow at least twice (initial + retry)
         // May be called more if timer fires before disposal
-        Mock.Get(_systemClock).UtcNow.WasCalled(Times.AtLeast(2));
+        await Assert.That(_timeProvider.ReadCount >= 2).IsTrue();
         AssertWarningLogged();
     }
 
@@ -148,8 +149,8 @@ public class ScheduledRecurringTaskTests : IDisposable
     public void Schedule_WithNegativeDelayAfterRetry_ShouldLogWarningAndUseMinimumDelay()
     {
         // Arrange - simulate a case where even after retry, delay is negative
-        // This could happen due to system clock adjustments
-        SetupSystemClock(DefaultNow, DefaultNow);
+        // This could happen due to system timeProvider adjustments
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow.AddMilliseconds(-100); // Negative delay
 
         // Act - Should handle negative delay gracefully
@@ -166,7 +167,7 @@ public class ScheduledRecurringTaskTests : IDisposable
     public void DisposeDuringTimerCallback_ShouldNotCrash()
     {
         // Arrange - set up a very short delay so timer fires quickly
-        SetupSystemClock(DefaultNow);
+        SetupTimeProvider(DefaultNow);
         var startAt = DefaultNow; // Will use 1ms minimum delay
 
         // Act - Create task and immediately dispose it (simulating race condition)
@@ -186,5 +187,21 @@ public class ScheduledRecurringTaskTests : IDisposable
             ((IDisposable)task).Dispose();
         }
         _serviceProvider.Dispose();
+    }
+
+    private sealed class RecordingTimeProvider(DateTimeOffset initialUtc) : TimeProvider
+    {
+        private readonly FakeTimeProvider _time = new(initialUtc);
+        private int _readCount;
+
+        public int ReadCount => Volatile.Read(ref _readCount);
+
+        public void SetUtcNow(DateTimeOffset value) => _time.SetUtcNow(value);
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            Interlocked.Increment(ref _readCount);
+            return _time.GetUtcNow();
+        }
     }
 }

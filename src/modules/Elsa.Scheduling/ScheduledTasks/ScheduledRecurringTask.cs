@@ -13,7 +13,7 @@ namespace Elsa.Scheduling.ScheduledTasks;
 public class ScheduledRecurringTask : IScheduledTask, IDisposable
 {
     private readonly ITask _task;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ScheduledRecurringTask> _logger;
     private readonly TimeSpan _interval;
@@ -29,10 +29,10 @@ public class ScheduledRecurringTask : IScheduledTask, IDisposable
     /// <summary>
     /// Initializes a new instance of <see cref="ScheduledRecurringTask"/>.
     /// </summary>
-    public ScheduledRecurringTask(ITask task, DateTimeOffset startAt, TimeSpan interval, ISystemClock systemClock, IServiceScopeFactory scopeFactory, ILogger<ScheduledRecurringTask> logger)
+    public ScheduledRecurringTask(ITask task, DateTimeOffset startAt, TimeSpan interval, TimeProvider timeProvider, IServiceScopeFactory scopeFactory, ILogger<ScheduledRecurringTask> logger)
     {
         _task = task;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _scopeFactory = scopeFactory;
         _logger = logger;
         _startAt = startAt;
@@ -64,7 +64,7 @@ public class ScheduledRecurringTask : IScheduledTask, IDisposable
 
         while (true)
         {
-            var now = _systemClock.UtcNow;
+            var now = _timeProvider.GetUtcNow();
             var delay = startAt - now;
 
             if (!adjusted && delay <= TimeSpan.Zero)
@@ -80,7 +80,7 @@ public class ScheduledRecurringTask : IScheduledTask, IDisposable
 
     private void SetupTimer(TimeSpan delay)
     {
-        // Handle edge cases where delay is zero or negative (e.g., due to clock drift, fast execution, or time alignment)
+        // Handle edge cases where delay is zero or negative (e.g., due to timeProvider drift, fast execution, or time alignment)
         // Instead of silently returning, use a minimum delay to ensure the timer fires and workflow continues scheduling
         if (delay <= TimeSpan.Zero)
         {
@@ -107,7 +107,7 @@ public class ScheduledRecurringTask : IScheduledTask, IDisposable
             // Check if disposed before proceeding
             if (_disposed) return;
 
-            _startAt = _systemClock.UtcNow + _interval;
+            _startAt = _timeProvider.GetUtcNow() + _interval;
 
             using var scope = _scopeFactory.CreateScope();
             var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
