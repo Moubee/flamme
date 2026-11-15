@@ -12,10 +12,9 @@ of truth for triggers and commands. Use the SDK selected by
 | [Packages](../.github/workflows/packages.yml) | Pushes to `main` and manual runs | Unit/integration and component coverage on both frameworks, aggregate coverage gate, and optional build/pack artifacts. |
 | [ADR index](../.github/workflows/adr-toc.yml) | ADR/index/script changes | Generated architecture decision index is current. |
 
-PR changes entirely within `design/video/elsa-readme-video/` skip the .NET matrix
-and retain the `ubuntu-latest` result check. Mixed changes, production ClientLib
-changes, unknown or empty diffs, and manual runs validate .NET. Classification
-errors fail the gate. This skip does not validate the video's npm build.
+Pull requests and manual PR workflow runs execute the complete .NET matrix.
+The required `ubuntu-latest` result check succeeds only when both framework lanes
+pass; failed, canceled, or skipped tests fail the gate.
 
 Packages manual runs can target a development branch. `build_packages` defaults
 to true; disabling it skips only the separate build/pack job. All four coverage

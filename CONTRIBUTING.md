@@ -83,11 +83,10 @@ the AppHost while retaining PostgreSQL data.
 
 ### CI validation and package artifacts
 
-Pull requests run .NET validation on both supported frameworks, except changes
-entirely within the isolated `design/video/elsa-readme-video/` project. Those PRs
-still report the `ubuntu-latest` check with an explicit .NET skip decision; this
-does not validate the video's npm build. Mixed changes and production ClientLib
-updates run the complete .NET matrix. Manual PR runs always run it as well.
+Pull requests and manual PR workflow runs validate .NET on both supported
+frameworks. The required `ubuntu-latest` check succeeds only when the complete
+.NET test matrix passes.
+
 Packages runs automatically after a push to `main`; development branches can request it from
 Actions → Packages → Run workflow. Select the branch and leave `build_packages`
 enabled to produce NuGet artifacts, or disable it for coverage validation only.
@@ -97,14 +96,14 @@ See the [CI guide](doc/ci.md) for workflow policy, dependency locks, and artifac
 
 ### Dependency updates
 
-[Dependabot](.github/dependabot.yml) checks GitHub Actions and both npm
-projects every Monday at 06:00 UTC (09:00 in Minsk). Update pull requests use
+[Dependabot](.github/dependabot.yml) checks GitHub Actions and the production JavaScript
+ClientLib npm project every Monday at 06:00 UTC (09:00 in Minsk). Update pull requests use
 Conventional Commits with the `chore` prefix and a dependency scope. Add any new
 npm manifest directory to the existing `directories` list so it receives updates.
 
 Minor and patch version updates are grouped by provider or package family, such
-as React, Remotion, webpack, and the `actions` and `docker` action owners. Major
-upgrades and unmatched packages receive individual pull requests.
+as webpack and the `actions` and `docker` action owners. Major upgrades and
+unmatched packages receive individual pull requests.
 
 Routine NuGet version scans remain disabled. The retired Loom and manifest
 generator integrations no longer require Feedz; `NuGet.Config` now uses only

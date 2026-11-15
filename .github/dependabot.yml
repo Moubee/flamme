@@ -26,7 +26,6 @@ updates:
   - package-ecosystem: "npm"
     directories:
       - "/src/modules/Elsa.Expressions.JavaScript.Libraries/ClientLib"
-      - "/design/video/elsa-readme-video"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -40,13 +39,4 @@ updates:
     groups:
       webpack:
         patterns: ["webpack", "webpack-cli", "terser-webpack-plugin"]
-        update-types: ["minor", "patch"]
-      remotion:
-        patterns: ["remotion", "@remotion/*"]
-        update-types: ["minor", "patch"]
-      react:
-        patterns: ["react", "react-dom"]
-        update-types: ["minor", "patch"]
-      react-types:
-        patterns: ["@types/react", "@types/react-dom"]
         update-types: ["minor", "patch"]

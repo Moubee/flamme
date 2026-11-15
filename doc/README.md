@@ -15,7 +15,7 @@ and migrations take priority when working on that feature.
 | 3 — Feature design | [Specs index](wiki/specs-and-adrs.md) and `specs/**/*.md` | Requirements, contracts, design research, delivery plans, and feature validation records. Some proposals remain drafts; check code and tests for current behavior. |
 | 3 — Test guidance | [Testing strategy](qa/test-guidelines.md), `test/**/README.md` | Test boundaries, fixtures, and scenario-specific setup. |
 | 4 — Supporting context | [Throughput analysis](qa/workflow-throughput-log-persistence-analysis.md), [historical finding reconciliation](security-assessment/README.md) | Focused research and dated evidence with explicit validation limits. |
-| 4 — Contribution and asset support | `.github/ISSUE_TEMPLATE/*.md`, [PR template](../.github/pull_request_template.md), [Copilot pointer](../.github/copilot-instructions.md), [video project](../design/video/elsa-readme-video/README.md) | Submission templates, agent entry point, and asset-project setup. |
+| 4 — Contribution support | `.github/ISSUE_TEMPLATE/*.md`, [PR template](../.github/pull_request_template.md), [Copilot pointer](../.github/copilot-instructions.md) | Submission templates and agent entry point. |
 
 ## Keeping the repository clean
 
