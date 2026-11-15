@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -29,7 +30,7 @@ public sealed class RefreshTokenEndpointTests
 {
     private static readonly User Alice = new() { Id = "alice-id", Name = "alice" };
     private static readonly User Victim = new() { Id = "victim-id", Name = "victim" };
-    private readonly MutableSystemClock _clock = new();
+    private readonly FakeTimeProvider _clock = new(DateTimeOffset.UtcNow);
     private WebApplication _app = null!;
     private HttpClient _client = null!;
     private IdentityTokenOptions _tokenOptions = null!;
@@ -52,7 +53,7 @@ public sealed class RefreshTokenEndpointTests
         }
 
         builder.Services
-            .AddSingleton<ISystemClock>(_clock)
+            .AddSingleton<TimeProvider>(_clock)
             .AddScoped<IUserCredentialsValidator, NameOnlyCredentialsValidator>()
             .AddFastEndpoints(options =>
             {

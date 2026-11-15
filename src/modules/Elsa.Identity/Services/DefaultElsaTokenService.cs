@@ -15,12 +15,12 @@ namespace Elsa.Identity.Services;
 /// <summary>
 /// Creates signed Elsa JWTs from trusted issuance data.
 /// </summary>
-public sealed class DefaultElsaTokenService(ISystemClock systemClock, IOptions<IdentityTokenOptions> identityTokenOptions) : IElsaTokenService
+public sealed class DefaultElsaTokenService(TimeProvider timeProvider, IOptions<IdentityTokenOptions> identityTokenOptions) : IElsaTokenService
 {
     /// <inheritdoc />
     public ValueTask<IssuedAccessToken> IssueAccessTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default)
     {
-        return IssueTokenAsync(context, TokenUse.Access, systemClock.UtcNow.Add(identityTokenOptions.Value.AccessTokenLifetime), [], cancellationToken);
+        return IssueTokenAsync(context, TokenUse.Access, timeProvider.GetUtcNow().Add(identityTokenOptions.Value.AccessTokenLifetime), [], cancellationToken);
     }
 
     /// <inheritdoc />
@@ -32,7 +32,7 @@ public sealed class DefaultElsaTokenService(ISystemClock systemClock, IOptions<I
     public ValueTask<IssuedAccessToken> IssueRefreshTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default)
     {
         var session = context.Session;
-        var expiresAt = systemClock.UtcNow.Add(identityTokenOptions.Value.RefreshTokenLifetime);
+        var expiresAt = timeProvider.GetUtcNow().Add(identityTokenOptions.Value.RefreshTokenLifetime);
         var sessionExpiresAt = session?.ExpiresAt > expiresAt ? session.ExpiresAt : expiresAt;
         Claim[] sessionClaims =
         [

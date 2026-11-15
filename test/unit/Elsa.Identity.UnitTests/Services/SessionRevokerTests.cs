@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
 using Elsa.Common.Services;
 using Elsa.Identity.Constants;
@@ -12,7 +13,7 @@ namespace Elsa.Identity.UnitTests.Services;
 public class SessionRevokerTests
 {
     private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromHours(2);
-    private readonly MutableSystemClock _clock = new();
+    private readonly FakeTimeProvider _clock = new(DateTimeOffset.UtcNow);
     private readonly MemoryStore<RevokedSession> _store = new();
     private readonly SessionRevoker _revoker;
 
@@ -27,7 +28,7 @@ public class SessionRevokerTests
     {
         await Assert.That(await _revoker.IsRevokedAsync("session-a")).IsFalse();
 
-        await RevokeAsync("session-a", _clock.UtcNow);
+        await RevokeAsync("session-a", _clock.GetUtcNow());
 
         await Assert.That(await _revoker.IsRevokedAsync("session-a")).IsTrue();
         await Assert.That(await _revoker.IsRevokedAsync("session-b")).IsFalse();
@@ -36,8 +37,8 @@ public class SessionRevokerTests
     [Test]
     public async Task RevokingASessionTwiceIsHarmless()
     {
-        await RevokeAsync("session-a", _clock.UtcNow);
-        await RevokeAsync("session-a", _clock.UtcNow);
+        await RevokeAsync("session-a", _clock.GetUtcNow());
+        await RevokeAsync("session-a", _clock.GetUtcNow());
 
         await Assert.That(await _revoker.IsRevokedAsync("session-a")).IsTrue();
         await Assert.That(_store.List()).HasSingleItem();
@@ -46,16 +47,16 @@ public class SessionRevokerTests
     [Test]
     public async Task RevocationOutlivesARefreshTokenIssuedNow()
     {
-        await RevokeAsync("session-a", _clock.UtcNow.AddMinutes(1));
+        await RevokeAsync("session-a", _clock.GetUtcNow().AddMinutes(1));
 
-        await Assert.That((await Revocation("session-a")).ExpiresAt > _clock.UtcNow + RefreshTokenLifetime).IsTrue();
+        await Assert.That((await Revocation("session-a")).ExpiresAt > _clock.GetUtcNow() + RefreshTokenLifetime).IsTrue();
     }
 
     [Test]
     public async Task RevocationOutlivesEveryRefreshTokenTheSessionWentThrough()
     {
         // One of them was issued with a longer lifetime than the one configured now.
-        var sessionExpiresAt = _clock.UtcNow + RefreshTokenLifetime * 3;
+        var sessionExpiresAt = _clock.GetUtcNow() + RefreshTokenLifetime * 3;
 
         await RevokeAsync("session-a", sessionExpiresAt);
 
@@ -65,10 +66,10 @@ public class SessionRevokerTests
     [Test]
     public async Task RevokingASessionAgainNeverShortensItsRevocation()
     {
-        await RevokeAsync("session-a", _clock.UtcNow + RefreshTokenLifetime * 3);
+        await RevokeAsync("session-a", _clock.GetUtcNow() + RefreshTokenLifetime * 3);
         var expiresAt = (await Revocation("session-a")).ExpiresAt;
 
-        await RevokeAsync("session-a", _clock.UtcNow);
+        await RevokeAsync("session-a", _clock.GetUtcNow());
 
         await Assert.That((await Revocation("session-a")).ExpiresAt).IsEqualTo(expiresAt);
     }
@@ -76,10 +77,10 @@ public class SessionRevokerTests
     [Test]
     public async Task RevokingASessionAgainExtendsItsRevocation()
     {
-        await RevokeAsync("session-a", _clock.UtcNow);
+        await RevokeAsync("session-a", _clock.GetUtcNow());
         var revokedAt = (await Revocation("session-a")).RevokedAt;
-        var sessionExpiresAt = _clock.UtcNow + RefreshTokenLifetime * 3;
-        _clock.UtcNow += TimeSpan.FromMinutes(1);
+        var sessionExpiresAt = _clock.GetUtcNow() + RefreshTokenLifetime * 3;
+        _clock.Advance(TimeSpan.FromMinutes(1));
 
         await RevokeAsync("session-a", sessionExpiresAt);
 
@@ -90,12 +91,12 @@ public class SessionRevokerTests
     [Test]
     public async Task RevokingPrunesExpiredRevocationsOnly()
     {
-        await RevokeAsync("expired", _clock.UtcNow);
-        _clock.UtcNow += TimeSpan.FromDays(1);
-        await RevokeAsync("live", _clock.UtcNow);
-        _clock.UtcNow += RefreshTokenLifetime;
+        await RevokeAsync("expired", _clock.GetUtcNow());
+        _clock.Advance(TimeSpan.FromDays(1));
+        await RevokeAsync("live", _clock.GetUtcNow());
+        _clock.Advance(RefreshTokenLifetime);
 
-        await RevokeAsync("latest", _clock.UtcNow);
+        await RevokeAsync("latest", _clock.GetUtcNow());
 
         await Assert.That(await _revoker.IsRevokedAsync("expired")).IsFalse();
         await Assert.That(await _revoker.IsRevokedAsync("live")).IsTrue();

@@ -20,7 +20,7 @@ namespace Elsa.Identity.Services;
 /// Only refresh tokens are revoked. Access tokens stay valid until they expire, which
 /// <see cref="IdentityTokenOptions.AccessTokenLifetime"/> keeps short.
 /// </remarks>
-public class SessionRevoker(IRevokedSessionStore store, ISystemClock systemClock, IOptions<IdentityTokenOptions> identityTokenOptions)
+public class SessionRevoker(IRevokedSessionStore store, TimeProvider timeProvider, IOptions<IdentityTokenOptions> identityTokenOptions)
 {
     // A refresh racing the revocation can issue a token a moment after it, and nodes' clocks differ.
     private static readonly TimeSpan ExpiryMargin = TimeSpan.FromMinutes(5);
@@ -64,7 +64,7 @@ public class SessionRevoker(IRevokedSessionStore store, ISystemClock systemClock
     /// <param name="cancellationToken">The cancellation token.</param>
     public async ValueTask RevokeAsync(SignInSession session, CancellationToken cancellationToken = default)
     {
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
 
         // The refresh tokens the session went through expire by session.ExpiresAt, whatever lifetime they were issued
         // with, and a refresh racing this revocation can still issue one a lifetime from now. None can be issued after

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -48,7 +49,7 @@ public sealed class EmptyPermissionsClaimTests
         }
 
         builder.Services
-            .AddSingleton<Elsa.Common.ISystemClock, Elsa.Common.Services.SystemClock>()
+            .AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow))
             .AddElsaAuthorization()
             .AddPermissionDescriptors<IdentityPermissionsDescriptorProvider>()
             .AddScoped<IUserCredentialsValidator, NameOnlyCredentialsValidator>()

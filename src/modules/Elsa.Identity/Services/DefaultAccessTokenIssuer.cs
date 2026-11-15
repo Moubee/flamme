@@ -1,11 +1,8 @@
-using Elsa.Common;
 using Elsa.Extensions;
 using Elsa.Identity.Contracts;
 using Elsa.Identity.Entities;
 using Elsa.Identity.Models;
-using Elsa.Identity.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Elsa.Identity.Services;
 
@@ -27,14 +24,6 @@ public class DefaultAccessTokenIssuer : IAccessTokenIssuer
         _roleProvider = roleProvider;
         _tokenService = tokenService;
         _stampCalculator = stampCalculator;
-    }
-
-    /// <summary>
-    /// Initializes a new instance using the legacy constructor shape.
-    /// </summary>
-    public DefaultAccessTokenIssuer(IRoleProvider roleProvider, ISystemClock systemClock, IOptions<IdentityTokenOptions> identityTokenOptions)
-        : this(roleProvider, new DefaultElsaTokenService(systemClock, identityTokenOptions))
-    {
     }
 
     /// <inheritdoc />

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
 using Elsa.Common.Multitenancy;
 using Elsa.Common.Services;
@@ -30,7 +31,7 @@ public class DefaultIdentityRefreshTokenServiceTests
 
     public DefaultIdentityRefreshTokenServiceTests()
     {
-        var clock = new MutableSystemClock();
+        var clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
         var options = Microsoft.Extensions.Options.Options.Create(_options);
         Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Id == User.Id), Arg.Any<CancellationToken>()).Returns(User);
         Mock.Get(_userProvider).FindAsync(Arg.Is<UserFilter>(x => x.Id == Victim.Id), Arg.Any<CancellationToken>()).Returns(Victim);

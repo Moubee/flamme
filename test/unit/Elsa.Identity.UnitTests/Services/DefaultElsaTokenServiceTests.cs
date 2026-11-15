@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
 using System.Text.Json;
 using Elsa;
@@ -20,7 +21,7 @@ public class DefaultElsaTokenServiceTests
     [DisplayName("Token issuance context is projected into an Elsa access token")]
     public async Task IssueAccessTokenProjectsContext()
     {
-        var clock = new TestSystemClock(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero));
+        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero));
         var options = Microsoft.Extensions.Options.Options.Create(new IdentityTokenOptions
         {
             SigningKey = "external-authentication-test-signing-key",
@@ -40,7 +41,7 @@ public class DefaultElsaTokenServiceTests
         var result = await service.IssueAccessTokenAsync(context);
         var token = new JsonWebTokenHandler().ReadJsonWebToken(result.Token);
 
-        await Assert.That(result.ExpiresAt).IsEqualTo(clock.UtcNow.AddMinutes(15));
+        await Assert.That(result.ExpiresAt).IsEqualTo(clock.GetUtcNow().AddMinutes(15));
         await Assert.That(token.Claims).Contains(x => x.Type == JwtRegisteredClaimNames.Sub && x.Value == user.Id);
         await Assert.That(token.Claims).Contains(x => x.Type == JwtRegisteredClaimNames.Name && x.Value == user.Name);
         await Assert.That(token.Claims).Contains(x => x.Type == options.Value.TenantIdClaimsType && x.Value == user.TenantId);
@@ -95,7 +96,7 @@ public class DefaultElsaTokenServiceTests
     public async Task EmptySetSentinelRoundTripsToAKnownEmptySet()
     {
         var options = CreateOptions();
-        var result = await new DefaultElsaTokenService(new TestSystemClock(DateTimeOffset.UtcNow), options).IssueAccessTokenAsync(EmptyGrantContext());
+        var result = await new DefaultElsaTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options).IssueAccessTokenAsync(EmptyGrantContext());
 
         var jwtBearerClaims = await ValidateWithJwtBearerAsync(result.Token, options.Value);
         var wasmClaims = StudioWasmJwtParser.Parse(result.Token);
@@ -184,7 +185,7 @@ public class DefaultElsaTokenServiceTests
     }
 
     private static DefaultElsaTokenService CreateService() =>
-        new(new TestSystemClock(DateTimeOffset.UtcNow), CreateOptions());
+        new(new FakeTimeProvider(DateTimeOffset.UtcNow), CreateOptions());
 
     private static IOptions<IdentityTokenOptions> CreateOptions() =>
         Microsoft.Extensions.Options.Options.Create(new IdentityTokenOptions { SigningKey = IdentityTokenTestConstants.SigningKey });
@@ -244,8 +245,4 @@ public class DefaultElsaTokenServiceTests
         });
     }
 
-    private sealed class TestSystemClock(DateTimeOffset utcNow) : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = utcNow;
-    }
 }

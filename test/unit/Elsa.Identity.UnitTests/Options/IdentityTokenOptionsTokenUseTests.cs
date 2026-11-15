@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Elsa.Common.Services;
@@ -20,7 +21,7 @@ public class IdentityTokenOptionsTokenUseTests
     private static readonly IServiceProvider RequestServices = new ServiceCollection()
         .AddSingleton(new SessionRevoker(
             new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()),
-            new MutableSystemClock(),
+            new FakeTimeProvider(DateTimeOffset.UtcNow),
             Microsoft.Extensions.Options.Options.Create(new IdentityTokenOptions())))
         .BuildServiceProvider();
 

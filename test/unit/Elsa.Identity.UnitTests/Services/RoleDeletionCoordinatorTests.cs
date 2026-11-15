@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Authorization;
 using System.Security.Claims;
@@ -403,7 +404,7 @@ public class RoleDeletionCoordinatorTests
         await store.SaveAsync(new Role { Id = "workflow-user", Name = "Workflow user", Permissions = [] });
         var roleStore = storeDecorator?.Invoke(store) ?? store;
         var roleProvider = new StoreBasedRoleProvider(roleStore);
-        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? Mock.Of<INotificationSender>().Object, TestTenantAccessor.Default, new SystemClock());
+        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? Mock.Of<INotificationSender>().Object, TestTenantAccessor.Default, new FakeTimeProvider(DateTimeOffset.UtcNow));
         var coordinator = new RoleDeletionCoordinator(roleStore, new RoleAuthorizationService(roleProvider, new PermissionEvaluator()), [contributor], securityNotifier);
         return (store, coordinator);
     }

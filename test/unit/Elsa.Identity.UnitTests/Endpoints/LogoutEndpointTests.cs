@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -31,7 +32,7 @@ public sealed class LogoutEndpointTests
 {
     private static readonly User Alice = new() { Id = "alice-id", Name = "alice" };
     private static readonly User Bob = new() { Id = "bob-id", Name = "bob" };
-    private readonly MutableSystemClock _clock = new();
+    private readonly FakeTimeProvider _clock = new(DateTimeOffset.UtcNow);
     private WebApplication _app = null!;
     private HttpClient _client = null!;
     private IdentityTokenOptions _tokenOptions = null!;
@@ -51,7 +52,7 @@ public sealed class LogoutEndpointTests
             builder.Services.Remove(diagnostic);
 
         builder.Services
-            .AddSingleton<ISystemClock>(_clock)
+            .AddSingleton<TimeProvider>(_clock)
             .AddScoped<IUserCredentialsValidator, NameOnlyCredentialsValidator>()
             .AddFastEndpoints(options =>
             {
@@ -209,9 +210,9 @@ public sealed class LogoutEndpointTests
     [Test]
     public async Task RevokingWithAnExpiredRefreshTokenEndsItsSession()
     {
-        _clock.UtcNow -= TimeSpan.FromHours(3);
+        _clock.AdjustTime(_clock.GetUtcNow() - TimeSpan.FromHours(3));
         var expired = await LoginAsync(Alice);
-        _clock.UtcNow += TimeSpan.FromHours(3);
+        _clock.Advance(TimeSpan.FromHours(3));
         var live = await ContinueSessionAsync(Alice, expired.RefreshToken);
         await AssertRefreshWorksAsync(live.RefreshToken);
 
@@ -310,7 +311,7 @@ public sealed class LogoutEndpointTests
     // Revocations are pruned when the next session is revoked.
     private async Task PruneRevocationsAsync(TimeSpan later)
     {
-        _clock.UtcNow += later;
+        _clock.Advance(later);
         var other = await LoginAsync(Bob);
         await AssertLogoutAsync(HttpStatusCode.NoContent, other.AccessToken, other.RefreshToken);
     }

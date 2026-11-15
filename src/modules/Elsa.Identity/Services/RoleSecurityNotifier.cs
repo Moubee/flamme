@@ -14,7 +14,7 @@ namespace Elsa.Identity.Services;
 /// identity administration to an audit database.
 /// </remarks>
 [UsedImplicitly]
-public class RoleSecurityNotifier(INotificationSender notificationSender, ITenantAccessor tenantAccessor, ISystemClock clock)
+public class RoleSecurityNotifier(INotificationSender notificationSender, ITenantAccessor tenantAccessor, TimeProvider clock)
 {
     /// <summary>Publishes a role creation, update, or deletion.</summary>
     public Task RoleChangedAsync(ClaimsPrincipal? actor, string operation, string roleId, string roleName, IReadOnlyCollection<string> permissions, CancellationToken cancellationToken = default) =>
@@ -29,5 +29,5 @@ public class RoleSecurityNotifier(INotificationSender notificationSender, ITenan
             cancellationToken);
 
     private RoleSecurityEventContext Context(ClaimsPrincipal? actor, string summary) =>
-        new(actor?.Identity?.Name, tenantAccessor.TenantId, clock.UtcNow, summary);
+        new(actor?.Identity?.Name, tenantAccessor.TenantId, clock.GetUtcNow(), summary);
 }
