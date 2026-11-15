@@ -188,3 +188,97 @@ Combining UTC-read migration with timer replacement would also change callback,
 cancellation, disposal and cadence semantics. Keep those changes separate. This
 decision improves standardization and deterministic testing; it makes no
 performance, distributed clock synchronization, or universal virtual-time claim.
+
+## Incremental implementation
+
+The following are proposed implementation commits, not claims that the changes
+already exist. Follow the order within each group; carry constructor callers,
+explicit factories and tests with the owning change. Use one conventional commit
+per row. Shared composition changes require the full suite before release even
+when targeted checks are used while iterating.
+
+### Group A: establish composition, then migrate the core
+
+| Step / suggested commit | Bounded change | Required evidence |
+| --- | --- | --- |
+| 1. `feat(common): introduce canonical TimeProvider registration` | Add `TimeProviderFeature` and the temporary `SystemClock` facade; make the old feature depend on it. Add the centrally versioned test package and regenerate locks. Keep all existing consumers on the facade. | Common DI tests: default, custom override before/after composition, repeat application, singleton scope validation, Resilience order and sub-second fidelity. |
+| 2. `test(time): compose fixtures around a controlled provider` | Update `ActivityTestFixture` and repository DI overrides to register `FakeTimeProvider` as `TimeProvider`; keep the temporary legacy facade in manually constructed fixture containers. Update dependent activity/scheduling tests together. | Existing tests retain their intended instants. Independent fixtures do not share mutable fake clocks. Direct-constructor legacy mocks may remain until their consumers migrate. |
+| 3. `refactor(dashboard): use TimeProvider for range resolution` | Replace the dependency and reads in `DashboardRangeResolver`, including direct callers. Use this small leaf service as the first production example. | Dashboard unit tests pin range boundaries and UTC values. |
+| 4. `refactor(workflows): migrate execution context time APIs` | Migrate both execution contexts, partial files, core middleware, bookmark/context extensions and periodic commit strategy. Update `UserTask` activity accesses to the context property and direct context constructors in tests in the same commit. | Core and activity tests pin created/updated/completed/log/bookmark instants and periodic commit boundaries; UserTasks compiles against the new public property. |
+
+Review A checks provider precedence, fixture consistency, cross-module compilation
+and the public API diff. Do not proceed with two clocks in a shared container.
+
+### Group B: management and runtime services
+
+| Step / suggested commit | Bounded change | Required evidence |
+| --- | --- | --- |
+| 5. `refactor(management): use TimeProvider for workflow timestamps` | `WorkflowDefinitionPublisher` and `WorkflowInstanceFactory`, callers and tests. | Published and instantiated timestamps retain their type, precision and read timing. |
+| 6. `refactor(alterations): use TimeProvider for alteration timestamps` | `AlterationLog`, managers, runners, activities and submit endpoint in the two Alterations modules. | Alteration logging and workflow integration tests; no change to persisted log shape. |
+| 7. `refactor(runtime): migrate queue and outbox timestamps` | Bookmark queue store/processor/purger/dead-letter manager, dispatch outbox/processor and stimulus inbox. | Queue eligibility, retries, retention and outbox tests at existing boundaries; preserve atomic operations and due instants. |
+| 8. `refactor(runtime): migrate lifecycle clock dependencies` | Remaining Runtime consumers: registries, quiescence, drain, admin service, definition populator, workflow heartbeat and interrupted-workflow restart. Update the explicit `QuiescenceSignal` factory in `WorkflowRuntimeFeature`. | Runtime drain/recovery/heartbeat tests; retain real waits and cancellation mechanisms, including wall-clock duration calculations. |
+
+Review B checks timestamp persistence, recovery, deadline predicates and all
+Runtime factory registrations. Perform the workflow PostgreSQL recovery gate
+before considering this group ready for release.
+
+### Group C: hosting and authentication contracts
+
+| Step / suggested commit | Bounded change | Required evidence |
+| --- | --- | --- |
+| 9. `refactor(hosting): use TimeProvider for heartbeat timestamps` | Instance heartbeat writer and monitor. Preserve their timers and stale-instance predicates. | Hosting unit tests pin stale/healthy boundaries and shutdown behavior. |
+| 10. `refactor(identity): use TimeProvider for token timestamps` | `DefaultElsaTokenService`, `RoleSecurityNotifier`, `SessionRevoker`; remove the legacy clock constructor on `DefaultAccessTokenIssuer` and update callers. | Identity tests preserve issuance, expiry encoding and session revocation. Direct `DateTime.UtcNow` in `IdentityTokenOptions.ValidateLifetime` remains a separately tracked limitation. |
+| 11. `refactor(auth): expose TimeProvider in extension contexts` | Change the five positional records and their entire construction/read chain: broker, preview sign-in, connection test/management services and provider adapter tests. Change owning constructor dependencies when required to pass the canonical provider. | External-auth and OpenIdConnect adapter tests compile with new record members, named arguments, deconstruction and `with` usage; callback/logout behavior is unchanged. |
+| 12. `refactor(auth): migrate remaining in-memory clock consumers` | Remaining external-auth services, token issuer, validity assessor, identity link management, provisioner and four in-memory stores. | Existing state/grant/session/preview-result tests preserve exact expiry, refresh rotation and single-use consumption rules. |
+
+Review C checks the authentication extension API, token boundaries and explicitly
+remaining system-time dependencies. A controlled token issuer alone does not make
+the framework JWT validator or application lifetime delegate use fake time.
+
+### Group D: database and user-task consumers
+
+| Step / suggested commit | Bounded change | Required evidence |
+| --- | --- | --- |
+| 13. `refactor(auth): migrate PostgreSQL clock dependencies` | EF atomic stores, session store and identity provisioner. Capture timestamps outside EF expression trees at the existing operation boundary. | PostgreSQL conformance/integration tests verify generated queries execute, consume races remain atomic, refresh reuse is detected, revocation values and strict expiry rules remain intact. |
+| 14. `refactor(user-tasks): migrate service clock dependencies` | Managers, due/invitation/projection/reconciliation services, guest security, bookmark handler, endpoints and worker resolution. | UserTasks tests pin creation, due, claim, invitation and revocation timestamps; existing `PeriodicTimer` cadence remains real. |
+| 15. `refactor(user-tasks): migrate PostgreSQL guest clock reads` | Guest session store and invitation outbox in `EFCoreUserTaskGuestStores`; capture values before `ExecuteUpdate`. | PostgreSQL user-task conformance tests prove revocation updates and guest expiry/claim behavior; no schema changes. |
+| 16. `refactor(http): use TimeProvider for zip cache expiry` | `ZipManager` and its activity tests. | Preserve the existing `>` expiry comparison, including exact equality, with controlled UTC time. |
+
+Review D checks SQL translation, single-use/concurrency behavior, data formats and
+durable test evidence. A passing in-memory suite does not satisfy this review.
+
+### Group E: scheduling calculations and removal
+
+| Step / suggested commit | Bounded change | Required evidence |
+| --- | --- | --- |
+| 17. `refactor(common): migrate recurring schedule clock reads` | `RecurringTaskScheduleManager` and `CronSchedule`; preserve timer implementation and existing read/conversion behavior. | Characterize cron conversion behavior first. If `.DateTime` needs a fix, land it as a separate `fix(common)` commit before this rewrite, with UTC-kind and occurrence tests. |
+| 18. `refactor(scheduling): use TimeProvider for due-time calculations` | `CronosCronParser`, `DefaultTriggerScheduler`, StartAt and Delay/Timer context extensions. | Scheduling/activity tests cover UTC cron occurrence, one tick before/at/after due time, and unchanged bookmark payloads. |
+| 19. `refactor(scheduling): migrate scheduled task clock dependencies` | The three `Scheduled*Task` classes and their constructor/factory tests. Change UTC reads only; keep `System.Timers.Timer`, catch-up staggering, minimum delay and rearming behavior. | Existing scheduled task and disposal tests pass. Recurrence still computes the next start from callback-time UTC plus interval. |
+| 20. `refactor(common)!: remove the legacy system clock API` | Retarget remaining feature dependencies; remove `ISystemClock`, `SystemClock`, `SystemClockFeature` and obsolete fixture mock interfaces. Update host examples and migration guidance. | All source/test categories and downstream examples compile without legacy symbols; full .NET 10/11 suite and release gates pass. Commit footer describes the breaking API and registration changes. |
+
+Review E checks final removal, release guidance, and timer semantics. If a group
+needs a separate correctness repair, keep it separately reviewable and perform
+the review after at most four commits rather than stretching the group.
+
+### Host and extension upgrade
+
+Default hosts need no custom clock registration. Hosts with a custom legacy
+implementation must derive from `TimeProvider`, override `GetUtcNow()`, and
+register the instance as the base service type before building the container:
+
+```csharp
+services.AddSingleton<TimeProvider>(customTimeProvider);
+services.AddElsa(elsa => { /* existing feature configuration */ });
+```
+
+Replace constructor parameters and `context.SystemClock.UtcNow` with the APIs in
+the table above. External-authentication extensions use
+`context.TimeProvider.GetUtcNow()`. Rebuild all custom activities and provider
+adapters, update clock mocks, and update the whole Flamme package graph together;
+old binaries compiled against deleted types cannot be mixed with new packages.
+
+No stored workflow/bookmark/schema migration is intended. Keep activity names,
+versions, JSON fields and persisted instants stable, and prove old persisted
+instances can resume with the new binaries. Rollback means redeploying the
+previous coherent application/package set, not selectively restoring an old
+clock package. Persistence compatibility is a release gate, not an assumption.
