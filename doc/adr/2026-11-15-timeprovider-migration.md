@@ -282,3 +282,103 @@ versions, JSON fields and persisted instants stable, and prove old persisted
 instances can resume with the new binaries. Rollback means redeploying the
 previous coherent application/package set, not selectively restoring an old
 clock package. Persistence compatibility is a release gate, not an assumption.
+
+## Validation and release gates
+
+### Deterministic time tests
+
+Use a fresh `FakeTimeProvider` per test with an explicit UTC starting instant and
+`AutoAdvanceAmount = TimeSpan.Zero`. Register it as `TimeProvider`, not only as its
+concrete type. Call `Advance` deliberately between operations. Where existing
+tests verify sequential clock reads, retain the scenario with a small scripted
+provider; replacing every sequential mock with a frozen clock would lose coverage.
+
+| Contract | Acceptance checks |
+| --- | --- |
+| Composition | Full `AddElsa` and minimal fixture containers resolve the same provider for all consumers. Defaults, repeated feature application, both Resilience orders and host overrides before/after `AddElsa` pass. Use `ValidateOnBuild` and `ValidateScopes`, and explicitly resolve factory-created singletons: build validation alone cannot inspect dependencies inside factories. |
+| API construction | Exercise normal DI and `ActivatorUtilities` paths, explicit runtime/scheduling factories, direct constructors and external-authentication records. Compile affected dependent projects, not just the edited module. |
+| UTC values | Preserve fractional-second ticks and `DateTimeOffset` values in memory. Test a non-UTC host time zone without substituting local time. Verify `.UtcDateTime.Kind == Utc` at existing UTC conversion boundaries. |
+| Workflow state | With controlled instants, execute, suspend, persist, rebuild the host/provider, resume and complete. Verify created/updated/completed/log/bookmark fields, old serialized shape and original due instants. Read legacy-version fixtures and exercise PostgreSQL recovery. |
+| Expiration | In memory, check one tick before, exactly at, and one tick after expiration using each consumer's existing comparison. PostgreSQL tests use instants representable by the mapped column precision; tick-backed columns retain exact tick boundaries. Never assert sub-microsecond timestamp round-trips that PostgreSQL cannot preserve. |
+| Atomicity | With two callers racing to consume the same grant/state/invitation, retain one success. Preserve refresh-generation/reuse and revoked-session behavior. Verify updates execute on PostgreSQL, with captured time values and unchanged transaction boundaries. |
+| Scheduling | Verify future/past/exact-now calculations, cron boundary crossing, stagger/minimum-delay rules and callback-based recurrence. Existing real-timer disposal, cancellation, exception and non-overlap tests remain required. |
+| Scope limit | Fake advancement controls UTC reads in this release. It does not establish virtual behavior for drain waits, heartbeat timers, scheduled callbacks, JWT framework validation or third-party libraries. |
+
+For later timer work, require provider-aware waits/timers, cancellation before and
+during a callback, async callback completion signals, no callbacks/rearming after
+disposal, and a real watchdog timeout to prevent hanging tests. `FakeTimeProvider`
+advancement alone is not proof that an asynchronous callback has completed. Do
+not adopt a periodic timer without deciding whether recurrence is fixed-rate,
+relative to callback start, or relative to callback completion.
+
+### Build commands
+
+Use the pinned SDK and the native solution/test runner. Restore all target
+frameworks before using a framework-specific `--no-restore` command. Dependency
+changes in step 1 require `dotnet restore Elsa.slnx --force-evaluate`, followed by
+review of central package and executable lockfile changes. Thereafter validate
+locked restore:
+
+```bash
+dotnet --info
+dotnet msbuild src/modules/Elsa.Common/Elsa.Common.csproj \
+  -p:TargetFramework=net11.0 \
+  -getProperty:TargetFramework,NETCoreSdkVersion,UseRuntimeAsync
+dotnet restore Elsa.slnx --locked-mode
+
+# Example targeted iteration; replace the project for the owning slice.
+dotnet test --project test/unit/Elsa.Common.UnitTests/Elsa.Common.UnitTests.csproj \
+  --configuration Release --no-restore
+
+# Cross-module and release gates, with PostgreSQL/container prerequisites ready.
+dotnet build Elsa.slnx --configuration Release --no-restore
+dotnet test --solution Elsa.slnx --configuration Release --framework net10.0 --no-build
+dotnet test --solution Elsa.slnx --configuration Release --framework net11.0 --no-build
+```
+
+Use TUnit on Microsoft Testing Platform; do not introduce VSTest or Coverlet
+settings. Runner switches precede `--`; application switches follow it. Keep the
+existing CI coverage policy. See [CI guidance](../ci.md) and the
+[testing strategy](../qa/test-guidelines.md) for environment requirements.
+
+For affected async infrastructure, also rebuild and test the .NET 11 opt-out;
+changing the property with `--no-build` alone would test the wrong assemblies:
+
+```bash
+dotnet build test/unit/Elsa.Workflows.Runtime.UnitTests/Elsa.Workflows.Runtime.UnitTests.csproj \
+  --configuration Release --framework net11.0 --no-restore --no-incremental \
+  -p:UseRuntimeAsync=false
+dotnet test --project test/unit/Elsa.Workflows.Runtime.UnitTests/Elsa.Workflows.Runtime.UnitTests.csproj \
+  --configuration Release --framework net11.0 --no-build -p:UseRuntimeAsync=false
+```
+
+Rebuild with the default property before subsequent default-mode validation or
+packaging. Record mode, framework, passed/failed/skipped test totals and any
+environment limits in PR evidence. A skipped PostgreSQL test is not durable
+persistence evidence. This proposal does not claim the release gates have run.
+
+### Final removal and release review
+
+Run the legacy search against tracked C# files, including performance tests and
+shared fixtures. Any remaining hit must be removed or explained by a genuinely
+unrelated external contract; there is no Elsa compatibility allowlist:
+
+```bash
+git grep -n -E '\b(ISystemClock|SystemClock|SystemClockFeature)\b' -- '*.cs'
+git grep -n -E '\.Clock\b|\bTimeProvider\b' -- '*.cs'
+git diff --check
+scripts/adr/generate-toc.sh --check
+```
+
+The first search should return no Elsa legacy usages (exit code 1 means no
+matches). Inspect the second search's record callers, registrations and any
+`TimeProvider.System` uses; production services should consume DI, while defaults
+belong at composition boundaries. Update live code examples; retain historical
+mentions in this ADR and the release's upgrade guidance as explanations.
+
+Publish the complete package graph as a breaking release only after API changes,
+default host startup, full test matrix, PostgreSQL recovery/conformance and
+constructor activation checks pass. No database migration is planned; any test
+showing a persisted format change stops the release until that change is removed
+or receives its own migration design. Keep review findings and command logs in
+the PR or external evidence rather than appending execution ledgers to this ADR.
