@@ -62,7 +62,7 @@ public class InstanceHeartbeatMonitorService : IHostedService, IDisposable
         var lockProvider = scope.ServiceProvider.GetRequiredService<IDistributedLockProvider>();
         var store = scope.ServiceProvider.GetRequiredService<IKeyValueStore>();
         var notificationSender = scope.ServiceProvider.GetRequiredService<INotificationSender>();
-        var systemClock = scope.ServiceProvider.GetRequiredService<ISystemClock>();
+        var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
         
         const string lockKey = "InstanceHeartbeatMonitorService";
         await using var monitorLock = await lockProvider.TryAcquireLockAsync(lockKey, TimeSpan.Zero);
@@ -80,7 +80,7 @@ public class InstanceHeartbeatMonitorService : IHostedService, IDisposable
         {
             var lastHeartbeat = DateTimeOffset.Parse(heartbeat.SerializedValue).UtcDateTime;
 
-            if (systemClock.UtcNow - lastHeartbeat <= _heartbeatOptions.Timeout)
+            if (timeProvider.GetUtcNow() - lastHeartbeat <= _heartbeatOptions.Timeout)
                 continue;
 
             var instanceName = heartbeat.Key[InstanceHeartbeatService.HeartbeatKeyPrefix.Length..];

@@ -61,11 +61,11 @@ public class InstanceHeartbeatService : IHostedService, IDisposable
         using var scope = _serviceProvider.CreateScope();
         var instanceNameProvider = scope.ServiceProvider.GetRequiredService<IApplicationInstanceNameProvider>();
         var store = scope.ServiceProvider.GetRequiredService<IKeyValueStore>();
-        var systemClock = scope.ServiceProvider.GetRequiredService<ISystemClock>();
+        var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
         await store.SaveAsync(new SerializedKeyValuePair
             {
                 Id = $"{HeartbeatKeyPrefix}{instanceNameProvider.GetName()}",
-                SerializedValue = systemClock.UtcNow.ToString("o")
+                SerializedValue = timeProvider.GetUtcNow().ToString("o")
             },
             default);
     }
