@@ -12,6 +12,7 @@ using Elsa.Workflows.Runtime.Models;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.State;
 using Medallion.Threading;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
@@ -23,13 +24,13 @@ public class WorkflowDispatchOutboxProcessorTests
     private readonly IWorkflowDispatchOutboxStore _store = Mock.Of<IWorkflowDispatchOutboxStore>().Object;
     private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
     private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
-    private readonly ISystemClock _systemClock = Mock.Of<ISystemClock>().Object;
+    private readonly FakeTimeProvider _timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
     private readonly WorkflowDispatcherOptions _options = new();
     private readonly WorkflowDispatchOutboxProcessor _processor;
 
     public WorkflowDispatchOutboxProcessorTests()
     {
-        Mock.Get(_systemClock).UtcNow.Returns(DateTimeOffset.UtcNow);
+        _timeProvider.SetUtcNow(new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero));
         _processor = CreateProcessor();
     }
 
@@ -114,7 +115,7 @@ public class WorkflowDispatchOutboxProcessorTests
             _workflowInstanceStore,
             _commandSender,
             distributedLockProvider ?? new NoopDistributedSynchronizationProvider(),
-            _systemClock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             Microsoft.Extensions.Options.Options.Create(_options),
             NullLogger<WorkflowDispatchOutboxProcessor>.Instance,
@@ -125,7 +126,7 @@ public class WorkflowDispatchOutboxProcessorTests
     public async Task ProcessAsync_DoesNotDispatch_WhenOwnerWorkflowHasNotCommittedOutboxMarker()
     {
         var item = CreateItem();
-        Mock.Get(_systemClock).UtcNow.Returns(item.CreatedAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
+        _timeProvider.SetUtcNow(item.CreatedAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
@@ -141,7 +142,7 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        _timeProvider.SetUtcNow(createdAt.Add(_options.OrphanedOutboxItemRetention));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
@@ -157,7 +158,7 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        _timeProvider.SetUtcNow(createdAt.Add(_options.OrphanedOutboxItemRetention));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: false));
@@ -176,7 +177,7 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
+        _timeProvider.SetUtcNow(createdAt.Add(_options.OrphanedOutboxItemRetention).AddTicks(-1));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns((WorkflowInstance?)null);
@@ -192,7 +193,7 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        _timeProvider.SetUtcNow(createdAt.Add(_options.OrphanedOutboxItemRetention));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns((WorkflowInstance?)null);
@@ -208,7 +209,7 @@ public class WorkflowDispatchOutboxProcessorTests
     {
         var createdAt = new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
         var item = CreateItem(createdAt);
-        Mock.Get(_systemClock).UtcNow.Returns(createdAt.Add(_options.OrphanedOutboxItemRetention));
+        _timeProvider.SetUtcNow(createdAt.Add(_options.OrphanedOutboxItemRetention));
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns((WorkflowInstance?)null);
@@ -404,7 +405,7 @@ public class WorkflowDispatchOutboxProcessorTests
             {
                 InstanceId = $"child-{id}"
             },
-            CreatedAt = createdAt ?? DateTimeOffset.UtcNow
+            CreatedAt = createdAt ?? new DateTimeOffset(2026, 5, 20, 12, 0, 0, TimeSpan.Zero)
         };
     }
 

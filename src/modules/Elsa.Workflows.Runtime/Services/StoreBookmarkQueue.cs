@@ -8,7 +8,7 @@ namespace Elsa.Workflows.Runtime;
 public class StoreBookmarkQueue(
     IBookmarkQueueStore store, 
     IBookmarkQueueSignaler bookmarkQueueSignaler, 
-    ISystemClock systemClock, 
+    TimeProvider timeProvider,
     IIdentityGenerator identityGenerator,
     ILogger<StoreBookmarkQueue> logger,
     ITenantAccessor? tenantAccessor = null) : IBookmarkQueue
@@ -26,7 +26,7 @@ public class StoreBookmarkQueue(
             ActivityInstanceId = item.ActivityInstanceId,
             ActivityTypeName = item.ActivityTypeName,
             Options = item.Options,
-            CreatedAt = systemClock.UtcNow,
+            CreatedAt = timeProvider.GetUtcNow(),
         };
 
         logger.LogDebug("Enqueuing bookmark queue item {BookmarkQueueItemId} with bookmark {BookmarkId} and stimulus {StimulusHash}", entity.Id, entity.BookmarkId, entity.StimulusHash);

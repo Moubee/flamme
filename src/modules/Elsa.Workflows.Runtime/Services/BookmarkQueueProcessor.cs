@@ -15,7 +15,7 @@ public class BookmarkQueueProcessor(
     IBookmarkQueueStore store,
     IBookmarkQueueDeadLetterManager deadLetterManager,
     IWorkflowResumer workflowResumer,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IOptions<BookmarkQueuePurgeOptions> options,
     ILogger<BookmarkQueueProcessor> logger) : IBookmarkQueueProcessor
 {
@@ -86,7 +86,7 @@ public class BookmarkQueueProcessor(
     private async Task<bool> HandleFailureAsync(BookmarkQueueItem item, Exception exception, CancellationToken cancellationToken)
     {
         item.DeliveryAttempts++;
-        item.LastAttemptedAt = systemClock.UtcNow;
+        item.LastAttemptedAt = timeProvider.GetUtcNow();
         item.LastErrorType = exception.GetType().FullName;
         item.LastErrorMessage = exception.Message;
 

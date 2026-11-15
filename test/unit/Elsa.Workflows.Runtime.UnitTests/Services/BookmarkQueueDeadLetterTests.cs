@@ -9,6 +9,7 @@ using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.OrderDefinitions;
 using Elsa.Workflows.Runtime.Requests;
 using Elsa.Workflows.Runtime.Stores;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
@@ -18,7 +19,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 public class BookmarkQueueDeadLetterTests
 {
     private readonly DateTimeOffset _now = new(2026, 5, 20, 10, 0, 0, TimeSpan.Zero);
-    private readonly TestClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IIdentityGenerator _identityGenerator = Mock.Of<IIdentityGenerator>().Object;
     private readonly IBookmarkQueueSignaler _signaler = Mock.Of<IBookmarkQueueSignaler>().Object;
     private readonly MemoryBookmarkQueueStore _queueStore;
@@ -26,7 +27,7 @@ public class BookmarkQueueDeadLetterTests
 
     public BookmarkQueueDeadLetterTests()
     {
-        _clock = new(_now);
+        _timeProvider = new(_now);
         Mock.Get(_identityGenerator).GenerateId().ReturnsSequentially("generated-1", "generated-2", "generated-3");
         _queueStore = new(new MemoryStore<BookmarkQueueItem>());
         _deadLetterStore = new(new MemoryStore<BookmarkQueueDeadLetterItem>());
@@ -66,7 +67,7 @@ public class BookmarkQueueDeadLetterTests
             queueStore,
             _deadLetterStore,
             CreateManager(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { Ttl = TimeSpan.FromMinutes(1), DeadLetterTtl = TimeSpan.FromDays(7), BatchSize = 10 }),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
 
@@ -89,7 +90,7 @@ public class BookmarkQueueDeadLetterTests
             queueStore,
             _deadLetterStore,
             CreateManager(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { Ttl = TimeSpan.FromMinutes(1), DeadLetterTtl = TimeSpan.FromDays(7) }),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
 
@@ -121,7 +122,7 @@ public class BookmarkQueueDeadLetterTests
             queueStore,
             _deadLetterStore,
             CreateManager(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { Ttl = TimeSpan.FromMinutes(1), DeadLetterTtl = TimeSpan.FromDays(7), BatchSize = 10 }),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
 
@@ -158,7 +159,7 @@ public class BookmarkQueueDeadLetterTests
             queueStore,
             _deadLetterStore,
             CreateManager(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { Ttl = TimeSpan.FromMinutes(1), DeadLetterTtl = TimeSpan.FromDays(7) }),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
 
@@ -189,7 +190,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             deadLetterStore,
             CreateManager(deadLetterStore),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { Ttl = TimeSpan.FromMinutes(1), DeadLetterTtl = TimeSpan.FromDays(7) }),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
 
@@ -229,7 +230,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             CreateManager(),
             workflowResumer,
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { MaxDeliveryAttempts = 2 }),
             NullLogger<BookmarkQueueProcessor>.Instance);
 
@@ -257,7 +258,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             CreateManager(),
             new CancelingWorkflowResumer(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { MaxDeliveryAttempts = 2 }),
             NullLogger<BookmarkQueueProcessor>.Instance);
 
@@ -277,7 +278,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             CreateManager(),
             new ThrowingWorkflowResumer(new InvalidOperationException("transient failure")),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions { MaxDeliveryAttempts = 1 }),
             NullLogger<BookmarkQueueProcessor>.Instance);
 
@@ -301,7 +302,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             CreateManager(),
             new SuccessfulWorkflowResumer(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),
             NullLogger<BookmarkQueueProcessor>.Instance);
 
@@ -399,7 +400,7 @@ public class BookmarkQueueDeadLetterTests
             inspectingDeadLetterStore,
             new ThrowingAddQueueStore(_queueStore),
             _signaler,
-            _clock,
+            _timeProvider,
             _identityGenerator,
             NullLogger<BookmarkQueueDeadLetterManager>.Instance);
 
@@ -479,7 +480,7 @@ public class BookmarkQueueDeadLetterTests
             _queueStore,
             _deadLetterStore,
             CreateManager(),
-            _clock,
+            _timeProvider,
             Microsoft.Extensions.Options.Options.Create(options),
             NullLogger<DefaultBookmarkQueuePurger>.Instance);
     }
@@ -490,7 +491,7 @@ public class BookmarkQueueDeadLetterTests
             deadLetterStore ?? _deadLetterStore,
             _queueStore,
             _signaler,
-            _clock,
+            _timeProvider,
             _identityGenerator,
             NullLogger<BookmarkQueueDeadLetterManager>.Instance);
     }
@@ -506,11 +507,6 @@ public class BookmarkQueueDeadLetterTests
             ActivityTypeName = "activity",
             CreatedAt = createdAt
         };
-    }
-
-    private sealed class TestClock(DateTimeOffset utcNow) : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = utcNow;
     }
 
     private sealed class ThrowingWorkflowResumer(Exception? exception = null) : IWorkflowResumer

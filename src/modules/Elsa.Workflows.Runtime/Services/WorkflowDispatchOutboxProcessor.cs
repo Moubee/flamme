@@ -22,7 +22,7 @@ public class WorkflowDispatchOutboxProcessor(
     IWorkflowInstanceStore workflowInstanceStore,
     ICommandSender commandSender,
     IDistributedLockProvider distributedLockProvider,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IOptions<DistributedLockingOptions> distributedLockingOptions,
     IOptions<WorkflowDispatcherOptions> dispatcherOptions,
     ILogger<WorkflowDispatchOutboxProcessor> logger,
@@ -176,7 +176,7 @@ public class WorkflowDispatchOutboxProcessor(
         var retention = dispatcherOptions.Value.OrphanedOutboxItemRetention;
         var expiresAt = item.CreatedAt.Add(retention);
 
-        if (retention <= TimeSpan.Zero || systemClock.UtcNow >= expiresAt)
+        if (retention <= TimeSpan.Zero || timeProvider.GetUtcNow() >= expiresAt)
         {
             logger.LogWarning("Deleting workflow dispatch outbox item {OutboxItemId} because owner workflow {WorkflowInstanceId} was not found and the orphan retention period has elapsed", item.Id, item.OwnerWorkflowInstanceId);
             await TryDeleteRetainedItemAsync(item, cancellationToken);
@@ -191,7 +191,7 @@ public class WorkflowDispatchOutboxProcessor(
         var retention = dispatcherOptions.Value.OrphanedOutboxItemRetention;
         var expiresAt = item.CreatedAt.Add(retention);
 
-        if (retention <= TimeSpan.Zero || systemClock.UtcNow >= expiresAt)
+        if (retention <= TimeSpan.Zero || timeProvider.GetUtcNow() >= expiresAt)
         {
             logger.LogWarning("Deleting workflow dispatch outbox item {OutboxItemId} because owner workflow {WorkflowInstanceId} never committed the outbox marker and the retention period has elapsed", item.Id, item.OwnerWorkflowInstanceId);
             await TryDeleteRetainedItemAsync(item, cancellationToken);

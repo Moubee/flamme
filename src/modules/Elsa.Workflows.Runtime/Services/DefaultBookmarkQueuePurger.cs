@@ -15,13 +15,13 @@ public class DefaultBookmarkQueuePurger(
     IBookmarkQueueStore store,
     IBookmarkQueueDeadLetterStore deadLetterStore,
     IBookmarkQueueDeadLetterManager deadLetterManager,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IOptions<BookmarkQueuePurgeOptions> options,
     ILogger<DefaultBookmarkQueuePurger> logger) : IBookmarkQueuePurger
 {
     public async Task PurgeAsync(CancellationToken cancellationToken = default)
     {
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var thresholdDate = now - options.Value.Ttl;
 
         logger.LogDebug("Purging bookmark queue items older than {ThresholdDate}.", thresholdDate);

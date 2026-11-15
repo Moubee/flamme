@@ -6,6 +6,7 @@ using Elsa.Workflows.Runtime.Filters;
 using Elsa.Workflows.Runtime.Messages;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Stores;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
@@ -244,7 +245,7 @@ public class BookmarkQueueTenantIsolationTests
             store,
             Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
             resumer,
-            Mock.Of<ISystemClock>().Object,
+            new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),
             NullLogger<BookmarkQueueProcessor>.Instance);
         var processor = new TenantRecordingProcessor(accessor, inner);

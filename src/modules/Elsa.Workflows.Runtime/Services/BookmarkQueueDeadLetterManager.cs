@@ -9,7 +9,7 @@ public class BookmarkQueueDeadLetterManager(
     IBookmarkQueueDeadLetterStore deadLetterStore,
     IBookmarkQueueStore bookmarkQueueStore,
     IBookmarkQueueSignaler bookmarkQueueSignaler,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IIdentityGenerator identityGenerator,
     ILogger<BookmarkQueueDeadLetterManager> logger) : IBookmarkQueueDeadLetterManager
 {
@@ -29,7 +29,7 @@ public class BookmarkQueueDeadLetterManager(
         var originalQueueItemIds = itemList.Select(x => x.Id).ToList();
         var existingDeadLetters = (await deadLetterStore.FindManyAsync(new BookmarkQueueDeadLetterFilter { OriginalQueueItemIds = originalQueueItemIds }, cancellationToken)).ToList();
         var existingByOriginalQueueItemId = existingDeadLetters.ToDictionary(x => x.OriginalQueueItemId);
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var deadLetterItems = itemList
             .Where(item => !existingByOriginalQueueItemId.ContainsKey(item.Id))
             .Select(item => CreateDeadLetterItem(item, reason, exception, now))
@@ -84,7 +84,7 @@ public class BookmarkQueueDeadLetterManager(
     public async Task<ReplayBookmarkQueueDeadLetterResult> ReplayAsync(string id, CancellationToken cancellationToken = default)
     {
         var queueItemId = identityGenerator.GenerateId();
-        var replayedAt = systemClock.UtcNow;
+        var replayedAt = timeProvider.GetUtcNow();
         var item = await deadLetterStore.TryMarkReplayedAsync(id, queueItemId, replayedAt, cancellationToken);
 
         if (item == null)
@@ -106,7 +106,7 @@ public class BookmarkQueueDeadLetterManager(
             ActivityInstanceId = item.ActivityInstanceId,
             ActivityTypeName = item.ActivityTypeName,
             Options = item.Options,
-            CreatedAt = systemClock.UtcNow
+            CreatedAt = timeProvider.GetUtcNow()
         };
 
         try

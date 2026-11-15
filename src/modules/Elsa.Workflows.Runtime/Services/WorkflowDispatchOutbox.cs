@@ -7,14 +7,14 @@ namespace Elsa.Workflows.Runtime;
 public class WorkflowDispatchOutbox(
     IWorkflowDispatchOutboxStore store,
     IIdentityGenerator identityGenerator,
-    ISystemClock systemClock) : IWorkflowDispatchOutbox
+    TimeProvider timeProvider) : IWorkflowDispatchOutbox
 {
     /// <inheritdoc />
     public async Task EnqueueAsync(WorkflowExecutionContext workflowExecutionContext, WorkflowDispatchOutboxItem item, CancellationToken cancellationToken = default)
     {
         item.Id = identityGenerator.GenerateId();
         item.OwnerWorkflowInstanceId = workflowExecutionContext.Id;
-        item.CreatedAt = systemClock.UtcNow;
+        item.CreatedAt = timeProvider.GetUtcNow();
 
         await store.SaveAsync(item, cancellationToken);
         workflowExecutionContext.AddWorkflowDispatchOutboxItem(item.Id);

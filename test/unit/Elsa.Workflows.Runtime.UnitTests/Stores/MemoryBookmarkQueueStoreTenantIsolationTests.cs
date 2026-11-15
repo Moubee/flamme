@@ -9,6 +9,7 @@ using Elsa.Workflows.Runtime.Messages;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.OrderDefinitions;
 using Elsa.Workflows.Runtime.Stores;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
@@ -33,13 +34,13 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
 
         var identity = Mock.Of<IIdentityGenerator>().Object;
         Mock.Get(identity).GenerateId().Returns("queue-a");
-        var clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(clock).UtcNow.Returns(DateTimeOffset.UtcNow);
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        timeProvider.SetUtcNow(DateTimeOffset.UtcNow);
 
         var queue = new StoreBookmarkQueue(
             storeA,
             Mock.Of<IBookmarkQueueSignaler>().Object,
-            clock,
+            timeProvider,
             identity,
             NullLogger<StoreBookmarkQueue>.Instance,
             accessorA);
@@ -67,7 +68,7 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
             storeB,
             Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
             resumer,
-            clock,
+            timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),
             NullLogger<BookmarkQueueProcessor>.Instance);
 

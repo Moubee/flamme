@@ -19,7 +19,7 @@ namespace Elsa.Workflows.Runtime;
 public class StimulusProxyWorkflowInbox(
     IStimulusSender stimulusSender,
     IWorkflowDispatcher workflowDispatcher,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IIdentityGenerator identityGenerator,
     IHasher bookmarkHasher,
     ILogger<StimulusProxyWorkflowInbox> logger)
@@ -45,7 +45,7 @@ public class StimulusProxyWorkflowInbox(
             Input = newMessage.Input
         };
 
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
 
         var message = new WorkflowInboxMessage
         {
