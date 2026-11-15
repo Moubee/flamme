@@ -30,9 +30,9 @@ public class SubmitAlterationPlan : CodeActivity<string>
     /// <inheritdoc />
     protected override async ValueTask ExecuteAsync(ActivityExecutionContext context)
     {
-        var systemClock = context.GetRequiredService<ISystemClock>();
+        var timeProvider = context.GetRequiredService<TimeProvider>();
         var identityGenerator = context.GetRequiredService<IIdentityGenerator>();
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var planParams = context.Get(Params)!;
 
         var plan = new AlterationPlan

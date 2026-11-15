@@ -15,7 +15,7 @@ public class DefaultAlterationJobRunner : IAlterationJobRunner
     private readonly IAlterationJobStore _alterationJobStore;
     private readonly IAlterationRunner _alterationRunner;
     private readonly INotificationSender _notificationSender;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultAlterationJobRunner"/> class.
@@ -25,13 +25,13 @@ public class DefaultAlterationJobRunner : IAlterationJobRunner
         IAlterationJobStore alterationJobStore,
         IAlterationRunner alterationRunner,
         INotificationSender notificationSender,
-        ISystemClock systemClock)
+        TimeProvider timeProvider)
     {
         _alterationPlanStore = alterationPlanStore;
         _alterationJobStore = alterationJobStore;
         _alterationRunner = alterationRunner;
         _notificationSender = notificationSender;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -42,14 +42,14 @@ public class DefaultAlterationJobRunner : IAlterationJobRunner
         var workflowInstanceId = job.WorkflowInstanceId;
         
         job.Status = AlterationJobStatus.Running;
-        job.StartedAt = _systemClock.UtcNow;
+        job.StartedAt = _timeProvider.GetUtcNow();
         await _alterationJobStore.SaveAsync(job, cancellationToken);
         
         var result = await _alterationRunner.RunAsync(workflowInstanceId, plan.Alterations, cancellationToken);
         
         job.Status = result.IsSuccessful ? AlterationJobStatus.Completed : AlterationJobStatus.Failed;
         job.Log = result.Log.LogEntries.ToList();
-        job.CompletedAt = _systemClock.UtcNow;
+        job.CompletedAt = _timeProvider.GetUtcNow();
         await _alterationJobStore.SaveAsync(job, cancellationToken);
         await _notificationSender.SendAsync(new AlterationJobCompleted(job, result.WorkflowHasScheduledWork), cancellationToken);
 

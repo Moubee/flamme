@@ -17,14 +17,14 @@ public class Submit : ElsaEndpoint<AlterationPlanParams, Response>
 {
     private readonly IAlterationPlanScheduler _alterationPlanScheduler;
     private readonly IIdentityGenerator _identityGenerator;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
 
     /// <inheritdoc />
-    public Submit(IAlterationPlanScheduler alterationPlanScheduler, IIdentityGenerator identityGenerator, ISystemClock systemClock)
+    public Submit(IAlterationPlanScheduler alterationPlanScheduler, IIdentityGenerator identityGenerator, TimeProvider timeProvider)
     {
         _alterationPlanScheduler = alterationPlanScheduler;
         _identityGenerator = identityGenerator;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />

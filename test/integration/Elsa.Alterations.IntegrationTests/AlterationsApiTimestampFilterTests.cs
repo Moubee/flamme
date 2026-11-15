@@ -7,6 +7,7 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Enums;
 using Elsa.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TUnit.AspNetCore;
 
 namespace Elsa.Alterations.IntegrationTests;
@@ -38,7 +39,7 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
         services.AddSingleton(Mock.Of<IWorkflowDispatcher>().Object);
         services.AddSingleton(Mock.Of<IWorkflowInstanceStore>().Object);
         services.AddSingleton(Mock.Of<IIdentityGenerator>().Object);
-        services.AddSingleton(Mock.Of<ISystemClock>().Object);
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
     }
 
     [Test]

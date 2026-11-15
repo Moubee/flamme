@@ -87,14 +87,14 @@ public class GenerateAlterationJobs : CodeActivity<int>
     {
         var cancellationToken = context.CancellationToken;
         var identityGenerator = context.GetRequiredService<IIdentityGenerator>();
-        var systemClock = context.GetRequiredService<ISystemClock>();
+        var timeProvider = context.GetRequiredService<TimeProvider>();
         var jobs = workflowInstanceIds.Select(workflowInstanceId => new AlterationJob
             {
                 Id = identityGenerator.GenerateId(),
                 PlanId = plan.Id,
                 Status = AlterationJobStatus.Pending,
                 WorkflowInstanceId = workflowInstanceId,
-                CreatedAt = systemClock.UtcNow
+                CreatedAt = timeProvider.GetUtcNow()
             })
             .ToList();
 

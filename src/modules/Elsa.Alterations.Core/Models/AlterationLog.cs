@@ -9,15 +9,15 @@ namespace Elsa.Alterations.Core.Models;
 /// </summary>
 public class AlterationLog 
 {
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly List<AlterationLogEntry> _logEntries = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AlterationLog"/> class.
     /// </summary>
-    public AlterationLog(ISystemClock systemClock)
+    public AlterationLog(TimeProvider timeProvider)
     {
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
     }
     
     /// <summary>
@@ -33,7 +33,7 @@ public class AlterationLog
     /// <param name="eventName">The event that generated the log entry.</param>
     public void Add(string message, LogLevel logLevel = LogLevel.Information, string? eventName = null)
     {
-        var entry = new AlterationLogEntry(message, logLevel, _systemClock.UtcNow, eventName);
+        var entry = new AlterationLogEntry(message, logLevel, _timeProvider.GetUtcNow(), eventName);
         
         _logEntries.Add(entry);
     }

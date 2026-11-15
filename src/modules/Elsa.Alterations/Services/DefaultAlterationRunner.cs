@@ -19,7 +19,7 @@ public class DefaultAlterationRunner(
     IWorkflowDefinitionService workflowDefinitionService,
     IWorkflowStateExtractor workflowStateExtractor,
     ICommitStateHandler commitStateHandler,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IServiceProvider serviceProvider)
     : IAlterationRunner
 {
@@ -41,7 +41,7 @@ public class DefaultAlterationRunner(
     /// <inheritdoc />
     public async Task<RunAlterationsResult> RunAsync(string workflowInstanceId, IEnumerable<IAlteration> alterations, CancellationToken cancellationToken = default)
     {
-        var log = new AlterationLog(systemClock);
+        var log = new AlterationLog(timeProvider);
         var result = new RunAlterationsResult(workflowInstanceId, log);
         var workflowClient = await workflowRuntime.CreateClientAsync(workflowInstanceId, cancellationToken: cancellationToken);
 

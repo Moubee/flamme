@@ -9,7 +9,7 @@ using Elsa.Mediator.Contracts;
 namespace Elsa.Alterations.Services;
 
 /// <inheritdoc />
-public class AlterationPlanManager(IAlterationPlanStore planStore, IAlterationJobStore jobStore, ISystemClock systemClock, INotificationSender notificationSender) : IAlterationPlanManager
+public class AlterationPlanManager(IAlterationPlanStore planStore, IAlterationJobStore jobStore, TimeProvider timeProvider, INotificationSender notificationSender) : IAlterationPlanManager
 {
     /// <inheritdoc />
     public async Task<AlterationPlan?> GetPlanAsync(string planId, CancellationToken cancellationToken = default)
@@ -35,7 +35,7 @@ public class AlterationPlanManager(IAlterationPlanStore planStore, IAlterationJo
     public async Task CompletePlanAsync(AlterationPlan plan, CancellationToken cancellationToken = default)
     {
         plan.Status = AlterationPlanStatus.Completed;
-        plan.CompletedAt = systemClock.UtcNow;
+        plan.CompletedAt = timeProvider.GetUtcNow();
         
         await planStore.SaveAsync(plan, cancellationToken);
         await notificationSender.SendAsync(new AlterationPlanCompleted(plan), cancellationToken);
