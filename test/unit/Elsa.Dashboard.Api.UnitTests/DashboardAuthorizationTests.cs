@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -74,7 +75,7 @@ public class DashboardAuthorizationTests
     [Before(Test)]
     public async Task InitializeAsync() => _host = await AuthorizationTestHost.StartAsync<DashboardApiFeature>(
         endpoint => endpoint.Namespace?.StartsWith("Elsa.Dashboard.Api.Endpoints", StringComparison.Ordinal) == true,
-        services => services.AddSingleton<IDashboardProvider>(new DefaultDashboardProvider([Declared()], new(new TestClock(DateTimeOffset.UtcNow)), new TestHostEnvironment())));
+        services => services.AddSingleton<IDashboardProvider>(new DefaultDashboardProvider([Declared()], new(new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero))), new TestHostEnvironment())));
 
     [After(Test)]
     public async Task DisposeAsync()

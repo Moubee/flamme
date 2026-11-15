@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Dashboard.Abstractions.Contracts;
 using Elsa.Dashboard.Abstractions.Models;
 using Elsa.Dashboard.Api.Services;
@@ -606,7 +607,7 @@ public class DefaultDashboardProviderTests
     }
 
     private DefaultDashboardProvider CreateProvider(params IDashboardContributor[] contributors) =>
-        new(contributors, new(new TestClock(_now)), new TestHostEnvironment());
+        new(contributors, new(new FakeTimeProvider(_now)), new TestHostEnvironment());
 
     private static async Task AssertRegisteredContributor<TContributor>(IServiceCollection services)
     {

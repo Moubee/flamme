@@ -1,9 +1,8 @@
-using Elsa.Common;
 using Elsa.Dashboard.Abstractions.Models;
 
 namespace Elsa.Dashboard.Api.Services;
 
-public class DashboardRangeResolver(ISystemClock clock)
+public class DashboardRangeResolver(TimeProvider timeProvider)
 {
     public DashboardRange Resolve(string? range)
     {
@@ -14,7 +13,7 @@ public class DashboardRangeResolver(ISystemClock clock)
             DashboardRangeKeys.SevenDays => TimeSpan.FromDays(7),
             _ => TimeSpan.FromHours(24)
         };
-        var to = clock.UtcNow;
+        var to = timeProvider.GetUtcNow();
         return new(key, to.Subtract(duration), to);
     }
 

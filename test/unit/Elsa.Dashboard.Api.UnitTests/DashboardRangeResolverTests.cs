@@ -1,4 +1,4 @@
-using Elsa.Common;
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Dashboard.Abstractions.Models;
 using Elsa.Dashboard.Api.Services;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ public class DashboardRangeResolverTests
 
     public DashboardRangeResolverTests()
     {
-        _resolver = new(new TestClock(_now));
+        _resolver = new(new FakeTimeProvider(_now));
     }
 
     [Test]
@@ -28,6 +28,21 @@ public class DashboardRangeResolverTests
         await Assert.That(range.Key).IsEqualTo(expectedKey);
         await Assert.That(range.To).IsEqualTo(_now);
         await Assert.That(range.From).IsEqualTo(_now.AddHours(-expectedHours));
+    }
+
+    [Test]
+    public async Task Resolve_UsesCurrentInstantAndPreservesFractionalTicks()
+    {
+        var initialUtc = _now.AddTicks(1_234_567);
+        var fakeTime = new FakeTimeProvider(initialUtc);
+        var resolver = new DashboardRangeResolver(fakeTime);
+
+        fakeTime.Advance(TimeSpan.FromMinutes(5));
+        var range = resolver.Resolve(DashboardRangeKeys.OneHour);
+        var expectedTo = initialUtc.AddMinutes(5);
+
+        await Assert.That(range.To).IsEqualTo(expectedTo);
+        await Assert.That(range.From).IsEqualTo(expectedTo.AddHours(-1));
     }
 
     [Test]
@@ -47,10 +62,5 @@ public class DashboardRangeResolverTests
         var granularity = _resolver.ResolveGranularity("custom", DashboardRangeKeys.OneHour);
 
         await Assert.That(granularity).IsEqualTo("custom");
-    }
-
-    private class TestClock(DateTimeOffset utcNow) : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = utcNow;
     }
 }
