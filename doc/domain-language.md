@@ -1,6 +1,6 @@
-# Elsa Workflow Runtime
+# Domain language
 
-The workflow runtime executes activities and moves their results into destinations that workflows can consume.
+Canonical terminology for workflow outputs, external authentication, and User Tasks. Use these terms when changing public contracts and feature specifications.
 
 ## Language
 

@@ -30,7 +30,11 @@ OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 
 The SDK handles protocol options, signal-specific paths, headers, batching, and export. For signal-specific endpoints and other options, see the [official OTLP exporter documentation](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md).
 
-The modular sample host registers the workflow source and meter and enables OTLP export when `OTEL_EXPORTER_OTLP_ENDPOINT` or a signal-specific `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`, or `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` is supplied. Its regular launch profiles do not export by default. The `http-aspire` and `https-aspire` profiles target an external gRPC endpoint at `http://localhost:4317`; select the actual dashboard or collector endpoint for your environment. These profiles do not start an Aspire AppHost.
+The reference server registers the workflow source and meter through
+[`Elsa.ServiceDefaults`](../../src/apps/Elsa.ServiceDefaults/Extensions.cs). It enables
+OTLP export when `OTEL_EXPORTER_OTLP_ENDPOINT` is configured. The
+[Aspire AppHost](../aspire-development.md) supplies that endpoint for local
+development; standalone hosts must configure their collector endpoint explicitly.
 
 ## Traces
 

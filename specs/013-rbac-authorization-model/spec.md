@@ -8,7 +8,7 @@
 
 **Tracking**: [#7974](https://github.com/elsa-workflows/elsa-core/issues/7974)
 
-**Input**: A customer request for role-based access control, assessed in [research.md](research.md), reframed against Elsa's existing identity, permission, and multitenancy infrastructure, [domain language](../../CONTEXT.md), and [architecture decisions](../../doc/adr).
+**Input**: A customer request for role-based access control, assessed in [research.md](research.md), reframed against Elsa's existing identity, permission, and multitenancy infrastructure, [domain language](../../doc/domain-language.md), and [architecture decisions](../../doc/adr).
 
 ## Product Context
 

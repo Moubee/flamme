@@ -48,8 +48,6 @@ flowchart LR
 | [Expressions And Scripting](expressions-and-scripting.md) | Expression evaluators and language feature packages. |
 | [HTTP, Scheduling, And Resilience](http-scheduling-resilience.md) | Inbound HTTP workflows, outbound HTTP, scheduled triggers, and resilience strategies. |
 | [Persistence](persistence.md) | In-memory stores, EF Core stores, provider packages, migrations, and multi-provider rules. |
-| [Diagnostics Structured Logs migration](diagnostics-structured-logs.md) | Migrate removed structured-log capture, storage, and dashboard integrations to host-owned logging. |
-| [Diagnostics Console Logs migration](diagnostics-console-logs.md) | Migrate removed console capture and streaming to the process/container logging pipeline. |
 | [Health Checks](health-checks.md) | Elsa runtime readiness probes, liveness/readiness mapping, and Kubernetes probe guidance. |
 | [Identity, Tenancy, And Security](identity-tenancy-security.md) | Users, applications, roles, API keys, tenant resolution, and authorization touch points. |
 | [Testing Guide](testing-guide.md) | TUnit and Microsoft Testing Platform project layout, fixture choices, and targeted commands. |

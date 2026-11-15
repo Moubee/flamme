@@ -6,7 +6,7 @@
 
 **Initial protocol scope**: Host-wide, brokered OpenID Connect
 
-**Domain language**: [`CONTEXT.md`](../../CONTEXT.md)
+**Domain language**: [`doc/domain-language.md`](../../doc/domain-language.md)
 
 **Architecture decisions**: [`doc/adr`](../../doc/adr)
 
@@ -665,7 +665,7 @@ Given an Elsa Role is referenced by any CreateUser or matcher no-match CreateUse
 
 After PRD approval:
 
-1. Run SpecKit specification generation using this PRD, `CONTEXT.md`, and the ADRs as sources.
+1. Maintain feature specifications using this PRD, `doc/domain-language.md`, and the ADRs as sources.
 2. Clarify and analyze the specification for contradictions, missing acceptance cases, and cross-repository impact.
 3. Produce an implementation plan with research, data model, state machines, API contracts, Studio contracts, migrations, and threat modeling.
 4. Generate story-oriented tasks with explicit Elsa Core and Elsa Studio ownership.

@@ -38,5 +38,4 @@ Package restore no longer needs Feedz. Dependency graph and lock inspection must
 verify the retired package families have disappeared, including transitive paths.
 This decision makes no unmeasured throughput, startup or memory claims.
 
-See the [migration guide](../integration-removal.md) and
-[review evidence](../integration-removal-review.md).
+See the [migration guide](../integration-removal.md).

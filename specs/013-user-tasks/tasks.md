@@ -14,7 +14,7 @@ Tasks use `[ID] [P?] [Story] Description with file path`. `[P]` tasks may run in
 - [x] T005 Add requirements, security, and accessibility gates in `specs/013-user-tasks/checklists/`.
 - [x] T006 Record architecture, sequence, risks, and verification in `specs/013-user-tasks/plan.md`.
 - [x] T007 Reconcile dossier terminology and run cross-artifact analysis across `specs/013-user-tasks/`.
-- [x] T008 Add canonical User Tasks terminology to `CONTEXT.md` and update the active Spec Kit pointer in `AGENTS.md`.
+- [x] T008 Add canonical User Tasks terminology to `doc/domain-language.md`.
 
 ## Phase 2: Core domain and workflow slice
 

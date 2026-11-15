@@ -16,7 +16,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 | [test/component](../../test/component) | Larger host-level and persistence-oriented scenarios. |
 | [test/performance](../../test/performance) | Benchmark and throughput-oriented tests. |
 | [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets) | Shared MSBuild settings used by the .NET CLI and CI. |
-| [doc](../../doc) | ADRs, QA notes, agent logs, bounty docs, and this wiki. |
+| [doc](../../doc) | Architecture decisions, migration guides, testing guidance, and this wiki. |
 | [specs](../../specs) | Spec Kit feature specs, plans, tasks, contracts, and quickstarts. |
 | [design](../../design) | Logos, screenshots, and visual assets used by public docs and README files. |
 

@@ -1,8 +1,5 @@
 # Static hosting and inherited integration removal
 
-Baseline: freshly fetched `origin/main` at `4c60b13bf` on 2026-11-14.
-Branch: `refactor/remove-inherited-integrations`.
-
 ## Scope and migration
 
 This breaking change retires Nuplane runtime package loading, CShells modular
@@ -42,31 +39,3 @@ the stored value and tenant context. Resolve multiple shell states explicitly;
 they cannot be merged automatically. Verify pause recovery before enabling
 ingress or background dispatch. Re-applying pause after an unrestricted startup
 does not close the interval in which workflows could already execute.
-
-## Implementation and review gates
-
-1. Record scope, acceptance criteria, and the baseline in a conventional commit.
-2. Retire optional modules and modular host/client surfaces.
-3. Remove shared shell adapters while preserving classic registrations/lifecycle.
-4. Remove package/build/solution remnants and regenerate executable locks.
-5. Review the first implementation batch, fix findings, and record validation.
-
-The coordinator owns commits, dependency graph integration and review. Three
-implementation agents own disjoint module, shell adapter, and host/client scopes.
-The original checkout's unrelated changes remain untouched.
-
-Acceptance requires a Release solution build, meaningful retained unit/integration
-tests on .NET 10 and .NET 11, zero retired package families in restored graphs and
-locks, retained exception-group dependencies, and reviewed public/configuration
-migration documentation. Restore the standalone TLS smoke project separately.
-Run a locked restore after lock regeneration. Record infrastructure-dependent
-checks separately from successful checks.
-
-Tooling: .NET SDK 11.0.100 / MSBuild 18.12.2 and Aspire CLI 13.6.5. No AppHost is
-present on this baseline; adding orchestration infrastructure is outside the
-integration-removal change. Aspire's installed CLI is checked, and any lifecycle
-validation must target an existing AppHost using isolated worktree execution.
-
-Implementation and both review checkpoints are complete. See the
-[review evidence](integration-removal-review.md) for dependency, build, test and
-packaging results and the existing skipped component cases.

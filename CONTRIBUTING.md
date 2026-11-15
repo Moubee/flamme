@@ -40,8 +40,7 @@ The default opt-in excludes Mono, browser/WASI runtime identifiers, and
 platform-specific target frameworks. The .NET 11 NuGet assets are intended for
 supported CoreCLR consumers; consumers on unsupported runtimes should use the
 .NET 10 assets or rebuild with runtime async disabled. NativeAOT and ReadyToRun
-remain supported compilation modes. See the [research and validation record](doc/qa/2026-11-14-runtime-async.md)
-for compatibility evidence and verification results.
+remain supported compilation modes.
 
 ```bash
 dotnet restore Elsa.slnx
@@ -94,7 +93,7 @@ Actions → Packages → Run workflow. Select the branch and leave `build_packag
 enabled to produce NuGet artifacts, or disable it for coverage validation only.
 All four coverage test lanes and the aggregate coverage threshold run either way.
 Manual requests stay independent; newer automatic pushes cancel superseded runs.
-See the [workflow run audit](doc/ci-workflow-runs.md) for the policy and baseline.
+See the [CI guide](doc/ci.md) for workflow policy, dependency locks, and artifacts.
 
 ### Dependency updates
 
