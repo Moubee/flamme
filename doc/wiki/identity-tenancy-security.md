@@ -213,8 +213,6 @@ return `Bearer ${token}`;
 - [test/integration/Elsa.JavaScript.IntegrationTests](../../test/integration/Elsa.JavaScript.IntegrationTests)
 - [test/integration/Elsa.Activities.IntegrationTests](../../test/integration/Elsa.Activities.IntegrationTests)
 
-Spec: [specs/007-secrets-module/spec.md](../../specs/007-secrets-module/spec.md).
-
 ## Ingress Rate Limiting
 
 Elsa exposes opt-in ASP.NET Core rate limiting hooks for two ingress surfaces:

@@ -173,8 +173,6 @@ Recent graceful shutdown work added node-local quiescence and drain concepts. So
 - [InterruptedRecoveryScanner](../../src/modules/Elsa.Workflows.Runtime/Services/InterruptedRecoveryScanner.cs)
 - [RecoverInterruptedWorkflowsStartupTask](../../src/modules/Elsa.Workflows.Runtime/StartupTasks/RecoverInterruptedWorkflowsStartupTask.cs)
 
-The design intent is captured in [specs/002-graceful-shutdown/plan.md](../../specs/002-graceful-shutdown/plan.md).
-
 Ingress source adapters are currently registered by modules such as HTTP and Scheduling so the runtime can pause external event intake during drain.
 
 ## Runtime Admin

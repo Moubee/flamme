@@ -2,14 +2,14 @@
 
 This wiki maps Flamme from its source code: where the important components live, how they connect, and how to extend or test them. Flamme is forked from Elsa 3.9 and retains `Elsa.*` technical identifiers. The [project direction](../project-direction.md) explains its focus on high-load, distributed process orchestration, PostgreSQL, and Kubernetes.
 
-The source of truth is still the code, specs, ADRs, and tests. Each page links back to the relevant files so you can jump from explanation to implementation.
+The source of truth is the code, ADRs, and tests. Each page links back to the relevant files so you can jump from explanation to implementation.
 
 The [documentation index](../README.md) ranks the repository's guides and references
 by importance. Use [domain language](../domain-language.md) for canonical terminology.
 
 ## Start Here
 
-Flamme is a modular .NET process orchestrator. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
+Flamme is a modular .NET process orchestrator. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), and architecture decisions under [doc/adr](../adr).
 
 The main execution flow:
 
@@ -56,7 +56,7 @@ flowchart LR
 | [Testing Guide](testing-guide.md) | TUnit and Microsoft Testing Platform project layout, fixture choices, and targeted commands. |
 | [Extension Guide](extension-guide.md) | How to add features, activities, expression providers, stores, endpoints, and ingress sources. |
 | [OpenTelemetry Workflow Instrumentation](opentelemetry-workflows.md) | First-party workflow and activity traces and metrics emitted through `System.Diagnostics`. |
-| [Specs And ADRs](specs-and-adrs.md) | How current specs and ADRs explain design intent. |
+| [Architecture decisions](../adr/toc.md) | Durable decisions and their rationale. |
 | [Build, Run, And Operate](build-run-operate.md) | Build commands, sample hosts, runtime knobs, Docker notes, and operational endpoints. |
 
 ## Source Landmarks
@@ -75,4 +75,4 @@ flowchart LR
 
 Use targeted reads first, then targeted tests. For most changes, start with the relevant module page, inspect the linked feature class and contracts, add or update tests in the matching `test/unit`, `test/integration`, or `test/component` project, and run `dotnet test --project <path-to-test.csproj>` for the narrowest project that proves the behavior. Use `dotnet test --solution Elsa.slnx` for the full suite.
 
-When changing public behavior, update the related README, spec quickstart, or wiki page in the same PR. This repository is strongly modular, so the best changes keep ownership boundaries clear.
+When changing public behavior, update the related README or wiki page in the same PR. This repository is strongly modular, so the best changes keep ownership boundaries clear.

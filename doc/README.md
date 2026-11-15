@@ -12,7 +12,6 @@ and migrations take priority when working on that feature.
 | 2 — Upgrade guidance | [Persistence migration](postgres-inmemory-migration.md), [integration migration](integration-removal.md), [BPMN migration](wiki/bpmn-workflows.md), [migration guides](migrations), [migration scripts](../scripts/migrations/README.md) | Required actions when upgrading hosts, stored data, permissions, and authentication. |
 | 2 — Domain contracts | [Domain language](domain-language.md), [User Tasks](user-tasks.md), remaining `src/**/README.md` files | Canonical terminology and module-specific usage or security constraints. |
 | 3 — Architecture and implementation | [Contributor wiki](wiki/README.md), remaining `doc/wiki/*.md`, [ADR index](adr/toc.md) and `doc/adr/*.md` | Source maps and durable design decisions. The ADR index is generated. |
-| 3 — Feature design | [Specs index](wiki/specs-and-adrs.md) and `specs/**/*.md` | Requirements, contracts, design research, delivery plans, and feature validation records. Some proposals remain drafts; check code and tests for current behavior. |
 | 3 — Test guidance | [Testing strategy](qa/test-guidelines.md), `test/**/README.md` | Test boundaries, fixtures, and scenario-specific setup. |
 | 4 — Supporting context | [Throughput analysis](qa/workflow-throughput-log-persistence-analysis.md), [historical finding reconciliation](security-assessment/README.md) | Focused research and dated evidence with explicit validation limits. |
 | 4 — Contribution support | `.github/ISSUE_TEMPLATE/*.md`, [PR template](../.github/pull_request_template.md), [Copilot pointer](../.github/copilot-instructions.md) | Submission templates and agent entry point. |
@@ -24,8 +23,8 @@ module README and architectural rationale in an ADR. Keep task transcripts, buil
 logs, review ledgers, generated codebase scans, and one-off plans in PRs or external
 evidence instead of adding parallel Markdown reports.
 
-Project-local skill copies, Claude folders, SpecKit generation scaffolding,
-retired shell/diagnostics specs, upstream announcement packs, superseded scans,
+Feature specifications, Claude folders, SpecKit generation scaffolding,
+retired project-local skills, upstream announcement packs, superseded scans,
 and execution reports were removed. Their earlier versions remain in Git history.
 The former root `CONTEXT.md` glossary is maintained as [domain language](domain-language.md).
 

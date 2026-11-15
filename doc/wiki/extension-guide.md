@@ -115,7 +115,6 @@ Update docs when changing:
 Good locations:
 
 - module README
-- relevant spec quickstart
 - this wiki
 - ADR for architectural decisions
 

@@ -105,4 +105,4 @@ Configuration bindings use `ownership: external`: their values and lifecycle rem
 
 Management, descriptor, link, preview, test, and session APIs are served below `/external-authentication`. On-demand tests store only the latest redacted observation and become stale after a material connection revision. Preview state and results are short-lived, administrator-bound, and one-time; preview never creates a user, link, Elsa credential, or normal session.
 
-See [the full quickstart](../../../specs/012-external-authentication/quickstart.md) and [REST contract](../../../specs/012-external-authentication/contracts/rest-api.md).
+See [the OpenID Connect adapter](../Elsa.ExternalAuthentication.OpenIdConnect/README.md) for provider configuration and [the Studio migration guide](../../../doc/migrations/external-authentication.md) for rollout guidance.
