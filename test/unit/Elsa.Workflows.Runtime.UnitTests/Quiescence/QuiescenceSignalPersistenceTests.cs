@@ -367,7 +367,7 @@ public class QuiescenceSignalPersistenceTests
     {
         var services = new ServiceCollection();
         services.AddOptions<GracefulShutdownOptions>().Configure(options => options.PausePersistence = PausePersistencePolicy.AcrossReactivations);
-        services.AddSingleton(_timeProvider);
+        services.AddSingleton<TimeProvider>(_timeProvider);
         services.AddSingleton(_cycleRegistry);
         services.AddScoped<IKeyValueStore>(_ => _kv);
         services.AddSingleton<IQuiescenceSignal, QuiescenceSignal>();
