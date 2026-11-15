@@ -110,6 +110,12 @@ Scheduled workflows typically create trigger or bookmark payloads that the sched
 
 The scheduler integrates with tenancy by reacting to tenant activation/deletion events.
 
+Cron, recurring, and specific-instant timer callbacks tolerate disposal while queued
+or executing. They retain their cancellation token before the timer starts and contain
+callback failures, including scope resolution and teardown, so those failures cannot
+escape the timer's asynchronous event handler and terminate the process. Unexpected
+execution failures are logged while the scheduled task is active.
+
 ## Resilience Module
 
 Start in [src/modules/Elsa.Resilience](../../src/modules/Elsa.Resilience) and [Elsa.Resilience.Core](../../src/modules/Elsa.Resilience.Core).

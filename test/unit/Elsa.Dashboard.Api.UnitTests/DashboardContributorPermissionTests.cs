@@ -1,10 +1,6 @@
-using ConsoleLogStreaming.Core;
 using Elsa.Common.Models;
 using Elsa.Dashboard.Abstractions.Contracts;
 using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Diagnostics.ConsoleLogs.Dashboard;
-using Elsa.Diagnostics.StructuredLogs.Contracts;
-using Elsa.Diagnostics.StructuredLogs.Dashboard;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Models;
@@ -55,29 +51,13 @@ public class DashboardContributorPermissionTests
     }
 
     [Test]
-    public async Task StructuredLogsContributor_GuardsItsSummaryAndFindings() =>
-        await AssertGuardsAsync(
-            new StructuredLogsDashboardContributor(Mock.Of<IStructuredLogProvider>().Object, []),
-            async permissions => await Assert.That(permissions.StructuredLogs).IsEqualTo(StructuredLogsView),
-            StructuredLogsView);
-
-    [Test]
-    public async Task ConsoleLogsContributor_GuardsItsSummaryAndFindings() =>
-        await AssertGuardsAsync(
-            new ConsoleLogsDashboardContributor(Mock.Of<IConsoleLogProvider>().Object),
-            async permissions => await Assert.That(permissions.ConsoleLogs).IsEqualTo(ConsoleLogsView),
-            ConsoleLogsView);
-
-    [Test]
     public async Task BuiltInContributors_DeclareEveryPermissionTheirOverviewCardsAndPanelsUse()
     {
         var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
         Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
         var contributors = new IDashboardContributor[]
         {
-            new WorkflowDashboardContributor(CreateStore(), runtime),
-            new StructuredLogsDashboardContributor(Mock.Of<IStructuredLogProvider>().Object, []),
-            new ConsoleLogsDashboardContributor(Mock.Of<IConsoleLogProvider>().Object)
+            new WorkflowDashboardContributor(CreateStore(), runtime)
         };
 
         foreach (var contributor in contributors)

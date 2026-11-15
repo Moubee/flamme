@@ -4,11 +4,10 @@ using Elsa.Features.Models;
 namespace Elsa.Features.Services;
 
 /// <summary>
-/// Legacy implementation of <see cref="IInstalledFeatureProvider"/> that delegates to <see cref="IInstalledFeatureRegistry"/>.
+/// Implementation of <see cref="IInstalledFeatureProvider"/> that delegates to <see cref="IInstalledFeatureRegistry"/>.
 /// </summary>
 /// <remarks>
-/// This implementation is used when features are manually registered using the legacy feature system.
-/// For shell-based feature discovery, use <c>ShellInstalledFeatureProvider</c> instead.
+/// Features registered through an Elsa module are published in the installed feature registry.
 /// </remarks>
 public class InstalledFeatureProvider : IInstalledFeatureProvider
 {

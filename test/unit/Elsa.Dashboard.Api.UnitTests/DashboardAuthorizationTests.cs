@@ -58,7 +58,7 @@ public class DashboardAuthorizationTests
     /// <summary>Every instance endpoint crossed with each permission that guards only another section.</summary>
     public static IEnumerable<(string, string, string)> InstanceEndpointsWithAnotherSectionsPermission() =>
         from endpoint in InstanceEndpointList
-        from permission in new[] { RuntimeView, StructuredLogsView, ConsoleLogsView }.Select(Format)
+        from permission in new[] { RuntimeView }.Select(Format)
         select (endpoint.Method.Method, endpoint.Path, permission);
 
     /// <summary>The sections a caller holding only the permission reads; every other section is withheld.</summary>

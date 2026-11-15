@@ -37,8 +37,6 @@ public class DefaultDashboardProvider(
         var unavailable = new DashboardCapabilityStatus(DashboardCapabilityStatus.Unavailable.Status, "Some sources are unavailable; figures would be incomplete");
         var runtime = MergeSection(contributions, skipped, failed, canRead, x => x.Runtime, x => x.Runtime, x => x.Capability.Status == unavailable.Status || x.Status == DashboardRuntimeStatusKeys.Unavailable, MergeRuntime, new() { Capability = unauthorized }, new() { Capability = unavailable });
         var workflowInstances = MergeSection(contributions, skipped, failed, canRead, x => x.WorkflowInstances, x => x.WorkflowInstances, x => x.Capability.Status == unavailable.Status, MergeWorkflowMetrics, new() { Capability = unauthorized }, new() { Capability = unavailable });
-        var structuredLogs = MergeSection(contributions, skipped, failed, canRead, x => Installed(x.Diagnostics?.StructuredLogs, y => y.Capability), x => x.StructuredLogs, x => x.Capability.Status == unavailable.Status, summaries => summaries.FirstOrDefault() ?? new(), new() { Capability = unauthorized }, new() { Capability = unavailable });
-        var consoleLogs = MergeSection(contributions, skipped, failed, canRead, x => Installed(x.Diagnostics?.ConsoleLogs, y => y.Capability), x => x.ConsoleLogs, x => x.Capability.Status == unavailable.Status, summaries => summaries.FirstOrDefault() ?? new(), new() { Capability = unauthorized }, new() { Capability = unavailable });
         var metrics = contributions.SelectMany(x => x.Contribution.Metrics).Where(x => canRead(x.Permission)).OrderBy(x => x.Order).ThenBy(x => x.Id, StringComparer.Ordinal).ToList();
         var panels = contributions.SelectMany(x => x.Contribution.Panels).Where(x => canRead(x.Permission)).OrderBy(x => x.Order).ThenBy(x => x.Id, StringComparer.Ordinal).ToList();
 
@@ -56,11 +54,6 @@ public class DefaultDashboardProvider(
             EnvironmentName = withheld ? null : environment.EnvironmentName,
             Runtime = Section(runtime),
             WorkflowInstances = Section(workflowInstances),
-            Diagnostics = new()
-            {
-                StructuredLogs = Section(structuredLogs),
-                ConsoleLogs = Section(consoleLogs)
-            },
             Metrics = metrics,
             Panels = panels,
             AppliedRange = range.Key,
@@ -321,10 +314,6 @@ public class DefaultDashboardProvider(
 
     /// <summary>A merged overview section, the <paramref name="Denied"/> form of it, and whether the caller read any of it.</summary>
     private sealed record OverviewSection<T>(T Value, T Denied, bool Readable);
-
-    // A diagnostics slice that reports NotInstalled was not supplied: every contribution carries both slices.
-    private static T? Installed<T>(T? section, Func<T, DashboardCapabilityStatus> capability) where T : class =>
-        section != null && capability(section).Status != DashboardCapabilityStatus.NotInstalled.Status ? section : null;
 
     private static DashboardRuntimeStatus MergeRuntime(IReadOnlyCollection<DashboardRuntimeStatus> runtimes) =>
         runtimes.FirstOrDefault(x => x.Status != DashboardRuntimeStatusKeys.Unavailable) ?? new();

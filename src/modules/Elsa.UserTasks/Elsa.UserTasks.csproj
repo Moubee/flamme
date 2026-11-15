@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Description>Provides identity-neutral, workflow-bound human user tasks.</Description>
     <PackageTags>elsa workflow user tasks human tasks</PackageTags>
-    <GenerateElsaPackageManifest>false</GenerateElsaPackageManifest>
   </PropertyGroup>
 
   <ItemGroup>

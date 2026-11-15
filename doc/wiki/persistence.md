@@ -24,8 +24,6 @@ Shared EF Core infrastructure lives in [Elsa.Persistence.EFCore.Common](../../sr
 Important base types:
 
 - [PersistenceFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/PersistenceFeatureBase.cs)
-- [PersistenceShellFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/PersistenceShellFeatureBase.cs)
-- [CombinedPersistenceShellFeatureBase](../../src/modules/Elsa.Persistence.EFCore.Common/CombinedPersistenceShellFeatureBase.cs)
 - [ElsaDbContextBase](../../src/modules/Elsa.Persistence.EFCore.Common/ElsaDbContextBase.cs)
 
 `PersistenceFeatureBase` registers `IDbContextFactory<TDbContext>`, migration options, tenant-aware context factory decoration, and tenant model handlers.
@@ -41,7 +39,7 @@ The shared EF Core module contains slices for:
 - [Labels](../../src/modules/Elsa.Persistence.EFCore/Modules/Labels)
 - [Alterations](../../src/modules/Elsa.Persistence.EFCore/Modules/Alterations)
 
-Each slice has a DbContext, configurations, store implementations, feature classes, and shell feature classes.
+Each slice has a DbContext, configurations, store implementations, and code-first feature classes.
 
 ## Provider Packages
 
@@ -49,7 +47,7 @@ Provider packages configure database-specific EF Core options and migrations:
 
 - [Elsa.Persistence.EFCore.PostgreSql](../../src/modules/Elsa.Persistence.EFCore.PostgreSql)
 
-Combined provider shell features such as `PostgreSqlWorkflowPersistenceFeature` let modular hosts configure workflow persistence once and share settings with dependent definition, instance, and runtime persistence features.
+Configure each required persistence slice through its code-first feature and PostgreSQL provider extension. Shell-based persistence feature classes have been removed; migrate their connection and migration settings to the host registrations below.
 
 ## Typical Host Configuration
 
@@ -99,16 +97,9 @@ Tenant conventions are documented in ADRs:
 - [ADR 0008: Empty String As Default Tenant ID](../adr/0008-empty-string-as-default-tenant-id.md)
 - [ADR 0009: Asterisk Sentinel Value For Tenant-Agnostic Entities](../adr/0009-asterisk-sentinel-value-for-tenant-agnostic-entities.md)
 
-## Structured Log Persistence
+## Operational Log Storage
 
-Structured logs keep recent events in bounded process-local memory. The relational extension contracts remain separate from EF Core, but no durable structured-log provider is bundled.
-
-Packages:
-
-- [Elsa.Diagnostics.StructuredLogs](../../src/modules/Elsa.Diagnostics.StructuredLogs): core capture, API, hub, provider/store contracts, default in-memory store.
-- [Elsa.Diagnostics.StructuredLogs.Persistence.Relational](../../src/modules/Elsa.Diagnostics.StructuredLogs.Persistence.Relational): provider-neutral relational store, SQL builder, mapper, retention service, write buffer.
-
-In-memory log history is lost when the process stops. Hosts that need durable operational logs should configure their existing external logging pipeline.
+Operational logs and telemetry are stored by the host's external logging and observability pipeline. Elsa's custom structured-log, console-log, and OpenTelemetry storage packages have been removed; see the [migration guide](opentelemetry-workflows.md#upgrading-from-elsa-diagnostics-packages). Workflow execution journals and persisted activity records remain domain data.
 
 ## Adding A Store
 

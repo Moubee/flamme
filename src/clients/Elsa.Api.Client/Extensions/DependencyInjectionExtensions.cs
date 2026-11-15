@@ -13,7 +13,6 @@ using Elsa.Api.Client.Resources.IncidentStrategies.Contracts;
 using Elsa.Api.Client.Resources.LogPersistenceStrategies;
 using Elsa.Api.Client.Resources.OutputConverters.Contracts;
 using Elsa.Api.Client.Resources.Resilience.Contracts;
-using Elsa.Api.Client.Resources.Shells.Contracts;
 using Elsa.Api.Client.Resources.Scripting.Contracts;
 using Elsa.Api.Client.Resources.StorageDrivers.Contracts;
 using Elsa.Api.Client.Resources.Tasks.Contracts;
@@ -90,7 +89,6 @@ public static class DependencyInjectionExtensions
             services.AddApi<IExternalAuthenticationDescriptorsApi>(builderOptions);
             services.AddApi<IExternalIdentityLinksApi>(builderOptions);
             services.AddApi<IFeaturesApi>(builderOptions);
-            services.AddApi<IShellsApi>(builderOptions);
             services.AddApi<IJavaScriptApi>(builderOptions);
             services.AddApi<IExpressionDescriptorsApi>(builderOptions);
             services.AddApi<IOutputConvertersApi>(builderOptions);

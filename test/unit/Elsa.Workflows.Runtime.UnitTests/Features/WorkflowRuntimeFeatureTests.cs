@@ -12,14 +12,12 @@ using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Providers;
 using TUnit.Mocks;
 using RuntimeFeature = Elsa.Workflows.Runtime.Features.WorkflowRuntimeFeature;
-using ShellRuntimeFeature = Elsa.Workflows.Runtime.ShellFeatures.WorkflowRuntimeFeature;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Features;
 
 public class WorkflowRuntimeFeatureTests
 {
     private readonly RuntimeFeature _feature = new(Mock.Of<IModule>().Object);
-    private readonly ShellRuntimeFeature _shellFeature = new();
 
     [Test]
     public void AddWorkflow_Throws_WhenTypeDoesNotImplementWorkflow()
@@ -35,19 +33,6 @@ public class WorkflowRuntimeFeatureTests
     }
 
     [Test]
-    public void ShellAddWorkflow_Throws_WhenTypeDoesNotImplementWorkflow()
-    {
-        Assert.ThrowsExactly<ArgumentException>(() => _shellFeature.AddWorkflow(typeof(NotAWorkflow)));
-    }
-
-    [Test]
-    [MethodDataSource(nameof(NonInstantiableWorkflowTypes))]
-    public void ShellAddWorkflow_Throws_WhenWorkflowTypeIsNotInstantiable(Type workflowType)
-    {
-        Assert.ThrowsExactly<ArgumentException>(() => _shellFeature.AddWorkflow(workflowType));
-    }
-
-    [Test]
     public async Task AddWorkflow_AllowsClosedGenericWorkflowType()
     {
         var workflowType = typeof(GenericWorkflow<int>);
@@ -56,17 +41,6 @@ public class WorkflowRuntimeFeatureTests
 
         await Assert.That(_feature.Workflows.Keys).Contains(workflowType.GetSimpleAssemblyQualifiedName());
         await Assert.That(_feature.Workflows.Keys).Contains(workflowType.FullName!);
-    }
-
-    [Test]
-    public async Task ShellAddWorkflow_AllowsClosedGenericWorkflowType()
-    {
-        var workflowType = typeof(GenericWorkflow<int>);
-
-        _shellFeature.AddWorkflow(workflowType);
-
-        await Assert.That(_shellFeature.Workflows.Keys).Contains(workflowType.GetSimpleAssemblyQualifiedName());
-        await Assert.That(_shellFeature.Workflows.Keys).Contains(workflowType.FullName!);
     }
 
     [Test]
@@ -125,19 +99,6 @@ public class WorkflowRuntimeFeatureTests
     }
 
     [Test]
-    public async Task ShellWorkflowsAdd_RegistersWorkflowTypeAlias()
-    {
-        var workflowType = typeof(GenericWorkflow<int>);
-        var options = new SerializationTypeOptions();
-
-        _shellFeature.Workflows.Add(workflowType);
-
-        RegisterWorkflowTypeAliases(_shellFeature, options);
-
-        await Assert.That(options.AliasTypeDictionary[workflowType.GetSimpleAssemblyQualifiedName()]).IsEqualTo(workflowType);
-    }
-
-    [Test]
     public void WorkflowsAdd_Throws_WhenTypeDoesNotImplementWorkflow()
     {
         Assert.ThrowsExactly<ArgumentException>(() => _feature.Workflows.Add(typeof(NotAWorkflow)));
@@ -167,19 +128,6 @@ public class WorkflowRuntimeFeatureTests
     }
 
     [Test]
-    public async Task ShellRegisterWorkflowTypeAliases_RegistersBuiltInActivationStrategyAliases()
-    {
-        var options = new SerializationTypeOptions();
-
-        RegisterWorkflowTypeAliases(_shellFeature, options);
-        var registry = new SerializationTypeRegistry(Microsoft.Extensions.Options.Options.Create(options));
-
-        await AssertActivationStrategyAlias(options, registry, typeof(SingletonStrategy), nameof(SingletonStrategy));
-        await AssertActivationStrategyAlias(options, registry, typeof(CorrelatedSingletonStrategy), nameof(CorrelatedSingletonStrategy));
-        await AssertActivationStrategyAlias(options, registry, typeof(CorrelationStrategy), nameof(CorrelationStrategy));
-    }
-
-    [Test]
     public async Task RegisterWorkflowTypeAliases_RegistersOnlyTrackedWorkflowTypes()
     {
         var workflowType = typeof(GenericWorkflow<int>);
@@ -188,20 +136,6 @@ public class WorkflowRuntimeFeatureTests
         _feature.Workflows[typeof(NotAWorkflow).AssemblyQualifiedName!] = _ => new ValueTask<IWorkflow>(new GenericWorkflow<int>());
 
         RegisterWorkflowTypeAliases(_feature, options);
-
-        await Assert.That(options.AliasTypeDictionary[workflowType.GetSimpleAssemblyQualifiedName()]).IsEqualTo(workflowType);
-        await Assert.That(options.AliasTypeDictionary.Keys).DoesNotContain(typeof(NotAWorkflow).AssemblyQualifiedName!);
-    }
-
-    [Test]
-    public async Task ShellRegisterWorkflowTypeAliases_RegistersOnlyTrackedWorkflowTypes()
-    {
-        var workflowType = typeof(GenericWorkflow<int>);
-        var options = new SerializationTypeOptions();
-        _shellFeature.AddWorkflow(workflowType);
-        _shellFeature.Workflows[typeof(NotAWorkflow).AssemblyQualifiedName!] = _ => new ValueTask<IWorkflow>(new GenericWorkflow<int>());
-
-        RegisterWorkflowTypeAliases(_shellFeature, options);
 
         await Assert.That(options.AliasTypeDictionary[workflowType.GetSimpleAssemblyQualifiedName()]).IsEqualTo(workflowType);
         await Assert.That(options.AliasTypeDictionary.Keys).DoesNotContain(typeof(NotAWorkflow).AssemblyQualifiedName!);

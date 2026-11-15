@@ -2,8 +2,6 @@ using Elsa.Authorization;
 using Elsa.Dashboard.Abstractions.Contracts;
 using Elsa.Dashboard.Abstractions.Models;
 using Elsa.Dashboard.Api.Permissions;
-using Elsa.Diagnostics.ConsoleLogs.Permissions;
-using Elsa.Diagnostics.StructuredLogs.Permissions;
 using Elsa.Workflows.Api.Permissions;
 
 namespace Elsa.Dashboard.Api.UnitTests;
@@ -13,13 +11,11 @@ internal sealed class TestContributor(string id, int order) : IDashboardContribu
     public static readonly DashboardPermission WholeOverview = new(DashboardResourcePermissions.Dashboard, CoreVerbs.View);
     public static readonly DashboardPermission RuntimeView = new(WorkflowPermissions.Runtime, CoreVerbs.View);
     public static readonly DashboardPermission InstancesView = new(WorkflowPermissions.Instances, CoreVerbs.View);
-    public static readonly DashboardPermission StructuredLogsView = new(StructuredLogsResourcePermissions.StructuredLogs, CoreVerbs.View);
-    public static readonly DashboardPermission ConsoleLogsView = new(ConsoleLogsResourcePermissions.ConsoleLogs, CoreVerbs.View);
 
     public const string InstancesMetric = "instances";
     public const string InstancesPanel = "instances-panel";
     public const string InstancesFinding = "instances-finding";
-    public const string LogsPanel = "logs-panel";
+    public const string RuntimePanel = "runtime-panel";
 
     /// <summary>A contributor supplying every section, each guarded by the permission of its data.</summary>
     public static TestContributor Declared() => new("declared", 1)
@@ -35,21 +31,19 @@ internal sealed class TestContributor(string id, int order) : IDashboardContribu
             Panels =
             [
                 new() { Id = InstancesPanel, Title = "Instances", Permission = InstancesView },
-                new() { Id = LogsPanel, Title = "Logs", Permission = StructuredLogsView },
+                new() { Id = RuntimePanel, Title = "Runtime", Permission = RuntimeView },
                 new() { Id = "both", Title = "Both", Permission = WholeOverview }
             ]
         },
         OverviewPermissions = new()
         {
             Runtime = RuntimeView,
-            WorkflowInstances = InstancesView,
-            StructuredLogs = StructuredLogsView,
-            ConsoleLogs = ConsoleLogsView
+            WorkflowInstances = InstancesView
         },
         Findings =
         [
             new() { Id = InstancesFinding, Message = "Instances", Permission = InstancesView },
-            new() { Id = "logs-finding", Message = "Logs", Permission = StructuredLogsView }
+            new() { Id = "runtime-finding", Message = "Runtime", Permission = RuntimeView }
         ],
         Trend = new() { Buckets = [new() { CreatedOrStarted = 1 }], Permission = InstancesView },
         RecentActivity = new() { Items = [new() { InstanceId = "instance", DefinitionId = "definition", Status = "Finished", SubStatus = "Finished" }], Permission = InstancesView },
@@ -69,12 +63,7 @@ internal sealed class TestContributor(string id, int order) : IDashboardContribu
     private static DashboardOverviewContribution SectionData() => new()
     {
         Runtime = new() { Status = DashboardRuntimeStatusKeys.AcceptingWork },
-        WorkflowInstances = new() { Running = 3 },
-        Diagnostics = new()
-        {
-            StructuredLogs = new() { Capability = DashboardCapabilityStatus.Available, SourceCount = 2 },
-            ConsoleLogs = new() { Capability = DashboardCapabilityStatus.Available, SourceCount = 4 }
-        }
+        WorkflowInstances = new() { Running = 3 }
     };
 
     public string Id { get; } = id;

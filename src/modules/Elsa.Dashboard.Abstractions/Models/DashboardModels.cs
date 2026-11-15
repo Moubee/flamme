@@ -28,7 +28,6 @@ public record DashboardOverview
     public string? EnvironmentName { get; init; }
     public DashboardRuntimeStatus Runtime { get; init; } = new();
     public DashboardWorkflowInstanceMetrics WorkflowInstances { get; init; } = new();
-    public DashboardDiagnosticsSummary Diagnostics { get; init; } = new();
     public IReadOnlyCollection<DashboardMetricCard> Metrics { get; init; } = [];
     public IReadOnlyCollection<DashboardPanelSummary> Panels { get; init; } = [];
     public string AppliedRange { get; init; } = DashboardRangeKeys.TwentyFourHours;
@@ -76,31 +75,6 @@ public record DashboardWorkflowInstanceMetrics
     public long Interrupted { get; init; }
     public long IncidentBearing { get; init; }
     public TimeSpan? AverageDuration { get; init; }
-}
-
-public record DashboardDiagnosticsSummary
-{
-    public DashboardStructuredLogSummary StructuredLogs { get; init; } = new();
-    public DashboardConsoleLogSummary ConsoleLogs { get; init; } = new();
-}
-
-public record DashboardStructuredLogSummary
-{
-    public DashboardCapabilityStatus Capability { get; init; } = DashboardCapabilityStatus.NotInstalled;
-    public int SourceCount { get; init; }
-    public int StaleSourceCount { get; init; }
-    public int RecentErrorOrCriticalCount { get; init; }
-    public long DroppedWriteCount { get; init; }
-    public long DroppedEventCount { get; init; }
-}
-
-public record DashboardConsoleLogSummary
-{
-    public DashboardCapabilityStatus Capability { get; init; } = DashboardCapabilityStatus.NotInstalled;
-    public int SourceCount { get; init; }
-    public int StaleSourceCount { get; init; }
-    public int RecentStderrCount { get; init; }
-    public long DroppedLineCount { get; init; }
 }
 
 public record DashboardMetricCard

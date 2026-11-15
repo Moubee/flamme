@@ -26,7 +26,7 @@ public class WorkflowTestFixture : IAsyncDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="WorkflowTestFixture"/> class.
     /// </summary>
-    /// <param name="testOutput">The writer that receives diagnostic and workflow output.</param>
+    /// <param name="testOutput">The writer that receives workflow output.</param>
     public WorkflowTestFixture(TextWriter testOutput)
     {
         _testApplicationBuilder = new(testOutput);

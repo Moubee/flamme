@@ -3,6 +3,7 @@ using Elsa.Expressions.Models;
 using Elsa.Expressions.Python.Contracts;
 using Elsa.Expressions.Python.Options;
 using Elsa.Expressions.Python.Services;
+using Elsa.Features.Services;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Management.Services;
 using Elsa.Testing.Shared;
@@ -34,10 +35,12 @@ public class PythonHostCodeExecutionTests
     {
         var services = new ServiceCollection();
         services.AddOptions();
-        new Elsa.Expressions.Python.ShellFeatures.PythonFeature
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
+        new Elsa.Expressions.Python.Features.PythonFeature(module)
         {
             PythonOptions = options => options.AllowHostCodeExecution = allowHostCodeExecution
-        }.ConfigureServices(services);
+        }.Apply();
         services.AddSingleton<IExpressionDescriptorRegistry, ExpressionDescriptorRegistry>();
 
         var serviceProvider = services.BuildServiceProvider();

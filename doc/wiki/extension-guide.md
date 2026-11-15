@@ -13,19 +13,11 @@ Elsa is designed to be extended by adding modules, features, activities, stores,
 7. Add `Extensions/ModuleExtensions.cs` with `UseMyFeature`.
 8. Add unit tests that prove core services register.
 
-Use [HttpFeature](../../src/modules/Elsa.Http/Features/HttpFeature.cs), [SchedulingFeature](../../src/modules/Elsa.Scheduling/Features/SchedulingFeature.cs), and [StructuredLogsFeature](../../src/modules/Elsa.Diagnostics.StructuredLogs/Features/StructuredLogsFeature.cs) as examples.
+Use [HttpFeature](../../src/modules/Elsa.Http/Features/HttpFeature.cs), [SchedulingFeature](../../src/modules/Elsa.Scheduling/Features/SchedulingFeature.cs), and [WorkflowsFeature](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs) as examples.
 
-## Add A Shell Feature
+## Deploy A Feature
 
-Shell features live in `ShellFeatures` and implement CShells interfaces such as `IShellFeature`, `IFastEndpointsShellFeature`, or `IMiddlewareShellFeature`.
-
-Use shell features when modular server/package configuration needs to activate the feature without code-first `AddElsa` calls.
-
-Examples:
-
-- [Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs](../../src/modules/Elsa.Shells.Api/ShellFeatures/ShellsApiFeature.cs)
-- [Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs](../../src/modules/Elsa.Diagnostics.StructuredLogs/ShellFeatures/StructuredLogsFeature.cs)
-- [EF Core provider shell features](../../src/modules/Elsa.Persistence.EFCore.PostgreSql/ShellFeatures)
+Register the feature through `AddElsa` in the host and include its project or package as a build-time reference. Deploy a new application version to change the feature set. Runtime package discovery and shell feature activation/reload are no longer supported.
 
 ## Add An Activity
 
@@ -84,15 +76,7 @@ For an EF Core-backed store:
 4. Add tests for query/filter/order behavior.
 5. Add provider integration tests for migrations or SQL differences.
 
-For diagnostics structured log relational providers:
-
-1. Reference the relational structured-log package.
-2. Implement `IRelationalStructuredLogConnectionFactory`.
-3. Implement `IRelationalStructuredLogDialect`.
-4. Implement `IStructuredLogSchemaMigrator`.
-5. Register those services and call `AddRelationalStructuredLogPersistence`.
-
-No concrete structured-log database backend is bundled. PostgreSQL is the supported durable database if a host supplies an implementation.
+Operational log and telemetry storage belongs to the host's external observability pipeline. The former diagnostics storage and relational extension contracts have been removed; see the [telemetry migration guide](opentelemetry-workflows.md).
 
 ## Add A Runtime Ingress Source
 

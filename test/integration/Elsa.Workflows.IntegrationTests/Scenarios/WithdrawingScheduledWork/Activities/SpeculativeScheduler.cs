@@ -6,8 +6,7 @@ namespace Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Act
 /// <summary>
 /// A container that schedules two children and then decides one of them must not run after all, before the engine has
 /// taken either work item. It holds a handle on the speculative child by creating that child's execution context up
-/// front and scheduling against it, which is how a container gets something to cancel later (Elsa.Bpmn does exactly
-/// this when it starts a unit of work).
+/// front and scheduling against it, which gives the container something to cancel later.
 /// </summary>
 public class SpeculativeScheduler : Activity
 {

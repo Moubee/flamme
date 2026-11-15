@@ -8,6 +8,11 @@ Guidance for AI coding agents working in this repository.
 - Priorities are high-load performance, distributed production execution, PostgreSQL persistence, and Kubernetes hosting. UI work is secondary; see [project direction](doc/project-direction.md) and the [roadmap](ROADMAP.md).
 - PostgreSQL is the only supported durable database. In-memory stores are for development and tests; MySQL, SQLite, and Cassandra are future plans, not bundled providers.
 - Production code lives under `src/`.
+- Hosts use static `AddElsa` composition. Nuplane, CShells adapters/reload APIs,
+  Loom Platform recipes/catalog manifests, BPMN, and WebhooksCore are retired;
+  see `doc/integration-removal.md`. Historical specifications can mention them.
+- Preserve classic scripting, AI/blob, FastEndpoints, Fody, Newtonsoft.Json,
+  distributed locks, resilience, and PostgreSQL/in-memory persistence support.
 - Tests live under `test/`, grouped by `unit`, `integration`, `component`, and `performance`.
 - Build and package automation uses the .NET CLI and shared MSBuild settings in `Directory.Build.props` and `Directory.Build.targets`.
 
@@ -132,6 +137,11 @@ shell commands, and other important information, read `specs/013-user-tasks/plan
 <!-- SPECKIT END -->
 
 ## Active Technologies
+
+The feature-spec annotations below are historical. Some described modules and
+shell integrations have since been retired; use the Project Overview and
+`doc/integration-removal.md` for the current supported composition.
+
 - C# latest, nullable reference types enabled, implicit usings enabled. + `Microsoft.Extensions.Logging`, `Microsoft.AspNetCore.SignalR`, Elsa feature/module infrastructure, FastEndpoints through Elsa API endpoint patterns, existing Elsa identity/authorization features. (003-live-server-logs)
 - Bounded in-memory ring buffer for MVP; no EF Core schema changes. Provider abstraction allows external/shared log backends later. (003-live-server-logs)
 - C# latest, nullable reference types enabled, implicit usings enabled. + `Microsoft.Extensions.Logging`, `Microsoft.Extensions.Options`, `Microsoft.AspNetCore.SignalR`, Elsa feature/module infrastructure, FastEndpoints through Elsa API endpoint patterns, CShells shell feature infrastructure. (004-diagnostics-structured-logs)

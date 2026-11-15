@@ -106,19 +106,19 @@ Elsa stores workflow and activity execution records that can be exposed through 
 
 ### Structured Log Capture
 
-`Elsa.Diagnostics.StructuredLogs` captures semantic `ILogger` events from Elsa hosts, redacts sensitive data, stores recent records, exposes REST query endpoints, and streams live events to Studio over SignalR. Records include rendered messages, templates, properties, scopes, exceptions, source metadata, trace/span IDs, workflow context, tenant, and correlation fields.
+Application logging uses `Microsoft.Extensions.Logging`. Hosts configure their logging providers and external observability pipeline. The custom `Elsa.Diagnostics.StructuredLogs` package and its REST/SignalR API have been removed.
 
 ### Structured Log Storage
 
-Structured logs use bounded, process-local in-memory history and live streaming. No durable structured-log backend is bundled. Shared relational contracts remain available for host extensions.
+Operational log storage, retention, queries, and access control belong to the host's observability backend. Elsa no longer supplies structured-log buffers, storage contracts, relational helpers, or dashboard adapters.
 
 ### Console Log Streaming
 
-`Elsa.Diagnostics.ConsoleLogs` captures raw stdout and stderr, preserves the original console output destination, redacts content before buffering or streaming, and exposes recent/live console lines through REST and SignalR. This helps operators diagnose container or process-level output without leaving the workflow management experience.
+Process and container logging infrastructure handles stdout and stderr. The custom `Elsa.Diagnostics.ConsoleLogs` package, capture hook, REST/SignalR API, and dashboard adapter have been removed.
 
 ### OpenTelemetry Workflow Diagnostics
 
-The extensions repository includes `Elsa.OpenTelemetry`, and Studio includes an OpenTelemetry diagnostics module. The intent is workflow-aware trace, metric, and log exploration where Core remains responsible for ingestion, redaction, storage, permissions, and API contracts while Studio presents normalized diagnostics views.
+The runtime emits workflow and activity spans and measurements through the `Elsa.Workflows` activity source and meter. Application hosts configure official OpenTelemetry SDKs and exporters. External collectors and observability backends own ingestion, storage, querying, and visualization; Elsa no longer hosts telemetry APIs or collectors. See the [configuration and migration guide](../wiki/opentelemetry-workflows.md).
 
 ### Configurable Workflow Logging Framework
 
@@ -144,19 +144,19 @@ Studio includes workflow modules for managing definitions, viewing workflow stat
 
 ### Real-Time Workflow and Diagnostics Updates
 
-Studio uses SignalR-backed clients for live updates such as structured logs and console logs. Authentication providers can configure SignalR connections consistently, allowing live operational views to work with JWT, Elsa Identity, or OpenID Connect setups.
+Studio uses SignalR-backed clients for workflow updates. The former structured-log, console-log, and OpenTelemetry backend streams have been removed; use the host's observability platform for operational telemetry.
 
 ### Structured Logs Viewer
 
-Studio's structured log viewer loads recent semantic logs, subscribes to live updates, supports source selection, filtering, pause/reconnect/clear behaviors, and exposes detailed log inspection with properties, scopes, exceptions, trace/span fields, tenant, workflow, correlation, and raw JSON.
+The upstream Studio structured-log viewer depends on removed backend APIs and is no longer supplied by this repository. Use the external logging platform's viewer.
 
 ### Console Logs Viewer
 
-Studio includes a diagnostics console page for raw stdout/stderr streaming. Navigation is feature-gated by backend capability and permission, with unavailable and unauthorized states handled in the UI.
+The upstream Studio console viewer depends on removed backend APIs. Use process/container log viewing instead.
 
 ### OpenTelemetry Diagnostics Viewer
 
-Studio includes a diagnostics OpenTelemetry shell at `/diagnostics/opentelemetry`, with expected views for resource search, trace search/detail, metrics, OTLP logs, storage diagnostics, and collector configuration.
+The upstream Studio OpenTelemetry viewer depends on removed collector and query APIs. Configure an external telemetry dashboard instead.
 
 ### Authentication Options
 
@@ -298,7 +298,7 @@ Elsa uses explicit feature/module registration, dependency declarations, and ext
 
 ### Provider-Neutral Boundaries
 
-Many Elsa capabilities are expressed behind provider contracts: persistence, structured logs, scheduling, workflow providers, SQL clients, authentication, storage, logging sinks, and diagnostics. This gives architects flexibility to standardize on their own infrastructure.
+Many Elsa capabilities are expressed behind provider contracts: persistence, scheduling, workflow providers, SQL clients, authentication, and domain storage. Operational logging and telemetry use host-owned standard providers. This gives architects flexibility to standardize on their own infrastructure.
 
 ### API-First and Studio-Ready
 
@@ -306,7 +306,7 @@ Core capabilities are exposed through APIs and then surfaced in Studio. This mea
 
 ### Production Operations Mindset
 
-The runtime includes operational concepts such as graceful shutdown, recovery scanning, dead-letter queues, storage diagnostics, redaction, bounded buffers, authorization, tenant-aware behavior, and runtime admin endpoints. These are the details architects and CTOs look for when evaluating production fit.
+The runtime includes operational concepts such as graceful shutdown, recovery scanning, dead-letter queues, authorization, tenant-aware behavior, and runtime admin endpoints. These are the details architects and CTOs look for when evaluating production fit.
 
 ### Developer Extensibility
 
@@ -326,7 +326,7 @@ For the public product website, do not display all features as a flat checklist.
 4. Rich control flow, including flowcharts, sequences, state machines, and parallel execution.
 5. API-first workflow management and runtime administration.
 6. Persistence choices and production-ready storage boundaries.
-7. Observability: execution journal, structured logs, console logs, OpenTelemetry direction.
+7. Observability: workflow execution journal, workflow activity source and meter, host-owned logging and official OpenTelemetry export.
 8. Security and platform fit: identity, authorization, multi-tenancy, secrets.
 9. Extensibility: custom activities, modules, expression providers, Studio modules.
 10. Integration ecosystem: HTTP, scheduling, SQL, Slack, GitHub, messaging, files, AI agents.
@@ -369,7 +369,7 @@ For the public product website, do not display all features as a flat checklist.
 
 **Title:** Built for production workflow operations
 
-**Description:** Elsa includes runtime administration, execution journals, graceful shutdown, recovery scanning, dead-letter handling, structured log capture, console streaming, redaction, permissions, and storage diagnostics.
+**Description:** Elsa includes runtime administration, execution journals, graceful shutdown, recovery scanning, dead-letter handling, and workflow telemetry for the host's observability platform.
 
 ### Feature: Architecture Fit
 
@@ -381,13 +381,13 @@ For the public product website, do not display all features as a flat checklist.
 
 **Title:** See what workflows are doing
 
-**Description:** Inspect workflow execution history, activity records, structured logs, raw console output, source metadata, trace and span correlation, workflow context, tenant, and correlation fields from API and Studio diagnostics views.
+**Description:** Inspect workflow execution history and activity records through workflow APIs. Collect workflow traces, metrics, and application logs using official OpenTelemetry packages and your external observability platform.
 
 ### Feature: Security and Multi-Tenancy
 
 **Title:** Designed for secure platforms
 
-**Description:** Elsa includes identity, authorization, tenant-aware behavior, secrets management, authenticated SignalR diagnostics, and permission-gated APIs for teams building SaaS, internal platforms, and regulated automation systems.
+**Description:** Elsa includes identity, authorization, tenant-aware behavior, secrets management, and permission-gated workflow APIs for teams building SaaS, internal platforms, and regulated automation systems.
 
 ### Feature: AI Workflow Orchestration
 

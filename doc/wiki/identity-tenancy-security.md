@@ -40,7 +40,7 @@ Refresh resolves the caller only when every `sub` and inbound-mapped `NameIdenti
 
 Elsa-issued access and refresh tokens always carry a `permissions` claim. Each grant is one value (`permissions` is a JSON array when there are two or more). A caller whose roles grant nothing receives the sentinel `none`, which is not a grant: it exists so clients can tell a known empty set from a token that omits the claim entirely. Third-party OIDC tokens that do not carry Elsa permissions keep omitting the claim; Studio treats that as unknown and fails open.
 
-JWT signing keys must be configured with a secure random value before production startup. Missing keys, weak keys shorter than 32 ASCII characters, and known public defaults are rejected by options startup validation. Known public defaults are only tolerated in the explicit `Development` or `Demo` environments for local/demo hosts. Use environment variables or a secrets manager, such as `Identity__Tokens__SigningKey` for code-first hosts or `CShells__Shells__Default__Features__Identity__SigningKey` for shell-based hosts.
+JWT signing keys must be configured with a secure random value before production startup. Missing keys, weak keys shorter than 32 ASCII characters, and known public defaults are rejected by options startup validation. Known public defaults are only tolerated in the explicit `Development` or `Demo` environments for local/demo hosts. Use environment variables or a secrets manager, such as `Identity__Tokens__SigningKey` for the reference server.
 
 ### Signing Out
 
@@ -69,7 +69,7 @@ After that, `/identity/refresh-token` answers `401` for every refresh token of t
 
 **Access tokens are not revoked.** One already issued stays valid until it expires, which `AccessTokenLifetime` (default 15 minutes) bounds, so clients discard it themselves when signing out. A denylist would put a store lookup on every authenticated request on every node to shorten a window that short; refresh is the only call that consults revocations.
 
-Revocations are kept by `IRevokedSessionStore` until the later of the presented refresh token's `elsa:session_exp` and one `RefreshTokenLifetime` after sign-out, plus a margin for clock skew, and pruned when the next session is revoked. Signing out of the same session again can extend a revocation, never shorten it. The default store is in memory: revocations are lost on restart and not shared between nodes, so a revoked refresh token keeps working on any other node until it expires. Deployments with more than one node, or that must survive a restart, use EF Core persistence (`identity.UseEntityFrameworkCore(...)`, or a provider's Identity persistence shell feature), which stores them in the `RevokedSessions` table added by the `RevokedSessions` migration. A custom persistence provider registers its own `IRevokedSessionStore`, whose `AddOrExtendAsync` must keep the later expiry of two revocations of the same session, also when they are written concurrently.
+Revocations are kept by `IRevokedSessionStore` until the later of the presented refresh token's `elsa:session_exp` and one `RefreshTokenLifetime` after sign-out, plus a margin for clock skew, and pruned when the next session is revoked. Signing out of the same session again can extend a revocation, never shorten it. The default store is in memory: revocations are lost on restart and not shared between nodes, so a revoked refresh token keeps working on any other node until it expires. Deployments with more than one node, or that must survive a restart, use EF Core persistence (`identity.UseEntityFrameworkCore(...)` with the PostgreSQL provider), which stores them in the `RevokedSessions` table added by the `RevokedSessions` migration. A custom persistence provider registers its own `IRevokedSessionStore`, whose `AddOrExtendAsync` must keep the later expiry of two revocations of the same session, also when they are written concurrently.
 
 A revocation therefore outlives every refresh token of the session issued with a lifetime no longer than the current `RefreshTokenLifetime`, and every refresh token the presented one was refreshed from, whatever lifetime they were issued with, so raising `RefreshTokenLifetime` is safe. Lowering it leaves one gap, for at most the old lifetime: a refresh token issued with the old, longer lifetime that the presented one was not refreshed from can outlive the revocation, and works again once the revocation is pruned. That takes a session refreshed twice from the same token, such as a copy of it, or signing out with an older refresh token than the session's newest; a client that signs out with its newest refresh token, and whose tokens were not copied, is covered.
 
@@ -88,8 +88,7 @@ Key points:
 - It creates initial admin role/user idempotently.
 - It is recommended for initial identity access.
 - Do not keep development defaults in production.
-- Shell-based configuration uses `DefaultAdminUser` shell feature.
-- Code-first configuration uses `identity.UseDefaultAdmin(...)`.
+- Configure bootstrap through `identity.UseDefaultAdmin(...)` in the code-first host.
 
 ## SAS Tokens
 

@@ -30,9 +30,8 @@ Shared helpers:
 | API endpoint shape or authorization | Unit/integration endpoint test if existing pattern exists; component test for host-level behavior. |
 | EF Core store or migration | Provider-specific integration/component test. |
 | HTTP workflows | Component test under HTTP workflow scenarios. |
-| Structured log capture, storage, or API | Structured log unit/integration projects. |
-| Console log capture, buffering, or endpoints | `Elsa.Diagnostics.ConsoleLogs.UnitTests` or `Elsa.Diagnostics.ConsoleLogs.IntegrationTests`. |
-| OpenTelemetry diagnostics collection or endpoints | `Elsa.Diagnostics.OpenTelemetry.UnitTests` or `Elsa.Diagnostics.OpenTelemetry.IntegrationTests`. |
+| Workflow trace/metric instrumentation | `Elsa.Workflows.Core.UnitTests` instrumentation tests. |
+| Test-run logs and telemetry | TUnit native logging and ASP.NET Core integration. |
 | Dashboard API endpoints or aggregation logic | `Elsa.Dashboard.Api.UnitTests`. |
 | AI/Weaver abstractions or host behavior | `Elsa.AI.Abstractions.UnitTests`, `Elsa.AI.Host.UnitTests`, or `Elsa.AI.IntegrationTests`. |
 
@@ -110,24 +109,19 @@ Fixture landmarks:
 
 Use component tests when host lifecycle, HTTP server behavior, actual persistence, distributed runtime behavior, or multiple services working together are essential to the assertion.
 
-## Structured Log Tests
+## Logs And Telemetry
 
-Structured log tests are split by layer:
+TUnit owns test-run log capture, correlation, and telemetry. Shared integration hosts use the official TUnit logging provider, and TUnit ASP.NET Core integration configures application telemetry. Do not add Elsa log-capture providers, in-memory exporters, or telemetry receivers.
 
-- [test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.UnitTests)
-- [test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests](../../test/integration/Elsa.Diagnostics.StructuredLogs.IntegrationTests)
-- [test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests](../../test/unit/Elsa.Diagnostics.StructuredLogs.Persistence.Relational.UnitTests)
+`TestWebApplicationFactory` registers logging automatically for its application host.
+`TestApplicationBuilder` constructs a plain `ServiceCollection`, so it references
+`TUnit.Logging.Microsoft` and explicitly adds the official correlated provider. TUnit's
+automatic console capture alone does not register an `ILogger` provider in this container.
+Set both the logging filter and the provider minimum to Debug to retain diagnostic output.
+See TUnit's [standalone logging documentation](https://github.com/thomhurst/TUnit/blob/77453eab9cc452dbba8c53e77d12bf595f71cf30/docs/docs/extending/logging.md#standalone-no-aspnet-core),
+which matches the source commit of the installed TUnit 1.84.0 packages.
 
-Core capture and API behavior use in-memory storage. The relational unit tests exercise shared contracts without claiming database durability. PostgreSQL persistence tests must use a real PostgreSQL database; EF Core InMemory does not verify relational transactions, indexes, or migrations.
-
-## Console Log Tests
-
-Console log tests are split by layer:
-
-- [test/unit/Elsa.Diagnostics.ConsoleLogs.UnitTests](../../test/unit/Elsa.Diagnostics.ConsoleLogs.UnitTests): capture, filtering, redaction, buffering, source registry, and naming.
-- [test/integration/Elsa.Diagnostics.ConsoleLogs.IntegrationTests](../../test/integration/Elsa.Diagnostics.ConsoleLogs.IntegrationTests): module registration, endpoint authorization, SignalR hub, and recent query behavior.
-
-Run targeted console log tests when touching `Elsa.Diagnostics.ConsoleLogs`.
+The removed diagnostics modules and their test projects are no longer part of the solution. The retained [workflow instrumentation tests](../../test/unit/Elsa.Workflows.Core.UnitTests/Telemetry/WorkflowInstrumentationTests.cs) verify the `Elsa.Workflows` source and meter contract with native .NET listeners.
 
 ## Good Test Hygiene
 

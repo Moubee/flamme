@@ -37,9 +37,10 @@ flowchart LR
 | --- | --- |
 | [Repository Map](repository-map.md) | Top-level folders, projects, and where to look first. |
 | [Architecture](architecture.md) | The main system layers and request/execution flow. |
-| [Module System](module-system.md) | How `IModule`, `FeatureBase`, feature dependencies, and shell features work. |
+| [Module System](module-system.md) | How `IModule`, `FeatureBase`, feature dependencies, and static host composition work. |
 | [Workflow Core](workflow-core.md) | Activities, execution contexts, pipelines, variables, bookmarks, graphs, and flowchart execution. |
 | [Workflow Management](workflow-management.md) | Workflow definitions, instances, import/export, materializers, validation, and activity descriptors. |
+| [BPMN integration removal](bpmn-workflows.md) | Migrate definitions and deployments that depended on retired BPMN execution and interchange. |
 | [Workflow Runtime](workflow-runtime.md) | Dispatch, triggers, bookmarks, queues, background activity scheduling, graceful shutdown, and recovery. |
 | [Workflow API](workflow-api.md) | FastEndpoints, route prefixing, API categories, SignalR, and client-facing contracts. |
 | [Activities And Authoring](activities-and-authoring.md) | How workflows are authored in C#, JSON, ElsaScript, and host methods. |
@@ -47,8 +48,8 @@ flowchart LR
 | [Expressions And Scripting](expressions-and-scripting.md) | Expression evaluators and language feature packages. |
 | [HTTP, Scheduling, And Resilience](http-scheduling-resilience.md) | Inbound HTTP workflows, outbound HTTP, scheduled triggers, and resilience strategies. |
 | [Persistence](persistence.md) | In-memory stores, EF Core stores, provider packages, migrations, and multi-provider rules. |
-| [Diagnostics Structured Logs](diagnostics-structured-logs.md) | `ILogger` capture, live feed, REST/SignalR surface, redaction, and bounded in-memory storage. |
-| [Diagnostics Console Logs](diagnostics-console-logs.md) | Raw stdout/stderr capture, live feed, REST/SignalR surface, and redaction. |
+| [Diagnostics Structured Logs migration](diagnostics-structured-logs.md) | Migrate removed structured-log capture, storage, and dashboard integrations to host-owned logging. |
+| [Diagnostics Console Logs migration](diagnostics-console-logs.md) | Migrate removed console capture and streaming to the process/container logging pipeline. |
 | [Health Checks](health-checks.md) | Elsa runtime readiness probes, liveness/readiness mapping, and Kubernetes probe guidance. |
 | [Identity, Tenancy, And Security](identity-tenancy-security.md) | Users, applications, roles, API keys, tenant resolution, and authorization touch points. |
 | [Testing Guide](testing-guide.md) | TUnit and Microsoft Testing Platform project layout, fixture choices, and targeted commands. |
@@ -67,7 +68,7 @@ flowchart LR
 - Runtime feature: [src/modules/Elsa.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs](../../src/modules/Elsa.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs)
 - API feature: [src/modules/Elsa.Workflows.Api/Features/WorkflowsApiFeature.cs](../../src/modules/Elsa.Workflows.Api/Features/WorkflowsApiFeature.cs)
 - Reference server: [src/apps/Elsa.Server.Web/Program.cs](../../src/apps/Elsa.Server.Web/Program.cs)
-- Structured-log persistence design: [specs/005-structured-log-persistence/plan.md](../../specs/005-structured-log-persistence/plan.md)
+- Workflow telemetry and diagnostics migration: [OpenTelemetry Workflow Instrumentation](opentelemetry-workflows.md)
 
 ## Contributor Workflow
 

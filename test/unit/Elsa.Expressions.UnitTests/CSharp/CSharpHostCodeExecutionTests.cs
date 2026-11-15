@@ -3,6 +3,7 @@ using Elsa.Expressions.CSharp.Contracts;
 using Elsa.Expressions.CSharp.Options;
 using Elsa.Expressions.CSharp.Services;
 using Elsa.Expressions.Models;
+using Elsa.Features.Services;
 using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
 using Microsoft.Extensions.Caching.Memory;
@@ -37,10 +38,12 @@ public class CSharpHostCodeExecutionTests
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddMemoryCache();
-        new Elsa.Expressions.CSharp.ShellFeatures.CSharpFeature
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
+        new Elsa.Expressions.CSharp.Features.CSharpFeature(module)
         {
             CSharpOptions = options => options.AllowHostCodeExecution = allowHostCodeExecution
-        }.ConfigureServices(services);
+        }.Apply();
         services.AddSingleton<IExpressionDescriptorRegistry, Elsa.Workflows.Management.Services.ExpressionDescriptorRegistry>();
 
         var serviceProvider = services.BuildServiceProvider();

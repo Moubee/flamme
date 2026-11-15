@@ -1,20 +1,36 @@
 # OpenTelemetry Workflow Instrumentation
 
-Elsa emits first-party OpenTelemetry-compatible workflow and activity instrumentation through `System.Diagnostics`.
+Elsa emits workflow and activity traces and metrics through `System.Diagnostics`. The runtime provides the `Elsa.Workflows` activity source and meter; the host application selects the OpenTelemetry SDK, exporters, collector, and observability backend.
 
-To collect workflow traces, configure OpenTelemetry to listen to the `Elsa.Workflows` activity source. To collect workflow metrics, configure it to listen to the `Elsa.Workflows` meter.
+## Host configuration
+
+Configure the official OpenTelemetry packages in the application host. No Elsa diagnostics package is required:
 
 ```csharp
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+
 services.AddOpenTelemetry()
-    .WithTracing(builder => builder
-        .AddSource("Elsa.Workflows")
-        .AddOtlpExporter())
-    .WithMetrics(builder => builder
-        .AddMeter("Elsa.Workflows")
-        .AddOtlpExporter());
+    .WithTracing(tracing => tracing.AddSource("Elsa.Workflows"))
+    .WithMetrics(metrics => metrics.AddMeter("Elsa.Workflows"))
+    .UseOtlpExporter();
 ```
 
-If you previously enabled workflow tracing through the `Elsa.OpenTelemetry` extension package, avoid enabling both the extension tracing middleware and the first-party workflow spans for the same host unless duplicate workflow and activity spans are acceptable. Both integrations publish to the `Elsa.Workflows` activity source so existing collectors can keep the same source configuration.
+`UseOtlpExporter` is supplied by `OpenTelemetry.Exporter.OpenTelemetryProtocol` with `OpenTelemetry.Extensions.Hosting`. It enables the official exporter for logs, metrics, and traces. Add standard ASP.NET Core and HTTP client instrumentation in the host as needed. Keep operational logging on `Microsoft.Extensions.Logging`.
+
+Configure an external collector or backend using standard environment variables:
+
+```bash
+OTEL_SERVICE_NAME=elsa-server
+OTEL_RESOURCE_ATTRIBUTES=service.instance.id=local-dev
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+```
+
+The SDK handles protocol options, signal-specific paths, headers, batching, and export. For signal-specific endpoints and other options, see the [official OTLP exporter documentation](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md).
+
+The modular sample host registers the workflow source and meter and enables OTLP export when `OTEL_EXPORTER_OTLP_ENDPOINT` or a signal-specific `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT`, or `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` is supplied. Its regular launch profiles do not export by default. The `http-aspire` and `https-aspire` profiles target an external gRPC endpoint at `http://localhost:4317`; select the actual dashboard or collector endpoint for your environment. These profiles do not start an Aspire AppHost.
 
 ## Traces
 
@@ -22,7 +38,7 @@ Elsa creates spans around workflow execution cycles and activity execution. The 
 
 Faulted workflow and activity spans use `ActivityStatusCode.Error` and record the exception type as `exception.type` when an exception is available. Exception messages and stack traces are not added to spans or exception events by Elsa workflow instrumentation.
 
-Outbound `SendHttpRequest` and `FlowSendHttpRequest` calls inject the current W3C trace context headers when an active workflow/activity span exists, so downstream services can continue the same trace without Elsa-specific middleware. Enable standard .NET HTTP client instrumentation in your OpenTelemetry setup when you want outbound HTTP spans for these calls.
+Outbound `SendHttpRequest` and `FlowSendHttpRequest` calls inject the current W3C trace context headers when an active workflow/activity span exists, so downstream services can continue the same trace. Enable standard .NET HTTP client instrumentation in the host when you want outbound HTTP spans for these calls.
 
 ## Metrics
 
@@ -33,54 +49,27 @@ The `Elsa.Workflows` meter emits:
 - `elsa.workflow.faulted`
 - `elsa.activity.duration` in seconds
 
-Metric tags use the same low-cardinality workflow and activity metadata as the spans where practical. The started counter omits execution status tags because it records the pre-execution boundary; completed and faulted counters include terminal workflow status tags.
+Metric tags use low-cardinality workflow and activity metadata and omit per-execution identifiers. The started counter omits execution status tags because it records the pre-execution boundary; completed and faulted counters include terminal workflow status tags.
 
-## Elsa Diagnostics Collector
+## Upgrading from Elsa diagnostics packages
 
-The `Elsa.Diagnostics.OpenTelemetry` module can collect OTLP HTTP/protobuf telemetry for local diagnostics and Studio visualization. The default ingestion routes are:
+The following custom telemetry packages and their tests have been removed:
 
-- `/elsa/otlp/v1/traces`
-- `/elsa/otlp/v1/metrics`
-- `/elsa/otlp/v1/logs`
+- `Elsa.Diagnostics.OpenTelemetry`
+- `Elsa.Diagnostics.StructuredLogs`
+- `Elsa.Diagnostics.StructuredLogs.Persistence.Relational`
+- `Elsa.Diagnostics.StructuredLogs.Dashboard`
+- `Elsa.Diagnostics.ConsoleLogs`
+- `Elsa.Diagnostics.ConsoleLogs.Dashboard`
 
-Use the collector for development and focused troubleshooting. Production deployments should usually export to an external OpenTelemetry Collector or observability backend unless Elsa collector capacity, retention, and ingress security are deliberately configured for that environment.
+Remove package references and feature registration for `OpenTelemetry`, `StructuredLogs`, `ConsoleLogs`, `StructuredLogsDashboard`, and `ConsoleLogsDashboard`. Remove their `Use*`/`Add*` calls, hub mappings, console capture hooks, and related configuration.
 
-### .NET Setup
+Elsa no longer hosts OTLP ingestion, telemetry buffers, log/trace/metric query endpoints, collector configuration APIs, or telemetry SignalR hubs. Existing diagnostics clients and dashboard integrations must use your observability platform instead. Retention, storage, queries, streaming, redaction, and access policies belong to that platform and the host's logging/export pipeline.
 
-Configure the .NET OpenTelemetry SDK to collect Elsa workflow instrumentation and export via OTLP:
+Replace `Diagnostics:OpenTelemetry:Exporter:Endpoint` and `Diagnostics:OpenTelemetry:Exporter:Protocol` with `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL`. Point the endpoint at an external collector or backend; the former `/elsa/otlp/v1/*` routes are gone. For HTTP/protobuf, supply a collector base URL and let the official SDK add the signal paths.
 
-```csharp
-services.AddOpenTelemetry()
-    .WithTracing(builder => builder
-        .AddSource("Elsa.Workflows")
-        .AddOtlpExporter())
-    .WithMetrics(builder => builder
-        .AddMeter("Elsa.Workflows")
-        .AddOtlpExporter());
-```
+Replace any legacy `Elsa.OpenTelemetry` extension registration with the built-in workflow source/meter and host-owned SDK configuration. Do not add duplicate workflow tracing middleware.
 
-Then configure standard OTEL environment variables for the process:
+Workflow execution journals, persisted workflow/activity records, and retry history remain workflow domain data. This removal concerns operational telemetry capture and storage.
 
-```bash
-OTEL_SERVICE_NAME=elsa-server
-OTEL_RESOURCE_ATTRIBUTES=service.instance.id=local-dev
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:5000/elsa/otlp/v1
-OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-OTEL_BSP_SCHEDULE_DELAY=1000
-OTEL_METRIC_EXPORT_INTERVAL=1000
-```
-
-If the collector is exposed beyond loopback, also configure the required API key header. The header name is returned by the collector configuration API; do not expose the secret value through Studio or documentation.
-
-### Polyglot Setup
-
-Non-.NET services can use the same standard OTEL variables:
-
-```bash
-OTEL_SERVICE_NAME=worker
-OTEL_RESOURCE_ATTRIBUTES=service.instance.id=worker-1
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:5000/elsa/otlp/v1
-OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-```
-
-Use each language SDK's OTLP exporter package. Studio identifies resources by `service.name` and `service.instance.id` when those attributes are present.
+TUnit handles test-run logs and telemetry. Test hosts use TUnit's logging and ASP.NET Core integration rather than Elsa telemetry exporters or log-capture providers. Focused instrumentation tests can still observe the public .NET source/meter to verify emitted spans and measurements.

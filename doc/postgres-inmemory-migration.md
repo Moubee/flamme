@@ -40,9 +40,7 @@ PostgreSQL migrations remain the schema authority for durable stores. Existing P
 
 ## Structured logs
 
-The SQLite structured-log persistence package, its shell feature, and `UseSqliteStorage` have been removed. Enable the core `StructuredLogs` feature without a persistence feature to use bounded in-memory recent history and live streaming.
-
-No PostgreSQL structured-log backend is bundled. The shared relational package remains an extension point; registering it alone does not provide a database connection, dialect, or migration implementation. Use the host's external logging pipeline when operational logs must survive process restarts.
+All custom structured-log, console-log, and OpenTelemetry diagnostics packages, including relational structured-log helpers, have been removed. Use the host's external logging and observability pipeline for operational telemetry. Remove the former diagnostics feature registrations and configuration; see the [telemetry migration guide](wiki/opentelemetry-workflows.md#upgrading-from-elsa-diagnostics-packages). Workflow execution records and retry history remain domain data.
 
 ## Tests
 

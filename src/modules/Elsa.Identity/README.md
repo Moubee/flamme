@@ -5,7 +5,6 @@
 Identity token signing requires a secure random key. Configure it through environment variables or a secrets manager and keep it out of committed appsettings files.
 
 - Code-first hosts using `Identity:Tokens` should set `Identity__Tokens__SigningKey`.
-- Shell-based hosts should set the shell feature path, for example `CShells__Shells__Default__Features__Identity__SigningKey`.
 - Production startup rejects missing keys, keys shorter than 32 ASCII characters, and known public defaults. Known public defaults are tolerated only in the explicit `Development` or `Demo` environments.
 
 ## Default Admin User Bootstrap
@@ -16,39 +15,10 @@ This is the recommended way to initialize identity access now that user-manageme
 
 See `doc/adr/0010-default-admin-user-bootstrap-for-initial-identity-access.md` for the architectural decision.
 
-### New shell functionality (recommended)
+### Code-first registration
 
-When using shell-based configuration (`CShells`), configure the `DefaultAdminUser` shell feature.
-
-Example (`appsettings.json`):
-
-```json
-{
-  "CShells": {
-    "Shells": [
-      {
-        "Name": "Default",
-        "Features": {
-          "Identity": {},
-          "DefaultAuthentication": {},
-          "DefaultAdminUser": {
-            "AdminUserName": "admin",
-            "AdminPassword": "REPLACE_WITH_SECURE_BOOTSTRAP_PASSWORD",
-            "AdminRoleName": "admin",
-            "AdminRolePermissions": ["*"]
-          }
-        }
-      }
-    ]
-  }
-}
-```
-
-This maps to `Elsa.Identity.ShellFeatures.DefaultAdminUserFeature` and configures `DefaultAdminUserOptions` at startup.
-
-### Legacy feature system (code-first)
-
-When using the legacy feature system (module configuration in code), call `UseDefaultAdmin` while configuring `Identity`.
+Call `UseDefaultAdmin` while configuring Identity in the host. Shell features and
+shell configuration paths have been removed.
 
 ```csharp
 services.AddElsa(elsa =>
@@ -63,7 +33,7 @@ services.AddElsa(elsa =>
 
             identity.UseDefaultAdmin(admin => admin
                 .WithAdminUserName("admin")
-                .WithAdminPassword("REPLACE_WITH_SECURE_BOOTSTRAP_PASSWORD")
+                .WithAdminPassword(builder.Configuration.GetRequiredSection("Identity:Bootstrap")["Password"]!)
                 .WithAdminRoleName("admin")
                 .WithAdminRolePermissions(new List<string> { "*" }));
         })
@@ -71,10 +41,12 @@ services.AddElsa(elsa =>
 });
 ```
 
-You can also use the shorthand overload:
+Supply the bootstrap password through deployment-owned configuration, for example
+`Identity__Bootstrap__Password`, or a secrets manager. You can also use the shorthand
+overload with an already resolved password:
 
 ```csharp
-identity.UseDefaultAdmin("admin", "REPLACE_WITH_SECURE_BOOTSTRAP_PASSWORD", "admin", new List<string> { "*" });
+identity.UseDefaultAdmin("admin", bootstrapPassword, "admin", new List<string> { "*" });
 ```
 
 ### Operational notes
@@ -83,7 +55,7 @@ identity.UseDefaultAdmin("admin", "REPLACE_WITH_SECURE_BOOTSTRAP_PASSWORD", "adm
 - Do not keep development defaults in production.
 - Prefer environment variables or a secret manager for admin credentials.
 - After first bootstrap, rotate credentials according to your security policy.
-- Localhost requests no longer satisfy `SecurityRoot` by default. Legacy localhost bootstrap requires an explicit opt-in: call `EnableLocalHostPermissionGrantForSecurityRoot()` in code-first configuration or set `EnableLocalHostPermissionGrant` on the shell `DefaultAuthentication` feature; prefer `DefaultAdminUser` instead.
+- The `SecurityRoot` policy and localhost permission grant have been removed. Use the configured bootstrap administrator or admin API key for initial access.
 
 ## Secret Hashing
 

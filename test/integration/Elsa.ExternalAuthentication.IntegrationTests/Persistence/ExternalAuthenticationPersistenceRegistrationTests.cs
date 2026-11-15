@@ -1,9 +1,12 @@
 using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ShellFeatures;
+using Elsa.ExternalAuthentication.Persistence.EFCore.Features;
+using Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.Extensions;
 using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
 using Elsa.ExternalAuthentication.Services;
 using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Persistence.EFCore.PostgreSql.ShellFeatures.Identity;
+using Elsa.Features.Services;
+using Elsa.Persistence.EFCore.Extensions;
+using Elsa.Persistence.EFCore.Modules.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
@@ -23,16 +26,16 @@ public class ExternalAuthenticationPersistenceRegistrationTests
     }
 
     [Test]
-    public async Task PostgreSqlIdentityShellFeatureDoesNotRegisterExternalAuthenticationPersistence()
+    public async Task PostgreSqlIdentityFeatureDoesNotRegisterExternalAuthenticationPersistence()
     {
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new PostgreSqlIdentityPersistenceFeature
-        {
-            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
-        };
-        feature.ConfigureServices(services);
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
+        var feature = new EFCoreIdentityPersistenceFeature(module);
+        feature.UsePostgreSql("Host=localhost;Database=elsa;Username=elsa;Password=elsa");
+        feature.Apply();
 
         // External authentication persistence has its own feature; enabling identity persistence must not imply it.
         var registration = services.Last(x => x.ServiceType == typeof(IIdentityProviderConnectionStore));
@@ -41,16 +44,13 @@ public class ExternalAuthenticationPersistenceRegistrationTests
     }
 
     [Test]
-    public async Task PostgreSqlExternalAuthenticationShellFeatureRegistersEntityFrameworkCoreStores()
+    public async Task PostgreSqlExternalAuthenticationFeatureRegistersEntityFrameworkCoreStores()
     {
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new PostgreSqlExternalAuthenticationPersistenceShellFeature
-        {
-            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
-        };
-        feature.ConfigureServices(services);
+        var feature = CreatePersistenceFeature(services);
+        feature.Apply();
 
         var connectionStore = services.Last(x => x.ServiceType == typeof(IIdentityProviderConnectionStore));
         await Assert.That(connectionStore.ImplementationType).IsEqualTo(typeof(EFCoreIdentityProviderConnectionStore));
@@ -66,11 +66,8 @@ public class ExternalAuthenticationPersistenceRegistrationTests
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var feature = new PostgreSqlExternalAuthenticationPersistenceShellFeature
-        {
-            ConnectionString = "Host=localhost;Database=elsa;Username=elsa;Password=elsa"
-        };
-        feature.ConfigureServices(services);
+        var feature = CreatePersistenceFeature(services);
+        feature.Apply();
 
         // DatabaseIdentityProviderConnectionSource is registered as a singleton and takes both of these stores, so
         // neither may be scoped. Under ValidateScopes, resolving a scoped service from the root provider throws.
@@ -80,5 +77,13 @@ public class ExternalAuthenticationPersistenceRegistrationTests
 
         await Assert.That(serviceProvider.GetRequiredService<IIdentityProviderConnectionStore>()).IsOfType(typeof(EFCoreIdentityProviderConnectionStore));
         await Assert.That(serviceProvider.GetRequiredService<IConnectionRegistryVersionStore>()).IsOfType(typeof(EFCoreConnectionRegistryVersionStore));
+    }
+
+    private static EFCoreExternalAuthenticationPersistenceFeature CreatePersistenceFeature(IServiceCollection services)
+    {
+        var module = Mock.Of<IModule>().Object;
+        Mock.Get(module).Services.Returns(services);
+        return new EFCoreExternalAuthenticationPersistenceFeature(module)
+            .UsePostgreSql("Host=localhost;Database=elsa;Username=elsa;Password=elsa");
     }
 }

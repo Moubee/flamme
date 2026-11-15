@@ -2,13 +2,13 @@
 
 This package installs the `openid-connect` adapter for `Elsa.ExternalAuthentication`.
 
-Classic Elsa hosts can enable the adapter as a feature:
+Enable the adapter through code-first feature registration:
 
 ```csharp
 services.AddElsa(elsa => elsa.UseOpenIdConnectExternalAuthentication());
 ```
 
-CShells hosts can enable the `OpenIdConnectExternalAuthentication` shell feature. Both features depend on the External Authentication foundation.
+This feature depends on the External Authentication foundation. Shell-based feature registration has been removed; add the module to the host at build time.
 
 The direct service registration remains available for hosts that compose services without Elsa features:
 

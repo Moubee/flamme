@@ -6,6 +6,7 @@ using FluentStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TUnit.Logging.Microsoft;
 
 namespace Elsa.Testing.Shared;
 
@@ -21,7 +22,7 @@ public class TestApplicationBuilder
     /// <summary>
     /// Initializes a new instance of the <see cref="TestApplicationBuilder"/> class.
     /// </summary>
-    /// <param name="testOutput">The writer that receives diagnostic and workflow output.</param>
+    /// <param name="testOutput">The writer that receives workflow output.</param>
     public TestApplicationBuilder(TextWriter testOutput)
     {
         ArgumentNullException.ThrowIfNull(testOutput);
@@ -31,7 +32,9 @@ public class TestApplicationBuilder
         _services
             .AddSingleton(_testOutput)
             .AddSingleton<IConfiguration, ConfigurationManager>()
-            .AddLogging(logging => logging.AddProvider(new TextWriterLoggerProvider(_testOutput)).SetMinimumLevel(LogLevel.Debug));
+            .AddLogging(logging => logging
+                .SetMinimumLevel(LogLevel.Debug)
+                .AddCorrelatedTUnit(LogLevel.Debug));
 
         _configureElsa += elsa => elsa
             .AddActivitiesFrom<WriteLine>()

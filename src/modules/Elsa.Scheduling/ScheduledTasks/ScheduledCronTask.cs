@@ -20,6 +20,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
     private readonly ICronParser _cronParser;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly CancellationToken _cancellationToken;
     private readonly SemaphoreSlim _executionSemaphore = new(1, 1);
     private bool _executing;
     private bool _cancellationRequested;
@@ -37,6 +38,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
         _systemClock = systemClock;
         _logger = logger;
         _cancellationTokenSource = new();
+        _cancellationToken = _cancellationTokenSource.Token;
 
         Schedule();
     }
@@ -103,7 +105,13 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
             Enabled = true
         };
 
-        _timer.Elapsed += async (_, _) =>
+        _timer.Elapsed += async (_, _) => await OnElapsedAsync();
+    }
+
+    // Timer events cannot return a Task to their caller, so contain failures across the entire callback.
+    private async Task OnElapsedAsync()
+    {
+        try
         {
             _timer?.Dispose();
             _timer = null;
@@ -126,7 +134,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
             using (scope)
             {
                 var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
-                var cancellationToken = _cancellationTokenSource.Token;
+                var cancellationToken = _cancellationToken;
 
                 if (!cancellationToken.IsCancellationRequested)
                 {
@@ -149,6 +157,9 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
                     {
                         // Semaphore was disposed during execution, exit gracefully
                         return;
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
                     }
                     catch (Exception e)
                     {
@@ -186,7 +197,24 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
                 if (!cancellationToken.IsCancellationRequested && !_disposed)
                     Schedule();
             }
-        };
+        }
+        catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception e)
+        {
+            if (!_disposed)
+            {
+                try
+                {
+                    _logger.LogError(e, "Error executing scheduled task");
+                }
+                catch
+                {
+                    // Logging infrastructure may already be disposed during shutdown.
+                }
+            }
+        }
     }
 
     void IDisposable.Dispose()
