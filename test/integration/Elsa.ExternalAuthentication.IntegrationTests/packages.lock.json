@@ -702,6 +702,11 @@
           "OpenTelemetry.Api": "1.21.0"
         }
       },
+      "Parlot": {
+        "type": "Transitive",
+        "resolved": "1.5.9",
+        "contentHash": "Vro4ZKVZLBoPdCftyMUlzhlRpegI3N6TlT0zpyn79a42mH214VDqzkAdV70vu578W6NKS84hBA9H6j81cz0dLg=="
+      },
       "Polly.Core": {
         "type": "Transitive",
         "resolved": "8.9.1",
@@ -901,17 +906,6 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )"
         }
       },
-      "elsa.dsl.elsascript": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Expressions": "[1.0.0, )",
-          "Elsa.Features": "[1.0.0, )",
-          "Elsa.Workflows.Core": "[1.0.0, )",
-          "Elsa.Workflows.Management": "[1.0.0, )",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )",
-          "Parlot": "[1.6.0, )"
-        }
-      },
       "elsa.expressions": {
         "type": "Project",
         "dependencies": {
@@ -1105,7 +1099,6 @@
           "Elsa.Caching": "[1.0.0, )",
           "Elsa.Common": "[1.0.0, )",
           "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Dsl.ElsaScript": "[1.0.0, )",
           "Elsa.Expressions": "[1.0.0, )",
           "Elsa.Expressions.CSharp": "[1.0.0, )",
           "Elsa.Expressions.JavaScript": "[1.0.0, )",
@@ -1118,7 +1111,6 @@
           "Elsa.ServiceDefaults": "[1.0.0, )",
           "Elsa.Tenants.AspNetCore": "[1.0.0, )",
           "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage.ElsaScript": "[1.0.0, )",
           "Elsa.Workflows.Api": "[1.0.0, )",
           "Elsa.Workflows.Core": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )",
@@ -1188,13 +1180,6 @@
           "Elsa.Workflows.Management": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )",
           "FluentStorage": "[6.0.4, )"
-        }
-      },
-      "elsa.workflowproviders.blobstorage.elsascript": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dsl.ElsaScript": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )"
         }
       },
       "elsa.workflows.api": {
@@ -1749,12 +1734,6 @@
           "Microsoft.Extensions.Options": "10.0.0",
           "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.21.0, 2.0.0)"
         }
-      },
-      "Parlot": {
-        "type": "CentralTransitive",
-        "requested": "[1.6.0, )",
-        "resolved": "1.6.0",
-        "contentHash": "np7i7wVhi9dbo+VRT5ymWG4qHkVxZAae24rdvTxUpVu2RotEnnXxFLA67YqyrIsmFSK8h/lzuMQj7U+GO4qJ4w=="
       },
       "Polly": {
         "type": "CentralTransitive",
@@ -2525,6 +2504,11 @@
           "OpenTelemetry.Api": "1.21.0"
         }
       },
+      "Parlot": {
+        "type": "Transitive",
+        "resolved": "1.5.9",
+        "contentHash": "Vro4ZKVZLBoPdCftyMUlzhlRpegI3N6TlT0zpyn79a42mH214VDqzkAdV70vu578W6NKS84hBA9H6j81cz0dLg=="
+      },
       "Polly.Core": {
         "type": "Transitive",
         "resolved": "8.9.1",
@@ -2711,16 +2695,6 @@
           "Elsa.Dashboard.Abstractions": "[1.0.0, )"
         }
       },
-      "elsa.dsl.elsascript": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Expressions": "[1.0.0, )",
-          "Elsa.Features": "[1.0.0, )",
-          "Elsa.Workflows.Core": "[1.0.0, )",
-          "Elsa.Workflows.Management": "[1.0.0, )",
-          "Parlot": "[1.6.0, )"
-        }
-      },
       "elsa.expressions": {
         "type": "Project",
         "dependencies": {
@@ -2902,7 +2876,6 @@
           "Elsa.Caching": "[1.0.0, )",
           "Elsa.Common": "[1.0.0, )",
           "Elsa.Dashboard.Api": "[1.0.0, )",
-          "Elsa.Dsl.ElsaScript": "[1.0.0, )",
           "Elsa.Expressions": "[1.0.0, )",
           "Elsa.Expressions.CSharp": "[1.0.0, )",
           "Elsa.Expressions.JavaScript": "[1.0.0, )",
@@ -2915,7 +2888,6 @@
           "Elsa.ServiceDefaults": "[1.0.0, )",
           "Elsa.Tenants.AspNetCore": "[1.0.0, )",
           "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage.ElsaScript": "[1.0.0, )",
           "Elsa.Workflows.Api": "[1.0.0, )",
           "Elsa.Workflows.Core": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )",
@@ -2985,13 +2957,6 @@
           "Elsa.Workflows.Management": "[1.0.0, )",
           "Elsa.Workflows.Runtime": "[1.0.0, )",
           "FluentStorage": "[6.0.4, )"
-        }
-      },
-      "elsa.workflowproviders.blobstorage.elsascript": {
-        "type": "Project",
-        "dependencies": {
-          "Elsa.Dsl.ElsaScript": "[1.0.0, )",
-          "Elsa.WorkflowProviders.BlobStorage": "[1.0.0, )"
         }
       },
       "elsa.workflows.api": {
@@ -3445,12 +3410,6 @@
           "Microsoft.Extensions.Configuration": "11.0.0",
           "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.21.0, 2.0.0)"
         }
-      },
-      "Parlot": {
-        "type": "CentralTransitive",
-        "requested": "[1.6.0, )",
-        "resolved": "1.6.0",
-        "contentHash": "np7i7wVhi9dbo+VRT5ymWG4qHkVxZAae24rdvTxUpVu2RotEnnXxFLA67YqyrIsmFSK8h/lzuMQj7U+GO4qJ4w=="
       },
       "Polly": {
         "type": "CentralTransitive",
