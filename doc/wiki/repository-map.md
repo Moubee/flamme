@@ -6,7 +6,7 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 | Path | Purpose |
 | --- | --- |
-| [src/apps](../../src/apps) | Code-first reference server and shared service defaults. |
+| [src/apps](../../src/apps) | Aspire AppHost, code-first reference server, and shared service defaults. |
 | [src/modules](../../src/modules) | Elsa product modules: workflow engine, runtime, management, APIs, HTTP, identity, persistence, diagnostics, scripting, scheduling, tenants, labels, resilience, and more. |
 | [src/common](../../src/common) | Shared infrastructure such as feature/module plumbing, mediator, API helpers, and test helpers. |
 | [src/clients](../../src/clients) | Client packages, currently including the Elsa API client. |
@@ -46,7 +46,9 @@ Elsa Core is organized as a large multi-project .NET solution. The repo favors s
 
 ## Reference Hosts
 
+- [Elsa.AppHost](../../src/apps/Elsa.AppHost) orchestrates the reference server and PostgreSQL for local development and demonstrations. The root [aspire.config.json](../../aspire.config.json) selects `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`; see the [Aspire development guide](../aspire-development.md).
 - [Elsa.Server.Web](../../src/apps/Elsa.Server.Web) is the most useful all-up ASP.NET Core sample. Its [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs) shows typical module composition with identity, PostgreSQL EF Core persistence, runtime, management, HTTP, scheduling, scripting, and multitenancy.
+- [Elsa.ServiceDefaults](../../src/apps/Elsa.ServiceDefaults) supplies the reference server's OpenTelemetry configuration for host requests, logs, and workflow execution.
 
 ## Build And Package Files
 

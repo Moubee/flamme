@@ -74,8 +74,8 @@ logs, traces, metrics, and health in the dashboard. Run `aspire run --isolated` 
 repository root for an interactive session. For agents or Git worktrees, use:
 
 ```bash
-aspire start --non-interactive --isolated --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 The [Aspire development guide](doc/aspire-development.md) covers prerequisites,

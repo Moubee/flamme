@@ -17,8 +17,10 @@
 ### Directory Structure
 ```
 src/
-├── apps/               # Reference servers
-│   └── Elsa.Server.Web            # Workflow server only
+├── apps/               # Local orchestration, reference server, and telemetry
+│   ├── Elsa.AppHost               # Aspire development graph (.NET 11)
+│   ├── Elsa.Server.Web            # Workflow server only
+│   └── Elsa.ServiceDefaults       # Shared OpenTelemetry configuration
 ├── common/             # Shared libraries (8 projects)
 ├── modules/            # Core functionality modules (70+ projects)
 │   ├── Elsa.Workflows.Core         # Core workflow engine
@@ -218,6 +220,20 @@ Multiple Docker configurations available:
    ```
 
 ## Running the Applications
+
+### Aspire Development Graph
+
+The root `aspire.config.json` selects `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`.
+From the repository root, use Aspire CLI 13.6.5 to start the reference server and
+PostgreSQL with isolated ports:
+
+```bash
+aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+```
+
+See the [Aspire development guide](../doc/aspire-development.md) for endpoint
+discovery, the workflow demo, telemetry, shutdown, and retained data.
 
 ### Development Workflow Server
 

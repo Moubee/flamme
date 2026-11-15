@@ -1,5 +1,5 @@
 {
   "appHost": {
-    "path": "Elsa.AppHost/Elsa.AppHost.csproj"
+    "path": "src/apps/Elsa.AppHost/Elsa.AppHost.csproj"
   }
 }

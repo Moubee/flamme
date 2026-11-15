@@ -4,10 +4,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/apps/">
-    <Project Path="Elsa.AppHost/Elsa.AppHost.csproj" />
-    <Project Path="src/apps/Elsa.ServiceDefaults/Elsa.ServiceDefaults.csproj" />
-  </Folder>
   <Folder Name="/docker/">
     <File Path="docker/.dockerignore" />
     <File Path="docker/docker-compose.yml" />
@@ -78,7 +74,9 @@
   </Folder>
   <Folder Name="/src/apps/">
     <File Path="src/apps/Directory.Build.props" />
+    <Project Path="src/apps/Elsa.AppHost/Elsa.AppHost.csproj" />
     <Project Path="src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
+    <Project Path="src/apps/Elsa.ServiceDefaults/Elsa.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/src/clients/">
     <Project Path="src/clients/Elsa.Api.Client/Elsa.Api.Client.csproj" />

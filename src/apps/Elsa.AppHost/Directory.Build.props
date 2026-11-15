@@ -1,0 +1,4 @@
+<Project>
+    <!-- Keep orchestration net11-only without inheriting the servers' multi-targeting and Fody dependencies. -->
+    <Import Project="../../../Directory.Build.props" />
+</Project>

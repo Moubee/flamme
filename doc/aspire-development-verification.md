@@ -5,6 +5,10 @@ Verified on 2026-11-14 in the separate `aspire-development` worktree, branch
 `8c50b8669`. Other worktrees were not edited. SDK: .NET 11.0.100. Aspire CLI,
 AppHost SDK and PostgreSQL hosting integration: 13.6.5.
 
+The build, test, and runtime results below describe the original AppHost layout
+and host inventory before the later relocation and upstream removals. The
+follow-up section records validation for that later revision separately.
+
 ## Build and tests
 
 | Check | Result |
@@ -73,3 +77,24 @@ Initial HTTPS requests also produced transient Kestrel `TimingPipeFlusher` error
 despite successful responses. They did not recur in workflow requests after two
 ordinary restarts. Their cause was not established, and no unrelated runtime or
 repository-wide async policy changes were made.
+
+## Follow-up: relocation and current main (2026-11-15)
+
+Merged `origin/main` at `16c06213d`, preserving its removal of the modular host and
+associated modules. The AppHost now lives physically at `src/apps/Elsa.AppHost`;
+the explicit command target is `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`.
+
+The generated PostgreSQL volume identity depends on the AppHost path, so the
+relocated AppHost uses a different volume. The original volume and its data are
+left intact; no data migration is implied by the move. The historical restart
+check above applies to the original path.
+
+| Follow-up check | Result |
+| --- | --- |
+| Full-target and locked solution restores; solution build after merge and relocation | Passed; build completed with 189 existing warnings and zero errors. |
+| AppHost MSBuild boundary | `TargetFramework=net11.0`, empty `TargetFrameworks`, no inherited Fody/JetBrains references; dependency lock is byte-identical. |
+| Current host smoke tests on .NET 10 and .NET 11 | 10 passed, zero failures/skips: five per framework. Upstream removed the modular host, so the historical 14-test total does not describe the current suite. |
+| Isolated Aspire start and PostgreSQL/server readiness at the new path | Passed using `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`. |
+| Discovered server endpoint health and HTTP workflow demo | HTTP and HTTPS checks passed with the expected workflow response; request/workflow spans reached Aspire without workflow faults. |
+| Data volume preservation | New path uses a different generated volume; the original volume was confirmed to still exist. |
+| Review of relocated project/configuration/documentation paths | Independent review passed; selectors, sibling server reference, solution membership, and physical location agree. |

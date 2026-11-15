@@ -1,6 +1,6 @@
 # Aspire development and demonstration
 
-The root `aspire.config.json` selects `Elsa.AppHost/Elsa.AppHost.csproj`. The
+The root `aspire.config.json` selects `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`. The
 AppHost starts the reference server from source on .NET 11, provisions PostgreSQL
 17, waits for database readiness, and shows application logs, traces, metrics,
 endpoints, and health in the Aspire dashboard.
@@ -46,10 +46,10 @@ For agents, background operation, or a separate Git worktree, start the exact
 AppHost with isolated ports and user secrets:
 
 ```bash
-aspire start --non-interactive --isolated --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait postgres --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire describe server --format Json --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire wait postgres --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire describe server --format Json --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 Use `aspire wait` before sending requests. Copy a published `server` URL from
@@ -102,17 +102,17 @@ The existing `/health/live` and `/health/ready` routes remain the health endpoin
 The same data is available through the CLI:
 
 ```bash
-aspire logs server --tail 50 --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire otel logs server --limit 20 --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire otel traces server --limit 20 --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire logs server --tail 50 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire otel logs server --limit 20 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire otel traces server --limit 20 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 After changing server source, use the resource's Rebuild command in the dashboard,
 or the CLI when that command is available:
 
 ```bash
-aspire resource server rebuild --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire resource server rebuild --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 Keep an IDE's active debugging/hot-reload session in control of its own process.
@@ -122,8 +122,8 @@ After changing the AppHost resource graph or configuration, stop that AppHost
 and start it again, retaining `--isolated` for worktrees:
 
 ```bash
-aspire stop --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
-aspire start --non-interactive --isolated --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire stop --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 Rediscover endpoints before reusing a saved URL.
@@ -134,7 +134,7 @@ Press Ctrl+C in an interactive `aspire run --isolated` session, or stop the exac
 AppHost:
 
 ```bash
-aspire stop --non-interactive --apphost Elsa.AppHost/Elsa.AppHost.csproj
+aspire stop --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
 PostgreSQL uses a persistent container lifetime and a named data volume. Ordinary
@@ -145,6 +145,11 @@ shutdown. Keep Aspire's generated volume and container names so worktrees retain
 their own resource identity. Use `--isolated` consistently to follow the verified
 workflow. When changing secret configuration with retained database data, preserve
 the existing PostgreSQL credentials.
+
+The generated volume identity depends on the AppHost path. Moving the AppHost
+from the repository root to `src/apps/Elsa.AppHost` therefore selects a different
+PostgreSQL volume. The previous volume and its data remain intact; this relocation
+does not migrate that data into the new volume.
 
 This graph runs one reference server and permits its existing single-host
 file-system locks in Development. It does not establish multi-node locking or a

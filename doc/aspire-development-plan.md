@@ -27,6 +27,21 @@ the reference-server demo.
 Follow-up: the legacy load-balancer sample was subsequently removed at the user's
 request. The Aspire development graph continues to run one reference server.
 
+## Follow-up: application layout and current main
+
+On 2026-11-15, merge current `origin/main` and move the AppHost physically to
+`src/apps/Elsa.AppHost`, alongside `Elsa.Server.Web` and `Elsa.ServiceDefaults`.
+Update the root Aspire configuration, project references, solution membership,
+and command examples to `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`; the co-located
+Aspire configuration remains relative to its project directory. Preserve
+upstream's removal of the modular host and its modules when resolving conflicts.
+
+AppHost-path-derived generated volume names change with this move. The new path
+uses a different volume and leaves the previous volume and data intact; the move
+does not perform a database migration. Repeat locked restore, build, relevant
+host tests, and the Aspire readiness/workflow checks after relocation. Record
+those results separately from the original verification.
+
 ```mermaid
 flowchart LR
     AppHost["Aspire AppHost (.NET 11)"] --> PostgreSQL["PostgreSQL 17 + data volume"]
