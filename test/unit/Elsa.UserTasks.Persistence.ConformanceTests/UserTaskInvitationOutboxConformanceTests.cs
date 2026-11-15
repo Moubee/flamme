@@ -54,7 +54,9 @@ public abstract class UserTaskInvitationOutboxConformanceTests(UserTaskStoreFixt
 
         await Assert.That(await DequeueMineAsync()).IsEmpty();
 
-        Clock.Advance(TimeSpan.FromMinutes(11));
+        Clock.Advance(TimeSpan.FromMinutes(10).Subtract(TimeSpan.FromMicroseconds(1)));
+        await Assert.That(await DequeueMineAsync()).IsEmpty();
+        Clock.Advance(TimeSpan.FromMicroseconds(1));
         await Assert.That(await DequeueMineAsync()).HasSingleItem();
     }
 

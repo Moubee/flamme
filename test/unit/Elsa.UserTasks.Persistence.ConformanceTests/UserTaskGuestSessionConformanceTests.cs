@@ -104,8 +104,11 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
         var issued = await IssueAsync(Invitation(expiresAt: Clock.GetUtcNow().AddDays(1)), Subject("guest-1"));
         await Assert.That(await Sessions.ResolveAsync(issued.Token!)).IsNotNull();
 
-        Clock.Advance(TimeSpan.FromMinutes(31));
-
+        Clock.Advance(TimeSpan.FromMinutes(30).Subtract(TimeSpan.FromMicroseconds(1)));
+        await Assert.That(await Sessions.ResolveAsync(issued.Token!)).IsNotNull();
+        Clock.Advance(TimeSpan.FromMicroseconds(1));
+        await Assert.That(await Sessions.ResolveAsync(issued.Token!)).IsNull();
+        Clock.Advance(TimeSpan.FromMicroseconds(1));
         await Assert.That(await Sessions.ResolveAsync(issued.Token!)).IsNull();
     }
 

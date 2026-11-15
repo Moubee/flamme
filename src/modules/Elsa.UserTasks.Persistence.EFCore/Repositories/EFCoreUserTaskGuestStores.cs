@@ -26,14 +26,14 @@ internal static class UserTaskSecretHashing
 /// </summary>
 public sealed class EFCoreUserTaskGuestSessionIssuer(
     Store<UserTasksElsaDbContext, UserTaskGuestSessionRecord> store,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskGuestSessionIssuer
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter() } };
 
     public async Task<GuestSessionResult> IssueAsync(UserTaskInvitation invitation, ParticipantReference subject, CancellationToken cancellationToken = default)
     {
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var expiresAt = invitation.ExpiresAt <= now.Add(options.Value.GuestSessionLifetime) ? invitation.ExpiresAt : now.Add(options.Value.GuestSessionLifetime);
         if (expiresAt <= now)
             return new(false, FailureCode: "session-unavailable");
@@ -62,7 +62,7 @@ public sealed class EFCoreUserTaskGuestSessionIssuer(
 
         var hash = UserTaskSecretHashing.Hash(credential);
         await using var dbContext = await store.CreateDbContextAsync(cancellationToken);
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var row = await dbContext.UserTaskGuestSessions.AsNoTracking()
             .FirstOrDefaultAsync(x => x.SessionTokenHash == hash && x.RevokedAt == null && x.ExpiresAt > now, cancellationToken);
         if (row is null)
@@ -79,17 +79,19 @@ public sealed class EFCoreUserTaskGuestSessionIssuer(
     public async Task RevokeForTaskAsync(string tenantId, string taskId, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await store.CreateDbContextAsync(cancellationToken);
+        var revokedAt = timeProvider.GetUtcNow();
         await dbContext.UserTaskGuestSessions
             .Where(x => x.TenantId == tenantId && x.TaskId == taskId && x.RevokedAt == null)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.RevokedAt, clock.UtcNow), cancellationToken);
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.RevokedAt, revokedAt), cancellationToken);
     }
 
     public async Task RevokeForInvitationAsync(string tenantId, string invitationId, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await store.CreateDbContextAsync(cancellationToken);
+        var revokedAt = timeProvider.GetUtcNow();
         await dbContext.UserTaskGuestSessions
             .Where(x => x.TenantId == tenantId && x.InvitationId == invitationId && x.RevokedAt == null)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.RevokedAt, clock.UtcNow), cancellationToken);
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.RevokedAt, revokedAt), cancellationToken);
     }
 }
 
@@ -100,7 +102,7 @@ public sealed class EFCoreUserTaskGuestSessionIssuer(
 public sealed class EFCoreUserTaskInvitationOutbox(
     Store<UserTasksElsaDbContext, UserTaskInvitationDeliveryRecord> store,
     IDataProtectionProvider dataProtectionProvider,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskInvitationOutbox
 {
     private static readonly JsonSerializerOptions MetadataJsonOptions = new() { PropertyNameCaseInsensitive = true };
@@ -120,9 +122,9 @@ public sealed class EFCoreUserTaskInvitationOutbox(
             EncryptedToken = _protector.Protect(delivery.Token),
             DeliveryMetadataJson = delivery.Recipient == null ? null : JsonSerializer.Serialize(new { delivery.Recipient }),
             Status = UserTaskPersistenceDeliveryStatus.Pending,
-            AvailableAt = delivery.NotBefore ?? clock.UtcNow,
+            AvailableAt = delivery.NotBefore ?? timeProvider.GetUtcNow(),
             ExpiresAt = delivery.ExpiresAt,
-            CreatedAt = clock.UtcNow
+            CreatedAt = timeProvider.GetUtcNow()
         });
         await dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -130,7 +132,7 @@ public sealed class EFCoreUserTaskInvitationOutbox(
     public async Task<IReadOnlyCollection<UserTaskInvitationDelivery>> DequeueDueAsync(int maxCount, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await store.CreateDbContextAsync(cancellationToken);
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         // Expired secrets are dropped, never delivered late.
         await dbContext.UserTaskInvitationDeliveries.Where(x => x.ExpiresAt <= now).ExecuteDeleteAsync(cancellationToken);
 
