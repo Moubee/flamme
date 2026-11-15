@@ -14,7 +14,7 @@ public sealed class WorkflowRuntimeAdminService(
     IIngressSourceRegistry registry,
     IDrainOrchestrator orchestrator,
     INotificationSender mediator,
-    ISystemClock clock) : IWorkflowRuntimeAdminService
+    TimeProvider timeProvider) : IWorkflowRuntimeAdminService
 {
     /// <inheritdoc />
     public async ValueTask<QuiescenceState> PauseAsync(string? reason, string? requestedBy, CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ public sealed class WorkflowRuntimeAdminService(
         var wasPaused = (before.Reason & QuiescenceReason.AdministrativePause) != 0;
         var isPaused = (after.Reason & QuiescenceReason.AdministrativePause) != 0;
         if (!wasPaused && isPaused)
-            await mediator.SendAsync(new RuntimePauseRequested(requestedBy, reason, after.PausedAt ?? clock.UtcNow), cancellationToken);
+            await mediator.SendAsync(new RuntimePauseRequested(requestedBy, reason, after.PausedAt ?? timeProvider.GetUtcNow()), cancellationToken);
 
         return after;
     }
@@ -40,7 +40,7 @@ public sealed class WorkflowRuntimeAdminService(
         var wasPaused = (before.Reason & QuiescenceReason.AdministrativePause) != 0;
         var isPaused = (after.Reason & QuiescenceReason.AdministrativePause) != 0;
         if (wasPaused && !isPaused)
-            await mediator.SendAsync(new RuntimeResumeRequested(requestedBy, clock.UtcNow), cancellationToken);
+            await mediator.SendAsync(new RuntimeResumeRequested(requestedBy, timeProvider.GetUtcNow()), cancellationToken);
 
         return after;
     }
@@ -54,7 +54,7 @@ public sealed class WorkflowRuntimeAdminService(
         // Audit. Skip when the call returned a cached outcome — repeated invocations in the same generation
         // would otherwise emit spurious audit events and break SC-007 idempotency.
         if (!outcome.WasCached)
-            await mediator.SendAsync(new RuntimeForceDrainRequested(requestedBy, reason, clock.UtcNow, outcome), cancellationToken);
+            await mediator.SendAsync(new RuntimeForceDrainRequested(requestedBy, reason, timeProvider.GetUtcNow(), outcome), cancellationToken);
 
         return outcome;
     }

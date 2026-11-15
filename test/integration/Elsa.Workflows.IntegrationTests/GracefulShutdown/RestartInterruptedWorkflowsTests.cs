@@ -48,9 +48,9 @@ public class RestartInterruptedWorkflowsTests : IAsyncDisposable
 
     private static DateTimeOffset GetStaleTimestamp(IServiceProvider serviceProvider)
     {
-        var clock = serviceProvider.GetRequiredService<ISystemClock>();
+        var timeProvider = serviceProvider.GetRequiredService<TimeProvider>();
         var options = serviceProvider.GetRequiredService<IOptions<RuntimeOptions>>().Value;
-        return clock.UtcNow - options.InactivityThreshold - TimeSpan.FromMinutes(1);
+        return timeProvider.GetUtcNow() - options.InactivityThreshold - TimeSpan.FromMinutes(1);
     }
 
     private static async Task SeedInstancesAsync(IWorkflowInstanceStore store, int count, WorkflowStatus status, WorkflowSubStatus subStatus, bool isExecuting, string idPrefix = "instance-", DateTimeOffset? timestamp = null)

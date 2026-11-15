@@ -16,6 +16,7 @@ using Elsa.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Persistence.EFCore.UnitTests;
 
@@ -280,7 +281,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
         private readonly PostgreSqlTestDatabase _database;
         private readonly ServiceProvider _services;
         private readonly IServiceScope _scope;
-        private readonly ISystemClock _clock;
+        private readonly FakeTimeProvider _timeProvider;
         private readonly IExecutionCycleRegistry _cycleRegistry;
 
         private EfHarness(
@@ -289,7 +290,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
             IServiceScope scope,
             DefaultTenantAccessor tenantAccessor,
             EFCoreKeyValueStore store,
-            ISystemClock clock,
+            FakeTimeProvider timeProvider,
             IExecutionCycleRegistry cycleRegistry)
         {
             _database = database;
@@ -297,7 +298,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
             _scope = scope;
             TenantAccessor = tenantAccessor;
             Store = store;
-            _clock = clock;
+            _timeProvider = timeProvider;
             _cycleRegistry = cycleRegistry;
         }
 
@@ -308,8 +309,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
         {
             var database = new PostgreSqlTestDatabase();
             var tenantAccessor = new DefaultTenantAccessor();
-            var clock = Mock.Of<ISystemClock>().Object;
-            Mock.Get(clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+            var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
             var cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
             var migrationsAssembly = typeof(RuntimeDbContextFactory).Assembly;
 
@@ -343,7 +343,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
                 scope,
                 tenantAccessor,
                 scope.ServiceProvider.GetRequiredService<EFCoreKeyValueStore>(),
-                clock,
+                timeProvider,
                 cycleRegistry);
         }
 
@@ -353,7 +353,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
                 {
                     PausePersistence = PausePersistencePolicy.AcrossReactivations
                 }),
-                _clock,
+                _timeProvider,
                 _cycleRegistry,
                 store ?? Store,
                 TenantAccessor);

@@ -17,7 +17,7 @@ public class RestartInterruptedWorkflowsTask(
     IWorkflowInstanceStore workflowInstanceStore,
     ILogger<RestartInterruptedWorkflowsTask> logger,
     IOptions<RuntimeOptions> options, 
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     ITenantService? tenantService = null,
     ITenantAccessor? tenantAccessor = null) : RecurringTask
 {
@@ -58,7 +58,7 @@ public class RestartInterruptedWorkflowsTask(
     private WorkflowInstanceFilter CreateWorkflowInstanceFilter()
     {
         var livenessThreshold = options.Value.InactivityThreshold;
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var cutoffTimestamp = now - livenessThreshold;
         return new()
         {

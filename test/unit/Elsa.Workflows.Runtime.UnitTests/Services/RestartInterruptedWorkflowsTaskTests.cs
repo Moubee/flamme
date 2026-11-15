@@ -6,6 +6,7 @@ using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Tasks;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
@@ -21,7 +22,7 @@ public class RestartInterruptedWorkflowsTaskTests
         var tenantAccessor = new DefaultTenantAccessor();
         var tenantService = Mock.Of<ITenantService>().Object;
         var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
-        var clock = Mock.Of<ISystemClock>().Object;
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
@@ -30,7 +31,7 @@ public class RestartInterruptedWorkflowsTaskTests
             CreateWorkflowInstance("workflow-2", "tenant-b", now)
         };
         var observedTenantIds = new List<string?>();
-        Mock.Get(clock).UtcNow.Returns(now);
+        timeProvider.SetUtcNow(now);
         Mock.Get(tenantService).FindAsync("tenant-a", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-a", Name = "Tenant A" });
         Mock.Get(tenantService).FindAsync("tenant-b", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-b", Name = "Tenant B" });
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
@@ -48,7 +49,7 @@ public class RestartInterruptedWorkflowsTaskTests
             RestartInterruptedWorkflowsBatchSize = 10,
             InactivityThreshold = TimeSpan.FromMinutes(5)
         });
-        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, clock, tenantService, tenantAccessor);
+        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, timeProvider, tenantService, tenantAccessor);
 
         await task.ExecuteAsync(CancellationToken.None);
 
@@ -68,7 +69,7 @@ public class RestartInterruptedWorkflowsTaskTests
         var tenantAccessor = new DefaultTenantAccessor();
         var tenantService = Mock.Of<ITenantService>().Object;
         var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
-        var clock = Mock.Of<ISystemClock>().Object;
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
@@ -76,7 +77,7 @@ public class RestartInterruptedWorkflowsTaskTests
             CreateWorkflowInstance("workflow-1", tenantId, now)
         };
         var observedTenantIds = new List<string?>();
-        Mock.Get(clock).UtcNow.Returns(now);
+        timeProvider.SetUtcNow(now);
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
                         (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
@@ -92,7 +93,7 @@ public class RestartInterruptedWorkflowsTaskTests
             RestartInterruptedWorkflowsBatchSize = 10,
             InactivityThreshold = TimeSpan.FromMinutes(5)
         });
-        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, clock, tenantService, tenantAccessor);
+        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, timeProvider, tenantService, tenantAccessor);
 
         await task.ExecuteAsync(CancellationToken.None);
 
@@ -110,7 +111,7 @@ public class RestartInterruptedWorkflowsTaskTests
         var tenantAccessor = new DefaultTenantAccessor();
         var tenantService = Mock.Of<ITenantService>().Object;
         var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
-        var clock = Mock.Of<ISystemClock>().Object;
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
@@ -118,7 +119,7 @@ public class RestartInterruptedWorkflowsTaskTests
             CreateWorkflowInstance("workflow-1", "tenant-a", now),
             CreateWorkflowInstance("workflow-2", "tenant-b", now)
         };
-        Mock.Get(clock).UtcNow.Returns(now);
+        timeProvider.SetUtcNow(now);
         Mock.Get(tenantService).FindAsync("tenant-a", Arg.Any<CancellationToken>()).Returns(() => Task.FromException<Tenant?>(new InvalidOperationException("Transient tenant lookup failure")));
         Mock.Get(tenantService).FindAsync("tenant-b", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-b", Name = "Tenant B" });
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
@@ -135,7 +136,7 @@ public class RestartInterruptedWorkflowsTaskTests
             RestartInterruptedWorkflowsBatchSize = 10,
             InactivityThreshold = TimeSpan.FromMinutes(5)
         });
-        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, clock, tenantService, tenantAccessor);
+        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, timeProvider, tenantService, tenantAccessor);
 
         await task.ExecuteAsync(CancellationToken.None);
 
@@ -149,14 +150,14 @@ public class RestartInterruptedWorkflowsTaskTests
     {
         var workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
         var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
-        var clock = Mock.Of<ISystemClock>().Object;
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
         {
             CreateWorkflowInstance("workflow-1", "tenant-a", now)
         };
-        Mock.Get(clock).UtcNow.Returns(now);
+        timeProvider.SetUtcNow(now);
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
                         (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
@@ -171,7 +172,7 @@ public class RestartInterruptedWorkflowsTaskTests
             RestartInterruptedWorkflowsBatchSize = 10,
             InactivityThreshold = TimeSpan.FromMinutes(5)
         });
-        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, clock);
+        var task = new RestartInterruptedWorkflowsTask(workflowRestarter, workflowInstanceStore, logger, options, timeProvider);
 
         await task.ExecuteAsync(CancellationToken.None);
 

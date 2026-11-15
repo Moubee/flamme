@@ -5,6 +5,7 @@ using Elsa.KeyValues.Entities;
 using Elsa.KeyValues.Models;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
@@ -13,14 +14,13 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
 public class QuiescenceSignalPersistenceTests
 {
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IExecutionCycleRegistry _cycleRegistry;
     private readonly FakeKeyValueStore _kv;
 
     public QuiescenceSignalPersistenceTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
         _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
         _kv = new FakeKeyValueStore();
     }
@@ -30,7 +30,7 @@ public class QuiescenceSignalPersistenceTests
     public async Task SessionScopedIgnoresKey()
     {
         _kv.Pairs["elsa.quiescence.host-pause.default"] = new SerializedKeyValuePair { Key = "elsa.quiescence.host-pause.default", SerializedValue = "prior" };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.SessionScoped }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.SessionScoped }), _timeProvider, _cycleRegistry, _kv);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
 
@@ -42,7 +42,7 @@ public class QuiescenceSignalPersistenceTests
     public async Task AcrossReactivationsRestoresPause()
     {
         _kv.Pairs["elsa.quiescence.host-pause.default"] = new SerializedKeyValuePair { Key = "elsa.quiescence.host-pause.default", SerializedValue = "maintenance" };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
 
@@ -60,7 +60,7 @@ public class QuiescenceSignalPersistenceTests
             SerializedValue = "legacy-maintenance",
             TenantId = Tenant.DefaultTenantId
         };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
 
@@ -89,7 +89,7 @@ public class QuiescenceSignalPersistenceTests
             SerializedValue = "stale-legacy",
             TenantId = Tenant.DefaultTenantId
         };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
         await Assert.That(sut.CurrentState.Reason.HasFlag(QuiescenceReason.AdministrativePause)).IsTrue();
@@ -97,7 +97,7 @@ public class QuiescenceSignalPersistenceTests
 
         await sut.ResumeAsync("op", CancellationToken.None);
 
-        var restarted = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var restarted = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
         await restarted.InitializePersistedStateAsync(CancellationToken.None);
 
         await Assert.That(restarted.CurrentState.Reason.HasFlag(QuiescenceReason.AdministrativePause)).IsFalse();
@@ -124,7 +124,7 @@ public class QuiescenceSignalPersistenceTests
             SerializedValue = "legacy-reason",
             TenantId = Tenant.DefaultTenantId
         };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, store);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, store);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
 
@@ -249,7 +249,7 @@ public class QuiescenceSignalPersistenceTests
             SerializedValue = "legacy-reason",
             TenantId = Tenant.DefaultTenantId
         };
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, store);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, store);
 
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             sut.InitializePersistedStateAsync(CancellationToken.None).AsTask());
@@ -262,7 +262,7 @@ public class QuiescenceSignalPersistenceTests
     [DisplayName("Pause writes the persisted key when policy is AcrossReactivations")]
     public async Task PauseWritesKey()
     {
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
 
         await sut.PauseAsync("migration", "op@ex.com", CancellationToken.None);
 
@@ -276,7 +276,7 @@ public class QuiescenceSignalPersistenceTests
     [DisplayName("Resume clears the persisted key when policy is AcrossReactivations")]
     public async Task ResumeClearsKey()
     {
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
         await sut.PauseAsync("migration", "op@ex.com", CancellationToken.None);
 
         await sut.ResumeAsync("op@ex.com", CancellationToken.None);
@@ -290,8 +290,8 @@ public class QuiescenceSignalPersistenceTests
     {
         // Independently named runtime instances sharing a store must not restore one another's pause state.
         // Preserve the existing named-key contract for consumers that supply a runtime name.
-        var sutA = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv, shellName: "shell-a");
-        var sutB = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv, shellName: "shell-b");
+        var sutA = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv, shellName: "shell-a");
+        var sutB = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv, shellName: "shell-b");
 
         await sutA.PauseAsync("migration-a", "op@ex.com", CancellationToken.None);
         await sutB.PauseAsync("migration-b", "op@ex.com", CancellationToken.None);
@@ -315,7 +315,7 @@ public class QuiescenceSignalPersistenceTests
         // paused state the operator had already cancelled. The fix serializes persistence on a dedicated semaphore
         // and re-reads live state inside it, so each I/O writes the most recent in-memory transition.
         var gatedStore = new GatedFakeKeyValueStore();
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, gatedStore);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, gatedStore);
 
         var pauseTask = sut.PauseAsync("migration", "op@ex.com", CancellationToken.None).AsTask();
         await gatedStore.SaveStarted.Task; // Pause holds the persistence mutex; its SaveAsync is blocked.
@@ -337,7 +337,7 @@ public class QuiescenceSignalPersistenceTests
     {
         // The mutex wait honours the caller token so a hung store cannot block a cancelled caller.
         // Persist I/O still uses CancellationToken.None after the in-memory transition.
-        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry, _kv);
+        var sut = QuiescenceSignal.Create(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry, _kv);
         var cancelled = new CancellationToken(canceled: true);
 
         await Assert.ThrowsAsync<OperationCanceledException>(() =>
@@ -351,7 +351,7 @@ public class QuiescenceSignalPersistenceTests
     [DisplayName("Null key-value store is tolerated under AcrossReactivations")]
     public async Task NullKeyValueStoreTolerated()
     {
-        var sut = new QuiescenceSignal(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _clock, _cycleRegistry);
+        var sut = new QuiescenceSignal(Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions { PausePersistence = PausePersistencePolicy.AcrossReactivations }), _timeProvider, _cycleRegistry);
 
         await sut.InitializePersistedStateAsync(CancellationToken.None);
         await sut.PauseAsync("migration", null, CancellationToken.None);
@@ -367,7 +367,7 @@ public class QuiescenceSignalPersistenceTests
     {
         var services = new ServiceCollection();
         services.AddOptions<GracefulShutdownOptions>().Configure(options => options.PausePersistence = PausePersistencePolicy.AcrossReactivations);
-        services.AddSingleton(_clock);
+        services.AddSingleton(_timeProvider);
         services.AddSingleton(_cycleRegistry);
         services.AddScoped<IKeyValueStore>(_ => _kv);
         services.AddSingleton<IQuiescenceSignal, QuiescenceSignal>();
@@ -388,7 +388,7 @@ public class QuiescenceSignalPersistenceTests
             {
                 PausePersistence = PausePersistencePolicy.AcrossReactivations
             }),
-            _clock,
+            _timeProvider,
             _cycleRegistry,
             store);
 

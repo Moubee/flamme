@@ -1,6 +1,7 @@
 using Elsa.Common;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
 
@@ -8,19 +9,18 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
 public class QuiescenceSignalTests
 {
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IExecutionCycleRegistry _cycleRegistry;
     private readonly IOptions<GracefulShutdownOptions> _options;
     private readonly QuiescenceSignal _sut;
 
     public QuiescenceSignalTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
         _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
         Mock.Get(_cycleRegistry).ActiveCount.Returns(0);
         _options = Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions());
-        _sut = new QuiescenceSignal(_options, _clock, _cycleRegistry);
+        _sut = new QuiescenceSignal(_options, _timeProvider, _cycleRegistry);
     }
 
     [Test]

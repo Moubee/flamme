@@ -45,7 +45,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IOptions<GracefulShutdownOptions> _options;
     private readonly IOptions<HostOptions> _hostOptions;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _timeProvider;
     private readonly IIdentityGenerator _identityGenerator;
     private readonly ILogger<DrainOrchestrator> _logger;
 
@@ -60,7 +60,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
         IServiceScopeFactory scopeFactory,
         IOptions<GracefulShutdownOptions> options,
         IOptions<HostOptions> hostOptions,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IIdentityGenerator identityGenerator,
         ILogger<DrainOrchestrator> logger)
     {
@@ -70,7 +70,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
         _scopeFactory = scopeFactory;
         _options = options;
         _hostOptions = hostOptions;
-        _clock = clock;
+        _timeProvider = timeProvider;
         _identityGenerator = identityGenerator;
         _logger = logger;
     }
@@ -94,7 +94,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
             _drainInProgress = true;
         }
 
-        var startedAt = _clock.UtcNow;
+        var startedAt = _timeProvider.GetUtcNow();
         var deadline = ComputeEffectiveDeadline(trigger);
         var sw = Stopwatch.StartNew();
         TimeSpan pausePhase = TimeSpan.Zero;
@@ -141,7 +141,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
             var outcome = new DrainOutcome(
                 OverallResult: result,
                 StartedAt: startedAt,
-                CompletedAt: _clock.UtcNow,
+                CompletedAt: _timeProvider.GetUtcNow(),
                 PausePhaseDuration: pausePhase,
                 WaitPhaseDuration: waitPhase,
                 Sources: BuildSourceFinalStates(),
@@ -163,7 +163,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
             var outcome = new DrainOutcome(
                 OverallResult: DrainResult.AbortedByUnhandledException,
                 StartedAt: startedAt,
-                CompletedAt: _clock.UtcNow,
+                CompletedAt: _timeProvider.GetUtcNow(),
                 PausePhaseDuration: pausePhase,
                 WaitPhaseDuration: waitPhase,
                 Sources: BuildSourceFinalStates(),
@@ -212,7 +212,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
         // configured-default still produces a non-zero CancelAfter.
         var configured = _options.Value.IngressPauseTimeout;
         var sourceDeadline = source.PauseTimeout > TimeSpan.Zero ? source.PauseTimeout : configured;
-        var overallRemaining = deadlineAt - _clock.UtcNow;
+        var overallRemaining = deadlineAt - _timeProvider.GetUtcNow();
         if (sourceDeadline > overallRemaining) sourceDeadline = overallRemaining;
         if (sourceDeadline <= TimeSpan.Zero) sourceDeadline = TimeSpan.FromMilliseconds(1);
 
@@ -243,7 +243,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
 
         // Use the *remaining* budget — not the full overall deadline — so a per-source pause that already
         // burned most of the window can't get another full deadline's worth of force-stop runway.
-        var remaining = deadlineAt - _clock.UtcNow;
+        var remaining = deadlineAt - _timeProvider.GetUtcNow();
         if (remaining <= TimeSpan.Zero)
         {
             _logger.LogWarning("Skipping force-stop of ingress source '{Name}': overall drain deadline already exceeded.", source.Name);
@@ -267,7 +267,7 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
     {
         while (_cycles.ActiveCount > 0)
         {
-            if (_clock.UtcNow >= deadlineAt) return false;
+            if (_timeProvider.GetUtcNow() >= deadlineAt) return false;
             try { await Task.Delay(PollInterval, cancellationToken); }
             catch (OperationCanceledException) { return _cycles.ActiveCount == 0; }
         }
@@ -526,13 +526,13 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
             // recovery can audit what happened. Write a synthetic WorkflowInterrupted log entry with the
             // PersistenceFailure discriminator — the workflow-definition fields are unknown so they remain empty.
             var orphanPayload = new WorkflowInterruptedPayload(
-                InterruptedAt: _clock.UtcNow,
+                InterruptedAt: _timeProvider.GetUtcNow(),
                 Reason: WorkflowInterruptedPayload.ReasonPersistenceFailure,
                 GenerationId: generationId,
                 LastActivityId: null,
                 LastActivityNodeId: null,
                 IngressSourceName: handle.IngressSourceName,
-                ExecutionCycleDuration: _clock.UtcNow - handle.StartedAt);
+                ExecutionCycleDuration: _timeProvider.GetUtcNow() - handle.StartedAt);
             try
             {
                 await logStore.AddAsync(new Entities.WorkflowExecutionLogRecord
@@ -598,13 +598,13 @@ public sealed class DrainOrchestrator : IDrainOrchestrator
         }
 
         var payload = new WorkflowInterruptedPayload(
-            InterruptedAt: _clock.UtcNow,
+            InterruptedAt: _timeProvider.GetUtcNow(),
             Reason: actualReason,
             GenerationId: generationId,
             LastActivityId: null,
             LastActivityNodeId: null,
             IngressSourceName: handle.IngressSourceName,
-            ExecutionCycleDuration: _clock.UtcNow - handle.StartedAt);
+            ExecutionCycleDuration: _timeProvider.GetUtcNow() - handle.StartedAt);
 
         try
         {

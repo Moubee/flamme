@@ -2,6 +2,7 @@ using Elsa.Common;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 /// </summary>
 public abstract class DrainOrchestratorTestsBase
 {
-    protected readonly ISystemClock Clock = Mock.Of<ISystemClock>().Object;
+    protected readonly FakeTimeProvider TimeProvider = new(DateTimeOffset.Parse("2026-04-25T10:00:00Z"));
     protected readonly IQuiescenceSignal Signal = Mock.Of<IQuiescenceSignal>().Object;
     protected readonly IIngressSourceRegistry Registry = Mock.Of<IIngressSourceRegistry>().Object;
     protected readonly IExecutionCycleRegistry ExecutionCycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
@@ -23,11 +24,9 @@ public abstract class DrainOrchestratorTestsBase
     protected readonly IWorkflowExecutionLogStore LogStore = Mock.Of<IWorkflowExecutionLogStore>().Object;
     protected readonly GracefulShutdownOptions Options = new();
     protected readonly HostOptions HostOptionsValue = new() { ShutdownTimeout = TimeSpan.FromSeconds(60) };
-    private DateTimeOffset _now = DateTimeOffset.Parse("2026-04-25T10:00:00Z");
 
     protected DrainOrchestratorTestsBase()
     {
-        Mock.Get(Clock).UtcNow.Returns(() => _now);
         Mock.Get(Signal).CurrentState.Returns(QuiescenceState.Initial("gen-1"));
         Mock.Get(Signal).BeginDrainAsync(Arg.Any<CancellationToken>()).Returns(() => new ValueTask<QuiescenceState>(QuiescenceState.Initial("gen-1")));
         Mock.Get(Registry).Sources.Returns(Array.Empty<IIngressSource>());
@@ -38,9 +37,9 @@ public abstract class DrainOrchestratorTestsBase
                     .Returns(true);
     }
 
-    protected void AdvanceTime(TimeSpan span) => _now += span;
+    protected void AdvanceTime(TimeSpan span) => TimeProvider.Advance(span);
 
-    protected void SetTime(DateTimeOffset value) => _now = value;
+    protected void SetTime(DateTimeOffset value) => TimeProvider.SetUtcNow(value);
 
     protected DrainOrchestrator BuildSut()
     {
@@ -62,7 +61,7 @@ public abstract class DrainOrchestratorTestsBase
             scopeFactory,
             Microsoft.Extensions.Options.Options.Create(Options),
             Microsoft.Extensions.Options.Options.Create(HostOptionsValue),
-            Clock,
+            TimeProvider,
             identityGenerator,
             Mock.Of<ILogger<DrainOrchestrator>>().Object);
     }

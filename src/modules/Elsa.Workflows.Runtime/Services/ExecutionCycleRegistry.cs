@@ -12,12 +12,12 @@ public sealed class ExecutionCycleRegistry : IExecutionCycleRegistry
 {
     private readonly ConcurrentDictionary<Guid, ExecutionCycleHandle> _active = new();
     private readonly IIngressSourceRegistry _sources;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _timeProvider;
 
-    public ExecutionCycleRegistry(IIngressSourceRegistry sources, ISystemClock clock)
+    public ExecutionCycleRegistry(IIngressSourceRegistry sources, TimeProvider timeProvider)
     {
         _sources = sources;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -41,7 +41,7 @@ public sealed class ExecutionCycleRegistry : IExecutionCycleRegistry
             id: Guid.NewGuid(),
             workflowInstanceId: workflowInstanceId,
             ingressSourceName: ingressSourceName,
-            startedAt: _clock.UtcNow,
+            startedAt: _timeProvider.GetUtcNow(),
             linkedToken: linkedToken,
             onDisposed: h => _active.TryRemove(h.Id, out _),
             cancelCallback: cancelCallback);

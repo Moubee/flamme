@@ -4,6 +4,7 @@ using Elsa.KeyValues.Entities;
 using Elsa.KeyValues.Models;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
@@ -15,13 +16,12 @@ public class QuiescenceSignalPersistFailureTests
 {
     private const string PauseKey = "elsa.quiescence.host-pause.default";
 
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IExecutionCycleRegistry _cycleRegistry;
 
     public QuiescenceSignalPersistFailureTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
         _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
     }
 
@@ -109,7 +109,7 @@ public class QuiescenceSignalPersistFailureTests
             {
                 PausePersistence = PausePersistencePolicy.AcrossReactivations
             }),
-            _clock,
+            _timeProvider,
             _cycleRegistry,
             store);
 

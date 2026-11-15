@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Elsa.Workflows.Runtime;
 
-public class WorkflowHeartbeatGeneratorFactory(IOptions<RuntimeOptions> options, ISystemClock systemClock, ILogger<WorkflowHeartbeatMiddleware> logger, ILoggerFactory loggerFactory)
+public class WorkflowHeartbeatGeneratorFactory(IOptions<RuntimeOptions> options, TimeProvider timeProvider, ILogger<WorkflowHeartbeatMiddleware> logger, ILoggerFactory loggerFactory)
 {
     public HeartbeatGenerator CreateHeartbeatGenerator(WorkflowExecutionContext context)
     {
@@ -21,6 +21,6 @@ public class WorkflowHeartbeatGeneratorFactory(IOptions<RuntimeOptions> options,
     {
         var workflowInstanceStore = context.GetRequiredService<IWorkflowInstanceStore>();
         var workflowInstanceId = context.Id;
-        await workflowInstanceStore.UpdateUpdatedTimestampAsync(workflowInstanceId, systemClock.UtcNow, context.CancellationToken);
+        await workflowInstanceStore.UpdateUpdatedTimestampAsync(workflowInstanceId, timeProvider.GetUtcNow(), context.CancellationToken);
     }
 }

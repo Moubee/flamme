@@ -11,7 +11,7 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
 {
     private readonly ConcurrentDictionary<string, Entry> _entries = new(StringComparer.Ordinal);
     private readonly Lazy<IEnumerable<IIngressSource>> _sourcesFactory;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _timeProvider;
     private readonly Lock _materializeSync = new();
     private volatile bool _materialized;
 
@@ -22,10 +22,10 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
     /// <c>IEnumerable&lt;IIngressSource&gt;</c>). The first call that requires <see cref="Sources"/> materializes
     /// the enumerable; subsequent calls reuse the snapshot.
     /// </summary>
-    public IngressSourceRegistry(Lazy<IEnumerable<IIngressSource>> sourcesFactory, ISystemClock clock)
+    public IngressSourceRegistry(Lazy<IEnumerable<IIngressSource>> sourcesFactory, TimeProvider timeProvider)
     {
         _sourcesFactory = sourcesFactory;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -77,7 +77,7 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
             {
                 entry.State = IngressSourceState.PauseFailed;
                 entry.LastError = error ?? new InvalidOperationException(reason);
-                entry.LastTransitionAt = _clock.UtcNow;
+                entry.LastTransitionAt = _timeProvider.GetUtcNow();
             }
         }
         return ValueTask.CompletedTask;
@@ -93,7 +93,7 @@ public sealed class IngressSourceRegistry : IIngressSourceRegistry
             {
                 entry.State = newState;
                 entry.LastError = error;
-                entry.LastTransitionAt = _clock.UtcNow;
+                entry.LastTransitionAt = _timeProvider.GetUtcNow();
             }
         }
     }

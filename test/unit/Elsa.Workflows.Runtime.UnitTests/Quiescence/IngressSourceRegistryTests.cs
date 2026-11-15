@@ -1,17 +1,17 @@
 using Elsa.Common;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
 public class IngressSourceRegistryTests
 {
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
 
     public IngressSourceRegistryTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
     }
 
     [Test]
@@ -20,7 +20,7 @@ public class IngressSourceRegistryTests
     {
         var a = CreateSource("a");
         var b = CreateSource("b");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b }), _timeProvider);
 
         await Assert.That(sut.Sources.Count).IsEqualTo(2);
         await Assert.That(sut.Sources).Contains(a);
@@ -36,7 +36,7 @@ public class IngressSourceRegistryTests
         // until the first call that needs the underlying sources.
         var a = CreateSource("same");
         var b = CreateSource("same");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b }), _timeProvider);
         Assert.ThrowsExactly<InvalidOperationException>(() => _ = sut.Sources);
     }
 
@@ -45,7 +45,7 @@ public class IngressSourceRegistryTests
     public async Task SnapshotIncludesState()
     {
         var a = CreateSource("a");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _timeProvider);
 
         sut.RecordTransition("a", IngressSourceState.Pausing);
 
@@ -53,7 +53,7 @@ public class IngressSourceRegistryTests
         await Assert.That(snap).HasSingleItem();
         await Assert.That(snap.First().Name).IsEqualTo("a");
         await Assert.That(snap.First().State).IsEqualTo(IngressSourceState.Pausing);
-        await Assert.That(snap.First().LastTransitionAt).IsEqualTo(_clock.UtcNow);
+        await Assert.That(snap.First().LastTransitionAt).IsEqualTo(_timeProvider.GetUtcNow());
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class IngressSourceRegistryTests
     public async Task MarkPauseFailedCapturesError()
     {
         var a = CreateSource("a");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _timeProvider);
         var error = new TimeoutException("ingress timed out");
 
         await sut.MarkPauseFailedAsync("a", "timeout", error);
@@ -76,7 +76,7 @@ public class IngressSourceRegistryTests
     public async Task MarkPauseFailedConcurrent()
     {
         var a = CreateSource("a");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a }), _timeProvider);
 
         await Task.WhenAll(Enumerable.Range(0, 100).Select(_ => sut.MarkPauseFailedAsync("a", "race").AsTask()));
 
@@ -93,7 +93,7 @@ public class IngressSourceRegistryTests
         var a = CreateSource("a");
         var b = CreateSource("b");
         var c = CreateSource("c");
-        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b, c }), _clock);
+        var sut = new IngressSourceRegistry(new Lazy<IEnumerable<IIngressSource>>(() => new[] { a, b, c }), _timeProvider);
 
         var startGate = new TaskCompletionSource();
         var readers = Enumerable.Range(0, 16).Select(_ => Task.Run(async () =>

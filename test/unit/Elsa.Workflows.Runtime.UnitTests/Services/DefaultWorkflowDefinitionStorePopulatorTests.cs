@@ -4,6 +4,7 @@ using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Entities;
 using Elsa.Workflows.Management.Filters;
 using Elsa.Workflows.Models;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using Open.Linq.AsyncExtensions;
 using TUnit.Mocks;
@@ -26,7 +27,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
             _storeMock,
             Mock.Of<IActivitySerializer>().Object,
             Mock.Of<IPayloadSerializer>().Object,
-            Mock.Of<ISystemClock>().Object,
+            new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
             Mock.Of<IIdentityGraphService>().Object,
             Mock.Of<ITenantAccessor>().Object,
             Mock.Of<ILogger<DefaultWorkflowDefinitionStorePopulator>>().Object);
@@ -314,7 +315,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
             _storeMock,
             Mock.Of<IActivitySerializer>().Object,
             Mock.Of<IPayloadSerializer>().Object,
-            Mock.Of<ISystemClock>().Object,
+            new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
             Mock.Of<IIdentityGraphService>().Object,
             tenantAccessor,
             Mock.Of<ILogger<DefaultWorkflowDefinitionStorePopulator>>().Object);

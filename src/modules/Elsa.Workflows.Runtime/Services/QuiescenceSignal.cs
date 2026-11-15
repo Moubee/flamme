@@ -23,7 +23,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
     // Held across the whole Pause/Resume (fast-path, transition, persist, revert). Pause/resume aren't hot paths.
     private readonly SemaphoreSlim _persistenceMutex = new(1, 1);
     private readonly IOptions<GracefulShutdownOptions> _options;
-    private readonly ISystemClock _clock;
+    private readonly TimeProvider _timeProvider;
     private readonly IKeyValueStore? _keyValueStore;
     private readonly IServiceScopeFactory? _serviceScopeFactory;
     private readonly ITenantAccessor? _tenantAccessor;
@@ -47,20 +47,20 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
     [ActivatorUtilitiesConstructor]
     public QuiescenceSignal(
         IOptions<GracefulShutdownOptions> options,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IExecutionCycleRegistry cycleRegistry,
         IServiceScopeFactory serviceScopeFactory,
         string? shellName = null,
-        string? generationId = null) : this(options, clock, cycleRegistry, keyValueStore: null, serviceScopeFactory, tenantAccessor: null, shellName, generationId)
+        string? generationId = null) : this(options, timeProvider, cycleRegistry, keyValueStore: null, serviceScopeFactory, tenantAccessor: null, shellName, generationId)
     {
     }
 
     public QuiescenceSignal(
         IOptions<GracefulShutdownOptions> options,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IExecutionCycleRegistry cycleRegistry,
         string? shellName = null,
-        string? generationId = null) : this(options, clock, cycleRegistry, keyValueStore: null, serviceScopeFactory: null, tenantAccessor: null, shellName, generationId)
+        string? generationId = null) : this(options, timeProvider, cycleRegistry, keyValueStore: null, serviceScopeFactory: null, tenantAccessor: null, shellName, generationId)
     {
     }
 
@@ -69,11 +69,11 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
     /// </summary>
     public static QuiescenceSignal Create(
         IOptions<GracefulShutdownOptions> options,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IExecutionCycleRegistry cycleRegistry,
         IKeyValueStore? keyValueStore = null,
         string? shellName = null,
-        string? generationId = null) => new(options, clock, cycleRegistry, keyValueStore, serviceScopeFactory: null, tenantAccessor: null, shellName, generationId);
+        string? generationId = null) => new(options, timeProvider, cycleRegistry, keyValueStore, serviceScopeFactory: null, tenantAccessor: null, shellName, generationId);
 
     /// <summary>
     /// Creates the signal with a fixed key-value store and tenant accessor. Test helper only —
@@ -81,16 +81,16 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
     /// </summary>
     internal static QuiescenceSignal Create(
         IOptions<GracefulShutdownOptions> options,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IExecutionCycleRegistry cycleRegistry,
         IKeyValueStore keyValueStore,
         ITenantAccessor tenantAccessor,
         string? shellName = null,
-        string? generationId = null) => new(options, clock, cycleRegistry, keyValueStore, serviceScopeFactory: null, tenantAccessor, shellName, generationId);
+        string? generationId = null) => new(options, timeProvider, cycleRegistry, keyValueStore, serviceScopeFactory: null, tenantAccessor, shellName, generationId);
 
     private QuiescenceSignal(
         IOptions<GracefulShutdownOptions> options,
-        ISystemClock clock,
+        TimeProvider timeProvider,
         IExecutionCycleRegistry cycleRegistry,
         IKeyValueStore? keyValueStore,
         IServiceScopeFactory? serviceScopeFactory,
@@ -99,7 +99,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
         string? generationId)
     {
         _options = options;
-        _clock = clock;
+        _timeProvider = timeProvider;
         _cycleRegistry = cycleRegistry;
         _keyValueStore = keyValueStore;
         _serviceScopeFactory = serviceScopeFactory;
@@ -145,7 +145,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
             var next = _state with
             {
                 Reason = _state.Reason | QuiescenceReason.AdministrativePause,
-                PausedAt = _clock.UtcNow,
+                PausedAt = _timeProvider.GetUtcNow(),
                 PauseReasonText = pair.SerializedValue,
                 PauseRequestedBy = "persisted",
             };
@@ -167,7 +167,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
             next = _state with
             {
                 Reason = _state.Reason | QuiescenceReason.Drain,
-                DrainStartedAt = _clock.UtcNow,
+                DrainStartedAt = _timeProvider.GetUtcNow(),
             };
             Volatile.Write(ref _state, next);
         }
@@ -192,7 +192,7 @@ public sealed class QuiescenceSignal : IQuiescenceSignal
                 next = _state with
                 {
                     Reason = _state.Reason | QuiescenceReason.AdministrativePause,
-                    PausedAt = _clock.UtcNow,
+                    PausedAt = _timeProvider.GetUtcNow(),
                     PauseReasonText = reasonText,
                     PauseRequestedBy = requestedBy,
                 };

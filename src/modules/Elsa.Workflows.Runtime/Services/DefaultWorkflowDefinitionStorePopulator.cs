@@ -18,7 +18,7 @@ public class DefaultWorkflowDefinitionStorePopulator : IWorkflowDefinitionStoreP
     private readonly IWorkflowDefinitionStore _workflowDefinitionStore;
     private readonly IActivitySerializer _activitySerializer;
     private readonly IPayloadSerializer _payloadSerializer;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly IIdentityGraphService _identityGraphService;
     private readonly ITenantAccessor _tenantAccessor;
     private readonly ILogger<DefaultWorkflowDefinitionStorePopulator> _logger;
@@ -33,7 +33,7 @@ public class DefaultWorkflowDefinitionStorePopulator : IWorkflowDefinitionStoreP
         IWorkflowDefinitionStore workflowDefinitionStore,
         IActivitySerializer activitySerializer,
         IPayloadSerializer payloadSerializer,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         IIdentityGraphService identityGraphService,
         ITenantAccessor tenantAccessor,
         ILogger<DefaultWorkflowDefinitionStorePopulator> logger)
@@ -43,7 +43,7 @@ public class DefaultWorkflowDefinitionStorePopulator : IWorkflowDefinitionStoreP
         _workflowDefinitionStore = workflowDefinitionStore;
         _activitySerializer = activitySerializer;
         _payloadSerializer = payloadSerializer;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _identityGraphService = identityGraphService;
         _tenantAccessor = tenantAccessor;
         _logger = logger;
@@ -227,7 +227,7 @@ public class DefaultWorkflowDefinitionStorePopulator : IWorkflowDefinitionStoreP
         workflowDefinition.Outcomes = workflow.Outcomes;
         workflowDefinition.StringData = stringData;
         workflowDefinition.OriginalSource = originalSource;
-        workflowDefinition.CreatedAt = workflow.WorkflowMetadata.CreatedAt == default ? _systemClock.UtcNow : workflow.WorkflowMetadata.CreatedAt;
+        workflowDefinition.CreatedAt = workflow.WorkflowMetadata.CreatedAt == default ? _timeProvider.GetUtcNow() : workflow.WorkflowMetadata.CreatedAt;
         workflowDefinition.Options = workflow.Options;
         workflowDefinition.ProviderName = materializedWorkflow.ProviderName;
         workflowDefinition.MaterializerContext = materializerContextJson;

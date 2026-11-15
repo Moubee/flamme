@@ -283,7 +283,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
         Services
             .AddSingleton<IQuiescenceSignal>(sp => new Elsa.Workflows.Runtime.Services.QuiescenceSignal(
                 sp.GetRequiredService<IOptions<GracefulShutdownOptions>>(),
-                sp.GetRequiredService<ISystemClock>(),
+                sp.GetRequiredService<TimeProvider>(),
                 sp.GetRequiredService<IExecutionCycleRegistry>(),
                 sp.GetRequiredService<IServiceScopeFactory>()))
             .AddSingleton<IIngressSourceRegistry, Elsa.Workflows.Runtime.Services.IngressSourceRegistry>()

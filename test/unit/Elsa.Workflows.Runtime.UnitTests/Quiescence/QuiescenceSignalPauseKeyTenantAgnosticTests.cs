@@ -6,6 +6,7 @@ using Elsa.KeyValues.Models;
 using Elsa.KeyValues.Stores;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using TUnit.Mocks;
 
 namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
@@ -18,7 +19,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticTests
 {
     private const string PauseKey = "elsa.quiescence.host-pause.default";
 
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IExecutionCycleRegistry _cycleRegistry;
     private readonly DefaultTenantAccessor _tenantAccessor;
     private readonly MemoryStore<SerializedKeyValuePair> _backing;
@@ -26,8 +27,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticTests
 
     public QuiescenceSignalPauseKeyTenantAgnosticTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
         _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
         _tenantAccessor = new DefaultTenantAccessor();
         _backing = new MemoryStore<SerializedKeyValuePair>();
@@ -103,7 +103,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticTests
             {
                 PausePersistence = PausePersistencePolicy.AcrossReactivations
             }),
-            _clock,
+            _timeProvider,
             _cycleRegistry,
             store,
             recording);
@@ -120,7 +120,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticTests
             {
                 PausePersistence = PausePersistencePolicy.AcrossReactivations
             }),
-            _clock,
+            _timeProvider,
             _cycleRegistry,
             _store,
             _tenantAccessor);

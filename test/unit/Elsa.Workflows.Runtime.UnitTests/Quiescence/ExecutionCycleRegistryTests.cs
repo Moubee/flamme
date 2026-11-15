@@ -1,5 +1,6 @@
 using Elsa.Common;
 using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Time.Testing;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
@@ -7,13 +8,12 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 
 public class ExecutionCycleRegistryTests
 {
-    private readonly ISystemClock _clock;
+    private readonly FakeTimeProvider _timeProvider;
     private readonly IIngressSourceRegistry _sources;
 
     public ExecutionCycleRegistryTests()
     {
-        _clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(_clock).UtcNow.Returns(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
         _sources = Mock.Of<IIngressSourceRegistry>().Object;
         Mock.Get(_sources).Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
     }
@@ -22,7 +22,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("Active count increases and decreases with begin/dispose")]
     public async Task ActiveCountFollowsExecutionCycleLifecycle()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
 
         await Assert.That(sut.ActiveCount).IsEqualTo(0);
 
@@ -43,7 +43,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("Begin with null ingress name does NOT flip any source")]
     public void NullIngressNameDoesNotFlip()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: null, CancellationToken.None);
 
@@ -54,10 +54,10 @@ public class ExecutionCycleRegistryTests
     [DisplayName("Begin from a Paused source flips it to PauseFailed (FR-018)")]
     public void PausedSourceDeliveringIsFlipped()
     {
-        var now = _clock.UtcNow;
+        var now = _timeProvider.GetUtcNow();
         var snapshot = new[] { new IngressSourceSnapshot("http.trigger", IngressSourceState.Paused, null, now) };
         Mock.Get(_sources).Snapshot().Returns(snapshot);
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: "http.trigger", CancellationToken.None);
 
@@ -68,10 +68,10 @@ public class ExecutionCycleRegistryTests
     [DisplayName("Begin from a Running source does NOT flip")]
     public void RunningSourceIsNotFlipped()
     {
-        var now = _clock.UtcNow;
+        var now = _timeProvider.GetUtcNow();
         var snapshot = new[] { new IngressSourceSnapshot("http.trigger", IngressSourceState.Running, null, now) };
         Mock.Get(_sources).Snapshot().Returns(snapshot);
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
 
         using var _ = sut.BeginCycle("instance-1", ingressSourceName: "http.trigger", CancellationToken.None);
 
@@ -82,7 +82,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ListActiveCycles returns a snapshot of live handles")]
     public async Task ListActiveCyclesReturnsSnapshot()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         var a = sut.BeginCycle("instance-1", null, CancellationToken.None);
         var b = sut.BeginCycle("instance-2", null, CancellationToken.None);
 
@@ -100,7 +100,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.Cancel triggers the cancellation token")]
     public async Task ExecutionCycleHandleCancelFiresToken()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         using var handle = sut.BeginCycle("instance-1", null, CancellationToken.None);
 
         await Assert.That(handle.CancellationToken.IsCancellationRequested).IsFalse();
@@ -112,7 +112,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.TryCancel reports whether this call transitioned the handle")]
     public async Task ExecutionCycleHandleTryCancelReportsTransition()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         var handle = sut.BeginCycle("instance-1", null, CancellationToken.None);
 
         await Assert.That(handle.TryCancel()).IsTrue();
@@ -130,7 +130,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.TryCancel reports false when disposed during the cancellation callback")]
     public async Task TryCancelReportsFalseWhenDisposedDuringCancellationCallback()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         var callbackEntered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var releaseCallback = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var handle = sut.BeginCycle(
@@ -251,7 +251,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.Cancel invokes the cancel callback supplied at registration")]
     public async Task CancelCallbackIsInvoked()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         var callbackInvocations = 0;
         using var handle = sut.BeginCycle(
             "instance-1",
@@ -277,7 +277,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.Cancel swallows callback exceptions so drain is not interrupted")]
     public async Task CancelCallbackExceptionsAreSwallowed()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         using var handle = sut.BeginCycle(
             "instance-1",
             ingressSourceName: null,
@@ -331,7 +331,7 @@ public class ExecutionCycleRegistryTests
     [DisplayName("ExecutionCycleHandle.Disposed completes when the handle is disposed")]
     public async Task DisposedTaskCompletesOnDispose()
     {
-        var sut = new ExecutionCycleRegistry(_sources, _clock);
+        var sut = new ExecutionCycleRegistry(_sources, _timeProvider);
         var handle = sut.BeginCycle("instance-1", null, CancellationToken.None);
 
         await Assert.That(handle.Disposed.IsCompleted).IsFalse();
