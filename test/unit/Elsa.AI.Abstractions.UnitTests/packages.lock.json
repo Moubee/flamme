@@ -2,6 +2,12 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "Microsoft.Extensions.TimeProvider.Testing": {
+        "type": "Direct",
+        "requested": "[11.0.0, )",
+        "resolved": "11.0.0",
+        "contentHash": "GMXLbXAPI1GrcNQJQCHr0jgH/5fdPAGI4easP0KwMeJ6neSeWFeZcd8PhxDlII8TVXO1UctHl/4OC0sYZS4iuA=="
+      },
       "Microsoft.NET.ILLink.Tasks": {
         "type": "Direct",
         "requested": "[10.0.15, )",
@@ -638,6 +644,7 @@
           "Elsa.Expressions.JavaScript": "[1.0.0, )",
           "Elsa.Expressions.Liquid": "[1.0.0, )",
           "Microsoft.AspNetCore.TestHost": "[10.0.15, )",
+          "Microsoft.Extensions.TimeProvider.Testing": "[11.0.0, )",
           "Npgsql": "[10.0.3, )",
           "TUnit.Mocks": "[1.84.0, )",
           "Testcontainers.PostgreSql": "[4.16.0, )"
@@ -1063,6 +1070,12 @@
       }
     },
     "net11.0": {
+      "Microsoft.Extensions.TimeProvider.Testing": {
+        "type": "Direct",
+        "requested": "[11.0.0, )",
+        "resolved": "11.0.0",
+        "contentHash": "GMXLbXAPI1GrcNQJQCHr0jgH/5fdPAGI4easP0KwMeJ6neSeWFeZcd8PhxDlII8TVXO1UctHl/4OC0sYZS4iuA=="
+      },
       "Microsoft.NET.ILLink.Tasks": {
         "type": "Direct",
         "requested": "[11.0.0, )",
@@ -1648,6 +1661,7 @@
           "Elsa.Expressions.JavaScript": "[1.0.0, )",
           "Elsa.Expressions.Liquid": "[1.0.0, )",
           "Microsoft.AspNetCore.TestHost": "[11.0.0, )",
+          "Microsoft.Extensions.TimeProvider.Testing": "[11.0.0, )",
           "Npgsql": "[10.0.3, )",
           "TUnit.Mocks": "[1.84.0, )",
           "Testcontainers.PostgreSql": "[4.16.0, )"

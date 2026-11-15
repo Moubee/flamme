@@ -1,8 +1,12 @@
 namespace Elsa.Common.Services;
 
 /// <inheritdoc />
-public class SystemClock : ISystemClock
+public class SystemClock(TimeProvider timeProvider) : ISystemClock
 {
+    public SystemClock() : this(TimeProvider.System)
+    {
+    }
+
     /// <inheritdoc />
-    public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+    public DateTimeOffset UtcNow => timeProvider.GetUtcNow();
 }
