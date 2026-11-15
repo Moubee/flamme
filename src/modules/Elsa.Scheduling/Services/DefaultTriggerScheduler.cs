@@ -11,7 +11,7 @@ namespace Elsa.Scheduling.Services;
 /// <summary>
 /// A default implementation of <see cref="ITriggerScheduler"/> that schedules triggers using <see cref="IWorkflowScheduler"/>.
 /// </summary>
-public class DefaultTriggerScheduler(IWorkflowScheduler workflowScheduler, ISystemClock systemClock, ILogger<DefaultTriggerScheduler> logger)
+public class DefaultTriggerScheduler(IWorkflowScheduler workflowScheduler, TimeProvider timeProvider, ILogger<DefaultTriggerScheduler> logger)
     : ITriggerScheduler
 {
     /// <inheritdoc />
@@ -21,7 +21,7 @@ public class DefaultTriggerScheduler(IWorkflowScheduler workflowScheduler, ISyst
         var timerTriggers = triggerList.Filter<Activities.Timer>();
         var startAtTriggers = triggerList.Filter<StartAt>();
         var cronTriggers = triggerList.Filter<Cron>();
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
 
         // Schedule each Timer trigger.
         foreach (var trigger in timerTriggers)

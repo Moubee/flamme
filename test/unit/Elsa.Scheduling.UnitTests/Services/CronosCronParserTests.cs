@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Common;
 using Elsa.Scheduling.Services;
 
@@ -95,6 +96,23 @@ public class CronosCronParserTests
         await Assert.That(() => parser.GetNextOccurrence(cronExpression)).Throws<Exception>();
     }
 
+    [Test]
+    [Arguments(-1)]
+    [Arguments(0)]
+    [Arguments(1)]
+    public async Task GetNextOccurrence_PreservesUtcMinuteBoundaryWithANonUtcLocalZone(int offsetTicks)
+    {
+        var boundary = new DateTimeOffset(2026, 11, 15, 12, 1, 0, TimeSpan.Zero);
+        var timeProvider = new FakeTimeProvider(boundary.AddTicks(offsetTicks));
+        timeProvider.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("test-offset", TimeSpan.FromHours(3), "test-offset", "test-offset"));
+        var parser = new CronosCronParser(timeProvider);
+
+        var occurrence = parser.GetNextOccurrence("0 * * * * *");
+
+        await Assert.That(occurrence).IsEqualTo(offsetTicks < 0 ? boundary : boundary.AddMinutes(1));
+        await Assert.That(occurrence.Offset).IsEqualTo(TimeSpan.Zero);
+    }
+
     private static CronosCronParser CreateParser(out DateTimeOffset now)
     {
         now = new DateTimeOffset(2025, 1, 6, 12, 0, 0, TimeSpan.Zero);
@@ -103,8 +121,7 @@ public class CronosCronParserTests
 
     private static CronosCronParser CreateParser(DateTimeOffset now)
     {
-        var clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(clock).UtcNow.Returns(now);
-        return new CronosCronParser(clock);
+        var timeProvider = new FakeTimeProvider(now);
+        return new CronosCronParser(timeProvider);
     }
 }

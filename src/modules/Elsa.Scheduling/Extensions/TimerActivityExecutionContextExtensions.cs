@@ -23,8 +23,8 @@ public static class TimerActivityExecutionContextExtensions
             return;
         }
         
-        var clock = context.ExpressionExecutionContext.GetRequiredService<ISystemClock>();
-        var resumeAt = clock.UtcNow.Add(interval);
+        var timeProvider = context.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var resumeAt = timeProvider.GetUtcNow().Add(interval);
 
         var bookmarkOptions = new CreateBookmarkArgs
         {
@@ -37,8 +37,8 @@ public static class TimerActivityExecutionContextExtensions
     
     public static TimerTriggerPayload GetTimerTriggerStimulus(this TriggerIndexingContext context, TimeSpan interval)
     {
-        var clock = context.ExpressionExecutionContext.GetRequiredService<ISystemClock>();
-        var executeAt = clock.UtcNow.Add(interval);
+        var timeProvider = context.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var executeAt = timeProvider.GetUtcNow().Add(interval);
         context.TriggerName = SchedulingStimulusNames.Timer;
         return new(executeAt, interval);
     }

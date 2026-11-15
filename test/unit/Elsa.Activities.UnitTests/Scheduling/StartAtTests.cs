@@ -69,6 +69,28 @@ public class StartAtTests
         await Assert.That(context.JournalData["Executed At"]).IsEqualTo(now);
     }
 
+    [Test]
+    [Arguments(-1)]
+    [Arguments(0)]
+    [Arguments(1)]
+    public async Task ExecuteBehavior_PreservesTheExactUtcTickBoundary(int offsetTicks)
+    {
+        var now = new DateTimeOffset(2026, 11, 15, 12, 0, 0, TimeSpan.Zero).AddTicks(1234567);
+        var executeAt = now.AddTicks(offsetTicks);
+        var context = await ExecuteAsync(new StartAt(executeAt), now);
+
+        await Assert.That(context.JournalData["Executed At"]).IsEqualTo(now);
+        if (offsetTicks > 0)
+        {
+            await Assert.That((await GetStartAtPayload(context)).ExecuteAt).IsEqualTo(executeAt);
+        }
+        else
+        {
+            await Assert.That(context.Status).IsEqualTo(ActivityStatus.Completed);
+            await Assert.That(context.WorkflowExecutionContext.Bookmarks).IsEmpty();
+        }
+    }
+
     private static async Task<ActivityExecutionContext> ExecuteAsync(StartAt activity, DateTimeOffset? clockTime = null)
     {
         var clock = new FakeTimeProvider(clockTime ?? DateTimeOffset.UnixEpoch);

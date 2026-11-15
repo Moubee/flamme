@@ -17,8 +17,8 @@ public static class DelayActivityExecutionContextExtensions
     /// <param name="callback">The delegate to execute when the activity resumes.</param>
     public static void DelayFor(this ActivityExecutionContext context, TimeSpan delay, ExecuteActivityDelegate? callback = null)
     {
-        var clock = context.ExpressionExecutionContext.GetRequiredService<ISystemClock>();
-        var resumeAt = clock.UtcNow.Add(delay);
+        var timeProvider = context.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var resumeAt = timeProvider.GetUtcNow().Add(delay);
         
         DelayUntil(context, resumeAt, callback);
     }

@@ -83,8 +83,8 @@ public class StartAt : Trigger
         }
 
         var executeAt = context.ExpressionExecutionContext.Get(DateTime);
-        var clock = context.ExpressionExecutionContext.GetRequiredService<ISystemClock>();
-        var now = clock.UtcNow;
+        var timeProvider = context.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var now = timeProvider.GetUtcNow();
         var logger = context.GetRequiredService<ILogger<StartAt>>();
 
         context.JournalData.Add("Executed At", now);

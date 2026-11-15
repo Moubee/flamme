@@ -8,21 +8,21 @@ namespace Elsa.Scheduling.Services;
 /// </summary>
 public class CronosCronParser : ICronParser
 {
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CronosCronParser"/> class.
     /// </summary>
-    public CronosCronParser(ISystemClock systemClock)
+    public CronosCronParser(TimeProvider timeProvider)
     {
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
     }
     
     /// <inheritdoc />
     public DateTimeOffset GetNextOccurrence(string expression)
     {
         var parsedExpression = CronExpression.Parse(expression, CronFormat.IncludeSeconds);
-        var now = _systemClock.UtcNow;
+        var now = _timeProvider.GetUtcNow();
         return parsedExpression.GetNextOccurrence(now, TimeZoneInfo.Utc).GetValueOrDefault();
     }
 }

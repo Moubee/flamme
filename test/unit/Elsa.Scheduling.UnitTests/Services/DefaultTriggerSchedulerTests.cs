@@ -5,6 +5,7 @@ using Elsa.Scheduling.Services;
 using Elsa.Workflows.Helpers;
 using Elsa.Workflows.Runtime.Entities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Scheduling.UnitTests.Services;
 
@@ -14,9 +15,9 @@ public class DefaultTriggerSchedulerTests
     public async Task ScheduleAsync_SchedulesPastDueStartAtTriggerForCatchUp()
     {
         var workflowScheduler = Mock.Of<IWorkflowScheduler>().Object;
-        var systemClock = Mock.Of<ISystemClock>().Object;
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.UnixEpoch);
         var logger = Mock.Of<ILogger<DefaultTriggerScheduler>>().Object;
-        var scheduler = new DefaultTriggerScheduler(workflowScheduler, systemClock, logger);
+        var scheduler = new DefaultTriggerScheduler(workflowScheduler, timeProvider, logger);
         var now = new DateTimeOffset(2025, 11, 06, 22, 50, 00, TimeSpan.Zero);
         var executeAt = now.AddMinutes(-5);
         ScheduleNewWorkflowInstanceRequest? scheduledRequest = null;
@@ -28,7 +29,7 @@ public class DefaultTriggerSchedulerTests
             ActivityId = "activity-1",
             Payload = new StartAtPayload(executeAt)
         };
-        Mock.Get(systemClock).UtcNow.Returns(now);
+        timeProvider.SetUtcNow(now);
         Mock.Get(workflowScheduler).ScheduleAtAsync(trigger.Id, Arg.Any<ScheduleNewWorkflowInstanceRequest>(), executeAt, Arg.Any<CancellationToken>()).Callback((string _, ScheduleNewWorkflowInstanceRequest request, DateTimeOffset _, CancellationToken _) => scheduledRequest = request);
 
         await scheduler.ScheduleAsync([trigger], CancellationToken.None);
