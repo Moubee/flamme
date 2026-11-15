@@ -30,7 +30,8 @@ public class AlterationJobTimeTests
         await Assert.That(result.StartedAt).IsEqualTo(initialUtc);
         await Assert.That(result.CompletedAt).IsEqualTo(initialUtc.AddMinutes(5));
         await Assert.That(result.Status).IsEqualTo(AlterationJobStatus.Completed);
-        await Assert.That(result.Log.Single().Timestamp).IsEqualTo(initialUtc.AddMinutes(5));
+        var log = await Assert.That(result.Log).IsNotNull();
+        await Assert.That(log.Single().Timestamp).IsEqualTo(initialUtc.AddMinutes(5));
     }
 
     private sealed class AdvancingRunner(FakeTimeProvider time) : IAlterationRunner

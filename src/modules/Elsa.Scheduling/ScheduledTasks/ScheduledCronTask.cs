@@ -80,7 +80,7 @@ public class ScheduledCronTask : IScheduledTask, IDisposable
 
     private void TrySetupTimer(TimeSpan delay)
     {
-        // Handle edge cases where delay is zero or negative (e.g., due to timeProvider drift, fast execution, or time alignment)
+        // Handle edge cases where delay is zero or negative (e.g., due to clock drift, fast execution, or time alignment)
         // Instead of silently returning, use a minimum delay to ensure the timer fires and workflow continues scheduling
         if (delay <= TimeSpan.Zero)
         {
