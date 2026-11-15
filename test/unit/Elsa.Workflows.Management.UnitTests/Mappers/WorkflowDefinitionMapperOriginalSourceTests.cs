@@ -55,7 +55,7 @@ public class WorkflowDefinitionMapperOriginalSourceTests
     [Test]
     public async Task Map_WhenOnlyOriginalSourceIsPresent_UsesOriginalSource()
     {
-        var sourceRoot = new WriteLine("from-elsascript-equivalent");
+        var sourceRoot = new WriteLine("from-original-source");
         Mock.Get(_activitySerializer).Deserialize<WorkflowDefinitionModel>("SOURCE")
                     .Returns(new WorkflowDefinitionModel
                     {

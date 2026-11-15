@@ -1,6 +1,4 @@
 using Elsa.Common.Models;
-using Elsa.Dsl.ElsaScript.Contracts;
-using Elsa.Dsl.ElsaScript.Materializers;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Management;
@@ -18,20 +16,20 @@ namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowReferenceUpdaterOriginalSourceTests
 {
-    private const string ElsaScriptSource = "workflow Consumer { WriteLine(\"from-elsascript\"); }";
+    private const string CustomSource = "custom workflow source";
 
     [Test]
-    public async Task UpdateWorkflowReferencesAsync_SkipsElsaScriptConsumerAndUpdatesJsonConsumer()
+    public async Task UpdateWorkflowReferencesAsync_SkipsSourceOnlyConsumerAndUpdatesJsonConsumer()
     {
         var target = CreateTargetDefinition();
-        var elsaScriptConsumer = CreateElsaScriptConsumer();
+        var sourceOnlyConsumer = CreateSourceOnlyConsumer();
         var jsonConsumer = CreateJsonConsumer();
-        var elsaScriptGraph = CreateConsumerGraph(elsaScriptConsumer, target, "elsa-consumer-workflow");
+        var sourceOnlyGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var jsonGraph = CreateConsumerGraph(jsonConsumer, target, "json-consumer-workflow");
         var logger = new CollectingLogger();
         var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
         var activityRegistry = Mock.Of<IActivityRegistry>().Object;
-        var updater = CreateUpdater(target, [elsaScriptConsumer, jsonConsumer], [elsaScriptGraph, jsonGraph], publisher, logger, activityRegistry, out _);
+        var updater = CreateUpdater(target, [sourceOnlyConsumer, jsonConsumer], [sourceOnlyGraph, jsonGraph], publisher, logger, activityRegistry, out _);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
 
@@ -41,53 +39,46 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         await Assert.That(updated.OriginalSource).IsNull();
         await Assert.That(updated.MaterializerName).IsEqualTo(JsonWorkflowMaterializer.MaterializerName);
 
-        await Assert.That(elsaScriptConsumer.OriginalSource).IsEqualTo(ElsaScriptSource);
-        await Assert.That(elsaScriptConsumer.StringData).IsNull();
-        await Assert.That(elsaScriptConsumer.MaterializerName).IsEqualTo("ElsaScript");
-        await Assert.That(elsaScriptConsumer.Id).IsEqualTo("consumer-elsascript-v1");
+        await Assert.That(sourceOnlyConsumer.OriginalSource).IsEqualTo(CustomSource);
+        await Assert.That(sourceOnlyConsumer.StringData).IsNull();
+        await Assert.That(sourceOnlyConsumer.MaterializerName).IsEqualTo("CustomSource");
+        await Assert.That(sourceOnlyConsumer.Id).IsEqualTo("consumer-source-v1");
 
-        var compiler = Mock.Of<IElsaScriptCompiler>().Object;
-        Mock.Get(compiler).CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-                    .Returns(new Workflow());
-        var materializer = new ElsaScriptWorkflowMaterializer(compiler);
-        await materializer.MaterializeAsync(elsaScriptConsumer, CancellationToken.None);
-        Mock.Get(compiler).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
-
-        Mock.Get(publisher).GetDraftAsync(elsaScriptConsumer.DefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>()).WasNeverCalled();
-        Mock.Get(publisher).SaveDraftAsync(elsaScriptConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
-        Mock.Get(publisher).PublishAsync(elsaScriptConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).GetDraftAsync(sourceOnlyConsumer.DefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).SaveDraftAsync(sourceOnlyConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(publisher).PublishAsync(sourceOnlyConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(publisher).SaveDraftAsync(jsonConsumer, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         await Assert.That(logger.Messages).Contains(message =>
-            message.Contains(elsaScriptConsumer.DefinitionId, StringComparison.Ordinal)
+            message.Contains(sourceOnlyConsumer.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.Version.ToString(), StringComparison.Ordinal)
             && message.Contains("must be updated manually", StringComparison.Ordinal));
     }
 
     [Test]
-    public async Task UpdateWorkflowReferencesAsync_WhenPublishedElsaScriptConsumerIsOutdated_DoesNotCreateOrRegisterDraft()
+    public async Task UpdateWorkflowReferencesAsync_WhenPublishedSourceOnlyConsumerIsOutdated_DoesNotCreateOrRegisterDraft()
     {
         var target = CreateTargetDefinition();
-        var elsaScriptConsumer = CreateElsaScriptConsumer(isPublished: true);
-        var consumerGraph = CreateConsumerGraph(elsaScriptConsumer, target, "elsa-consumer-workflow");
+        var sourceOnlyConsumer = CreateSourceOnlyConsumer(isPublished: true);
+        var consumerGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var logger = new CollectingLogger();
         var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
         var activityRegistry = Mock.Of<IActivityRegistry>().Object;
-        var updater = CreateUpdater(target, [elsaScriptConsumer], [consumerGraph], publisher, logger, activityRegistry, out var store);
+        var updater = CreateUpdater(target, [sourceOnlyConsumer], [consumerGraph], publisher, logger, activityRegistry, out var store);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
 
         await Assert.That(result.UpdatedWorkflows).IsEmpty();
-        await Assert.That(elsaScriptConsumer.OriginalSource).IsEqualTo(ElsaScriptSource);
-        await Assert.That(elsaScriptConsumer.IsPublished).IsTrue();
-        await Assert.That(elsaScriptConsumer.Version).IsEqualTo(1);
+        await Assert.That(sourceOnlyConsumer.OriginalSource).IsEqualTo(CustomSource);
+        await Assert.That(sourceOnlyConsumer.IsPublished).IsTrue();
+        await Assert.That(sourceOnlyConsumer.Version).IsEqualTo(1);
 
         var stored = await store.FindAsync(new WorkflowDefinitionFilter
         {
-            DefinitionId = elsaScriptConsumer.DefinitionId,
+            DefinitionId = sourceOnlyConsumer.DefinitionId,
             VersionOptions = VersionOptions.Latest
         }, CancellationToken.None);
-        await Assert.That(stored).IsSameReferenceAs(elsaScriptConsumer);
+        await Assert.That(stored).IsSameReferenceAs(sourceOnlyConsumer);
         await Assert.That(stored!.IsPublished).IsTrue();
         await Assert.That(stored.Version).IsEqualTo(1);
 
@@ -96,14 +87,8 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         Mock.Get(publisher).PublishAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(activityRegistry).Add(Arg.Any<Type>(), Arg.Any<ActivityDescriptor>()).WasNeverCalled();
         await Assert.That(logger.Messages).Contains(message =>
-            message.Contains(elsaScriptConsumer.DefinitionId, StringComparison.Ordinal)
+            message.Contains(sourceOnlyConsumer.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.DefinitionId, StringComparison.Ordinal));
-
-        var compiler = Mock.Of<IElsaScriptCompiler>().Object;
-        Mock.Get(compiler).CompileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-                    .Returns(new Workflow());
-        await new ElsaScriptWorkflowMaterializer(compiler).MaterializeAsync(elsaScriptConsumer, CancellationToken.None);
-        Mock.Get(compiler).CompileAsync(ElsaScriptSource, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private static WorkflowReferenceUpdater CreateUpdater(
@@ -179,18 +164,18 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         };
     }
 
-    private static WorkflowDefinition CreateElsaScriptConsumer(bool isPublished = false)
+    private static WorkflowDefinition CreateSourceOnlyConsumer(bool isPublished = false)
     {
         return new()
         {
-            Id = "consumer-elsascript-v1",
-            DefinitionId = "consumer-elsascript",
-            Name = "ElsaScript Consumer",
+            Id = "consumer-source-v1",
+            DefinitionId = "consumer-source",
+            Name = "Source-only Consumer",
             Version = 1,
             IsPublished = isPublished,
             IsLatest = true,
-            MaterializerName = "ElsaScript",
-            OriginalSource = ElsaScriptSource,
+            MaterializerName = "CustomSource",
+            OriginalSource = CustomSource,
             StringData = null
         };
     }
