@@ -57,8 +57,7 @@ for build, test, dependency, and pull request workflows; use the SDK selected by
   thresholds. Do not add per-project Coverlet settings.
 - Executable entry points commit `packages.lock.json`; CI restores in locked
   mode. After dependency changes, restore all targets with
-  `dotnet restore Elsa.slnx --force-evaluate` and review lock updates. Restore
-  `test/TlsSmoke/TlsSmoke.csproj` separately. Restore all targets before using a
+  `dotnet restore Elsa.slnx --force-evaluate` and review lock updates. Restore all targets before using a
   targeted `--framework <tfm> --no-restore` test run to avoid rewriting full locks.
 - Use the [Aspire development guide](doc/aspire-development.md) for local server
   orchestration, endpoint discovery, telemetry, and worktree isolation.

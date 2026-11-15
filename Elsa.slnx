@@ -5,8 +5,9 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/docker/">
-    <File Path="docker/.dockerignore" />
-    <File Path="docker/docker-compose.yml" />
+    <File Path="docker/ElsaServer.Dockerfile" />
+    <File Path="docker/ElsaServer-Datadog.Dockerfile" />
+    <File Path="docker/entrypoint.sh" />
   </Folder>
   <Folder Name="/github/">
     <File Path=".github/copilot-instructions.md" />
@@ -21,7 +22,6 @@
     <File Path=".github/ISSUE_TEMPLATE/task.md" />
   </Folder>
   <Folder Name="/github/workflows/">
-    <File Path=".github/workflows/bounty.yml" />
     <File Path=".github/workflows/copilot-setup-steps.yml" />
     <File Path=".github/workflows/packages.yml" />
     <File Path=".github/workflows/pr.yml" />
@@ -33,34 +33,11 @@
     <Project Path="src/modules/Elsa.UserTasks/Elsa.UserTasks.csproj" />
   </Folder>
   <Folder Name="/scripts/" />
-  <Folder Name="/scripts/docker/">
-    <File Path="scripts/docker/docker-compose-citus.yml" />
-    <File Path="scripts/docker/docker-compose.yml" />
-  </Folder>
-  <Folder Name="/scripts/k8s/" />
-  <Folder Name="/scripts/k8s/elsa-server/">
-    <File Path="scripts/k8s/elsa-server/deployment.yaml" />
-    <File Path="scripts/k8s/elsa-server/role-binding.yaml" />
-    <File Path="scripts/k8s/elsa-server/role.yaml" />
-    <File Path="scripts/k8s/elsa-server/service-account.yml" />
-    <File Path="scripts/k8s/elsa-server/service.yaml" />
-  </Folder>
-  <Folder Name="/scripts/k8s/plant-uml/">
-    <File Path="scripts/k8s/plant-uml/deployment.yaml" />
-  </Folder>
-  <Folder Name="/scripts/k8s/postgres/">
-    <File Path="scripts/k8s/postgres/config-map.yaml" />
-    <File Path="scripts/k8s/postgres/deployment.yaml" />
-    <File Path="scripts/k8s/postgres/service.yml" />
-  </Folder>
-  <Folder Name="/scripts/k8s/trace-lens/">
-    <File Path="scripts/k8s/trace-lens/deployment.yaml" />
-    <File Path="scripts/k8s/trace-lens/service.yaml" />
-  </Folder>
   <Folder Name="/scripts/migrations/">
     <File Path="scripts/migrations/README.md" />
   </Folder>
   <Folder Name="/solution/">
+    <File Path=".dockerignore" />
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
