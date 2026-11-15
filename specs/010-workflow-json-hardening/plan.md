@@ -3,8 +3,6 @@
 **Branch**: `codex/7541-workflow-json-hardening` | **Date**: 2026-05-29 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/010-workflow-json-hardening/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
-
 ## Summary
 
 Reintroduce workflow JSON hardening through a workflow-specific type registry and resolver. Existing registered legacy CLR names remain readable, new workflow JSON emits aliases when available, and public descriptor APIs use the same identifier contract they accept.

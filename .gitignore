@@ -24,9 +24,7 @@ Thumbs.db
 *.lib
 *.sbr
 obj/
-# Build output only. Left unanchored this also matched documentation and tooling
-# directories such as docs/images/releases/ and .claude/skills/release-*/, which
-# were then silently excluded from commits. bin/ and obj/ are already ignored above.
+# Anchor release build output to the root so documentation directories remain visible.
 /[Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
