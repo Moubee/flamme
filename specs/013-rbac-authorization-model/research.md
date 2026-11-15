@@ -1,5 +1,10 @@
 # Authorization model: assessment and design record
 
+This assessment records the 2026-08-20 proposal before static hosting and later
+authorization changes. Its counts, gaps, and recommendations describe that earlier
+state. For current behavior, use the [authorization migration guide](../../doc/migrations/authorization-model.md)
+and [identity and tenancy guide](../../doc/wiki/identity-tenancy-security.md).
+
 ## Context
 
 A request was raised for a five-layer role-based access control model: Modules → Roles →
@@ -28,16 +33,16 @@ Far more than the ticket assumes. The endpoint-declaration layer is essentially 
 
 | Piece | Where | State |
 |---|---|---|
-| `Role { Name, ICollection<string> Permissions }` | [Role.cs](src/modules/Elsa.Identity/Entities/Role.cs) | Tenant-scoped via `Entity.TenantId` |
-| `User { Name, ICollection<string> Roles }` | [User.cs](src/modules/Elsa.Identity/Entities/User.cs) | Single `TenantId`; roles by ID |
-| Roles → permission claims | [DefaultAccessTokenIssuer.cs](src/modules/Elsa.Identity/Services/DefaultAccessTokenIssuer.cs), [DefaultElsaTokenService.cs](src/modules/Elsa.Identity/Services/DefaultElsaTokenService.cs) | Union of role permissions, baked into the JWT as one `permissions` claim each |
-| Endpoint declaration | [Endpoints.cs](src/common/Elsa.Api.Common/Abstractions/Endpoints.cs) `ConfigurePermissions` | **151 of 160 endpoint files already declare permissions** |
-| Escalation guard | [RoleAuthorizationService.cs](src/modules/Elsa.Identity/Services/RoleAuthorizationService.cs) | Caller may only grant permissions they hold |
-| Permission catalog | [ExternalAuthenticationContracts.cs](src/modules/Elsa.ExternalAuthentication/Contracts/ExternalAuthenticationContracts.cs) `IPermissionDescriptorProvider` / `IPermissionDescriptorRegistry`, `PermissionDescriptor(Name, DisplayName, Description, **Category**)` | Exists, but **only one provider is registered** — External Authentication's |
-| Deployment grant boundary | `PermissionGrantBoundary` in [DefaultPermissionGrantResolver.cs](src/modules/Elsa.ExternalAuthentication/Services/DefaultPermissionGrantResolver.cs), `PermissionGrantOptions.{Allowed,Denied}Permissions` | Exists, external-auth-scoped |
-| Per-tenant capability composition | CShells `IShellFeature`, [ShellInstalledFeatureProvider.cs](src/common/Elsa.Features/Services/ShellInstalledFeatureProvider.cs), `GET /features/installed` | Exists |
-| Tenant scoping | `Entity.TenantId`, [SetTenantIdFilter.cs](src/modules/Elsa.Persistence.EFCore.Common/EntityHandlers/SetTenantIdFilter.cs), `""` = default, `"*"` = agnostic (ADR 0009) | Exists for EF Core |
-| Richest scope model in the repo | `ConnectionScope(ConnectionScopeKind { Host, DefaultTenant, Tenant }, TenantId)` in [ExternalAuthenticationModels.cs](src/modules/Elsa.ExternalAuthentication/Models/ExternalAuthenticationModels.cs) | The precedent to follow for role scoping |
+| `Role { Name, ICollection<string> Permissions }` | [Role.cs](../../src/modules/Elsa.Identity/Entities/Role.cs) | Tenant-scoped via `Entity.TenantId` |
+| `User { Name, ICollection<string> Roles }` | [User.cs](../../src/modules/Elsa.Identity/Entities/User.cs) | Single `TenantId`; roles by ID |
+| Roles → permission claims | [DefaultAccessTokenIssuer.cs](../../src/modules/Elsa.Identity/Services/DefaultAccessTokenIssuer.cs), [DefaultElsaTokenService.cs](../../src/modules/Elsa.Identity/Services/DefaultElsaTokenService.cs) | Union of role permissions, baked into the JWT as one `permissions` claim each |
+| Endpoint declaration | [Endpoints.cs](../../src/common/Elsa.Api.Common/Abstractions/Endpoints.cs) `ConfigurePermissions` | **151 of 160 endpoint files already declare permissions** |
+| Escalation guard | [RoleAuthorizationService.cs](../../src/modules/Elsa.Identity/Services/RoleAuthorizationService.cs) | Caller may only grant permissions they hold |
+| Permission catalog | [ExternalAuthenticationContracts.cs](../../src/modules/Elsa.ExternalAuthentication/Contracts/ExternalAuthenticationContracts.cs) `IPermissionDescriptorProvider` / `IPermissionDescriptorRegistry`, `PermissionDescriptor(Name, DisplayName, Description, **Category**)` | Exists, but **only one provider is registered** — External Authentication's |
+| Deployment grant boundary | `PermissionGrantBoundary` in [DefaultPermissionGrantResolver.cs](../../src/modules/Elsa.ExternalAuthentication/Services/DefaultPermissionGrantResolver.cs), `PermissionGrantOptions.{Allowed,Denied}Permissions` | Exists, external-auth-scoped |
+| Per-tenant capability composition | CShells `IShellFeature`, [ShellInstalledFeatureProvider.cs](https://github.com/DenDeline/flamme/blob/3921715060b60520c7f015fbc23796d46e1b1dc3/src/common/Elsa.Features/Services/ShellInstalledFeatureProvider.cs) (retired), `GET /features/installed` | Exists |
+| Tenant scoping | `Entity.TenantId`, [SetTenantIdFilter.cs](../../src/modules/Elsa.Persistence.EFCore.Common/EntityHandlers/SetTenantIdFilter.cs), `""` = default, `"*"` = agnostic (ADR 0009) | Exists for EF Core |
+| Richest scope model in the repo | `ConnectionScope(ConnectionScopeKind { Host, DefaultTenant, Tenant }, TenantId)` in [ExternalAuthenticationModels.cs](../../src/modules/Elsa.ExternalAuthentication/Models/ExternalAuthenticationModels.cs) | The precedent to follow for role scoping |
 
 Governing ADRs: [0017](../../doc/adr/0017-separate-external-identity-from-elsa-authorization.md) —
 Elsa's permission vocabulary is deliberately **open**, composed through grant sources;
@@ -73,10 +78,10 @@ over `INotificationSender`, no audit persistence in the producing module.
 The ticket's "roles configurable per tenant, never shared" is not currently safe to promise:
 
 - **`User.Name`, `Role.Name`, `Application.{ClientId,Name}` have globally unique indexes, not
-  per-tenant composite indexes** ([Configurations.cs](src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs)).
+  per-tenant composite indexes** ([Configurations.cs](../../src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs)).
   Two tenants cannot both have a role called `Admin`. This is a hard blocker.
 - **Default `IUserStore`/`IRoleStore` are memory-backed and tenancy-blind**
-  ([MemoryStore.cs](src/modules/Elsa.Common/Services/MemoryStore.cs)). Isolation exists only on the
+  ([MemoryStore.cs](../../src/modules/Elsa.Common/Services/MemoryStore.cs)). Isolation exists only on the
   EF Core path, and only when `TenantsOptions.IsEnabled`.
 - **`GET /identity/users` and `/identity/roles` pass an empty filter** — they rely entirely on the
   ambient EF global query filter.
@@ -177,9 +182,9 @@ unique indexes on `Role.Name` / `User.Name`.
 
 `UserRoleAssignment { userId, roleId, tenantId }` implies **one person holding different roles in
 different tenants**. Elsa today has a single `User.TenantId`, resolves the tenant *from the user*
-([CurrentUserTenantResolver.cs](src/modules/Elsa.Identity/Multitenancy/CurrentUserTenantResolver.cs),
-[ClaimsTenantResolver.cs](src/modules/Elsa.Identity/Multitenancy/ClaimsTenantResolver.cs)), and has
-no tenant selection at login ([Login/Endpoint.cs](src/modules/Elsa.Identity/Endpoints/Login/Endpoint.cs)).
+([CurrentUserTenantResolver.cs](../../src/modules/Elsa.Identity/Multitenancy/CurrentUserTenantResolver.cs),
+[ClaimsTenantResolver.cs](../../src/modules/Elsa.Identity/Multitenancy/ClaimsTenantResolver.cs)), and has
+no tenant selection at login ([Login/Endpoint.cs](../../src/modules/Elsa.Identity/Endpoints/Login/Endpoint.cs)).
 
 **Decided: we do not adopt this.** Users stay one-per-tenant; a person operating in two tenants has
 two user records, and `User.Roles` remains a flat list resolved within the user's own tenant. This
@@ -222,7 +227,7 @@ a cached value (`Elsa.Caching` already provides distributed invalidation).
    `Elsa.ExternalAuthentication` to `Elsa.Api.Common` (or `Elsa.Identity`); leave type-forwarding
    shims. Extend the record to `(Resource, Scope, DisplayName, Description, Category)`.
    Every module with endpoints contributes a provider, following the existing
-   [ExternalAuthenticationPermissions.cs](src/modules/Elsa.ExternalAuthentication/Permissions/ExternalAuthenticationPermissions.cs)
+   [ExternalAuthenticationPermissions.cs](https://github.com/DenDeline/flamme/blob/3921715060b60520c7f015fbc23796d46e1b1dc3/src/modules/Elsa.ExternalAuthentication/Permissions/ExternalAuthenticationPermissions.cs) (historical type, since replaced)
    shape. This alone removes `unknown_permission_descriptor` warnings for every core permission.
 2. **Add `[Flags] PermissionScope`** in `Elsa.Api.Common`, with aggregates derived from named
    members (`Manage = View | Create | Update | Delete | Execute`), never literals, and no `All`
@@ -232,7 +237,7 @@ a cached value (`Elsa.Caching` already provides distributed invalidation).
    hubs, the mid-handler checks and `RoleAuthorizationService`.
 4. **`RequirePermission(resource, scope)`** as a typed overload alongside the existing
    `ConfigurePermissions(params string[])` in
-   [Endpoints.cs](src/common/Elsa.Api.Common/Abstractions/Endpoints.cs) — incremental migration,
+   [Endpoints.cs](../../src/common/Elsa.Api.Common/Abstractions/Endpoints.cs) — incremental migration,
    151 call sites keep compiling. Collapse the six copy-pasted method bodies while there.
 5. **Fail closed.** A startup guard (and a test) asserting every discovered `ElsaEndpoint*`
    declares either a permission or `AllowAnonymous`.
@@ -245,7 +250,7 @@ a cached value (`Elsa.Caching` already provides distributed invalidation).
 8. `Role.Grants: ICollection<PermissionGrant(Resource, ScopeMask)>` alongside the existing
    `Permissions` list; dual-read during migration, expand grants → strings at token issuance so
    nothing downstream changes on day one. Note the EF converter joins collections with commas
-   ([Configurations.cs](src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs)),
+   ([Configurations.cs](../../src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs)),
    so grants need their own serialization.
 9. Compact the `permissions` claim to one entry per resource.
 10. **Security stamp** for revocation (above).
@@ -258,9 +263,9 @@ Scoped down by the one-user-per-tenant decision: no cross-tenant assignments, no
 at login. What remains is closing the gaps that make the current per-tenant promise unsafe.
 
 13. **Per-tenant composite unique indexes** on `User.Name`, `Role.Name`, `Application.ClientId`,
-    `Application.Name` in [Configurations.cs](src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs),
+    `Application.Name` in [Configurations.cs](../../src/modules/Elsa.Persistence.EFCore/Modules/Identity/Configurations.cs),
     plus migrations across all six EF providers. Today two tenants cannot both have an `Admin` role.
-14. **Tenant-aware `MemoryStore`** ([MemoryStore.cs](src/modules/Elsa.Common/Services/MemoryStore.cs))
+14. **Tenant-aware `MemoryStore`** ([MemoryStore.cs](../../src/modules/Elsa.Common/Services/MemoryStore.cs))
     so the default `IUserStore`/`IRoleStore` isolate, not just the EF path.
 15. **Explicit tenant filtering** in `GET /identity/users` and `/identity/roles` (they pass an empty
     filter today) and in `UserManager.CreateUserAsync` (never sets `TenantId`) — belt and braces
@@ -285,14 +290,14 @@ editor UI.
 
 - Unit: `PermissionScope` aggregate derivation; `IPermissionEvaluator` matcher table
   (`*`, hierarchical prefixes, verb matching, absence denies) — *superseded in detail by D13; `tasks.md` carries the authoritative verification* —
-  alongside the existing [RoleAuthorizationServiceTests.cs](test/unit/Elsa.Identity.UnitTests/Services/RoleAuthorizationServiceTests.cs).
+  alongside the existing [RoleAuthorizationServiceTests.cs](../../test/unit/Elsa.Identity.UnitTests/Services/RoleAuthorizationServiceTests.cs).
 - Guard test: enumerate every `ElsaEndpoint*` type and assert a declared permission or
   `AllowAnonymous`; assert every declared permission resolves to a registered descriptor.
 - Integration: `GET /identity/me/permissions` for a role holding partial scopes; a revoked role
   denying on the next request once the security stamp lands.
 - Regression: existing role documents with legacy permission strings still authorize
-  ([DefaultAccessTokenIssuerRegistrationTests.cs](test/unit/Elsa.Identity.UnitTests/Services/DefaultAccessTokenIssuerRegistrationTests.cs),
-  [LegacyIdentityEndpointTests.cs](test/integration/Elsa.ExternalAuthentication.IntegrationTests/Compatibility/LegacyIdentityEndpointTests.cs)).
+  ([DefaultAccessTokenIssuerRegistrationTests.cs](../../test/unit/Elsa.Identity.UnitTests/Services/DefaultAccessTokenIssuerRegistrationTests.cs),
+  [LegacyIdentityEndpointTests.cs](../../test/integration/Elsa.ExternalAuthentication.IntegrationTests/Compatibility/LegacyIdentityEndpointTests.cs)).
 - Multi-tenant: two tenants each with a role named `Admin` (fails today); a role listed in tenant A
   is invisible to tenant B against both the EF and memory stores.
 - Record the outcome as an ADR and a `specs/0NN-authorization-model/` spec, matching the

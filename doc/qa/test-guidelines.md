@@ -621,7 +621,7 @@ public async Task Workflow_Persists_Instance_And_Journal()
 
 ### Component test with async workflow execution
 
-For testing workflows that complete asynchronously (e.g., with timers, external triggers), use [`AsyncWorkflowRunner`](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Services/AsyncWorkflowRunner.cs):
+For testing workflows that complete asynchronously (e.g., with timers, external triggers), use [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs):
 
 ```csharp
 [Test]
@@ -661,7 +661,7 @@ A: Query [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/
 
 **Q: Do I need a new helper to wait for workflow completion?**
 
-A: No. The repo provides [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) for integration tests and [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) for activity unit tests, as well as integration helpers that cover all necessary scenarios. For async workflows in component tests, use [`AsyncWorkflowRunner`](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Services/AsyncWorkflowRunner.cs).
+A: No. The repo provides [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) for integration tests and [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) for activity unit tests, as well as integration helpers that cover all necessary scenarios. For async workflows in component tests, use [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs).
 
 ---
 
@@ -671,4 +671,4 @@ Search the `test/` tree for examples that follow the above patterns:
 
 - **Unit test activity examples:** `test/unit/Elsa.Activities.UnitTests` (look for [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) usage)
 - **Integration workflow examples:** `test/integration/Elsa.*.IntegrationTests` (look for [`PopulateRegistriesAsync()`](../../src/common/Elsa.Testing.Shared.Integration/ServiceProviderExtensions.cs) and [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) usage)
-- **Component scenarios exercising persistence:** `test/component/Elsa.Workflows.ComponentTests` (look for [`AsyncWorkflowRunner`](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Services/AsyncWorkflowRunner.cs) and [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) assertions)
+- **Component scenarios exercising persistence:** `test/component/Elsa.Workflows.ComponentTests` (look for [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs) and [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) assertions)
