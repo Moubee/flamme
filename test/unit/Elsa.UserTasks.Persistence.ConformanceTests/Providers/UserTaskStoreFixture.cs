@@ -1,4 +1,4 @@
-using Elsa.Common;
+using Microsoft.Extensions.Time.Testing;
 using Elsa.UserTasks.Contracts;
 using Elsa.UserTasks.Options;
 using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
@@ -26,7 +26,7 @@ public abstract class UserTaskStoreFixture : IAsyncInitializer, IAsyncDisposable
     }
 
     public ConformanceProvider Provider { get; }
-    public TestClock Clock { get; } = new();
+    public FakeTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 8, 25, 12, 0, 0, TimeSpan.Zero));
     public UserTasksOptions Settings { get; } = new();
     public IOptions<UserTasksOptions> Options { get; }
     public IDataProtectionProvider DataProtection { get; } = new PassthroughDataProtectionProvider();
@@ -59,13 +59,6 @@ public abstract class UserTaskStoreFixture : IAsyncInitializer, IAsyncDisposable
     public async ValueTask DisposeAsync() => await DisposeCoreAsync();
 
     protected virtual Task DisposeCoreAsync() => Task.CompletedTask;
-
-    public sealed class TestClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; set; } = new(2026, 8, 25, 12, 0, 0, TimeSpan.Zero);
-
-        public DateTimeOffset Advance(TimeSpan amount) => UtcNow = UtcNow.Add(amount);
-    }
 
     /// <summary>
     /// Data Protection stand-in. The outbox's contract is only that the ciphertext round-trips and that an

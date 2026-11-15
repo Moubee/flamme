@@ -10,11 +10,11 @@ public sealed class DefaultUserTaskDueService(
     IUserTaskManager manager,
     IUserTaskNotificationSink notifications,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock) : IUserTaskDueService
+    TimeProvider timeProvider) : IUserTaskDueService
 {
     public async Task<int> MarkOverdueAsync(string tenantId, DateTimeOffset? now = null, CancellationToken cancellationToken = default)
     {
-        var scanNow = now ?? clock.UtcNow;
+        var scanNow = now ?? timeProvider.GetUtcNow();
         var cursor = (string?)null;
         var marked = 0;
 
@@ -54,7 +54,7 @@ public sealed class DefaultUserTaskDueService(
                             return false;
                         current.IsOverdue = true;
                         current.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, current.Id, current.Revision + 1,
-                            "OverdueNotified", clock.UtcNow));
+                            "OverdueNotified", timeProvider.GetUtcNow()));
                         return true;
                     }, cancellationToken))
                     continue;

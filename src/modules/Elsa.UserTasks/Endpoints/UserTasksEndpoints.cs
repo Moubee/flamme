@@ -122,7 +122,7 @@ internal sealed class FeatureCapabilitiesEndpoint(IUserTaskIdentityResolver iden
     }
 }
 
-internal sealed class ListEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver, ISystemClock clock)
+internal sealed class ListEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver, TimeProvider timeProvider)
     : ElsaEndpoint<ListUserTasksRequest, UserTaskListResponse>
 {
     public override void Configure()
@@ -159,7 +159,7 @@ internal sealed class ListEndpoint(IUserTaskManager manager, IUserTaskIdentityRe
             Search = request.Search,
             IncludeTotalCount = request.IncludeTotalCount
         };
-        query = UserTaskEndpointHelpers.ApplyDueFilter(query, request.Due, clock.UtcNow);
+        query = UserTaskEndpointHelpers.ApplyDueFilter(query, request.Due, timeProvider.GetUtcNow());
 
         var scope = UserTaskEndpointHelpers.ParseScope(request.Scope);
         var result = await manager.QueryAsync(query, scope, actor, cancellationToken);

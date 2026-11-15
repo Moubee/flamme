@@ -1,4 +1,5 @@
 using Elsa.UserTasks.Contracts;
+using Microsoft.Extensions.Time.Testing;
 using Elsa.UserTasks.Models;
 using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
 using Elsa.UserTasks.Persistence.ConformanceTests.Providers;
@@ -19,7 +20,7 @@ public abstract class UserTaskConformanceTestBase(UserTaskStoreFixture fixture)
 
     protected UserTaskStoreFixture Fixture { get; } = fixture;
     protected IUserTaskRepository Repository => Fixture.Repository;
-    protected UserTaskStoreFixture.TestClock Clock => Fixture.Clock;
+    protected FakeTimeProvider Clock => Fixture.Clock;
 
     /// <summary>This test's private tenant. Never reused, so a shared store still gives per-test isolation.</summary>
     protected string TenantId { get; } = $"tenant-{Guid.NewGuid():N}";
@@ -40,7 +41,7 @@ public abstract class UserTaskConformanceTestBase(UserTaskStoreFixture fixture)
         DateTimeOffset? updatedAt = null)
     {
         var ordinal = ++_sequence;
-        var created = createdAt ?? Clock.UtcNow.AddMinutes(ordinal);
+        var created = createdAt ?? Clock.GetUtcNow().AddMinutes(ordinal);
         return new()
         {
             // Ordinal-prefixed so the identity tiebreaker is predictable and a failure is readable.

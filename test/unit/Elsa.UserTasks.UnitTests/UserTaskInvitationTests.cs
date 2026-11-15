@@ -109,7 +109,7 @@ public class UserTaskInvitationTests
         await Assert.That(unknown.TaskId).IsNull();
         await Assert.That(wrongCode.TaskId).IsNull();
 
-        fixture.Clock.UtcNow = fixture.Clock.UtcNow.AddDays(30);
+        fixture.Clock.Advance(TimeSpan.FromDays(30));
         var expired = await fixture.Invitations.VerifyAsync(new(token, "correct"));
         await Assert.That(expired.Succeeded).IsFalse();
         await Assert.That(expired.FailureCode).IsEqualTo(unknown.FailureCode);
@@ -138,7 +138,7 @@ public class UserTaskInvitationTests
 
         // A different caller has its own budget, and the window resets on its own.
         await Assert.That(await limiter.TryAcquireAsync("10.0.0.2")).IsTrue();
-        _fixture.Clock.UtcNow = _fixture.Clock.UtcNow.AddMinutes(6);
+        _fixture.Clock.Advance(TimeSpan.FromMinutes(6));
         await Assert.That(await limiter.TryAcquireAsync("10.0.0.1")).IsTrue();
     }
 
@@ -153,7 +153,7 @@ public class UserTaskInvitationTests
         await Assert.That(ownDetail.Disclosure.GuestVisible).IsTrue();
 
         var other = await _fixture.Manager.ProjectAsync(new(Tenant, "definition-2", "instance-2", "activity-2", "bookmark-2",
-            new() { Title = "Other", Actions = [new("Approve", "Approve")] }, [], [], _fixture.Clock.UtcNow, "task-2"));
+            new() { Title = "Other", Actions = [new("Approve", "Approve")] }, [], [], _fixture.Clock.GetUtcNow(), "task-2"));
         await Assert.That(await _fixture.Manager.GetAsync(Tenant, other.Task.Id, guest)).IsNull();
 
         var cross = await _fixture.Manager.CompleteAsync(Tenant, other.Task.Id, new(other.Task.Revision, "op-1", "Approve"), guest);
@@ -405,7 +405,7 @@ public class UserTaskInvitationTests
         var (_, credential) = await _fixture.IssueGuestSessionAsync(task, manager);
         await Assert.That(await _fixture.GuestActors.ResolveAsync(credential)).IsNotNull();
 
-        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(Tenant, task.Id, task.BookmarkId, _fixture.Clock.UtcNow));
+        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(Tenant, task.Id, task.BookmarkId, _fixture.Clock.GetUtcNow()));
 
         await Assert.That(await _fixture.GuestActors.ResolveAsync(credential)).IsNull();
     }
@@ -419,8 +419,11 @@ public class UserTaskInvitationTests
         var task = await fixture.ProjectAsync(fixture.Actor("user-1").Subject, WithBearerInvitation());
         var (_, credential) = await fixture.IssueGuestSessionAsync(task, manager);
 
-        fixture.Clock.UtcNow = fixture.Clock.UtcNow.AddMinutes(31);
-
+        fixture.Clock.Advance(TimeSpan.FromMinutes(30).Subtract(TimeSpan.FromTicks(1)));
+        await Assert.That(await fixture.GuestActors.ResolveAsync(credential)).IsNotNull();
+        fixture.Clock.Advance(TimeSpan.FromTicks(1));
+        await Assert.That(await fixture.GuestActors.ResolveAsync(credential)).IsNull();
+        fixture.Clock.Advance(TimeSpan.FromTicks(1));
         await Assert.That(await fixture.GuestActors.ResolveAsync(credential)).IsNull();
     }
 
@@ -436,12 +439,12 @@ public class UserTaskInvitationTests
         for (var attempt = 0; attempt < 2; attempt++)
         {
             var due = await Assert.That(await fixture.Outbox.DequeueDueAsync(10)).HasSingleItem();
-            await fixture.Outbox.RescheduleAsync(due.Id, fixture.Clock.UtcNow);
+            await fixture.Outbox.RescheduleAsync(due.Id, fixture.Clock.GetUtcNow());
         }
 
         // The schedule is exhausted, so the encrypted secret is dropped rather than retried forever.
         var third = await Assert.That(await fixture.Outbox.DequeueDueAsync(10)).HasSingleItem();
-        await fixture.Outbox.RescheduleAsync(third.Id, fixture.Clock.UtcNow);
+        await fixture.Outbox.RescheduleAsync(third.Id, fixture.Clock.GetUtcNow());
         await Assert.That(await fixture.Outbox.DequeueDueAsync(10)).IsEmpty();
     }
 

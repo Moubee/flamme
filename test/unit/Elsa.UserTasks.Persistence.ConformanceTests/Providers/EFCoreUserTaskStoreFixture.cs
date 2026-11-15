@@ -81,7 +81,8 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
         services.AddScoped<EFCoreUserTaskGuestSessionIssuer>();
         services.AddScoped<EFCoreUserTaskInvitationOutbox>();
         services.AddSingleton(Clock);
-        services.AddSingleton<Elsa.Common.ISystemClock>(Clock);
+        services.AddSingleton<TimeProvider>(Clock);
+        services.AddSingleton<Elsa.Common.ISystemClock>(sp => new Elsa.Common.Services.SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton(Options);
         services.AddSingleton(DataProtection);
         _serviceProvider = services.BuildServiceProvider();

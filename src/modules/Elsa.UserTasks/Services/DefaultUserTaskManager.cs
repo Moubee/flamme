@@ -16,7 +16,7 @@ public sealed class DefaultUserTaskManager(
     IUserTaskWorkflowResumer workflowResumer,
     IUserTaskNotificationSink notificationSink,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     Microsoft.Extensions.Options.IOptions<UserTasksOptions> options,
     IUserTaskParticipantDirectory? participantDirectory = null) : IUserTaskManager
 {
@@ -213,7 +213,7 @@ public sealed class DefaultUserTaskManager(
         // Appended without bumping the revision: a reveal is a read, and consuming the concurrency token
         // here would make the caller's next command conflict for no reason.
         await repository.AppendEventAsync(tenantId, taskId, new(identityGenerator.GenerateId(), tenantId, taskId, task.Revision,
-            "FieldRevealed", clock.UtcNow, actor.Subject, Metadata: new Dictionary<string, object?> { ["fieldKey"] = fieldKey }), cancellationToken);
+            "FieldRevealed", timeProvider.GetUtcNow(), actor.Subject, Metadata: new Dictionary<string, object?> { ["fieldKey"] = fieldKey }), cancellationToken);
         return value;
     }
 
@@ -238,7 +238,7 @@ public sealed class DefaultUserTaskManager(
                 if (task.Status is not (UserTaskStatus.Available or UserTaskStatus.Unassigned))
                     return "not-claimable";
                 task.Assignee = actor.Subject;
-                task.AssignedAt = clock.UtcNow;
+                task.AssignedAt = timeProvider.GetUtcNow();
                 task.Status = UserTaskStatus.Assigned;
                 return null;
             }, cancellationToken);
@@ -265,7 +265,7 @@ public sealed class DefaultUserTaskManager(
                 if (task.IsTerminal)
                     return "terminal";
                 task.Assignee = request.Assignee;
-                task.AssignedAt = clock.UtcNow;
+                task.AssignedAt = timeProvider.GetUtcNow();
                 task.Status = UserTaskStatus.Assigned;
                 return null;
             }, cancellationToken, request.Reason, request.Assignee);
@@ -345,13 +345,13 @@ public sealed class DefaultUserTaskManager(
 
         var operation = new UserTaskOperation(identityGenerator.GenerateId(), tenantId, taskId, request.OperationId, UserTaskOperationKind.Complete,
             request.ExpectedRevision, requestHash, UserTaskOperationStatus.Accepted,
-            clock.UtcNow, clock.UtcNow, request.ActionKey, request.Data);
+            timeProvider.GetUtcNow(), timeProvider.GetUtcNow(), request.ActionKey, request.Data);
         task.Status = UserTaskStatus.Completing;
         task.CompletionActionKey = request.ActionKey;
         task.CompletionData = request.Data;
         task.CompletedBy = actor.Subject;
         task.Operations.Add(operation);
-        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "CompletionRequested", clock.UtcNow, actor.Subject, request.OperationId));
+        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "CompletionRequested", timeProvider.GetUtcNow(), actor.Subject, request.OperationId));
         try
         {
             await repository.SaveAsync(task, request.ExpectedRevision, cancellationToken);
@@ -363,7 +363,7 @@ public sealed class DefaultUserTaskManager(
         var committed = await repository.GetAsync(tenantId, taskId, cancellationToken) ?? task;
         await notificationSink.PublishAsync(new UserTaskCompletionAccepted(tenantId, taskId, committed.Status, committed.Revision, request.OperationId), cancellationToken);
         await notificationSink.PublishAsync(new UserTaskChanged(tenantId, taskId, committed.Status, committed.Revision, ["completionRequested"]), cancellationToken);
-        await workflowResumer.ResumeAsync(committed, new UserTaskStimulus(tenantId, taskId, request.OperationId, request.ActionKey, request.Data, actor.Subject, clock.UtcNow, committed.BookmarkId), cancellationToken);
+        await workflowResumer.ResumeAsync(committed, new UserTaskStimulus(tenantId, taskId, request.OperationId, request.ActionKey, request.Data, actor.Subject, timeProvider.GetUtcNow(), committed.BookmarkId), cancellationToken);
         return new UserTaskOperationResult(committed, operation, true);
     }
 
@@ -405,14 +405,14 @@ public sealed class DefaultUserTaskManager(
 
         var operation = new UserTaskOperation(
             identityGenerator.GenerateId(), tenantId, taskId, operationId, UserTaskOperationKind.Timeout,
-            expectedRevision, hash, UserTaskOperationStatus.Accepted, clock.UtcNow, clock.UtcNow,
+            expectedRevision, hash, UserTaskOperationStatus.Accepted, timeProvider.GetUtcNow(), timeProvider.GetUtcNow(),
             ActionKey: "Timeout");
         task.IsOverdue = true;
         task.Status = UserTaskStatus.TimingOut;
         task.CompletionActionKey = "Timeout";
         task.Operations.Add(operation);
         task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1,
-            "TimeoutRequested", clock.UtcNow, OperationId: operationId));
+            "TimeoutRequested", timeProvider.GetUtcNow(), OperationId: operationId));
         try
         {
             await repository.SaveAsync(task, expectedRevision, cancellationToken);
@@ -452,12 +452,12 @@ public sealed class DefaultUserTaskManager(
         if (task.Revision != request.ExpectedRevision)
             return Failure(task, request.OperationId, UserTaskOperationKind.Cancel, "revision-conflict");
         var operation = new UserTaskOperation(identityGenerator.GenerateId(), tenantId, taskId, request.OperationId, UserTaskOperationKind.Cancel,
-            request.ExpectedRevision, hash, UserTaskOperationStatus.Accepted, clock.UtcNow, clock.UtcNow, ActionKey: "Cancelled", Data: null, ErrorCode: null);
+            request.ExpectedRevision, hash, UserTaskOperationStatus.Accepted, timeProvider.GetUtcNow(), timeProvider.GetUtcNow(), ActionKey: "Cancelled", Data: null, ErrorCode: null);
         task.Status = UserTaskStatus.Cancelling;
         task.CompletionActionKey = "Cancelled";
         task.CompletedBy = actor.Subject;
         task.Operations.Add(operation);
-        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "CancellationRequested", clock.UtcNow, actor.Subject, request.OperationId, request.Reason));
+        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "CancellationRequested", timeProvider.GetUtcNow(), actor.Subject, request.OperationId, request.Reason));
         try
         {
             await repository.SaveAsync(task, request.ExpectedRevision, cancellationToken);
@@ -468,7 +468,7 @@ public sealed class DefaultUserTaskManager(
         }
         var committed = await repository.GetAsync(tenantId, taskId, cancellationToken) ?? task;
         await notificationSink.PublishAsync(new UserTaskChanged(tenantId, taskId, committed.Status, committed.Revision, ["cancellationRequested"]), cancellationToken);
-        await workflowResumer.ResumeAsync(committed, new UserTaskStimulus(tenantId, taskId, request.OperationId, "Cancelled", null, actor.Subject, clock.UtcNow, committed.BookmarkId), cancellationToken);
+        await workflowResumer.ResumeAsync(committed, new UserTaskStimulus(tenantId, taskId, request.OperationId, "Cancelled", null, actor.Subject, timeProvider.GetUtcNow(), committed.BookmarkId), cancellationToken);
         return new UserTaskOperationResult(committed, operation, true);
     }
 
@@ -529,9 +529,9 @@ public sealed class DefaultUserTaskManager(
         task.HealthCode = healthCode;
         task.HealthMessage = healthMessage;
         var operation = new UserTaskOperation(identityGenerator.GenerateId(), tenantId, taskId, operationId, UserTaskOperationKind.RetryResolution,
-            request.ExpectedRevision, hash, UserTaskOperationStatus.Completed, clock.UtcNow, clock.UtcNow);
+            request.ExpectedRevision, hash, UserTaskOperationStatus.Completed, timeProvider.GetUtcNow(), timeProvider.GetUtcNow());
         task.Operations.Add(operation);
-        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "ResolutionRetried", clock.UtcNow, actor.Subject, operationId));
+        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, task.Revision + 1, "ResolutionRetried", timeProvider.GetUtcNow(), actor.Subject, operationId));
         try
         {
             await repository.SaveAsync(task, request.ExpectedRevision, cancellationToken);
@@ -566,9 +566,9 @@ public sealed class DefaultUserTaskManager(
         if (reasonCode != null)
             return Failure(task, operationId, kind, reasonCode);
         var operation = new UserTaskOperation(identityGenerator.GenerateId(), tenantId, taskId, operationId, kind, expectedRevision,
-            hash, UserTaskOperationStatus.Completed, clock.UtcNow, clock.UtcNow);
+            hash, UserTaskOperationStatus.Completed, timeProvider.GetUtcNow(), timeProvider.GetUtcNow());
         task.Operations.Add(operation);
-        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, expectedRevision + 1, kind.ToString(), clock.UtcNow, actor.Subject, operationId, reason));
+        task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, expectedRevision + 1, kind.ToString(), timeProvider.GetUtcNow(), actor.Subject, operationId, reason));
         try
         {
             await repository.SaveAsync(task, expectedRevision, cancellationToken);

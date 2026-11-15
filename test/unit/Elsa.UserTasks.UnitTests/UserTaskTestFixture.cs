@@ -9,6 +9,7 @@ using Elsa.UserTasks.Services;
 using Elsa.Workflows;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.UserTasks.UnitTests;
 
@@ -21,7 +22,7 @@ public sealed class UserTaskTestFixture
     public const string TenantId = "tenant";
 
     public InMemoryUserTaskRepository Repository { get; } = new();
-    public TestClock Clock { get; } = new();
+    public FakeTimeProvider Clock { get; } = new(new DateTimeOffset(2026, 11, 15, 12, 0, 0, TimeSpan.Zero));
     public TestIdentityGenerator Identity { get; } = new();
     public TestResumer Resumer { get; } = new();
     public TestSink Sink { get; } = new();
@@ -76,7 +77,7 @@ public sealed class UserTaskTestFixture
             Actions = [new("Approve", "Approve"), new("Reject", "Reject")]
         };
         return new(TenantId, "definition", "instance", "activity", "bookmark",
-            configure?.Invoke(definition) ?? definition, [], [], Clock.UtcNow, "task-1",
+            configure?.Invoke(definition) ?? definition, [], [], Clock.GetUtcNow(), "task-1",
             "Approval workflow", 3, "correlation-1");
     }
 
@@ -141,11 +142,6 @@ public sealed class UserTaskTestFixture
                 throw new InvalidOperationException("Simulated session-store failure.");
             return inner.RevokeForInvitationAsync(tenantId, invitationId, cancellationToken);
         }
-    }
-
-    public sealed class TestClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; set; } = DateTimeOffset.UtcNow;
     }
 
     public sealed class TestIdentityGenerator : IIdentityGenerator

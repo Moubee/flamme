@@ -1,5 +1,6 @@
 using Elsa.Authorization;
 using Elsa.Common;
+using Microsoft.Extensions.Time.Testing;
 using Elsa.Persistence.EFCore;
 using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Testing.Shared.Databases;
@@ -219,7 +220,7 @@ public sealed class EFCoreUserTaskRepositoryTests
     {
         await using var scope = serviceProvider.CreateAsyncScope();
         var repository = scope.ServiceProvider.GetRequiredService<EFCoreUserTaskRepository>();
-        var clock = new FixedClock();
+        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 11, 15, 12, 0, 0, TimeSpan.Zero));
         var manager = new DefaultUserTaskManager(repository, new DefaultUserTaskAccessPolicy(), [],
             new NoOpResumer(), new NoOpSink(), new SequentialIdentityGenerator(), clock,
             Microsoft.Extensions.Options.Options.Create(new UserTasksOptions()));
@@ -246,11 +247,6 @@ public sealed class EFCoreUserTaskRepositoryTests
 
         await Assert.That(result.Accepted).IsFalse();
         await Assert.That(result.ConflictCode).IsEqualTo("revision-conflict");
-    }
-
-    private sealed class FixedClock : ISystemClock
-    {
-        public DateTimeOffset UtcNow { get; } = DateTimeOffset.UtcNow;
     }
 
     private sealed class SequentialIdentityGenerator : IIdentityGenerator

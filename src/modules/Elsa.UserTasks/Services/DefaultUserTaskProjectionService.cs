@@ -11,7 +11,7 @@ public sealed class DefaultUserTaskProjectionService(
     IUserTaskNotificationSink notifications,
     IUserTaskGuestSessionIssuer guestSessions,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock) : IUserTaskProjectionService
+    TimeProvider timeProvider) : IUserTaskProjectionService
 {
     public async Task ProjectCommittedBookmarksAsync(IReadOnlyCollection<UserTaskMaterialization> materializations, CancellationToken cancellationToken = default)
     {
@@ -50,12 +50,12 @@ public sealed class DefaultUserTaskProjectionService(
         if (operation != null)
         {
             var index = task.Operations.IndexOf(operation);
-            task.Operations[index] = operation with { Status = UserTaskOperationStatus.Completed, UpdatedAt = clock.UtcNow };
+            task.Operations[index] = operation with { Status = UserTaskOperationStatus.Completed, UpdatedAt = timeProvider.GetUtcNow() };
         }
         task.Status = terminalStatus.Value;
-        task.CompletedAt ??= clock.UtcNow;
+        task.CompletedAt ??= timeProvider.GetUtcNow();
         task.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), task.TenantId, task.Id, expectedRevision + 1,
-            terminalStatus.Value.ToString(), clock.UtcNow, operation == null ? null : task.CompletedBy, operation?.OperationId,
+            terminalStatus.Value.ToString(), timeProvider.GetUtcNow(), operation == null ? null : task.CompletedBy, operation?.OperationId,
             Metadata: operation?.ActionKey == null ? null : new Dictionary<string, object?> { ["actionKey"] = operation.ActionKey }));
         try
         {

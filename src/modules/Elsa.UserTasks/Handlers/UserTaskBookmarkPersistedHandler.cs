@@ -12,7 +12,7 @@ namespace Elsa.UserTasks.Handlers;
 /// Bridges the workflow bookmark commit notification to the User Tasks projection. This keeps workflow
 /// and task persistence decoupled: task projection is never written from inside activity execution.
 /// </summary>
-public sealed class UserTaskBookmarkPersistedHandler(IUserTaskProjectionService projectionService, ISystemClock clock) : INotificationHandler<WorkflowBookmarksPersisted>
+public sealed class UserTaskBookmarkPersistedHandler(IUserTaskProjectionService projectionService, TimeProvider timeProvider) : INotificationHandler<WorkflowBookmarksPersisted>
 {
     public async Task HandleAsync(WorkflowBookmarksPersisted notification, CancellationToken cancellationToken)
     {
@@ -33,7 +33,7 @@ public sealed class UserTaskBookmarkPersistedHandler(IUserTaskProjectionService 
                 materialization.TenantId,
                 materialization.TaskId,
                 bookmark.Id,
-                clock.UtcNow), cancellationToken);
+                timeProvider.GetUtcNow()), cancellationToken);
         }
     }
 

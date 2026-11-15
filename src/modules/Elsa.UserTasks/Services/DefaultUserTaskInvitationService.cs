@@ -22,7 +22,7 @@ public sealed class DefaultUserTaskInvitationService(
     IUserTaskGuestSessionIssuer sessionIssuer,
     IUserTaskNotificationSink notifications,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskInvitationService
 {
     /// <summary>The single public failure code. Callers must not be able to tell these cases apart.</summary>
@@ -46,7 +46,7 @@ public sealed class DefaultUserTaskInvitationService(
         if (definition == null || actions.Length == 0)
             return null;
 
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var lifetime = request.Lifetime ?? definition.Lifetime ?? options.Value.DefaultInvitationLifetime;
         if (lifetime <= TimeSpan.Zero)
             return null;
@@ -132,9 +132,9 @@ public sealed class DefaultUserTaskInvitationService(
                 if (invitation == null || invitation.Status is UserTaskInvitationStatus.Revoked or UserTaskInvitationStatus.Expired)
                     return false;
                 var index = current.Invitations.IndexOf(invitation);
-                current.Invitations[index] = invitation with { Status = UserTaskInvitationStatus.Revoked, RevokedAt = clock.UtcNow };
+                current.Invitations[index] = invitation with { Status = UserTaskInvitationStatus.Revoked, RevokedAt = timeProvider.GetUtcNow() };
                 current.Events.Add(new UserTaskEvent(identityGenerator.GenerateId(), tenantId, taskId, current.Revision + 1,
-                    "InvitationRevoked", clock.UtcNow, actor.Subject));
+                    "InvitationRevoked", timeProvider.GetUtcNow(), actor.Subject));
                 return true;
             }, cancellationToken))
             return false;
@@ -177,7 +177,7 @@ public sealed class DefaultUserTaskInvitationService(
 
         var subject = new ParticipantReference(task.TenantId, "guest", UserTaskParticipantType.User,
             challengeResult.Subject ?? $"invitation:{invitation.Id}");
-        var verifiedAt = clock.UtcNow;
+        var verifiedAt = timeProvider.GetUtcNow();
 
         // Claiming, consuming, and sibling revocation happen inside one compare-and-swap. A second holder
         // racing the same sibling group therefore loses and receives the same generic failure.
@@ -243,7 +243,7 @@ public sealed class DefaultUserTaskInvitationService(
         if (match is not { } found)
             return null;
         var invitation = found.Invitation;
-        return invitation.ExpiresAt <= clock.UtcNow || invitation.Status is not (UserTaskInvitationStatus.Pending or UserTaskInvitationStatus.Dispatched)
+        return invitation.ExpiresAt <= timeProvider.GetUtcNow() || invitation.Status is not (UserTaskInvitationStatus.Pending or UserTaskInvitationStatus.Dispatched)
             ? null
             : found;
     }

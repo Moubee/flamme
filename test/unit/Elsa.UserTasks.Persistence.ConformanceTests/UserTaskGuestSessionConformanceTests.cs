@@ -101,7 +101,7 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
     {
         await ActivateAsync();
         Fixture.Settings.GuestSessionLifetime = TimeSpan.FromMinutes(30);
-        var issued = await IssueAsync(Invitation(expiresAt: Clock.UtcNow.AddDays(1)), Subject("guest-1"));
+        var issued = await IssueAsync(Invitation(expiresAt: Clock.GetUtcNow().AddDays(1)), Subject("guest-1"));
         await Assert.That(await Sessions.ResolveAsync(issued.Token!)).IsNotNull();
 
         Clock.Advance(TimeSpan.FromMinutes(31));
@@ -114,7 +114,7 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
     {
         await ActivateAsync();
         Fixture.Settings.GuestSessionLifetime = TimeSpan.FromDays(7);
-        var invitationExpiry = Clock.UtcNow.AddMinutes(10);
+        var invitationExpiry = Clock.GetUtcNow().AddMinutes(10);
 
         var issued = await IssueAsync(Invitation(expiresAt: invitationExpiry), Subject("guest-1"));
 
@@ -128,7 +128,7 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
     {
         await ActivateAsync();
 
-        var issued = await IssueAsync(Invitation(expiresAt: Clock.UtcNow.AddMinutes(-1)), Subject("guest-1"));
+        var issued = await IssueAsync(Invitation(expiresAt: Clock.GetUtcNow().AddMinutes(-1)), Subject("guest-1"));
 
         await Assert.That(issued.Succeeded).IsFalse();
         await Assert.That(issued.Token).IsNull();
@@ -152,7 +152,7 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
 
     private UserTaskInvitation Invitation(string? taskId = null, string id = "invitation-1", DateTimeOffset? expiresAt = null) =>
         new(id, TenantId, taskId ?? $"task-{Guid.NewGuid():N}", "guest@example.com", $"HASH-{Guid.NewGuid():N}",
-            UserTaskInvitationStatus.Consumed, Clock.UtcNow, expiresAt ?? Clock.UtcNow.AddDays(1), "bearer")
+            UserTaskInvitationStatus.Consumed, Clock.GetUtcNow(), expiresAt ?? Clock.GetUtcNow().AddDays(1), "bearer")
         {
             AllowedActions = ["Complete"]
         };

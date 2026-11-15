@@ -220,7 +220,7 @@ public abstract class UserTaskFaultInjectionConformanceTests(UserTaskStoreFixtur
         var faulting = new FaultingUserTaskRepository(Repository) { FailAppendEventCalls = 1 };
 
         await Assert.ThrowsExactlyAsync<InjectedStoreFaultException>(() =>
-            faulting.AppendEventAsync(TenantId, task.Id, new($"event-{Guid.NewGuid():N}", TenantId, task.Id, task.Revision, "Viewed", Clock.UtcNow)));
+            faulting.AppendEventAsync(TenantId, task.Id, new($"event-{Guid.NewGuid():N}", TenantId, task.Id, task.Revision, "Viewed", Clock.GetUtcNow())));
 
         // The command the caller was already holding a revision for still commits.
         var held = await GetAsync(task.Id);

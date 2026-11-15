@@ -8,6 +8,7 @@ using Elsa.UserTasks.Permissions;
 using Elsa.UserTasks.Services;
 using FastEndpoints;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using System.Threading.Tasks;
 
 namespace Elsa.UserTasks.UnitTests.Authorization;
@@ -136,7 +137,7 @@ public class EndpointPermissionTests
         if (type == typeof(IOptions<UserTasksOptions>)) return Mock.Of<IOptions<UserTasksOptions>>().Object;
         if (type == typeof(IUserTaskParticipantDirectory)) return Mock.Of<IUserTaskParticipantDirectory>().Object;
         if (type == typeof(IUserTaskManager)) return Mock.Of<IUserTaskManager>().Object;
-        if (type == typeof(ISystemClock)) return Mock.Of<ISystemClock>().Object;
+        if (type == typeof(TimeProvider)) return new FakeTimeProvider(DateTimeOffset.UnixEpoch);
         if (type == typeof(IUserTaskAccessPolicy)) return Mock.Of<IUserTaskAccessPolicy>().Object;
         if (type == typeof(IUserTaskInvitationService)) return Mock.Of<IUserTaskInvitationService>().Object;
         throw new InvalidOperationException($"No generated mock registered for endpoint dependency '{type}'.");

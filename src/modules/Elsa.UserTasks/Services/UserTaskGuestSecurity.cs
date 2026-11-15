@@ -18,13 +18,13 @@ namespace Elsa.UserTasks.Services;
 /// log of this structure cannot be replayed against the API. Hosts running more than one replica should
 /// register a shared-store implementation instead.
 /// </summary>
-public sealed class InMemoryUserTaskGuestSessionIssuer(ISystemClock clock, IOptions<UserTasksOptions> options) : IUserTaskGuestSessionIssuer
+public sealed class InMemoryUserTaskGuestSessionIssuer(TimeProvider timeProvider, IOptions<UserTasksOptions> options) : IUserTaskGuestSessionIssuer
 {
     private readonly ConcurrentDictionary<string, UserTaskGuestSession> _sessions = new(StringComparer.Ordinal);
 
     public Task<GuestSessionResult> IssueAsync(UserTaskInvitation invitation, ParticipantReference subject, CancellationToken cancellationToken = default)
     {
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         // The session never outlives the invitation it came from, and never exceeds the host's own ceiling.
         var expiresAt = Min(invitation.ExpiresAt, now.Add(options.Value.GuestSessionLifetime));
         if (expiresAt <= now)
@@ -44,7 +44,7 @@ public sealed class InMemoryUserTaskGuestSessionIssuer(ISystemClock clock, IOpti
         var hash = DefaultUserTaskInvitationService.HashToken(credential);
         if (!_sessions.TryGetValue(hash, out var session))
             return Task.FromResult<UserTaskGuestSession?>(null);
-        if (session.ExpiresAt > clock.UtcNow)
+        if (session.ExpiresAt > timeProvider.GetUtcNow())
             return Task.FromResult<UserTaskGuestSession?>(session);
 
         _sessions.TryRemove(hash, out _);
@@ -73,7 +73,7 @@ public sealed class InMemoryUserTaskGuestSessionIssuer(ISystemClock clock, IOpti
 /// (normally the remote address) and never by the token, so probing many tokens from one host still
 /// consumes one budget.
 /// </summary>
-public sealed class SlidingWindowUserTaskInvitationRateLimiter(ISystemClock clock, IOptions<UserTasksOptions> options) : IUserTaskInvitationRateLimiter
+public sealed class SlidingWindowUserTaskInvitationRateLimiter(TimeProvider timeProvider, IOptions<UserTasksOptions> options) : IUserTaskInvitationRateLimiter
 {
     private readonly ConcurrentDictionary<string, Window> _windows = new(StringComparer.Ordinal);
 
@@ -83,7 +83,7 @@ public sealed class SlidingWindowUserTaskInvitationRateLimiter(ISystemClock cloc
         if (settings.AnonymousRateLimit <= 0)
             return ValueTask.FromResult(true);
 
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         var allowed = true;
         _windows.AddOrUpdate(partitionKey,
             _ => new Window(now, 1),
@@ -115,7 +115,7 @@ public sealed class SlidingWindowUserTaskInvitationRateLimiter(ISystemClock cloc
 /// </summary>
 public sealed class InMemoryUserTaskInvitationOutbox(
     IDataProtectionProvider dataProtectionProvider,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskInvitationOutbox
 {
     private readonly IDataProtector _protector = dataProtectionProvider.CreateProtector("Elsa.UserTasks.InvitationDelivery.v1");
@@ -126,13 +126,13 @@ public sealed class InMemoryUserTaskInvitationOutbox(
         _entries[delivery.Id] = new Entry(
             delivery.Id, delivery.TenantId, delivery.TaskId, delivery.InvitationId, delivery.DispatcherName,
             delivery.Recipient, _protector.Protect(JsonSerializer.Serialize(delivery.Token)), delivery.ExpiresAt,
-            delivery.Attempt, delivery.NotBefore ?? clock.UtcNow);
+            delivery.Attempt, delivery.NotBefore ?? timeProvider.GetUtcNow());
         return Task.CompletedTask;
     }
 
     public Task<IReadOnlyCollection<UserTaskInvitationDelivery>> DequeueDueAsync(int maxCount, CancellationToken cancellationToken = default)
     {
-        var now = clock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         foreach (var expired in _entries.Where(x => x.Value.ExpiresAt <= now).ToArray())
             _entries.TryRemove(expired.Key, out _);
 

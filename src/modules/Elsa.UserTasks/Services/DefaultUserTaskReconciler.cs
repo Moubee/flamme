@@ -20,12 +20,12 @@ public sealed class DefaultUserTaskReconciler(
     IUserTaskManager manager,
     IUserTaskProjectionService projectionService,
     IUserTaskWorkflowResumer workflowResumer,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     IBookmarkStore? bookmarkStore = null) : IUserTaskReconciler
 {
     public async Task<UserTaskReconciliationResult> ReconcileAsync(UserTaskReconciliationRequest request, CancellationToken cancellationToken = default)
     {
-        var olderThan = request.OlderThan ?? clock.UtcNow.Subtract(TimeSpan.FromMinutes(5));
+        var olderThan = request.OlderThan ?? timeProvider.GetUtcNow().Subtract(TimeSpan.FromMinutes(5));
         var pageSize = Math.Clamp(request.PageSize, 1, 200);
         var recreated = bookmarkStore == null ? 0 : await RecreateMissingProjectionsAsync(request.TenantId, pageSize, cancellationToken);
         var cursor = (string?)null;
@@ -55,7 +55,7 @@ public sealed class DefaultUserTaskReconciler(
                 if (bookmarkStore != null && bookmark == null && task.IsOpen)
                 {
                     var before = task.Status;
-                    await projectionService.FinalizeBookmarkRemovalAsync(new UserTaskBookmarkRemoval(task.TenantId, task.Id, task.BookmarkId, clock.UtcNow), cancellationToken);
+                    await projectionService.FinalizeBookmarkRemovalAsync(new UserTaskBookmarkRemoval(task.TenantId, task.Id, task.BookmarkId, timeProvider.GetUtcNow()), cancellationToken);
                     var after = await repository.GetAsync(task.TenantId, task.Id, cancellationToken);
                     if (after?.Status != before)
                         finalized++;
@@ -75,7 +75,7 @@ public sealed class DefaultUserTaskReconciler(
                 if (bookmarkStore != null && bookmark == null)
                 {
                     var before = task.Status;
-                    await projectionService.FinalizeBookmarkRemovalAsync(new UserTaskBookmarkRemoval(task.TenantId, task.Id, task.BookmarkId, clock.UtcNow), cancellationToken);
+                    await projectionService.FinalizeBookmarkRemovalAsync(new UserTaskBookmarkRemoval(task.TenantId, task.Id, task.BookmarkId, timeProvider.GetUtcNow()), cancellationToken);
                     var after = await repository.GetAsync(task.TenantId, task.Id, cancellationToken);
                     if (after?.Status != before)
                         finalized++;

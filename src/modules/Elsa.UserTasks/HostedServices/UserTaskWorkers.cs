@@ -102,7 +102,7 @@ public sealed class UserTaskInvitationDeliveryWorker(IServiceScopeFactory scopeF
     {
         var outbox = services.GetRequiredService<IUserTaskInvitationOutbox>();
         var dispatcher = services.GetRequiredService<IUserTaskInvitationDispatcher>();
-        var clock = services.GetRequiredService<ISystemClock>();
+        var timeProvider = services.GetRequiredService<TimeProvider>();
 
         foreach (var delivery in await outbox.DequeueDueAsync(50, cancellationToken))
         {
@@ -117,7 +117,7 @@ public sealed class UserTaskInvitationDeliveryWorker(IServiceScopeFactory scopeF
                 var delay = delivery.Attempt < delays.Count ? delays[delivery.Attempt] : delays.Count > 0 ? delays[^1] : TimeSpan.FromMinutes(5);
                 // The exception may carry recipient details, so only the invitation ID is logged.
                 _logger.LogWarning(exception, "Invitation delivery {InvitationId} failed on attempt {Attempt}", delivery.InvitationId, delivery.Attempt + 1);
-                await outbox.RescheduleAsync(delivery.Id, clock.UtcNow.Add(delay), cancellationToken);
+                await outbox.RescheduleAsync(delivery.Id, timeProvider.GetUtcNow().Add(delay), cancellationToken);
             }
         }
     }

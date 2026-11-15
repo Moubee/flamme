@@ -15,6 +15,32 @@ public class UserTaskTests
     private readonly UserTaskTestFixture _fixture = new();
 
     [Test]
+    public async Task LifecycleTimestamps_FollowTheConfiguredProvider()
+    {
+        _fixture.Clock.Advance(TimeSpan.FromTicks(1_234_567));
+        var createdAt = _fixture.Clock.GetUtcNow();
+        var actor = _fixture.Actor("user-1");
+        var task = await _fixture.ProjectAsync(actor.Subject);
+        await Assert.That(task.CreatedAt).IsEqualTo(createdAt);
+
+        _fixture.Clock.Advance(TimeSpan.FromTicks(37));
+        var claimed = await _fixture.Manager.ClaimAsync(UserTaskTestFixture.TenantId, task.Id, new(1, "claim"), actor);
+        await Assert.That(claimed.Task.AssignedAt).IsEqualTo(createdAt.AddTicks(37));
+
+        _fixture.Clock.Advance(TimeSpan.FromMinutes(5));
+        var completing = await _fixture.Manager.CompleteAsync(UserTaskTestFixture.TenantId, task.Id, new(claimed.Task.Revision, "complete", "Approve"), actor);
+        await Assert.That(completing.Accepted).IsTrue();
+        await Assert.That(_fixture.Resumer.LastStimulus!.CompletedAt).IsEqualTo(createdAt.AddTicks(37).AddMinutes(5));
+
+        _fixture.Clock.Advance(TimeSpan.FromMinutes(3));
+        var completedAt = _fixture.Clock.GetUtcNow();
+        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(UserTaskTestFixture.TenantId, task.Id, task.BookmarkId, completedAt));
+        var completed = await _fixture.Repository.GetAsync(UserTaskTestFixture.TenantId, task.Id);
+        await Assert.That(completed!.CompletedAt).IsEqualTo(completedAt);
+        await Assert.That(completed.Events.Last().OccurredAt).IsEqualTo(completedAt);
+    }
+
+    [Test]
     public async Task ClaimsResolver_PreservesExternalGroupClaimValues()
     {
         var resolver = new DefaultClaimsIdentityResolver(Microsoft.Extensions.Options.Options.Create(new UserTasksOptions { DefaultTenantId = "tenant", DefaultProvider = "oidc" }));
@@ -166,7 +192,7 @@ public class UserTaskTests
         await Assert.That(divergent.Accepted).IsFalse();
         await Assert.That(divergent.ConflictCode).IsEqualTo("idempotency-conflict");
 
-        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(UserTaskTestFixture.TenantId, task.Id, task.BookmarkId, _fixture.Clock.UtcNow));
+        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(UserTaskTestFixture.TenantId, task.Id, task.BookmarkId, _fixture.Clock.GetUtcNow()));
         var completed = await _fixture.Repository.GetAsync(UserTaskTestFixture.TenantId, task.Id);
         await Assert.That(completed!.Status).IsEqualTo(UserTaskStatus.Completed);
 
@@ -363,17 +389,17 @@ public class UserTaskTests
     [Test]
     public async Task DueService_ReservesTimeoutAndResumesWorkflow()
     {
-        var dueAt = _fixture.Clock.UtcNow.AddMinutes(-1);
+        var dueAt = _fixture.Clock.GetUtcNow().AddMinutes(-1);
         var task = await _fixture.ProjectAsync(_fixture.Actor("user-1").Subject,
             definition => definition with { DueAt = dueAt, EnableTimeoutOutcome = true });
         var due = new DefaultUserTaskDueService(_fixture.Repository, _fixture.Manager, _fixture.Sink, _fixture.Identity, _fixture.Clock);
 
-        await Assert.That(await due.MarkOverdueAsync(UserTaskTestFixture.TenantId, _fixture.Clock.UtcNow)).IsEqualTo(1);
+        await Assert.That(await due.MarkOverdueAsync(UserTaskTestFixture.TenantId, _fixture.Clock.GetUtcNow())).IsEqualTo(1);
         var timingOut = await _fixture.Repository.GetAsync(UserTaskTestFixture.TenantId, task.Id);
         await Assert.That(timingOut!.Status).IsEqualTo(UserTaskStatus.TimingOut);
         await Assert.That(_fixture.Resumer.LastStimulus!.ActionKey).IsEqualTo("Timeout");
 
-        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(UserTaskTestFixture.TenantId, task.Id, task.BookmarkId, _fixture.Clock.UtcNow));
+        await _fixture.Projection.FinalizeBookmarkRemovalAsync(new(UserTaskTestFixture.TenantId, task.Id, task.BookmarkId, _fixture.Clock.GetUtcNow()));
         var timedOut = await _fixture.Repository.GetAsync(UserTaskTestFixture.TenantId, task.Id);
         await Assert.That(timedOut!.Status).IsEqualTo(UserTaskStatus.TimedOut);
     }

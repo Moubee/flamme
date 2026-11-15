@@ -168,7 +168,7 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         var task = CreateTask(Subject());
         var tokenHash = $"HASH-{Guid.NewGuid():N}";
         task.Invitations.Add(new("invitation-1", TenantId, task.Id, "guest@example.com", tokenHash,
-            UserTaskInvitationStatus.Pending, Clock.UtcNow, Clock.UtcNow.AddDays(1), "bearer")
+            UserTaskInvitationStatus.Pending, Clock.GetUtcNow(), Clock.GetUtcNow().AddDays(1), "bearer")
         {
             AllowedActions = ["Complete"]
         });
@@ -486,7 +486,7 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
     private async Task SeedSortableTasksAsync()
     {
         var subject = Subject();
-        var baseline = Clock.UtcNow;
+        var baseline = Clock.GetUtcNow();
         var shared = baseline.AddDays(3);
         var sharedUpdated = baseline.AddHours(3);
         UserTask[] tasks =
@@ -504,5 +504,5 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
     }
 
     private UserTaskEvent Event(UserTask task, int revision, string type, string id) =>
-        new($"{id}-{Guid.NewGuid():N}", TenantId, task.Id, revision, type, Clock.UtcNow);
+        new($"{id}-{Guid.NewGuid():N}", TenantId, task.Id, revision, type, Clock.GetUtcNow());
 }
