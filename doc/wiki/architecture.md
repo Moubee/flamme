@@ -61,7 +61,7 @@ sequenceDiagram
 
 ## Definitions Versus Instances
 
-- A workflow definition describes what can run. It may originate from C# workflow types, JSON files, imported payloads, blob storage providers, or DSL compilation.
+- A workflow definition describes what can run. It may originate from C# workflow types, JSON files, imported payloads, or blob storage providers.
 - A workflow instance is a running or historical execution, including workflow state, variables, activity execution state, incidents, status, and logs.
 - Management owns definition and instance stores. Runtime owns trigger/bookmark queues and execution.
 

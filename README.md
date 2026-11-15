@@ -67,7 +67,7 @@ aspire run --isolated
 Aspire starts PostgreSQL 17 and the reference server from source, and provides a
 dashboard for endpoints, health, logs, traces, and metrics. Follow the
 [Aspire development guide](doc/aspire-development.md) for certificate setup,
-isolated Git worktrees, the HTTP workflow demo, and database lifetime details.
+isolated Git worktrees, server health checks, and database lifetime details.
 
 ### Manual server startup
 
@@ -137,7 +137,7 @@ Use separate liveness and readiness probes, configure PostgreSQL persistence, an
 | [Repository wiki](doc/wiki/README.md) | Architecture, modules, runtime behavior, and source landmarks. |
 | [Persistence migration](doc/postgres-inmemory-migration.md) | Removed providers and PostgreSQL configuration. |
 | [Server configuration](src/apps/Elsa.Server.Web/README.md) | Reference host settings, identity, and ingress rate limiting. |
-| [Aspire development](doc/aspire-development.md) | Coordinated server/database startup, workflow demo, telemetry, and isolated worktrees. |
+| [Aspire development](doc/aspire-development.md) | Coordinated server/database startup, health checks, telemetry, and isolated worktrees. |
 | [Upstream Elsa documentation](https://docs.elsaworkflows.io/) | Background on inherited concepts; verify differences against Flamme's code and documentation. |
 
 ## Contributing

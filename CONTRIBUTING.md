@@ -78,7 +78,7 @@ aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHos
 ```
 
 The [Aspire development guide](doc/aspire-development.md) covers prerequisites,
-endpoint discovery, the HTTP workflow demo, rebuilding a resource, and stopping
+endpoint discovery, server health checks, rebuilding a resource, and stopping
 the AppHost while retaining PostgreSQL data.
 
 ### CI validation and package artifacts

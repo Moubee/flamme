@@ -59,26 +59,19 @@ string to the server and all configured sample tenants, and updates their HTTP
 host settings and the server's `Http:BaseUrl` from the generated endpoint.
 It does not use the reference server's fixed-port launch profile.
 
-## Run the HTTP workflow demo
+## Verify server health
 
-The server copies `src/apps/Elsa.Server.Web/Workflows/hello-world-http.elsa` into
-its workflow-provider directory. It listens for an anonymous `GET` at
-`/workflows/hello-world-dsl` and writes a response using a JavaScript expression.
 Set `FLAMME_SERVER_URL` to the discovered HTTP or HTTPS origin, without a trailing
-slash:
+slash, then check process liveness and runtime readiness:
 
 ```bash
 export FLAMME_SERVER_URL='https://localhost:<discovered-port>'
 curl --fail "$FLAMME_SERVER_URL/health/live"
 curl --fail "$FLAMME_SERVER_URL/health/ready"
-curl --fail "$FLAMME_SERVER_URL/workflows/hello-world-dsl"
 ```
 
-The workflow response body is:
-
-```text
-Message: Hello World from DSL via Expressions!
-```
+See [Activities And Authoring](wiki/activities-and-authoring.md) for supported
+C# and JSON workflow examples.
 
 The management API under `/elsa/api` still requires authentication and
 authorization. Development configuration contains sample identities and a
