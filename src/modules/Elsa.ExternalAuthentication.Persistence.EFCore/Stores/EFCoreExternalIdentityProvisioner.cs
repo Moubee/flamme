@@ -29,7 +29,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
     IRoleProvider roleProvider,
     IExternalAuthenticationHandleHasher handleHasher,
     IIdentityGenerator identityGenerator,
-    ISystemClock clock,
+    TimeProvider timeProvider,
     ILogger<EFCoreExternalIdentityProvisioner> logger) : IExternalIdentityProvisioner, IExternalIdentityLinkManagementStore, IExternalIdentitySignInTracker
 {
     private readonly ExternalIdentityUserProvisioningService _userProvisioningService = new(userStore, userProvider, roleProvider, identityGenerator);
@@ -60,7 +60,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
             Issuer = request.Identity.Issuer,
             SubjectHash = handleHasher.Hash(request.Identity.Subject),
             UserId = user.Id,
-            CreatedAt = clock.UtcNow
+            CreatedAt = timeProvider.GetUtcNow()
         };
 
         var saveAttempted = false;
@@ -191,7 +191,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
                 Issuer = request.Identity.Issuer,
                 SubjectHash = subjectHash,
                 UserId = replacementUser.Id,
-                CreatedAt = clock.UtcNow
+                CreatedAt = timeProvider.GetUtcNow()
             };
             dbContext.ExternalIdentityLinks.Add(replacementEntity);
             await dbContext.SaveChangesAsync(cancellationToken);

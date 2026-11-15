@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
 
-public sealed class EFCoreExternalAuthenticationSessionStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, ISystemClock clock) : IExternalAuthenticationSessionStore
+public sealed class EFCoreExternalAuthenticationSessionStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, TimeProvider timeProvider) : IExternalAuthenticationSessionStore
 {
     public async ValueTask<IReadOnlyCollection<ExternalAuthenticationSession>> FindAsync(ExternalAuthenticationSessionFilter filter, CancellationToken cancellationToken = default)
     {
@@ -77,10 +77,11 @@ public sealed class EFCoreExternalAuthenticationSessionStore(ExternalAuthenticat
             return new ExternalAuthenticationSessionRotationResult.NotFound();
         if (session.RevokedAt is not null)
             return new ExternalAuthenticationSessionRotationResult.Revoked();
-        if (session.ExpiresAt <= clock.UtcNow || session.RefreshExpiresAt <= clock.UtcNow)
+        if (session.ExpiresAt <= timeProvider.GetUtcNow() || session.RefreshExpiresAt <= timeProvider.GetUtcNow())
         {
+            var expiredAt = timeProvider.GetUtcNow();
             await dbContext.ExternalAuthenticationSessions.Where(x => x.Id == sessionId && x.RevokedAt == null)
-                .ExecuteUpdateAsync(x => x.SetProperty(y => y.RevokedAt, clock.UtcNow).SetProperty(y => y.RevocationReason, "expired").SetProperty(y => y.ProtectedUpstreamLogoutHint, (byte[]?)null), cancellationToken);
+                .ExecuteUpdateAsync(x => x.SetProperty(y => y.RevokedAt, expiredAt).SetProperty(y => y.RevocationReason, "expired").SetProperty(y => y.ProtectedUpstreamLogoutHint, (byte[]?)null), cancellationToken);
             return new ExternalAuthenticationSessionRotationResult.Expired();
         }
 
@@ -100,8 +101,9 @@ public sealed class EFCoreExternalAuthenticationSessionStore(ExternalAuthenticat
 
         await transaction.RollbackAsync(cancellationToken);
 
+        var reuseDetectedAt = timeProvider.GetUtcNow();
         var revoked = await dbContext.ExternalAuthenticationSessions.Where(x => x.Id == sessionId && x.RevokedAt == null)
-            .ExecuteUpdateAsync(x => x.SetProperty(y => y.RevokedAt, clock.UtcNow).SetProperty(y => y.RevocationReason, "refresh_token_reuse").SetProperty(y => y.ProtectedUpstreamLogoutHint, (byte[]?)null), cancellationToken);
+            .ExecuteUpdateAsync(x => x.SetProperty(y => y.RevokedAt, reuseDetectedAt).SetProperty(y => y.RevocationReason, "refresh_token_reuse").SetProperty(y => y.ProtectedUpstreamLogoutHint, (byte[]?)null), cancellationToken);
         return revoked == 1 ? new ExternalAuthenticationSessionRotationResult.Reused() : new ExternalAuthenticationSessionRotationResult.Revoked();
     }
 

@@ -47,10 +47,10 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
     [Test]
     public async Task InitiationCallbackAndExchangeCanConsumeDurableStateAcrossNodesExactlyOnce()
     {
-        var initiatingNode = new EFCoreExternalAuthenticationStateStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
-        var callbackNode = new EFCoreExternalAuthenticationStateStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
-        var exchangeNode = new EFCoreAuthorizationGrantStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
-        var replayNode = new EFCoreAuthorizationGrantStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
+        var initiatingNode = new EFCoreExternalAuthenticationStateStore(_contexts, _clock);
+        var callbackNode = new EFCoreExternalAuthenticationStateStore(_contexts, _clock);
+        var exchangeNode = new EFCoreAuthorizationGrantStore(_contexts, _clock);
+        var replayNode = new EFCoreAuthorizationGrantStore(_contexts, _clock);
         var transaction = new BrokerTransaction
         {
             HandleHash = "state-hash", Purpose = BrokerTransactionPurpose.ExternalSignIn, ClientId = "studio", CallbackUri = new Uri("https://studio.example/callback"),
@@ -72,8 +72,8 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
     [Test]
     public async Task RefreshRotationAndRevocationAreAtomicAcrossNodes()
     {
-        var firstNode = new EFCoreExternalAuthenticationSessionStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
-        var secondNode = new EFCoreExternalAuthenticationSessionStore(_contexts, new Elsa.Common.Services.SystemClock(_clock));
+        var firstNode = new EFCoreExternalAuthenticationSessionStore(_contexts, _clock);
+        var secondNode = new EFCoreExternalAuthenticationSessionStore(_contexts, _clock);
         await firstNode.SaveAsync(Session());
 
         var rotation = await secondNode.TryRotateRefreshTokenAsync("session-a", "refresh-a", 0, "refresh-b", _clock.GetUtcNow());

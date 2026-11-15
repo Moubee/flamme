@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
 
-public sealed class EFCoreExternalAuthenticationStateStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, ISystemClock clock) : IExternalAuthenticationStateStore
+public sealed class EFCoreExternalAuthenticationStateStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, TimeProvider timeProvider) : IExternalAuthenticationStateStore
 {
     public async ValueTask PutAsync<T>(string purpose, string handleHash, T value, DateTimeOffset expiresAt, CancellationToken cancellationToken = default)
     {
@@ -39,7 +39,7 @@ public sealed class EFCoreExternalAuthenticationStateStore(ExternalAuthenticatio
         if (entry is null)
             return new TakeResult<T>.NotFound();
 
-        var consumedAt = clock.UtcNow;
+        var consumedAt = timeProvider.GetUtcNow();
         var consumed = await dbContext.ExternalAuthenticationBrokerTransactions
             .Where(x => x.Purpose == purpose && x.HandleHash == handleHash && x.ConsumedAt == null && x.ExpiresAtUtcTicks > consumedAt.UtcTicks)
             .ExecuteUpdateAsync(x => x.SetProperty(y => y.ConsumedAt, consumedAt), cancellationToken);
@@ -53,7 +53,7 @@ public sealed class EFCoreExternalAuthenticationStateStore(ExternalAuthenticatio
     }
 }
 
-public sealed class EFCoreAuthorizationGrantStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, ISystemClock clock) : IAuthorizationGrantStore
+public sealed class EFCoreAuthorizationGrantStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, TimeProvider timeProvider) : IAuthorizationGrantStore
 {
     public async ValueTask SaveAsync(AuthorizationGrant grant, CancellationToken cancellationToken = default)
     {
@@ -71,7 +71,7 @@ public sealed class EFCoreAuthorizationGrantStore(ExternalAuthenticationDbContex
         if (grant is null)
             return new TakeResult<AuthorizationGrant>.NotFound();
 
-        var consumedAt = clock.UtcNow;
+        var consumedAt = timeProvider.GetUtcNow();
         var consumed = await dbContext.ExternalAuthenticationAuthorizationGrants
             .Where(x => x.CodeHash == codeHash && x.ConsumedAt == null && x.ExpiresAtUtcTicks > consumedAt.UtcTicks)
             .ExecuteUpdateAsync(x => x.SetProperty(y => y.ConsumedAt, consumedAt), cancellationToken);
@@ -83,7 +83,7 @@ public sealed class EFCoreAuthorizationGrantStore(ExternalAuthenticationDbContex
     }
 }
 
-public sealed class EFCorePreviewResultStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, ISystemClock clock) : IPreviewResultStore
+public sealed class EFCorePreviewResultStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, TimeProvider timeProvider) : IPreviewResultStore
 {
     public async ValueTask SaveAsync(PreviewResult result, CancellationToken cancellationToken = default)
     {
@@ -101,7 +101,7 @@ public sealed class EFCorePreviewResultStore(ExternalAuthenticationDbContextLeas
         if (result is null)
             return new TakeResult<PreviewResult>.NotFound();
 
-        var consumedAt = clock.UtcNow;
+        var consumedAt = timeProvider.GetUtcNow();
         var consumed = await dbContext.ExternalAuthenticationPreviewResults
             .Where(x => x.HandleHash == handleHash && x.AdministratorId == administratorId && x.ConsumedAt == null && x.ExpiresAtUtcTicks > consumedAt.UtcTicks)
             .ExecuteUpdateAsync(x => x.SetProperty(y => y.ConsumedAt, consumedAt), cancellationToken);
