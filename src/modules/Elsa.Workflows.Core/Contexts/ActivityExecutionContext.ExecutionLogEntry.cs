@@ -24,7 +24,7 @@ public partial class ActivityExecutionContext
             Activity.Name,
             NodeId,
             null,
-            _systemClock.UtcNow,
+            _timeProvider.GetUtcNow(),
             WorkflowExecutionContext.ExecutionLogSequence++,
             eventName,
             message,

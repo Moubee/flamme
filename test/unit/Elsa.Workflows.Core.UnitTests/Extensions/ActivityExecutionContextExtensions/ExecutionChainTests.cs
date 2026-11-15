@@ -1,4 +1,3 @@
-using Elsa.Common;
 using Elsa.Extensions;
 using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
@@ -16,7 +15,7 @@ public class ExecutionChainTests
         var fixture = new ActivityTestFixture(root);
         var contextRoot = await fixture.BuildAsync();
         var w = contextRoot.WorkflowExecutionContext;
-        var clock = contextRoot.GetRequiredService<ISystemClock>();
+        var clock = contextRoot.GetRequiredService<TimeProvider>();
 
         var contextA = new ActivityExecutionContext("A", w, null, root, contextRoot.ActivityDescriptor, contextRoot.StartedAt, null, clock, default);
         var contextB = new ActivityExecutionContext("B", w, null, root, contextRoot.ActivityDescriptor, contextRoot.StartedAt, null, clock, default);
@@ -46,7 +45,7 @@ public class ExecutionChainTests
         var fixture = new ActivityTestFixture(root);
         var contextRoot = await fixture.BuildAsync();
         var w = contextRoot.WorkflowExecutionContext;
-        var clock = contextRoot.GetRequiredService<ISystemClock>();
+        var clock = contextRoot.GetRequiredService<TimeProvider>();
 
         var contextA = new ActivityExecutionContext("A", w, null, root, contextRoot.ActivityDescriptor, contextRoot.StartedAt, null, clock, default);
         var contextB = new ActivityExecutionContext("B", w, null, root, contextRoot.ActivityDescriptor, contextRoot.StartedAt, null, clock, default);

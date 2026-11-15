@@ -343,8 +343,8 @@ public static partial class ActivityExecutionContextExtensions
             activityExecutionContext.TransitionTo(ActivityStatus.Faulted);
             var activity = activityExecutionContext.Activity;
             var exceptionState = ExceptionState.FromException(e);
-            var systemClock = activityExecutionContext.GetRequiredService<ISystemClock>();
-            var now = systemClock.UtcNow;
+            var timeProvider = activityExecutionContext.GetRequiredService<TimeProvider>();
+            var now = timeProvider.GetUtcNow();
             var incident = new ActivityIncident(activity.Id, activity.NodeId, activity.Type, e.Message, exceptionState, now, activityExecutionContext.Id);
             activityExecutionContext.WorkflowExecutionContext.Incidents.Add(incident);
             activityExecutionContext.AggregateFaultCount++;

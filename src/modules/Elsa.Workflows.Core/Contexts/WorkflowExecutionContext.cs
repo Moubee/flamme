@@ -59,7 +59,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
         CancellationToken cancellationToken)
     {
         ServiceProvider = serviceProvider;
-        SystemClock = serviceProvider.GetRequiredService<ISystemClock>();
+        TimeProvider = serviceProvider.GetRequiredService<TimeProvider>();
         ActivityRegistry = serviceProvider.GetRequiredService<IActivityRegistry>();
         ActivityRegistryLookup = serviceProvider.GetRequiredService<IActivityRegistryLookupService>();
         _hasher = serviceProvider.GetRequiredService<IHasher>();
@@ -95,7 +95,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
         string id,
         CancellationToken cancellationToken = default)
     {
-        var systemClock = serviceProvider.GetRequiredService<ISystemClock>();
+        var timeProvider = serviceProvider.GetRequiredService<TimeProvider>();
 
         return await CreateAsync(
             serviceProvider,
@@ -103,7 +103,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
             id,
             new List<ActivityIncident>(),
             new List<Bookmark>(),
-            systemClock.UtcNow,
+            timeProvider.GetUtcNow(),
             cancellationToken: cancellationToken
         );
     }
@@ -123,7 +123,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
         string? triggerActivityId = null,
         CancellationToken cancellationToken = default)
     {
-        var systemClock = serviceProvider.GetRequiredService<ISystemClock>();
+        var timeProvider = serviceProvider.GetRequiredService<TimeProvider>();
 
         return await CreateAsync(
             serviceProvider,
@@ -131,7 +131,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
             id,
             new List<ActivityIncident>(),
             new List<Bookmark>(),
-            systemClock.UtcNow,
+            timeProvider.GetUtcNow(),
             correlationId,
             parentWorkflowInstanceId,
             input,
@@ -307,7 +307,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
     internal Exception? Exception { get; set; }
 
     /// Gets the clock used to determine the current time.
-    public ISystemClock SystemClock { get; }
+    public TimeProvider TimeProvider { get; }
 
     /// A flattened list of <see cref="ActivityNode"/>s from the <see cref="Graph"/>. 
     public IReadOnlyCollection<ActivityNode> Nodes => WorkflowGraph.Nodes.ToList();
@@ -565,7 +565,7 @@ public partial class WorkflowExecutionContext : IExecutionContext
             throw new($"Cannot transition from {SubStatus} to {subStatus}");
 
         SubStatus = subStatus;
-        UpdatedAt = SystemClock.UtcNow;
+        UpdatedAt = TimeProvider.GetUtcNow();
 
         if (Status == WorkflowStatus.Finished)
             FinishedAt = UpdatedAt;
@@ -583,9 +583,9 @@ public partial class WorkflowExecutionContext : IExecutionContext
         var activityDescriptor = await ActivityRegistryLookup.FindAsync(activity) ?? throw new ActivityNotFoundException(activity.Type);
         var tag = options?.Tag;
         var parentContext = options?.Owner;
-        var now = SystemClock.UtcNow;
+        var now = TimeProvider.GetUtcNow();
         var id = IdentityGenerator.GenerateId();
-        var activityExecutionContext = new ActivityExecutionContext(id, this, parentContext, activity, activityDescriptor, now, tag, SystemClock, CancellationToken);
+        var activityExecutionContext = new ActivityExecutionContext(id, this, parentContext, activity, activityDescriptor, now, tag, TimeProvider, CancellationToken);
         var variablesToDeclare = options?.Variables ?? [];
         var variableContainer = new[]
         {

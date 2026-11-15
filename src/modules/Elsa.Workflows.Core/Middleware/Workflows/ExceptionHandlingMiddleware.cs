@@ -1,4 +1,3 @@
-using Elsa.Common;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Pipelines.WorkflowExecution;
 using Elsa.Workflows.State;
@@ -23,16 +22,16 @@ public static class ExceptionHandlingMiddlewareExtensions
 public class ExceptionHandlingMiddleware : IWorkflowExecutionMiddleware
 {
     private readonly WorkflowMiddlewareDelegate _next;
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public ExceptionHandlingMiddleware(WorkflowMiddlewareDelegate next, ISystemClock systemClock, ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(WorkflowMiddlewareDelegate next, TimeProvider timeProvider, ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         _logger = logger;
     }
 
@@ -52,7 +51,7 @@ public class ExceptionHandlingMiddleware : IWorkflowExecutionMiddleware
         {
             _logger.LogWarning(e, "An exception was caught from a downstream middleware component");
             var exceptionState = ExceptionState.FromException(e);
-            var now = _systemClock.UtcNow;
+            var now = _timeProvider.GetUtcNow();
             var activity = context.Workflow;
             var incident = new ActivityIncident(activity.Id, activity.NodeId ,activity.Type, e.Message, exceptionState, now);
             context.Exception ??= e;

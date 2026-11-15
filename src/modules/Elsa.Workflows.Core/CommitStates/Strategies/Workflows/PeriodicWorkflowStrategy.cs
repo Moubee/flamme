@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using Elsa.Common;
 
 namespace Elsa.Workflows.CommitStates.Strategies;
 
@@ -18,7 +17,7 @@ public class PeriodicWorkflowStrategy(TimeSpan interval) : IWorkflowCommitStrate
     public CommitAction ShouldCommit(WorkflowCommitStateStrategyContext context)
     {
         var lastCommit = context.WorkflowExecutionContext.TransientProperties.TryGetValue(LastCommitPropertyKey, out var value) ? (DateTimeOffset?)value : null;
-        var now = context.WorkflowExecutionContext.GetRequiredService<ISystemClock>().UtcNow;
+        var now = context.WorkflowExecutionContext.GetRequiredService<TimeProvider>().GetUtcNow();
         var shouldCommit = lastCommit == null || (now - lastCommit.Value).TotalMilliseconds > Interval.TotalMilliseconds;
 
         if (shouldCommit)

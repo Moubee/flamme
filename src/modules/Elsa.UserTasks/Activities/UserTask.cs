@@ -96,7 +96,7 @@ public sealed class UserTask : Activity<UserTaskResult>
             definition,
             [],
             [],
-            context.WorkflowExecutionContext.SystemClock.UtcNow,
+            context.WorkflowExecutionContext.TimeProvider.GetUtcNow(),
             taskId,
             workflow.WorkflowMetadata.Name,
             workflow.Identity.Version,
@@ -115,7 +115,7 @@ public sealed class UserTask : Activity<UserTaskResult>
     private async ValueTask ResumeAsync(ActivityExecutionContext context)
     {
         var stimulus = context.GetWorkflowInput<UserTaskStimulus>(InputKey);
-        Result?.Set(context, new UserTaskResult(stimulus.ActionKey, stimulus.CompletionData, stimulus.CompletedBy, stimulus.CompletedAt ?? context.WorkflowExecutionContext.SystemClock.UtcNow));
+        Result?.Set(context, new UserTaskResult(stimulus.ActionKey, stimulus.CompletionData, stimulus.CompletedBy, stimulus.CompletedAt ?? context.WorkflowExecutionContext.TimeProvider.GetUtcNow()));
         await context.CompleteActivityAsync();
     }
 }

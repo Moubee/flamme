@@ -1,4 +1,3 @@
-using Elsa.Common;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Pipelines.WorkflowExecution;
 using Elsa.Workflows.State;
@@ -20,7 +19,7 @@ public static class EngineExceptionHandlingMiddlewareExtensions
 /// <summary>
 /// Catches any exceptions thrown by downstream components and transitions the workflow into the faulted state.
 /// </summary>
-public class EngineExceptionHandlingMiddleware(WorkflowMiddlewareDelegate next, ISystemClock systemClock, ILogger<EngineExceptionHandlingMiddleware> logger) : IWorkflowExecutionMiddleware
+public class EngineExceptionHandlingMiddleware(WorkflowMiddlewareDelegate next, TimeProvider timeProvider, ILogger<EngineExceptionHandlingMiddleware> logger) : IWorkflowExecutionMiddleware
 {
     /// <inheritdoc />
     public async ValueTask InvokeAsync(WorkflowExecutionContext context)
@@ -33,7 +32,7 @@ public class EngineExceptionHandlingMiddleware(WorkflowMiddlewareDelegate next, 
         {
             logger.LogWarning(e, "An exception was caught from a downstream middleware component");
             var exceptionState = ExceptionState.FromException(e);
-            var now = systemClock.UtcNow;
+            var now = timeProvider.GetUtcNow();
             var activity = context.Workflow;
             var incident = new ActivityIncident(activity.Id, activity.NodeId, activity.Type, e.Message, exceptionState, now);
             

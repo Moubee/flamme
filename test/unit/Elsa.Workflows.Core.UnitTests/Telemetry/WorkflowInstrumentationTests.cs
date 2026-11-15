@@ -590,7 +590,7 @@ public class WorkflowInstrumentationTests
         {
             var middleware = new ExceptionHandlingMiddleware(
                 _ => throw exception,
-                context.SystemClock,
+                context.TimeProvider,
                 NullLogger<ExceptionHandlingMiddleware>.Instance);
 
             await middleware.InvokeAsync(context);
@@ -608,7 +608,7 @@ public class WorkflowInstrumentationTests
         {
             var middleware = new ExceptionHandlingMiddleware(
                 _ => throw new OperationCanceledException(),
-                context.SystemClock,
+                context.TimeProvider,
                 NullLogger<ExceptionHandlingMiddleware>.Instance);
 
             await middleware.InvokeAsync(context);

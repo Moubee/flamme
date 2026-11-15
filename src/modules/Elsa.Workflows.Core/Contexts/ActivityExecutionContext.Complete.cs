@@ -62,7 +62,7 @@ public partial class ActivityExecutionContext
         }
 
         // Update the completed at timestamp.
-        CompletedAt = WorkflowExecutionContext.SystemClock.UtcNow;
+        CompletedAt = WorkflowExecutionContext.TimeProvider.GetUtcNow();
     }
 
     /// <summary>

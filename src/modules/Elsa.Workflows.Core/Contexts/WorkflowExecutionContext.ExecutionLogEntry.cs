@@ -23,7 +23,7 @@ public partial class WorkflowExecutionContext
             Workflow.Name,
             Workflow.Identity.Id,
             null,
-            SystemClock.UtcNow,
+            TimeProvider.GetUtcNow(),
             ExecutionLogSequence++,
             eventName,
             message,

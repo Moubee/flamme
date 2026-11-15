@@ -18,7 +18,7 @@ namespace Elsa.Workflows;
 [PublicAPI]
 public partial class ActivityExecutionContext : IExecutionContext, IDisposable
 {
-    private readonly ISystemClock _systemClock;
+    private readonly TimeProvider _timeProvider;
     private long _executionCount;
     
     // Bookmarks created during the lifetime of this activity. 
@@ -35,10 +35,10 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
         ActivityDescriptor activityDescriptor,
         DateTimeOffset startedAt,
         object? tag,
-        ISystemClock systemClock,
+        TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
-        _systemClock = systemClock;
+        _timeProvider = timeProvider;
         Properties = new ChangeTrackingDictionary<string, object>(Taint);
         Metadata = new ChangeTrackingDictionary<string, object>(Taint);
         ActivityState = new ChangeTrackingDictionary<string, object>(Taint);
@@ -519,7 +519,7 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
             Activity.Id,
             ActivityNode.NodeId,
             Id,
-            _systemClock.UtcNow,
+            _timeProvider.GetUtcNow(),
             options?.AutoBurn ?? true,
             callback?.Method.Name,
             options?.AutoComplete ?? true,
