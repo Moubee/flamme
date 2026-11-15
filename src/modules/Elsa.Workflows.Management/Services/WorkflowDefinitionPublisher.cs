@@ -22,7 +22,7 @@ public class WorkflowDefinitionPublisher(
     IIdentityGenerator identityGenerator,
     IActivitySerializer activitySerializer,
     IMediator mediator,
-    ISystemClock systemClock,
+    TimeProvider timeProvider,
     IOptions<ManagementOptions> options)
     : IWorkflowDefinitionPublisher
 {
@@ -41,7 +41,7 @@ public class WorkflowDefinitionPublisher(
             Version = version,
             IsLatest = true,
             IsPublished = false,
-            CreatedAt = systemClock.UtcNow,
+            CreatedAt = timeProvider.GetUtcNow(),
             StringData = activitySerializer.Serialize(root),
             MaterializerName = JsonWorkflowMaterializer.MaterializerName
         };
@@ -61,7 +61,7 @@ public class WorkflowDefinitionPublisher(
             Version = version,
             IsLatest = true,
             IsPublished = false,
-            CreatedAt = systemClock.UtcNow,
+            CreatedAt = timeProvider.GetUtcNow(),
             StringData = activitySerializer.Serialize(root),
             MaterializerName = JsonWorkflowMaterializer.MaterializerName
         };
@@ -204,7 +204,7 @@ public class WorkflowDefinitionPublisher(
         var draft = definition.ShallowClone();
 
         draft.Version = lastVersion?.Version + 1 ?? 1;
-        draft.CreatedAt = systemClock.UtcNow;
+        draft.CreatedAt = timeProvider.GetUtcNow();
         draft.Id = identityGenerator.GenerateId();
         draft.IsLatest = true;
         draft.IsPublished = false;

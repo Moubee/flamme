@@ -8,12 +8,12 @@ using Elsa.Workflows.State;
 namespace Elsa.Workflows.Management.Services;
 
 /// <inheritdoc />
-public class WorkflowInstanceFactory(IIdentityGenerator identityGenerator, ISystemClock systemClock) : IWorkflowInstanceFactory
+public class WorkflowInstanceFactory(IIdentityGenerator identityGenerator, TimeProvider timeProvider) : IWorkflowInstanceFactory
 {
     /// <inheritdoc />
     public WorkflowState CreateWorkflowState(Workflow workflow, WorkflowInstanceOptions? options = null)
     {
-        var now = systemClock.UtcNow;
+        var now = timeProvider.GetUtcNow();
         return new()
         {
             Id = string.IsNullOrEmpty(options?.WorkflowInstanceId) ? identityGenerator.GenerateId() : options.WorkflowInstanceId,
