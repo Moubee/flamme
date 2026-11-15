@@ -1,6 +1,7 @@
 using Elsa.Common.Multitenancy;
 using Elsa.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
@@ -124,7 +125,7 @@ public class TenantTaskLifecycleCoordinatorTests : IAsyncDisposable
 
     private static TenantTaskLifecycleCoordinator CreateCoordinator()
     {
-        var scheduleManager = new RecurringTaskScheduleManager(Microsoft.Extensions.Options.Options.Create(new RecurringTaskOptions()), Mock.Of<ISystemClock>().Object);
+        var scheduleManager = new RecurringTaskScheduleManager(Microsoft.Extensions.Options.Options.Create(new RecurringTaskOptions()), new FakeTimeProvider(new DateTimeOffset(2026, 11, 15, 12, 0, 0, TimeSpan.Zero)));
         return new TenantTaskLifecycleCoordinator(scheduleManager, NullLogger<TenantTaskLifecycleCoordinator>.Instance);
     }
 

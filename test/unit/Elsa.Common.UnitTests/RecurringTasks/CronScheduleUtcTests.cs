@@ -1,6 +1,5 @@
 using Cronos;
 using Elsa.Common.RecurringTasks;
-using Elsa.Common.Services;
 using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Common.UnitTests.RecurringTasks;
@@ -23,7 +22,7 @@ public class CronScheduleUtcTests
     {
         var initialUtc = new DateTimeOffset(2026, 11, 15, 12, 0, 15, TimeSpan.Zero).AddTicks(1234567);
         var time = new FakeTimeProvider(initialUtc) { AutoAdvanceAmount = TimeSpan.FromTicks(1) };
-        var schedule = new CronSchedule(new SystemClock(time), CronExpression.Parse("* * * * *"));
+        var schedule = new CronSchedule(time, CronExpression.Parse("* * * * *"));
 
         await using var timer = schedule.CreateTimer(() => Task.CompletedTask);
 

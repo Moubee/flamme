@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Elsa.Common.RecurringTasks;
 
-public class RecurringTaskScheduleManager(IOptions<RecurringTaskOptions> options, ISystemClock systemClock)
+public class RecurringTaskScheduleManager(IOptions<RecurringTaskOptions> options, TimeProvider timeProvider)
 {
     public IDictionary<Type, ISchedule> ScheduledTasks { get; set; } = new Dictionary<Type, ISchedule>();
     
@@ -23,7 +23,7 @@ public class RecurringTaskScheduleManager(IOptions<RecurringTaskOptions> options
     {
         return intervalExpression.Type switch
         {
-            IntervalExpressionType.Cron => new CronSchedule(systemClock, CronExpression.Parse(intervalExpression.Expression)),
+            IntervalExpressionType.Cron => new CronSchedule(timeProvider, CronExpression.Parse(intervalExpression.Expression)),
             IntervalExpressionType.Interval => new IntervalSchedule(TimeSpan.Parse(intervalExpression.Expression)),
             _ => throw new NotSupportedException($"Interval expression type '{intervalExpression.Type}' is not supported.")
         };
