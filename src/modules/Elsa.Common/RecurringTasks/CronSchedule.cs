@@ -7,6 +7,6 @@ public class CronSchedule(ISystemClock systemClock, CronExpression expression) :
 {
     public ScheduledTimer CreateTimer(Func<Task> action, ILogger? logger = null)
     {
-        return new ScheduledTimer(action, () => expression.GetNextOccurrence(systemClock.UtcNow.DateTime)!.Value - systemClock.UtcNow.DateTime, logger);
+        return new ScheduledTimer(action, () => expression.GetNextOccurrence(systemClock.UtcNow.UtcDateTime)!.Value - systemClock.UtcNow.UtcDateTime, logger);
     }
 }
