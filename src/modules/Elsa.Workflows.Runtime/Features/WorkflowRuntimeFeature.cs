@@ -38,7 +38,7 @@ namespace Elsa.Workflows.Runtime.Features;
 /// <summary>
 /// Installs and configures workflow runtime features.
 /// </summary>
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 [DependsOn(typeof(WorkflowsFeature))]
 public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
 {

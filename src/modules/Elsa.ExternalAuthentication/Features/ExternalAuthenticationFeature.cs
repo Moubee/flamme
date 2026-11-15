@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.ExternalAuthentication.Features;
 
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 public sealed class ExternalAuthenticationFeature(IModule module) : FeatureBase(module)
 {
     /// <summary>Configures deployment-owned broker clients, connections, security boundaries, and operations.</summary>

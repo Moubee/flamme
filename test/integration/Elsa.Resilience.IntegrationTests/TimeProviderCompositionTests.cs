@@ -1,4 +1,3 @@
-using Elsa.Common;
 using Elsa.Common.Features;
 using Elsa.Extensions;
 using Elsa.Features.Implementations;
@@ -28,11 +27,11 @@ public class TimeProviderCompositionTests
         if (resilienceFirst)
         {
             module.Configure<ResilienceFeature>();
-            module.Configure<SystemClockFeature>();
+            module.Configure<TimeProviderFeature>();
         }
         else
         {
-            module.Configure<SystemClockFeature>();
+            module.Configure<TimeProviderFeature>();
             module.Configure<ResilienceFeature>();
         }
         module.Apply();
@@ -74,16 +73,15 @@ public class TimeProviderCompositionTests
     private static async Task AssertSharedTimeAsync(IServiceProvider container, FakeTimeProvider fake)
     {
         var provider = container.GetRequiredService<TimeProvider>();
-        var facade = container.GetRequiredService<ISystemClock>();
         var sessions = container.GetRequiredService<SimulateResponseSessionStore>();
         await Assert.That(provider).IsSameReferenceAs(fake);
-        await Assert.That(facade.UtcNow).IsEqualTo(fake.GetUtcNow());
+        await Assert.That(provider.GetUtcNow()).IsEqualTo(fake.GetUtcNow());
         await Assert.That(sessions.TryGetNextIndex("session", 3, out var firstIndex)).IsTrue();
         await Assert.That(firstIndex).IsEqualTo(0);
 
         fake.Advance(container.GetRequiredService<IOptions<SimulateResponseOptions>>().Value.SessionSlidingExpiration);
 
-        await Assert.That(facade.UtcNow).IsEqualTo(fake.GetUtcNow());
+        await Assert.That(provider.GetUtcNow()).IsEqualTo(fake.GetUtcNow());
         await Assert.That(sessions.TryGetNextIndex("session", 3, out var expiredIndex)).IsTrue();
         await Assert.That(expiredIndex).IsEqualTo(0);
     }

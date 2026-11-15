@@ -21,7 +21,7 @@ namespace Elsa.Identity.Features;
 /// <summary>
 /// Provides identity feature to authenticate &amp; authorize API requests.
 /// </summary>
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 [PublicAPI]
 public class IdentityFeature : FeatureBase
 {

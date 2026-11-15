@@ -42,7 +42,7 @@ namespace Elsa.Workflows.Management.Features;
 [DependsOn(typeof(StringCompressionFeature))]
 [DependsOn(typeof(MediatorFeature))]
 [DependsOn(typeof(MemoryCacheFeature))]
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 [DependsOn(typeof(WorkflowsFeature))]
 [DependsOn(typeof(WorkflowDefinitionsFeature))]
 [DependsOn(typeof(WorkflowInstancesFeature))]

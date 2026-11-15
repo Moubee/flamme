@@ -36,47 +36,31 @@ public class TimeProviderFeatureTests
         using var scope = container.CreateScope();
         var provider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
         await Assert.That(provider).IsSameReferenceAs(fake);
+        await Assert.That(container.GetRequiredService<TimeProvider>()).IsSameReferenceAs(provider);
         await Assert.That(provider.GetUtcNow()).IsEqualTo(instant);
         fake.Advance(TimeSpan.FromTicks(37));
         await Assert.That(provider.GetUtcNow()).IsEqualTo(instant.AddTicks(37));
     }
 
     [Test]
-    [Arguments(true)]
-    [Arguments(false)]
-    public async Task LegacyFacade_UsesTheHostProviderAcrossScopes(bool registerBefore)
-    {
-        var services = new ServiceCollection();
-        var initialUtc = DateTimeOffset.UnixEpoch.AddTicks(1_234_567);
-        var fake = new FakeTimeProvider(initialUtc);
-        if (registerBefore) services.AddSingleton<TimeProvider>(fake);
-        var module = new Module(services);
-        module.Configure<SystemClockFeature>();
-        module.Apply();
-        if (!registerBefore) services.AddSingleton<TimeProvider>(fake);
-        using var container = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-        using var scope = container.CreateScope();
-        var facade = scope.ServiceProvider.GetRequiredService<ISystemClock>();
-
-        await Assert.That(container.GetRequiredService<ISystemClock>()).IsSameReferenceAs(facade);
-        await Assert.That(scope.ServiceProvider.GetRequiredService<TimeProvider>()).IsSameReferenceAs(fake);
-        await Assert.That(facade.UtcNow).IsEqualTo(initialUtc);
-        fake.Advance(TimeSpan.FromTicks(37));
-        await Assert.That(facade.UtcNow).IsEqualTo(initialUtc.AddTicks(37));
-    }
-
-    [Test]
-    public async Task LegacyFacade_RejectsAScopedProviderWhenResolved()
+    public async Task SingletonConsumer_RejectsAScopedProvider()
     {
         var services = new ServiceCollection();
         services.AddScoped<TimeProvider>(_ => new FakeTimeProvider(DateTimeOffset.UnixEpoch));
+        services.AddSingleton<SingletonConsumer>();
         var module = new Module(services);
-        module.Configure<SystemClockFeature>();
+        module.Configure<TimeProviderFeature>();
         module.Apply();
-        using var container = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
 
-        // Factory dependencies are checked on resolution, rather than by ValidateOnBuild.
-        await Assert.That(() => container.GetRequiredService<ISystemClock>()).Throws<InvalidOperationException>();
+        await Assert.That(() => services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        })).Throws<AggregateException>();
     }
 
+    public sealed class SingletonConsumer(TimeProvider timeProvider)
+    {
+        public TimeProvider TimeProvider { get; } = timeProvider;
+    }
 }

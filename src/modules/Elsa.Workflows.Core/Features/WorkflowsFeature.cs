@@ -39,7 +39,7 @@ namespace Elsa.Workflows.Features;
 /// <summary>
 /// Adds workflow services to the system.
 /// </summary>
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 [DependsOn(typeof(ExpressionsFeature))]
 [DependsOn(typeof(MediatorFeature))]
 [DependsOn(typeof(DefaultFormattersFeature))]

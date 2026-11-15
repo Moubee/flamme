@@ -2,17 +2,18 @@
 
 ## Status
 
-Proposed for a breaking release; breaking API changes are authorized. This record
-specifies the migration; it does not change production
-registrations, public APIs, scheduling behavior, or persisted data. Acceptance
-requires the implementation and release gates described below.
+Accepted for the breaking TimeProvider release. The migration replaces public
+clock APIs and registrations, adopts FakeTimeProvider in tests, and preserves
+persisted timestamp formats and existing timer mechanisms. Release validation
+follows the gates below. The temporary adapter described here is removed from
+the completed implementation.
 
 ## Context and research
 
 The baseline is `origin/main` at `239ae5b99`. Flamme has its own
-[`Elsa.Common.ISystemClock`](../../src/modules/Elsa.Common/Contracts/ISystemClock.cs),
+[`Elsa.Common.ISystemClock`](https://github.com/Moubee/flamme/blob/239ae5b99/src/modules/Elsa.Common/Contracts/ISystemClock.cs),
 with one member: `DateTimeOffset UtcNow`. Its
-[`SystemClock`](../../src/modules/Elsa.Common/Services/SystemClock.cs) returns
+[`SystemClock`](https://github.com/Moubee/flamme/blob/239ae5b99/src/modules/Elsa.Common/Services/SystemClock.cs) returns
 `DateTimeOffset.UtcNow`, without rounding or truncation. This is **not**
 `Microsoft.AspNetCore.Authentication.ISystemClock`: Microsoft's authentication
 [migration notice](https://learn.microsoft.com/en-us/aspnet/core/breaking-changes/8/isystemclock-obsolete)
@@ -87,12 +88,11 @@ an SDK upgrade or solution conversion is not part of this migration.
 comes from the test-only `Microsoft.Extensions.TimeProvider.Testing` package.
 Use stable [version 11.0.0](https://www.nuget.org/packages/Microsoft.Extensions.TimeProvider.Testing/11.0.0),
 which includes both target frameworks, through `Directory.Packages.props`.
-Add versionless references in `Elsa.Testing.Shared` for the fixture and in test
-projects that directly use the fake. Do not add it to production modules or
+Add versionless references in `Elsa.Testing.Shared` for the fixture and centrally
+in `test/Directory.Build.props` for correctness test projects. Do not add it to production modules or
 hosts. Regenerate all executable dependency locks according to
 [contributor guidance](../../CONTRIBUTING.md#dependency-updates). Adding this
-dependency and replacing legacy clock mocks are explicitly in the migration's
-scope; the package itself is not added by this design record.
+dependency and replacing legacy clock mocks are part of the implementation.
 
 ## Decision
 
@@ -195,8 +195,7 @@ performance, distributed clock synchronization, or universal virtual-time claim.
 
 ## Incremental implementation
 
-The following are proposed implementation commits, not claims that the changes
-already exist. Follow the order within each group; carry constructor callers,
+The following sequence defines the implementation boundaries. Carry constructor callers,
 explicit factories and tests with the owning change. Use one conventional commit
 per row. Shared composition changes require the full suite before release even
 when targeted checks are used while iterating.

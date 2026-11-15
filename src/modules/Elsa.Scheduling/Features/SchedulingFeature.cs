@@ -20,7 +20,7 @@ namespace Elsa.Scheduling.Features;
 /// <summary>
 /// Provides scheduling features to the system.
 /// </summary>
-[DependsOn(typeof(SystemClockFeature))]
+[DependsOn(typeof(TimeProviderFeature))]
 public class SchedulingFeature : FeatureBase
 {
     /// <inheritdoc />

@@ -206,7 +206,6 @@ public class ActivityTestFixture : IAsyncDisposable
     {
         services.AddLogging();
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
-        services.AddSingleton<ISystemClock>(sp => new SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<INotificationSender>(_ => Mock.Of<IFixtureNotificationSender>().Object);
         services.AddSingleton<IActivityVisitor, ActivityVisitor>();
         services.AddScoped<IExpressionEvaluator, ExpressionEvaluator>();
