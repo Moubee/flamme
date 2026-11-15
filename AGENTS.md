@@ -5,6 +5,8 @@ technical identifiers remain unchanged. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 for build, test, dependency, and pull request workflows; use the SDK selected by
 [global.json](global.json).
 
+Use the [ranked documentation index](doc/README.md) to find guidance for a task.
+
 ## Project constraints
 
 - Prioritize runtime correctness, measured performance, distributed execution,

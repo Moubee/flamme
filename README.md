@@ -131,6 +131,7 @@ Use separate liveness and readiness probes, configure PostgreSQL persistence, an
 
 | Resource | Purpose |
 | --- | --- |
+| [Documentation index](doc/README.md) | Guides ranked by importance, retained reference material, and documentation maintenance policy. |
 | [Project direction](doc/project-direction.md) | Fork rationale, scope, and relationship to upstream. |
 | [Roadmap](ROADMAP.md) | Flamme's development priorities and future database plans. |
 | [Repository wiki](doc/wiki/README.md) | Architecture, modules, runtime behavior, and source landmarks. |

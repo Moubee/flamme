@@ -4,6 +4,9 @@ This wiki maps Flamme from its source code: where the important components live,
 
 The source of truth is still the code, specs, ADRs, and tests. Each page links back to the relevant files so you can jump from explanation to implementation.
 
+The [documentation index](../README.md) ranks the repository's guides and references
+by importance. Use [domain language](../domain-language.md) for canonical terminology.
+
 ## Start Here
 
 Flamme is a modular .NET process orchestrator. The main solution is [Elsa.slnx](../../Elsa.slnx). Production code lives under [src](../../src), tests under [test](../../test), specifications under [specs](../../specs), and architecture decisions under [doc/adr](../adr).
