@@ -1,10 +1,11 @@
-using Elsa.Common;
+using Elsa.Extensions;
 using Elsa.Scheduling;
 using Elsa.Scheduling.Activities;
 using Elsa.Scheduling.Bookmarks;
 using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using System.Threading.Tasks;
 
 namespace Elsa.Activities.UnitTests.Scheduling;
@@ -36,6 +37,29 @@ public class DelayTests
     }
 
     [Test]
+    public async Task FixtureClockAdvancement_IsIsolatedAndControlsBookmarkTime()
+    {
+        var duration = TimeSpan.FromMinutes(1);
+        await using var firstFixture = new ActivityTestFixture(new Delay(duration));
+        await using var secondFixture = new ActivityTestFixture(new Delay(duration));
+        var firstContext = await firstFixture.BuildAsync();
+        var secondContext = await secondFixture.BuildAsync();
+        var firstClock = (FakeTimeProvider)firstContext.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var secondClock = (FakeTimeProvider)secondContext.ExpressionExecutionContext.GetRequiredService<TimeProvider>();
+        var initialUtc = secondClock.GetUtcNow();
+
+        firstClock.Advance(TimeSpan.FromMinutes(5));
+        await firstFixture.ExecuteAsync(firstContext);
+        await secondFixture.ExecuteAsync(secondContext);
+
+        var firstPayload = await GetDelayPayload(firstContext);
+        var secondPayload = await GetDelayPayload(secondContext);
+        await Assert.That(firstPayload.ResumeAt).IsEqualTo(initialUtc.AddMinutes(5).Add(duration));
+        await Assert.That(secondPayload.ResumeAt).IsEqualTo(initialUtc.Add(duration));
+        await Assert.That(secondClock.GetUtcNow()).IsEqualTo(initialUtc);
+    }
+
+    [Test]
     [MethodDataSource(nameof(FactoryMethodTestCases))]
     public async Task FactoryMethods_CreateCorrectTimeSpans(Delay activity, TimeSpan expected)
     {
@@ -59,18 +83,16 @@ public class DelayTests
         () => (Delay.FromDays(1), TimeSpan.FromDays(1))
     ];
 
-    private static async Task<ActivityExecutionContext> ExecuteAsync(Delay activity, ISystemClock clock)
+    private static async Task<ActivityExecutionContext> ExecuteAsync(Delay activity, TimeProvider clock)
     {
         return await new ActivityTestFixture(activity)
-            .ConfigureServices(services => services.AddSingleton(clock))
+            .ConfigureServices(services => services.AddSingleton<TimeProvider>(clock))
             .ExecuteAsync();
     }
 
-    private static ISystemClock CreateClock(DateTimeOffset now)
+    private static TimeProvider CreateClock(DateTimeOffset now)
     {
-        var clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(clock).UtcNow.Returns(now);
-        return clock;
+        return new FakeTimeProvider(now);
     }
 
     private static async Task<DelayPayload> GetDelayPayload(ActivityExecutionContext context)

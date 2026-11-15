@@ -1,5 +1,6 @@
 using Elsa.Common;
 using Elsa.Common.Multitenancy;
+using Elsa.Common.Services;
 using Elsa.Common.Serialization;
 using Elsa.Expressions.Contracts;
 using Elsa.Expressions.Services;
@@ -15,6 +16,7 @@ using Elsa.Workflows.PortResolvers;
 using Elsa.Workflows.Serialization.Serializers;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Testing.Shared;
 
@@ -203,7 +205,8 @@ public class ActivityTestFixture : IAsyncDisposable
     private static void AddCoreWorkflowServices(IServiceCollection services)
     {
         services.AddLogging();
-        services.AddSingleton<ISystemClock>(_ => Mock.Of<IFixtureSystemClock>().Object);
+        services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
+        services.AddSingleton<ISystemClock>(sp => new SystemClock(sp.GetRequiredService<TimeProvider>()));
         services.AddSingleton<INotificationSender>(_ => Mock.Of<IFixtureNotificationSender>().Object);
         services.AddSingleton<IActivityVisitor, ActivityVisitor>();
         services.AddScoped<IExpressionEvaluator, ExpressionEvaluator>();
@@ -236,7 +239,6 @@ public class ActivityTestFixture : IAsyncDisposable
 
     // TUnit follows the target's visibility for generated setup extensions. Keep fixture
     // defaults internal so consumers can mock the public interfaces without ambiguous extensions.
-    internal interface IFixtureSystemClock : ISystemClock;
     internal interface IFixtureNotificationSender : INotificationSender;
     internal interface IFixtureIdentityGenerator : IIdentityGenerator;
     internal interface IFixtureHasher : IHasher;

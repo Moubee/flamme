@@ -1,4 +1,3 @@
-using Elsa.Common;
 using Elsa.Extensions;
 using Elsa.Scheduling;
 using Elsa.Scheduling.Bookmarks;
@@ -6,6 +5,7 @@ using Elsa.Testing.Shared;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Elsa.Scheduling.UnitTests.Extensions;
 
@@ -48,12 +48,12 @@ public class TimerActivityExecutionContextExtensionsTests
         await Assert.That(context.WorkflowExecutionContext.Bookmarks).IsEmpty();
     }
 
-    private static async Task<ActivityExecutionContext> ExecuteAsync(Inline activity, ISystemClock? clock = null)
+    private static async Task<ActivityExecutionContext> ExecuteAsync(Inline activity, TimeProvider? clock = null)
     {
         var fixture = new ActivityTestFixture(activity);
 
         if (clock != null)
-            fixture.ConfigureServices(services => services.AddSingleton(clock));
+            fixture.ConfigureServices(services => services.AddSingleton<TimeProvider>(clock));
 
         return await fixture.ExecuteAsync();
     }
@@ -65,11 +65,9 @@ public class TimerActivityExecutionContextExtensionsTests
             .ExecuteAsync();
     }
 
-    private static ISystemClock CreateClock(DateTimeOffset now)
+    private static TimeProvider CreateClock(DateTimeOffset now)
     {
-        var clock = Mock.Of<ISystemClock>().Object;
-        Mock.Get(clock).UtcNow.Returns(now);
-        return clock;
+        return new FakeTimeProvider(now);
     }
 
     private static async Task<TimerBookmarkPayload> GetTimerPayload(ActivityExecutionContext context)
