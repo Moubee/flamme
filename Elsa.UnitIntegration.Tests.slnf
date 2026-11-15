@@ -7,7 +7,6 @@
       "test/integration/Elsa.Alterations.Persistence.ConformanceTests/Elsa.Alterations.Persistence.ConformanceTests.csproj",
       "test/integration/Elsa.Alterations.IntegrationTests/Elsa.Alterations.IntegrationTests.csproj",
       "test/integration/Elsa.Common.IntegrationTests/Elsa.Common.IntegrationTests.csproj",
-      "test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj",
       "test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj",
       "test/integration/Elsa.Hosts.SmokeTests/Elsa.Hosts.SmokeTests.csproj",
       "test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj",

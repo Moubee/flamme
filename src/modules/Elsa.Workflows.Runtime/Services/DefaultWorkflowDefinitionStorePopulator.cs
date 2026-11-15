@@ -162,7 +162,7 @@ public class DefaultWorkflowDefinitionStorePopulator : IWorkflowDefinitionStoreP
             stringData = materializedWorkflow.MaterializerName == "Json"
                 ? _activitySerializer.Serialize(workflow.Root)
                 :
-                // For new formats (ElsaScript, YAML, etc.), only OriginalSource is needed
+                // Custom source-only materializers only need OriginalSource
                 // StringData can be null as these materializers only use OriginalSource
                 null;
         }

@@ -14,7 +14,7 @@ public interface IBlobWorkflowFormatHandler
     string Name { get; }
 
     /// <summary>
-    /// Gets the file extensions that this handler supports (without the leading dot, e.g., "json", "elsa").
+    /// Gets the file extensions that this handler supports (without the leading dot, e.g., "json").
     /// This is used to optimize blob storage browsing by filtering files before reading their contents.
     /// Return an empty collection if the handler can process any file type.
     /// </summary>

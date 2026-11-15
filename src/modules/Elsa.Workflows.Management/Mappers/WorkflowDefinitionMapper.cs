@@ -33,7 +33,7 @@ public class WorkflowDefinitionMapper
     public Workflow Map(WorkflowDefinition source)
     {
         // OriginalSource is the authoritative payload only when StringData is absent
-        // (ElsaScript, YAML, and other source-only materializers introduced with #7076).
+        // (for example, a full JSON definition imported without a serialized root).
         // File-imported JSON stores both: the blob snapshot in OriginalSource and the
         // serialized root in StringData. Studio/API edits update StringData (and entity
         // fields) but used to leave OriginalSource stale, so preferring OriginalSource

@@ -83,9 +83,6 @@
   </Folder>
   <Folder Name="/src/modules/diagnostics/">
   </Folder>
-  <Folder Name="/src/modules/dsl/">
-    <Project Path="src/modules/Elsa.Dsl.ElsaScript/Elsa.Dsl.ElsaScript.csproj" />
-  </Folder>
   <Folder Name="/src/modules/expressions/">
     <Project Path="src/modules/Elsa.Expressions.CSharp/Elsa.Expressions.CSharp.csproj" />
     <Project Path="src/modules/Elsa.Expressions.JavaScript.Libraries/Elsa.Expressions.JavaScript.Libraries.csproj" />
@@ -145,7 +142,6 @@
     <Project Path="src/modules/Elsa.AI.Persistence.EFCore/Elsa.AI.Persistence.EFCore.csproj" />
   </Folder>
   <Folder Name="/src/modules/workflows/">
-    <Project Path="src/modules/Elsa.WorkflowProviders.BlobStorage.ElsaScript/Elsa.WorkflowProviders.BlobStorage.ElsaScript.csproj" />
     <Project Path="src/modules/Elsa.WorkflowProviders.BlobStorage/Elsa.WorkflowProviders.BlobStorage.csproj" />
     <Project Path="src/modules/Elsa.Workflows.Api/Elsa.Workflows.Api.csproj" />
     <Project Path="src/modules/Elsa.Workflows.Core/Elsa.Workflows.Core.csproj" />
@@ -170,7 +166,6 @@
     <Project Path="test/integration/Elsa.Alterations.IntegrationTests/Elsa.Alterations.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Alterations.Persistence.ConformanceTests/Elsa.Alterations.Persistence.ConformanceTests.csproj" />
     <Project Path="test/integration/Elsa.Common.IntegrationTests/Elsa.Common.IntegrationTests.csproj" />
-    <Project Path="test/integration/Elsa.Dsl.ElsaScript.IntegrationTests/Elsa.Dsl.ElsaScript.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.ExternalAuthentication.IntegrationTests/Elsa.ExternalAuthentication.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.JavaScript.IntegrationTests/Elsa.JavaScript.IntegrationTests.csproj" />

@@ -17,7 +17,6 @@ using Elsa.ServiceDefaults;
 using Elsa.Tenants;
 using Elsa.Tenants.AspNetCore;
 using Elsa.Tenants.Extensions;
-using Elsa.WorkflowProviders.BlobStorage.ElsaScript.Extensions;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Api;
@@ -101,7 +100,6 @@ services
             .UseDashboardApi()
             .UseWorkflowRuntimeDashboard()
             .UseFluentStorageProvider()
-            .UseElsaScriptBlobStorage()
             .UseScheduling()
             .UseCSharp(options =>
             {

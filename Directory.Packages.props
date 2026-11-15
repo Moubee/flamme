@@ -118,7 +118,6 @@
         <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.21.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.21.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.21.0-beta.1"/>
-        <PackageVersion Include="Parlot" Version="1.6.0"/>
         <PackageVersion Include="Polly" Version="8.9.1"/>
         <PackageVersion Include="Polly.Extensions" Version="8.9.1"/>
         <PackageVersion Include="Polly.Extensions.Http" Version="3.0.0"/>
