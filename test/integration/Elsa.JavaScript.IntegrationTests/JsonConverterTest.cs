@@ -1,6 +1,7 @@
 ﻿using System.Dynamic;
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Elsa.Common.Converters;
 using Elsa.Expressions.JavaScript.Contracts;
 using Elsa.Expressions.Models;
@@ -49,7 +50,28 @@ public class JsonConverterTest : IAsyncDisposable
 }";
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new MemoryRegister());
         var result = (await javaScriptEvaluator.EvaluateAsync(script, typeof(ExpandoObject), expressionExecutionContext))!;
-        var serializedText = JsonSerializer.Serialize((ExpandoObject)result, TestJsonSerializerContext.Default.ExpandoObject);
+        var options = new JsonSerializerOptions
+        {
+            TypeInfoResolver = TestJsonSerializerContext.Default.WithAddedModifier(typeInfo =>
+            {
+                if (typeInfo.Type != typeof(BigInteger))
+                    return;
+
+                // Preserve the property order of the original reflection-based contract.
+                foreach (var property in typeInfo.Properties)
+                    property.Order = property.Name switch
+                    {
+                        nameof(BigInteger.IsPowerOfTwo) => 0,
+                        nameof(BigInteger.IsZero) => 1,
+                        nameof(BigInteger.IsOne) => 2,
+                        nameof(BigInteger.IsEven) => 3,
+                        nameof(BigInteger.Sign) => 4,
+                        _ => 5
+                    };
+            })
+        };
+        var typeInfo = (JsonTypeInfo<ExpandoObject>)options.GetTypeInfo(typeof(ExpandoObject));
+        var serializedText = JsonSerializer.Serialize((ExpandoObject)result, typeInfo);
 
         await Assert.That(serializedText).IsEqualTo("{\"BigNumber\":{\"IsPowerOfTwo\":false,\"IsZero\":false,\"IsOne\":false,\"IsEven\":false,\"Sign\":1}}");
     }

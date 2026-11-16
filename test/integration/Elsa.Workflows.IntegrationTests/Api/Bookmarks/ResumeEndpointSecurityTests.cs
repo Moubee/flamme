@@ -78,7 +78,7 @@ public class ResumeEndpointSecurityTests
         var context = CreateHttpContext(HttpMethods.Post, "?t=valid", "null");
         var sut = CreateEndpoint(context);
         ArrangeValidToken();
-        Mock.Get(_apiSerializer).Deserialize<Request>("null").Returns(null!);
+        Mock.Get(_apiSerializer).Deserialize<Request>("null").Returns((Request)null!);
 
         await sut.HandleAsync(CancellationToken.None);
 

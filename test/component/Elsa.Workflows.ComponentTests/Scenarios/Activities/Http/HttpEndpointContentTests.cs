@@ -32,6 +32,22 @@ public class HttpEndpointContentTests(App app) : AppComponentTest(app)
     }
 
     [Test]
+    [Arguments("""["first",2,true]""")]
+    [Arguments("""{"Nested":[1,{"Enabled":true}]}""")]
+    [Arguments("\"hello\"")]
+    [Arguments("42")]
+    [Arguments("1.25")]
+    [Arguments("true")]
+    public async Task JsonContent_ArraysAndScalars_ReturnsEchoedJson(string jsonContent)
+    {
+        using var response = await PostJsonContentAsync(jsonContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
+        await Assert.That(JsonElement.DeepEquals(JsonElement.Parse(jsonContent), JsonElement.Parse(responseContent))).IsTrue();
+    }
+
+    [Test]
     [Arguments("{ \"name\": \"John\", invalid }", HttpStatusCode.BadRequest)]
     [Arguments("", HttpStatusCode.OK, "No content received")]
     public async Task JsonContent_InvalidOrEmpty_ReturnsExpectedResponse(

@@ -713,7 +713,7 @@ internal sealed class ElsaModuleRegistryLease
     private static ConcurrentDictionary<IServiceCollection, IModule> GetModules()
     {
         const string fieldName = "Modules";
-        var extensionsType = Type.GetType("Elsa.Extensions.ModuleExtensions, Elsa.Features", throwOnError: true)!;
+        var extensionsType = Type.GetType("Elsa.Extensions.ModuleExtensions, Elsa", throwOnError: true)!;
         var field = extensionsType.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
             ?? throw new MissingFieldException(extensionsType.FullName, fieldName);
         var expectedType = typeof(IDictionary<IServiceCollection, IModule>);

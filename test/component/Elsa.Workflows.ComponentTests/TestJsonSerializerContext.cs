@@ -12,6 +12,7 @@ namespace Elsa.Workflows.ComponentTests;
 [JsonSerializable(typeof(PostRequest))]
 [JsonSerializable(typeof(ExecuteWorkflowResult))]
 [JsonSerializable(typeof(ExpandoObject))]
+[JsonSerializable(typeof(object[]))]
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(long))]

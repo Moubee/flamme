@@ -70,11 +70,7 @@ public class SerializationTests : IAsyncDisposable
         else
         {
             result = type == typeof(JsonObject)
-                ? new JsonObject
-                {
-                    ["StatusCode"] = (string)transformationModel["StatusCode"],
-                    ["Content"] = ((JsonNode)transformationModel["Content"]).DeepClone()
-                }.ToJsonString()
+                ? JsonSerializer.Serialize(transformationModel, JsonSerializationFixtureContext.Default.ObjectMap)
                 : ((JsonNode)transformationModel["Content"]).ToJsonString();
         }
 

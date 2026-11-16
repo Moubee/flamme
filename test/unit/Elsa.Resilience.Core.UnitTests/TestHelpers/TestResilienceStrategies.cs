@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Polly;
 using Polly.Retry;
 
@@ -12,16 +13,16 @@ internal class TestRetryStrategy : IResilienceStrategy
     public string DisplayName { get; set; } = "Test Retry";
     public int MaxRetryAttempts { get; set; } = 2;
 
+    [UnconditionalSuppressMessage("Trimming", "IL2091", Justification = "This JIT-run helper uses primitive test results and must add generic retries to the supplied builder so the production retry telemetry remains attached; the production strategy interface does not carry Polly's result-preservation requirement.")]
     public Task ConfigurePipeline<T>(ResiliencePipelineBuilder<T> pipelineBuilder, ResilienceContext context)
     {
-        var retryPipeline = new ResiliencePipelineBuilder().AddRetry(new RetryStrategyOptions
+        pipelineBuilder.AddRetry(new RetryStrategyOptions<T>
         {
             MaxRetryAttempts = MaxRetryAttempts,
             Delay = TimeSpan.Zero,
             BackoffType = DelayBackoffType.Constant,
-            ShouldHandle = new PredicateBuilder().Handle<InvalidOperationException>()
-        }).Build();
-        pipelineBuilder.AddPipeline(retryPipeline);
+            ShouldHandle = new PredicateBuilder<T>().Handle<InvalidOperationException>()
+        });
 
         return Task.CompletedTask;
     }

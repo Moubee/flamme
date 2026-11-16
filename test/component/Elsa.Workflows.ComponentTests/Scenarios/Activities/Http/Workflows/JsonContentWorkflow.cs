@@ -1,4 +1,3 @@
-using System.Dynamic;
 using System.Net;
 using Elsa.Http;
 using Elsa.Workflows.Activities;
@@ -34,7 +33,7 @@ public class JsonContentWorkflow : WorkflowBase
                     {
                         var content = parsedContentVariable.Get(context);
                         return content != null 
-                            ? JsonSerializer.Serialize((ExpandoObject)content, TestJsonSerializerContext.Default.ExpandoObject)
+                            ? JsonSerializer.Serialize(content, TestJsonSerializerContext.Default.GetTypeInfo(content.GetType())!)
                             : "No content received";
                     }),
                     ContentType = new("application/json"),
