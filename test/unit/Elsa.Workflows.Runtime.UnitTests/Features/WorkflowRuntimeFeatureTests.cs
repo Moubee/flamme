@@ -168,9 +168,9 @@ public class WorkflowRuntimeFeatureTests
         }
     }
 
-    private static void RegisterWorkflowTypeAliases(object feature, SerializationTypeOptions options)
+    private static void RegisterWorkflowTypeAliases(RuntimeFeature feature, SerializationTypeOptions options)
     {
-        feature.GetType()
+        typeof(RuntimeFeature)
             .GetMethod("RegisterWorkflowTypeAliases", BindingFlags.Instance | BindingFlags.NonPublic)!
             .Invoke(feature, new object[] { options });
     }

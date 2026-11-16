@@ -1,5 +1,7 @@
 using Elsa.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Elsa.Common.UnitTests;
@@ -16,11 +18,10 @@ public class ExceptionExtensionsTests
     [Arguments(typeof(AccessViolationException))]
     [Arguments(typeof(SEHException))]
     [Arguments(typeof(ThreadAbortException))]
-    public async Task FatalExceptions(Type exceptionType)
+    public async Task FatalExceptions(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] Type exceptionType)
     {
-#pragma warning disable SYSLIB0050 // FormatterServices is needed to instantiate fatal exception types without throwing them.
-        var ex = (Exception)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(exceptionType);
-#pragma warning restore SYSLIB0050
+        var ex = (Exception)RuntimeHelpers.GetUninitializedObject(exceptionType);
         await Assert.That(ex.IsFatal()).IsTrue();
     }
 
@@ -39,7 +40,8 @@ public class ExceptionExtensionsTests
     [Arguments(typeof(TimeoutException))]
     [Arguments(typeof(NullReferenceException))]
     [Arguments(typeof(IOException))]
-    public async Task RecoverableExceptions(Type exceptionType)
+    public async Task RecoverableExceptions(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type exceptionType)
     {
         var ex = (Exception)Activator.CreateInstance(exceptionType)!;
         await Assert.That(ex.IsFatal()).IsFalse();

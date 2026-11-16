@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Elsa.Activities.UnitTests.Http.Helpers;
 using Elsa.Extensions;
@@ -44,7 +45,7 @@ public class SendHttpRequestTests
     {
         // Arrange
         var expectedUrl = new Uri("https://api.example.com/secure");
-        
+
         var requestCapture = new RequestCapture();
         var responseHandler = CreateResponseHandler(HttpStatusCode.OK, null, requestCapture);
         var sendHttpRequest = CreateSendHttpRequest(expectedUrl, authorization: authorizationHeader);
@@ -97,7 +98,7 @@ public class SendHttpRequestTests
         var (sendHttpRequest, childActivities) = CreateSendHttpRequestWithErrorHandlers(
             failedToConnect: "mockFailedToConnect"
         );
-        
+
         var responseHandler = CreateExceptionHandler<HttpRequestException>("Connection failed");
 
         // Act
@@ -116,7 +117,7 @@ public class SendHttpRequestTests
         var (sendHttpRequest, childActivities) = CreateSendHttpRequestWithErrorHandlers(
             timeout: "mockTimeout"
         );
-        
+
         var responseHandler = CreateExceptionHandler<TaskCanceledException>("Request timed out");
 
         // Act
@@ -132,7 +133,7 @@ public class SendHttpRequestTests
     public async Task Should_Schedule_No_Activity_When_No_Status_Code_Cases_Match_And_No_Unmatched_Handler()
     {
         // Arrange
-        var (configured, _) = CreateSendHttpRequestWithStatusHandlers([(200, "handler200")], unmatchedHandler: null); 
+        var (configured, _) = CreateSendHttpRequestWithStatusHandlers([(200, "handler200")], unmatchedHandler: null);
         var responseHandler = CreateResponseHandler(HttpStatusCode.InternalServerError); // 500 - no match
 
         // Act
@@ -231,15 +232,15 @@ public class SendHttpRequestTests
         string? unmatchedHandler)
     {
         var childActivities = new Dictionary<string, IActivity>();
-        
+
         // Create mock activities for expected status codes
-        var expectedStatusCodeCases = expectedStatusCodes.Select(x => 
+        var expectedStatusCodeCases = expectedStatusCodes.Select(x =>
         {
             var mockActivity = IActivity.Mock().Object;
             childActivities[x.activityName] = mockActivity;
             return new HttpStatusCodeCase(x.statusCode, mockActivity);
         }).ToList();
-        
+
         // Create mock activity for unmatched handler
         var unmatchedActivity = IActivity.Mock().Object;
         if (unmatchedHandler is not null)
@@ -263,16 +264,16 @@ public class SendHttpRequestTests
         string? timeout = null)
     {
         var childActivities = new Dictionary<string, IActivity>();
-        
+
         IActivity? failedToConnectActivity = null;
         IActivity? timeoutActivity = null;
-        
+
         if (failedToConnect != null)
         {
             failedToConnectActivity = IActivity.Mock().Object;
             childActivities[failedToConnect] = failedToConnectActivity;
         }
-        
+
         if (timeout != null)
         {
             timeoutActivity = IActivity.Mock().Object;
@@ -291,7 +292,7 @@ public class SendHttpRequestTests
         return (sendHttpRequest, childActivities);
     }
 
-    private static Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> CreateExceptionHandler<TException>(string message) 
+    private static Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> CreateExceptionHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TException>(string message)
         where TException : Exception
     {
         return (_, _) => throw ((TException)Activator.CreateInstance(typeof(TException), message)!);

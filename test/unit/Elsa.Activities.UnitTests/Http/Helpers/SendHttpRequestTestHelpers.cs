@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ public static class SendHttpRequestTestHelpers
     /// <summary>
     /// Creates an exception handler that throws a specific exception type with a message.
     /// </summary>
-    public static Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> CreateExceptionHandler<TException>(string message)
+    public static Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> CreateExceptionHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TException>(string message)
         where TException : Exception
     {
         return (_, _) => throw ((TException)Activator.CreateInstance(typeof(TException), message)!);

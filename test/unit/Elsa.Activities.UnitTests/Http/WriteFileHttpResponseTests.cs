@@ -477,7 +477,7 @@ public class WriteFileHttpResponseTests
 
     private static void RegisterZipManager(IServiceCollection services)
     {
-        var zipManagerType = typeof(WriteFileHttpResponse).Assembly.GetType("Elsa.Http.Services.ZipManager");
+        var zipManagerType = Type.GetType("Elsa.Http.Services.ZipManager, Elsa.Http");
         if (zipManagerType != null)
         {
             services.AddSingleton(zipManagerType, zipManagerType);

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Elsa.Mediator.CommandStrategies;
@@ -14,7 +15,8 @@ public class RuntimeAsyncCompatibilityTests
     [Arguments(typeof(CommandPipeline), nameof(CommandPipeline.InvokeAsync))]
     [Arguments(typeof(CommandHandlerInvokerMiddleware), nameof(CommandHandlerInvokerMiddleware.InvokeAsync))]
     [Arguments(typeof(DefaultStrategy), nameof(DefaultStrategy.ExecuteAsync))]
-    public async Task ProductionAsyncMethods_UseSelectedCompilerModel(Type declaringType, string methodName)
+    public async Task ProductionAsyncMethods_UseSelectedCompilerModel(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type declaringType, string methodName)
     {
         var method = declaringType.GetMethod(methodName)!;
 #if NET11_0_OR_GREATER

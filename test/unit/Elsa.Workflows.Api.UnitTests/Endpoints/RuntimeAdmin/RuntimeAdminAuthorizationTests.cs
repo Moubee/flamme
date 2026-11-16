@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Elsa.Authorization;
 using Elsa.Workflows.Api.Permissions;
@@ -31,9 +32,20 @@ public class RuntimeAdminAuthorizationTests
         await Assert.That(permission.Verb).IsNotEqualTo(CoreVerbs.View);
     }
 
+    // Constant assembly-qualified names let the trimmer preserve these internal endpoints.
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    private static Type ResolveEndpointType(string name) => name switch
+    {
+        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
+        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
+        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
+        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
+        _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
+    };
+
     private static async Task<Permission> GetDeclaredPermission(string endpointTypeName)
     {
-        var endpointType = typeof(WorkflowsApiFeature).Assembly.GetType(endpointTypeName, throwOnError: true)!;
+        var endpointType = ResolveEndpointType(endpointTypeName);
         var endpoint = Activator.CreateInstance(
             endpointType,
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,

@@ -29,7 +29,7 @@ public class OutputAssignmentBenchmark
 
         var activity = new WriteLine("benchmark");
         var registry = _serviceProvider.GetRequiredService<IActivityRegistry>();
-        await registry.RegisterAsync(activity.GetType());
+        await registry.RegisterAsync(typeof(WriteLine));
 
         var graphBuilder = _serviceProvider.GetRequiredService<IWorkflowGraphBuilder>();
         var workflow = Workflow.FromActivity(activity);

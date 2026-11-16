@@ -9,7 +9,7 @@ using Elsa.Http.FileCaches;
 using Elsa.Http.Options;
 using FluentStorage;
 using FluentStorage.Blobs;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
@@ -17,11 +17,13 @@ namespace Elsa.Activities.UnitTests.Http;
 
 public class ZipManagerTests : IDisposable
 {
-    private static readonly Type ZipManagerType = typeof(WriteFileHttpResponse).Assembly.GetRequiredType("Elsa.Http.Services.ZipManager");
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+    private static readonly Type ZipManagerType = Type.GetType("Elsa.Http.Services.ZipManager, Elsa.Http", throwOnError: true)!;
     private static readonly MethodInfo CreateAsyncMethod = ZipManagerType.GetRequiredMethod("CreateAsync");
     private static readonly MethodInfo LoadAsyncMethod = ZipManagerType.GetRequiredMethod("LoadAsync");
     private readonly string _cacheDirectory = Path.Join(Path.GetTempPath(), "elsa-zip-manager-tests", Guid.NewGuid().ToString("N"));
     private readonly IBlobStorage _blobStorage;
+    private readonly ServiceProvider _services = new ServiceCollection().AddLogging().BuildServiceProvider();
     private readonly object _zipManager;
     private static readonly DateTimeOffset _now = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -150,11 +152,11 @@ public class ZipManagerTests : IDisposable
 
     public void Dispose()
     {
+        _services.Dispose();
         if (Directory.Exists(_cacheDirectory))
             Directory.Delete(_cacheDirectory, true);
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2077:Target type is resolved by name for an internal test subject.")]
     private object CreateZipManager(IFileCacheStorageProvider? fileCacheStorageProvider = null)
     {
         fileCacheStorageProvider ??= new BlobFileCacheStorageProvider(_blobStorage);
@@ -163,9 +165,7 @@ public class ZipManagerTests : IDisposable
             LocalCacheDirectory = _cacheDirectory,
             TimeToLive = TimeSpan.FromHours(1)
         });
-        var logger = typeof(NullLogger<>).MakeGenericType(ZipManagerType).GetRequiredField("Instance").GetValue(null)!;
-
-        return Activator.CreateInstance(ZipManagerType, _timeProvider, fileCacheStorageProvider, options, logger)!;
+        return ActivatorUtilities.CreateInstance(_services, ZipManagerType, _timeProvider, fileCacheStorageProvider, options);
     }
 
     private async Task CreateCachedZipAsync(string downloadId, string content)
@@ -178,11 +178,8 @@ public class ZipManagerTests : IDisposable
                 Filename = "file.txt"
             })
         };
-        var task = (Task)CreateAsyncMethod.Invoke(_zipManager, [downloadables, true, downloadId, "download.zip", "application/zip", CancellationToken.None])!;
-        await task;
-        var result = task.GetType().GetRequiredProperty("Result").GetValue(task)!;
-        var zipStream = (Stream)result.GetType().GetRequiredField("Item2").GetValue(result)!;
-        var cleanup = (Action)result.GetType().GetRequiredField("Item3").GetValue(result)!;
+        var task = (Task<(Blob Blob, Stream Stream, Action Cleanup)>)CreateAsyncMethod.Invoke(_zipManager, [downloadables, true, downloadId, "download.zip", "application/zip", CancellationToken.None])!;
+        var (_, zipStream, cleanup) = await task;
 
         try
         {
@@ -196,15 +193,14 @@ public class ZipManagerTests : IDisposable
 
     private async Task<(Blob Blob, byte[] Content)?> LoadAsync(string downloadId, object? zipManager = null)
     {
-        var task = (Task)LoadAsyncMethod.Invoke(zipManager ?? _zipManager, [downloadId, CancellationToken.None])!;
-        await task;
-        var result = task.GetType().GetRequiredProperty("Result").GetValue(task);
+        var task = (Task<(Blob Blob, Stream Stream)?>)LoadAsyncMethod.Invoke(zipManager ?? _zipManager, [downloadId, CancellationToken.None])!;
+        var result = await task;
 
         if (result == null)
             return null;
 
-        var blob = (Blob)result.GetType().GetRequiredField("Item1").GetValue(result)!;
-        await using var stream = (Stream)result.GetType().GetRequiredField("Item2").GetValue(result)!;
+        var blob = result.Value.Blob;
+        await using var stream = result.Value.Stream;
         using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
         return (blob, memoryStream.ToArray());
@@ -213,25 +209,11 @@ public class ZipManagerTests : IDisposable
 
 internal static class ReflectionExtensions
 {
-    public static Type GetRequiredType(this Assembly assembly, string typeName)
-    {
-        return assembly.GetType(typeName) ?? throw new InvalidOperationException($"Could not find type {typeName}.");
-    }
-
-    public static MethodInfo GetRequiredMethod(this Type type, string methodName)
+    public static MethodInfo GetRequiredMethod([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type, string methodName)
     {
         return type.GetMethod(methodName) ?? throw new InvalidOperationException($"Could not find method {type.FullName}.{methodName}.");
     }
 
-    public static PropertyInfo GetRequiredProperty(this Type type, string propertyName)
-    {
-        return type.GetProperty(propertyName) ?? throw new InvalidOperationException($"Could not find property {type.FullName}.{propertyName}.");
-    }
-
-    public static FieldInfo GetRequiredField(this Type type, string fieldName)
-    {
-        return type.GetField(fieldName) ?? throw new InvalidOperationException($"Could not find field {type.FullName}.{fieldName}.");
-    }
 }
 
 internal sealed class BlobStorageStub(string lookupPath, string fullPath, byte[] content, DateTimeOffset expiresAt) : IBlobStorage

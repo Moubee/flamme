@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ public class DefaultTransientExceptionStrategyTests
     [Test]
     [DisplayName("Known transient exception type $exceptionType should be detected as transient")]
     [MethodDataSource(nameof(TransientExceptionTypes))]
-    public async Task IsTransient_KnownTransientExceptionType_ReturnsTrue(Type exceptionType)
+    public async Task IsTransient_KnownTransientExceptionType_ReturnsTrue([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type exceptionType)
     {
         var exception = (Exception)Activator.CreateInstance(exceptionType)!;
         await Assert.That(_strategy.IsTransient(exception)).IsTrue();
@@ -75,7 +76,7 @@ public class DefaultTransientExceptionStrategyTests
     [Arguments(typeof(InvalidOperationException), "Some error")]
     [Arguments(typeof(ArgumentException), "Invalid argument")]
     [Arguments(typeof(NullReferenceException), "Object reference not set")]
-    public async Task IsTransient_NonTransientExceptionType_ReturnsFalse(Type exceptionType, string message)
+    public async Task IsTransient_NonTransientExceptionType_ReturnsFalse([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type exceptionType, string message)
     {
         var exception = (Exception)Activator.CreateInstance(exceptionType, message)!;
         await Assert.That(_strategy.IsTransient(exception)).IsFalse();
@@ -85,7 +86,7 @@ public class DefaultTransientExceptionStrategyTests
     [DisplayName("Exception type $exceptionType with an empty message should yield $expectedResult")]
     [Arguments(typeof(TimeoutException), true)]
     [Arguments(typeof(InvalidOperationException), false)]
-    public async Task IsTransient_ExceptionWithEmptyMessage_ChecksTypeOnly(Type exceptionType, bool expectedResult)
+    public async Task IsTransient_ExceptionWithEmptyMessage_ChecksTypeOnly([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type exceptionType, bool expectedResult)
     {
         var exception = (Exception)Activator.CreateInstance(exceptionType, "")!;
         await Assert.That(_strategy.IsTransient(exception)).IsEqualTo(expectedResult);

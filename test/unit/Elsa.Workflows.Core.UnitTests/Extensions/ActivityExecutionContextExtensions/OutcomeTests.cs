@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Extensions;
 using Elsa.Workflows.Attributes;
 using static Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions.TestHelpers;
@@ -10,7 +11,7 @@ public class OutcomeTests
     [Test]
     [Arguments(typeof(TestActivityWithPort), "Done")]
     [Arguments(typeof(TestActivityWithNamedPort), "CustomOutcome")]
-    public async Task GetOutcomeName_ReturnsExpectedName(Type activityType, string expectedOutcomeName)
+    public async Task GetOutcomeName_ReturnsExpectedName([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type activityType, string expectedOutcomeName)
     {
         // Arrange
         var activity = (Activity)Activator.CreateInstance(activityType)!;

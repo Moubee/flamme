@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.UnitTests.Shared;
 using Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.List;
 using Elsa.Workflows.Api.UnitTests.Endpoints.Descriptors;
@@ -17,7 +18,7 @@ public class FastEndpointsResolverTests
     [Test]
     [Arguments(typeof(DescriptorCatalogAuthorizationTests))]
     [Arguments(typeof(InstalledFeaturesAuthorizationTests))]
-    public async Task FactoryCreatesEndpointsAfterAnEndpointHostIsDisposed(Type hostTestClass)
+    public async Task FactoryCreatesEndpointsAfterAnEndpointHostIsDisposed([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type hostTestClass)
     {
         switch (Activator.CreateInstance(hostTestClass))
         {

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Expressions.Contracts;
 using Elsa.Expressions.Models;
 using Elsa.Extensions;
@@ -15,7 +16,7 @@ public class InputEvaluationErrorTests : EvaluationTestBase
     [Arguments(typeof(InvalidOperationException), "Expression evaluation failed")]
     [Arguments(typeof(ArgumentException), "Detailed inner error message")]
     [Arguments(typeof(TimeoutException), "Expression evaluation timed out")]
-    public async Task WrapsEvaluationExceptions(Type exceptionType, string errorMessage)
+    public async Task WrapsEvaluationExceptions([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type exceptionType, string errorMessage)
     {
         // Arrange
         var exception = (Exception)Activator.CreateInstance(exceptionType, errorMessage)!;

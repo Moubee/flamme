@@ -14,13 +14,14 @@ internal class TestRetryStrategy : IResilienceStrategy
 
     public Task ConfigurePipeline<T>(ResiliencePipelineBuilder<T> pipelineBuilder, ResilienceContext context)
     {
-        pipelineBuilder.AddRetry(new RetryStrategyOptions<T>
+        var retryPipeline = new ResiliencePipelineBuilder().AddRetry(new RetryStrategyOptions
         {
             MaxRetryAttempts = MaxRetryAttempts,
             Delay = TimeSpan.Zero,
             BackoffType = DelayBackoffType.Constant,
-            ShouldHandle = new PredicateBuilder<T>().Handle<InvalidOperationException>()
-        });
+            ShouldHandle = new PredicateBuilder().Handle<InvalidOperationException>()
+        }).Build();
+        pipelineBuilder.AddPipeline(retryPipeline);
 
         return Task.CompletedTask;
     }

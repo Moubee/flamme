@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Elsa.Common.Multitenancy;
 using Elsa.Secrets.Contracts;
@@ -500,7 +501,7 @@ public class SecretRepositoryTenantIsolationTests
         }
     }
 
-    private static ServiceProvider CreateDiRepository<TRepository>(bool tenancyEnabled, string? repositoryFilePath = null)
+    private static ServiceProvider CreateDiRepository<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TRepository>(bool tenancyEnabled, string? repositoryFilePath = null)
         where TRepository : class, ISecretRepository
     {
         return new ServiceCollection()
@@ -514,6 +515,7 @@ public class SecretRepositoryTenantIsolationTests
 
     private sealed class MutableTenantAccessor(string? tenantId) : ITenantAccessor
     {
+        [AllowNull]
         public string TenantId { get; set; } = tenantId!;
 
         public Tenant? Tenant => TenantId is null ? null : new Tenant { Id = TenantId, Name = TenantId };

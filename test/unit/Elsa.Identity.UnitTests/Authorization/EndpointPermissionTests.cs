@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Elsa.Authorization;
@@ -54,9 +55,19 @@ public class EndpointPermissionTests
     /// touches none of the injected services, and substituting them would make the rows depend on which
     /// dependencies happen to be interfaces.
     /// </summary>
+    // Constant assembly-qualified names let the trimmer preserve these internal endpoints.
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    private static Type ResolveEndpointType(string name) => name switch
+    {
+        "Elsa.Identity.Endpoints.Secrets.Hash.Hash" => Type.GetType("Elsa.Identity.Endpoints.Secrets.Hash.Hash, Elsa.Identity", throwOnError: true)!,
+        "Elsa.Identity.Endpoints.Roles.Create.Create" => Type.GetType("Elsa.Identity.Endpoints.Roles.Create.Create, Elsa.Identity", throwOnError: true)!,
+        "Elsa.Identity.Endpoints.Applications.Create.Create" => Type.GetType("Elsa.Identity.Endpoints.Applications.Create.Create, Elsa.Identity", throwOnError: true)!,
+        _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
+    };
+
     private static async Task<Permission> Declare(string endpointTypeName)
     {
-        var endpointType = Module.GetType(endpointTypeName, true)!;
+        var endpointType = ResolveEndpointType(endpointTypeName);
         var endpoint = RuntimeHelpers.GetUninitializedObject(endpointType);
         var (requestType, responseType) = DtoTypes(endpointType);
 

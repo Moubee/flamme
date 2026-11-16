@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Elsa.Authorization;
 using Elsa.Common;
@@ -110,9 +111,33 @@ public class EndpointPermissionTests
     /// inline policy, which cannot be read back off the definition, so the registry is the only way to observe
     /// a declaration without booting a host.
     /// </summary>
+    // Constant assembly-qualified names let the trimmer preserve these internal endpoints.
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    private static Type ResolveEndpointType(string name) => name switch
+    {
+        "FeatureCapabilitiesEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.FeatureCapabilitiesEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ListEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "GetEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.GetEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "CapabilitiesEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CapabilitiesEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ListEventsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListEventsEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "RevealFieldEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RevealFieldEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ClaimEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ClaimEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ReleaseEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ReleaseEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "AssignEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.AssignEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ScheduleEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ScheduleEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "CompleteEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CompleteEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "CancelEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CancelEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "RetryResolutionEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RetryResolutionEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "IssueInvitationEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.IssueInvitationEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ListInvitationsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListInvitationsEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "RevokeInvitationEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RevokeInvitationEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "ListParticipantsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListParticipantsEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
+    };
+
     private static async Task<Permission> Declare(string endpointName)
     {
-        var endpointType = Module.GetTypes().Single(x => x.Name == endpointName);
+        var endpointType = ResolveEndpointType(endpointName);
         var arguments = endpointType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Single()
             .GetParameters()

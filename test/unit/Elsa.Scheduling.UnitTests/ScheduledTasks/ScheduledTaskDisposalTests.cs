@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Time.Testing;
 using System.Reflection;
 using Elsa.Common;
@@ -109,13 +110,22 @@ public class ScheduledTaskDisposalTests : IDisposable
 
     private static Task InvokeElapsedAsync(IDisposable scheduledTask)
     {
-        var callback = scheduledTask.GetType().GetMethod("OnElapsedAsync", BindingFlags.Instance | BindingFlags.NonPublic)!
+        var callback = GetScheduledTaskType(scheduledTask).GetMethod("OnElapsedAsync", BindingFlags.Instance | BindingFlags.NonPublic)!
             .CreateDelegate<Func<Task>>(scheduledTask);
         return callback();
     }
 
     private static object? GetTimer(IDisposable scheduledTask) =>
-        scheduledTask.GetType().GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scheduledTask);
+        GetScheduledTaskType(scheduledTask).GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scheduledTask);
+
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods | DynamicallyAccessedMemberTypes.NonPublicFields)]
+    private static Type GetScheduledTaskType(IDisposable scheduledTask) => scheduledTask switch
+    {
+        ScheduledCronTask => typeof(ScheduledCronTask),
+        ScheduledRecurringTask => typeof(ScheduledRecurringTask),
+        ScheduledSpecificInstantTask => typeof(ScheduledSpecificInstantTask),
+        _ => throw new ArgumentException("Unknown scheduled task type.", nameof(scheduledTask))
+    };
 
     public void Dispose() => _services.Dispose();
 

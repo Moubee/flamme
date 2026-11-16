@@ -31,7 +31,7 @@ public class SecretManagerTests
         await Assert.That(secret.Name).IsEqualTo("smtp:password");
         await Assert.That(model.DisplayName).IsEqualTo("SMTP password");
         await Assert.That(model.CurrentVersion).IsEqualTo(1);
-        await Assert.That(model.GetType().GetProperties()).DoesNotContain(x => x.Name.Contains("Value", StringComparison.OrdinalIgnoreCase));
+        await Assert.That(typeof(SecretModel).GetProperties()).DoesNotContain(x => x.Name.Contains("Value", StringComparison.OrdinalIgnoreCase));
     }
 
     [Test]
