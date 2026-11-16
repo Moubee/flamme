@@ -47,11 +47,15 @@ public class WorkflowStateExtractorTests
         await extractor.ApplyAsync(resumedWorkflowContext, state);
 
         var restoredWorkItem = await Assert.That(resumedWorkflowContext.Scheduler.List()).HasSingleItem();
-        await Assert.That(restoredWorkItem.Owner?.Id).IsEqualTo("owner-context");
-        await Assert.That(restoredWorkItem.Tag).IsEqualTo("scheduled");
-        await Assert.That(restoredWorkItem.SchedulingActivityExecutionId).IsEqualTo("predecessor");
-        await Assert.That(restoredWorkItem.SchedulingWorkflowInstanceId).IsEqualTo("parent-workflow");
-        await Assert.That(restoredWorkItem.SchedulingCallStackDepth).IsEqualTo(3);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(restoredWorkItem.Owner?.Id).IsEqualTo("owner-context");
+            await Assert.That(restoredWorkItem.Tag).IsEqualTo("scheduled");
+            await Assert.That(restoredWorkItem.SchedulingActivityExecutionId).IsEqualTo("predecessor");
+            await Assert.That(restoredWorkItem.SchedulingWorkflowInstanceId).IsEqualTo("parent-workflow");
+            await Assert.That(restoredWorkItem.SchedulingCallStackDepth).IsEqualTo(3);
+        }
     }
 
     [Test]
@@ -109,9 +113,12 @@ public class WorkflowStateExtractorTests
         var context = await workflowExecutionContext.CreateActivityExecutionContextAsync(root, options);
 
         // Assert - The CallStackDepth should be incremented from the scheduling depth
-        await Assert.That(context.CallStackDepth).IsEqualTo(schedulingDepth + 1);
-        await Assert.That(context.SchedulingActivityExecutionId).IsEqualTo("parent-activity-id");
-        await Assert.That(context.SchedulingWorkflowInstanceId).IsEqualTo("parent-workflow-id");
+        using (Assert.Multiple())
+        {
+            await Assert.That(context.CallStackDepth).IsEqualTo(schedulingDepth + 1);
+            await Assert.That(context.SchedulingActivityExecutionId).IsEqualTo("parent-activity-id");
+            await Assert.That(context.SchedulingWorkflowInstanceId).IsEqualTo("parent-workflow-id");
+        }
     }
 
     [Test]
@@ -137,8 +144,11 @@ public class WorkflowStateExtractorTests
         var childContext = await workflowExecutionContext.CreateActivityExecutionContextAsync(root, options);
 
         // Assert - The CallStackDepth should be parent depth + 1
-        await Assert.That(childContext.CallStackDepth).IsEqualTo(4);
-        await Assert.That(childContext.SchedulingActivityExecutionId).IsEqualTo(parentContext.Id);
+        using (Assert.Multiple())
+        {
+            await Assert.That(childContext.CallStackDepth).IsEqualTo(4);
+            await Assert.That(childContext.SchedulingActivityExecutionId).IsEqualTo(parentContext.Id);
+        }
     }
 
     [Test]

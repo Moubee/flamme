@@ -283,10 +283,15 @@ public class Tests
             await finishedSignal.WaitForFinishAsync(parentInstanceId);
 
             var persistedParent = (await Assert.That((await FindByDefinitionAsync(services, nameof(WaitForDeniedBulkDispatchConversationWorkflow))).Where(instance => instance.Id == parentInstanceId)).HasSingleItem());
-            await Assert.That(persistedParent.Status).IsEqualTo(WorkflowStatus.Finished);
-            await Assert.That(persistedParent.WorkflowState.Bookmarks).IsEmpty();
-            await Assert.That(persistedParent.WorkflowState.Output["ActivationDenied"]).IsEqualTo(true);
-            await Assert.That(persistedParent.WorkflowState.Properties.ContainsKey(WorkflowInstanceStorageDriver.VariablesDictionaryStateKey)).IsFalse();
+            var activationDenied = await Assert.That(persistedParent.WorkflowState.Output["ActivationDenied"]).IsTypeOf<bool>();
+
+            using (Assert.Multiple())
+            {
+                await Assert.That(persistedParent.Status).IsEqualTo(WorkflowStatus.Finished);
+                await Assert.That(persistedParent.WorkflowState.Bookmarks).IsEmpty();
+                await Assert.That(activationDenied).IsTrue();
+                await Assert.That(persistedParent.WorkflowState.Properties.ContainsKey(WorkflowInstanceStorageDriver.VariablesDictionaryStateKey)).IsFalse();
+            }
 
             var persistedChildren = await FindByCorrelationAsync(services, nameof(CorrelatedSingletonConversationWorkflow), "denied-bulk-dispatch-correlation");
             await Assert.That((await Assert.That(persistedChildren).HasSingleItem()).Id).IsEqualTo(child.WorkflowInstanceId);

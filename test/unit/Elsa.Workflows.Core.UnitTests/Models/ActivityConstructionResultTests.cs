@@ -20,9 +20,12 @@ public class ActivityConstructionResultTests
         var result = new ActivityConstructionResult(activity, exceptions);
 
         // Assert
-        await Assert.That(result.Activity).IsSameReferenceAs(activity);
-        await Assert.That(result.Exceptions.Count()).IsEqualTo(exceptionCount);
-        await Assert.That(result.HasExceptions).IsEqualTo(expectedHasExceptions);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.Activity).IsSameReferenceAs(activity);
+            await Assert.That(result.Exceptions.Count()).IsEqualTo(exceptionCount);
+            await Assert.That(result.HasExceptions).IsEqualTo(expectedHasExceptions);
+        }
     }
 
     [Test]
@@ -35,8 +38,11 @@ public class ActivityConstructionResultTests
         var result = new ActivityConstructionResult(activity, null);
 
         // Assert
-        await Assert.That(result.Exceptions).IsEmpty();
-        await Assert.That(result.HasExceptions).IsFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.Exceptions).IsEmpty();
+            await Assert.That(result.HasExceptions).IsFalse();
+        }
     }
 
     [Test]
@@ -55,9 +61,13 @@ public class ActivityConstructionResultTests
 
         // Assert
         await Assert.That(typedResult).IsTypeOf<ActivityConstructionResult<WriteLine>>();
-        await Assert.That(typedResult.Activity).IsSameReferenceAs(activity);
-        await Assert.That(typedResult.Exceptions.Count()).IsEqualTo(exceptionCount);
-        await Assert.That(typedResult.HasExceptions).IsEqualTo(expectedHasExceptions);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(typedResult.Activity).IsSameReferenceAs(activity);
+            await Assert.That(typedResult.Exceptions.Count()).IsEqualTo(exceptionCount);
+            await Assert.That(typedResult.HasExceptions).IsEqualTo(expectedHasExceptions);
+        }
     }
 
     [Test]
@@ -74,10 +84,13 @@ public class ActivityConstructionResultTests
         var result = new ActivityConstructionResult<WriteLine>(activity, exceptions);
 
         // Assert
-        await Assert.That(result.Activity).IsSameReferenceAs(activity);
-        await Assert.That(result.Exceptions.Count()).IsEqualTo(exceptionCount);
-        await Assert.That(result.HasExceptions).IsEqualTo(expectedHasExceptions);
-        await Assert.That(result).IsAssignableTo<ActivityConstructionResult>();
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.Activity).IsSameReferenceAs(activity);
+            await Assert.That(result.Exceptions.Count()).IsEqualTo(exceptionCount);
+            await Assert.That(result.HasExceptions).IsEqualTo(expectedHasExceptions);
+            await Assert.That(result).IsAssignableTo<ActivityConstructionResult>();
+        }
     }
 
     [Test]

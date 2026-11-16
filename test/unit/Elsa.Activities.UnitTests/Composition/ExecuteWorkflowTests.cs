@@ -61,9 +61,13 @@ public class ExecuteWorkflowTests
         {
             var result = (ExecuteWorkflowResult)context.GetActivityOutput(() => executeWorkflow.Result)!;
             await Assert.That(result).IsNotNull();
-            await Assert.That(result.WorkflowInstanceId).IsEqualTo(DefaultGeneratedId);
-            await Assert.That(result.Status).IsEqualTo(childWorkflowStatus);
-            await Assert.That(result.Output).IsEqualTo(childOutput);
+
+            using (Assert.Multiple())
+            {
+                await Assert.That(result.WorkflowInstanceId).IsEqualTo(DefaultGeneratedId);
+                await Assert.That(result.Status).IsEqualTo(childWorkflowStatus);
+                await Assert.That(result.Output).IsEquivalentTo(childOutput);
+            }
         }
     }
 

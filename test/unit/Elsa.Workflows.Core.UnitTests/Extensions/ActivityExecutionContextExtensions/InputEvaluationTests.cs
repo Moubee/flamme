@@ -15,6 +15,12 @@ public class InputEvaluationTests
         _fixture = new(_activity);
     }
 
+    [After(Test)]
+    public async Task CleanupAsync()
+    {
+        await _fixture.DisposeAsync();
+    }
+
     [Test]
     public async Task EvaluateInputPropertiesAsync_WhenInputIsSensitive_RemovesItFromActivityState()
     {
@@ -22,8 +28,11 @@ public class InputEvaluationTests
 
         var context = await ActivateAsync();
 
-        await Assert.That(context.ActivityState.ContainsKey(nameof(ActivityWithSensitiveInputs.SensitiveText))).IsFalse();
-        await Assert.That(_activity.CapturedSensitiveText).IsEqualTo("secret");
+        using (Assert.Multiple())
+        {
+            await Assert.That(context.ActivityState.ContainsKey(nameof(ActivityWithSensitiveInputs.SensitiveText))).IsFalse();
+            await Assert.That(_activity.CapturedSensitiveText).IsEqualTo("secret");
+        }
     }
 
     [Test]
@@ -31,8 +40,13 @@ public class InputEvaluationTests
     {
         var context = await ActivateAsync();
 
-        await Assert.That(context.ActivityState[nameof(ActivityWithSensitiveInputs.PublicText)]).IsEqualTo("public");
-        await Assert.That(_activity.CapturedPublicText).IsEqualTo("public");
+        await Assert.That(context.ActivityState).ContainsKey(nameof(ActivityWithSensitiveInputs.PublicText));
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(context.ActivityState[nameof(ActivityWithSensitiveInputs.PublicText)]).IsEqualTo("public");
+            await Assert.That(_activity.CapturedPublicText).IsEqualTo("public");
+        }
     }
 
     private Task<ActivityExecutionContext> ActivateAsync() => _fixture.ExecuteAsync();

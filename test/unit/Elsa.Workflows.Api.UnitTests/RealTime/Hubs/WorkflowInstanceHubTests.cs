@@ -44,6 +44,13 @@ public class WorkflowInstanceHubTests
         StubWorkflowInstance();
     }
 
+    [After(Test)]
+    public void Cleanup()
+    {
+        _hub.Dispose();
+        _connectionAbortedTokenSource.Dispose();
+    }
+
     [Test]
     public async Task ObserveInstanceAsync_WithReadPermissionAndMatchingTenant_JoinsInstanceGroup()
     {
@@ -119,7 +126,7 @@ public class WorkflowInstanceHubTests
     [Test]
     public async Task ObserveInstanceAsync_WithoutTenantAccessor_JoinsVisibleInstanceGroup()
     {
-        var hub = new WorkflowInstanceHub(_workflowInstanceStore)
+        using var hub = new WorkflowInstanceHub(_workflowInstanceStore)
         {
             Context = _context,
             Groups = _groups

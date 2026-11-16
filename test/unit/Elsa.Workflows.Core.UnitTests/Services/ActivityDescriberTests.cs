@@ -29,8 +29,11 @@ public class ActivityDescriberTests
         var sensitiveInput = descriptor.Inputs.Single(x => x.Name == nameof(ActivityWithSensitiveInputs.SensitiveText));
         var publicInput = descriptor.Inputs.Single(x => x.Name == nameof(ActivityWithSensitiveInputs.PublicText));
 
-        await Assert.That(sensitiveInput.IsSensitive).IsTrue();
-        await Assert.That(publicInput.IsSensitive).IsFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(sensitiveInput.IsSensitive).IsTrue();
+            await Assert.That(publicInput.IsSensitive).IsFalse();
+        }
     }
 
     private sealed class ActivityWithSensitiveInputs : CodeActivity
