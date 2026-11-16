@@ -114,7 +114,7 @@ public class ExternalAuthenticationBenchmarks
         Key = key,
         AdapterType = BenchmarkAdapter.AdapterType,
         AdapterSettingsVersion = 1,
-        AdapterSettings = JsonSerializer.SerializeToElement(new { }),
+        AdapterSettings = JsonElement.Parse("{}"),
         DisplayName = key,
         DisplayOrder = order,
         IsEnabled = true,

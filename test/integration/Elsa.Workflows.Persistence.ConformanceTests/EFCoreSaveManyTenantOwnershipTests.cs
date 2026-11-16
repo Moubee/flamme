@@ -283,8 +283,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     }
 
     private static JsonElement ForeignBookmarkElement(string id) =>
-        JsonElement.Parse(new JsonArray
-        {
+        JsonElement.Parse(new JsonArray(
             new JsonObject
             {
                 ["id"] = id,
@@ -297,7 +296,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
                 ["payload"] = new JsonObject(),
                 ["metadata"] = new JsonObject()
             }
-        }.ToJsonString());
+        ).ToJsonString());
 
     private static readonly DateTimeOffset CreatedAt = new(2026, 9, 26, 12, 0, 0, TimeSpan.Zero);
 

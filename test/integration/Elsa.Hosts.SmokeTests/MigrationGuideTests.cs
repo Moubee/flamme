@@ -75,6 +75,8 @@ public class MigrationGuideTests
             .GroupBy(x => x.Resource, StringComparer.Ordinal)
             .ToDictionary(x => x.Key, x => (IReadOnlyCollection<string>)x.SelectMany(d => d.SupportedVerbs).Distinct(StringComparer.Ordinal).ToArray(), StringComparer.Ordinal);
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "This JIT-only coverage check loads every retained module from the test output to detect unadvertised permissions.")]
     private static Assembly? TryLoad(string path)
     {
         try
