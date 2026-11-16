@@ -61,6 +61,48 @@ Each test layer has distinct goals and clear boundaries — see [**Which parts o
 
 ---
 
+## TUnit assertions, mocks, and cleanup
+
+Await every TUnit assertion. Group independent checks of the same result with
+`Assert.Multiple()` so a failed test reports all relevant differences:
+
+```csharp
+await Assert.That(result).IsNotNull();
+
+using (Assert.Multiple())
+{
+    await Assert.That(result.Status).IsEqualTo(WorkflowStatus.Finished);
+    await Assert.That(result.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
+}
+```
+
+Keep prerequisite checks outside the bundle: a null, type, count, or dictionary-key
+assertion must succeed before accessing the guarded value. Keep separate act/assert
+phases separate; an assertion scope defers failures until it is disposed.
+
+Use `TUnit.Mocks` and prefer the generated `IService.Mock()` factory for interface
+mocks (`TM010`). Retain argument matchers, callbacks, captures, property storage,
+and asynchronous return behavior when updating mock syntax. Use generated mock
+types when an explicit mock type is needed (`TM011`).
+
+Dispose owned test fixtures and other resources through `IDisposable`,
+`IAsyncDisposable`, or an `[After(Test)]` hook (`TUnit0023`). Local resources should
+use `using` or `await using` as appropriate.
+
+Build warnings do not include every analyzer suggestion. Use the SDK selected by
+`global.json` to inspect informational diagnostics as well:
+
+```bash
+dotnet format analyzers Elsa.slnx --no-restore --severity info --verify-no-changes
+```
+
+Review diagnostics and fixes before applying them; analyzer fixes do not replace
+running the affected tests on both supported target frameworks. See the official
+[TUnit assertion scopes](https://tunit.dev/docs/assertions/combining-assertions)
+and [mock syntax and analyzers](https://tunit.dev/docs/writing-tests/mocking/) for API guidance.
+
+---
+
 ## Characteristics for testing
 
 - **Activities:** First-class pluggable units. Each activity implements execution logic and interacts with the [`ActivityExecutionContext`](../../src/modules/Elsa.Workflows.Core/Contexts/ActivityExecutionContext.cs). More details in [**Activities**](#activities).
