@@ -134,7 +134,7 @@ public class MemoryRoleStoreUniquenessTests
         var unchanged = await tenantA.FindAsync(new RoleFilter { Id = "shared-role" });
         await Assert.That(unchanged!.Name).IsEqualTo("Tenant A role");
         await Assert.That(unchanged.TenantId).IsEqualTo("tenant-a");
-        await Assert.That(unchanged.Permissions).IsEquivalentTo(["tenant-a:permission"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(unchanged.Permissions).IsEquivalentTo(["tenant-a:permission"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

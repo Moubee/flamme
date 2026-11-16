@@ -32,7 +32,7 @@ public class WithdrawingScheduledWorkTests : IAsyncDisposable
         await _services.PopulateRegistriesAsync();
         await _workflowRunner.RunAsync<SpeculativeSchedulingWorkflow>();
 
-        await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["Start", "Committed", "End"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["Start", "Committed", "End"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class WithdrawingScheduledWorkTests : IAsyncDisposable
 
         // "End" is absent because cancelling the container clears the completion callback the Sequence was waiting
         // on: the point of the assertion is that "Withdrawn" never ran.
-        await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["Start"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["Start"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

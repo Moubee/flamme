@@ -79,7 +79,7 @@ public class WriteFileHttpResponseTests
         // Assert
         await Assert.That(context.IsCompleted).IsTrue();
         var responseBytes = GetResponseBytes(httpContext);
-        await Assert.That(responseBytes).IsEquivalentTo(testBytes, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(responseBytes).IsEquivalentTo(testBytes, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

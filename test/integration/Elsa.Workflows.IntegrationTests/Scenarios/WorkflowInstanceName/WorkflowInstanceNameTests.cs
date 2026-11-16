@@ -40,7 +40,7 @@ public class WorkflowInstanceNameTests : IAsyncDisposable
         await workflowClient.RunInstanceAsync(RunWorkflowInstanceRequest.Empty);
         var workflowState = await workflowClient.ExportStateAsync();
 
-        await Assert.That(_capturingTextWriter.Lines).IsEquivalentTo([desiredName], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_capturingTextWriter.Lines).IsEquivalentTo([desiredName], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(workflowState.Name).IsEqualTo(desiredName);
     }
 

@@ -20,7 +20,7 @@ public class IncidentStrategyTests
         await services.PopulateRegistriesAsync();
         var workflowState = await services.RunWorkflowUntilEndAsync<FaultyWorkflow>();
         var lines = capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(expectedOutput, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(expectedOutput, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(workflowState.SubStatus).IsEqualTo(expectedSubStatus);
         await Assert.That(workflowState.Incidents).HasSingleItem();
     }

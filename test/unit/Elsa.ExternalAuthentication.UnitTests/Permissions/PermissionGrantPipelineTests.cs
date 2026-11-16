@@ -32,7 +32,7 @@ public class PermissionGrantPipelineTests
 
         var result = await resolver.ResolveAsync(context);
 
-        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["workflows:manage", "workflows:read", "reports:view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["workflows:manage", "workflows:read", "reports:view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.Grants.First(x => x.Permission == "workflows:read").SourceType).IsEqualTo("elsa-roles");
         await Assert.That(result.Grants.First(x => x.Permission == "workflows:manage").SourceReference).IsEqualTo("role-a");
         await Assert.That(result.Grants.Last().SourceReference).IsEqualTo("department:engineering");
@@ -55,7 +55,7 @@ public class PermissionGrantPipelineTests
         var mappedContext = context with { ProjectedClaims = new Dictionary<string, IReadOnlyCollection<string>> { ["department"] = ["engineering"] } };
         var mapped = await resolver.ResolveAsync(mappedContext);
 
-        await Assert.That(mapped.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(mapped.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(mapped.Warnings).Contains(warning => warning.Code == "permission_denied_by_deployment");
         await Assert.That(mapped.Warnings).Contains(warning => warning.Code == "unknown_permission_descriptor" && warning.Message.Contains("reports:view", StringComparison.Ordinal));
     }
@@ -74,7 +74,7 @@ public class PermissionGrantPipelineTests
 
         var result = await resolver.ResolveAsync(context);
 
-        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view", "workflows:read"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view", "workflows:read"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.Warnings).HasSingleItem(warning => warning.Code == "unknown_permission_descriptor" && warning.Message.Contains("reports:view", StringComparison.Ordinal));
     }
 
@@ -119,7 +119,7 @@ public class PermissionGrantPipelineTests
         };
         var boundedResult = await resolver.ResolveAsync(bounded);
 
-        await Assert.That(boundedResult.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(boundedResult.Grants.Select(x => x.Permission)).IsEquivalentTo(["reports:view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -133,13 +133,13 @@ public class PermissionGrantPipelineTests
         var ordinary = await authorizer.AuthorizeAsync(ordinaryActor, [selection]);
 
         await Assert.That(ordinary.IsAuthorized).IsFalse();
-        await Assert.That(ordinary.UnauthorizedPermissions).IsEquivalentTo(["workflows:manage"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(ordinary.UnauthorizedPermissions).IsEquivalentTo(["workflows:manage"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         options.PermissionGrants.DeniedPermissions = ["workflows:manage"];
         var unrestricted = await authorizer.AuthorizeAsync(CreateActor(DelegateUnrestrictedPermission), [selection]);
 
         await Assert.That(unrestricted.IsAuthorized).IsFalse();
-        await Assert.That(unrestricted.UnauthorizedPermissions).IsEquivalentTo(["workflows:manage"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(unrestricted.UnauthorizedPermissions).IsEquivalentTo(["workflows:manage"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -152,7 +152,7 @@ public class PermissionGrantPipelineTests
         var allowed = await authorizer.AuthorizeAsync(CreateActor(DelegatePermission, "reports:view"), [selection]);
 
         await Assert.That(denied.IsAuthorized).IsFalse();
-        await Assert.That(denied.UnauthorizedPermissions).IsEquivalentTo(["reports:view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(denied.UnauthorizedPermissions).IsEquivalentTo(["reports:view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(allowed.IsAuthorized).IsTrue();
     }
 
@@ -191,7 +191,7 @@ public class PermissionGrantPipelineTests
 
         var result = await resolver.ResolveAsync(MappedContext(granted));
 
-        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(isAdmitted ? [granted] : Array.Empty<string>(), TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(isAdmitted ? [granted] : Array.Empty<string>(), StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -228,7 +228,7 @@ public class PermissionGrantPipelineTests
 
         var result = await resolver.ResolveAsync(context);
 
-        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["workflows/definitions:view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Grants.Select(x => x.Permission)).IsEquivalentTo(["workflows/definitions:view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.Warnings).Contains(warning => warning.Code == "permission_denied_by_deployment");
     }
 

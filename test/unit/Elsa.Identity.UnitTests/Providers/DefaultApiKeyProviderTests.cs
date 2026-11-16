@@ -25,7 +25,7 @@ public class DefaultApiKeyProviderTests
         var apiKey = await ProvideAsync("reader", permissions: ["identity/users:view", "identity/roles:view"]);
 
         await Assert.That(apiKey).IsNotNull();
-        await Assert.That(apiKey.Claims.Where(x => x.Type == PermissionNames.ClaimType).Select(x => x.Value).ToArray()).IsEquivalentTo(new[] { "identity/users:view", "identity/roles:view" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(apiKey.Claims.Where(x => x.Type == PermissionNames.ClaimType).Select(x => x.Value).ToArray()).IsEquivalentTo(new[] { "identity/users:view", "identity/roles:view" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(apiKey.Claims).DoesNotContain(x => x.Type == PermissionNames.ClaimType && x.Value == PermissionNames.None);
     }
 

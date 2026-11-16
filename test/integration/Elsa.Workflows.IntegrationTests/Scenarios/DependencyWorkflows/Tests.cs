@@ -29,7 +29,7 @@ public class Tests : IAsyncDisposable
         // Assert.
         var lines = _capturingTextWriter.Lines.ToList();
 
-        await Assert.That(lines).IsEquivalentTo(new[] { "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom", "Atom" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

@@ -72,7 +72,7 @@ public class MemoryKeyValueStoreTenantIsolationTests
             Take = 3
         }, CancellationToken.None)).ToList();
 
-        await Assert.That(found.Select(x => x.Key).ToList()).IsEquivalentTo(["kv-a", "kv-a2", "kv-star"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(found.Select(x => x.Key).ToList()).IsEquivalentTo(["kv-a", "kv-a2", "kv-star"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(found).DoesNotContain(x => x.Key == "kv-b");
     }
 

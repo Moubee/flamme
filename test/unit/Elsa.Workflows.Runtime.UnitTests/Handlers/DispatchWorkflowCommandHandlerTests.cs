@@ -174,7 +174,7 @@ public class DispatchWorkflowCommandHandlerTests
 
         await Assert.That(observedRequest).IsNotNull();
         await Assert.That(observedRequest.Properties).IsNotSameReferenceAs(properties);
-        await Assert.That(observedRequest.Properties).IsEquivalentTo(new Dictionary<string, object> { ["WaitForCompletion"] = true }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(observedRequest.Properties).IsEquivalentTo(new Dictionary<string, object> { ["WaitForCompletion"] = true }, EqualityComparer<KeyValuePair<string, object>>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(properties.Keys).Contains("__elsa.internal.dispatch-activation-denied.activity-type-name");
         await Assert.That(properties.Keys).Contains("__elsa.internal.dispatch-activation-denied.stimulus-hash");
     }

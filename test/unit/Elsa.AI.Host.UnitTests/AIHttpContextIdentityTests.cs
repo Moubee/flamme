@@ -22,7 +22,7 @@ public class AIHttpContextIdentityTests
         var permissions = AIHttpContextIdentity.GetPermissions(context);
 
         await Assert.That(permissions).DoesNotContain(PermissionNames.None);
-        await Assert.That(permissions).IsEquivalentTo(["workflows:read"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(permissions).IsEquivalentTo(["workflows:read"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

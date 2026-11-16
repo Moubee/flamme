@@ -277,7 +277,7 @@ public abstract class ExternalAuthenticationStoreConformanceTests
             () => scenario.RegistryVersionStore.AdvanceAsync(),
             () => scenario.RegistryVersionStore.AdvanceAsync());
 
-        await Assert.That(concurrentAdvances.OrderBy(x => x).ToArray()).IsEquivalentTo([2L, 3L], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(concurrentAdvances.OrderBy(x => x).ToArray()).IsEquivalentTo([2L, 3L], EqualityComparer<long>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await scenario.RegistryVersionStore.GetVersionAsync()).IsEqualTo(3L);
         await Assert.That(await scenario.RegistryVersionStore.IsCurrentAsync(3)).IsTrue();
     }
@@ -297,7 +297,7 @@ public abstract class ExternalAuthenticationStoreConformanceTests
         var concurrentAdvances = await RunConcurrentlyAsync(scenario, ConformanceRacePoint.RegistryVersionAdvance,
             () => scenario.RegistryVersionStore.AdvanceAsync(),
             () => scenario.RegistryVersionStore.AdvanceAsync());
-        await Assert.That(concurrentAdvances.OrderBy(x => x).ToArray()).IsEquivalentTo([seeded + 1, seeded + 2], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(concurrentAdvances.OrderBy(x => x).ToArray()).IsEquivalentTo([seeded + 1, seeded + 2], EqualityComparer<long>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         var afterConcurrent = await scenario.RegistryVersionStore.GetVersionAsync();
         await Assert.That(afterConcurrent).IsEqualTo(seeded + 2);
         await Assert.That(await scenario.RegistryVersionStore.IsCurrentAsync(afterConcurrent)).IsTrue();

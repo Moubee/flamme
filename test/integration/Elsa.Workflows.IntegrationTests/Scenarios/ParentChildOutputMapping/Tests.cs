@@ -35,7 +35,7 @@ public class Tests : IAsyncDisposable
 
         // Assert expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Result: 9" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Result: 9" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     
     [Test]
@@ -58,7 +58,7 @@ public class Tests : IAsyncDisposable
 
         // Assert expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "FooBar" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "FooBar" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     
     [Test]
@@ -81,7 +81,7 @@ public class Tests : IAsyncDisposable
 
         // Assert expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Foo" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Foo" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

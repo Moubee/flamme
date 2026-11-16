@@ -125,8 +125,8 @@ public class DashboardAuthorizationTests
     {
         var overview = await ReadOverviewAsync(await SendAsync(HttpMethod.Get, OverviewEndpoint.Path, InstancesPermission));
 
-        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo([InstancesMetric], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(overview.Panels.Select(x => x.Id)).IsEquivalentTo([InstancesPanel], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo([InstancesMetric], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(overview.Panels.Select(x => x.Id)).IsEquivalentTo([InstancesPanel], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -172,7 +172,7 @@ public class DashboardAuthorizationTests
         var response = await SendAsync(HttpMethod.Get, "/dashboard/needs-attention", InstancesPermission);
         var findings = (await response.Content.ReadFromJsonAsync<DashboardNeedsAttentionResponse>(JsonOptions))!.Findings;
 
-        await Assert.That(findings.Select(x => x.Id)).IsEquivalentTo([InstancesFinding], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(findings.Select(x => x.Id)).IsEquivalentTo([InstancesFinding], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class DashboardAuthorizationTests
         var requirement = EndpointPermissionRegistry.FindRequirement(endpointType);
 
         await Assert.That(requirement).IsNotNull();
-        await Assert.That(requirement.AnyOf).IsEquivalentTo(new[] { new Permission(DashboardResourcePermissions.Dashboard, CoreVerbs.View), new Permission(WorkflowPermissions.Instances, CoreVerbs.View) });
+        await Assert.That(requirement.AnyOf).IsEquivalentTo(new[] { new Permission(DashboardResourcePermissions.Dashboard, CoreVerbs.View), new Permission(WorkflowPermissions.Instances, CoreVerbs.View) }, EqualityComparer<Permission>.Default);
     }
 
     [Test]

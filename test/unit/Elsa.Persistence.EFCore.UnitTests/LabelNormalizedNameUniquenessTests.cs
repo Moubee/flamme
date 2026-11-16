@@ -22,7 +22,7 @@ public class LabelNormalizedNameUniquenessTests
             .GetIndexes()
             .Single(x => x.IsUnique);
 
-        await Assert.That(index.Properties.Select(x => x.Name)).IsEquivalentTo(["TenantId", "NormalizedName"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(index.Properties.Select(x => x.Name)).IsEquivalentTo(["TenantId", "NormalizedName"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(index.GetDatabaseName()).IsEqualTo("IX_Label_TenantId_NormalizedName");
     }
 

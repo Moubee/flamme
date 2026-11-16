@@ -99,7 +99,7 @@ public class Tests : IAsyncDisposable
         dynamicObject = (ExpandoObject)(await _evaluator.EvaluateAsync(script, typeof(ExpandoObject), _expressionContext))!;
         var items = ((object[])dynamicObject.Items).Cast<double>().ToArray();
 
-        await Assert.That(items).IsEquivalentTo([2d, 4d, 8d], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(items).IsEquivalentTo([2d, 4d, 8d], EqualityComparer<double>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public static IEnumerable<Func<(string CollectionType, IEnumerable<double> Collection)>> ArraySortEnumerableData()

@@ -81,7 +81,7 @@ public class DrainRecoveryEndToEndTests : IAsyncDisposable
                        && _capturingTextWriter.Lines.Contains("first");
             }, TimeSpan.FromSeconds(5));
 
-            await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["first"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["first"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
             var drainWorkflow = new TestWorkflow(builder => builder.Root = new DrainLiveActivity { Gate = drainLive });
             drainTask = Task.Run(() => _workflowRunner.RunAsync(drainWorkflow));
@@ -105,7 +105,7 @@ public class DrainRecoveryEndToEndTests : IAsyncDisposable
             await Assert.That(interrupted.Status).IsEqualTo(WorkflowStatus.Running);
             await Assert.That(interrupted.SubStatus).IsEqualTo(WorkflowSubStatus.Interrupted);
             await Assert.That(interrupted.IsExecuting).IsFalse();
-            await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["first"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo(["first"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
             var cancelled = await instanceStore.FindAsync(new WorkflowInstanceFilter { Id = cancelledId });
             await Assert.That(cancelled).IsNotNull();

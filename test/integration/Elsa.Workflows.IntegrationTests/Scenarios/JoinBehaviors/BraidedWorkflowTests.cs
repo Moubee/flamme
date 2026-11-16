@@ -16,7 +16,7 @@ public class BraidedWorkflowTests : IAsyncDisposable
         var options = new RunWorkflowOptions().WithTokenBasedFlowchart();
         await _fixture.RunWorkflowAsync<BraidedWorkflow>(options);
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "WriteLine1", "WriteLine2", "WriteLine3", "WriteLine4", "WriteLine5", "WriteLine6", "WriteLine7" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "WriteLine1", "WriteLine2", "WriteLine3", "WriteLine4", "WriteLine5", "WriteLine6", "WriteLine7" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

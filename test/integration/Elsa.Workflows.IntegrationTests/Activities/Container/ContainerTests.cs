@@ -20,7 +20,7 @@ public class ContainerTests : IAsyncDisposable
 
         // Assert
         await Assert.That(result.WorkflowState.Status).IsEqualTo(WorkflowStatus.Finished);
-        await Assert.That(lines).IsEquivalentTo(new[] { "Activity 1", "Activity 2", "Activity 3" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Activity 1", "Activity 2", "Activity 3" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

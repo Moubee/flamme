@@ -75,7 +75,7 @@ public class BookmarkQueueDeadLetterTests
 
         var deleteFilter = await Assert.That(queueStore.DeleteFilters).HasSingleItem();
         await Assert.That(deleteFilter.Id).IsNull();
-        await Assert.That(deleteFilter.Ids).IsEquivalentTo(["expired-1", "expired-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(deleteFilter.Ids).IsEquivalentTo(["expired-1", "expired-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await _queueStore.FindManyAsync(new BookmarkQueueFilter())).IsEmpty();
         await Assert.That((await _deadLetterStore.FindManyAsync(new BookmarkQueueDeadLetterFilter())).Count()).IsEqualTo(2);
     }
@@ -129,7 +129,7 @@ public class BookmarkQueueDeadLetterTests
         await purger.PurgeAsync();
 
         var deadLetters = (await _deadLetterStore.FindManyAsync(new BookmarkQueueDeadLetterFilter())).OrderBy(x => x.OriginalQueueItemId).ToList();
-        await Assert.That(deadLetters.Select(x => x.OriginalQueueItemId)).IsEquivalentTo(["removed", "retained"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(deadLetters.Select(x => x.OriginalQueueItemId)).IsEquivalentTo(["removed", "retained"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(deadLetters[0].CanReplay).IsFalse();
         await Assert.That(deadLetters[1].CanReplay).IsTrue();
         await Assert.That(await _queueStore.FindManyAsync(new BookmarkQueueFilter())).IsEmpty();

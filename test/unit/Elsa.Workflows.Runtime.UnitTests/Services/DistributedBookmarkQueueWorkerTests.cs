@@ -37,7 +37,7 @@ public class DistributedBookmarkQueueWorkerTests
 
             await WaitUntilAsync(() => processor.Calls == 1);
 
-            await Assert.That(lockProvider.Names).IsEquivalentTo([$"{nameof(DistributedBookmarkQueueWorker)}:tenant-a"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(lockProvider.Names).IsEquivalentTo([$"{nameof(DistributedBookmarkQueueWorker)}:tenant-a"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         }
         finally
         {
@@ -62,7 +62,7 @@ public class DistributedBookmarkQueueWorkerTests
             await signaler.TriggerAsync();
             await WaitUntilAsync(() => processor.Calls == 1);
 
-            await Assert.That(lockProvider.Names).IsEquivalentTo([nameof(DistributedBookmarkQueueWorker)], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(lockProvider.Names).IsEquivalentTo([nameof(DistributedBookmarkQueueWorker)], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         }
         finally
         {

@@ -42,7 +42,7 @@ public class Tests : IAsyncDisposable
 
         // Verify expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "Branch 2 - Resumed", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "Branch 2 - Resumed", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class Tests : IAsyncDisposable
 
         // Verify expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class Tests : IAsyncDisposable
 
         // Verify expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 1", "Branch 2", "Branch 1 - Resumed", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

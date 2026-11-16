@@ -18,8 +18,8 @@ public class EndpointPermissionRegistryTests
 
         await Assert.That(EndpointPermissionRegistry.Find(typeof(SinglePermissionEndpoint))).IsEqualTo(Alpha);
         await Assert.That(EndpointPermissionRegistry.All[typeof(SinglePermissionEndpoint)]).IsEqualTo(Alpha);
-        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(SinglePermissionEndpoint))!.AnyOf).IsEquivalentTo([Alpha], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(EndpointPermissionRegistry.AllRequirements[typeof(SinglePermissionEndpoint)].AnyOf).IsEquivalentTo([Alpha], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(SinglePermissionEndpoint))!.AnyOf).IsEquivalentTo([Alpha], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(EndpointPermissionRegistry.AllRequirements[typeof(SinglePermissionEndpoint)].AnyOf).IsEquivalentTo([Alpha], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -27,8 +27,8 @@ public class EndpointPermissionRegistryTests
     {
         EndpointPermissionRegistry.Record(typeof(AnyOfEndpoint), new EndpointPermissionRequirement([Alpha, Beta]));
 
-        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(AnyOfEndpoint))!.AnyOf).IsEquivalentTo([Alpha, Beta], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(EndpointPermissionRegistry.AllRequirements[typeof(AnyOfEndpoint)].AnyOf).IsEquivalentTo([Alpha, Beta], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(AnyOfEndpoint))!.AnyOf).IsEquivalentTo([Alpha, Beta], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(EndpointPermissionRegistry.AllRequirements[typeof(AnyOfEndpoint)].AnyOf).IsEquivalentTo([Alpha, Beta], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         // A single permission cannot express a choice, so these report nothing rather than one of the two.
         await Assert.That(EndpointPermissionRegistry.Find(typeof(AnyOfEndpoint))).IsNull();
@@ -47,12 +47,12 @@ public class EndpointPermissionRegistryTests
         EndpointPermissionRegistry.Record(typeof(RedeclaredEndpoint), Beta);
 
         await Assert.That(EndpointPermissionRegistry.Find(typeof(RedeclaredEndpoint))).IsEqualTo(Beta);
-        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(RedeclaredEndpoint))!.AnyOf).IsEquivalentTo([Beta], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(EndpointPermissionRegistry.FindRequirement(typeof(RedeclaredEndpoint))!.AnyOf).IsEquivalentTo([Beta], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
     public async Task ARequirement_CollapsesDuplicatePermissions() =>
-        await Assert.That(new EndpointPermissionRequirement([Alpha, Alpha]).AnyOf).IsEquivalentTo([Alpha], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(new EndpointPermissionRequirement([Alpha, Alpha]).AnyOf).IsEquivalentTo([Alpha], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
     [Test]
     public void ARequirementWithNoPermissions_IsRejected() =>

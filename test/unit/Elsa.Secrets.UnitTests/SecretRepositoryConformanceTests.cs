@@ -86,7 +86,7 @@ public abstract class SecretRepositoryConformanceTests
         using (scenario.UseTenant("tenant-a"))
         {
             var listedA = (await scenario.Repository.ListAsync()).OrderBy(x => x.Name).ToList();
-            await Assert.That(listedA.Select(x => x.Name).ToList()).IsEquivalentTo(["api:key", "smtp:password"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(listedA.Select(x => x.Name).ToList()).IsEquivalentTo(["api:key", "smtp:password"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             foreach (var secret in listedA)
                 await Assert.That(secret.TenantId).IsEqualTo("tenant-a");
         }

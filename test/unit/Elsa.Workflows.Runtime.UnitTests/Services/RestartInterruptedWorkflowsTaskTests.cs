@@ -53,7 +53,7 @@ public class RestartInterruptedWorkflowsTaskTests
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await Assert.That(observedTenantIds).IsEquivalentTo(new string?[] { "tenant-a", "tenant-b" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(observedTenantIds).IsEquivalentTo(new string?[] { "tenant-a", "tenant-b" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(tenantAccessor.Tenant).IsNull();
         Mock.Get(workflowRestarter).RestartWorkflowAsync("workflow-1", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         Mock.Get(workflowRestarter).RestartWorkflowAsync("workflow-2", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
@@ -97,7 +97,7 @@ public class RestartInterruptedWorkflowsTaskTests
 
         await task.ExecuteAsync(CancellationToken.None);
 
-        await Assert.That(observedTenantIds).IsEquivalentTo(new string?[] { null }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(observedTenantIds).IsEquivalentTo(new string?[] { null }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(tenantAccessor.Tenant).IsNull();
         Mock.Get(tenantService).FindAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(workflowRestarter).RestartWorkflowAsync("workflow-1", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));

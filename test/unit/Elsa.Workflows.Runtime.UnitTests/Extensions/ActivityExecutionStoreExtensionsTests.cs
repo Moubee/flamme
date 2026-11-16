@@ -77,7 +77,7 @@ public class ActivityExecutionStoreExtensionsTests
 
         // Assert
         await Assert.That(result.TotalCount).IsEqualTo(expectedTotal);
-        await Assert.That(items.Select(x => x.Id).ToArray()).IsEquivalentTo(expectedIds, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(items.Select(x => x.Id).ToArray()).IsEquivalentTo(expectedIds, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -117,7 +117,7 @@ public class ActivityExecutionStoreExtensionsTests
         var items = result.Items.ToList();
 
         await Assert.That(items.Count).IsEqualTo(expectedIds.Length);
-        await Assert.That(items.Select(x => x.Id).ToArray()).IsEquivalentTo(expectedIds, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(items.Select(x => x.Id).ToArray()).IsEquivalentTo(expectedIds, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.TotalCount >= expectedIds.Length).IsTrue();
     }
 

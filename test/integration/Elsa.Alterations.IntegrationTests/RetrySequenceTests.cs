@@ -82,13 +82,13 @@ public sealed class RetrySequenceTests : IAsyncInitializer, IAsyncDisposable
         var nextState = await client.ExportStateAsync();
         var nextBookmark = await Assert.That(nextState.Bookmarks).HasSingleItem();
         await Assert.That(afterRetry.Status).IsEqualTo(WorkflowStatus.Running);
-        await Assert.That(_output.Lines).IsEquivalentTo(["Sequence finished"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_output.Lines).IsEquivalentTo(["Sequence finished"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(nextState.Incidents.Count).IsEqualTo(faultedState.Incidents.Count);
         await Assert.That(nextBookmark.ActivityInstanceId).IsNotEqualTo(retryBookmark.ActivityInstanceId);
 
         var finalRun = await client.RunInstanceAsync(new() { BookmarkId = nextBookmark.Id });
         await Assert.That(finalRun.Status).IsEqualTo(WorkflowStatus.Finished);
-        await Assert.That(_output.Lines).IsEquivalentTo(["Sequence finished", "Done"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_output.Lines).IsEquivalentTo(["Sequence finished", "Done"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(_probe.Attempts).IsEqualTo(2);
         await Assert.That((await client.ExportStateAsync()).Bookmarks).IsEmpty();
     }

@@ -76,7 +76,7 @@ public class EFCoreAIAuditSinkTests : IAsyncInitializer, IAsyncDisposable
         ]);
 
         var types = await _dbContext.AuditRecords.OrderBy(x => x.Id).Select(x => x.Type).ToListAsync();
-        await Assert.That(types).IsEquivalentTo(["tool.invoked", "tool.completed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(types).IsEquivalentTo(["tool.invoked", "tool.completed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

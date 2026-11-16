@@ -20,7 +20,7 @@ public class ExtensionConformanceTests
 
         var registry = new DefaultExternalAuthenticationAdapterRegistry([second, first], validator, Microsoft.Extensions.Options.Options.Create(options));
 
-        await Assert.That(registry.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["second"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(registry.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["second"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(registry.TryGet("first", out _)).IsFalse();
         await Assert.That(registry.TryGet("second", out var selected)).IsTrue();
         await Assert.That(selected).IsSameReferenceAs(second);
@@ -49,8 +49,8 @@ public class ExtensionConformanceTests
             validator,
             Microsoft.Extensions.Options.Options.Create(options));
 
-        await Assert.That(policies.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["custom-policy"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(sources.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["custom-grants"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(policies.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["custom-policy"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(sources.ListDescriptors().Select(x => x.Type)).IsEquivalentTo(["custom-grants"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(policies.TryGet("hidden-policy", out _)).IsFalse();
         await Assert.That(sources.TryGet("hidden-grants", out _)).IsFalse();
     }

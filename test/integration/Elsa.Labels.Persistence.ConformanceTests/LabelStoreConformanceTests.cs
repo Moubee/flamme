@@ -61,7 +61,7 @@ public abstract class LabelStoreConformanceTests
             .Select(x => x.Id)
             .OrderBy(x => x)
             .ToList();
-        await Assert.That(remaining).IsEquivalentTo(["assoc-blue", "assoc-green"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(remaining).IsEquivalentTo(["assoc-blue", "assoc-green"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -120,15 +120,15 @@ public abstract class LabelStoreConformanceTests
         await scenario.Labels.SaveAsync(Label("label-m", "Mango", "tenant-a"));
 
         var all = (await scenario.Labels.ListAsync()).Items.Select(x => x.Name).ToList();
-        await Assert.That(all).IsEquivalentTo(["Apple", "Mango", "Zebra"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(all).IsEquivalentTo(["Apple", "Mango", "Zebra"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         // Page.TotalCount is not a shared contract: Memory ToPage counts after Skip/Take,
         // EF PaginateAsync counts the unpaged query.
         var firstPage = await scenario.Labels.ListAsync(PageArgs.FromRange(0, 2));
-        await Assert.That(firstPage.Items.Select(x => x.Name).ToList()).IsEquivalentTo(["Apple", "Mango"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(firstPage.Items.Select(x => x.Name).ToList()).IsEquivalentTo(["Apple", "Mango"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var secondPage = await scenario.Labels.ListAsync(PageArgs.FromRange(2, 2));
-        await Assert.That(secondPage.Items.Select(x => x.Name).ToList()).IsEquivalentTo(["Zebra"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(secondPage.Items.Select(x => x.Name).ToList()).IsEquivalentTo(["Zebra"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

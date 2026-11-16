@@ -40,8 +40,8 @@ public class SchedulingBookmarkReconcilerTests
             Bookmark("b-pending", "pending")
         ]);
 
-        await Assert.That(result.Schedulable.Select(x => x.Id)).IsEquivalentTo(["b-running", "b-suspended", "b-interrupted", "b-pending"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(result.Orphans.Select(x => x.Id)).IsEquivalentTo(["b-missing", "b-blank", "b-finished", "b-cancelled", "b-faulted"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Schedulable.Select(x => x.Id)).IsEquivalentTo(["b-running", "b-suspended", "b-interrupted", "b-pending"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Orphans.Select(x => x.Id)).IsEquivalentTo(["b-missing", "b-blank", "b-finished", "b-cancelled", "b-faulted"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class SchedulingBookmarkReconcilerTests
 
         var result = await reconciler.ClassifyAsync([Bookmark("past-due-delay", "suspended")]);
 
-        await Assert.That(result.Schedulable.Select(x => x.Id)).IsEquivalentTo(["past-due-delay"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Schedulable.Select(x => x.Id)).IsEquivalentTo(["past-due-delay"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.Orphans).IsEmpty();
     }
 
@@ -72,7 +72,7 @@ public class SchedulingBookmarkReconcilerTests
         await reconciler.PurgeAsync([Bookmark("orphan-1", "missing"), Bookmark("orphan-2", "finished")]);
 
         var remaining = (await bookmarkStore.FindManyAsync(new BookmarkFilter())).Select(x => x.Id).ToList();
-        await Assert.That(remaining).IsEquivalentTo(["live"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(remaining).IsEquivalentTo(["live"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

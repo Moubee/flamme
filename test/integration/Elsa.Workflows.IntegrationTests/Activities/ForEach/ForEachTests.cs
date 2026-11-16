@@ -23,7 +23,7 @@ public class ForEachTests : IAsyncDisposable
         await _services.PopulateRegistriesAsync();
         await _workflowRunner.RunAsync(new ForEachWorkflow(items));
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(items, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(items, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

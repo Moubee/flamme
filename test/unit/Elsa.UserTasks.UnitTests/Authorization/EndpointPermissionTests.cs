@@ -83,7 +83,7 @@ public class EndpointPermissionTests
         var declaring = EndpointNames().OrderBy(x => x, StringComparer.Ordinal).ToArray();
         var asserted = Expected.Select(x => x.Endpoint).OrderBy(x => x, StringComparer.Ordinal).ToArray();
 
-        await Assert.That(declaring).IsEquivalentTo(asserted, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(declaring).IsEquivalentTo(asserted, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

@@ -81,7 +81,7 @@ public class EFCoreSecretRepositoryTests
             .GetIndexes()
             .Single(x => x.IsUnique);
 
-        await Assert.That(index.Properties.Select(x => x.Name)).IsEquivalentTo(["TenantId", SecretShadowPropertyNames.NormalizedName], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(index.Properties.Select(x => x.Name)).IsEquivalentTo(["TenantId", SecretShadowPropertyNames.NormalizedName], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

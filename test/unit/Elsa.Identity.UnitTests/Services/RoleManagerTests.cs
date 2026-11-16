@@ -36,7 +36,7 @@ public class RoleManagerTests
 
             await Assert.That(roleB.Role.Id).IsNotEqualTo(roleA.Role.Id);
             await Assert.That(roleB.Role.TenantId).IsEqualTo("tenant-b");
-            await Assert.That(roleB.Role.Permissions).IsEquivalentTo(["tenant-b:permission"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(roleB.Role.Permissions).IsEquivalentTo(["tenant-b:permission"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
             var tenantBRoles = await _roleStore.FindManyAsync(new() { TenantId = "tenant-b" });
             await Assert.That(tenantBRoles).HasSingleItem();
@@ -51,7 +51,7 @@ public class RoleManagerTests
         var tenantARole = await _roleStore.FindAsync(new() { Id = roleA.Role.Id });
         await Assert.That(tenantARole).IsNotNull();
         await Assert.That(tenantARole.Name).IsEqualTo("Operators");
-        await Assert.That(tenantARole.Permissions).IsEquivalentTo(["tenant-a:permission"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(tenantARole.Permissions).IsEquivalentTo(["tenant-a:permission"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         tenantARole.Name = "Operators A";
         await _roleStore.SaveAsync(tenantARole);
@@ -98,7 +98,7 @@ public class RoleManagerTests
         var role = await _roleStore.FindAsync(new() { Id = "admin" });
         await Assert.That(role).IsNotNull();
         await Assert.That(role.Name).IsEqualTo("Admin");
-        await Assert.That(role.Permissions).IsEquivalentTo([PermissionNames.All], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(role.Permissions).IsEquivalentTo([PermissionNames.All], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

@@ -26,7 +26,7 @@ public class DefaultIdentityProviderConnectionRegistryTests
         var shadowedBy = await Assert.That(shadowed.ShadowedBy).IsNotNull();
         await Assert.That(shadowedBy).IsOfType(typeof(IdentityProviderConnectionReference));
         await Assert.That(shadowedBy.Id).IsEqualTo("configuration-oidc");
-        await Assert.That(result.LoginMethods.Select(x => x.Id)).IsEquivalentTo(["configuration-oidc"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.LoginMethods.Select(x => x.Id)).IsEquivalentTo(["configuration-oidc"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -109,7 +109,7 @@ public class DefaultIdentityProviderConnectionRegistryTests
 
         var result = await registry.GetAsync("tenant-a");
 
-        await Assert.That(result.Connections.Select(x => x.Connection.Id)).IsEquivalentTo(["host"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Connections.Select(x => x.Connection.Id)).IsEquivalentTo(["host"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.Connections).DoesNotContain(x => x.Connection.Id == "tenant-a");
         await Assert.That(result.Connections).DoesNotContain(x => x.Connection.Id == "tenant-b");
     }
@@ -152,7 +152,7 @@ public class DefaultIdentityProviderConnectionRegistryTests
 
         var result = await registry.GetAsync("tenant-a");
 
-        await Assert.That(result.LoginMethods.Select(x => x.Id)).IsEquivalentTo(["early", "preferred", "host"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.LoginMethods.Select(x => x.Id)).IsEquivalentTo(["early", "preferred", "host"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         var preferredLoginMethod = await Assert.That(result.LoginMethods).HasSingleItem(x => x.IsPreferred);
         await Assert.That(preferredLoginMethod.Id).IsEqualTo("preferred");
         await Assert.That(result.LoginMethods).DoesNotContain(x => x.Id == "disabled");

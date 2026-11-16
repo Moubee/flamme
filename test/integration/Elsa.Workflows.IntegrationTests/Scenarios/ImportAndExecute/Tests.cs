@@ -31,7 +31,7 @@ public class Tests : IAsyncDisposable
         // Assert.
         var lines = _capturingTextWriter.Lines.ToList();
 
-        await Assert.That(lines).IsEquivalentTo(expectedOutput, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(expectedOutput, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     
     public static IEnumerable<Func<(string WorkflowFileName, string[] ExpectedOutput)>> GetSpecimen()

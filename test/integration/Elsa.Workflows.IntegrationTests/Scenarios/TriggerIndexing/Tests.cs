@@ -91,7 +91,7 @@ public class Tests : IAsyncDisposable
     private async Task AssertRemainingTriggers(string[] expectedTriggerIds)
     {
         var remainingTriggerIds = await GetRemainingTriggerIdsAsync();
-        await Assert.That(remainingTriggerIds).IsEquivalentTo(expectedTriggerIds.OrderBy(id => id), TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(remainingTriggerIds).IsEquivalentTo(expectedTriggerIds.OrderBy(id => id), StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private async Task SaveWorkflowsAndTriggersAsync(WorkflowDefinition[] workflows, StoredTrigger[] triggers)

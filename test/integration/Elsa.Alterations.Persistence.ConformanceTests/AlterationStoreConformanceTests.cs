@@ -190,14 +190,14 @@ public abstract class AlterationStoreConformanceTests
             .Select(x => x.Id)
             .OrderBy(x => x)
             .ToList();
-        await Assert.That(plan1).IsEquivalentTo(["job-completed-1", "job-pending-1", "job-running-1", "job-star-failed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(plan1).IsEquivalentTo(["job-completed-1", "job-pending-1", "job-running-1", "job-star-failed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await scenario.Jobs.CountAsync(new AlterationJobFilter { PlanId = "plan-1" })).IsEqualTo(4);
 
         var pending = (await scenario.Jobs.FindManyAsync(new AlterationJobFilter { Status = AlterationJobStatus.Pending }, CancellationToken.None))
             .Select(x => x.Id)
             .OrderBy(x => x)
             .ToList();
-        await Assert.That(pending).IsEquivalentTo(["job-pending-1", "job-pending-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(pending).IsEquivalentTo(["job-pending-1", "job-pending-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var plan1Pending = (await Assert.That(await scenario.Jobs.FindManyAsync(new AlterationJobFilter
         {
@@ -210,10 +210,10 @@ public abstract class AlterationStoreConformanceTests
         {
             Statuses = [AlterationJobStatus.Completed, AlterationJobStatus.Failed]
         }, CancellationToken.None)).Select(x => x.Id).OrderBy(x => x).ToList();
-        await Assert.That(completedOrFailed).IsEquivalentTo(["job-completed-1", "job-star-failed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(completedOrFailed).IsEquivalentTo(["job-completed-1", "job-star-failed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var plan1Ids = (await scenario.Jobs.FindManyIdsAsync(new AlterationJobFilter { PlanId = "plan-1" })).OrderBy(x => x).ToList();
-        await Assert.That(plan1Ids).IsEquivalentTo(["job-completed-1", "job-pending-1", "job-running-1", "job-star-failed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(plan1Ids).IsEquivalentTo(["job-completed-1", "job-pending-1", "job-running-1", "job-star-failed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         using (scenario.UseTenant("tenant-b"))
         {
@@ -221,7 +221,7 @@ public abstract class AlterationStoreConformanceTests
                 .Select(x => x.Id)
                 .OrderBy(x => x)
                 .ToList();
-            await Assert.That(tenantB).IsEquivalentTo(["job-b-pending", "job-star-failed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(tenantB).IsEquivalentTo(["job-b-pending", "job-star-failed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             await Assert.That(await scenario.Jobs.CountAsync(new AlterationJobFilter { Status = AlterationJobStatus.Pending })).IsEqualTo(1);
         }
     }
@@ -263,9 +263,9 @@ public abstract class AlterationStoreConformanceTests
         await Assert.That(plan.CreatedAt).IsEqualTo(createdAt);
         await Assert.That(plan.StartedAt).IsEqualTo(startedAt);
         await Assert.That(plan.CompletedAt).IsNull();
-        await Assert.That(plan.Alterations.Cast<TestAlteration>().Select(x => $"{x.Kind}:{x.Value}").ToList()).IsEquivalentTo(["cancel:activity-1", "migrate:v2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(plan.WorkflowInstanceFilter.WorkflowInstanceIds).IsEquivalentTo(["wf-1", "wf-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(plan.WorkflowInstanceFilter.CorrelationIds).IsEquivalentTo(["corr-1"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(plan.Alterations.Cast<TestAlteration>().Select(x => $"{x.Kind}:{x.Value}").ToList()).IsEquivalentTo(["cancel:activity-1", "migrate:v2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(plan.WorkflowInstanceFilter.WorkflowInstanceIds).IsEquivalentTo(["wf-1", "wf-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(plan.WorkflowInstanceFilter.CorrelationIds).IsEquivalentTo(["corr-1"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(plan.WorkflowInstanceFilter.SearchTerm).IsEqualTo("invoice");
         await Assert.That(plan.WorkflowInstanceFilter.HasIncidents).IsTrue();
         await Assert.That(plan.WorkflowInstanceFilter.IsSystem).IsFalse();

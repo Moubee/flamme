@@ -82,8 +82,8 @@ public class DefaultDashboardProviderTests
 
         await readable.AssertOn(overview);
         await Assert.That(overview.BackendName).IsEqualTo("Elsa.TestHost");
-        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo(readable.Metrics, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(overview.Panels.Select(x => x.Id)).IsEquivalentTo(readable.Panels, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo(readable.Metrics, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(overview.Panels.Select(x => x.Id)).IsEquivalentTo(readable.Panels, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -137,7 +137,7 @@ public class DefaultDashboardProviderTests
         var overview = await CreateProvider(contributor).GetOverviewAsync(new() { CanRead = x => x == InstancesView });
 
         await Assert.That(contributor.Invocations).IsEqualTo(1);
-        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo(["card"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(overview.Metrics.Select(x => x.Id)).IsEquivalentTo(["card"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -232,7 +232,7 @@ public class DefaultDashboardProviderTests
         var response = await CreateProvider(new WorkflowDashboardContributor(store, runtime))
             .GetNeedsAttentionAsync(new() { CanRead = x => x == RuntimeView }, 10);
 
-        await Assert.That(response.Findings.Select(x => x.Id)).IsEquivalentTo(["runtime-paused"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(response.Findings.Select(x => x.Id)).IsEquivalentTo(["runtime-paused"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(response.Findings.Single().Message).DoesNotContain("secret");
     }
 
@@ -398,7 +398,7 @@ public class DefaultDashboardProviderTests
 
         var response = await provider.GetNeedsAttentionAsync(new() { CanRead = permission => permission == InstancesView }, 10);
 
-        await Assert.That(response.Findings.Select(x => x.Id)).IsEquivalentTo([InstancesFinding], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(response.Findings.Select(x => x.Id)).IsEquivalentTo([InstancesFinding], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -540,8 +540,8 @@ public class DefaultDashboardProviderTests
         var narrow = await provider.GetWorkflowTrendsAsync(new() { CanRead = permission => permission == InstancesView });
         var whole = await provider.GetWorkflowTrendsAsync(new() { CanRead = _ => true });
 
-        await Assert.That(narrow.Buckets.Select(x => x.CreatedOrStarted)).IsEquivalentTo([1L], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(whole.Buckets.Select(x => x.CreatedOrStarted)).IsEquivalentTo([11L], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(narrow.Buckets.Select(x => x.CreatedOrStarted)).IsEquivalentTo([1L], EqualityComparer<long>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(whole.Buckets.Select(x => x.CreatedOrStarted)).IsEquivalentTo([11L], EqualityComparer<long>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -552,8 +552,8 @@ public class DefaultDashboardProviderTests
         var narrow = await provider.GetRecentActivityAsync(new() { CanRead = permission => permission == InstancesView }, 10);
         var whole = await provider.GetRecentActivityAsync(new() { CanRead = _ => true }, 10);
 
-        await Assert.That(narrow.Items.Select(x => x.InstanceId)).IsEquivalentTo(["instance"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(whole.Items.Select(x => x.InstanceId).Order()).IsEquivalentTo(["instance", "undeclared"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(narrow.Items.Select(x => x.InstanceId)).IsEquivalentTo(["instance"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(whole.Items.Select(x => x.InstanceId).Order()).IsEquivalentTo(["instance", "undeclared"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -564,8 +564,8 @@ public class DefaultDashboardProviderTests
         var narrow = await provider.GetWorkflowHotspotsAsync(new() { CanRead = permission => permission == InstancesView });
         var whole = await provider.GetWorkflowHotspotsAsync(new() { CanRead = _ => true });
 
-        await Assert.That(narrow.Items.Select(x => x.DefinitionId)).IsEquivalentTo(["definition"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(whole.Items.Select(x => x.DefinitionId).Order()).IsEquivalentTo(["definition", "undeclared"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(narrow.Items.Select(x => x.DefinitionId)).IsEquivalentTo(["definition"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(whole.Items.Select(x => x.DefinitionId).Order()).IsEquivalentTo(["definition", "undeclared"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

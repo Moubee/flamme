@@ -26,7 +26,7 @@ public class Tests : IAsyncDisposable
         await _services.PopulateRegistriesAsync();
         await _workflowRunner.RunAsync<BlockingSequentialWorkflow>();
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Line 1" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Line 1" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class Tests : IAsyncDisposable
 
         // Verify expected output.
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Line 1", "Line 2", "Line 3" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Line 1", "Line 2", "Line 3" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

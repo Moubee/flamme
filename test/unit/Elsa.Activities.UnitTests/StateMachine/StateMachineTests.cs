@@ -142,7 +142,7 @@ public class StateMachineTests
         lifecycle.Add("target entry");
         await Assert.That(context.HasScheduledActivity(_paidTrigger)).IsTrue();
 
-        await Assert.That(lifecycle).IsEquivalentTo(new[] { "source entry", "trigger", "source exit", "action", "target entry" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lifecycle).IsEquivalentTo(new[] { "source entry", "trigger", "source exit", "action", "target entry" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

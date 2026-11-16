@@ -34,7 +34,7 @@ public class ExplicitJoinWaitAnyTests : IAsyncDisposable
         // Assert expected output.
         var lines = _capturingTextWriter.Lines.ToList();
         var expectedLinesArray = expectedLines.Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        await Assert.That(lines).IsEquivalentTo(expectedLinesArray, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(expectedLinesArray, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         // Assert expected workflow status.
         await Assert.That(workflowState.Status).IsEqualTo(WorkflowStatus.Finished);

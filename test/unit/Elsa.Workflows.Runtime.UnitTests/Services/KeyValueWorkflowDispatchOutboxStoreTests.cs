@@ -40,7 +40,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync(2)).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["oldest", "middle"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["oldest", "middle"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(_keyValueStore).FindManyAsync(
             Arg.Is<KeyValueFilter>(x => x.Key == "Elsa:WorkflowDispatchOutbox:Index:" && x.OrderByKey && x.Take == 2), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
@@ -61,7 +61,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync()).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy", "orphan", "indexed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy", "orphan", "indexed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync(2)).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan", "indexed-1"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan", "indexed-1"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -95,7 +95,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync(2)).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy-1", "legacy-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy-1", "legacy-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(_keyValueStore).SaveAsync(
             Arg.Is<SerializedKeyValuePair>(x => x.Key == "Elsa:WorkflowDispatchOutbox:Items:legacy-1"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         Mock.Get(_keyValueStore).SaveAsync(
@@ -119,7 +119,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync(2)).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy-1", "legacy-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["legacy-1", "legacy-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(_keyValueStore).SaveAsync(
             Arg.Is<SerializedKeyValuePair>(x => x.Key == DefaultLegacyScanCompletedKey && x.SerializedValue == "true"), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
@@ -138,7 +138,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync()).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(_keyValueStore).FindManyAsync(
             Arg.Is<KeyValueFilter>(x => x.Key == "Elsa:WorkflowDispatchOutbox:" && x.StartsWith), Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(_keyValueStore).SaveAsync(
@@ -161,7 +161,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
 
         var result = (await _store.FindManyAsync(2)).ToList();
 
-        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan-1", "orphan-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(["orphan-1", "orphan-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(_keyValueStore).FindManyAsync(
             Arg.Is<KeyValueFilter>(x => x.Key == "Elsa:WorkflowDispatchOutbox:Recovery:" && x.StartsWith && x.OrderByKey && x.Take == 2), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
@@ -190,7 +190,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
         var tenantASecond = (await tenantAStore.FindManyAsync()).ToList();
 
         await Assert.That(tenantAFirst).IsEmpty();
-        await Assert.That(tenantBResult.Select(x => x.Id)).IsEquivalentTo(["legacy-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(tenantBResult.Select(x => x.Id)).IsEquivalentTo(["legacy-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(tenantASecond).IsEmpty();
         await Assert.That(await tenantAKv.FindAsync(new KeyValueFilter { Key = tenantAStore.GetLegacyScanCompletedKey() }, CancellationToken.None)).IsNotNull();
         await Assert.That(await tenantBKv.FindAsync(new KeyValueFilter { Key = tenantBStore.GetLegacyScanCompletedKey() }, CancellationToken.None)).IsNotNull();
@@ -241,7 +241,7 @@ public class KeyValueWorkflowDispatchOutboxStoreTests
         var secondBatch = (await store.FindManyAsync(1)).ToList();
 
         await Assert.That(firstBatch).IsEmpty();
-        await Assert.That(secondBatch.Select(x => x.Id)).IsEquivalentTo(["valid"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(secondBatch.Select(x => x.Id)).IsEquivalentTo(["valid"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await FindAsync(keyValueStore, $"Elsa:WorkflowDispatchOutbox:Items:{corrupt.Id}")).IsNull();
         await Assert.That(await FindAsync(keyValueStore, $"Elsa:WorkflowDispatchOutbox:Index:{corrupt.CreatedAt.UtcTicks:D20}:{corrupt.Id}")).IsNull();
         await Assert.That(await FindAsync(keyValueStore, $"Elsa:WorkflowDispatchOutbox:IndexById:{corrupt.Id}")).IsNull();

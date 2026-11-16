@@ -155,8 +155,8 @@ public class OpenIdConnectAdapterTests
         var result = await AuthenticateAsync(token, projection);
 
         await Assert.That(result.Identity.Subject).IsEqualTo("subject");
-        await Assert.That(result.ProjectedClaims["name"]).IsEquivalentTo(["Ada"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(result.ProjectedClaims["email"]).IsEquivalentTo(["secret"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.ProjectedClaims["name"]).IsEquivalentTo(["Ada"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result.ProjectedClaims["email"]).IsEquivalentTo(["secret"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.ProjectedClaims.Keys).DoesNotContain("groups");
     }
 

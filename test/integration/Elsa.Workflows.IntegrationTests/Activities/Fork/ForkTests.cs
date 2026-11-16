@@ -23,7 +23,7 @@ public class ForkTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Branch 1", "Branch 2", "Branch 3" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Branch 1", "Branch 2", "Branch 3" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class ForkTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 2", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Branch 2", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class ForkTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Before fork", "After fork" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Before fork", "After fork" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_fixture);

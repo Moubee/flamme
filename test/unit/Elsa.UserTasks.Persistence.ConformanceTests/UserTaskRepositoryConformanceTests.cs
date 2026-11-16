@@ -282,11 +282,11 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         // The unauthorized rows are absent from the total, not merely hidden on the page. A count that
         // includes them leaks their existence and pushes authorized rows off the last page.
         await Assert.That(page.TotalCount).IsEqualTo(2);
-        await Assert.That(page.Items.Select(x => x.Id).Order(StringComparer.Ordinal)).IsEquivalentTo([visible.Id, alsoVisible.Id], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(page.Items.Select(x => x.Id).Order(StringComparer.Ordinal)).IsEquivalentTo([visible.Id, alsoVisible.Id], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         // The same must hold once a page limit forces a cursor: the excluded rows cannot occupy a slot.
         var paged = await PageThroughAsync(Query(), pageSize: 1);
-        await Assert.That(paged.Order(StringComparer.Ordinal)).IsEquivalentTo([visible.Id, alsoVisible.Id], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(paged.Order(StringComparer.Ordinal)).IsEquivalentTo([visible.Id, alsoVisible.Id], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -412,7 +412,7 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         // Paging must reproduce the unpaged order exactly: no row seen twice, none skipped, and no
         // dependence on the page size. A cursor that only works at one limit is not a cursor.
         foreach (var pageSize in new[] { 1, 2, 3 })
-            await Assert.That(await PageThroughAsync(query, pageSize)).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(await PageThroughAsync(query, pageSize)).IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -424,10 +424,10 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         // Seed UpdatedAt order is Bravo, Foxtrot, Charlie+Delta (shared, Id tie), Echo, Alpha —
         // not the created/title order — so a provider that still maps updated to created fails.
         var ascending = await Repository.QueryAsync(Query(sort: "updated", limit: 200));
-        await Assert.That(ascending.Items.Select(x => x.Title)).IsEquivalentTo(["Bravo", "Foxtrot", "Charlie", "Delta", "Echo", "Alpha"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(ascending.Items.Select(x => x.Title)).IsEquivalentTo(["Bravo", "Foxtrot", "Charlie", "Delta", "Echo", "Alpha"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var descending = await Repository.QueryAsync(Query(sort: "updated", descending: true, limit: 200));
-        await Assert.That(descending.Items.Select(x => x.Title)).IsEquivalentTo(["Alpha", "Echo", "Charlie", "Delta", "Foxtrot", "Bravo"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(descending.Items.Select(x => x.Title)).IsEquivalentTo(["Alpha", "Echo", "Charlie", "Delta", "Foxtrot", "Bravo"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

@@ -41,7 +41,7 @@ public class BytesAndStringEncodingTests : IAsyncDisposable
         var result = (byte[])(await _evaluator.EvaluateAsync(script, typeof(byte[]), _expressionContext))!;
         var bytes = Encoding.UTF8.GetBytes(data);
 
-        await Assert.That(result).IsEquivalentTo(bytes, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result).IsEquivalentTo(bytes, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     
     [Test]
@@ -67,7 +67,7 @@ public class BytesAndStringEncodingTests : IAsyncDisposable
         _expressionContext.SetVariable("Data", base64);
         var result = (byte[])(await _evaluator.EvaluateAsync(script, typeof(byte[]), _expressionContext))!;
 
-        await Assert.That(result).IsEquivalentTo(bytes, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result).IsEquivalentTo(bytes, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     
     [Test]

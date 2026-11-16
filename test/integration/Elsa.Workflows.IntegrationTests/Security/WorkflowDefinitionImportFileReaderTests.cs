@@ -26,7 +26,7 @@ public class WorkflowDefinitionImportFileReaderTests
 
         var models = await WorkflowDefinitionImportFileReader.ReadAsync(files, _apiSerializer, () => false, CancellationToken.None);
 
-        await Assert.That(models.Select(x => x.DefinitionId)).IsEquivalentTo(["plain-a", "zip-b", "zip-c"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(models.Select(x => x.DefinitionId)).IsEquivalentTo(["plain-a", "zip-b", "zip-c"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class WorkflowDefinitionImportFileReaderTests
 
         var models = await WorkflowDefinitionImportFileReader.ReadAsync(files, _apiSerializer, () => hasResponseStarted, CancellationToken.None);
 
-        await Assert.That(models.Select(x => x.DefinitionId)).IsEquivalentTo(["zip-a"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(models.Select(x => x.DefinitionId)).IsEquivalentTo(["zip-a"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static IFormFile CreateJsonFile(string content)

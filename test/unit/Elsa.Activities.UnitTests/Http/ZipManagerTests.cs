@@ -87,7 +87,7 @@ public class ZipManagerTests : IDisposable
         var result = await LoadAsync("download", zipManager);
 
         await Assert.That(result.HasValue).IsTrue();
-        await Assert.That(result!.Value.Content).IsEquivalentTo(new byte[] { 1, 2, 3 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result!.Value.Content).IsEquivalentTo(new byte[] { 1, 2, 3 }, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(blobStorage.OpenedPath).IsEqualTo(blobPath);
     }
 

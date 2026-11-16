@@ -49,7 +49,7 @@ public class FaultHandlingTests
 
         // Assert
         await Assert.That(chain.Select(x => x.AggregateFaultCount))
-            .IsEquivalentTo(new[] { 1, 1, 1 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { 1, 1, 1 }, EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class FaultHandlingTests
 
         // Assert
         await Assert.That(chain.Select(x => x.AggregateFaultCount))
-            .IsEquivalentTo(new[] { 0, 0, 0 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { 0, 0, 0 }, EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(faultedContext.Status).IsEqualTo(ActivityStatus.Running);
     }
 
@@ -88,7 +88,7 @@ public class FaultHandlingTests
         // Assert
         await Assert.That(faultedContext.AggregateFaultCount).IsEqualTo(0);
         await Assert.That(chain.Take(chain.Count - 1).Select(x => x.AggregateFaultCount))
-            .IsEquivalentTo(new[] { -1, -1 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { -1, -1 }, EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -109,7 +109,7 @@ public class FaultHandlingTests
         // Assert
         await Assert.That(faultedContext.Status).IsEqualTo(ActivityStatus.Canceled);
         await Assert.That(chain.Select(x => x.AggregateFaultCount))
-            .IsEquivalentTo(new[] { 0, 0, 0 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { 0, 0, 0 }, EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

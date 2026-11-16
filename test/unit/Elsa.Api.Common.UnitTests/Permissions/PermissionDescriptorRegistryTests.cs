@@ -22,7 +22,7 @@ public class PermissionDescriptorRegistryTests
             new Provider(Descriptor("workflows/instances"), Descriptor("dashboard")),
             new Provider(Descriptor("identity/users")));
 
-        await Assert.That(registry.List().Select(x => x.Resource)).IsEquivalentTo(["dashboard", "identity/users", "workflows/instances"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(registry.List().Select(x => x.Resource)).IsEquivalentTo(["dashboard", "identity/users", "workflows/instances"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class PermissionDescriptorRegistryTests
         var registry = Registry(new Provider(Descriptor("secrets", "view")), new Provider(Descriptor("secrets", "delete")));
 
         await Assert.That(registry.List()).HasSingleItem();
-        await Assert.That(registry.Find("secrets")!.SupportedVerbs).IsEquivalentTo(["view"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(registry.Find("secrets")!.SupportedVerbs).IsEquivalentTo(["view"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class PermissionDescriptorRegistryTests
     {
         var descriptor = Descriptor("workflows/definitions", "view", "write", "publish", "retract");
 
-        await Assert.That(descriptor.NonCoreVerbs).IsEquivalentTo(["publish", "retract"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(descriptor.NonCoreVerbs).IsEquivalentTo(["publish", "retract"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(descriptor.Supports("write")).IsTrue();
         await Assert.That(descriptor.Supports("quarantine")).IsFalse();
     }
@@ -53,8 +53,8 @@ public class PermissionDescriptorRegistryTests
             Descriptor("workflows/instances"),
             Descriptor("identity/users")));
 
-        await Assert.That(registry.Reach("workflows/*")).IsEquivalentTo(["workflows/definitions", "workflows/definitions/versions", "workflows/instances"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(registry.Reach("workflows/definitions/*")).IsEquivalentTo(["workflows/definitions", "workflows/definitions/versions"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(registry.Reach("workflows/*")).IsEquivalentTo(["workflows/definitions", "workflows/definitions/versions", "workflows/instances"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(registry.Reach("workflows/definitions/*")).IsEquivalentTo(["workflows/definitions", "workflows/definitions/versions"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(registry.Reach("*").Count).IsEqualTo(4);
     }
 

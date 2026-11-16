@@ -23,7 +23,7 @@ public class Tests : IAsyncDisposable
         await _services.PopulateRegistriesAsync();
         await _workflowRunner.RunAsync<SetGetVariableWorkflow>();
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Line 5" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Line 5" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class Tests : IAsyncDisposable
         await _services.PopulateRegistriesAsync();
         await _workflowRunner.RunAsync<SetGetVariablesWorkflow>();
         var lines = _capturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Variable 2: The value of variable 1" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Variable 2: The value of variable 1" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

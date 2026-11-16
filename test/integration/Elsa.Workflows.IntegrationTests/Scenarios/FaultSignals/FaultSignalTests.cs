@@ -185,7 +185,7 @@ public class FaultSignalTests : IAsyncDisposable
 
         // Assert: completing the child fires the container's completion callback, so sequencing resumes.
         await Assert.That(result.GetActivityStatus(_faultingActivity)).IsEqualTo(ActivityStatus.Completed);
-        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(new[] { "after" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(new[] { "after" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.WorkflowState.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
         await AssertFaultCountsAsync(result, expected: 0);
     }

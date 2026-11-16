@@ -47,8 +47,8 @@ public class WorkflowInstanceStoreExtensionsTests
             results.Add(workflowInstance);
 
         // Assert
-        await Assert.That(results.Select(x => x.Id).ToArray()).IsEquivalentTo(["workflow-1", "workflow-2", "workflow-3", "workflow-4"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(requestedPages.Select(x => x.Offset).ToArray()).IsEquivalentTo([(int?)0, 2, 4], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(results.Select(x => x.Id).ToArray()).IsEquivalentTo(["workflow-1", "workflow-2", "workflow-3", "workflow-4"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(requestedPages.Select(x => x.Offset).ToArray()).IsEquivalentTo([(int?)0, 2, 4], EqualityComparer<int?>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         foreach (var requestedPage in requestedPages)
             await Assert.That(requestedPage.Limit).IsEqualTo(2);
     }

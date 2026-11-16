@@ -333,11 +333,11 @@ public abstract class WorkflowStoreConformanceTests
 
         var filter = new WorkflowExecutionLogRecordFilter { WorkflowInstanceId = "instance-1" };
         var page = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
-        await Assert.That(page.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3", "el-later"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(page.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3", "el-later"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var firstPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2));
         await Assert.That(firstPage.TotalCount).IsEqualTo(4);
-        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var first = await scenario.ExecutionLogs.FindAsync(filter);
         await Assert.That(first!.Id).IsEqualTo("el-seq-1");
@@ -368,13 +368,13 @@ public abstract class WorkflowStoreConformanceTests
 
         var filter = new WorkflowExecutionLogRecordFilter();
         var all = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
-        await Assert.That(all.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b", "el-c", "el-d"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(all.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b", "el-c", "el-d"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var firstPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2));
         var secondPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(2, 2));
         await Assert.That(firstPage.TotalCount).IsEqualTo(4);
-        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(secondPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-c", "el-d"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(firstPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-a", "el-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(secondPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-c", "el-d"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -394,19 +394,19 @@ public abstract class WorkflowStoreConformanceTests
         };
 
         var defaultPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All);
-        await Assert.That(defaultPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(defaultPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2", "el-seq-3"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var descending = new WorkflowExecutionLogRecordOrder<long>(x => x.Sequence, OrderDirection.Descending);
         var descendingPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.All, descending);
-        await Assert.That(descendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2", "el-seq-1"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(descendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2", "el-seq-1"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var firstDescendingPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2), descending);
         await Assert.That(firstDescendingPage.TotalCount).IsEqualTo(3);
-        await Assert.That(firstDescendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(firstDescendingPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-3", "el-seq-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         var journalOrder = new WorkflowExecutionLogRecordOrder<long>(x => x.Sequence, OrderDirection.Ascending);
         var journalPage = await scenario.ExecutionLogs.FindManyAsync(filter, PageArgs.FromRange(0, 2), journalOrder);
-        await Assert.That(journalPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(journalPage.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(["el-seq-1", "el-seq-2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -479,8 +479,8 @@ public abstract class WorkflowStoreConformanceTests
         var records = (await scenario.ActivityExecutions.FindManyAsync(filter, order)).ToList();
         var summaries = (await scenario.ActivityExecutions.FindManySummariesAsync(filter, order)).ToList();
 
-        await Assert.That(records.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(summaries.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(records.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(summaries.Select(x => x.Id).ToArray()).IsEquivalentTo(["ae-early", "ae-mid", "ae-late"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         for (var i = 0; i < records.Count; i++)
         {
@@ -572,8 +572,8 @@ public abstract class WorkflowStoreConformanceTests
         var summaries = (await scenario.ActivityExecutions.FindManySummariesAsync(filter)).Select(x => x.Id).OrderBy(x => x).ToArray();
         var expected = expectedIds.OrderBy(x => x).ToArray();
 
-        await Assert.That(records).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(summaries).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(records).IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(summaries).IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static ActivityExecutionRecord ActivityExecution(

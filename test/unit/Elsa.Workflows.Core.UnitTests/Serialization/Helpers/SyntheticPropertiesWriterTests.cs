@@ -34,7 +34,7 @@ public sealed class SyntheticPropertiesWriterTests
         await Assert.That(converter.GetProperty("id").GetString()).IsEqualTo("sample.to-text");
         await Assert.That(converter.GetProperty("settings").GetProperty("format").GetString()).IsEqualTo("compact");
         await Assert.That(converter.EnumerateObject().Select(x => x.Name))
-            .IsEquivalentTo(new[] { "id", "settings" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { "id", "settings" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public sealed class SyntheticPropertiesWriterTests
         // Assert
         var syntheticOutput = document.RootElement.GetProperty("result");
         await Assert.That(syntheticOutput.EnumerateObject().Select(x => x.Name))
-            .IsEquivalentTo(new[] { "typeName", "memoryReference" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { "typeName", "memoryReference" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(syntheticOutput.GetProperty("typeName").GetString()).IsEqualTo("String");
         await Assert.That(syntheticOutput.GetProperty("memoryReference").GetProperty("id").GetString()).IsEqualTo("resultVariable");
     }

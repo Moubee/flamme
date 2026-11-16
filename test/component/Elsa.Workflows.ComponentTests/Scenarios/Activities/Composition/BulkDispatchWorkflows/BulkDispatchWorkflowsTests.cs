@@ -89,7 +89,7 @@ public class BulkDispatchWorkflowsTests : AppComponentTest
         var expectedCorrelationIds = new[] { "correlation-1", "correlation-2", "correlation-3" };
         var actualCorrelationIds = completedChildWorkflows.Select(c => c.CorrelationId!).OrderBy(c => c).ToList();
 
-        await Assert.That(actualCorrelationIds).IsEquivalentTo(expectedCorrelationIds, CollectionOrdering.Matching);
+        await Assert.That(actualCorrelationIds).IsEquivalentTo(expectedCorrelationIds, StringComparer.Ordinal, CollectionOrdering.Matching);
     }
 
     [Test]

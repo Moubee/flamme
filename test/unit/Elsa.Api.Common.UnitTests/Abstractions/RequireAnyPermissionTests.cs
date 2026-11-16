@@ -87,7 +87,7 @@ public class RequireAnyPermissionTests
         var requirement = EndpointPermissionRegistry.FindRequirement(typeof(AnyOfEndpoint));
 
         await Assert.That(requirement).IsNotNull();
-        await Assert.That(requirement.AnyOf).IsEquivalentTo([Alpha, Beta], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(requirement.AnyOf).IsEquivalentTo([Alpha, Beta], EqualityComparer<Permission>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(EndpointPermissionRegistry.Find(typeof(AnyOfEndpoint))).IsNull();
     }
 

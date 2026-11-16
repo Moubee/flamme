@@ -53,8 +53,8 @@ public class BookmarkQueueTenantIsolationTests
 
             await Assert.That(resumedSnapshot).Contains("bookmark-a");
             await Assert.That(resumedSnapshot).Contains("bookmark-b");
-            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-            await Assert.That(processorB.AmbientTenantIds).IsEquivalentTo(["tenant-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processorB.AmbientTenantIds).IsEquivalentTo(["tenant-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
@@ -111,8 +111,8 @@ public class BookmarkQueueTenantIsolationTests
 
             await WaitUntilAsync(() => processorA.Calls == 1);
 
-            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-            await Assert.That(scopesA.OpenedTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(scopesA.OpenedTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             await Assert.That(processorB.Calls).IsEqualTo(0);
             await Assert.That(processorB.AmbientTenantIds).IsEmpty();
             await Assert.That(scopesB.OpenedTenantIds).IsEmpty();
@@ -150,8 +150,8 @@ public class BookmarkQueueTenantIsolationTests
 
             await Task.Delay(50);
             await Assert.That(processorB.Calls).IsEqualTo(0);
-            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
-            await Assert.That(scopesA.OpenedTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processorA.AmbientTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(scopesA.OpenedTenantIds).IsEquivalentTo(new string?[] { "tenant-a" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
             Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).WasNeverCalled();
         }
         finally
@@ -203,7 +203,7 @@ public class BookmarkQueueTenantIsolationTests
             await signaler.TriggerAsync();
             await WaitUntilAsync(() => processor.Calls == 1);
 
-            await Assert.That(processor.AmbientTenantIds).IsEquivalentTo([Elsa.Common.Multitenancy.Tenant.DefaultTenantId], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processor.AmbientTenantIds).IsEquivalentTo([Elsa.Common.Multitenancy.Tenant.DefaultTenantId], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         }
         finally
         {

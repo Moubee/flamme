@@ -66,7 +66,7 @@ public class ExecuteWorkflowTests
             {
                 await Assert.That(result.WorkflowInstanceId).IsEqualTo(DefaultGeneratedId);
                 await Assert.That(result.Status).IsEqualTo(childWorkflowStatus);
-                await Assert.That(result.Output).IsEquivalentTo(childOutput);
+                await Assert.That(result.Output).IsEquivalentTo(childOutput, EqualityComparer<KeyValuePair<string, object>>.Default);
             }
         }
     }

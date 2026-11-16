@@ -12,7 +12,7 @@ public class KeyValueFilterTests
 
         var result = filter.Apply(CreateUnorderedPairs()).Select(x => x.Key).ToList();
 
-        await Assert.That(result).IsEquivalentTo(["key-a", "key-b", "key-c"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result).IsEquivalentTo(["key-a", "key-b", "key-c"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class KeyValueFilterTests
 
         var result = filter.Apply(CreateUnorderedPairs()).Select(x => x.Key).ToList();
 
-        await Assert.That(result).IsEquivalentTo(["key-a", "key-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result).IsEquivalentTo(["key-a", "key-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class KeyValueFilterTests
 
         var result = filter.Apply(CreateUnorderedPairs()).Select(x => x.Key).ToList();
 
-        await Assert.That(result).IsEquivalentTo(["key-c", "key-a", "key-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result).IsEquivalentTo(["key-c", "key-a", "key-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static IQueryable<SerializedKeyValuePair> CreateUnorderedPairs()

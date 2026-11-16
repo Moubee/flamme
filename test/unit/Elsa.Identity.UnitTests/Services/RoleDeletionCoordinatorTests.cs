@@ -215,7 +215,7 @@ public class RoleDeletionCoordinatorTests
 
         await Assert.That(result).IsOfType(typeof(RoleDeletionOperationResult.Deleted));
         var deleted = (RoleDeletionOperationResult.Deleted)result;
-        await Assert.That(deleted.ChangedOwnerIds).IsEquivalentTo(["connection-a"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(deleted.ChangedOwnerIds).IsEquivalentTo(["connection-a"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await store.FindAsync(new() { Id = "workflow-user" })).IsNull();
         await Assert.That(contributor.Dependencies).IsEmpty();
         await AssertRoleDeletedNotificationAsync(notificationSender);
@@ -243,7 +243,7 @@ public class RoleDeletionCoordinatorTests
 
         await Assert.That(result).IsOfType(typeof(RoleDeletionOperationResult.Incomplete));
         var incomplete = (RoleDeletionOperationResult.Incomplete)result;
-        await Assert.That(incomplete.ChangedOwnerIds).IsEquivalentTo(["connection-a"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(incomplete.ChangedOwnerIds).IsEquivalentTo(["connection-a"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await store.FindAsync(new() { Id = "workflow-user" })).IsNotNull();
         await Assert.That(contributor.Dependencies).HasSingleItem();
         await AssertNoRoleNotificationAsync(notificationSender);
@@ -271,9 +271,9 @@ public class RoleDeletionCoordinatorTests
 
         await Assert.That(result).IsOfType(typeof(RoleDeletionOperationResult.Incomplete));
         var incomplete = (RoleDeletionOperationResult.Incomplete)result;
-        await Assert.That(incomplete.ChangedOwnerIds).IsEquivalentTo(["connection-a"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(incomplete.ChangedOwnerIds).IsEquivalentTo(["connection-a"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(await store.FindAsync(new() { Id = "workflow-user" })).IsNotNull();
-        await Assert.That(contributor.Dependencies.Select(x => x.OwnerId).ToArray()).IsEquivalentTo(["connection-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(contributor.Dependencies.Select(x => x.OwnerId).ToArray()).IsEquivalentTo(["connection-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

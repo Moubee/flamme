@@ -79,7 +79,7 @@ public class MultitenancyTests(App app) : AppComponentTest(app)
         var tenant2 = await tenantsProvider.FindAsync(TenantFilter.ById("Tenant2"));
 
         await Assert.That(workflows).IsNotNull();
-        await Assert.That(tenants.Select(x => x.Id)).IsEquivalentTo([string.Empty, "Tenant1", "Tenant2", "Tenant3"]);
+        await Assert.That(tenants.Select(x => x.Id)).IsEquivalentTo([string.Empty, "Tenant1", "Tenant2", "Tenant3"], StringComparer.Ordinal);
         await Assert.That(tenant2).IsNotNull();
         await Assert.That(tenant2.Id).IsEqualTo("Tenant2");
         await Assert.That(tenant2.Name).IsEqualTo("Tenant2");

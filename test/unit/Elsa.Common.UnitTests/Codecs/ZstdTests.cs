@@ -37,7 +37,7 @@ public class ZstdTests
         var decompressed = await _codec.DecompressAsync(compressed);
 
         // Assert
-        await Assert.That(decompressed).IsEquivalentTo(original, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(decompressed).IsEquivalentTo(original, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class ZstdTests
         var decompressed = await _codec.DecompressAsync(compressed);
 
         // Assert
-        await Assert.That(decompressed).IsEquivalentTo(original, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(decompressed).IsEquivalentTo(original, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(compressed.Length < original.Length).IsTrue().Because("Compressed string should be smaller than original");
     }
 
@@ -66,7 +66,7 @@ public class ZstdTests
         var result2 = await _codec.CompressAsync(input);
 
         // Assert
-        await Assert.That(result2).IsEquivalentTo(result1, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(result2).IsEquivalentTo(result1, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

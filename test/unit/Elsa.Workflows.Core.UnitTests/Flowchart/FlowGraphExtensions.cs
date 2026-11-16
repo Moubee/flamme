@@ -8,13 +8,13 @@ public static class FlowGraphExtensions
     public static async Task ValidateOutboundConnections(this FlowGraph flowGraph, List<string> expected, IActivity activity)
     {
         await Assert.That(flowGraph.GetOutboundConnections(activity).Select(c => c.ToString()))
-            .IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public static async Task ValidateForwardInboundConnections(this FlowGraph flowGraph, List<string> expected, IActivity activity)
     {
         await Assert.That(flowGraph.GetForwardInboundConnections(activity).Select(c => c.ToString()))
-            .IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
     public static async Task ValidateBackwardConnection(this FlowGraph flowGraph, bool expectedBackward, bool expectedValid, Connection connection)
     {
@@ -31,6 +31,6 @@ public static class FlowGraphExtensions
     public static async Task ValidateAncestorActivities(this FlowGraph flowGraph, List<Activity> expected, Activity activity)
     {
         await Assert.That(flowGraph.GetAncestorActivities(activity))
-            .IsEquivalentTo(expected.Cast<IActivity>(), TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(expected.Cast<IActivity>(), ReferenceEqualityComparer.Instance, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 }

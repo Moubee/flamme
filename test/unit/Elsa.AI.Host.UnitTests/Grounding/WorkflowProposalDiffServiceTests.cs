@@ -30,7 +30,7 @@ public class WorkflowProposalDiffServiceTests
 
         var diff = service.CreateDiff(draft, baseline);
 
-        await Assert.That(diff.AddedActivityIds).IsEquivalentTo(["added"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
-        await Assert.That(diff.RemovedActivityIds).IsEquivalentTo(["removed"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(diff.AddedActivityIds).IsEquivalentTo(["added"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(diff.RemovedActivityIds).IsEquivalentTo(["removed"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 }

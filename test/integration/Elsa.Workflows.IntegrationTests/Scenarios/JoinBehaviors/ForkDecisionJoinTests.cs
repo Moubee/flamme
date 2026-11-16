@@ -62,7 +62,7 @@ public class ForkDecisionJoinTests : IAsyncDisposable
 
         // Assert.
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(expectedLines, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(expectedLines, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_fixture);

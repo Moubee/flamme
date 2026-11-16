@@ -45,7 +45,7 @@ public class VariablesArrayWorkflowTests(App app) : AppComponentTest(app)
         }, default);
 
         await Assert.That(result?.Variables.FirstOrDefault(v => v.Id == "elementsVariable")?.Value as IEnumerable<string>)
-            .IsEquivalentTo(["Element 1", "Element 2", "Element 3"], CollectionOrdering.Matching);
+            .IsEquivalentTo(["Element 1", "Element 2", "Element 3"], StringComparer.Ordinal, CollectionOrdering.Matching);
 
         while (bookmarks.Any())
         {

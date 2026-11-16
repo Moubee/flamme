@@ -22,12 +22,12 @@ public class BinaryDownloadableContentHandlerTests
 
         var actual = new byte[bytes.Length];
         await stream.ReadExactlyAsync(actual);
-        await Assert.That(actual).IsEquivalentTo(bytes, CollectionOrdering.Matching);
+        await Assert.That(actual).IsEquivalentTo(bytes, EqualityComparer<byte>.Default, CollectionOrdering.Matching);
 
         stream.Seek(-3, SeekOrigin.End);
         var range = new byte[3];
         await stream.ReadExactlyAsync(range);
-        await Assert.That(range).IsEquivalentTo(bytes[^3..], CollectionOrdering.Matching);
+        await Assert.That(range).IsEquivalentTo(bytes[^3..], EqualityComparer<byte>.Default, CollectionOrdering.Matching);
     }
 
     [Test]

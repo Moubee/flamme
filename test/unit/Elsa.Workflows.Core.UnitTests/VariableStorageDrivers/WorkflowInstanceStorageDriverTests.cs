@@ -102,7 +102,7 @@ public class WorkflowInstanceStorageDriverTests
         // Assert
         await Assert.That(node.GetValueKind()).IsEqualTo(JsonValueKind.Array);
         await Assert.That(actual).IsNotNull();
-        await Assert.That(actual).IsEquivalentTo(["Element 1", "Element 2"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(actual).IsEquivalentTo(["Element 1", "Element 2"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class WorkflowInstanceStorageDriverTests
         // Assert
         await Assert.That(node.GetValueKind()).IsEqualTo(JsonValueKind.Array);
         await Assert.That(actual).IsNotNull();
-        await Assert.That(actual).IsEquivalentTo(["A", "B", "C"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(actual).IsEquivalentTo(["A", "B", "C"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

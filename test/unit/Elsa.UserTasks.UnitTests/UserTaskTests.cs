@@ -113,7 +113,7 @@ public class UserTaskTests
 
         var page = await repository.QueryAsync(new() { TenantId = "tenant", Sort = "priority", Descending = true, Limit = 10 });
 
-        await Assert.That(page.Items.Select(x => x.Id)).IsEquivalentTo(["task-a", "task-b"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(page.Items.Select(x => x.Id)).IsEquivalentTo(["task-a", "task-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class UserTaskTests
         var created = await repository.QueryAsync(new() { TenantId = "tenant", Sort = "created", Limit = 10 });
         var completed = await repository.QueryAsync(new() { TenantId = "tenant", Sort = "completed", Limit = 10 });
 
-        await Assert.That(completed.Items.Select(x => x.Id)).IsEquivalentTo(created.Items.Select(x => x.Id), TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(completed.Items.Select(x => x.Id)).IsEquivalentTo(created.Items.Select(x => x.Id), StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

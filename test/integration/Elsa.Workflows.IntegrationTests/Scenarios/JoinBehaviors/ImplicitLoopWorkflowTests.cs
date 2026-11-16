@@ -16,7 +16,7 @@ public class ImplicitWorkflowTests : IAsyncDisposable
         var options = new RunWorkflowOptions().WithTokenBasedFlowchart();
         await _fixture.RunWorkflowAsync<ImplicitLoopWorkflow>(options);
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Retry", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "Retry", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

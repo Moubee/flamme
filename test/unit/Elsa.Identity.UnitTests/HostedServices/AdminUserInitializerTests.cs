@@ -23,7 +23,7 @@ public class AdminUserInitializerTests
 
         var role = await roleStore.FindAsync(new RoleFilter { Id = "admin" });
         await Assert.That(role).IsNotNull();
-        await Assert.That(role.Permissions).IsEquivalentTo(["custom", "*"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(role.Permissions).IsEquivalentTo(["custom", "*"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class AdminUserInitializerTests
 
         var role = await roleStore.FindAsync(new RoleFilter { Id = "admin" });
         await Assert.That(role).IsNotNull();
-        await Assert.That(role.Permissions).IsEquivalentTo(["*", "custom"], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(role.Permissions).IsEquivalentTo(["*", "custom"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static async Task<MemoryRoleStore> CreateRoleStoreAsync(ICollection<string> permissions)

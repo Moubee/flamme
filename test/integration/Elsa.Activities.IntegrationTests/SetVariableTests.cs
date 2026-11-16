@@ -36,7 +36,7 @@ public class SetVariableTests : IAsyncDisposable
         var lines = _capturingTextWriter.Lines.ToList();
 
         // The sequence-level variable should be set to "Sequence Value"
-        await Assert.That(lines).IsEquivalentTo(new[] { "Sequence Value" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Sequence Value" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
     }
 }

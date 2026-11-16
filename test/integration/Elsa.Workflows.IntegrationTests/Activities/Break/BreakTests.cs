@@ -20,7 +20,7 @@ public class BreakTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "C#", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "C#", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class BreakTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "C#", "Classes", "Rust", "Classes", "Go", "Classes" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "C#", "Classes", "Rust", "Classes", "Go", "Classes" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class BreakTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "0", "1", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "0", "1", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class BreakTests : IAsyncDisposable
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
 
         // Assert
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "1", "2", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "1", "2", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_fixture);

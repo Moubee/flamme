@@ -35,7 +35,7 @@ public sealed class OutputJsonConverterTests
         using var document = JsonDocument.Parse(json);
         var converter = document.RootElement.GetProperty("converter");
         await Assert.That(converter.EnumerateObject().Select(x => x.Name))
-            .IsEquivalentTo(new[] { "id", "settings" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { "id", "settings" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public sealed class OutputJsonConverterTests
 
         using var document = JsonDocument.Parse(json);
         await Assert.That(document.RootElement.EnumerateObject().Select(x => x.Name))
-            .IsEquivalentTo(new[] { "typeName", "memoryReference" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            .IsEquivalentTo(new[] { "typeName", "memoryReference" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(document.RootElement.GetProperty("typeName").GetString()).IsEqualTo("String");
         await Assert.That(document.RootElement.GetProperty("memoryReference").GetProperty("id").GetString()).IsEqualTo("resultVariable");
     }

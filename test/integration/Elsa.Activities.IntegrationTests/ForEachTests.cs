@@ -257,7 +257,7 @@ public class ForEachTests : IAsyncDisposable
         var result = await _fixture.RunActivityAsync(forEach);
         var journal = result.Journal;
         var forEachContext = journal.ActivityExecutionContexts.FirstOrDefault(x => x.Activity is ForEach<string>);
-        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(expectedLines, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(expectedLines, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
         forEachContext = (await Assert.That(forEachContext).IsNotNull())!;
 
@@ -272,7 +272,7 @@ public class ForEachTests : IAsyncDisposable
     private async Task RunAndAssertLines(IActivity activity, IEnumerable<string> expected)
     {
         await _fixture.RunActivityAsync(activity);
-        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(expected, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(_fixture.CapturingTextWriter.Lines).IsEquivalentTo(expected, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
 
     }
 }

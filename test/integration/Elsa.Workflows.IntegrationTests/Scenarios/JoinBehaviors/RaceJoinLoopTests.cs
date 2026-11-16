@@ -16,7 +16,7 @@ public class RaceJoinLoopTests : IAsyncDisposable
         var options = new RunWorkflowOptions().WithTokenBasedFlowchart();
         var result = await _fixture.RunWorkflowAsync<RaceJoinLoopWorkflow>(options);
         var lines = _fixture.CapturingTextWriter.Lines.ToList();
-        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "A", "Body", "Retry", "Body", "B", "Body", "End" }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(lines).IsEquivalentTo(new[] { "Start", "A", "Body", "Retry", "Body", "B", "Body", "End" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result.WorkflowState.Status).IsEqualTo(WorkflowStatus.Finished);
     }
 
