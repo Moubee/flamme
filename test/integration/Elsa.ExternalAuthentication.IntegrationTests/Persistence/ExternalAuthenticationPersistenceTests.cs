@@ -174,10 +174,10 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         // a store that accepted and ignored the filter would silently widen their reach.
         await Assert.That(tenantScoped.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(
             ["connection-a"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(hostScoped.Items.Select(x => x.Id).ToArray()).IsEquivalentTo(
             ["connection-host"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(unscoped.Items.Count).IsEqualTo(3);
     }
 

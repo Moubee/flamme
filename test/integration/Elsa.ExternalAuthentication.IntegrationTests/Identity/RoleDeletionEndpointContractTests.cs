@@ -29,16 +29,16 @@ public sealed class RoleDeletionEndpointContractTests : WebApplicationTest<RoleD
     [Test]
     public async Task RemediationBindsSelectedReferencesAndReplacementRole()
     {
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/identity/roles/target-role/remove-from-jit-policies-and-delete",
-            new
+            new JsonObject
             {
-                expectedDependencyVersion = "dependency-version",
-                confirmRemoveFromEditableJitPolicies = true,
-                confirmEmptyDefaultRoles = true,
-                confirmBestEffort = true,
-                selectedReferences = new[] { new { source = "external-authentication", ownerId = "connection-a" } },
-                replacementRoleId = "replacement-role"
+                ["expectedDependencyVersion"] = "dependency-version",
+                ["confirmRemoveFromEditableJitPolicies"] = true,
+                ["confirmEmptyDefaultRoles"] = true,
+                ["confirmBestEffort"] = true,
+                ["selectedReferences"] = new JsonArray { new JsonObject { ["source"] = "external-authentication", ["ownerId"] = "connection-a" } },
+                ["replacementRoleId"] = "replacement-role"
             });
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Conflict);

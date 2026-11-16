@@ -63,11 +63,11 @@ public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWe
     [Test]
     public async Task LogoutStillRequiresAnAuthenticatedCaller()
     {
-        var response = await Client.PostAsJsonAsync("/external-authentication/logout", new
+        var response = await Client.PostJsonAsync("/external-authentication/logout", new JsonObject
         {
-            clientId = "studio",
-            postLogoutRedirectUri = "https://studio.example/logout-callback",
-            mode = "local"
+            ["clientId"] = "studio",
+            ["postLogoutRedirectUri"] = "https://studio.example/logout-callback",
+            ["mode"] = "local"
         });
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Unauthorized);

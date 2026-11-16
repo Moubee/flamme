@@ -40,7 +40,7 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
         Mock.Get(_credentialsValidator).ValidateAsync("admin", "password", Arg.Any<CancellationToken>()).Returns(user);
         Mock.Get(_tokenIssuer).IssueTokensAsync(user, Arg.Any<CancellationToken>()).Returns(new IssuedTokens("access-a", "refresh-a"));
 
-        var response = await Client.PostAsJsonAsync("/identity/login", new { username = " admin ", password = " password " });
+        var response = await Client.PostJsonAsync("/identity/login", new JsonObject { ["username"] = " admin ", ["password"] = " password " });
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
@@ -55,7 +55,7 @@ public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdent
     {
         Mock.Get(_credentialsValidator).ValidateAsync("unknown", "wrong", Arg.Any<CancellationToken>()).Returns((User?)null);
 
-        var response = await Client.PostAsJsonAsync("/identity/login", new { username = "unknown", password = "wrong" });
+        var response = await Client.PostJsonAsync("/identity/login", new JsonObject { ["username"] = "unknown", ["password"] = "wrong" });
         var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);

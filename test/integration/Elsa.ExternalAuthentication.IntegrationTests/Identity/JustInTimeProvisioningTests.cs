@@ -132,7 +132,7 @@ public class JustInTimeProvisioningTests
         await Assert.That(user).IsNotNull();
         await Assert.That(user.Roles).IsEquivalentTo(
             ["admin"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class JustInTimeProvisioningTests
             AdapterSettingsVersion = 1,
             DisplayName = "Contoso",
             IsEnabled = true,
-            UnlinkedPolicy = new PolicySelection(policyType, 1, JsonSerializer.SerializeToElement(new { }))
+            UnlinkedPolicy = new PolicySelection(policyType, 1, JsonElement.Parse("{}"))
         };
         var effectiveConnection = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, new ConnectionScope(ConnectionScopeKind.Tenant, "tenant-a"), ConnectionValidity.Valid, false, "test");
         var identity = new ExternalIdentity("https://issuer.example", "subject-a", claims ?? new Dictionary<string, IReadOnlyCollection<string>>());

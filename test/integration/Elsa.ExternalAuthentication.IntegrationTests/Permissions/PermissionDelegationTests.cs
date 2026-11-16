@@ -27,7 +27,7 @@ public class PermissionDelegationTests
         await Assert.That(withoutGrantedPermission.IsAuthorized).IsFalse();
         await Assert.That(withoutGrantedPermission.UnauthorizedPermissions).IsEquivalentTo(
             ["reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(withGrantedPermission.IsAuthorized).IsTrue();
     }
 
@@ -45,7 +45,7 @@ public class PermissionDelegationTests
         await Assert.That(result.IsAuthorized).IsFalse();
         await Assert.That(result.UnauthorizedPermissions).IsEquivalentTo(
             ["reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private const string DelegatePermission = $"{ExternalAuthenticationResourcePermissions.PermissionGrants}:{ExternalAuthenticationVerbs.Delegate}";
@@ -54,10 +54,10 @@ public class PermissionDelegationTests
     private static GrantSourceSelection Selection(string permission) => new(
         "claim-mapping",
         1,
-        JsonSerializer.SerializeToElement(new
+        TestJson.Element(new JsonObject
         {
-            claimType = "department",
-            mappings = new Dictionary<string, string[]> { ["engineering"] = [permission] }
+            ["claimType"] = "department",
+            ["mappings"] = new JsonObject { ["engineering"] = new JsonArray(permission) }
         }),
         0);
 

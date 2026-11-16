@@ -19,7 +19,7 @@ internal static class ExternalAuthenticationTestData
         Key = key,
         AdapterType = "oidc",
         AdapterSettingsVersion = 1,
-        AdapterSettings = JsonSerializer.SerializeToElement(new { authority = "https://issuer.example" }),
+        AdapterSettings = JsonElement.Parse("""{"authority":"https://issuer.example"}"""),
         SecretBindings = new Dictionary<string, SecretBinding>(StringComparer.Ordinal)
         {
             ["clientSecret"] = new("test", "secret-a")

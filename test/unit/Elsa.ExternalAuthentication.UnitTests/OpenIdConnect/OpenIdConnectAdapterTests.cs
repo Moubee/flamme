@@ -74,16 +74,17 @@ public class OpenIdConnectAdapterTests
     {
         var handler = new CapturingTokenResponseHandler(CreateToken(audience: "client:id"));
         var adapter = CreateAdapter(handler);
-        var connection = CreateConnection(JsonSerializer.SerializeToElement(new
+        var connection = CreateConnection(JsonElement.Parse($$"""
         {
-            mode = "manual",
-            clientId = "client:id",
-            clientAuthenticationMethod = "client_secret_basic",
-            issuer = "https://issuer.example",
-            authorizationEndpoint = "https://issuer.example/authorize",
-            tokenEndpoint = "https://issuer.example/token",
-            signingKeys = new { keys = new[] { new { kty = "oct", kid = "test-key", k = Base64UrlEncoder.Encode(SigningKey.Key) } } }
-        }));
+            "mode": "manual",
+            "clientId": "client:id",
+            "clientAuthenticationMethod": "client_secret_basic",
+            "issuer": "https://issuer.example",
+            "authorizationEndpoint": "https://issuer.example/authorize",
+            "tokenEndpoint": "https://issuer.example/token",
+            "signingKeys": { "keys": [{ "kty": "oct", "kid": "test-key", "k": "{{Base64UrlEncoder.Encode(SigningKey.Key)}}" }] }
+        }
+        """));
         var effective = new EffectiveIdentityProviderConnection(connection, ConnectionSourceOwnership.Configuration, ConnectionScope.Host, ConnectionValidity.Valid, false, "configuration");
         var secrets = new Dictionary<string, ResolvedSecretBinding> { ["clientSecret"] = new(new SensitiveString("secret +/&"), "generation") };
 
@@ -292,23 +293,18 @@ public class OpenIdConnectAdapterTests
 
     private static BrokerTransaction CreateTransaction() => new() { HandleHash = "stored-hash", ProviderNonce = "nonce", PkceChallenge = "client-pkce", CallbackUri = new Uri("https://studio.example/callback"), ClientId = "studio", ReturnPath = "/", TenantId = "tenant-a" };
 
-    private static JsonElement CreateManualSettings() => JsonSerializer.SerializeToElement(new
+    private static JsonElement CreateManualSettings() => JsonElement.Parse($$"""
     {
-        mode = "manual",
-        issuer = "https://issuer.example",
-        authorizationEndpoint = "https://issuer.example/authorize",
-        tokenEndpoint = "https://issuer.example/token",
-        endSessionEndpoint = "https://issuer.example/logout",
-        clientId = "elsa",
-        clientAuthenticationMethod = "client_secret_basic",
-        signingKeys = new
-        {
-            keys = new[]
-            {
-                new { kty = "oct", kid = "test-key", k = Base64UrlEncoder.Encode(SigningKey.Key) }
-            }
-        }
-    });
+        "mode": "manual",
+        "issuer": "https://issuer.example",
+        "authorizationEndpoint": "https://issuer.example/authorize",
+        "tokenEndpoint": "https://issuer.example/token",
+        "endSessionEndpoint": "https://issuer.example/logout",
+        "clientId": "elsa",
+        "clientAuthenticationMethod": "client_secret_basic",
+        "signingKeys": { "keys": [{ "kty": "oct", "kid": "test-key", "k": "{{Base64UrlEncoder.Encode(SigningKey.Key)}}" }] }
+    }
+    """);
 
     private static string CreateToken(IEnumerable<Claim>? claims = null, SymmetricSecurityKey? signingKey = null, string issuer = "https://issuer.example", string audience = "elsa", string nonce = "nonce", DateTimeOffset? expires = null, IReadOnlyCollection<string>? audiences = null, string? azp = null)
     {

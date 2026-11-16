@@ -143,7 +143,7 @@ public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointCo
         Key = "connection-a",
         AdapterType = TestAdapter.AdapterType,
         AdapterSettingsVersion = 1,
-        AdapterSettings = JsonSerializer.SerializeToElement(new { }),
+        AdapterSettings = JsonElement.Parse("{}"),
         DisplayName = "Connection A",
         IsEnabled = true,
         MaterialRevision = "material-revision-a",

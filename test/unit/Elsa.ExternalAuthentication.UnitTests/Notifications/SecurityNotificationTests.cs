@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Notifications;
 using System.Threading.Tasks;
@@ -7,22 +8,23 @@ namespace Elsa.ExternalAuthentication.UnitTests.Notifications;
 public class SecurityNotificationTests
 {
     [Test]
-    public async Task EventFamiliesAreImmutableAndCarryOnlyTheSharedSafeContext()
+    [Arguments(typeof(IdentityProviderConnectionChanged))]
+    [Arguments(typeof(IdentityProviderConnectionLifecycleChanged))]
+    [Arguments(typeof(IdentityProviderConnectionSecretBindingChanged))]
+    [Arguments(typeof(IdentityProviderConnectionTested))]
+    [Arguments(typeof(IdentityProviderConnectionPreviewed))]
+    [Arguments(typeof(ExternalIdentityLinkChanged))]
+    [Arguments(typeof(ExternalIdentityLinkReplaced))]
+    [Arguments(typeof(ExternalAuthenticationSessionRevoked))]
+    [Arguments(typeof(ExternalAuthenticationConnectionSessionsRevoked))]
+    [Arguments(typeof(ExternalSignInCompleted))]
+    [Arguments(typeof(ExternalAuthenticationOutcomeRecorded))]
+    public async Task EventFamiliesAreImmutableAndCarryOnlyTheSharedSafeContext(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type notificationType)
     {
-        var notificationTypes = new[]
-        {
-            typeof(IdentityProviderConnectionChanged), typeof(IdentityProviderConnectionLifecycleChanged),
-            typeof(IdentityProviderConnectionSecretBindingChanged), typeof(IdentityProviderConnectionTested),
-            typeof(IdentityProviderConnectionPreviewed), typeof(ExternalIdentityLinkChanged), typeof(ExternalIdentityLinkReplaced),
-            typeof(ExternalAuthenticationSessionRevoked), typeof(ExternalAuthenticationConnectionSessionsRevoked),
-            typeof(ExternalSignInCompleted), typeof(ExternalAuthenticationOutcomeRecorded)
-        };
-
-        foreach (var type in notificationTypes)
-        {
-            await Assert.That(type.GetProperties()).Contains(property => property.Name == "Context" && property.PropertyType == typeof(SecurityEventContext));
-            await Assert.That(type.GetProperties()).DoesNotContain(property => property.Name.Contains("Token", StringComparison.OrdinalIgnoreCase) || property.Name.Contains("Secret", StringComparison.OrdinalIgnoreCase) || property.Name.Contains("Subject", StringComparison.OrdinalIgnoreCase));
-        }
+        var properties = notificationType.GetProperties();
+        await Assert.That(properties).Contains(property => property.Name == "Context" && property.PropertyType == typeof(SecurityEventContext));
+        await Assert.That(properties).DoesNotContain(property => property.Name.Contains("Token", StringComparison.OrdinalIgnoreCase) || property.Name.Contains("Secret", StringComparison.OrdinalIgnoreCase) || property.Name.Contains("Subject", StringComparison.OrdinalIgnoreCase));
     }
 
     [Test]

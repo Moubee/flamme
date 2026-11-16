@@ -40,7 +40,7 @@ public class ConformanceExtensionTests
         var migrated = await migrationService.MigrateAsync(
             adapter.Type,
             1,
-            JsonSerializer.SerializeToElement(new { authority = "https://issuer.example" }));
+            JsonElement.Parse("""{"authority":"https://issuer.example"}"""));
         var connection = new IdentityProviderConnection
         {
             Id = "connection-a",

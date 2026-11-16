@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Notifications;
@@ -25,7 +26,7 @@ public sealed class SensitiveDataLeakageTests
     {
         var error = BrokerErrorFactory.Create(BrokerErrorCategory.AuthenticationFailed, $"{Secret}?{AccessToken}");
         var redirect = new Uri($"https://studio.example/authentication/external/callback?error={error.Error}&correlation_id={error.CorrelationId}");
-        var serialized = JsonSerializer.Serialize(new { error, redirect = redirect.AbsoluteUri });
+        var serialized = JsonSerializer.Serialize(new ErrorAndRedirect(error, redirect.AbsoluteUri), SecurityJsonContext.Default.ErrorAndRedirect);
 
         await Assert.That(serialized).DoesNotContain(Secret).WithComparison(StringComparison.Ordinal);
         await Assert.That(serialized).DoesNotContain(AccessToken).WithComparison(StringComparison.Ordinal);
@@ -46,22 +47,20 @@ public sealed class SensitiveDataLeakageTests
 
         var raw = ExternalAuthenticationRedactor.RedactRawClaims(projected);
         var redacted = ExternalAuthenticationRedactor.RedactProjectedClaims(projected, new HashSet<string>(["email"], StringComparer.Ordinal));
-        var serialized = JsonSerializer.Serialize(new
-        {
-            secret = ExternalAuthenticationRedactor.RedactSecret(Secret),
-            token = ExternalAuthenticationRedactor.RedactToken(AccessToken),
-            providerBody = ExternalAuthenticationRedactor.RedactProviderResponseBody(ProviderBody),
+        var serialized = JsonSerializer.Serialize(new RedactedBoundary(
+            ExternalAuthenticationRedactor.RedactSecret(Secret),
+            ExternalAuthenticationRedactor.RedactToken(AccessToken),
+            ExternalAuthenticationRedactor.RedactProviderResponseBody(ProviderBody),
             raw,
-            redacted
-        });
+            redacted), SecurityJsonContext.Default.RedactedBoundary);
 
         await Assert.That(raw).IsEmpty();
         await Assert.That(redacted["email"]).IsEquivalentTo(
             [ExternalAuthenticationRedactor.RedactedValue],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(redacted["groups"]).IsEquivalentTo(
             ["operators"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(serialized).DoesNotContain(Secret).WithComparison(StringComparison.Ordinal);
         await Assert.That(serialized).DoesNotContain(AccessToken).WithComparison(StringComparison.Ordinal);
         await Assert.That(serialized).DoesNotContain(ProviderBody).WithComparison(StringComparison.Ordinal);
@@ -76,7 +75,7 @@ public sealed class SensitiveDataLeakageTests
             "external",
             "callback",
             "authentication_failed");
-        var serialized = JsonSerializer.Serialize(notification);
+        var serialized = JsonSerializer.Serialize(notification, SecurityJsonContext.Default.ExternalAuthenticationOutcomeRecorded);
 
         await Assert.That(serialized).DoesNotContain(Secret).WithComparison(StringComparison.Ordinal);
         await Assert.That(serialized).DoesNotContain(AccessToken).WithComparison(StringComparison.Ordinal);
@@ -97,7 +96,7 @@ public sealed class SensitiveDataLeakageTests
         await observations.SaveLatestAsync(new ConnectionObservation(connection.Id, connection.MaterialRevision, DateTimeOffset.UtcNow, ConnectionObservationStatus.Failed, "temporarily_unavailable", TimeSpan.Zero, $"{Secret} {AccessToken} {ProviderBody}", [$"{RawClaim}"], "correlation-a"));
 
         var result = await new ExternalAuthenticationHealthCheck(registry, observations).CheckHealthAsync(new HealthCheckContext());
-        var serialized = JsonSerializer.Serialize(new { result.Status, result.Description, result.Data });
+        var serialized = JsonSerializer.Serialize(new HealthSummary(result.Status, result.Description, result.Data), SecurityJsonContext.Default.HealthSummary);
 
         await Assert.That(result.Status).IsEqualTo(HealthStatus.Degraded);
         await Assert.That(serialized).DoesNotContain(Secret).WithComparison(StringComparison.Ordinal);
@@ -105,6 +104,19 @@ public sealed class SensitiveDataLeakageTests
         await Assert.That(serialized).DoesNotContain(ProviderBody).WithComparison(StringComparison.Ordinal);
         await Assert.That(serialized).DoesNotContain(RawClaim).WithComparison(StringComparison.Ordinal);
     }
+
+    internal sealed record ErrorAndRedirect(
+        [property: JsonPropertyName("error")] PublicBrokerError Error,
+        [property: JsonPropertyName("redirect")] string Redirect);
+
+    internal sealed record RedactedBoundary(
+        [property: JsonPropertyName("secret")] string Secret,
+        [property: JsonPropertyName("token")] string Token,
+        [property: JsonPropertyName("providerBody")] string ProviderBody,
+        [property: JsonPropertyName("raw")] IReadOnlyDictionary<string, IReadOnlyCollection<string>> Raw,
+        [property: JsonPropertyName("redacted")] IReadOnlyDictionary<string, IReadOnlyCollection<string>> Redacted);
+
+    internal sealed record HealthSummary(HealthStatus Status, string? Description, IReadOnlyDictionary<string, object> Data);
 
     private sealed class FixedRegistry(EffectiveIdentityProviderConnection connection) : IIdentityProviderConnectionRegistry
     {

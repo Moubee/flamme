@@ -132,7 +132,7 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
     {
         Mock.Get(_broker).InitiateLocalAsync(Arg.Any<LocalBrokerAuthorizationRequest>(), "tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/callback?code=one"))));
 
-        var response = await Client.PostAsJsonAsync("/external-authentication/local/authorize", new { clientId = "studio", redirectUri = "https://studio.example/callback", responseType = "code", codeChallenge = "x", codeChallengeMethod = "S256", returnPath = "/workflows", username = "alice", password = "p" });
+        var response = await Client.PostJsonAsync("/external-authentication/local/authorize", new JsonObject { ["clientId"] = "studio", ["redirectUri"] = "https://studio.example/callback", ["responseType"] = "code", ["codeChallenge"] = "x", ["codeChallengeMethod"] = "S256", ["returnPath"] = "/workflows", ["username"] = "alice", ["password"] = "p" });
         var body = await response.Content.ReadAsStringAsync();
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
@@ -159,7 +159,7 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
         Mock.Get(_broker).LogoutAsync(Arg.Any<BrokerLogoutRequest>(), "session-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerLogoutResult.Complete(new Uri("https://studio.example/logout-callback"))));
         Mock.Get(_broker).CompleteLogoutAsync("contoso", "opaque", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(BrokerCallbackResult.Redirect(new Uri("https://studio.example/logout-callback"))));
 
-        var logout = await Client.PostAsJsonAsync("/external-authentication/logout", new { clientId = "studio", postLogoutRedirectUri = "https://studio.example/logout-callback", mode = "local" });
+        var logout = await Client.PostJsonAsync("/external-authentication/logout", new JsonObject { ["clientId"] = "studio", ["postLogoutRedirectUri"] = "https://studio.example/logout-callback", ["mode"] = "local" });
         var callback = await Client.GetAsync("/external-authentication/logout/callback/contoso?state=opaque");
 
         await Assert.That(logout.StatusCode).IsEqualTo(HttpStatusCode.OK);

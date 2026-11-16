@@ -206,7 +206,7 @@ public class BrokerSecurityTests
         await Assert.That(adapter.CorrelationState).IsNotEqualTo(adapter.Transaction!.HandleHash);
         await Assert.That(adapter.Transaction.ProtectedPayload).IsNotEquivalentTo(
             new byte[] { 1, 2, 3 },
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -485,7 +485,7 @@ public class BrokerSecurityTests
     {
         var connection = new IdentityProviderConnection
         {
-            Id = "connection-a", TenantId = "tenant-a", Key = "contoso", AdapterType = "fake", AdapterSettings = JsonSerializer.SerializeToElement(new { }),
+            Id = "connection-a", TenantId = "tenant-a", Key = "contoso", AdapterType = "fake", AdapterSettings = JsonElement.Parse("{}"),
             DisplayName = "Contoso", IsEnabled = true, MaterialRevision = "revision-a"
         };
         configureConnection?.Invoke(connection);

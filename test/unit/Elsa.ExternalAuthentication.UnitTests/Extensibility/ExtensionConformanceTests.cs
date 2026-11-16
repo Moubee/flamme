@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
 using Elsa.ExternalAuthentication.Options;
@@ -110,14 +111,14 @@ public class ExtensionConformanceTests
         var service = new AdapterSettingsMigrationService(
             registry,
             [
-                new MigrationStep("conformance", 1, 2, settings => new { value = settings.GetProperty("value").GetString(), migratedTo = 2 }),
-                new MigrationStep("conformance", 2, 3, settings => new { value = settings.GetProperty("value").GetString(), migratedTo = 3 })
+                new MigrationStep("conformance", 1, 2, settings => new JsonObject { ["value"] = settings.GetProperty("value").GetString(), ["migratedTo"] = 2 }),
+                new MigrationStep("conformance", 2, 3, settings => new JsonObject { ["value"] = settings.GetProperty("value").GetString(), ["migratedTo"] = 3 })
             ]);
 
         var migrated = await service.MigrateAsync(
             "conformance",
             1,
-            JsonSerializer.SerializeToElement(new { value = "opaque" }));
+            JsonElement.Parse("""{"value":"opaque"}"""));
         var current = await service.MigrateAsync("conformance", 3, migrated.Settings);
 
         await Assert.That(migrated.WasMigrated).IsTrue();
@@ -126,9 +127,9 @@ public class ExtensionConformanceTests
         await Assert.That(migrated.Settings.GetProperty("migratedTo").GetInt32()).IsEqualTo(3);
         await Assert.That(current.WasMigrated).IsFalse();
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
-            service.MigrateAsync("unsupported", 1, JsonSerializer.SerializeToElement(new { })).AsTask());
+            service.MigrateAsync("unsupported", 1, JsonElement.Parse("{}")).AsTask());
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
-            service.MigrateAsync("conformance", 4, JsonSerializer.SerializeToElement(new { })).AsTask());
+            service.MigrateAsync("conformance", 4, JsonElement.Parse("{}")).AsTask());
     }
 
     private static ExternalAuthenticationOptions OptionsFor(ICollection<string>? allowedAdapters = null) => new()
@@ -208,7 +209,7 @@ public class ExtensionConformanceTests
         string adapterType,
         int fromVersion,
         int toVersion,
-        Func<JsonElement, object> migrate) : IAdapterSettingsMigration
+        Func<JsonElement, JsonObject> migrate) : IAdapterSettingsMigration
     {
         public string AdapterType => adapterType;
         public int FromVersion => fromVersion;
@@ -216,7 +217,7 @@ public class ExtensionConformanceTests
         public ValueTask<JsonElement> MigrateAsync(JsonElement settings, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return ValueTask.FromResult(JsonSerializer.SerializeToElement(migrate(settings)));
+            return ValueTask.FromResult(JsonElement.Parse(migrate(settings).ToJsonString()));
         }
     }
 }

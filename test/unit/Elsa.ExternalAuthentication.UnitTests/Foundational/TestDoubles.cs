@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Common;
 using Elsa.ExternalAuthentication.Contracts;
 using Elsa.ExternalAuthentication.Models;
@@ -5,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
 
-internal sealed class MutableOptionsMonitor<T>(T value) : IOptionsMonitor<T>
+internal sealed class MutableOptionsMonitor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T value) : IOptionsMonitor<T>
 {
     public T Value { get; set; } = value;
     public T CurrentValue => Value;

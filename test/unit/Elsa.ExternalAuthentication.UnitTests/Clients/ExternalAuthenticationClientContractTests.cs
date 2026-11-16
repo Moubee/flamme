@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
 using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ public class ExternalAuthenticationClientContractTests
     {
         var request = new SaveExternalAuthenticationConnectionRequest
         {
-            AdapterSettings = JsonSerializer.SerializeToElement(new { })
+            AdapterSettings = JsonElement.Parse("{}")
         };
-        var json = JsonSerializer.Serialize(request, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var json = JsonSerializer.Serialize(request, ClientContractJsonContext.Default.SaveExternalAuthenticationConnectionRequest);
         using var document = JsonDocument.Parse(json);
 
         await Assert.That(document.RootElement.GetProperty("scope").GetProperty("kind").GetString()).IsEqualTo("host");
@@ -23,7 +24,7 @@ public class ExternalAuthenticationClientContractTests
     [Test]
     public async Task ConnectionDeserializesNamedShadowRelationships()
     {
-        var connection = JsonSerializer.Deserialize<ExternalAuthenticationConnection>(
+        var connection = JsonSerializer.Deserialize(
             """
             {
               "id": "deployment-keycloak",
@@ -36,7 +37,7 @@ public class ExternalAuthenticationClientContractTests
               "shadows": []
             }
             """,
-            new JsonSerializerOptions(JsonSerializerDefaults.Web));
+            ClientContractJsonContext.Default.ExternalAuthenticationConnection);
 
         await Assert.That(connection).IsNotNull();
         var deserializedConnection = connection!;
@@ -46,3 +47,8 @@ public class ExternalAuthenticationClientContractTests
         await Assert.That(deserializedConnection.Shadows).IsEmpty();
     }
 }
+
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web, GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(SaveExternalAuthenticationConnectionRequest))]
+[JsonSerializable(typeof(ExternalAuthenticationConnection))]
+internal partial class ClientContractJsonContext : JsonSerializerContext;

@@ -75,7 +75,7 @@ internal sealed class ConformanceAdapterSettingsMigration : IAdapterSettingsMigr
     {
         cancellationToken.ThrowIfCancellationRequested();
         var authority = settings.GetProperty("authority").GetString();
-        return ValueTask.FromResult(JsonSerializer.SerializeToElement(new { issuer = authority }));
+        return ValueTask.FromResult(TestJson.Element(new JsonObject { ["issuer"] = authority }));
     }
 }
 

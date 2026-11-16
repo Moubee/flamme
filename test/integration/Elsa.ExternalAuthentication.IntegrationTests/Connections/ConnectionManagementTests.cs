@@ -110,8 +110,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     [Test]
     public async Task DatabaseConnectionLifecycleUsesEtagsAndPreservesItsIdentity()
     {
-        var create = await Client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("contoso"));
-        var created = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await Client.PostJsonAsync("/external-authentication/connections", CreateRequest("contoso"));
+        var created = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
 
         await Assert.That(create.StatusCode == HttpStatusCode.Created).IsTrue().Because(await create.Content.ReadAsStringAsync());
         await Assert.That(create.Headers.ETag?.Tag).IsEqualTo("\"1\"");
@@ -121,7 +121,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That(createdDocument.CallbackUri).IsEqualTo("https://elsa.example/elsa/api/external-authentication/callback/contoso");
         await Assert.That(createdDocument.PreviewCallbackUri).IsEqualTo($"https://elsa.example/elsa/api/external-authentication/previews/callback/{createdDocument.Id}");
 
-        var immutableKeyUpdate = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = JsonContent.Create(CreateRequest("contoso-renamed", displayName: "Updated")) };
+        var immutableKeyUpdate = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = TestJson.Content(CreateRequest("contoso-renamed", displayName: "Updated")) };
         immutableKeyUpdate.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         var immutableKeyResponse = await Client.SendAsync(immutableKeyUpdate);
         await Assert.That(immutableKeyResponse.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
@@ -133,7 +133,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
             await Assert.That(correlationId).Matches("^[A-Za-z0-9_-]{1,128}$");
         }
 
-        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = JsonContent.Create(CreateRequest("contoso", displayName: "Updated")) };
+        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = TestJson.Content(CreateRequest("contoso", displayName: "Updated")) };
         update.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         var updated = await Client.SendAsync(update);
         await Assert.That(updated.StatusCode).IsEqualTo(HttpStatusCode.OK);
@@ -143,7 +143,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That(validate.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(await validate.Content.ReadAsStringAsync()).Contains("\"valid\":true");
 
-        var stale = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = JsonContent.Create(CreateRequest("contoso", displayName: "Stale")) };
+        var stale = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{createdDocument.Id}") { Content = TestJson.Content(CreateRequest("contoso", displayName: "Stale")) };
         stale.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(stale)).StatusCode).IsEqualTo(HttpStatusCode.PreconditionFailed);
 
@@ -158,7 +158,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         var restore = new HttpRequestMessage(HttpMethod.Post, $"/external-authentication/connections/{createdDocument.Id}/restore");
         restore.Headers.TryAddWithoutValidation("If-Match", "\"4\"");
         var restored = await Client.SendAsync(restore);
-        var restoredDocument = await restored.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var restoredDocument = await restored.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(restored.StatusCode).IsEqualTo(HttpStatusCode.OK);
         var restoredConnectionValue2 = restoredDocument;
         await Assert.That(restoredConnectionValue2).IsOfType(typeof(ConnectionDocument));
@@ -171,8 +171,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ValidateRequiresCompleteConfigurationAndReturnsMissingSecretDetails()
     {
         _adapter.RequiresClientSecret = true;
-        var create = await Client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("missing-secret"));
-        var connectionValue3 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await Client.PostJsonAsync("/external-authentication/connections", CreateRequest("missing-secret"));
+        var connectionValue3 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue3).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue3!;
 
@@ -190,7 +190,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     [Test]
     public async Task ConnectionResponseEmitsCanonicalUpstreamLogoutModeString()
     {
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("user-choice-logout", upstreamLogoutMode: "user-choice"));
         var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -205,10 +205,10 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     {
         _registry.ConfigurationConnection = ConfigurationConnection("contoso");
 
-        var create = await Client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("contoso"));
+        var create = await Client.PostJsonAsync("/external-authentication/connections", CreateRequest("contoso"));
         await Assert.That(create.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
 
-        var update = new HttpRequestMessage(HttpMethod.Put, "/external-authentication/connections/configuration-contoso") { Content = JsonContent.Create(CreateRequest("contoso")) };
+        var update = new HttpRequestMessage(HttpMethod.Put, "/external-authentication/connections/configuration-contoso") { Content = TestJson.Content(CreateRequest("contoso")) };
         update.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(update)).StatusCode).IsEqualTo(HttpStatusCode.Forbidden);
 
@@ -216,7 +216,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         lifecycle.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(lifecycle)).StatusCode).IsEqualTo(HttpStatusCode.Forbidden);
 
-        var secret = new HttpRequestMessage(HttpMethod.Put, "/external-authentication/connections/configuration-contoso/secret-bindings/clientSecret/managed") { Content = JsonContent.Create(new { resolverType = "test-managed", value = "secret" }) };
+        var secret = new HttpRequestMessage(HttpMethod.Put, "/external-authentication/connections/configuration-contoso/secret-bindings/clientSecret/managed") { Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "secret" }) };
         secret.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(secret)).StatusCode).IsEqualTo(HttpStatusCode.Forbidden);
     }
@@ -269,7 +269,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         Services.GetRequiredService<IOptions<ExternalAuthenticationOptions>>().Value.AllowConfigurationConnectionOverrides = true;
         var promoted = await UpdateConnectionAsync(connectionId, 1, CreateRequest("contoso", overridesConfigurationConnection: true));
-        var promotedDocumentValue6 = await promoted.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var promotedDocumentValue6 = await promoted.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(promotedDocumentValue6).IsOfType(typeof(ConnectionDocument));
         var promotedDocument = (ConnectionDocument)promotedDocumentValue6!;
 
@@ -345,24 +345,24 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ConnectionsAreManagedHostWideRegardlessOfCurrentTenant()
     {
         var client = Client;
-        foreach (var scope in new[] { new { kind = "default", tenantId = (string?)null }, new { kind = "tenant", tenantId = (string?)"tenant-b" } })
+        foreach (var scope in new[] { new JsonObject { ["kind"] = "default", ["tenantId"] = (string?)null }, new JsonObject { ["kind"] = "tenant", ["tenantId"] = (string?)"tenant-b" } })
         {
-            var response = await Client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("scope-" + scope.kind, scope));
+            var response = await Client.PostJsonAsync("/external-authentication/connections", CreateRequest("scope-" + scope["kind"]!.GetValue<string>(), scope));
             await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
             await Assert.That(await response.Content.ReadAsStringAsync()).Contains("host_scope_required");
         }
 
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("host-connection"));
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("host-connection"));
         await Assert.That(create.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        var hostValue8 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var hostValue8 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(hostValue8).IsOfType(typeof(ConnectionDocument));
         var host = (ConnectionDocument)hostValue8!;
 
-        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{host.Id}") { Content = JsonContent.Create(CreateRequest("host-connection", displayName: "Updated")) };
+        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{host.Id}") { Content = TestJson.Content(CreateRequest("host-connection", displayName: "Updated")) };
         update.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await client.SendAsync(update)).StatusCode).IsEqualTo(HttpStatusCode.OK);
 
-        var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{host.Id}/secret-bindings/clientSecret/managed") { Content = JsonContent.Create(new { resolverType = "test-managed", value = "secret" }) };
+        var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{host.Id}/secret-bindings/clientSecret/managed") { Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "secret" }) };
         secret.Headers.TryAddWithoutValidation("If-Match", "\"2\"");
         await Assert.That((await client.SendAsync(secret)).StatusCode).IsEqualTo(HttpStatusCode.OK);
 
@@ -370,7 +370,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That((await client.GetAsync("/external-authentication/connections/legacy-tenant")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
 
         await _store.CreateAsync(DatabaseConnection("tenant-inherited-key", "tenant-a", "tenant-inherited-key"));
-        var hostCollision = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("tenant-inherited-key", new { kind = "host", tenantId = (string?)null }));
+        var hostCollision = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("tenant-inherited-key", new JsonObject { ["kind"] = "host", ["tenantId"] = (string?)null }));
         await Assert.That(hostCollision.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
     }
 
@@ -384,7 +384,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await _store.CreateAsync(DatabaseConnection("legacy-tenant", "tenant-b", "not-enumerable", 4));
         await _observations.SaveLatestAsync(new ConnectionObservation("list-a", "old-material", DateTimeOffset.UtcNow, ConnectionObservationStatus.Succeeded, "connectivity", TimeSpan.Zero, "OK", [], "test"));
 
-        var first = await client.GetFromJsonAsync<ListDocument>("/external-authentication/connections?source=database&valid=true&shadowed=false&pageSize=1");
+        var first = await client.GetFromJsonAsync("/external-authentication/connections?source=database&valid=true&shadowed=false&pageSize=1", HttpJsonContext.Default.ListDocument);
         var firstPageValue9 = first;
         await Assert.That(firstPageValue9).IsOfType(typeof(ListDocument));
         var firstPage = (ListDocument)firstPageValue9!;
@@ -393,11 +393,11 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That(firstConnection.LatestObservation!.IsStale).IsTrue();
         await Assert.That(firstPage.NextCursor).IsNotNull();
 
-        var detail = await client.GetFromJsonAsync<ListConnectionDocument>("/external-authentication/connections/list-a");
+        var detail = await client.GetFromJsonAsync("/external-authentication/connections/list-a", HttpJsonContext.Default.ListConnectionDocument);
         await Assert.That(detail).IsOfType(typeof(ListConnectionDocument));
         await Assert.That(((ListConnectionDocument)detail!).LatestObservation!.IsStale).IsTrue();
 
-        var second = await client.GetFromJsonAsync<ListDocument>($"/external-authentication/connections?source=database&valid=true&shadowed=false&pageSize=1&cursor={Uri.EscapeDataString(firstPage.NextCursor!)}");
+        var second = await client.GetFromJsonAsync($"/external-authentication/connections?source=database&valid=true&shadowed=false&pageSize=1&cursor={Uri.EscapeDataString(firstPage.NextCursor!)}", HttpJsonContext.Default.ListDocument);
         var secondPageValue10 = second;
         await Assert.That(secondPageValue10).IsOfType(typeof(ListDocument));
         var secondPage = (ListDocument)secondPageValue10!;
@@ -411,9 +411,9 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     {
         var client = Client;
         var versionBefore = await _registryVersions.GetVersionAsync();
-        var create = await Client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("draft", settings: new { }));
+        var create = await Client.PostJsonAsync("/external-authentication/connections", CreateRequest("draft", settings: new JsonObject()));
         await Assert.That(create.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        var draftValue11 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var draftValue11 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(draftValue11).IsOfType(typeof(ConnectionDocument));
         var draft = (ConnectionDocument)draftValue11!;
         await Assert.That(draft.AdapterSettingsVersion).IsEqualTo(2);
@@ -423,21 +423,21 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         enable.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await client.SendAsync(enable)).StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
 
-        var future = await client.PostAsJsonAsync("/external-authentication/connections", new { key = "future", scope = new { kind = "host" }, adapterType = "test", adapterSettingsVersion = 3, adapterSettings = new { valid = true }, displayName = "Future", claimProjection = new { }, upstreamLogoutMode = "disabled" });
+        var future = await client.PostJsonAsync("/external-authentication/connections", new JsonObject { ["key"] = "future", ["scope"] = new JsonObject { ["kind"] = "host" }, ["adapterType"] = "test", ["adapterSettingsVersion"] = 3, ["adapterSettings"] = new JsonObject { ["valid"] = true }, ["displayName"] = "Future", ["claimProjection"] = new JsonObject(), ["upstreamLogoutMode"] = "disabled" });
         await Assert.That(future.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(await future.Content.ReadAsStringAsync()).Contains("migration_unavailable");
 
-        var secretInSettings = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("secret-in-settings", settings: new { valid = true, clientSecret = "not-allowed" }));
+        var secretInSettings = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("secret-in-settings", settings: new JsonObject { ["valid"] = true, ["clientSecret"] = "not-allowed" }));
         await Assert.That(secretInSettings.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(await secretInSettings.Content.ReadAsStringAsync()).Contains("secret_binding_required");
 
         _settingsMigrations.CanMigrateVersionOne = false;
-        var missing = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("missing-migration"));
+        var missing = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("missing-migration"));
         await Assert.That(missing.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(await missing.Content.ReadAsStringAsync()).Contains("migration_unavailable");
 
         _settingsMigrations.CanMigrateVersionOne = true;
-        var uppercaseKey = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("UpperCase"));
+        var uppercaseKey = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("UpperCase"));
         await Assert.That(uppercaseKey.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }
 
@@ -445,14 +445,14 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ExistingUnsafeSettingsRemainManageableWithoutUnsafeConfirmation()
     {
         var client = Client;
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("unsafe", settings: new { valid = true, unsafeMode = true }, confirmUnsafeSettings: true));
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("unsafe", settings: new JsonObject { ["valid"] = true, ["unsafeMode"] = true }, confirmUnsafeSettings: true));
         await Assert.That(create.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        var connectionValue12 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var connectionValue12 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue12).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue12!;
 
         _authentication.SetPermissions($"{ExternalAuthenticationResourcePermissions.Connections}:{CoreVerbs.Update}");
-        var safeSettingsUpdate = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}") { Content = JsonContent.Create(CreateRequest("unsafe", settings: new { valid = true, unsafeMode = true, label = "changed" })) };
+        var safeSettingsUpdate = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}") { Content = TestJson.Content(CreateRequest("unsafe", settings: new JsonObject { ["valid"] = true, ["unsafeMode"] = true, ["label"] = "changed" })) };
         safeSettingsUpdate.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await client.SendAsync(safeSettingsUpdate)).StatusCode).IsEqualTo(HttpStatusCode.OK);
 
@@ -462,7 +462,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That(await validate.Content.ReadAsStringAsync()).Contains("\"valid\":true");
 
         _authentication.SetPermissions($"{ExternalAuthenticationResourcePermissions.Connections}:{CoreVerbs.Update}");
-        var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed") { Content = JsonContent.Create(new { resolverType = "test-managed", value = "secret" }) };
+        var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed") { Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "secret" }) };
         secret.Headers.TryAddWithoutValidation("If-Match", "\"2\"");
         await Assert.That((await client.SendAsync(secret)).StatusCode).IsEqualTo(HttpStatusCode.OK);
         Mock.Get(_notifications).SendAsync(Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is IdentityProviderConnectionSecretBindingChanged x && x.FieldName == "clientSecret" && x.ResolverType == "test-managed" && !x.IsConfigured), Arg.Any<CancellationToken>()).WasCalled();
@@ -472,8 +472,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ManagedSecretReplacementCleansUpStagedMaterialWhenConnectionCasLoses()
     {
         var client = Client;
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-race"));
-        var connectionValue13 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-race"));
+        var connectionValue13 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue13).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue13!;
         _managedSecretWriter.BeforeReturn = async () =>
@@ -487,7 +487,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         var replace = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {
-            Content = JsonContent.Create(new { resolverType = "test-managed", value = "replacement" })
+            Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "replacement" })
         };
         replace.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
 
@@ -501,10 +501,10 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     [Test]
     public async Task ManagedSecretReplacementCleansUpStagedMaterialWhenValidationThrows()
     {
-        var create = await Client.PostAsJsonAsync(
+        var create = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("managed-secret-exception", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
-        var connectionValue16 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var connectionValue16 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue16).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue16!;
         _managedSecretWriter.BeforeReturn = () =>
@@ -514,7 +514,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         };
         var replace = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {
-            Content = JsonContent.Create(new { resolverType = "test-managed", value = "replacement" })
+            Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "replacement" })
         };
         replace.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
 
@@ -522,7 +522,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         await Assert.That(_managedSecretWriter.RemovedReferences).IsEquivalentTo(
             new[] { "staged-1" },
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         var failedConnectionResult = await _store.FindByIdAsync(connection.Id);
         await Assert.That(failedConnectionResult).IsOfType(typeof(IdentityProviderConnection));
         await Assert.That(((IdentityProviderConnection)failedConnectionResult!).SecretBindings).IsEmpty();
@@ -555,8 +555,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ManagedSecretReplacementRemainsPublishedWhenPostCommitNotificationFails()
     {
         var client = Client;
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-notification"));
-        var connectionValue17 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-notification"));
+        var connectionValue17 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue17).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue17!;
         Mock.Get(_notifications)
@@ -565,7 +565,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         var replace = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {
-            Content = JsonContent.Create(new { resolverType = "test-managed", value = "replacement" })
+            Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "replacement" })
         };
         replace.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
 
@@ -581,13 +581,13 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task ManagedSecretWriterMustStageAReferenceDistinctFromTheLiveBinding()
     {
         var client = Client;
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-distinct"));
-        var connectionValue19 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("managed-secret-distinct"));
+        var connectionValue19 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue19).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue19!;
         var first = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {
-            Content = JsonContent.Create(new { resolverType = "test-managed", value = "first" })
+            Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "first" })
         };
         first.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await client.SendAsync(first)).StatusCode).IsEqualTo(HttpStatusCode.OK);
@@ -595,7 +595,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         _managedSecretWriter.ReferenceToReturn = "staged-1";
         var invalid = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed")
         {
-            Content = JsonContent.Create(new { resolverType = "test-managed", value = "second" })
+            Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "second" })
         };
         invalid.Headers.TryAddWithoutValidation("If-Match", "\"2\"");
 
@@ -610,38 +610,38 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     public async Task GeneralConnectionPayloadCannotInjectOrClearSecretBindings()
     {
         var client = Client;
-        var injectedCreate = await client.PostAsJsonAsync("/external-authentication/connections", new
+        var injectedCreate = await client.PostJsonAsync("/external-authentication/connections", new JsonObject
         {
-            key = "injected-secret",
-            scope = new { kind = "host" },
-            adapterType = "test",
-            adapterSettingsVersion = 1,
-            adapterSettings = new { valid = true },
-            displayName = "Injected",
-            secretBindings = new { clientSecret = new { resolverType = "configuration", reference = "ConnectionStrings:Production" } },
-            claimProjection = new { },
-            upstreamLogoutMode = "disabled"
+            ["key"] = "injected-secret",
+            ["scope"] = new JsonObject { ["kind"] = "host" },
+            ["adapterType"] = "test",
+            ["adapterSettingsVersion"] = 1,
+            ["adapterSettings"] = new JsonObject { ["valid"] = true },
+            ["displayName"] = "Injected",
+            ["secretBindings"] = new JsonObject { ["clientSecret"] = new JsonObject { ["resolverType"] = "configuration", ["reference"] = "ConnectionStrings:Production" } },
+            ["claimProjection"] = new JsonObject(),
+            ["upstreamLogoutMode"] = "disabled"
         });
         await Assert.That(injectedCreate.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(await injectedCreate.Content.ReadAsStringAsync()).Contains("secret_bindings_mutation_not_allowed");
 
-        var create = await client.PostAsJsonAsync("/external-authentication/connections", CreateRequest("cannot-clear-secret"));
-        var connectionValue20 = await create.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var create = await client.PostJsonAsync("/external-authentication/connections", CreateRequest("cannot-clear-secret"));
+        var connectionValue20 = await create.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(connectionValue20).IsOfType(typeof(ConnectionDocument));
         var connection = (ConnectionDocument)connectionValue20!;
         var clear = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}")
         {
-            Content = JsonContent.Create(new
+            Content = TestJson.Content(new JsonObject
             {
-                key = "cannot-clear-secret",
-                scope = new { kind = "host" },
-                adapterType = "test",
-                adapterSettingsVersion = 2,
-                adapterSettings = new { valid = true },
-                displayName = "Cannot clear",
-                secretBindings = new { },
-                claimProjection = new { },
-                upstreamLogoutMode = "disabled"
+                ["key"] = "cannot-clear-secret",
+                ["scope"] = new JsonObject { ["kind"] = "host" },
+                ["adapterType"] = "test",
+                ["adapterSettingsVersion"] = 2,
+                ["adapterSettings"] = new JsonObject { ["valid"] = true },
+                ["displayName"] = "Cannot clear",
+                ["secretBindings"] = new JsonObject(),
+                ["claimProjection"] = new JsonObject(),
+                ["upstreamLogoutMode"] = "disabled"
             })
         };
         clear.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
@@ -651,7 +651,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     [Test]
     public async Task MatcherPolicyRejectsAMatcherDisallowedByDeployment()
     {
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("disallowed-matcher", unlinkedPolicy: CreateMatcherPolicy("disallowed-matcher", "reject")));
 
@@ -664,7 +664,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     {
         _roleAuthorizationService.CanAssignRoles = false;
 
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("matcher-roles", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
 
@@ -672,7 +672,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         await Assert.That(await response.Content.ReadAsStringAsync()).Contains("validation_failed");
         await Assert.That(_roleAuthorizationService.LastRequestedRoleIds).IsEquivalentTo(
             new[] { "workflow-user" },
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -687,7 +687,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
             $"{ExternalAuthenticationResourcePermissions.Policies}:{CoreVerbs.Update}"
         ]);
 
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("roles-guard", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
 
@@ -705,7 +705,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
             $"{ExternalAuthenticationResourcePermissions.PolicyDefaultRoles}:{CoreVerbs.Update}"
         ]);
 
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("roles-allowed", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
 
@@ -719,11 +719,11 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         // Validation runs on every update, on enabling a connection, and on read-only validate. Keying the
         // permission off the roles being present rather than changing meant that once anyone set default
         // roles, an administrator without it could no longer edit an unrelated field on that connection.
-        var created = await Client.PostAsJsonAsync(
+        var created = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("roles-untouched", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
         await Assert.That(created.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        var id = (await created.Content.ReadFromJsonAsync<ConnectionDocument>())!.Id;
+        var id = (await created.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument))!.Id;
         var revision = created.Headers.ETag!.Tag;
 
         // Now act as someone who may edit connections and policies, but not decide default roles.
@@ -735,7 +735,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{id}")
         {
-            Content = JsonContent.Create(CreateRequest("roles-untouched", displayName: "Renamed", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")))
+            Content = TestJson.Content(CreateRequest("roles-untouched", displayName: "Renamed", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")))
         };
         request.Headers.TryAddWithoutValidation("If-Match", revision);
 
@@ -753,11 +753,11 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         // decision about what auto-created users receive, so it needs the same permission as editing the
         // list -- checking only create-user candidates would have let it through unguarded. Expressed here by
         // changing noMatchAction rather than the policy type, because the test registry only knows match-user.
-        var created = await Client.PostAsJsonAsync(
+        var created = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("roles-abandoned", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "create-user")));
         await Assert.That(created.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        var id = (await created.Content.ReadFromJsonAsync<ConnectionDocument>())!.Id;
+        var id = (await created.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument))!.Id;
         var revision = created.Headers.ETag!.Tag;
 
         SetPermissions(
@@ -768,7 +768,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{id}")
         {
-            Content = JsonContent.Create(CreateRequest("roles-abandoned", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "reject")))
+            Content = TestJson.Content(CreateRequest("roles-abandoned", unlinkedPolicy: CreateMatcherPolicy("allowed-matcher", "reject")))
         };
         request.Headers.TryAddWithoutValidation("If-Match", revision);
 
@@ -836,18 +836,18 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         $"{ExternalAuthenticationResourcePermissions.Policies}:{CoreVerbs.Update}"
     ];
 
-    private async Task<(string Id, string Revision)> CreateConnectionAsync(object request)
+    private async Task<(string Id, string Revision)> CreateConnectionAsync(JsonObject request)
     {
-        var created = await Client.PostAsJsonAsync("/external-authentication/connections", request);
+        var created = await Client.PostJsonAsync("/external-authentication/connections", request);
         await Assert.That(created.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        return ((await created.Content.ReadFromJsonAsync<ConnectionDocument>())!.Id, created.Headers.ETag!.Tag);
+        return ((await created.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument))!.Id, created.Headers.ETag!.Tag);
     }
 
-    private async Task<HttpResponseMessage> PutConnectionAsync(string id, string revision, object request)
+    private async Task<HttpResponseMessage> PutConnectionAsync(string id, string revision, JsonObject request)
     {
         using var message = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{id}")
         {
-            Content = JsonContent.Create(request)
+            Content = TestJson.Content(request)
         };
         message.Headers.TryAddWithoutValidation("If-Match", revision);
         return await Client.SendAsync(message);
@@ -881,7 +881,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
             $"{ExternalAuthenticationResourcePermissions.Policies}:{CoreVerbs.Update}"
         ]);
 
-        var response = await Client.PostAsJsonAsync(
+        var response = await Client.PostJsonAsync(
             "/external-authentication/connections",
             CreateRequest("roles-empty", unlinkedPolicy: CreateMatcherPolicyWithoutDefaultRoles("allowed-matcher", "create-user")));
 
@@ -891,40 +891,40 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     private static PolicySelection CreateMatcherPolicyWithoutDefaultRoles(string matcherType, string noMatchAction) => new(
         "match-user",
         1,
-        JsonSerializer.SerializeToElement(new
+        TestJson.Element(new JsonObject
         {
-            matcher = new { type = matcherType, settingsVersion = 1, settings = new { } },
-            noMatchAction,
-            defaultRoleIds = Array.Empty<string>()
+            ["matcher"] = new JsonObject { ["type"] = matcherType, ["settingsVersion"] = 1, ["settings"] = new JsonObject() },
+            ["noMatchAction"] = noMatchAction,
+            ["defaultRoleIds"] = new JsonArray()
         }));
 
-    private static object CreateRequest(string key, object? scope = null, string displayName = "Contoso", object? settings = null, bool confirmUnsafeSettings = false, object? unlinkedPolicy = null, string upstreamLogoutMode = "disabled", bool overridesConfigurationConnection = false) => new
+    private static JsonObject CreateRequest(string key, JsonObject? scope = null, string displayName = "Contoso", JsonObject? settings = null, bool confirmUnsafeSettings = false, PolicySelection? unlinkedPolicy = null, string upstreamLogoutMode = "disabled", bool overridesConfigurationConnection = false) => new JsonObject
     {
-        key,
-        scope = scope ?? new { kind = "host" },
-        adapterType = "test",
-        adapterSettingsVersion = 1,
-        adapterSettings = settings ?? new { valid = true },
-        displayName,
-        order = 10,
-        claimProjection = new { allowedClaimTypes = Array.Empty<string>(), redactedClaimTypes = Array.Empty<string>(), maximumClaimCount = 0, maximumValueLength = 0, maximumTotalBytes = 0 },
-        upstreamLogoutMode,
-        confirmUnsafeSettings,
-        overridesConfigurationConnection,
-        unlinkedPolicy
+        ["key"] = key,
+        ["scope"] = scope ?? new JsonObject { ["kind"] = "host" },
+        ["adapterType"] = "test",
+        ["adapterSettingsVersion"] = 1,
+        ["adapterSettings"] = settings ?? new JsonObject { ["valid"] = true },
+        ["displayName"] = displayName,
+        ["order"] = 10,
+        ["claimProjection"] = new JsonObject { ["allowedClaimTypes"] = new JsonArray(), ["redactedClaimTypes"] = new JsonArray(), ["maximumClaimCount"] = 0, ["maximumValueLength"] = 0, ["maximumTotalBytes"] = 0 },
+        ["upstreamLogoutMode"] = upstreamLogoutMode,
+        ["confirmUnsafeSettings"] = confirmUnsafeSettings,
+        ["overridesConfigurationConnection"] = overridesConfigurationConnection,
+        ["unlinkedPolicy"] = unlinkedPolicy is null ? null : JsonSerializer.SerializeToNode(unlinkedPolicy, HttpJsonContext.Default.PolicySelection)
     };
 
     private static PolicySelection CreateMatcherPolicy(string matcherType, string noMatchAction) => new(
         "match-user",
         1,
-        JsonSerializer.SerializeToElement(new
+        TestJson.Element(new JsonObject
         {
-            matcher = new { type = matcherType, settingsVersion = 1, settings = new { } },
-            noMatchAction,
-            defaultRoleIds = new[] { "workflow-user" }
+            ["matcher"] = new JsonObject { ["type"] = matcherType, ["settingsVersion"] = 1, ["settings"] = new JsonObject() },
+            ["noMatchAction"] = noMatchAction,
+            ["defaultRoleIds"] = new JsonArray("workflow-user")
         }));
 
-    private sealed class ConnectionDocument
+    internal sealed class ConnectionDocument
     {
         public string Id { get; set; } = null!;
         public string? CallbackUri { get; set; }
@@ -936,7 +936,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         public ICollection<ConnectionReferenceDocument> Shadows { get; set; } = [];
     }
 
-    private sealed class ConnectionReferenceDocument
+    internal sealed class ConnectionReferenceDocument
     {
         public string Id { get; set; } = null!;
         public string DisplayName { get; set; } = null!;
@@ -947,31 +947,31 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     {
         var response = await Client.GetAsync($"/external-authentication/connections/{connectionId}");
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        var resultValue21 = await response.Content.ReadFromJsonAsync<ConnectionDocument>();
+        var resultValue21 = await response.Content.ReadFromJsonAsync(HttpJsonContext.Default.ConnectionDocument);
         await Assert.That(resultValue21).IsOfType(typeof(ConnectionDocument));
         return (ConnectionDocument)resultValue21!;
     }
 
-    private async Task<HttpResponseMessage> UpdateConnectionAsync(string connectionId, long revision, object request)
+    private async Task<HttpResponseMessage> UpdateConnectionAsync(string connectionId, long revision, JsonObject request)
     {
-        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connectionId}") { Content = JsonContent.Create(request) };
+        var update = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connectionId}") { Content = TestJson.Content(request) };
         update.Headers.TryAddWithoutValidation("If-Match", $"\"{revision}\"");
         return await Client.SendAsync(update);
     }
 
-    private sealed class ListDocument
+    internal sealed class ListDocument
     {
         public List<ListConnectionDocument> Items { get; set; } = [];
         public string? NextCursor { get; set; }
     }
 
-    private sealed class ListConnectionDocument
+    internal sealed class ListConnectionDocument
     {
         public string Key { get; set; } = null!;
         public ObservationDocument? LatestObservation { get; set; }
     }
 
-    private sealed class ObservationDocument
+    internal sealed class ObservationDocument
     {
         public bool IsStale { get; set; }
     }

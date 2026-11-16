@@ -53,12 +53,12 @@ public class ExternalAuthenticationRedactorTests
 
         await Assert.That(result["email"]).IsEquivalentTo(
             [ExternalAuthenticationRedactor.RedactedValue],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(result["department"]).IsEquivalentTo(
             ["operations"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(claims["email"]).IsEquivalentTo(
             ["operator@example.test"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 }

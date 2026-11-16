@@ -60,7 +60,7 @@ public class ExternalRefreshPermissionTests
         await Assert.That(savedSession).IsNotNull();
         await Assert.That(savedSession!.ExternalGrants).IsEquivalentTo(
             [expectedGrant],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<PermissionGrant>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         Mock.Get(permissionResolver).ResolveAsync(
             Arg.Is<PermissionGrantResolutionContext>(context =>
                 context.TargetTenantId == "tenant-a" &&
@@ -147,10 +147,10 @@ public class ExternalRefreshPermissionTests
         await Assert.That(issuanceContexts.Count).IsEqualTo(2);
         await Assert.That(issuanceContexts[0].Permissions).IsEquivalentTo(
             ["*", "reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(issuanceContexts[1].Permissions).IsEquivalentTo(
             ["workflows:manage", "reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(issuanceContexts[1].Permissions).DoesNotContain("*");
         await Assert.That(issuanceContexts[1].ExternalAuthenticationSessionId).IsEqualTo("session-a");
     }
@@ -170,7 +170,7 @@ public class ExternalRefreshPermissionTests
         await Assert.That(contexts.Single().Permissions).DoesNotContain("workflows/definitions:delete");
         await Assert.That(contexts.Single().Permissions).IsEquivalentTo(
             ["workflows/definitions:view", "reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class ExternalRefreshPermissionTests
 
         await Assert.That(contexts.Single().Permissions).IsEquivalentTo(
             ["workflows/definitions:delete", "*", "reports:view"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static async Task<IReadOnlyList<TokenIssuanceContext>> IssueWithAsync(ExternalAuthenticationOptions options, string[] rolePermissions)

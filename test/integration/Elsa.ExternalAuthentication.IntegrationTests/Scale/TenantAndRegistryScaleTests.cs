@@ -48,7 +48,7 @@ public sealed class TenantAndRegistryScaleTests
         await Assert.That(first.LoginMethods.Count).IsEqualTo(10_000);
         await Assert.That(second.LoginMethods.Select(x => x.Id)).IsEquivalentTo(
             first.LoginMethods.Select(x => x.Id),
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(first.LoginMethods.Select(x => x.Id)).IsEquivalentTo(
             first.LoginMethods.OrderBy(x => x.Order).ThenBy(x => x.Key, StringComparer.Ordinal).Select(x => x.Id),
             TUnit.Assertions.Enums.CollectionOrdering.Matching);
@@ -60,7 +60,7 @@ public sealed class TenantAndRegistryScaleTests
 
     private static IdentityProviderConnection Connection(string id, string tenantId, string key, int displayOrder = 0, bool isPreferred = false) => new()
     {
-        Id = id, TenantId = tenantId, Key = key, AdapterType = "test", AdapterSettingsVersion = 1, AdapterSettings = JsonSerializer.SerializeToElement(new { }),
+        Id = id, TenantId = tenantId, Key = key, AdapterType = "test", AdapterSettingsVersion = 1, AdapterSettings = JsonElement.Parse("{}"),
         DisplayName = key, DisplayOrder = displayOrder, IsPreferred = isPreferred, IsEnabled = true, MaterialRevision = $"revision-{id}"
     };
 

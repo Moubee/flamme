@@ -81,24 +81,24 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That(first.StatusCode).IsEqualTo(HttpStatusCode.Created);
         await Assert.That(second.StatusCode).IsEqualTo(HttpStatusCode.Created);
 
-        var firstPage = await Client.GetFromJsonAsync<LinkList>($"/external-authentication/identity-links?userId=user-a&pageSize=1");
+        var firstPage = await Client.GetFromJsonAsync($"/external-authentication/identity-links?userId=user-a&pageSize=1", HttpJsonContext.Default.LinkList);
         await Assert.That(firstPage).IsNotNull();
         await Assert.That(firstPage!.Items).HasSingleItem();
         await Assert.That(firstPage.NextCursor).IsNotNull();
-        var serializedPage = JsonSerializer.Serialize(firstPage);
+        var serializedPage = JsonSerializer.Serialize(firstPage, HttpJsonContext.Default.LinkList);
         await Assert.That(serializedPage).DoesNotContain("subject-a");
         await Assert.That(serializedPage).DoesNotContain("subjecthash").WithComparison(StringComparison.OrdinalIgnoreCase);
 
-        var secondPage = await Client.GetFromJsonAsync<LinkList>($"/external-authentication/identity-links?userId=user-a&pageSize=1&cursor={Uri.EscapeDataString(firstPage.NextCursor!)}");
+        var secondPage = await Client.GetFromJsonAsync($"/external-authentication/identity-links?userId=user-a&pageSize=1&cursor={Uri.EscapeDataString(firstPage.NextCursor!)}", HttpJsonContext.Default.LinkList);
         await Assert.That(secondPage).IsNotNull();
         await Assert.That(secondPage!.Items).HasSingleItem();
 
-        var link = await first.Content.ReadFromJsonAsync<LinkDocument>();
+        var link = await first.Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
         var conflict = await PrelinkAsync("subject-a", "user-c");
         await Assert.That(conflict.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
 
         _connections.Archived = true;
-        var archived = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=contoso");
+        var archived = await Client.GetFromJsonAsync("/external-authentication/identity-links?connectionKey=contoso", HttpJsonContext.Default.LinkList);
         await Assert.That(archived).IsNotNull();
         var archivedLinksValue1 = archived;
         await Assert.That(archivedLinksValue1).IsOfType(typeof(LinkList));
@@ -125,7 +125,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
 
         var crossTenantPrelink = await PrelinkAsync("subject-b", "user-a");
         await Assert.That(crossTenantPrelink.StatusCode).IsEqualTo(HttpStatusCode.NotFound);
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links", HttpJsonContext.Default.LinkList);
         await Assert.That(links).IsNotNull();
         await Assert.That(links!.Items).IsEmpty();
     }
@@ -134,7 +134,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     public async Task IdentityLinksApiReturnsTheRecordedSignInForTheCurrentTenantAndConnection()
     {
         var identity = new ExternalIdentity("https://issuer.example", "subject-a", EmptyClaims);
-        var prelinked = await (await PrelinkAsync(identity.Subject)).Content.ReadFromJsonAsync<LinkDocument>();
+        var prelinked = await (await PrelinkAsync(identity.Subject)).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
         await Assert.That(prelinked!.LastSignedInAt).IsNull();
         var signedInAt = new DateTimeOffset(2026, 7, 26, 11, 0, 0, TimeSpan.Zero);
         await using (var scope = Services.CreateAsyncScope())
@@ -143,14 +143,14 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
             await Assert.That(await tracker.RecordSuccessfulSignInAsync("tenant-a", "contoso", identity, "user-a", signedInAt)).IsTrue();
         }
 
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=contoso");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links?connectionKey=contoso", HttpJsonContext.Default.LinkList);
         var link = (await Assert.That(links!.Items).HasSingleItem())!;
         await Assert.That(link.Id).IsEqualTo(prelinked.Id);
         await Assert.That(link.LastSignedInAt).IsEqualTo(signedInAt);
-        await Assert.That((await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=fabrikam"))!.Items).IsEmpty();
+        await Assert.That((await Client.GetFromJsonAsync("/external-authentication/identity-links?connectionKey=fabrikam", HttpJsonContext.Default.LinkList))!.Items).IsEmpty();
 
         Mock.Get(_tenant).TenantId.Returns("tenant-b");
-        await Assert.That((await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=contoso"))!.Items).IsEmpty();
+        await Assert.That((await Client.GetFromJsonAsync("/external-authentication/identity-links?connectionKey=contoso", HttpJsonContext.Default.LinkList))!.Items).IsEmpty();
     }
 
     [Test]
@@ -159,7 +159,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         var responses = await Task.WhenAll(Enumerable.Range(0, 16).Select(_ => PrelinkAsync("concurrent-subject")));
         foreach (var response in responses)
             await Assert.That(response.StatusCode is HttpStatusCode.Created or HttpStatusCode.OK).IsTrue();
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links?connectionKey=contoso");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links?connectionKey=contoso", HttpJsonContext.Default.LinkList);
         await Assert.That(links).IsNotNull();
         await Assert.That(links!.Items).HasSingleItem();
         await Assert.That((await Assert.That(links.Items).HasSingleItem())!.UserId).IsEqualTo("user-a");
@@ -190,11 +190,11 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         _connections.IsEnabled = false;
         _connections.Validity = ConnectionValidity.Invalid;
 
-        var prelinked = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
+        var prelinked = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
         var response = await ReplaceAsync(prelinked!.Id, "subject-new");
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Created);
-        await Assert.That((await response.Content.ReadFromJsonAsync<LinkDocument>())!.Id).IsNotEqualTo(prelinked.Id);
+        await Assert.That((await response.Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument))!.Id).IsNotEqualTo(prelinked.Id);
 
         _connections.Archived = true;
         await Assert.That((await PrelinkAsync("archived-subject")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
@@ -203,10 +203,10 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     [Test]
     public async Task ReplaceCreatesANewLinkAndResetsLifecycleMetadata()
     {
-        var prelinked = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
+        var prelinked = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
 
         var response = await ReplaceAsync(prelinked!.Id, "subject-new", "user-c", "fabrikam", "https://replacement.example/path/");
-        var replacement = await response.Content.ReadFromJsonAsync<LinkDocument>();
+        var replacement = await response.Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Created);
         await Assert.That(replacement).IsNotNull();
@@ -217,7 +217,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That(replacement.CreatedAt > prelinked.CreatedAt).IsTrue();
         await Assert.That(replacement.LastSignedInAt).IsNull();
 
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links", HttpJsonContext.Default.LinkList);
         var persisted = (await Assert.That(links!.Items).HasSingleItem())!;
         await Assert.That(persisted.Id).IsEqualTo(replacement.Id);
 
@@ -230,13 +230,13 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     [Test]
     public async Task ReplaceConflictLeavesTheOldLinkUntouchedEvenWhenTheTupleBelongsToTheSameUser()
     {
-        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
-        var conflicting = await (await PrelinkAsync("subject-conflict")).Content.ReadFromJsonAsync<LinkDocument>();
+        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
+        var conflicting = await (await PrelinkAsync("subject-conflict")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
 
         var response = await ReplaceAsync(old!.Id, "subject-conflict");
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links", HttpJsonContext.Default.LinkList);
         await Assert.That(links!.Items.Count).IsEqualTo(2);
         await Assert.That(links.Items).Contains(x => x.Id == old.Id && x.UserId == old.UserId && x.ConnectionKey == old.ConnectionKey);
         await Assert.That(links.Items).Contains(x => x.Id == conflicting!.Id);
@@ -245,7 +245,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     [Test]
     public async Task ReplaceUsesTheOldIdAsATenantBoundConcurrencyGuard()
     {
-        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
+        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
 
         Mock.Get(_tenant).TenantId.Returns("tenant-b");
         await Assert.That((await ReplaceAsync(old!.Id, "cross-tenant-subject", "user-b")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
@@ -257,21 +257,21 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
 
         await Assert.That(responses).HasSingleItem(x => x.StatusCode == HttpStatusCode.Created);
         var missing = (await Assert.That(responses).HasSingleItem(x => x.StatusCode == HttpStatusCode.NotFound))!;
-        await Assert.That((await missing.Content.ReadFromJsonAsync<ErrorDocument>())!.Error).IsEqualTo("not_found");
-        var links = await Client.GetFromJsonAsync<LinkList>("/external-authentication/identity-links");
+        await Assert.That((await missing.Content.ReadFromJsonAsync(HttpJsonContext.Default.ErrorDocument))!.Error).IsEqualTo("not_found");
+        var links = await Client.GetFromJsonAsync("/external-authentication/identity-links", HttpJsonContext.Default.LinkList);
         await Assert.That(links!.Items).HasSingleItem();
     }
 
     [Test]
     public async Task ReplaceAuditsSuccessAndConflictButNotValidationFailures()
     {
-        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync<LinkDocument>();
-        var conflicting = await (await PrelinkAsync("subject-conflict", "user-c")).Content.ReadFromJsonAsync<LinkDocument>();
+        var old = await (await PrelinkAsync("subject-old")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
+        var conflicting = await (await PrelinkAsync("subject-conflict", "user-c")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
         Mock.Get(_notifications).ClearCalls();
 
         var successfulResponse = await ReplaceAsync(old!.Id, "subject-new", "user-c", "fabrikam");
-        var replacement = await successfulResponse.Content.ReadFromJsonAsync<LinkDocument>();
-        var replacementToConflict = await (await PrelinkAsync("subject-another")).Content.ReadFromJsonAsync<LinkDocument>();
+        var replacement = await successfulResponse.Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
+        var replacementToConflict = await (await PrelinkAsync("subject-another")).Content.ReadFromJsonAsync(HttpJsonContext.Default.LinkDocument);
         await Assert.That((await ReplaceAsync(replacementToConflict!.Id, "subject-conflict", "user-c")).StatusCode).IsEqualTo(HttpStatusCode.Conflict);
         await Assert.That((await ReplaceAsync(replacement!.Id, "subject-invalid", issuer: "http://issuer.example")).StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
 
@@ -301,14 +301,14 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         await Assert.That(failed.ConflictingConnectionKey).IsEqualTo("contoso");
     }
 
-    private async Task<HttpResponseMessage> PrelinkAsync(string subject, string userId = "user-a") => await Client.PostAsJsonAsync("/external-authentication/identity-links", new { userId, connectionKey = "contoso", issuer = "https://issuer.example/", subject });
-    private async Task<HttpResponseMessage> ReplaceAsync(string linkId, string subject, string userId = "user-a", string connectionKey = "contoso", string issuer = "https://issuer.example/") => await Client.PostAsJsonAsync($"/external-authentication/identity-links/{linkId}/replace", new { userId, connectionKey, issuer, subject });
+    private async Task<HttpResponseMessage> PrelinkAsync(string subject, string userId = "user-a") => await Client.PostJsonAsync("/external-authentication/identity-links", new JsonObject { ["userId"] = userId, ["connectionKey"] = "contoso", ["issuer"] = "https://issuer.example/", ["subject"] = subject });
+    private async Task<HttpResponseMessage> ReplaceAsync(string linkId, string subject, string userId = "user-a", string connectionKey = "contoso", string issuer = "https://issuer.example/") => await Client.PostJsonAsync($"/external-authentication/identity-links/{linkId}/replace", new JsonObject { ["userId"] = userId, ["connectionKey"] = connectionKey, ["issuer"] = issuer, ["subject"] = subject });
 
     private static IReadOnlyDictionary<string, IReadOnlyCollection<string>> EmptyClaims { get; } = new Dictionary<string, IReadOnlyCollection<string>>();
 
-    private sealed record LinkDocument(string Id, string UserId, string ConnectionKey, string Issuer, DateTimeOffset CreatedAt, DateTimeOffset? LastSignedInAt);
-    private sealed record LinkList(IReadOnlyCollection<LinkDocument> Items, string? NextCursor);
-    private sealed record ErrorDocument(string Error, string Message);
+    internal sealed record LinkDocument(string Id, string UserId, string ConnectionKey, string Issuer, DateTimeOffset CreatedAt, DateTimeOffset? LastSignedInAt);
+    internal sealed record LinkList(IReadOnlyCollection<LinkDocument> Items, string? NextCursor);
+    internal sealed record ErrorDocument(string Error, string Message);
 
     private sealed class TestConnectionRegistry : IIdentityProviderConnectionRegistry
     {

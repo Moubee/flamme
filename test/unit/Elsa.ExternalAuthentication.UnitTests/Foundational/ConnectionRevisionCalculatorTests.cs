@@ -15,8 +15,8 @@ public class ConnectionRevisionCalculatorTests
         var first = ExternalAuthenticationTestData.CreateConnection();
         var second = ExternalAuthenticationTestData.CreateConnection();
         second.Key = " OIDC ";
-        second.AdapterSettings = JsonSerializer.SerializeToElement(new { authority = "https://issuer.example", client = new { id = "studio" } });
-        first.AdapterSettings = JsonSerializer.SerializeToElement(new { client = new { id = "studio" }, authority = "https://issuer.example" });
+        second.AdapterSettings = JsonElement.Parse("""{"authority":"https://issuer.example","client":{"id":"studio"}}""");
+        first.AdapterSettings = JsonElement.Parse("""{"client":{"id":"studio"},"authority":"https://issuer.example"}""");
         second.DisplayName = "Corporate login";
         second.DisplayOrder = 99;
         second.IsPreferred = true;
