@@ -17,14 +17,14 @@ public class ScheduledRecurringTaskTests : IDisposable
 
     private readonly ServiceProvider _serviceProvider;
     private readonly RecordingTimeProvider _timeProvider;
-    private readonly ILogger<ScheduledRecurringTask> _logger;
+    private readonly ILogger_TCategoryName_Mock<ScheduledRecurringTask> _logger;
     private readonly List<ScheduledRecurringTask> _tasksToDispose = new();
 
     public ScheduledRecurringTaskTests()
     {
         var services = new ServiceCollection();
         _timeProvider = new RecordingTimeProvider(DefaultNow);
-        _logger = ILogger<ScheduledRecurringTask>.Mock().Object;
+        _logger = ILogger<ScheduledRecurringTask>.Mock();
 
         services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
@@ -42,7 +42,7 @@ public class ScheduledRecurringTaskTests : IDisposable
             interval ?? DefaultInterval,
             timeProvider ?? _timeProvider,
             _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
-            _logger
+            _logger.Object
         );
         _tasksToDispose.Add(scheduledTask);
         return scheduledTask;
@@ -55,7 +55,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
     private void AssertNoErrorLogged()
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),
@@ -65,7 +65,7 @@ public class ScheduledRecurringTaskTests : IDisposable
 
     private void AssertWarningLogged(int expectedCount = 1)
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),

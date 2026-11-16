@@ -18,7 +18,7 @@ public class ScheduledCronTaskTests : IDisposable
     private readonly ServiceProvider _serviceProvider;
     private readonly FakeTimeProvider _timeProvider;
     private readonly ICronParser _cronParser;
-    private readonly ILogger<ScheduledCronTask> _logger;
+    private readonly ILogger_TCategoryName_Mock<ScheduledCronTask> _logger;
     private readonly List<ScheduledCronTask> _tasksToDispose = new();
 
     public ScheduledCronTaskTests()
@@ -26,7 +26,7 @@ public class ScheduledCronTaskTests : IDisposable
         var services = new ServiceCollection();
         _timeProvider = new FakeTimeProvider(DefaultNow);
         _cronParser = ICronParser.Mock().Object;
-        _logger = ILogger<ScheduledCronTask>.Mock().Object;
+        _logger = ILogger<ScheduledCronTask>.Mock();
         
         services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
@@ -44,7 +44,7 @@ public class ScheduledCronTaskTests : IDisposable
             cronParser ?? _cronParser,
             _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
             timeProvider ?? _timeProvider,
-            _logger
+            _logger.Object
         );
         _tasksToDispose.Add(scheduledTask);
         return scheduledTask;
@@ -62,7 +62,7 @@ public class ScheduledCronTaskTests : IDisposable
 
     private void AssertNoErrorLogged()
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),
@@ -72,7 +72,7 @@ public class ScheduledCronTaskTests : IDisposable
 
     private void AssertWarningLogged(int expectedCount = 1)
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),

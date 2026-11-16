@@ -19,7 +19,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
 
     private readonly ServiceProvider _serviceProvider;
     private readonly FakeTimeProvider _timeProvider;
-    private readonly ILogger<ScheduledSpecificInstantTask> _logger;
+    private readonly ILogger_TCategoryName_Mock<ScheduledSpecificInstantTask> _logger;
     private readonly PastDueScheduleStaggerer _pastDueScheduleStaggerer = new(OptionsFactory.Create(new SchedulingOptions
     {
         MinimumPastDueScheduleDelay = TimeSpan.FromMilliseconds(10),
@@ -32,7 +32,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     {
         var services = new ServiceCollection();
         _timeProvider = new FakeTimeProvider(DefaultNow);
-        _logger = ILogger<ScheduledSpecificInstantTask>.Mock().Object;
+        _logger = ILogger<ScheduledSpecificInstantTask>.Mock();
 
         services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
@@ -48,7 +48,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
             startAt ?? DefaultNow.AddMinutes(5),
             timeProvider ?? _timeProvider,
             _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IServiceScopeFactory>(),
-            _logger,
+            _logger.Object,
             _pastDueScheduleStaggerer
         );
         _tasksToDispose.Add(scheduledTask);
@@ -62,7 +62,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
 
     private void AssertNoErrorLogged()
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Error,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),
@@ -72,7 +72,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
 
     private void AssertDebugLogged(int expectedCount = 1)
     {
-        Mock.Get(_logger).Log<AnyType>(
+        _logger.Log<AnyType>(
             LogLevel.Debug,
             Arg.Any<EventId>(),
             Arg.Any<AnyType>(),
@@ -129,7 +129,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
         CreateScheduledTask(startAt: DefaultNow.AddMinutes(-1));
 
-        var debugMessages = Mock.Get(_logger).Invocations
+        var debugMessages = _logger.Invocations
             .Where(call => call.MemberName == nameof(ILogger.Log) && call.Arguments[0] is LogLevel.Debug)
             .Select(call => call.Arguments[2]?.ToString())
             .ToArray();
