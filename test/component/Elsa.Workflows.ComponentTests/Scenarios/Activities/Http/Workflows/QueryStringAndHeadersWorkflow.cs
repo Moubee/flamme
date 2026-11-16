@@ -13,8 +13,8 @@ public class QueryStringAndHeadersWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
         
-        var queryDataVariable = builder.WithVariable<IDictionary<string, object>>();
-        var headersVariable = builder.WithVariable<IDictionary<string, object>>();
+        var queryDataVariable = builder.WithVariable<IDictionary<string, object>>("QueryData", default!);
+        var headersVariable = builder.WithVariable<IDictionary<string, object>>("Headers", default!);
         
         builder.Root = new Sequence
         {

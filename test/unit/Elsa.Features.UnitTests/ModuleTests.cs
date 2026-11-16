@@ -98,7 +98,7 @@ public class ModuleTests
 
         await Assert.That(_appliedFeatures).IsEquivalentTo(
             [typeof(DependencyFeature), typeof(DependentFeature)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class ModuleTests
 
         await Assert.That(GetHostedServiceTypes()).IsEquivalentTo(
             [typeof(FirstHostedService), typeof(SecondHostedService), typeof(IntroducedHostedService)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class ModuleTests
         // The introduced feature configures its hosted service at priority 3, so it has to come first even though it shows up last.
         await Assert.That(GetHostedServiceTypes()).IsEquivalentTo(
             [typeof(IntroducedHostedService), typeof(SecondHostedService)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -139,7 +139,7 @@ public class ModuleTests
 
         await Assert.That(GetHostedServiceTypes()).IsEquivalentTo(
             [typeof(FirstHostedService), typeof(SelfRegisteredHostedService)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private List<Type> GetHostedServiceTypes()

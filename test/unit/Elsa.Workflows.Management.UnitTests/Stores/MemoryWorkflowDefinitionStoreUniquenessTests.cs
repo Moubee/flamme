@@ -25,7 +25,7 @@ public class MemoryWorkflowDefinitionStoreUniquenessTests
                 Definition("def-2", "order")
             ])).ThrowsExactly<InvalidOperationException>();
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         await Assert.That((await store.FindManyAsync(new WorkflowDefinitionFilter { TenantAgnostic = true })).ToList()).IsEmpty();
     }
 
@@ -39,7 +39,7 @@ public class MemoryWorkflowDefinitionStoreUniquenessTests
         var exception = await Assert.That(() => store.SaveManyAsync([Definition("def-2", "order")]))
             .ThrowsExactly<InvalidOperationException>();
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         var stored = (await store.FindManyAsync(new WorkflowDefinitionFilter { TenantAgnostic = true })).ToList();
         var single = await Assert.That(stored).HasSingleItem();
         await Assert.That(single.Id).IsEqualTo("def-1");

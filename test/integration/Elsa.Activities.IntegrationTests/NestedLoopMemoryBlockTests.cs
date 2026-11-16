@@ -75,7 +75,7 @@ public class NestedLoopMemoryBlockTests : IAsyncDisposable
                 "inner:inner-1:0",
                 "inner:inner-2:1",
                 "outer:outer-b:1"
-            ], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            ], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     private static WriteLine WriteLoopState(string scope) =>

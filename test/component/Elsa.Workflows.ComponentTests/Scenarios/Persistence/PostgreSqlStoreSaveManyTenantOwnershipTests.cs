@@ -22,8 +22,7 @@ public sealed class PostgreSqlStoreSaveManyTenantOwnershipTests : StoreSaveManyT
 
 public sealed class PostgreSqlStoreSaveManyFixture : IAsyncInitializer, IAsyncDisposable
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine")
         .Build();
 
     public string ConnectionString => _container.GetConnectionString();

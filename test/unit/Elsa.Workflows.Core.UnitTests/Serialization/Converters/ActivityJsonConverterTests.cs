@@ -121,7 +121,7 @@ public sealed class ActivityJsonConverterTests
     }
 
     static IActivity? Execute(ActivityJsonConverter sut, string json) =>
-        JsonSerializer.Deserialize<IActivity>(json, GetSerializerOptions(sut));
+        JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<IActivity>(GetSerializerOptions(sut)));
 
     static IActivityRegistry CreateActivityRegistry(string typeName, IActivity activity, int? version = null)
     {

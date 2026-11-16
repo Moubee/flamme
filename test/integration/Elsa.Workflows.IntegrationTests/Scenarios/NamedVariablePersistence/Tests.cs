@@ -42,6 +42,6 @@ public class Tests : IAsyncDisposable
         await Assert.That(_capturingTextWriter.Lines.ToList()).IsEquivalentTo([
                 "before suspend: hello",
                 "after resume: hello"
-            ], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            ], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 }

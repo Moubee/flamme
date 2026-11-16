@@ -25,7 +25,7 @@ public class Tests : IAsyncDisposable
         await Assert.That(lines).IsEquivalentTo(new[]
         {
             "The result of 4 and 6 is 10.", "The last result is 10."
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class Tests : IAsyncDisposable
             "Current value: Item 1, Activity result: Item 1",
             "Current value: Item 2, Activity result: Item 2",
             "Current value: Item 3, Activity result: Item 3"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

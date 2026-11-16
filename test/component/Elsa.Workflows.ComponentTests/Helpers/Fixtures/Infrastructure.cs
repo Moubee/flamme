@@ -29,7 +29,7 @@ public sealed class Infrastructure : IAsyncInitializer, IAsyncDisposable
 
         // Building the Testcontainers object performs Docker endpoint discovery and can throw.
         // Do that before mutating the process-wide parity setting.
-        var dbContainer = new PostgreSqlBuilder().WithImage("postgres:17-alpine").Build();
+        var dbContainer = new PostgreSqlBuilder("postgres:17-alpine").Build();
         _dbContainer = dbContainer;
         _originalStrictMode = ObjectConverter.StrictMode;
         _strictModeCaptured = true;

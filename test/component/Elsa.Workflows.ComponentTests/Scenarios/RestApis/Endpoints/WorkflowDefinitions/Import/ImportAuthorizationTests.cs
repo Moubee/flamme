@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -136,7 +137,7 @@ public class ImportAuthorizationTests : AppComponentTest
 
     private static MemoryStream CreateImportStream(string definitionId, string name, bool isReadonly = false)
     {
-        var json = JsonSerializer.Serialize(CreateImportModel(definitionId, name, isReadonly), new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var json = new JsonObject { ["definitionId"] = definitionId, ["name"] = name, ["isReadonly"] = isReadonly }.ToJsonString();
         return new(Encoding.UTF8.GetBytes(json));
     }
 }

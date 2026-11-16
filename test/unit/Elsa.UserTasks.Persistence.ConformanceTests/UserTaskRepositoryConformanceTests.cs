@@ -30,8 +30,8 @@ public abstract class UserTaskRepositoryConformanceTests(UserTaskStoreFixture fi
         // would both fail here, which is precisely the defect that shipped a 500 instead of a 409.
         var conflict = await Assert.That(() => Repository.SaveAsync(second, second.Revision)).ThrowsExactly<UserTaskRevisionConflictException>();
 
-        await Assert.That(conflict.TaskId).IsEqualTo(task.Id);
-        await Assert.That(conflict.ExpectedRevision).IsEqualTo(second.Revision);
+        await Assert.That(conflict!.TaskId).IsEqualTo(task.Id);
+        await Assert.That(conflict!.ExpectedRevision).IsEqualTo(second.Revision);
     }
 
     [Test]

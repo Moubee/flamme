@@ -35,8 +35,8 @@ public class HttpEndpointBookmarkPayloadTests
     {
         var payload = new HttpEndpointBookmarkPayload("/API/Orders", "POST", true, "orders", TimeSpan.FromSeconds(30), 1024);
 
-        var json = JsonSerializer.Serialize(payload);
-        var restored = JsonSerializer.Deserialize<HttpEndpointBookmarkPayload>(json);
+        var json = JsonSerializer.Serialize(payload, TestJsonSerializerContext.Default.HttpEndpointBookmarkPayload);
+        var restored = JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.HttpEndpointBookmarkPayload);
 
         await Assert.That(restored).IsEqualTo(payload);
         using var document = JsonDocument.Parse(json);

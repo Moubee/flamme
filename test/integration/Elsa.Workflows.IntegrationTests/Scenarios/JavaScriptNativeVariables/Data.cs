@@ -6,10 +6,11 @@ public class Data
 {
     public static ExpandoObject CreateCustomerModel()
     {
-        dynamic customer = new ExpandoObject();
-        customer.Name = "John Doe";
-        customer.Age = 42;
-        customer.Orders = new[]
+        var customer = new ExpandoObject();
+        IDictionary<string, object?> properties = customer;
+        properties["Name"] = "John Doe";
+        properties["Age"] = 42;
+        properties["Orders"] = new[]
         {
             new
             {

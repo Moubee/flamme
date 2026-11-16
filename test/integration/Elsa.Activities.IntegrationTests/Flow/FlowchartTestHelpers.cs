@@ -5,6 +5,7 @@ using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Activities.Flowchart.Models;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Options;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.Activities.IntegrationTests.Flow;
 
@@ -35,9 +36,8 @@ public static class FlowchartTestHelpers
             ? new RunWorkflowOptions().WithFlowchartExecutionMode(executionMode.Value)
             : null;
 
-        return options == null
-            ? await services.RunActivityAsync(flowchart)
-            : await services.RunActivityAsync(flowchart, options);
+        await services.PopulateRegistriesAsync();
+        return await services.GetRequiredService<IWorkflowRunner>().RunAsync(flowchart, options);
     }
 
     public static Connection CreateConnection(IActivity source, IActivity target, string? outcome = "Done")

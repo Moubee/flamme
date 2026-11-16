@@ -33,7 +33,7 @@ public class ResilienceStrategyCatalogTests
         var result = await catalog.ListAsync();
         await Assert.That(result.Select(x => x.Id)).IsEquivalentTo(
             ["strategy1", "strategy2"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

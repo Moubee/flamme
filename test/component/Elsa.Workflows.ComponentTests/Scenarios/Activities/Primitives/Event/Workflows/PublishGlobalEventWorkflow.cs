@@ -24,10 +24,12 @@ public class PublishGlobalEventWorkflow : WorkflowBase
                     EventName = new("GlobalOrderEvent"),
                     CorrelationId = new(context => context.GetWorkflowExecutionContext().CorrelationId),
                     IsLocalEvent = new(false),
-                    Payload = new(new { Status = "Shipped" })
+                    Payload = new(new OrderEventPayload("Shipped"))
                 },
                 new End()
             }
         };
     }
 }
+
+public sealed record OrderEventPayload(string Status);

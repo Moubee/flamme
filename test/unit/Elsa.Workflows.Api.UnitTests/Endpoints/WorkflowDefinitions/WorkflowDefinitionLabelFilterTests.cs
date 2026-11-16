@@ -72,7 +72,7 @@ public class WorkflowDefinitionLabelFilterTests
         await Assert.That(response.TotalCount).IsEqualTo(3);
         await Assert.That(response.Items.Select(x => x.Id).Order()).IsEquivalentTo(
             ["blue-version", "red-second-version", "red-version"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

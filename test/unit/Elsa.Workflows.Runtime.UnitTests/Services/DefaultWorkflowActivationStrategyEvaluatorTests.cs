@@ -23,8 +23,8 @@ public class DefaultWorkflowActivationStrategyEvaluatorTests
                 CancellationToken = CancellationToken.None
             }));
 
-        await Assert.That(exception.Message).Contains(nameof(UnregisteredStrategy)).WithComparison(StringComparison.Ordinal);
-        await Assert.That(exception.Message).Contains(nameof(IWorkflowActivationStrategy)).WithComparison(StringComparison.Ordinal);
+        await Assert.That(exception!.Message).Contains(nameof(UnregisteredStrategy)).WithComparison(StringComparison.Ordinal);
+        await Assert.That(exception!.Message).Contains(nameof(IWorkflowActivationStrategy)).WithComparison(StringComparison.Ordinal);
     }
 
     private sealed class UnregisteredStrategy : IWorkflowActivationStrategy

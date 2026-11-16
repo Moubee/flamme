@@ -21,7 +21,7 @@ public class ResilienceServiceCollectionExtensionsTests
 
         await Assert.That(GetOptions().StrategyTypes).IsEquivalentTo(
             [typeof(TestRetryStrategy)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -33,7 +33,7 @@ public class ResilienceServiceCollectionExtensionsTests
 
         await Assert.That(GetOptions().StrategyTypes).IsEquivalentTo(
             [typeof(TestRetryStrategy), typeof(TestNoopStrategy)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class ResilienceServiceCollectionExtensionsTests
 
         await Assert.That(GetOptions().StrategyTypes).IsEquivalentTo(
             [typeof(TestRetryStrategy), typeof(TestNoopStrategy)],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<Type>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

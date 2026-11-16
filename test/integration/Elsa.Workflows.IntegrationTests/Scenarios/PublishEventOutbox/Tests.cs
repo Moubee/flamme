@@ -41,9 +41,9 @@ public class Tests
         var outboxItem = (await Assert.That(outboxItems).HasSingleItem());
         await Assert.That(outboxItem.Kind).IsEqualTo(WorkflowDispatchOutboxItemKind.TriggerWorkflows);
         await Assert.That(outboxItem.OwnerWorkflowInstanceId).IsEqualTo(parentResponse.WorkflowInstanceId);
-        await Assert.That(outboxItem.TriggerWorkflowsCommand).IsNotNull();
-        await Assert.That(outboxItem.TriggerWorkflowsCommand.ActivityTypeName).IsEqualTo(ActivityTypeNameHelper.GenerateTypeName<Event>());
-        await Assert.That((await Assert.That(outboxItem.TriggerWorkflowsCommand.Stimulus).IsTypeOf<EventStimulus>()).EventName).IsEqualTo(PublishOrderShippedEventWorkflow.EventName);
+        var command = await Assert.That(outboxItem.TriggerWorkflowsCommand).IsNotNull();
+        await Assert.That(command.ActivityTypeName).IsEqualTo(ActivityTypeNameHelper.GenerateTypeName<Event>());
+        await Assert.That((await Assert.That(command.Stimulus).IsTypeOf<EventStimulus>())!.EventName).IsEqualTo(PublishOrderShippedEventWorkflow.EventName);
 
         var parentInstance = await services.GetRequiredService<IWorkflowInstanceStore>().FindAsync(new WorkflowInstanceFilter
         {

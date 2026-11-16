@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json.Nodes;
 using System.Net;
 using System.Net.Http.Json;
 using Elsa.Alterations.Core.Contracts;
@@ -47,7 +49,7 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
     [Arguments("/alterations/submit")]
     public async Task Post_WithInjectedTimestampFilterColumn_ReturnsBadRequest(string path)
     {
-        var response = await HttpClient.PostAsJsonAsync(path, CreateRequest(path));
+        var response = await HttpClient.PostAsync(path, CreateJsonContent(CreateRequest(path)));
         var body = await response.Content.ReadAsStringAsync();
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
@@ -57,7 +59,7 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
     [Test]
     public async Task Submit_WithNullFilter_DoesNotReturnServerError()
     {
-        var response = await HttpClient.PostAsJsonAsync("/alterations/submit", new { filter = (object?)null });
+        var response = await HttpClient.PostAsync("/alterations/submit", CreateJsonContent(new JsonObject { ["filter"] = null }));
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
     }
@@ -67,7 +69,7 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
     [Arguments("/alterations/submit")]
     public async Task Post_WithNullTimestampFilter_ReturnsBadRequest(string path)
     {
-        var response = await HttpClient.PostAsJsonAsync(path, CreateRequestWithNullTimestampFilter(path));
+        var response = await HttpClient.PostAsync(path, CreateJsonContent(CreateRequestWithNullTimestampFilter(path)));
         var body = await response.Content.ReadAsStringAsync();
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
@@ -79,7 +81,7 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
     [Arguments("/alterations/submit")]
     public async Task Post_WithMultipleInvalidTimestampFilters_ReturnsAllValidationErrors(string path)
     {
-        var response = await HttpClient.PostAsJsonAsync(path, CreateRequestWithMultipleInvalidTimestampFilters(path));
+        var response = await HttpClient.PostAsync(path, CreateJsonContent(CreateRequestWithMultipleInvalidTimestampFilters(path)));
         var body = await response.Content.ReadAsStringAsync();
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
@@ -87,56 +89,34 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
         await Assert.That(body).Contains("Timestamp filter at index 1 must be specified.", StringComparison.CurrentCulture);
     }
 
-    private static object CreateRequest(string path)
+    private static StringContent CreateJsonContent(JsonObject request) =>
+        new(request.ToJsonString(), Encoding.UTF8, "application/json");
+
+    private static JsonObject WrapFilter(string path, JsonObject filter) =>
+        path == "/alterations/submit" ? new JsonObject { ["filter"] = filter } : filter;
+
+    private static JsonObject CreateRequest(string path) => WrapFilter(path, new JsonObject
     {
-        var filter = new
+        ["timestampFilters"] = new JsonArray(new JsonObject
         {
-            timestampFilters = new[]
-            {
-                new
-                {
-                    column = "CreatedAt == @0 || Id != null",
-                    @operator = TimestampFilterOperator.Is,
-                    timestamp = new DateTimeOffset(2026, 5, 20, 10, 0, 0, TimeSpan.Zero)
-                }
-            }
-        };
+            ["column"] = "CreatedAt == @0 || Id != null",
+            ["operator"] = (int)TimestampFilterOperator.Is,
+            ["timestamp"] = new DateTimeOffset(2026, 5, 20, 10, 0, 0, TimeSpan.Zero)
+        })
+    });
 
-        return path == "/alterations/submit"
-            ? new { filter }
-            : filter;
-    }
-
-    private static object CreateRequestWithNullTimestampFilter(string path)
+    private static JsonObject CreateRequestWithNullTimestampFilter(string path) => WrapFilter(path, new JsonObject
     {
-        var filter = new
-        {
-            timestampFilters = new object?[] { null }
-        };
+        ["timestampFilters"] = new JsonArray((JsonNode?)null)
+    });
 
-        return path == "/alterations/submit"
-            ? new { filter }
-            : filter;
-    }
-
-    private static object CreateRequestWithMultipleInvalidTimestampFilters(string path)
+    private static JsonObject CreateRequestWithMultipleInvalidTimestampFilters(string path) => WrapFilter(path, new JsonObject
     {
-        var filter = new
+        ["timestampFilters"] = new JsonArray(new JsonObject
         {
-            timestampFilters = new object?[]
-            {
-                new
-                {
-                    column = " ",
-                    @operator = TimestampFilterOperator.Is,
-                    timestamp = new DateTimeOffset(2026, 5, 20, 10, 0, 0, TimeSpan.Zero)
-                },
-                null
-            }
-        };
-
-        return path == "/alterations/submit"
-            ? new { filter }
-            : filter;
-    }
+            ["column"] = " ",
+            ["operator"] = (int)TimestampFilterOperator.Is,
+            ["timestamp"] = new DateTimeOffset(2026, 5, 20, 10, 0, 0, TimeSpan.Zero)
+        }, null)
+    });
 }

@@ -21,8 +21,8 @@ public sealed class OutputJsonConverterTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(output, options);
-        var result = JsonSerializer.Deserialize<Output<string>>(json, options);
+        var json = JsonSerializer.Serialize(output, TestJsonTypeInfo.FromConverter<Output<string>>(options));
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Output<string>>(options));
 
         // Assert
         await Assert.That(result).IsNotNull();
@@ -46,8 +46,8 @@ public sealed class OutputJsonConverterTests
         var output = new Output<string>(new Variable("Result"));
 
         // Act
-        var json = JsonSerializer.Serialize(output, options);
-        var result = JsonSerializer.Deserialize<Output<string>>(json, options);
+        var json = JsonSerializer.Serialize(output, TestJsonTypeInfo.FromConverter<Output<string>>(options));
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Output<string>>(options));
 
         // Assert
         await Assert.That(result).IsNotNull();

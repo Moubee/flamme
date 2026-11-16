@@ -47,7 +47,7 @@ public class Tests : IAsyncDisposable
         {
             "Foo = Bar",
             "Foo = Baz"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

@@ -31,11 +31,11 @@ public class UserTaskInvitationTests
 
         await _fixture.DrainOutboxAsync();
         var token = await Assert.That(_fixture.Dispatcher.Token).IsNotNull();
-        await Assert.That(JsonSerializer.Serialize(issued)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
+        await Assert.That(JsonSerializer.Serialize(issued, TestJsonSerializerContext.Default.UserTaskInvitationIssueResult)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
 
         var stored = await _fixture.Repository.GetAsync(Tenant, task.Id);
-        await Assert.That(JsonSerializer.Serialize(stored!.Events)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
-        await Assert.That(JsonSerializer.Serialize(stored.Invitations)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
+        await Assert.That(JsonSerializer.Serialize(stored!.Events, TestJsonSerializerContext.Default.ListUserTaskEvent)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
+        await Assert.That(JsonSerializer.Serialize(stored.Invitations, TestJsonSerializerContext.Default.ListUserTaskInvitation)).DoesNotContain(token).WithComparison(StringComparison.CurrentCulture);
     }
 
     [Test]

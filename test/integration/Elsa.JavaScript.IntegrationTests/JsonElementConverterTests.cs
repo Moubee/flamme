@@ -27,7 +27,8 @@ public class JsonElementConverterTests : IAsyncDisposable
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new());
         var jsonVariable = new Variable<object>("JsonVariable", "");
         var jsonString = "{\"name\": \"John\", \"age\": 30}";
-        var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        using var document = JsonDocument.Parse(jsonString);
+        var jsonElement = document.RootElement;
 
         jsonVariable.Set(expressionExecutionContext, jsonElement);
         var script = "getVariable('JsonVariable').age";
@@ -43,7 +44,8 @@ public class JsonElementConverterTests : IAsyncDisposable
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new());
         var jsonVariable = new Variable<object>("JsonVariable", "");
         var jsonString = "[1, 2, 3, 4, 5, 6]";
-        var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        using var document = JsonDocument.Parse(jsonString);
+        var jsonElement = document.RootElement;
 
         jsonVariable.Set(expressionExecutionContext, jsonElement);
         var script = "getVariable('JsonVariable')[3]";
@@ -59,7 +61,8 @@ public class JsonElementConverterTests : IAsyncDisposable
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new());
         var jsonVariable = new Variable<object>("JsonVariable", "");
         var jsonString = "\"I'm just a string\"";
-        var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        using var document = JsonDocument.Parse(jsonString);
+        var jsonElement = document.RootElement;
 
         jsonVariable.Set(expressionExecutionContext, jsonElement);
         var script = "getVariable('JsonVariable')";
@@ -75,7 +78,8 @@ public class JsonElementConverterTests : IAsyncDisposable
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new());
         var jsonVariable = new Variable<object>("JsonVariable", "");
         var jsonString = "false";
-        var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        using var document = JsonDocument.Parse(jsonString);
+        var jsonElement = document.RootElement;
 
         jsonVariable.Set(expressionExecutionContext, jsonElement);
         var script = "getVariable('JsonVariable')";
@@ -120,7 +124,8 @@ public class JsonElementConverterTests : IAsyncDisposable
             ""isEmployed"": true,
             ""contact"": { ""email"": ""john.doe@example.com"", ""phone"": ""555-1234"" }
         }";
-        var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        using var document = JsonDocument.Parse(jsonString);
+        var jsonElement = document.RootElement;
 
         jsonVariable.Set(expressionExecutionContext, jsonElement);
 

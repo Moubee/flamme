@@ -18,7 +18,7 @@ public sealed class InputJsonConverterTests
         const string json = """{"typeName":"System.Boolean","expression":{"type":"JavaScript","value":"getVariable('x') > 0"}}""";
 
         // Act
-        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<Input<bool>>(json, options));
+        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Input<bool>>(options)));
 
         // Assert
         await Assert.That(exception.Message).Contains("JavaScript");
@@ -32,7 +32,7 @@ public sealed class InputJsonConverterTests
         var input = new Input<bool>(new Expression("JavaScript", "getVariable('x') > 0"));
 
         // Act
-        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Serialize(input, options));
+        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Serialize(input, TestJsonTypeInfo.FromConverter<Input<bool>>(options)));
 
         // Assert
         await Assert.That(exception.Message).Contains("JavaScript");
@@ -46,7 +46,7 @@ public sealed class InputJsonConverterTests
         const string json = """{"typeName":"System.Boolean","expression":{"type":"Literal","value":true}}""";
 
         // Act
-        var result = JsonSerializer.Deserialize<Input<bool>>(json, options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Input<bool>>(options));
 
         // Assert
         await Assert.That(result).IsNotNull();
@@ -63,7 +63,7 @@ public sealed class InputJsonConverterTests
         const string json = """{"typeName":"System.Boolean"}""";
 
         // Act
-        var result = JsonSerializer.Deserialize<Input<bool>>(json, options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Input<bool>>(options));
 
         // Assert
         await Assert.That(result).IsNull();

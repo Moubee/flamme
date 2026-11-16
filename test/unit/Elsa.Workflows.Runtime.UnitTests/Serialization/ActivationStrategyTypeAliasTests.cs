@@ -37,18 +37,19 @@ public class ActivationStrategyTypeAliasTests
     public async Task When_DeserializeWorkflowOptions_Then_ResolvesActivationStrategyType(Type strategyType, string alias)
     {
         var options = CreateJsonOptions();
+        var typeInfo = new TestJsonSerializerContext(options).WorkflowOptions;
 
-        var byAlias = JsonSerializer.Deserialize<WorkflowOptions>($$"""{"activationStrategyType":{{JsonSerializer.Serialize(alias)}}}""", options);
+        var byAlias = JsonSerializer.Deserialize($$"""{"activationStrategyType":{{JsonSerializer.Serialize(alias, TestJsonSerializerContext.Default.String)}}}""", typeInfo);
         await Assert.That(byAlias!.ActivationStrategyType).IsEqualTo(strategyType);
 
-        var byLegacyName = JsonSerializer.Deserialize<WorkflowOptions>($$"""{"activationStrategyType":{{JsonSerializer.Serialize(strategyType.GetSimpleAssemblyQualifiedName())}}}""", options);
+        var byLegacyName = JsonSerializer.Deserialize($$"""{"activationStrategyType":{{JsonSerializer.Serialize(strategyType.GetSimpleAssemblyQualifiedName(), TestJsonSerializerContext.Default.String)}}}""", typeInfo);
         await Assert.That(byLegacyName!.ActivationStrategyType).IsEqualTo(strategyType);
 
-        var serialized = JsonSerializer.Serialize(new WorkflowOptions { ActivationStrategyType = strategyType }, options);
+        var serialized = JsonSerializer.Serialize(new WorkflowOptions { ActivationStrategyType = strategyType }, typeInfo);
         await Assert.That(serialized).Contains(alias);
         await Assert.That(serialized).DoesNotContain("UnregisteredClrType:");
 
-        var roundTrip = JsonSerializer.Deserialize<WorkflowOptions>(serialized, options);
+        var roundTrip = JsonSerializer.Deserialize(serialized, typeInfo);
         await Assert.That(roundTrip!.ActivationStrategyType).IsEqualTo(strategyType);
     }
 

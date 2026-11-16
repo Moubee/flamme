@@ -24,9 +24,9 @@ public class Tests : IAsyncDisposable
     [DisplayName("Workflow inputs containing .NET lists on dynamic objects are converted to arrays for use in JavaScript.")]
     public async Task Test1()
     {
-        dynamic dynamicObject = new ExpandoObject();
+        IDictionary<string, object?> dynamicObject = new ExpandoObject();
 
-        dynamicObject.List = new List<string>
+        dynamicObject["List"] = new List<string>
         {
             "a",
             "b",
@@ -88,8 +88,8 @@ public class Tests : IAsyncDisposable
     //  - https://github.com/elsa-workflows/elsa-core/issues/5912
     public async Task Test5(string collectionType, IEnumerable<double> collection)
     {
-        dynamic dynamicObject = new ExpandoObject();
-        dynamicObject.Items = collection;
+        IDictionary<string, object?> dynamicObject = new ExpandoObject();
+        dynamicObject["Items"] = collection;
         var script = """
                      const model = variables.Model;
                      model.Items.sort((a, b) => a - b);
@@ -97,7 +97,7 @@ public class Tests : IAsyncDisposable
                      """;
         _expressionContext.SetVariable("Model", (object)dynamicObject);
         dynamicObject = (ExpandoObject)(await _evaluator.EvaluateAsync(script, typeof(ExpandoObject), _expressionContext))!;
-        var items = ((object[])dynamicObject.Items).Cast<double>().ToArray();
+        var items = ((object[])dynamicObject["Items"]!).Cast<double>().ToArray();
 
         await Assert.That(items).IsEquivalentTo([2d, 4d, 8d], EqualityComparer<double>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }

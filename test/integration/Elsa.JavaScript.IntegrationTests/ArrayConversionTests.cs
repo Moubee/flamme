@@ -40,10 +40,10 @@ public class ArrayConversionTests : IAsyncDisposable
         await Assert.That(result).IsOfType(typeof(object[]));
         await Assert.That(((object[])result!).Cast<double>()).IsEquivalentTo(
             [2.0, 4.0, 8.0],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<double>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(numbers).IsEquivalentTo(
             [8.0, 4.0, 2.0],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<double>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

@@ -13,7 +13,7 @@ public class RaceJoinLoopWorkflow : WorkflowBase
 {
     protected override void Build(IWorkflowBuilder builder)
     {
-        var counter = builder.WithVariable(0);
+        var counter = builder.WithVariable("Counter", 0);
         var start = new WriteLine("Start");
         var whichPath = new FlowDecision(context => counter.Get(context) == 0);
         var isSecondPass = new FlowDecision(context => counter.Get(context) == 2);

@@ -35,7 +35,7 @@ public class QuiescenceSignalPersistFailureTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             sut.PauseAsync("maintenance", "op", CancellationToken.None).AsTask());
 
-        await Assert.That(ex.Message).IsEqualTo("boom-save");
+        await Assert.That(ex!.Message).IsEqualTo("boom-save");
         await Assert.That(sut.CurrentState.Reason.HasFlag(QuiescenceReason.AdministrativePause)).IsFalse();
         await Assert.That(store.Pairs.ContainsKey(PauseKey)).IsFalse();
 
@@ -58,7 +58,7 @@ public class QuiescenceSignalPersistFailureTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             sut.ResumeAsync("op", CancellationToken.None).AsTask());
 
-        await Assert.That(ex.Message).IsEqualTo("boom-delete");
+        await Assert.That(ex!.Message).IsEqualTo("boom-delete");
         await Assert.That(sut.CurrentState.Reason.HasFlag(QuiescenceReason.AdministrativePause)).IsTrue();
         await Assert.That(store.Pairs.ContainsKey(PauseKey)).IsTrue();
     }

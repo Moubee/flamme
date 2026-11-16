@@ -147,7 +147,7 @@ public abstract class UserTaskGuestSessionConformanceTests(UserTaskStoreFixture 
 
         // The credential is a bearer secret: the store keeps a hash, so nothing it exposes can be replayed.
         var resolvedSession = await Assert.That(session).IsNotNull();
-        await Assert.That(System.Text.Json.JsonSerializer.Serialize(resolvedSession)).DoesNotContain(issued.Token!, StringComparison.Ordinal);
+        await Assert.That(System.Text.Json.JsonSerializer.Serialize(resolvedSession, TestJsonSerializerContext.Default.UserTaskGuestSession)).DoesNotContain(issued.Token!, StringComparison.Ordinal);
     }
 
     private Task<GuestSessionResult> IssueAsync(UserTaskInvitation invitation, ParticipantReference subject) =>

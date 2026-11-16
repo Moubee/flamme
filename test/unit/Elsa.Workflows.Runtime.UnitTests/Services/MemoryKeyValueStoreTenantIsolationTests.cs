@@ -189,7 +189,7 @@ public class MemoryKeyValueStoreTenantIsolationTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             tenantB.SaveAsync(Pair("shared", "b", "tenant-b"), CancellationToken.None));
 
-        await Assert.That(ex.Message).Contains("shared");
+        await Assert.That(ex!.Message).Contains("shared");
         var remaining = await tenantA.FindAsync(new KeyValueFilter { Key = "shared" }, CancellationToken.None);
         await Assert.That(remaining).IsNotNull();
         await Assert.That(remaining.SerializedValue).IsEqualTo("a");

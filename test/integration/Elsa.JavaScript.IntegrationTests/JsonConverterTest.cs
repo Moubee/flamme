@@ -34,7 +34,7 @@ public class JsonConverterTest : IAsyncDisposable
         {
             Converters = { new BigIntegerJsonConverter() }
         };
-        var serializedText = JsonSerializer.Serialize(result, options);
+        var serializedText = JsonSerializer.Serialize((ExpandoObject)result, new TestJsonSerializerContext(options).ExpandoObject);
 
         await Assert.That(serializedText).IsEqualTo("{\"BigNumber\":7239948466988781569}");
     }
@@ -49,7 +49,7 @@ public class JsonConverterTest : IAsyncDisposable
 }";
         var expressionExecutionContext = new ExpressionExecutionContext(_serviceProvider, new MemoryRegister());
         var result = (await javaScriptEvaluator.EvaluateAsync(script, typeof(ExpandoObject), expressionExecutionContext))!;
-        var serializedText = JsonSerializer.Serialize(result);
+        var serializedText = JsonSerializer.Serialize((ExpandoObject)result, TestJsonSerializerContext.Default.ExpandoObject);
 
         await Assert.That(serializedText).IsEqualTo("{\"BigNumber\":{\"IsPowerOfTwo\":false,\"IsZero\":false,\"IsOne\":false,\"IsEven\":false,\"Sign\":1}}");
     }
@@ -63,7 +63,7 @@ public class JsonConverterTest : IAsyncDisposable
             Converters = { new BigIntegerJsonConverter() }
         };
 
-        BigInteger bigInteger = JsonSerializer.Deserialize<BigInteger>("7239948466988781569", options);
+        BigInteger bigInteger = JsonSerializer.Deserialize("7239948466988781569", new TestJsonSerializerContext(options).BigInteger);
 
         await Assert.That(bigInteger).IsEqualTo(BigInteger.Parse("7239948466988781569"));
     }

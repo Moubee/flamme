@@ -107,7 +107,7 @@ public class OutputConverterRegistryTests
         // Assert
         await Assert.That(ids).IsEquivalentTo(
             ["sample.first", "sample.second"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class OutputConverterRegistryTests
         // Assert
         await Assert.That(ids).IsEquivalentTo(
             ["source.base", "source.exact", "source.interface"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

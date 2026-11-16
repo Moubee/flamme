@@ -13,7 +13,7 @@ public class RequestSizeLimitWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
 
-        var parsedContentVariable = builder.WithVariable<object>();
+        var parsedContentVariable = builder.WithVariable<object>("ParsedContent", default!);
 
         builder.Root = new Sequence
         {

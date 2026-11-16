@@ -67,7 +67,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var sut = BuildSut();
         var exception = await Assert.ThrowsExactlyAsync<AggregateException>(() => sut.DrainAsync(DrainTrigger.OperatorForce).AsTask());
 
-        await Assert.That(exception.Flatten().InnerExceptions).Contains(inner => inner is OutOfMemoryException);
+        await Assert.That(exception!.Flatten().InnerExceptions).Contains(inner => inner is OutOfMemoryException);
     }
 
     [Test]

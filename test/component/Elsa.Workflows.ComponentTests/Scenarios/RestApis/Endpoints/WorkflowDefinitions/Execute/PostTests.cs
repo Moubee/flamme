@@ -20,7 +20,7 @@ public class PostTests(App app) : AppComponentTest(app)
         var requestBody = JsonSerializer.Serialize(new PostRequest
         {
             CorrelationId = Guid.NewGuid().ToString()
-        });
+        }, TestJsonSerializerContext.Default.PostRequest);
         using var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
         using var response = await client.PostAsync(string.Format(Url, DefinitionId), content);
         var model = await response.ReadAsJsonAsync<Response>(WorkflowServer.Services);

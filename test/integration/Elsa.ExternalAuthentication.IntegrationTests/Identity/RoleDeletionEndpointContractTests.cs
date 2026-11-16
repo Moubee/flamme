@@ -37,7 +37,7 @@ public sealed class RoleDeletionEndpointContractTests : WebApplicationTest<RoleD
                 ["confirmRemoveFromEditableJitPolicies"] = true,
                 ["confirmEmptyDefaultRoles"] = true,
                 ["confirmBestEffort"] = true,
-                ["selectedReferences"] = new JsonArray { new JsonObject { ["source"] = "external-authentication", ["ownerId"] = "connection-a" } },
+                ["selectedReferences"] = new JsonArray(new JsonObject { ["source"] = "external-authentication", ["ownerId"] = "connection-a" }),
                 ["replacementRoleId"] = "replacement-role"
             });
 

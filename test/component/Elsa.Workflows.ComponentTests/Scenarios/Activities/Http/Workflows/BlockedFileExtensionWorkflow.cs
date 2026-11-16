@@ -15,7 +15,7 @@ public class BlockedFileExtensionWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
         
-        var filesVariable = builder.WithVariable<IFormFile[]>();
+        var filesVariable = builder.WithVariable<IFormFile[]>("Files", default!);
         
         var httpEndpoint = new HttpEndpoint
         {

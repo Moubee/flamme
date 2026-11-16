@@ -4,7 +4,9 @@ using Elsa.Expressions.Models;
 using Elsa.Extensions;
 using Elsa.Testing.Shared;
 using Jint;
+using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.JavaScript.IntegrationTests;
@@ -50,7 +52,11 @@ public class ExecutionConstraintTests : IAsyncDisposable
         await AssertAbortedByAsync<ExecutionCanceledException>(() => EvaluateAsync(
             services,
             "cancel(); " + InfiniteLoop,
-            engine => engine.SetValue("cancel", (Action)cancellationTokenSource.Cancel),
+            engine => engine.SetValue("cancel", new ClrFunction(engine, "cancel", (_, _) =>
+            {
+                cancellationTokenSource.Cancel();
+                return JsValue.Undefined;
+            })),
             cancellationTokenSource.Token));
     }
 

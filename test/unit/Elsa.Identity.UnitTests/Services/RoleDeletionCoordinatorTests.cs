@@ -192,7 +192,7 @@ public class RoleDeletionCoordinatorTests
         var confirmation = (RoleDeletionOperationResult.ConfirmationRequired)result;
         await Assert.That(confirmation.Warnings).IsEquivalentTo(
             ["confirm_remove_from_editable_jit_policies", "removes_last_default_role", "confirm_best_effort"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

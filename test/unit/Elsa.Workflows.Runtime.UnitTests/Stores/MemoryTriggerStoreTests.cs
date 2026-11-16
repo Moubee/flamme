@@ -147,7 +147,7 @@ public class MemoryTriggerStoreTests
         var exception = await Assert.That(() => store.SaveAsync(Trigger("id-2", hash: "hash-1")).AsTask())
             .ThrowsExactly<InvalidOperationException>();
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         var stored = (await store.FindManyAsync(new TriggerFilter())).ToList();
         var onlyTrigger = await Assert.That(stored).HasSingleItem();
         await Assert.That(onlyTrigger.Id).IsEqualTo("id-1");
@@ -176,7 +176,7 @@ public class MemoryTriggerStoreTests
         var exception = await Assert.That(() => store.SaveManyAsync([Trigger("id-2", hash: "hash-1")]).AsTask())
             .ThrowsExactly<InvalidOperationException>();
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         var stored = (await store.FindManyAsync(new TriggerFilter())).ToList();
         var onlyTrigger = await Assert.That(stored).HasSingleItem();
         await Assert.That(onlyTrigger.Id).IsEqualTo("id-1");

@@ -76,6 +76,6 @@ public class FlowSendHttpRequestResilienceTests : IAsyncDisposable
         await Assert.That(statusCode).IsEqualTo(200);
         await Assert.That(_recorder.Attempts.Select(x => x.AttemptNumber)).IsEquivalentTo(
             [0, 1],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 }

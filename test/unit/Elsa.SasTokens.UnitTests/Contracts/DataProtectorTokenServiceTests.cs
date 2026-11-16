@@ -1,10 +1,11 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Elsa.SasTokens.Contracts;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace Elsa.SasTokens.UnitTests.Contracts;
 
-public class DataProtectorTokenServiceTests : IDisposable
+public partial class DataProtectorTokenServiceTests : IDisposable
 {
     private readonly string _keyDirectory = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
     private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -57,7 +58,7 @@ public class DataProtectorTokenServiceTests : IDisposable
     public async Task TryDecryptToken_LegacyTimeLimitedTokenBeforeExpiration_ReturnsPayload()
     {
         var payload = new TokenPayload("workflow-instance-1", "bookmark-1");
-        var json = JsonSerializer.Serialize(payload);
+        var json = JsonSerializer.Serialize(payload, TokenJsonContext.Default.TokenPayload);
         var token = _dataProtectionProvider.CreateProtector("Elsa Tokens").ToTimeLimitedDataProtector().Protect(json, TimeSpan.FromMinutes(5));
 
         var result = _service.TryDecryptToken<TokenPayload>(token, out var decryptedPayload);
@@ -70,7 +71,7 @@ public class DataProtectorTokenServiceTests : IDisposable
     public async Task TryDecryptToken_LegacyNonExpiringToken_ReturnsPayload()
     {
         var payload = new TokenPayload("workflow-instance-1", "bookmark-1");
-        var json = JsonSerializer.Serialize(payload);
+        var json = JsonSerializer.Serialize(payload, TokenJsonContext.Default.TokenPayload);
         var token = _dataProtectionProvider.CreateProtector("Elsa Tokens").Protect(json);
 
         var result = _service.TryDecryptToken<TokenPayload>(token, out var decryptedPayload);
@@ -108,4 +109,7 @@ public class DataProtectorTokenServiceTests : IDisposable
     }
 
     private record TokenPayload(string WorkflowInstanceId, string BookmarkId);
+
+    [JsonSerializable(typeof(TokenPayload))]
+    private partial class TokenJsonContext : JsonSerializerContext;
 }

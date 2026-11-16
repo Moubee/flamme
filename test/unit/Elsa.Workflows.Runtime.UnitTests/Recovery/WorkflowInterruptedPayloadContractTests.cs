@@ -21,8 +21,8 @@ public class WorkflowInterruptedPayloadContractTests
             IngressSourceName: "http.trigger",
             ExecutionCycleDuration: TimeSpan.FromSeconds(7));
 
-        var json = JsonSerializer.Serialize(original);
-        var deserialized = JsonSerializer.Deserialize<WorkflowInterruptedPayload>(json);
+        var json = JsonSerializer.Serialize(original, TestJsonSerializerContext.Default.WorkflowInterruptedPayload);
+        var deserialized = JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.WorkflowInterruptedPayload);
 
         await Assert.That(deserialized).IsEqualTo(original);
     }
@@ -40,8 +40,8 @@ public class WorkflowInterruptedPayloadContractTests
             IngressSourceName: null,
             ExecutionCycleDuration: TimeSpan.FromMilliseconds(50));
 
-        var json = JsonSerializer.Serialize(original);
-        var deserialized = await Assert.That(JsonSerializer.Deserialize<WorkflowInterruptedPayload>(json)).IsNotNull();
+        var json = JsonSerializer.Serialize(original, TestJsonSerializerContext.Default.WorkflowInterruptedPayload);
+        var deserialized = await Assert.That(JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.WorkflowInterruptedPayload)).IsNotNull();
 
         await Assert.That(deserialized.LastActivityId).IsNull();
         await Assert.That(deserialized.IngressSourceName).IsNull();
@@ -71,7 +71,7 @@ public class WorkflowInterruptedPayloadContractTests
             IngressSourceName: "src",
             ExecutionCycleDuration: TimeSpan.FromSeconds(1));
 
-        var json = JsonSerializer.Serialize(payload);
+        var json = JsonSerializer.Serialize(payload, TestJsonSerializerContext.Default.WorkflowInterruptedPayload);
 
         await Assert.That(json).Contains("\"InterruptedAt\"").WithComparison(StringComparison.CurrentCulture);
         await Assert.That(json).Contains("\"Reason\"").WithComparison(StringComparison.CurrentCulture);

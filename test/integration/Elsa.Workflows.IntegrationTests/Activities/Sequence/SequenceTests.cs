@@ -62,7 +62,7 @@ public class SequenceTests : IAsyncDisposable
         {
             "Outer: Start",
             "Inner: Activity 1"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(lines).DoesNotContain("Inner: Activity 2 (should not execute)");
         await Assert.That(lines).DoesNotContain("Outer: After inner sequence");
         await Assert.That(lines).DoesNotContain("Outer: End");

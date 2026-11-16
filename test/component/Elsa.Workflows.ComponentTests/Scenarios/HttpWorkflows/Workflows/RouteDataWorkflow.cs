@@ -8,7 +8,7 @@ public class RouteDataWorkflow : WorkflowBase
 {
     protected override void Build(IWorkflowBuilder builder)
     {
-        var routeDataVariable = builder.WithVariable<IDictionary<string, object>>();
+        var routeDataVariable = builder.WithVariable<IDictionary<string, object>>("RouteData", default!);
         
         builder.Root = new Sequence
         {

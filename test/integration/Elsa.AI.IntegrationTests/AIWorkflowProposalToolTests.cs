@@ -32,7 +32,7 @@ public class AIWorkflowProposalToolTests
                 {
                     ["activities"] = new JsonArray
                     {
-                        new JsonObject { ["id"] = "a1", ["type"] = "Elsa.Http.HttpEndpoint" }
+                        (JsonNode)new JsonObject { ["id"] = "a1", ["type"] = "Elsa.Http.HttpEndpoint" }
                     }
                 },
                 ["rationale"] = "Create an HTTP-triggered workflow."

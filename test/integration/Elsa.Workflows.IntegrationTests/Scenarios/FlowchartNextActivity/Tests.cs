@@ -109,7 +109,7 @@ public class FlowchartNextActivityTests : IAsyncDisposable
         await Assert.That(lines).IsEquivalentTo(new[]
         {
             "A", "B", "D", "E", "A", "B", "E", "E", "F"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class FlowchartNextActivityTests : IAsyncDisposable
         await Assert.That(lines).IsEquivalentTo(new[]
         {
             "A", "B", "C", "D", "E"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -256,7 +256,7 @@ public class FlowchartNextActivityTests : IAsyncDisposable
         await Assert.That(lines).IsEquivalentTo(new[]
         {
             "A", "B", "C", "D", "A", "B", "C", "D", "A", "B", "C", "D"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -328,7 +328,7 @@ public class FlowchartNextActivityTests : IAsyncDisposable
         await Assert.That(lines).IsEquivalentTo(new[]
         {
             "A", "A", "A", "B"
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

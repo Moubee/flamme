@@ -322,7 +322,7 @@ public class ExecutionCycleRegistryTests
 
         var exception = await Assert.That(() => handle.TryCancel()).ThrowsExactly<AggregateException>();
 
-        await Assert.That(exception.Flatten().InnerExceptions).Contains(inner => inner is OutOfMemoryException);
+        await Assert.That(exception!.Flatten().InnerExceptions).Contains(inner => inner is OutOfMemoryException);
         handle.Dispose();
         await Assert.That(handle.Disposed.IsCompletedSuccessfully).IsTrue();
     }

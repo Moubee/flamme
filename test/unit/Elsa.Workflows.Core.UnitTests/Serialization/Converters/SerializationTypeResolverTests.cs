@@ -44,7 +44,7 @@ public sealed class SerializationTypeResolverTests
     [Arguments("ObjectDictionary", typeof(IDictionary<string, object>))]
     public async Task When_DeserializeRegisteredTypeAlias_Then_ReturnsExpectedType(string typeAlias, Type expectedType)
     {
-        var result = JsonSerializer.Deserialize<Type>(JsonSerializer.Serialize(typeAlias), _options);
+        var result = JsonSerializer.Deserialize(JsonSerializer.Serialize(typeAlias, TestJsonSerializerContext.Default.String), TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(result).IsEqualTo(expectedType);
     }
@@ -54,7 +54,7 @@ public sealed class SerializationTypeResolverTests
     {
         var typeAlias = typeof(RegisteredPayload).GetSimpleAssemblyQualifiedName();
 
-        var result = JsonSerializer.Deserialize<Type>(JsonString(typeAlias), _options);
+        var result = JsonSerializer.Deserialize(JsonString(typeAlias), TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(result).IsEqualTo(typeof(RegisteredPayload));
     }
@@ -62,7 +62,7 @@ public sealed class SerializationTypeResolverTests
     [Test]
     public async Task When_DeserializeRegisteredTypeAliasWithDifferentCasing_Then_ReturnsExpectedType()
     {
-        var result = JsonSerializer.Deserialize<Type>(JsonString("registeredpayload"), _options);
+        var result = JsonSerializer.Deserialize(JsonString("registeredpayload"), TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(result).IsEqualTo(typeof(RegisteredPayload));
     }
@@ -72,7 +72,7 @@ public sealed class SerializationTypeResolverTests
     {
         var typeAlias = typeof(List<RegisteredPayload>).GetSimpleAssemblyQualifiedName();
 
-        var result = JsonSerializer.Deserialize<Type>(JsonString(typeAlias), _options);
+        var result = JsonSerializer.Deserialize(JsonString(typeAlias), TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(result).IsEqualTo(typeof(List<RegisteredPayload>));
     }
@@ -90,9 +90,9 @@ public sealed class SerializationTypeResolverTests
     [Arguments(typeof(FaultException), "FaultException")]
     public async Task When_SerializeSupportedType_Then_EmitsAliasThatCanBeDeserialized(Type type, string expectedAlias)
     {
-        var json = JsonSerializer.Serialize(type, _options);
-        var alias = JsonSerializer.Deserialize<string>(json);
-        var result = JsonSerializer.Deserialize<Type>(json, _options);
+        var json = JsonSerializer.Serialize(type, TestJsonTypeInfo.FromConverter<Type>(_options));
+        var alias = JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.String);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(alias).IsEqualTo(expectedAlias);
         await Assert.That(result).IsEqualTo(type);
@@ -107,9 +107,9 @@ public sealed class SerializationTypeResolverTests
     [Arguments(typeof(ISet<string>), "HashSet<String>", typeof(HashSet<string>))]
     public async Task When_SerializeInterfaceCollectionType_Then_EmitsInstantiableAlias(Type type, string expectedAlias, Type expectedRoundTripType)
     {
-        var json = JsonSerializer.Serialize(type, _options);
-        var alias = JsonSerializer.Deserialize<string>(json);
-        var result = JsonSerializer.Deserialize<Type>(json, _options);
+        var json = JsonSerializer.Serialize(type, TestJsonTypeInfo.FromConverter<Type>(_options));
+        var alias = JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.String);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(alias).IsEqualTo(expectedAlias);
         await Assert.That(result).IsEqualTo(expectedRoundTripType);
@@ -122,8 +122,8 @@ public sealed class SerializationTypeResolverTests
         _workflowJsonTypeRegistry.RegisterType(typeof(JObject), nameof(JObject));
         _workflowJsonTypeRegistry.RegisterType(typeof(JArray), nameof(JArray));
 
-        var json = JsonSerializer.Serialize(value, _options);
-        var result = JsonSerializer.Deserialize<object>(json, _options);
+        var json = JsonSerializer.Serialize(value, TestJsonTypeInfo.FromConverter<object>(_options));
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options));
 
         await Assert.That(result).IsOfType(expectedType);
     }
@@ -134,9 +134,9 @@ public sealed class SerializationTypeResolverTests
     [Arguments(typeof(List<System.Text.StringBuilder>))]
     public async Task When_SerializeUnsupportedType_Then_EmitsSafeUnregisteredTypeAlias(Type type)
     {
-        var json = JsonSerializer.Serialize(type, _options);
-        var alias = JsonSerializer.Deserialize<string>(json);
-        var result = JsonSerializer.Deserialize<Type>(json, _options);
+        var json = JsonSerializer.Serialize(type, TestJsonTypeInfo.FromConverter<Type>(_options));
+        var alias = JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.String);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Type>(_options));
 
         await Assert.That(alias).StartsWith("UnregisteredClrType:");
         await Assert.That(result).IsEqualTo(typeof(Exception));
@@ -147,8 +147,8 @@ public sealed class SerializationTypeResolverTests
     {
         var exceptionState = ExceptionState.FromException(new NullReferenceException("Test"));
 
-        var json = JsonSerializer.Serialize(exceptionState, _options);
-        var result = JsonSerializer.Deserialize<ExceptionState>(json, _options)!;
+        var json = JsonSerializer.Serialize(exceptionState, new TestJsonSerializerContext(new JsonSerializerOptions(_options)).ExceptionState);
+        var result = JsonSerializer.Deserialize(json, new TestJsonSerializerContext(new JsonSerializerOptions(_options)).ExceptionState)!;
 
         await Assert.That(json).Contains("UnregisteredClrType:");
         await Assert.That(result.Type).IsEqualTo(typeof(Exception));
@@ -213,15 +213,15 @@ public sealed class SerializationTypeResolverTests
         var expressionRegistry = new WellKnownTypeRegistry(Microsoft.Extensions.Options.Options.Create(expressionOptions));
 
         await Assert.That(expressionRegistry.TryGetType("ExpressionOnlyPayload", out _)).IsTrue();
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<Type>(JsonString("ExpressionOnlyPayload"), _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(JsonString("ExpressionOnlyPayload"), TestJsonTypeInfo.FromConverter<Type>(_options)));
     }
 
     [Test]
     public async Task When_SerializePolymorphicObjectWithUnregisteredType_Then_OmitsTypeMetadata()
     {
-        var json = JsonSerializer.Serialize<object>(new UnregisteredPayload { Name = "Alice" }, _options);
+        var json = JsonSerializer.Serialize<object>(new UnregisteredPayload { Name = "Alice" }, TestJsonTypeInfo.FromConverter<object>(_options));
 
-        var result = JsonSerializer.Deserialize<object>(json, _options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options));
 
         await Assert.That(json).DoesNotContain("\"_type\"");
         var payload = (await Assert.That(result).IsAssignableTo<IDictionary<string, object>>())!;
@@ -231,7 +231,7 @@ public sealed class SerializationTypeResolverTests
     [Test]
     public void When_DeserializeUnknownAssemblyQualifiedTypeAlias_Then_ThrowsJsonException()
     {
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<Type>(JsonString(UnsafeAssemblyQualifiedTypeAlias), _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(JsonString(UnsafeAssemblyQualifiedTypeAlias), TestJsonTypeInfo.FromConverter<Type>(_options)));
     }
 
     [Test]
@@ -239,7 +239,7 @@ public sealed class SerializationTypeResolverTests
     {
         var typeAlias = $"List<{UnsafeAssemblyQualifiedTypeAlias}>";
 
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<Type>(JsonString(typeAlias), _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(JsonString(typeAlias), TestJsonTypeInfo.FromConverter<Type>(_options)));
     }
 
     [Test]
@@ -252,7 +252,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        var result = JsonSerializer.Deserialize<object>(json, _options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options));
 
         var payload = (await Assert.That(result).IsTypeOf<RegisteredPayload>())!;
         await Assert.That(payload.Name).IsEqualTo("Alice");
@@ -274,7 +274,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        var result = JsonSerializer.Deserialize<object>(json, _options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options));
 
         await Assert.That(result).IsOfType(expectedType);
     }
@@ -289,7 +289,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<object>(json, _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options)));
     }
 
     [Test]
@@ -302,7 +302,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<object>(json, _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(_options)));
     }
 
     [Test]
@@ -316,7 +316,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<object>(json, options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<object>(options)));
     }
 
     [Test]
@@ -331,7 +331,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        var result = JsonSerializer.Deserialize<IDictionary<string, object>>(json, _options)!;
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<IDictionary<string, object>>(_options))!;
 
         var payload = (await Assert.That(result["payload"]).IsTypeOf<RegisteredPayload>())!;
         await Assert.That(payload.Name).IsEqualTo("Alice");
@@ -349,7 +349,7 @@ public sealed class SerializationTypeResolverTests
         }
         """;
 
-        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<IDictionary<string, object>>(json, _options));
+        Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<IDictionary<string, object>>(_options)));
     }
 
     [Test]
@@ -394,7 +394,7 @@ public sealed class SerializationTypeResolverTests
         }
     };
 
-    private static string JsonString(string value) => JsonSerializer.Serialize(value);
+    private static string JsonString(string value) => JsonSerializer.Serialize(value, TestJsonSerializerContext.Default.String);
 
     public static IEnumerable<Func<(object Value, Type ExpectedType)>> JsonIslandValues()
     {

@@ -16,7 +16,7 @@ public sealed class ExpressionJsonConverterTests
         const string json = """{"type":"JavaScript","value":"getVariable('x') > 0"}""";
 
         // Act
-        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize<Expression>(json, options));
+        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Expression>(options)));
 
         // Assert
         await Assert.That(exception.Message).Contains("JavaScript");
@@ -30,7 +30,7 @@ public sealed class ExpressionJsonConverterTests
         var expression = new Expression("JavaScript", "getVariable('x') > 0");
 
         // Act
-        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Serialize(expression, options));
+        var exception = Assert.ThrowsExactly<JsonException>(() => JsonSerializer.Serialize(expression, TestJsonTypeInfo.FromConverter<Expression>(options)));
 
         // Assert
         await Assert.That(exception.Message).Contains("JavaScript");
@@ -44,7 +44,7 @@ public sealed class ExpressionJsonConverterTests
         const string json = """{"type":"Literal","value":"hello"}""";
 
         // Act
-        var result = JsonSerializer.Deserialize<Expression>(json, options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Expression>(options));
 
         // Assert
         await Assert.That(result).IsNotNull();
@@ -61,7 +61,7 @@ public sealed class ExpressionJsonConverterTests
         var options = CreateOptions();
 
         // Act
-        var result = JsonSerializer.Deserialize<Expression>(json, options);
+        var result = JsonSerializer.Deserialize(json, TestJsonTypeInfo.FromConverter<Expression>(options));
 
         // Assert
         await Assert.That(result).IsNull();

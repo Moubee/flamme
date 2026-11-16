@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Elsa.Common.Serialization;
 using Microsoft.Extensions.Configuration;
 
@@ -17,7 +18,7 @@ public class ConfigurationJsonConverterTests
         }
         """;
 
-        var configuration = JsonSerializer.Deserialize<IConfiguration>(json, CreateOptions())!;
+        var configuration = JsonSerializer.Deserialize(json, CreateTypeInfo(CreateOptions()))!;
 
         await Assert.That(configuration["Greeting"]).IsEqualTo("Hello! 你好! مرحبا! Здравствуйте! 🎉🎊");
         await Assert.That(configuration["Nested:Enabled"]).IsEqualTo("True");
@@ -40,7 +41,7 @@ public class ConfigurationJsonConverterTests
         options.ReadCommentHandling = JsonCommentHandling.Skip;
         options.AllowTrailingCommas = true;
 
-        var configuration = JsonSerializer.Deserialize<IConfiguration>(json, options)!;
+        var configuration = JsonSerializer.Deserialize(json, CreateTypeInfo(options))!;
 
         await Assert.That(configuration["Greeting"]).IsEqualTo("你好 🎉");
         await Assert.That(configuration["Items:1"]).IsEqualTo("2");
@@ -49,13 +50,16 @@ public class ConfigurationJsonConverterTests
     [Test]
     public async Task Deserialize_DuplicateConfigurationKeys_ThrowsFormatException()
     {
-        await Assert.ThrowsAsync<FormatException>(() => Task.FromResult(JsonSerializer.Deserialize<IConfiguration>(
-            """{"Greeting":"first","greeting":"second"}""", CreateOptions())));
+        await Assert.ThrowsAsync<FormatException>(() => Task.FromResult(JsonSerializer.Deserialize(
+            """{"Greeting":"first","greeting":"second"}""", CreateTypeInfo(CreateOptions()))));
     }
+
+    private static JsonTypeInfo<IConfiguration> CreateTypeInfo(JsonSerializerOptions options) =>
+        JsonMetadataServices.CreateValueInfo<IConfiguration>(options, new ConfigurationJsonConverter());
 
     private static JsonSerializerOptions CreateOptions()
     {
-        var options = new JsonSerializerOptions();
+        var options = new JsonSerializerOptions { TypeInfoResolver = JsonTypeInfoResolver.Combine() };
         options.Converters.Add(new ConfigurationJsonConverter());
         return options;
     }

@@ -13,8 +13,8 @@ public class FileUploadWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
         
-        var filesVariable = builder.WithVariable<IFormFile[]>();
-        var fileVariable = builder.WithVariable<IFormFile>();
+        var filesVariable = builder.WithVariable<IFormFile[]>("Files", default!);
+        var fileVariable = builder.WithVariable<IFormFile>("File", default!);
         
         builder.Root = new Sequence
         {

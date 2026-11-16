@@ -8,7 +8,7 @@ public class ImplicitLoopWorkflow : WorkflowBase
 {
     protected override void Build(IWorkflowBuilder builder)
     {
-        var counterVariable = builder.WithVariable(0);
+        var counterVariable = builder.WithVariable("Counter", 0);
         var start = new WriteLine("Start");
         var incrementCounter = new SetVariable<int>(counterVariable, context => counterVariable.Get(context) + 1);
         var counterGreaterThanOne = new FlowDecision(context => counterVariable.Get(context) > 1);

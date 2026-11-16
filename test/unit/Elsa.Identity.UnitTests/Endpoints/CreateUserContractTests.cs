@@ -34,7 +34,7 @@ public class CreateUserContractTests
 
         await Assert.That(properties).IsEquivalentTo(
             ["GeneratedPassword", "Id", "Name", "Roles", "TenantId"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(properties).DoesNotContain(x => x.Contains("Hash", StringComparison.OrdinalIgnoreCase) || x.Contains("Salt", StringComparison.OrdinalIgnoreCase));
     }
 

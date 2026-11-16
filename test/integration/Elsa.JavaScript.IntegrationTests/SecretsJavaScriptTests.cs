@@ -35,7 +35,7 @@ public class SecretsJavaScriptTests : IAsyncDisposable
         await Assert.That(result).IsEqualTo("secret-value");
         await Assert.That(_secretResolver.ResolvedNames).IsEquivalentTo(
             ["api:key"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

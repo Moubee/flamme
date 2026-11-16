@@ -80,7 +80,7 @@ public class MemoryAlterationJobStoreTenantIsolationTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => tenantB.SaveAsync(Job("shared", "tenant-b")));
         var remaining = await tenantA.FindAsync(new AlterationJobFilter { Id = "shared" });
 
-        await Assert.That(ex.Message).Contains("shared");
+        await Assert.That(ex!.Message).Contains("shared");
         await Assert.That(remaining).IsNotNull();
         await Assert.That(remaining.TenantId).IsEqualTo("tenant-a");
     }
@@ -113,7 +113,7 @@ public class MemoryAlterationJobStoreTenantIsolationTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => tenantB.SaveAsync(Job("shared", "tenant-a")));
         var remaining = await tenantA.FindAsync(new AlterationJobFilter { Id = "shared" });
 
-        await Assert.That(ex.Message).Contains("shared");
+        await Assert.That(ex!.Message).Contains("shared");
         await Assert.That(remaining).IsNotNull();
         await Assert.That(remaining.TenantId).IsEqualTo("tenant-a");
     }
@@ -146,7 +146,7 @@ public class MemoryAlterationJobStoreTenantIsolationTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => tenantB.SaveAsync(Job("shared", "tenant-b")));
         var remaining = await agnostic.FindAsync(new AlterationJobFilter { Id = "shared" });
 
-        await Assert.That(ex.Message).Contains("shared");
+        await Assert.That(ex!.Message).Contains("shared");
         await Assert.That(remaining).IsNotNull();
         await Assert.That(remaining.TenantId).IsEqualTo(Tenant.AgnosticTenantId);
     }
@@ -162,7 +162,7 @@ public class MemoryAlterationJobStoreTenantIsolationTests
         var ex = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => agnostic.SaveAsync(Job("shared", "tenant-b")));
         var remaining = await agnostic.FindAsync(new AlterationJobFilter { Id = "shared" });
 
-        await Assert.That(ex.Message).Contains("shared");
+        await Assert.That(ex!.Message).Contains("shared");
         await Assert.That(remaining).IsNotNull();
         await Assert.That(remaining.TenantId).IsEqualTo(Tenant.AgnosticTenantId);
     }

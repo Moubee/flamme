@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Elsa.Workflows.Helpers;
 using Elsa.Workflows.Options;
 using Elsa.Workflows.Runtime.Comparers;
@@ -27,9 +28,9 @@ public class WorkflowTriggerEqualityComparerTests
     /// <summary>
     /// A simple payload class that mimics real trigger payloads like HttpEndpointBookmarkPayload.
     /// </summary>
-    private record TestPayload(string Path, string Method);
-    private record TypedPayload(Type PayloadType, object Value);
-    private record NestedPayload(string Name);
+    internal record TestPayload(string Path, string Method);
+    internal record TypedPayload(Type PayloadType, object Value);
+    internal record NestedPayload(string Name);
 
     [Test]
     [DisplayName("Fresh and round-tripped triggers with identical logical content should be considered equal")]
@@ -95,18 +96,18 @@ public class WorkflowTriggerEqualityComparerTests
         var payload = new TestPayload("/api/test", "GET");
 
         // What WorkflowTriggerEqualityComparer produces for a fresh payload (PascalCase, no naming policy):
-        var freshJson = JsonSerializer.Serialize(payload, ComparerOptions);
+        var freshJson = JsonSerializer.Serialize(payload, (JsonTypeInfo<TestPayload>)ComparerOptions.GetTypeInfo(typeof(TestPayload)));
         // Result: {"Path":"/api/test","Method":"GET"}
 
         // What IPayloadSerializer stores in the DB (camelCase):
-        var storedJson = JsonSerializer.Serialize(payload, PayloadSerializerOptions);
+        var storedJson = JsonSerializer.Serialize(payload, (JsonTypeInfo<TestPayload>)PayloadSerializerOptions.GetTypeInfo(typeof(TestPayload)));
         // Result: {"path":"/api/test","method":"GET"}
 
         // After loading from DB, Deserialize<object> returns a JsonElement
-        var roundTrippedPayload = JsonSerializer.Deserialize<object>(storedJson, PayloadSerializerOptions);
+        var roundTrippedPayload = JsonSerializer.Deserialize(storedJson, (JsonTypeInfo<object>)PayloadSerializerOptions.GetTypeInfo(typeof(object)));
 
         // When WorkflowTriggerEqualityComparer serializes the round-tripped payload:
-        var roundTrippedJson = JsonSerializer.Serialize(roundTrippedPayload, ComparerOptions);
+        var roundTrippedJson = JsonSerializer.Serialize(roundTrippedPayload!, (JsonTypeInfo<object>)ComparerOptions.GetTypeInfo(typeof(object)));
         // Result: {"path":"/api/test","method":"GET"} — camelCase preserved from JsonElement!
 
         // The mismatch:
@@ -122,7 +123,7 @@ public class WorkflowTriggerEqualityComparerTests
         var payload = new TypedPayload(typeof(NestedPayload), new NestedPayload("orders"));
         var comparer = new WorkflowTriggerEqualityComparer(CreateTypeRegistry());
         var trigger = CreateTrigger("trigger-1", payload);
-        var expectedAliasPayload = JsonSerializer.Deserialize<object>(
+        var expectedAliasPayload = JsonSerializer.Deserialize(
             """
             {
               "payloadType": "NestedPayload",
@@ -132,8 +133,8 @@ public class WorkflowTriggerEqualityComparerTests
               }
             }
             """,
-            PayloadSerializerOptions);
-        var assemblyQualifiedPayload = JsonSerializer.Deserialize<object>(
+            (JsonTypeInfo<object>)PayloadSerializerOptions.GetTypeInfo(typeof(object)));
+        var assemblyQualifiedPayload = JsonSerializer.Deserialize(
             $$"""
             {
               "payloadType": "{{typeof(NestedPayload).AssemblyQualifiedName}}",
@@ -143,8 +144,8 @@ public class WorkflowTriggerEqualityComparerTests
               }
             }
             """,
-            PayloadSerializerOptions);
-        var missingTypePayload = JsonSerializer.Deserialize<object>(
+            (JsonTypeInfo<object>)PayloadSerializerOptions.GetTypeInfo(typeof(object)));
+        var missingTypePayload = JsonSerializer.Deserialize(
             """
             {
               "payloadType": "NestedPayload",
@@ -153,7 +154,7 @@ public class WorkflowTriggerEqualityComparerTests
               }
             }
             """,
-            PayloadSerializerOptions);
+            (JsonTypeInfo<object>)PayloadSerializerOptions.GetTypeInfo(typeof(object)));
 
         await Assert.That(comparer.Equals(trigger, CreateTrigger("trigger-2", expectedAliasPayload!))).IsTrue();
         await Assert.That(comparer.Equals(trigger, CreateTrigger("trigger-3", assemblyQualifiedPayload!))).IsFalse();
@@ -165,6 +166,7 @@ public class WorkflowTriggerEqualityComparerTests
     /// </summary>
     private static readonly JsonSerializerOptions PayloadSerializerOptions = new()
     {
+        TypeInfoResolver = TestJsonSerializerContext.Default,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -175,6 +177,7 @@ public class WorkflowTriggerEqualityComparerTests
     /// </summary>
     private static readonly JsonSerializerOptions ComparerOptions = new()
     {
+        TypeInfoResolver = TestJsonSerializerContext.Default,
         IncludeFields = true,
         PropertyNameCaseInsensitive = true
     };
@@ -183,14 +186,14 @@ public class WorkflowTriggerEqualityComparerTests
     /// Simulates the IPayloadSerializer round-trip: serialize with camelCase, then deserialize to object.
     /// This is what happens in TriggerStore.OnSaveAsync -> DB -> TriggerStore.OnLoadAsync.
     /// </summary>
-    private static object SimulatePayloadRoundTrip(object payload)
+    private static object SimulatePayloadRoundTrip(TestPayload payload)
     {
         // Serialize (OnSaveAsync)
-        var json = JsonSerializer.Serialize(payload, PayloadSerializerOptions);
+        var json = JsonSerializer.Serialize(payload, (JsonTypeInfo<TestPayload>)PayloadSerializerOptions.GetTypeInfo(typeof(TestPayload)));
 
         // Deserialize back to object (OnLoadAsync calls Deserialize<object>)
         // System.Text.Json deserializes to JsonElement when target type is object.
-        var deserialized = JsonSerializer.Deserialize<object>(json, PayloadSerializerOptions);
+        var deserialized = JsonSerializer.Deserialize(json, (JsonTypeInfo<object>)PayloadSerializerOptions.GetTypeInfo(typeof(object)));
 
         return deserialized!;
     }

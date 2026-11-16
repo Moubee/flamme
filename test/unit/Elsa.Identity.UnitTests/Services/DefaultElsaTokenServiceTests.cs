@@ -202,7 +202,7 @@ public class DefaultElsaTokenServiceTests
     private static async Task<IReadOnlyCollection<Claim>> ValidateWithJwtBearerAsync(string token, IdentityTokenOptions options)
     {
         var result = await new JsonWebTokenHandler().ValidateTokenAsync(token, options.CreateTokenValidationParameters());
-        await Assert.That(result.IsValid).IsTrue().Because(result.Exception?.Message);
+        await Assert.That(result.IsValid).IsTrue().Because(result.Exception?.Message ?? "Token validation must succeed.");
         return result.ClaimsIdentity.Claims.ToArray();
     }
 

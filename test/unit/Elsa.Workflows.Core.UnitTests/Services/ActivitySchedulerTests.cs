@@ -32,7 +32,7 @@ public class ActivitySchedulerTests
         // The survivors come out in the same order as a scheduler that only ever held them.
         await Assert.That(TakeAll(scheduler)).IsEquivalentTo(
             TakeAll(Schedule(schedulerFactory.Create(), "a", "c")),
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class ActivitySchedulerTests
         await Assert.That(removedCount).IsEqualTo(0);
         await Assert.That(TakeAll(scheduler)).IsEquivalentTo(
             TakeAll(Schedule(schedulerFactory.Create(), "a", "b", "c")),
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

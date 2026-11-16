@@ -112,8 +112,8 @@ public class SecretStoreTests
         var missingType = await Assert.That(() => fixture.TypeRegistry.Get("missing-type")).ThrowsExactly<InvalidOperationException>();
         var missingStore = await Assert.That(() => fixture.StoreRegistry.Get("missing-store")).ThrowsExactly<InvalidOperationException>();
 
-        await Assert.That(missingType.Message).Contains("missing-type");
-        await Assert.That(missingStore.Message).Contains("missing-store");
+        await Assert.That(missingType!.Message).Contains("missing-type");
+        await Assert.That(missingStore!.Message).Contains("missing-store");
     }
 
     [Test]

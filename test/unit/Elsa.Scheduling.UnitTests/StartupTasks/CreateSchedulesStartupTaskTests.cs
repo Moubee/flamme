@@ -141,7 +141,7 @@ public class CreateSchedulesStartupTaskTests
         await Assert.That(purgedFilter.BookmarkIds?.OrderBy(x => x, StringComparer.Ordinal).ToArray()).IsEquivalentTo(new[]
             {
                 "cancelled-bookmark", "empty-instance-bookmark", "faulted-bookmark", "finished-bookmark", "missing-bookmark"
-            }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

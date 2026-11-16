@@ -8,7 +8,7 @@ public class MagicWorkflow : WorkflowBase
 {
     protected override void Build(IWorkflowBuilder builder)
     {
-        var magicNumberVariable = builder.WithVariable<int>();
+        var magicNumberVariable = builder.WithVariable<int>("MagicNumber", default!);
 
         builder.Root = new Sequence
         {

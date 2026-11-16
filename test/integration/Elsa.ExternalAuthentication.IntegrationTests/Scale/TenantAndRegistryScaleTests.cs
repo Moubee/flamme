@@ -51,7 +51,7 @@ public sealed class TenantAndRegistryScaleTests
             StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(first.LoginMethods.Select(x => x.Id)).IsEquivalentTo(
             first.LoginMethods.OrderBy(x => x.Order).ThenBy(x => x.Key, StringComparer.Ordinal).Select(x => x.Id),
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         var preferredConnection = (await Assert.That(first.LoginMethods).HasSingleItem(x => x.IsPreferred))!;
         await Assert.That(preferredConnection.Id).IsEqualTo("connection-00042");
         await Assert.That(await registry.FindByKeyAsync(string.Empty, "provider-00000")).IsNotNull();

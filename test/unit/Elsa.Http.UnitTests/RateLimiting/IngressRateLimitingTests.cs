@@ -18,6 +18,12 @@ public class IngressRateLimitingTests
 {
     private const string PolicyName = "test";
 
+    private static Task WritePongAsync(HttpContext context)
+    {
+        context.Response.ContentType = "text/plain; charset=utf-8";
+        return context.Response.WriteAsync("pong");
+    }
+
     [Test]
     public async Task UseWorkflowsApiRateLimiting_AppliesPolicyToApiPrefix()
     {
@@ -247,7 +253,7 @@ public class IngressRateLimitingTests
                 });
                 app.UseRateLimiter();
                 app.UseEndpoints(endpoints => endpoints
-                    .MapGet("/elsa/api/ping", () => "pong")
+                    .MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync)
                     .WithDisplayName("Elsa API Ping")
                     .WithMetadata(routeMetadata));
             });
@@ -291,7 +297,7 @@ public class IngressRateLimitingTests
                 });
                 app.UseRateLimiter();
                 app.UseEndpoints(endpoints => endpoints
-                    .MapGet("/elsa/api/ping", () => "pong")
+                    .MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync)
                     .RequireRateLimiting("other")
                     .DisableRateLimiting());
             });
@@ -348,7 +354,7 @@ public class IngressRateLimitingTests
                 app.UseRouting();
                 configure(app);
                 app.UseRateLimiter();
-                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", () => "pong"));
+                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync));
             });
     }
 
@@ -366,7 +372,7 @@ public class IngressRateLimitingTests
                 configure(app);
                 app.UseRateLimiter();
                 app.Run(context => context.Response.WriteAsync("ok"));
-                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", () => "pong"));
+                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync));
             });
     }
 
@@ -383,7 +389,7 @@ public class IngressRateLimitingTests
                 app.UseRouting();
                 configure(app);
                 app.UseRateLimiter();
-                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", () => "pong"));
+                app.UseEndpoints(endpoints => endpoints.MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync));
             });
     }
 

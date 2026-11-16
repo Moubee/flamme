@@ -11,8 +11,8 @@ public class LabelNameMaxLengthTests
 
         var exception = await Assert.That(() => label.Name = new string('a', Label.NameMaxLength + 1)).ThrowsExactly<ArgumentException>();
 
-        await Assert.That(exception.ParamName).IsEqualTo("Name");
-        await Assert.That(exception.Message).Contains(Label.NameMaxLength.ToString());
+        await Assert.That(exception!.ParamName).IsEqualTo("Name");
+        await Assert.That(exception!.Message).Contains(Label.NameMaxLength.ToString());
     }
 
     [Test]

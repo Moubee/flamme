@@ -12,7 +12,7 @@ public class MainWorkflow : WorkflowBase
     protected override void Build(IWorkflowBuilder builder)
     {
         builder.WithDefinitionId(DefinitionId);
-        var workflowResult = builder.WithVariable<ExecuteWorkflowResult>();
+        var workflowResult = builder.WithVariable<ExecuteWorkflowResult>("WorkflowResult", default!);
         builder.Root = new Sequence
         {
             Activities =
@@ -26,7 +26,7 @@ public class MainWorkflow : WorkflowBase
                     }),
                     Result = new(workflowResult)
                 },
-                new WriteLine(context => $"Subroutine output: {JsonSerializer.Serialize(workflowResult.Get(context))}")
+                new WriteLine(context => $"Subroutine output: {JsonSerializer.Serialize(workflowResult.Get(context), TestJsonSerializerContext.Default.ExecuteWorkflowResult)}")
             }
         };
     }

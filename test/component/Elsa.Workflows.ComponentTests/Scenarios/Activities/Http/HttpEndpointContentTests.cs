@@ -14,8 +14,7 @@ public class HttpEndpointContentTests(App app) : AppComponentTest(app)
     public async Task JsonContent_ValidJson_ReturnsEchoedJson()
     {
         // Arrange
-        var testData = new { Name = "John", Age = 30, City = "New York" };
-        var jsonContent = JsonSerializer.Serialize(testData);
+        const string jsonContent = """{"Name":"John","Age":30,"City":"New York"}""";
 
         // Act
         using var response = await PostJsonContentAsync(jsonContent);
@@ -26,7 +25,8 @@ public class HttpEndpointContentTests(App app) : AppComponentTest(app)
         await Assert.That(response.Content.Headers.ContentType?.MediaType).IsEqualTo("application/json");
 
         // Verify JSON structure is preserved
-        var parsedResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
+        using var document = JsonDocument.Parse(responseContent);
+        var parsedResponse = document.RootElement;
         await Assert.That(parsedResponse.TryGetProperty("Name", out var nameProperty)).IsTrue();
         await Assert.That(nameProperty.GetString()).IsEqualTo("John");
     }

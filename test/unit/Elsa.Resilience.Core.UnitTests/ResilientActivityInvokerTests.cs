@@ -163,7 +163,7 @@ public class ResilientActivityInvokerTests
         await Assert.That(recordContext!.ActivityExecutionContext).IsSameReferenceAs(context);
         await Assert.That(recordContext.Attempts.Select(x => (x.AttemptNumber, x.Details["exception"]))).IsEquivalentTo(
             [(0, "boom 1"), (1, "boom 2")],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<(int AttemptNumber, string Exception)>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -201,7 +201,7 @@ public class ResilientActivityInvokerTests
         var record = await Assert.That(recordContext!.Attempts).HasSingleItem();
         await Assert.That(record.Details.Keys).IsEquivalentTo(
             ["exception"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

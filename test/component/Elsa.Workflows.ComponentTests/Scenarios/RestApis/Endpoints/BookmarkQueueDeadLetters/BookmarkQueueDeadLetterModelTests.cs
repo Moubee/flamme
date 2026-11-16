@@ -65,7 +65,7 @@ public class BookmarkQueueDeadLetterModelTests
         await Assert.That(model.ReplayedQueueItemId).IsEqualTo(item.ReplayedQueueItemId);
         await Assert.That(typeof(BookmarkQueueDeadLetterModel).GetProperty(nameof(BookmarkQueueDeadLetterItem.Options))).IsNull();
 
-        var json = JsonSerializer.Serialize(model);
+        var json = JsonSerializer.Serialize(model, TestJsonSerializerContext.Default.BookmarkQueueDeadLetterModel);
         await Assert.That(json).DoesNotContain("input-secret");
         await Assert.That(json).DoesNotContain("property-secret");
     }

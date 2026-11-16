@@ -20,7 +20,6 @@ public class PublishEventTests : AppComponentTest
     private IWorkflowInstanceStore _workflowInstanceStore = null!;
     private IWorkflowRuntime _workflowRuntime = null!;
     private WorkflowEvents _workflowEvents = null!;
-    private static readonly JsonSerializerOptions CaseInsensitive = new() { PropertyNameCaseInsensitive = true };
 
     public PublishEventTests(App app) : base(app)
     {
@@ -83,11 +82,15 @@ public class PublishEventTests : AppComponentTest
         // serializer it is an ExpandoObject whose keys have been camelCased by that serializer's naming policy.
         // Which one this test observes depends on whether the instance was read back from the store, so match
         // the property name case-insensitively rather than asserting one of the two representations.
-        var payload = JsonSerializer.Deserialize<ReceivedEventPayload>(JsonSerializer.Serialize(receivedPayload), CaseInsensitive);
-        await Assert.That(payload?.Status).IsEqualTo("Shipped");
+        var status = receivedPayload switch
+        {
+            OrderEventPayload payload => payload.Status,
+            IDictionary<string, object> payload => payload.Single(x => string.Equals(x.Key, "status", StringComparison.OrdinalIgnoreCase)).Value as string,
+            JsonElement payload => payload.EnumerateObject().Single(x => string.Equals(x.Name, "status", StringComparison.OrdinalIgnoreCase)).Value.GetString(),
+            _ => throw new InvalidOperationException($"Unexpected event payload representation: {receivedPayload.GetType()}.")
+        };
+        await Assert.That(status).IsEqualTo("Shipped");
     }
-
-    private record ReceivedEventPayload(string? Status);
 
     private async Task<WorkflowInstance> GetSingleWorkflowInstanceAsync(string definitionId, string correlationId, int timeoutMs = 5000)
     {

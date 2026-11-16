@@ -32,7 +32,7 @@ public class PersonTypeConverter : TypeConverter
                 return null;
             }
 
-            return JsonSerializer.Deserialize<Person>(json);
+            return JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.Person);
         }
 
         return base.ConvertFrom(context, culture, value);
@@ -42,7 +42,7 @@ public class PersonTypeConverter : TypeConverter
     {
         if (destinationType == typeof(string) && value is Person person)
         {
-            return JsonSerializer.Serialize(person);
+            return JsonSerializer.Serialize(person, TestJsonSerializerContext.Default.Person);
         }
 
         return base.ConvertTo(context, culture, value, destinationType);

@@ -13,7 +13,7 @@ public class RouteParametersWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
         
-        var routeDataVariable = builder.WithVariable<IDictionary<string, object>>();
+        var routeDataVariable = builder.WithVariable<IDictionary<string, object>>("RouteData", default!);
         
         builder.Root = new Sequence
         {

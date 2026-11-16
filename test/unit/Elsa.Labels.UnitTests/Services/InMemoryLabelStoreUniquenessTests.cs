@@ -22,7 +22,7 @@ public class InMemoryLabelStoreUniquenessTests
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             store.SaveAsync(Label("label-2", "urgent", "tenant-a")));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         var stored = (await store.ListAsync()).Items.ToList();
         await Assert.That((await Assert.That(stored).HasSingleItem()).Id).IsEqualTo("label-1");
     }
@@ -68,7 +68,7 @@ public class InMemoryLabelStoreUniquenessTests
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             store.SaveAsync(Label("label-2", "Urgent", "tenant-a")));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         await Assert.That((await store.FindByIdAsync("label-2"))!.Name).IsEqualTo("Later");
     }
 
@@ -85,7 +85,7 @@ public class InMemoryLabelStoreUniquenessTests
 
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => store.SaveAsync(found));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         var stored = await store.FindByIdAsync("label-2");
         await Assert.That(stored!.Name).IsEqualTo("Later");
         await Assert.That(stored.NormalizedName).IsEqualTo("later");
@@ -101,7 +101,7 @@ public class InMemoryLabelStoreUniquenessTests
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             store.SaveAsync(Label("label-2", "Urgent", tenantId: null)));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         await Assert.That((await store.FindByIdAsync("label-1"))!.TenantId).IsEqualTo("tenant-a");
     }
 
@@ -141,7 +141,7 @@ public class InMemoryLabelStoreUniquenessTests
         var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
             store.SaveManyAsync([Label("label-2", "Urgent", "tenant-a")]));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         await Assert.That(await store.FindByIdAsync("label-2")).IsNull();
     }
 
@@ -157,7 +157,7 @@ public class InMemoryLabelStoreUniquenessTests
                 Label("label-2", "urgent", "tenant-a")
             ]));
 
-        await Assert.That(exception.Message).Contains("already exists");
+        await Assert.That(exception!.Message).Contains("already exists");
         await Assert.That((await store.ListAsync()).Items).IsEmpty();
     }
 

@@ -4,6 +4,6 @@ class SampleWorkflow : WorkflowBase
 {
     protected override void Build(IWorkflowBuilder workflow)
     {
-        workflow.WithVariable<bool>();
+        workflow.WithVariable("Enabled", false);
     }
 }

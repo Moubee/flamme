@@ -70,8 +70,14 @@ public class IdentityTokenOptionsValidationTests
             options => options.SigningKey = knownDefaultKey,
             "Production");
 
+#if NET11_0_OR_GREATER
+        var startupValidator = serviceProvider.GetRequiredService<IAsyncStartupValidator>();
+        var exception = (await Assert.ThrowsExactlyAsync<OptionsValidationException>(
+            async () => await startupValidator.ValidateAsync(CancellationToken.None)))!;
+#else
         var startupValidator = serviceProvider.GetRequiredService<IStartupValidator>();
         var exception = Assert.ThrowsExactly<OptionsValidationException>(startupValidator.Validate);
+#endif
 
         await Assert.That(exception.Failures).Contains(failure => failure.Contains("known public default"));
     }
@@ -93,8 +99,14 @@ public class IdentityTokenOptionsValidationTests
     {
         using var serviceProvider = CreateServiceProvider(configure);
 
+#if NET11_0_OR_GREATER
+        var startupValidator = serviceProvider.GetRequiredService<IAsyncStartupValidator>();
+        var exception = (await Assert.ThrowsExactlyAsync<OptionsValidationException>(
+            async () => await startupValidator.ValidateAsync(CancellationToken.None)))!;
+#else
         var startupValidator = serviceProvider.GetRequiredService<IStartupValidator>();
         var exception = Assert.ThrowsExactly<OptionsValidationException>(startupValidator.Validate);
+#endif
 
         await Assert.That(exception.Failures).Contains(failure => failure.Contains(expectedFailure));
     }

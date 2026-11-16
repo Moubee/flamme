@@ -13,7 +13,7 @@ public class MultipleHttpMethodsWorkflow : WorkflowBase
     {
         builder.WithDefinitionId(DefinitionId);
         
-        var requestMethodVariable = builder.WithVariable<string>();
+        var requestMethodVariable = builder.WithVariable<string>("RequestMethod", default!);
         
         builder.Root = new Sequence
         {

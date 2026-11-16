@@ -44,8 +44,8 @@ public class WorkflowDraftValidationTests
         {
             ["activities"] = new JsonArray
             {
-                new JsonObject { ["id"] = "installed", ["type"] = "Elsa.WriteLine" },
-                new JsonObject { ["id"] = "missing", ["type"] = "Elsa.Missing" }
+                (JsonNode)new JsonObject { ["id"] = "installed", ["type"] = "Elsa.WriteLine" },
+                (JsonNode)new JsonObject { ["id"] = "missing", ["type"] = "Elsa.Missing" }
             }
         };
 

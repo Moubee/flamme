@@ -111,7 +111,7 @@ public class ExistingTriggerKindsTests : IAsyncDisposable
                 ("/orders", "get"),
                 ("/orders", "post")
             ],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            EqualityComparer<(string Path, string Method)>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
