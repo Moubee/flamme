@@ -206,7 +206,7 @@ public class ActivityTestFixture : IAsyncDisposable
     {
         services.AddLogging();
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
-        services.AddSingleton<INotificationSender>(_ => Mock.Of<IFixtureNotificationSender>().Object);
+        services.AddSingleton<INotificationSender>(_ => IFixtureNotificationSender.Mock().Object);
         services.AddSingleton<IActivityVisitor, ActivityVisitor>();
         services.AddScoped<IExpressionEvaluator, ExpressionEvaluator>();
         services.AddSingleton<IWellKnownTypeRegistry, WellKnownTypeRegistry>();
@@ -222,10 +222,10 @@ public class ActivityTestFixture : IAsyncDisposable
         services.AddScoped<DefaultActivityInputEvaluator>();
         services.AddSingleton<IExpressionDescriptorProvider, DefaultExpressionDescriptorProvider>();
         services.AddSingleton<IExpressionDescriptorRegistry, ExpressionDescriptorRegistry>();
-        services.AddSingleton<IIdentityGenerator>(_ => Mock.Of<IFixtureIdentityGenerator>().Object);
-        services.AddSingleton<IHasher>(_ => Mock.Of<IFixtureHasher>().Object);
+        services.AddSingleton<IIdentityGenerator>(_ => IFixtureIdentityGenerator.Mock().Object);
+        services.AddSingleton<IHasher>(_ => IFixtureHasher.Mock().Object);
         services.AddSingleton<IStimulusHasher, StimulusHasher>();
-        services.AddSingleton<ICommitStateHandler>(_ => Mock.Of<IFixtureCommitStateHandler>().Object);
+        services.AddSingleton<ICommitStateHandler>(_ => IFixtureCommitStateHandler.Mock().Object);
         services.AddSingleton<IActivitySchedulerFactory, ActivitySchedulerFactory>();
         services.AddSingleton<IWorkflowExecutionContextSchedulerStrategy, FakeWorkflowExecutionContextSchedulerStrategy>();
         services.AddSingleton<IActivityExecutionContextSchedulerStrategy, FakeActivityExecutionContextSchedulerStrategy>();

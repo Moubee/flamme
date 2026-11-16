@@ -24,9 +24,9 @@ public class ScheduledRecurringTaskTests : IDisposable
     {
         var services = new ServiceCollection();
         _timeProvider = new RecordingTimeProvider(DefaultNow);
-        _logger = Mock.Of<ILogger<ScheduledRecurringTask>>().Object;
+        _logger = ILogger<ScheduledRecurringTask>.Mock().Object;
 
-        services.AddSingleton(Mock.Of<ICommandSender>().Object);
+        services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -35,7 +35,7 @@ public class ScheduledRecurringTaskTests : IDisposable
         TimeSpan? interval = null,
         TimeProvider? timeProvider = null)
     {
-        var task = Mock.Of<ITask>().Object;
+        var task = ITask.Mock().Object;
         var scheduledTask = new ScheduledRecurringTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),

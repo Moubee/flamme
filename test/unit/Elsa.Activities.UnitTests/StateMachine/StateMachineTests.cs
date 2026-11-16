@@ -664,8 +664,8 @@ public class StateMachineTests
         {
             services.RemoveAll<IActivityExecutionContextSchedulerStrategy>();
             services.AddSingleton<IActivityExecutionContextSchedulerStrategy, ActivityExecutionContextSchedulerStrategy>();
-            services.AddSingleton<IMediator>(_ => Mock.Of<IMediator>().Object);
-            services.AddSingleton<IVariablePersistenceManager>(_ => Mock.Of<IVariablePersistenceManager>().Object);
+            services.AddSingleton<IMediator>(_ => IMediator.Mock().Object);
+            services.AddSingleton<IVariablePersistenceManager>(_ => IVariablePersistenceManager.Mock().Object);
         });
 
     private Task<ActivityExecutionContext> ExecuteAsync(StateMachineActivity? stateMachine = null) => CreateFixture(stateMachine ?? _stateMachine).ExecuteAsync();

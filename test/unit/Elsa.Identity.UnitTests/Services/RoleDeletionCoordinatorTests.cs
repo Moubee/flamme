@@ -82,7 +82,7 @@ public class RoleDeletionCoordinatorTests
     [Test]
     public async Task OrdinaryDeletionIsBlockedByConfigurationDependency()
     {
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([
                 Dependency("configuration", RoleDeletionDependencyOwnership.Configuration, configurationPath: "ExternalAuthentication:Connections:0:UnlinkedPolicy:Settings:defaultRoleIds:0")
@@ -99,7 +99,7 @@ public class RoleDeletionCoordinatorTests
     [Test]
     public async Task SuccessfulDeletionPublishesDeletedRoleNotification()
     {
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(new StubContributor([]), notificationSender);
         // A cancellable request token is what makes the token assertion below mean anything: were the notification
         // published with the request's own token, that token could be cancelled and the assertion would fail.
@@ -118,7 +118,7 @@ public class RoleDeletionCoordinatorTests
         // What the loser of a race sees: the role is still there to be found, and the delete then removes no row
         // because a concurrent request got there first. Publishing here would credit this request with a deletion
         // it did not perform, and audit would record the role as deleted twice.
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (_, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -135,7 +135,7 @@ public class RoleDeletionCoordinatorTests
     {
         // A third-party store implementing only IRoleStore reports no affected-row count. The deletion must still
         // reach security subscribers over that legacy path rather than being dropped for want of the capability.
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -153,7 +153,7 @@ public class RoleDeletionCoordinatorTests
     {
         // Both requests are held until each has already found the role, so neither can be turned away by the
         // existence check and the store's own delete is the only thing that can separate them.
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(
             new StubContributor([]),
             notificationSender,
@@ -199,7 +199,7 @@ public class RoleDeletionCoordinatorTests
     public async Task SuccessfulRemediationRemovesDependenciesBeforeDeletingRole()
     {
         var contributor = new StubContributor([Dependency("connection-a", removesLastDefaultRole: true)]);
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(contributor, notificationSender);
         var inspection = await coordinator.InspectAsync("workflow-user", Administrator());
         await Assert.That(inspection).IsOfType(typeof(RoleDeletionInspectionResult.Success));
@@ -227,7 +227,7 @@ public class RoleDeletionCoordinatorTests
         var contributor = new StubContributor(
             [Dependency("connection-a"), Dependency("connection-b")],
             failAfterFirst: true);
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         var (store, coordinator) = await CreateCoordinatorAsync(contributor, notificationSender);
         var inspection = await coordinator.InspectAsync("workflow-user", Administrator());
         await Assert.That(inspection).IsOfType(typeof(RoleDeletionInspectionResult.Success));
@@ -404,7 +404,7 @@ public class RoleDeletionCoordinatorTests
         await store.SaveAsync(new Role { Id = "workflow-user", Name = "Workflow user", Permissions = [] });
         var roleStore = storeDecorator?.Invoke(store) ?? store;
         var roleProvider = new StoreBasedRoleProvider(roleStore);
-        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? Mock.Of<INotificationSender>().Object, TestTenantAccessor.Default, new FakeTimeProvider(DateTimeOffset.UtcNow));
+        var securityNotifier = new RoleSecurityNotifier(notificationSender ?? INotificationSender.Mock().Object, TestTenantAccessor.Default, new FakeTimeProvider(DateTimeOffset.UtcNow));
         var coordinator = new RoleDeletionCoordinator(roleStore, new RoleAuthorizationService(roleProvider, new PermissionEvaluator()), [contributor], securityNotifier);
         return (store, coordinator);
     }

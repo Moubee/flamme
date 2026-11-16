@@ -13,17 +13,17 @@ namespace Elsa.Workflows.Management.UnitTests.Mappers;
 
 public class WorkflowDefinitionMapperOriginalSourceTests
 {
-    private readonly IActivitySerializer _activitySerializer = Mock.Of<IActivitySerializer>().Object;
+    private readonly IActivitySerializer _activitySerializer = IActivitySerializer.Mock().Object;
     private readonly WorkflowDefinitionMapper _mapper;
 
     public WorkflowDefinitionMapperOriginalSourceTests()
     {
-        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
+        var scopeFactory = IServiceScopeFactory.Mock().Object;
         var variableDefinitionMapper = new VariableDefinitionMapper(
             SerializationTypeRegistry.CreateDefault(),
             scopeFactory,
             NullLogger<VariableDefinitionMapper>.Instance);
-        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+        var workflowDefinitionService = IWorkflowDefinitionService.Mock().Object;
         _mapper = new(_activitySerializer, workflowDefinitionService, variableDefinitionMapper);
     }
 

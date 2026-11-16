@@ -217,7 +217,7 @@ public class WorkflowInstrumentationTests
         using var meterCapture = new MeterCapture();
         var activityExecutionContext = await BuildTelemetryContextAsync(new TestActivity());
         var context = activityExecutionContext.WorkflowExecutionContext;
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
         Mock.Get(notificationSender).SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
                     .Returns((global::Elsa.Mediator.Contracts.INotification __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
@@ -330,12 +330,12 @@ public class WorkflowInstrumentationTests
     {
         if (notificationSender == null)
         {
-            notificationSender = Mock.Of<INotificationSender>().Object;
+            notificationSender = INotificationSender.Mock().Object;
             Mock.Get(notificationSender).SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
                             .Returns(() => Task.CompletedTask);
         }
 
-        var workflowStateExtractor = Mock.Of<IWorkflowStateExtractor>().Object;
+        var workflowStateExtractor = IWorkflowStateExtractor.Mock().Object;
         Mock.Get(workflowStateExtractor).Extract(context).Returns(() => new WorkflowState
         {
             Id = context.Id,
@@ -350,12 +350,12 @@ public class WorkflowInstrumentationTests
             context.ServiceProvider,
             pipeline,
             workflowStateExtractor,
-            Mock.Of<IWorkflowBuilderFactory>().Object,
-            Mock.Of<IWorkflowGraphBuilder>().Object,
-            Mock.Of<IIdentityGenerator>().Object,
+            IWorkflowBuilderFactory.Mock().Object,
+            IWorkflowGraphBuilder.Mock().Object,
+            IIdentityGenerator.Mock().Object,
             notificationSender,
             new WorkflowLoggerStateGenerator(),
-            Mock.Of<ICommitStateHandler>().Object,
+            ICommitStateHandler.Mock().Object,
             NullLogger<WorkflowRunner>.Instance);
     }
 
@@ -504,7 +504,7 @@ public class WorkflowInstrumentationTests
             var middleware = new DefaultActivitySchedulerMiddleware(
                 _ => ValueTask.CompletedTask,
                 new CompletingActivityInvoker(),
-                Mock.Of<ICommitStrategyRegistry>().Object,
+                ICommitStrategyRegistry.Mock().Object,
                 Microsoft.Extensions.Options.Options.Create(new CommitStateOptions()));
 
             await middleware.InvokeAsync(context);

@@ -42,8 +42,8 @@ public class TransientExceptionDetectorTests
     public async Task IsTransient_AllDetectorsReturnFalse_ReturnsFalse()
     {
         var exception = new Exception("test");
-        var strategy1 = Mock.Of<ITransientExceptionStrategy>().Object;
-        var strategy2 = Mock.Of<ITransientExceptionStrategy>().Object;
+        var strategy1 = ITransientExceptionStrategy.Mock().Object;
+        var strategy2 = ITransientExceptionStrategy.Mock().Object;
         Mock.Get(strategy1).IsTransient(Arg.Any<Exception>()).Returns(false);
         Mock.Get(strategy2).IsTransient(Arg.Any<Exception>()).Returns(false);
         var detector = CreateDetector(strategy1, strategy2);
@@ -56,7 +56,7 @@ public class TransientExceptionDetectorTests
     [MethodDataSource(nameof(InnerExceptionChainTestCases))]
     public async Task IsTransient_InnerExceptionChainHasTransient_ReturnsTrue(Exception exception, Exception transientException)
     {
-        var strategy = Mock.Of<ITransientExceptionStrategy>().Object;
+        var strategy = ITransientExceptionStrategy.Mock().Object;
         Mock.Get(strategy).IsTransient(transientException).Returns(true);
         Mock.Get(strategy).IsTransient(Arg.Is<Exception>(e => e != transientException)).Returns(false);
         var detector = CreateDetector(strategy);
@@ -72,7 +72,7 @@ public class TransientExceptionDetectorTests
         Action<ITransientExceptionStrategy> configureDetector,
         bool expectedResult)
     {
-        var strategy = Mock.Of<ITransientExceptionStrategy>().Object;
+        var strategy = ITransientExceptionStrategy.Mock().Object;
         configureDetector(strategy);
         var detector = CreateDetector(strategy);
 
@@ -148,7 +148,7 @@ public class TransientExceptionDetectorTests
 
     private static ITransientExceptionStrategy CreateStrategy(params (Exception exception, bool isTransient)[] behaviors)
     {
-        var detector = Mock.Of<ITransientExceptionStrategy>().Object;
+        var detector = ITransientExceptionStrategy.Mock().Object;
         foreach (var (exception, isTransient) in behaviors)
             Mock.Get(detector).IsTransient(exception).Returns(isTransient);
         return detector;

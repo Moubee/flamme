@@ -22,7 +22,7 @@ public class HttpEndpointTests
             .ConfigureServices(services =>
             {
                 // Don't provide HttpContextAccessor, simulating non-HTTP context
-                var mockAccessor = Mock.Of<IHttpContextAccessor>().Object;
+                var mockAccessor = IHttpContextAccessor.Mock().Object;
                 Mock.Get(mockAccessor).HttpContext.Returns((HttpContext?)null);
                 services.AddSingleton(mockAccessor);
             });

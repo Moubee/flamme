@@ -14,7 +14,7 @@ public class ExecutionCycleRegistryTests
     public ExecutionCycleRegistryTests()
     {
         _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-        _sources = Mock.Of<IIngressSourceRegistry>().Object;
+        _sources = IIngressSourceRegistry.Mock().Object;
         Mock.Get(_sources).Snapshot().Returns(Array.Empty<IngressSourceSnapshot>());
     }
 

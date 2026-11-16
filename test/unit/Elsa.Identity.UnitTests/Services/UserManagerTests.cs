@@ -9,13 +9,13 @@ namespace Elsa.Identity.UnitTests.Services;
 
 public class UserManagerTests
 {
-    private readonly ISecretGenerator _secretGenerator = Mock.Of<ISecretGenerator>().Object;
-    private readonly IUserStore _userStore = Mock.Of<IUserStore>().Object;
+    private readonly ISecretGenerator _secretGenerator = ISecretGenerator.Mock().Object;
+    private readonly IUserStore _userStore = IUserStore.Mock().Object;
     private readonly UserManager _manager;
 
     public UserManagerTests()
     {
-        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        var identityGenerator = IIdentityGenerator.Mock().Object;
         Mock.Get(identityGenerator).GenerateId().Returns("user-1");
         Mock.Get(_secretGenerator).Generate(Arg.Any<int>()).Returns("generated-secret");
         _manager = new(identityGenerator, _secretGenerator, new DefaultSecretHasher(), _userStore, new TestTenantAccessor("tenant-a"));

@@ -12,7 +12,7 @@ public class OutputConverterEndpointTests
     [Test]
     public async Task Configure_ExposesTheDescriptorRouteWithoutRequiringAPermission()
     {
-        var endpoint = new List(Mock.Of<IOutputConverterRegistry>().Object, SerializationTypeRegistry.CreateDefault());
+        var endpoint = new List(IOutputConverterRegistry.Mock().Object, SerializationTypeRegistry.CreateDefault());
         var definition = new EndpointDefinition(typeof(List), typeof(EmptyRequest), typeof(ListResponse<OutputConverterDescriptorModel>));
 
         typeof(List).GetProperty("Definition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)!.SetValue(endpoint, definition);
@@ -34,7 +34,7 @@ public class OutputConverterEndpointTests
             "Convert to text",
             "Formats the source as text.",
             document.RootElement);
-        var registry = Mock.Of<IOutputConverterRegistry>().Object;
+        var registry = IOutputConverterRegistry.Mock().Object;
         Mock.Get(registry).FindCompatible(typeof(string), typeof(int)).Returns([descriptor]);
         var endpoint = new List(registry, SerializationTypeRegistry.CreateDefault());
 
@@ -60,7 +60,7 @@ public class OutputConverterEndpointTests
     [Arguments("String", "Unsafe.Type", "The destinationType query parameter must be a registered type alias or resolvable safe type name.")]
     public async Task TryListCompatible_RejectsMissingOrUnsafeQueryTypes(string? sourceTypeName, string? destinationTypeName, string expectedError)
     {
-        var registry = Mock.Of<IOutputConverterRegistry>().Object;
+        var registry = IOutputConverterRegistry.Mock().Object;
         var endpoint = new List(registry, SerializationTypeRegistry.CreateDefault());
 
         var listed = endpoint.TryListCompatible(sourceTypeName, destinationTypeName, out var response, out var errors);

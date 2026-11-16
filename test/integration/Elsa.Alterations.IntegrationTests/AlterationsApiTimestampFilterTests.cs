@@ -30,15 +30,15 @@ public class AlterationsApiTimestampFilterTests : WebApplicationTest<Alterations
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        services.AddSingleton(Mock.Of<IWorkflowInstanceFinder>().Object);
-        services.AddSingleton(Mock.Of<IAlterationPlanScheduler>().Object);
-        services.AddSingleton(Mock.Of<IAlterationRunner>().Object);
-        services.AddSingleton(Mock.Of<IAlteredWorkflowDispatcher>().Object);
-        services.AddSingleton(Mock.Of<IAlterationPlanStore>().Object);
-        services.AddSingleton(Mock.Of<IAlterationJobStore>().Object);
-        services.AddSingleton(Mock.Of<IWorkflowDispatcher>().Object);
-        services.AddSingleton(Mock.Of<IWorkflowInstanceStore>().Object);
-        services.AddSingleton(Mock.Of<IIdentityGenerator>().Object);
+        services.AddSingleton(IWorkflowInstanceFinder.Mock().Object);
+        services.AddSingleton(IAlterationPlanScheduler.Mock().Object);
+        services.AddSingleton(IAlterationRunner.Mock().Object);
+        services.AddSingleton(IAlteredWorkflowDispatcher.Mock().Object);
+        services.AddSingleton(IAlterationPlanStore.Mock().Object);
+        services.AddSingleton(IAlterationJobStore.Mock().Object);
+        services.AddSingleton(IWorkflowDispatcher.Mock().Object);
+        services.AddSingleton(IWorkflowInstanceStore.Mock().Object);
+        services.AddSingleton(IIdentityGenerator.Mock().Object);
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
     }
 

@@ -34,13 +34,13 @@ public class IdentityLinkAuthorizationTests : WebApplicationTest<IdentityLinkAut
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
-        services.AddSingleton<IIdentityProviderConnectionRegistry>(Mock.Of<IIdentityProviderConnectionRegistry>().Object);
-        var tenant = Mock.Of<ITenantAccessor>().Object;
+        services.AddSingleton<IIdentityProviderConnectionRegistry>(IIdentityProviderConnectionRegistry.Mock().Object);
+        var tenant = ITenantAccessor.Mock().Object;
         Mock.Get(tenant).TenantId.Returns("tenant-a");
         services.AddSingleton(tenant);
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
-        services.AddSingleton<IRoleProvider>(Mock.Of<IRoleProvider>().Object);
+        services.AddSingleton<IRoleProvider>(IRoleProvider.Mock().Object);
         services.AddScoped<InMemoryExternalIdentityProvisioner>();
         services.AddScoped<IExternalIdentityProvisioner>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());
         services.AddScoped<IExternalIdentityLinkManagementStore>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());

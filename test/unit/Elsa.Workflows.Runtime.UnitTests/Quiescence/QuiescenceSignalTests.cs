@@ -17,7 +17,7 @@ public class QuiescenceSignalTests
     public QuiescenceSignalTests()
     {
         _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-        _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
+        _cycleRegistry = IExecutionCycleRegistry.Mock().Object;
         Mock.Get(_cycleRegistry).ActiveCount.Returns(0);
         _options = Microsoft.Extensions.Options.Options.Create(new GracefulShutdownOptions());
         _sut = new QuiescenceSignal(_options, _timeProvider, _cycleRegistry);

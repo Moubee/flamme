@@ -9,9 +9,9 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundWorkflowDispatcherTests
 {
-    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
-    private readonly INotificationSender _notificationSender = Mock.Of<INotificationSender>().Object;
-    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+    private readonly ICommandSender _commandSender = ICommandSender.Mock().Object;
+    private readonly INotificationSender _notificationSender = INotificationSender.Mock().Object;
+    private readonly ITenantAccessor _tenantAccessor = ITenantAccessor.Mock().Object;
 
     [Test]
     public async Task DispatchWorkflowDefinition_DoesNotPropagateCallerToken()

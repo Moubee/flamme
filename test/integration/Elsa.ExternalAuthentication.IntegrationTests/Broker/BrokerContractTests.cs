@@ -74,8 +74,8 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
 {
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new();
-    private readonly IExternalAuthenticationBroker _broker = Mock.Of<IExternalAuthenticationBroker>().Object;
-    private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
+    private readonly IExternalAuthenticationBroker _broker = IExternalAuthenticationBroker.Mock().Object;
+    private readonly ITenantAccessor _tenant = ITenantAccessor.Mock().Object;
 
     private HttpClient Client => _client ??= Factory.CreateClient(new() { AllowAutoRedirect = false });
 

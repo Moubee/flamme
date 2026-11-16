@@ -56,7 +56,7 @@ public class WorkflowBuilderTests
 
     private static WorkflowBuilder CreateBuilder() =>
         new(
-            Mock.Of<IActivityVisitor>().Object,
-            Mock.Of<IIdentityGraphService>().Object,
-            Mock.Of<IActivityRegistry>().Object);
+            IActivityVisitor.Mock().Object,
+            IIdentityGraphService.Mock().Object,
+            IActivityRegistry.Mock().Object);
 }

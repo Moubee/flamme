@@ -19,7 +19,7 @@ public class CSharpHostCodeExecutionTests
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var evaluator = new CSharpEvaluator(
-            Mock.Of<Elsa.Mediator.Contracts.INotificationSender>().Object,
+            Elsa.Mediator.Contracts.INotificationSender.Mock().Object,
             Microsoft.Extensions.Options.Options.Create(new CSharpOptions()),
             memoryCache);
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();
@@ -38,7 +38,7 @@ public class CSharpHostCodeExecutionTests
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddMemoryCache();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new Elsa.Expressions.CSharp.Features.CSharpFeature(module)
         {

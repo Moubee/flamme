@@ -96,7 +96,7 @@ public class CronTests
 
     private static ICronParser CreateCronParser(DateTimeOffset returnValue)
     {
-        var parser = Mock.Of<ICronParser>().Object;
+        var parser = ICronParser.Mock().Object;
         Mock.Get(parser).GetNextOccurrence(Arg.Any<string>()).Returns(returnValue);
         return parser;
     }

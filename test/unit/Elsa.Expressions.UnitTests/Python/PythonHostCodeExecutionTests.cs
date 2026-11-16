@@ -18,7 +18,7 @@ public class PythonHostCodeExecutionTests
     public async Task Evaluator_BlocksExecution_WhenHostHasNotOptedIn()
     {
         var evaluator = new PythonNetPythonEvaluator(
-            Mock.Of<Elsa.Mediator.Contracts.INotificationSender>().Object,
+            Elsa.Mediator.Contracts.INotificationSender.Mock().Object,
             Microsoft.Extensions.Options.Options.Create(new PythonOptions()));
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();
 
@@ -35,7 +35,7 @@ public class PythonHostCodeExecutionTests
     {
         var services = new ServiceCollection();
         services.AddOptions();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new Elsa.Expressions.Python.Features.PythonFeature(module)
         {

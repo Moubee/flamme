@@ -18,13 +18,13 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class LocalWorkflowClientTests
 {
-    private readonly IWorkflowInstanceManager _workflowInstanceManager = Mock.Of<IWorkflowInstanceManager>().Object;
-    private readonly IWorkflowDefinitionService _workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
-    private readonly IWorkflowRunner _workflowRunner = Mock.Of<IWorkflowRunner>().Object;
-    private readonly IWorkflowCanceler _workflowCanceler = Mock.Of<IWorkflowCanceler>().Object;
-    private readonly IWorkflowActivationGate _workflowActivationGate = Mock.Of<IWorkflowActivationGate>().Object;
-    private readonly WorkflowStateMapper _workflowStateMapper = Mock.Of<WorkflowStateMapper>().Object;
-    private readonly ILogger<LocalWorkflowClient> _logger = Mock.Of<ILogger<LocalWorkflowClient>>().Object;
+    private readonly IWorkflowInstanceManager _workflowInstanceManager = IWorkflowInstanceManager.Mock().Object;
+    private readonly IWorkflowDefinitionService _workflowDefinitionService = IWorkflowDefinitionService.Mock().Object;
+    private readonly IWorkflowRunner _workflowRunner = IWorkflowRunner.Mock().Object;
+    private readonly IWorkflowCanceler _workflowCanceler = IWorkflowCanceler.Mock().Object;
+    private readonly IWorkflowActivationGate _workflowActivationGate = IWorkflowActivationGate.Mock().Object;
+    private readonly WorkflowStateMapper _workflowStateMapper = WorkflowStateMapper.Mock().Object;
+    private readonly ILogger<LocalWorkflowClient> _logger = ILogger<LocalWorkflowClient>.Mock().Object;
 
     [Test]
     public async Task CreateInstanceAsync_ThrowsWorkflowDefinitionNotFoundException_WhenDefinitionDoesNotExist()

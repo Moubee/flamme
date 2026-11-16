@@ -27,9 +27,9 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
     private HttpClient? _client;
     private readonly TestAuthenticationState _authentication = new();
     private readonly MemoryStore<User> _users = new();
-    private readonly ITenantAccessor _tenant = Mock.Of<ITenantAccessor>().Object;
+    private readonly ITenantAccessor _tenant = ITenantAccessor.Mock().Object;
     private readonly TestConnectionRegistry _connections = new();
-    private readonly INotificationSender _notifications = Mock.Of<INotificationSender>().Object;
+    private readonly INotificationSender _notifications = INotificationSender.Mock().Object;
     private readonly TimeProvider _clock = new ScriptedTimeProvider(
         new DateTimeOffset(2026, 7, 26, 10, 0, 0, TimeSpan.Zero),
         new DateTimeOffset(2026, 7, 26, 10, 1, 0, TimeSpan.Zero),
@@ -63,7 +63,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
-        services.AddSingleton<IRoleProvider>(Mock.Of<IRoleProvider>().Object);
+        services.AddSingleton<IRoleProvider>(IRoleProvider.Mock().Object);
         services.AddScoped<InMemoryExternalIdentityProvisioner>();
         services.AddScoped<IExternalIdentityProvisioner>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());
         services.AddScoped<IExternalIdentityLinkManagementStore>(provider => provider.GetRequiredService<InMemoryExternalIdentityProvisioner>());

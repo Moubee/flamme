@@ -17,9 +17,9 @@ public class ResumeDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDenied_RoutesParentBookmarkResumeWithDefinedOutcome()
     {
-        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
-        var stimulusHasher = Mock.Of<IStimulusHasher>().Object;
-        var stimulusSender = Mock.Of<IStimulusSender>().Object;
+        var bookmarkQueue = IBookmarkQueue.Mock().Object;
+        var stimulusHasher = IStimulusHasher.Mock().Object;
+        var stimulusSender = IStimulusSender.Mock().Object;
         var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, stimulusHasher, stimulusSender);
         StimulusMetadata? observedMetadata = null;
         Mock.Get(stimulusSender).SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>())
@@ -45,19 +45,19 @@ public class ResumeDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDeniedBeforeParentBookmark_QueuesResumeForExactParentRoute()
     {
-        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
+        var bookmarkQueue = IBookmarkQueue.Mock().Object;
         NewBookmarkQueueItem? enqueuedItem = null;
         Mock.Get(bookmarkQueue).EnqueueAsync(Arg.Any<NewBookmarkQueueItem>(), Arg.Any<CancellationToken>()).Callback((NewBookmarkQueueItem item, CancellationToken _) => enqueuedItem = item);
-        var workflowResumer = Mock.Of<IWorkflowResumer>().Object;
+        var workflowResumer = IWorkflowResumer.Mock().Object;
         Mock.Get(workflowResumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).Returns([]);
         var stimulusSender = new StimulusSender(
-            Mock.Of<IStimulusHasher>().Object,
-            Mock.Of<ITriggerBoundWorkflowService>().Object,
+            IStimulusHasher.Mock().Object,
+            ITriggerBoundWorkflowService.Mock().Object,
             workflowResumer,
             bookmarkQueue,
-            Mock.Of<ITriggerInvoker>().Object,
+            ITriggerInvoker.Mock().Object,
             Microsoft.Extensions.Logging.Abstractions.NullLogger<StimulusSender>.Instance);
-        var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, Mock.Of<IStimulusHasher>().Object, stimulusSender);
+        var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, IStimulusHasher.Mock().Object, stimulusSender);
 
         await handler.HandleAsync(
             new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "dispatch-stimulus-hash"),

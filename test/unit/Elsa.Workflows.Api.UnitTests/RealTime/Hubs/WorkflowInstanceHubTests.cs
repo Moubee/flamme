@@ -26,10 +26,10 @@ public class WorkflowInstanceHubTests
 
     public WorkflowInstanceHubTests()
     {
-        _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-        _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
-        _groups = Mock.Of<IGroupManager>().Object;
-        _context = Mock.Of<HubCallerContext>().Object;
+        _workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
+        _tenantAccessor = ITenantAccessor.Mock().Object;
+        _groups = IGroupManager.Mock().Object;
+        _context = HubCallerContext.Mock().Object;
         _workflowInstance = CreateWorkflowInstance(TenantId);
         _hub = new WorkflowInstanceHub(_workflowInstanceStore, _tenantAccessor)
         {

@@ -12,9 +12,9 @@ namespace Elsa.Workflows.Runtime.UnitTests.Recovery;
 
 public class InterruptedRecoveryScannerTests
 {
-    private readonly IWorkflowRestarter _restarter = Mock.Of<IWorkflowRestarter>().Object;
-    private readonly IWorkflowInstanceStore _instanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-    private readonly ILogger<InterruptedRecoveryScanner> _logger = Mock.Of<ILogger<InterruptedRecoveryScanner>>().Object;
+    private readonly IWorkflowRestarter _restarter = IWorkflowRestarter.Mock().Object;
+    private readonly IWorkflowInstanceStore _instanceStore = IWorkflowInstanceStore.Mock().Object;
+    private readonly ILogger<InterruptedRecoveryScanner> _logger = ILogger<InterruptedRecoveryScanner>.Mock().Object;
     private readonly RuntimeOptions _runtimeOptions = new() { RestartInterruptedWorkflowsBatchSize = 10 };
 
     [Test]
@@ -81,7 +81,7 @@ public class InterruptedRecoveryScannerTests
     public async Task PushesTenantContext()
     {
         StubInstances(new[] { Summary("a", tenantId: "tenant-1") });
-        var tenantService = Mock.Of<ITenantService>().Object;
+        var tenantService = ITenantService.Mock().Object;
         Mock.Get(tenantService).FindAsync("tenant-1", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-1", Name = "Tenant 1" });
         var tenantAccessor = new DefaultTenantAccessor();
         var observedTenant = (string?)null;
@@ -102,7 +102,7 @@ public class InterruptedRecoveryScannerTests
     public async Task DefaultOrAgnosticTenant(string? tenantId)
     {
         StubInstances(new[] { Summary("a", tenantId: tenantId) });
-        var tenantService = Mock.Of<ITenantService>().Object;
+        var tenantService = ITenantService.Mock().Object;
         var tenantAccessor = new DefaultTenantAccessor();
         var observedTenant = (Tenant?)tenantAccessor.Tenant;
         Mock.Get(_restarter).RestartWorkflowAsync("a", Arg.Any<CancellationToken>()).Callback(() => observedTenant = tenantAccessor.Tenant);

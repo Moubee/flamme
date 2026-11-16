@@ -14,9 +14,9 @@ public class ResumeBulkDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDenied_RoutesFaultedChildCompletionToParentBookmark()
     {
-        var bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
-        var stimulusHasher = Mock.Of<IStimulusHasher>().Object;
-        var stimulusSender = Mock.Of<IStimulusSender>().Object;
+        var bookmarkQueue = IBookmarkQueue.Mock().Object;
+        var stimulusHasher = IStimulusHasher.Mock().Object;
+        var stimulusSender = IStimulusSender.Mock().Object;
         StimulusMetadata? observedMetadata = null;
         Mock.Get(stimulusSender).SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>())
                     .Returns((string __arg0, global::Elsa.Workflows.Runtime.StimulusMetadata? __arg1, global::System.Threading.CancellationToken __arg2) =>
@@ -47,10 +47,10 @@ public class ResumeBulkDispatchWorkflowActivityTests
     [Test]
     public async Task HandleAsync_ActivationDeniedForAnotherActivity_DoesNotRouteToParent()
     {
-        var stimulusSender = Mock.Of<IStimulusSender>().Object;
+        var stimulusSender = IStimulusSender.Mock().Object;
         var handler = new ResumeBulkDispatchWorkflowActivity(
-            Mock.Of<IBookmarkQueue>().Object,
-            Mock.Of<IStimulusHasher>().Object,
+            IBookmarkQueue.Mock().Object,
+            IStimulusHasher.Mock().Object,
             stimulusSender);
 
         await handler.HandleAsync(

@@ -13,7 +13,7 @@ public class OpenIdConnectExternalAuthenticationFeatureTests
     public async Task ClassicFeatureRegistersTheOpenIdConnectAdapter()
     {
         var services = new ServiceCollection();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         var feature = new OpenIdConnectExternalAuthenticationFeature(module);
 

@@ -108,7 +108,7 @@ public static class ActivityTestFixtureHttpExtensions
     /// </summary>
     private static IResilientActivityInvoker CreateMockResilientActivityInvoker()
     {
-        var mock = Mock.Of<IResilientActivityInvoker>().Object;
+        var mock = IResilientActivityInvoker.Mock().Object;
 
         // Configure the mock to simply execute the provided action directly
         Mock.Get(mock).InvokeAsync(
@@ -127,7 +127,7 @@ public static class ActivityTestFixtureHttpExtensions
     private static IHttpClientFactory CreateMockHttpClientFactory(
         Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> responseHandler)
     {
-        var mockHttpClientFactory = Mock.Of<IHttpClientFactory>().Object;
+        var mockHttpClientFactory = IHttpClientFactory.Mock().Object;
         var testHandler = new TestHttpMessageHandler(responseHandler);
         var httpClient = new HttpClient(testHandler);
         Mock.Get(mockHttpClientFactory).CreateClient(Arg.Any<string>()).Returns(httpClient);

@@ -9,7 +9,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task SendAsync_WhenBuffering_DoesNotPublishUntilScopeIsFlushed()
     {
-        var mediator = Mock.Of<IMediator>().Object;
+        var mediator = IMediator.Mock().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
@@ -27,7 +27,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task SendAsync_AfterScopeIsFlushed_PublishesImmediately()
     {
-        var mediator = Mock.Of<IMediator>().Object;
+        var mediator = IMediator.Mock().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var bufferedNotification = new TestNotification();
@@ -56,7 +56,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task SendAsync_WhenBufferingScopeIsDisposedWithoutFlush_DiscardsNotifications()
     {
-        var mediator = Mock.Of<IMediator>().Object;
+        var mediator = IMediator.Mock().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
@@ -72,7 +72,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task FlushAsync_WhenNotificationFails_StillPublishesRemainingNotifications()
     {
-        var mediator = Mock.Of<IMediator>().Object;
+        var mediator = IMediator.Mock().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var failingNotification = new TestNotification();
@@ -93,7 +93,7 @@ public class WorkflowCommitNotificationBufferTests
     [Test]
     public async Task FlushAsync_WhenNotificationIsCanceled_PropagatesCancellation()
     {
-        var mediator = Mock.Of<IMediator>().Object;
+        var mediator = IMediator.Mock().Object;
         var buffer = CreateBuffer(mediator);
         var sender = new WorkflowCommitNotificationSender(mediator, buffer);
         var notification = new TestNotification();
@@ -106,7 +106,7 @@ public class WorkflowCommitNotificationBufferTests
         await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => scope.FlushAsync());
     }
 
-    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, Mock.Of<ILogger<WorkflowCommitNotificationBuffer>>().Object);
+    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, ILogger<WorkflowCommitNotificationBuffer>.Mock().Object);
 
     private class TestNotification : INotification;
 }

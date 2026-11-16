@@ -23,18 +23,18 @@ public class DefaultActivityExecutionMapperTests
     public async Task MapAsync_MapsCallStackDepth_Correctly()
     {
         // Arrange
-        var safeSerializer = Mock.Of<ISafeSerializer>().Object;
+        var safeSerializer = ISafeSerializer.Mock().Object;
         Mock.Get(safeSerializer).Serialize(Arg.Any<object?>()).Returns("serialized");
 
-        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        var payloadSerializer = IPayloadSerializer.Mock().Object;
         Mock.Get(payloadSerializer).Serialize(Arg.Any<object>()).Returns("serialized");
 
-        var compressionCodecResolver = Mock.Of<ICompressionCodecResolver>().Object;
-        var compressionCodec = Mock.Of<ICompressionCodec>().Object;
+        var compressionCodecResolver = ICompressionCodecResolver.Mock().Object;
+        var compressionCodec = ICompressionCodec.Mock().Object;
         Mock.Get(compressionCodecResolver).Resolve(Arg.Any<string>()).Returns(compressionCodec);
         Mock.Get(compressionCodec).CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("compressed");
 
-        var managementOptions = Mock.Of<IOptions<ManagementOptions>>().Object;
+        var managementOptions = IOptions<ManagementOptions>.Mock().Object;
         Mock.Get(managementOptions).Value.Returns(new ManagementOptions());
 
         var mapper = new DefaultActivityExecutionMapper(
@@ -113,18 +113,18 @@ public class DefaultActivityExecutionMapperTests
 
     private static DefaultActivityExecutionMapper CreateMapper()
     {
-        var safeSerializer = Mock.Of<ISafeSerializer>().Object;
+        var safeSerializer = ISafeSerializer.Mock().Object;
         Mock.Get(safeSerializer).Serialize(Arg.Any<object?>()).Returns("serialized");
 
-        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        var payloadSerializer = IPayloadSerializer.Mock().Object;
         Mock.Get(payloadSerializer).Serialize(Arg.Any<object>()).Returns("serialized");
 
-        var compressionCodecResolver = Mock.Of<ICompressionCodecResolver>().Object;
-        var compressionCodec = Mock.Of<ICompressionCodec>().Object;
+        var compressionCodecResolver = ICompressionCodecResolver.Mock().Object;
+        var compressionCodec = ICompressionCodec.Mock().Object;
         Mock.Get(compressionCodecResolver).Resolve(Arg.Any<string>()).Returns(compressionCodec);
         Mock.Get(compressionCodec).CompressAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("compressed");
 
-        var managementOptions = Mock.Of<IOptions<ManagementOptions>>().Object;
+        var managementOptions = IOptions<ManagementOptions>.Mock().Object;
         Mock.Get(managementOptions).Value.Returns(new ManagementOptions());
 
         return new DefaultActivityExecutionMapper(

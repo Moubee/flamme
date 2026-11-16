@@ -16,7 +16,7 @@ public class DefaultAuthenticationApiKeyTests
 
     public DefaultAuthenticationApiKeyTests()
     {
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(_services);
         _feature = new DefaultAuthenticationFeature(module);
     }

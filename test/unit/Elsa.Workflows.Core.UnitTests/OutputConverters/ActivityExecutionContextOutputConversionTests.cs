@@ -150,10 +150,10 @@ public class ActivityExecutionContextOutputConversionTests
     [Test]
     public async Task Set_WithoutConverter_UsesExistingPathWithoutConverterInfrastructureCalls()
     {
-        var registry = Mock.Of<IOutputConverterRegistry>().Object;
-        var resolver = Mock.Of<IOutputBindingDestinationResolver>().Object;
-        var validator = Mock.Of<IOutputConverterSettingsValidator>().Object;
-        var invoker = Mock.Of<IOutputConverterInvoker>().Object;
+        var registry = IOutputConverterRegistry.Mock().Object;
+        var resolver = IOutputBindingDestinationResolver.Mock().Object;
+        var validator = IOutputConverterSettingsValidator.Mock().Object;
+        var invoker = IOutputConverterInvoker.Mock().Object;
         var variable = new Variable<int>("Destination", 0);
         var activity = new TestActivity
         {

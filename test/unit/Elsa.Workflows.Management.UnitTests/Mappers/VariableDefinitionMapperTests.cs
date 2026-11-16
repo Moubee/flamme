@@ -13,7 +13,7 @@ namespace Elsa.Workflows.Management.UnitTests.Mappers;
 
 public class VariableDefinitionMapperTests
 {
-    private readonly IServiceScopeFactory _scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
+    private readonly IServiceScopeFactory _scopeFactory = IServiceScopeFactory.Mock().Object;
     private readonly SerializationTypeOptions _workflowJsonTypeOptions = new();
     private readonly VariableDefinitionMapper _mapper;
 

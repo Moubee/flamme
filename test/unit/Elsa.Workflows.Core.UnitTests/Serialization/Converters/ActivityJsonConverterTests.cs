@@ -49,7 +49,7 @@ public sealed class ActivityJsonConverterTests
     public async Task When_DeserializeUnknownActivity_Then_ReturnsNotFoundActivity()
     {
         // Arrange
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
         Mock.Get(activityRegistry).Find(NotFoundActivityTypeName)
                     .Returns(new ActivityDescriptor());
 
@@ -126,7 +126,7 @@ public sealed class ActivityJsonConverterTests
     static IActivityRegistry CreateActivityRegistry(string typeName, IActivity activity, int? version = null)
     {
         var descriptor = new ActivityDescriptor { Constructor = _ => new(activity) };
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
 
         if (version.HasValue)
             Mock.Get(activityRegistry).Find(typeName, version.Value).Returns(descriptor);
@@ -144,7 +144,7 @@ public sealed class ActivityJsonConverterTests
             CustomProperties = { [customPropertyName] = customPropertyValue }
         };
 
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
 
         // Mock type name lookups to return null, ensuring the custom property lookup path is tested
         Mock.Get(activityRegistry).Find(Arg.Any<string>()).Returns((ActivityDescriptor?)null);
@@ -332,7 +332,7 @@ public sealed class ActivityJsonConverterTests
     private static ActivityJsonConverter CreateSut(IActivityRegistry activityRegistry)
     {
         var expressionDescriptorRegistry = new ExpressionDescriptorRegistry([]);
-        var serviceProvider = Mock.Of<IServiceProvider>().Object;
+        var serviceProvider = IServiceProvider.Mock().Object;
         Mock.Get(serviceProvider)
             .GetService(typeof(ILogger<ActivityJsonConverter>))
             .Returns(CreateLogger<ActivityJsonConverter>());

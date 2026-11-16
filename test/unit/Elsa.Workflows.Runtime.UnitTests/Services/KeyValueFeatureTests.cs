@@ -13,7 +13,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 public class KeyValueFeatureTests
 {
     private readonly IServiceCollection _services = new ServiceCollection();
-    private readonly IModule _module = Mock.Of<IModule>().Object;
+    private readonly IModule _module = IModule.Mock().Object;
 
     public KeyValueFeatureTests()
     {

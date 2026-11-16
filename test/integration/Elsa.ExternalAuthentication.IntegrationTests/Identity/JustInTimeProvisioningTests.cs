@@ -160,7 +160,7 @@ public class JustInTimeProvisioningTests
         services.AddSingleton<Elsa.Common.Multitenancy.ITenantAccessor>(new TestTenantAccessor("tenant-a"));
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
-        services.AddSingleton<IRoleProvider>(Mock.Of<IRoleProvider>().Object);
+        services.AddSingleton<IRoleProvider>(IRoleProvider.Mock().Object);
         services.AddScoped<IExternalIdentityProvisioner, InMemoryExternalIdentityProvisioner>();
         await using var provider = services.BuildServiceProvider();
         var request = CreateProvisioningRequest();
@@ -191,7 +191,7 @@ public class JustInTimeProvisioningTests
         IRoleProvider? roleProvider = null) => new(
         userStore,
         new StoreBasedUserProvider(userStore),
-        roleProvider ?? Mock.Of<IRoleProvider>().Object,
+        roleProvider ?? IRoleProvider.Mock().Object,
         identityGenerator ?? new Elsa.Workflows.GuidIdentityGenerator(),
         new FakeTimeProvider(DateTimeOffset.UtcNow),
         new HmacExternalAuthenticationHandleHasher(),

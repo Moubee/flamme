@@ -136,7 +136,7 @@ public class ExpressionExecutionContextExtensionsTests
     public async Task GetInput_ResolvesSerializerOptionsFromCurrentHostOnEachCall()
     {
         // Arrange
-        var serializer = Mock.Of<IJsonSerializer>().Object;
+        var serializer = IJsonSerializer.Mock().Object;
         Mock.Get(serializer).GetOptions().ReturnsSequentially(CreateTaggedOptions("first"), CreateTaggedOptions("second"));
 
         var context = await CreateContextAsync(serializer);

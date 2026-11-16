@@ -20,7 +20,7 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "external-user", Name = "external-user", TenantId = "tenant-a" });
-        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
+        var links = IExternalIdentityLinkManagementStore.Mock().Object;
         Mock.Get(links).FindAsync(
                 Arg.Is<ExternalIdentityLinkFilter>(x => x.TenantId == "tenant-a" && x.UserId == "external-user"),
                 Arg.Any<CancellationToken>())
@@ -44,7 +44,7 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "local-user", Name = "local-user", TenantId = "tenant-a" });
-        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
+        var links = IExternalIdentityLinkManagementStore.Mock().Object;
         Mock.Get(links).FindAsync(
                 Arg.Is<ExternalIdentityLinkFilter>(x => x.TenantId == "tenant-a" && x.UserId == "local-user"),
                 Arg.Any<CancellationToken>())
@@ -64,7 +64,7 @@ public class ExternalAuthenticationUserDeletionDependencyContributorTests
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         await users.SaveAsync(new User { Id = "racing-user", Name = "racing-user", TenantId = "tenant-a" });
-        var links = Mock.Of<IExternalIdentityLinkManagementStore>().Object;
+        var links = IExternalIdentityLinkManagementStore.Mock().Object;
         var inspectionCount = 0;
         Mock.Get(links).FindAsync(Arg.Any<ExternalIdentityLinkFilter>(), Arg.Any<CancellationToken>())
             .Returns(() => ValueTask.FromResult(Interlocked.Increment(ref inspectionCount) == 1

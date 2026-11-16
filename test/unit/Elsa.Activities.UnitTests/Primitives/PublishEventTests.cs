@@ -17,7 +17,7 @@ public class PublishEventTests
     public async Task ExecuteAsync_PublishesEvent_WithParameters(string eventName, string? correlationId, string? expectedCorrelationId, bool expectNullCorrelation)
     {
         // Arrange
-        var publisher = Mock.Of<IEventPublisher>().Object;
+        var publisher = IEventPublisher.Mock().Object;
 
         // Act
         await ExecuteAsync(CreateActivity(eventName, correlationId), publisher);
@@ -37,7 +37,7 @@ public class PublishEventTests
     {
         // Arrange
         const string eventName = "TestEvent";
-        var publisher = Mock.Of<IEventPublisher>().Object;
+        var publisher = IEventPublisher.Mock().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity(eventName, isLocalEvent: isLocalEvent), publisher);
@@ -56,7 +56,7 @@ public class PublishEventTests
         // Arrange
         const string eventName = "OrderCreated";
         var payload = new { OrderId = 123, Amount = 99.99m };
-        var publisher = Mock.Of<IEventPublisher>().Object;
+        var publisher = IEventPublisher.Mock().Object;
 
         // Act
         await ExecuteAsync(CreateActivity(eventName, payload: payload), publisher);
@@ -69,7 +69,7 @@ public class PublishEventTests
     public async Task ExecuteAsync_CompletesActivity()
     {
         // Arrange
-        var publisher = Mock.Of<IEventPublisher>().Object;
+        var publisher = IEventPublisher.Mock().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity("TestEvent"), publisher);
@@ -85,7 +85,7 @@ public class PublishEventTests
         const string eventName = "CompleteOrderEvent";
         const string correlationId = "correlation-456";
         var payload = new { Status = "Shipped" };
-        var publisher = Mock.Of<IEventPublisher>().Object;
+        var publisher = IEventPublisher.Mock().Object;
 
         // Act
         var context = await ExecuteAsync(CreateActivity(eventName, correlationId, isLocalEvent: true, payload: payload), publisher);

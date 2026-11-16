@@ -17,7 +17,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Features;
 
 public class WorkflowRuntimeFeatureTests
 {
-    private readonly RuntimeFeature _feature = new(Mock.Of<IModule>().Object);
+    private readonly RuntimeFeature _feature = new(IModule.Mock().Object);
 
     [Test]
     public void AddWorkflow_Throws_WhenTypeDoesNotImplementWorkflow()
@@ -75,12 +75,12 @@ public class WorkflowRuntimeFeatureTests
     public async Task ClrWorkflowsProvider_MaterializesWorkflowOnce_WhenCanonicalAndLegacyKeysExist()
     {
         var createdCount = 0;
-        var builder = Mock.Of<IWorkflowBuilder>().Object;
-        var builderFactory = Mock.Of<IWorkflowBuilderFactory>().Object;
+        var builder = IWorkflowBuilder.Mock().Object;
+        var builderFactory = IWorkflowBuilderFactory.Mock().Object;
         var provider = new ClrWorkflowsProvider(
             Microsoft.Extensions.Options.Options.Create(new RuntimeOptions { Workflows = _feature.Workflows }),
             builderFactory,
-            Mock.Of<IServiceProvider>().Object);
+            IServiceProvider.Mock().Object);
         Mock.Get(builderFactory).CreateBuilder().Returns(builder);
         Mock.Get(builder).BuildWorkflowAsync(Arg.Any<CancellationToken>()).Returns(new Workflow());
 

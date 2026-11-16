@@ -17,11 +17,11 @@ public class StimulusSenderTests
     private const string BookmarkId = "bookmark-1";
     private const string CorrelationId = "correlation-1";
 
-    private readonly IStimulusHasher _stimulusHasher = Mock.Of<IStimulusHasher>().Object;
-    private readonly ITriggerBoundWorkflowService _triggerBoundWorkflowService = Mock.Of<ITriggerBoundWorkflowService>().Object;
-    private readonly IWorkflowResumer _workflowResumer = Mock.Of<IWorkflowResumer>().Object;
-    private readonly IBookmarkQueue _bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
-    private readonly ITriggerInvoker _triggerInvoker = Mock.Of<ITriggerInvoker>().Object;
+    private readonly IStimulusHasher _stimulusHasher = IStimulusHasher.Mock().Object;
+    private readonly ITriggerBoundWorkflowService _triggerBoundWorkflowService = ITriggerBoundWorkflowService.Mock().Object;
+    private readonly IWorkflowResumer _workflowResumer = IWorkflowResumer.Mock().Object;
+    private readonly IBookmarkQueue _bookmarkQueue = IBookmarkQueue.Mock().Object;
+    private readonly ITriggerInvoker _triggerInvoker = ITriggerInvoker.Mock().Object;
 
     public StimulusSenderTests()
     {

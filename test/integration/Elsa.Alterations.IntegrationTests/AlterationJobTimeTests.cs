@@ -19,11 +19,11 @@ public class AlterationJobTimeTests
         var time = new FakeTimeProvider(initialUtc);
         var job = new AlterationJob { Id = "job", PlanId = "plan", WorkflowInstanceId = "instance" };
         var plan = new AlterationPlan { Id = "plan" };
-        var jobs = Mock.Of<IAlterationJobStore>().Object;
-        var plans = Mock.Of<IAlterationPlanStore>().Object;
+        var jobs = IAlterationJobStore.Mock().Object;
+        var plans = IAlterationPlanStore.Mock().Object;
         Mock.Get(jobs).FindAsync(Arg.Any<AlterationJobFilter>(), Arg.Any<CancellationToken>()).Returns(job);
         Mock.Get(plans).FindAsync(Arg.Any<AlterationPlanFilter>(), Arg.Any<CancellationToken>()).Returns(plan);
-        var runner = new DefaultAlterationJobRunner(plans, jobs, new AdvancingRunner(time), Mock.Of<INotificationSender>().Object, time);
+        var runner = new DefaultAlterationJobRunner(plans, jobs, new AdvancingRunner(time), INotificationSender.Mock().Object, time);
 
         var result = await runner.RunAsync(job.Id);
 

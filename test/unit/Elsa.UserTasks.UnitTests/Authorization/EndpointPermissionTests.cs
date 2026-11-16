@@ -133,13 +133,13 @@ public class EndpointPermissionTests
 
     private static object CreateDependency(Type type)
     {
-        if (type == typeof(IUserTaskIdentityResolver)) return Mock.Of<IUserTaskIdentityResolver>().Object;
-        if (type == typeof(IOptions<UserTasksOptions>)) return Mock.Of<IOptions<UserTasksOptions>>().Object;
-        if (type == typeof(IUserTaskParticipantDirectory)) return Mock.Of<IUserTaskParticipantDirectory>().Object;
-        if (type == typeof(IUserTaskManager)) return Mock.Of<IUserTaskManager>().Object;
+        if (type == typeof(IUserTaskIdentityResolver)) return IUserTaskIdentityResolver.Mock().Object;
+        if (type == typeof(IOptions<UserTasksOptions>)) return IOptions<UserTasksOptions>.Mock().Object;
+        if (type == typeof(IUserTaskParticipantDirectory)) return IUserTaskParticipantDirectory.Mock().Object;
+        if (type == typeof(IUserTaskManager)) return IUserTaskManager.Mock().Object;
         if (type == typeof(TimeProvider)) return new FakeTimeProvider(DateTimeOffset.UnixEpoch);
-        if (type == typeof(IUserTaskAccessPolicy)) return Mock.Of<IUserTaskAccessPolicy>().Object;
-        if (type == typeof(IUserTaskInvitationService)) return Mock.Of<IUserTaskInvitationService>().Object;
+        if (type == typeof(IUserTaskAccessPolicy)) return IUserTaskAccessPolicy.Mock().Object;
+        if (type == typeof(IUserTaskInvitationService)) return IUserTaskInvitationService.Mock().Object;
         throw new InvalidOperationException($"No generated mock registered for endpoint dependency '{type}'.");
     }
 

@@ -166,11 +166,11 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
         var tenantAccessor = new TestTenantAccessor("tenant-b");
         IReadOnlyList<ActivityExecutionRecord>? savedActivities = null;
         IReadOnlyList<WorkflowExecutionLogRecord>? savedLogs = null;
-        var activityStore = Mock.Of<IActivityExecutionStore>().Object;
+        var activityStore = IActivityExecutionStore.Mock().Object;
         Mock.Get(activityStore).SaveManyAsync(Arg.Any<IEnumerable<ActivityExecutionRecord>>(), Arg.Any<CancellationToken>())
             .Callback((IEnumerable<ActivityExecutionRecord> records, CancellationToken cancellationToken) => savedActivities = records.ToList())
             .ReturnsAsync(Task.CompletedTask);
-        var logStore = Mock.Of<IWorkflowExecutionLogStore>().Object;
+        var logStore = IWorkflowExecutionLogStore.Mock().Object;
         Mock.Get(logStore).SaveManyAsync(Arg.Any<IEnumerable<WorkflowExecutionLogRecord>>(), Arg.Any<CancellationToken>())
             .Callback((IEnumerable<WorkflowExecutionLogRecord> records, CancellationToken cancellationToken) => savedLogs = records.ToList())
             .ReturnsAsync(Task.CompletedTask);
@@ -248,7 +248,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
         IWorkflowExecutionLogStore executionLogs,
         IBookmarkStore? bookmarks = null)
     {
-        var stateSerializer = Mock.Of<IWorkflowStateSerializer>().Object;
+        var stateSerializer = IWorkflowStateSerializer.Mock().Object;
         Mock.Get(stateSerializer).Deserialize(Arg.Any<JsonElement>()).Returns(new WorkflowState
         {
             Id = "instance-1",
@@ -256,16 +256,16 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             DefinitionVersionId = "v1"
         });
 
-        var instanceManager = Mock.Of<IWorkflowInstanceManager>().Object;
+        var instanceManager = IWorkflowInstanceManager.Mock().Object;
         Mock.Get(instanceManager).SaveAsync(Arg.Any<WorkflowState>(), Arg.Any<CancellationToken>())
             .Returns(new WorkflowInstance { Id = "instance-1" });
 
         return new Import(
             instanceManager,
-            Mock.Of<IWorkflowInstanceStore>().Object,
+            IWorkflowInstanceStore.Mock().Object,
             activityExecutions,
             executionLogs,
-            bookmarks ?? Mock.Of<IBookmarkStore>().Object,
+            bookmarks ?? IBookmarkStore.Mock().Object,
             stateSerializer,
             new ConformancePayloadSerializer(),
             new ConformanceSafeSerializer(),

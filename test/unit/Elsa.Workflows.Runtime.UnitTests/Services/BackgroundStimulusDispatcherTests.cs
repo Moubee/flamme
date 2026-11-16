@@ -9,8 +9,8 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundStimulusDispatcherTests
 {
-    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
-    private readonly ITenantAccessor _tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+    private readonly ICommandSender _commandSender = ICommandSender.Mock().Object;
+    private readonly ITenantAccessor _tenantAccessor = ITenantAccessor.Mock().Object;
 
     [Test]
     public async Task SendAsync_DoesNotPropagateCallerToken()

@@ -32,14 +32,14 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
         var storeA = new MemoryBookmarkQueueStore(memory, accessorA);
         var storeB = new MemoryBookmarkQueueStore(memory, accessorB);
 
-        var identity = Mock.Of<IIdentityGenerator>().Object;
+        var identity = IIdentityGenerator.Mock().Object;
         Mock.Get(identity).GenerateId().Returns("queue-a");
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
         timeProvider.SetUtcNow(DateTimeOffset.UtcNow);
 
         var queue = new StoreBookmarkQueue(
             storeA,
-            Mock.Of<IBookmarkQueueSignaler>().Object,
+            IBookmarkQueueSignaler.Mock().Object,
             timeProvider,
             identity,
             NullLogger<StoreBookmarkQueue>.Instance,
@@ -60,13 +60,13 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
 
         await Assert.That(pageB.Items).IsEmpty();
 
-        var resumer = Mock.Of<IWorkflowResumer>().Object;
+        var resumer = IWorkflowResumer.Mock().Object;
         Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
                     .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-b" }]);
 
         var processor = new BookmarkQueueProcessor(
             storeB,
-            Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
+            IBookmarkQueueDeadLetterManager.Mock().Object,
             resumer,
             timeProvider,
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),

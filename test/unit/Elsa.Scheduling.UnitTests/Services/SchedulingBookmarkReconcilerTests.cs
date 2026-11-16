@@ -25,7 +25,7 @@ public class SchedulingBookmarkReconcilerTests
             Instance("finished", WorkflowStatus.Finished, WorkflowSubStatus.Finished),
             Instance("cancelled", WorkflowStatus.Finished, WorkflowSubStatus.Cancelled),
             Instance("faulted", WorkflowStatus.Finished, WorkflowSubStatus.Faulted));
-        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Mock.Of<IBookmarkManager>().Object);
+        var reconciler = new SchedulingBookmarkReconciler(instanceStore, IBookmarkManager.Mock().Object);
 
         var result = await reconciler.ClassifyAsync(
         [
@@ -48,7 +48,7 @@ public class SchedulingBookmarkReconcilerTests
     public async Task ClassifyAsync_KeepsPastDueSuspendedDelayBookmarks()
     {
         var instanceStore = CreateInstanceStore(Instance("suspended", WorkflowStatus.Running, WorkflowSubStatus.Suspended));
-        var reconciler = new SchedulingBookmarkReconciler(instanceStore, Mock.Of<IBookmarkManager>().Object);
+        var reconciler = new SchedulingBookmarkReconciler(instanceStore, IBookmarkManager.Mock().Object);
 
         var result = await reconciler.ClassifyAsync([Bookmark("past-due-delay", "suspended")]);
 
@@ -66,7 +66,7 @@ public class SchedulingBookmarkReconcilerTests
             Bookmark("orphan-2", "finished"),
             Bookmark("live", "suspended")
         ], CancellationToken.None);
-        var bookmarkManager = new DefaultBookmarkManager(bookmarkStore, Mock.Of<INotificationSender>().Object, NullLogger<DefaultBookmarkManager>.Instance);
+        var bookmarkManager = new DefaultBookmarkManager(bookmarkStore, INotificationSender.Mock().Object, NullLogger<DefaultBookmarkManager>.Instance);
         var reconciler = new SchedulingBookmarkReconciler(CreateInstanceStore(), bookmarkManager);
 
         await reconciler.PurgeAsync([Bookmark("orphan-1", "missing"), Bookmark("orphan-2", "finished")]);
@@ -78,7 +78,7 @@ public class SchedulingBookmarkReconcilerTests
     [Test]
     public async Task PurgeAsync_DoesNotDeleteWhenThereAreNoOrphans()
     {
-        var bookmarkManager = Mock.Of<IBookmarkManager>().Object;
+        var bookmarkManager = IBookmarkManager.Mock().Object;
         var reconciler = new SchedulingBookmarkReconciler(CreateInstanceStore(), bookmarkManager);
 
         await reconciler.PurgeAsync([]);
@@ -89,7 +89,7 @@ public class SchedulingBookmarkReconcilerTests
     [Test]
     public async Task PurgeAsync_DoesNotDeleteWhenInstanceBecameRunning()
     {
-        var bookmarkManager = Mock.Of<IBookmarkManager>().Object;
+        var bookmarkManager = IBookmarkManager.Mock().Object;
         var reconciler = new SchedulingBookmarkReconciler(
             CreateInstanceStore(Instance("revived", WorkflowStatus.Running, WorkflowSubStatus.Suspended)),
             bookmarkManager);

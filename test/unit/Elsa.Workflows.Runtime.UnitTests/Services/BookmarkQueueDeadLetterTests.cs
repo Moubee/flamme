@@ -20,8 +20,8 @@ public class BookmarkQueueDeadLetterTests
 {
     private readonly DateTimeOffset _now = new(2026, 5, 20, 10, 0, 0, TimeSpan.Zero);
     private readonly FakeTimeProvider _timeProvider;
-    private readonly IIdentityGenerator _identityGenerator = Mock.Of<IIdentityGenerator>().Object;
-    private readonly IBookmarkQueueSignaler _signaler = Mock.Of<IBookmarkQueueSignaler>().Object;
+    private readonly IIdentityGenerator _identityGenerator = IIdentityGenerator.Mock().Object;
+    private readonly IBookmarkQueueSignaler _signaler = IBookmarkQueueSignaler.Mock().Object;
     private readonly MemoryBookmarkQueueStore _queueStore;
     private readonly MemoryBookmarkQueueDeadLetterStore _deadLetterStore;
 

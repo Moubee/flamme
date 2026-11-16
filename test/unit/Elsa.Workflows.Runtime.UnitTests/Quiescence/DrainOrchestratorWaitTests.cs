@@ -680,9 +680,9 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
-        var orchestrator = Mock.Of<IDrainOrchestrator>().Object;
+        var orchestrator = IDrainOrchestrator.Mock().Object;
         Mock.Get(orchestrator).DrainAsync(DrainTrigger.HostStopSignal, cts.Token).Returns(() => ThrowObjectDisposedAsync());
-        var hostedService = new DrainOrchestratorHostedService(orchestrator, Mock.Of<ILogger<DrainOrchestratorHostedService>>().Object);
+        var hostedService = new DrainOrchestratorHostedService(orchestrator, ILogger<DrainOrchestratorHostedService>.Mock().Object);
 
         await hostedService.StopAsync(cts.Token);
     }
@@ -691,9 +691,9 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
     [DisplayName("Host stop drain propagates ObjectDisposedException before shutdown cancellation")]
     public async Task HostStopDrainPropagatesObjectDisposedExceptionBeforeCancellation()
     {
-        var orchestrator = Mock.Of<IDrainOrchestrator>().Object;
+        var orchestrator = IDrainOrchestrator.Mock().Object;
         Mock.Get(orchestrator).DrainAsync(DrainTrigger.HostStopSignal, CancellationToken.None).Returns(() => ThrowObjectDisposedAsync());
-        var hostedService = new DrainOrchestratorHostedService(orchestrator, Mock.Of<ILogger<DrainOrchestratorHostedService>>().Object);
+        var hostedService = new DrainOrchestratorHostedService(orchestrator, ILogger<DrainOrchestratorHostedService>.Mock().Object);
 
         await Assert.ThrowsExactlyAsync<ObjectDisposedException>(() => hostedService.StopAsync(CancellationToken.None));
     }

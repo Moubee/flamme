@@ -111,8 +111,8 @@ public class ExpressionDescriptorRegistryTests
     public async Task Should_Handle_Duplicate_Registrations_Last_Wins()
     {
         // Arrange - Two providers register the same type
-        var handler1 = Mock.Of<IExpressionHandler>().Object;
-        var handler2 = Mock.Of<IExpressionHandler>().Object;
+        var handler1 = IExpressionHandler.Mock().Object;
+        var handler2 = IExpressionHandler.Mock().Object;
         var descriptor1 = CreateDescriptor("DuplicateType", handler1);
         var descriptor2 = CreateDescriptor("DuplicateType", handler2);
         var provider1 = CreateProvider(descriptor1);
@@ -198,7 +198,7 @@ public class ExpressionDescriptorRegistryTests
 
     private static ExpressionDescriptor CreateDescriptor(string type)
     {
-        var handler = Mock.Of<IExpressionHandler>().Object;
+        var handler = IExpressionHandler.Mock().Object;
         return CreateDescriptor(type, handler);
     }
 
@@ -213,7 +213,7 @@ public class ExpressionDescriptorRegistryTests
 
     private static IExpressionDescriptorProvider CreateProvider(params ExpressionDescriptor[] descriptors)
     {
-        var provider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        var provider = IExpressionDescriptorProvider.Mock().Object;
         Mock.Get(provider).GetDescriptors().Returns(descriptors);
         return provider;
     }

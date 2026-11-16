@@ -19,6 +19,6 @@ public class FastEndpointsResolverTests
         await host.InitializeAsync();
         await host.DisposeAsync();
 
-        await Assert.That(Factory.Create<Create>(Mock.Of<IUserManager>().Object, Mock.Of<IRoleAuthorizationService>().Object)).IsNotNull();
+        await Assert.That(Factory.Create<Create>(IUserManager.Mock().Object, IRoleAuthorizationService.Mock().Object)).IsNotNull();
     }
 }

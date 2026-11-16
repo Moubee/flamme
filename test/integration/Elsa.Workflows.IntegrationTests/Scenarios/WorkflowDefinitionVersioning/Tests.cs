@@ -305,7 +305,7 @@ public class Tests : IAsyncDisposable
         BatchFailurePoint failurePoint
     )
     {
-        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var store = IWorkflowDefinitionStore.Mock().Object;
 
         Mock.Get(store).FindLastVersionAsync(
                 Arg.Any<WorkflowDefinitionFilter>(),

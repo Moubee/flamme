@@ -10,10 +10,10 @@ namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
 public class DispatchWorkflowCommandHandlerTests
 {
-    private readonly IStimulusSender _stimulusSender = Mock.Of<IStimulusSender>().Object;
-    private readonly IWorkflowRuntime _workflowRuntime = Mock.Of<IWorkflowRuntime>().Object;
-    private readonly IWorkflowClient _workflowClient = Mock.Of<IWorkflowClient>().Object;
-    private readonly INotificationSender _notificationSender = Mock.Of<INotificationSender>().Object;
+    private readonly IStimulusSender _stimulusSender = IStimulusSender.Mock().Object;
+    private readonly IWorkflowRuntime _workflowRuntime = IWorkflowRuntime.Mock().Object;
+    private readonly IWorkflowClient _workflowClient = IWorkflowClient.Mock().Object;
+    private readonly INotificationSender _notificationSender = INotificationSender.Mock().Object;
     private readonly DispatchWorkflowCommandHandler _handler;
 
     public DispatchWorkflowCommandHandlerTests()

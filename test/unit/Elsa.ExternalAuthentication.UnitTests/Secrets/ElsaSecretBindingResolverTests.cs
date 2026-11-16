@@ -12,7 +12,7 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task MissingBindingReportsOnlySafeState()
     {
-        var manager = Mock.Of<ISecretManager>().Object;
+        var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).GetAsync("missing", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
 
@@ -25,7 +25,7 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task IncompatibleBindingDoesNotResolveOrTestTheSecret()
     {
-        var manager = Mock.Of<ISecretManager>().Object;
+        var manager = ISecretManager.Mock().Object;
         var secret = CreateSecret();
         Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
@@ -42,7 +42,7 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task ResolutionReturnsTransientValueAndOpaqueStableGenerationThatChangesOnRotation()
     {
-        var manager = Mock.Of<ISecretManager>().Object;
+        var manager = ISecretManager.Mock().Object;
         var secret = CreateSecret();
         Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
         Mock.Get(manager).TestAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(new SecretTestResponse { Succeeded = true }));
@@ -81,7 +81,7 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task ManagedReplaceStagesUniqueManagedBindingWithoutExposingTheValue()
     {
-        var manager = Mock.Of<ISecretManager>().Object;
+        var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
         Mock.Get(manager).CreateAsync(Arg.Any<CreateSecretRequest>(), Arg.Any<CancellationToken>()).Returns((CreateSecretRequest request, CancellationToken _) => new Secret { Name = request.Name });
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
@@ -103,7 +103,7 @@ public class ElsaSecretBindingResolverTests
     [Test]
     public async Task RemovingManagedBindingDeletesOnlyStudioOwnedSecretMaterial()
     {
-        var manager = Mock.Of<ISecretManager>().Object;
+        var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(true));
         var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
 

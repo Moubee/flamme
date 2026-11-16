@@ -22,12 +22,12 @@ public class CreateSchedulesStartupTaskTests
     ];
 
     private readonly StoredBookmark[] _bookmarks = [new() { Id = "bookmark-1", Hash = "hash", WorkflowInstanceId = "instance" }];
-    private readonly ITriggerStore _triggerStore = Mock.Of<ITriggerStore>().Object;
-    private readonly IBookmarkStore _bookmarkStore = Mock.Of<IBookmarkStore>().Object;
-    private readonly ITriggerScheduler _triggerScheduler = Mock.Of<ITriggerScheduler>().Object;
-    private readonly IBookmarkScheduler _bookmarkScheduler = Mock.Of<IBookmarkScheduler>().Object;
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-    private readonly IBookmarkManager _bookmarkManager = Mock.Of<IBookmarkManager>().Object;
+    private readonly ITriggerStore _triggerStore = ITriggerStore.Mock().Object;
+    private readonly IBookmarkStore _bookmarkStore = IBookmarkStore.Mock().Object;
+    private readonly ITriggerScheduler _triggerScheduler = ITriggerScheduler.Mock().Object;
+    private readonly IBookmarkScheduler _bookmarkScheduler = IBookmarkScheduler.Mock().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
+    private readonly IBookmarkManager _bookmarkManager = IBookmarkManager.Mock().Object;
     private readonly SchedulingOptions _options = new() { StartupSchedulePageSize = 1000 };
 
     public CreateSchedulesStartupTaskTests()
@@ -63,7 +63,7 @@ public class CreateSchedulesStartupTaskTests
     public async Task ExecuteAsync_WithTenantBackgroundQueue_EnqueuesScheduleCreation()
     {
         TenantBackgroundWorkItem? workItem = null;
-        var workQueue = Mock.Of<ITenantBackgroundWorkQueue>().Object;
+        var workQueue = ITenantBackgroundWorkQueue.Mock().Object;
         Mock.Get(workQueue).EnqueueAsync(Arg.Any<TenantBackgroundWorkItem>(), Arg.Any<CancellationToken>())
             .Callback((TenantBackgroundWorkItem item, CancellationToken _) => workItem = item);
         var serviceProvider = CreateServiceProvider(services => services.AddSingleton(workQueue));

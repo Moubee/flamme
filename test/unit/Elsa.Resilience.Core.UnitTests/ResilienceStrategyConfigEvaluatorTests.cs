@@ -10,10 +10,10 @@ namespace Elsa.Resilience.Core.UnitTests;
 
 public class ResilienceStrategyConfigEvaluatorTests
 {
-    private readonly IResilienceStrategyCatalog _catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
-    private readonly IExpressionEvaluator _expressionEvaluator = Mock.Of<IExpressionEvaluator>().Object;
+    private readonly IResilienceStrategyCatalog _catalog = IResilienceStrategyCatalog.Mock().Object;
+    private readonly IExpressionEvaluator _expressionEvaluator = IExpressionEvaluator.Mock().Object;
     private readonly ResilienceStrategyConfigEvaluator _evaluator;
-    private readonly ExpressionExecutionContext _context = new(Mock.Of<IServiceProvider>().Object, null!);
+    private readonly ExpressionExecutionContext _context = new(IServiceProvider.Mock().Object, null!);
 
     public ResilienceStrategyConfigEvaluatorTests()
     {

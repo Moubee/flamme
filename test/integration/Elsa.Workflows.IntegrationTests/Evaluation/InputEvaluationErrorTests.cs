@@ -62,7 +62,7 @@ public class InputEvaluationErrorTests : EvaluationTestBase
         WriteLine writeLine,
         Exception thrownException)
     {
-        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        var mockHandler = IExpressionHandler.Mock().Object;
         Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),
@@ -76,7 +76,7 @@ public class InputEvaluationErrorTests : EvaluationTestBase
             HandlerFactory = _ => mockHandler
         };
 
-        var mockProvider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        var mockProvider = IExpressionDescriptorProvider.Mock().Object;
         Mock.Get(mockProvider).GetDescriptors().Returns([mockDescriptor]);
 
         var fixture = new ActivityTestFixture(writeLine)

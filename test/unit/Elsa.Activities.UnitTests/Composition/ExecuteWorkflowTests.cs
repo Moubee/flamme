@@ -110,7 +110,7 @@ public class ExecuteWorkflowTests
         // Arrange
         const string workflowDefinitionId = "non-existent-workflow";
 
-        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
+        var workflowDefinitionService = IWorkflowDefinitionService.Mock().Object;
         Mock.Get(workflowDefinitionService)
             .FindWorkflowGraphAsync(workflowDefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>())
             .Returns((WorkflowGraph?)null);
@@ -201,7 +201,7 @@ public class ExecuteWorkflowTests
 
     private static IWorkflowDefinitionService CreateWorkflowDefinitionService(string workflowDefinitionId, WorkflowGraph workflowGraph)
     {
-        var service = Mock.Of<IWorkflowDefinitionService>().Object;
+        var service = IWorkflowDefinitionService.Mock().Object;
         Mock.Get(service)
             .FindWorkflowGraphAsync(workflowDefinitionId, Arg.Any<VersionOptions>(), Arg.Any<CancellationToken>())
             .Returns(workflowGraph);
@@ -210,7 +210,7 @@ public class ExecuteWorkflowTests
 
     private static IIdentityGenerator CreateIdentityGenerator(string generatedId)
     {
-        var generator = Mock.Of<IIdentityGenerator>().Object;
+        var generator = IIdentityGenerator.Mock().Object;
         Mock.Get(generator).GenerateId().Returns(generatedId);
         return generator;
     }
@@ -220,7 +220,7 @@ public class ExecuteWorkflowTests
         IDictionary<string, object>? output,
         WorkflowSubStatus subStatus = WorkflowSubStatus.Executing)
     {
-        var invoker = Mock.Of<IWorkflowInvoker>().Object;
+        var invoker = IWorkflowInvoker.Mock().Object;
         var workflow = Workflow.FromActivity(new WriteLine("Test"));
         var workflowState = new WorkflowState
         {
@@ -258,7 +258,7 @@ public class ExecuteWorkflowTests
                 services.AddSingleton(workflowDefinitionService);
                 services.AddSingleton(workflowInvoker);
                 services.AddSingleton(identityGenerator);
-                services.AddSingleton<IStimulusHasher>(_ => Mock.Of<IStimulusHasher>().Object);
+                services.AddSingleton<IStimulusHasher>(_ => IStimulusHasher.Mock().Object);
             })
             .ExecuteAsync();
 

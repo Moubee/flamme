@@ -147,7 +147,7 @@ public class ContainerTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = Mock.Of<IActivity>().Object;
+        var mockActivity = IActivity.Mock().Object;
         var container = CreateContainerWithActivities(writeLine, setVariable, mockActivity);
 
         // Act

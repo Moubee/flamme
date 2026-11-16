@@ -127,7 +127,7 @@ public class DefaultTenantResolverPipelineInvokerTests
 
     private static ITenantResolver CreateMockResolver(TenantResolverResult result)
     {
-        var mockResolver = Mock.Of<ITenantResolver>().Object;
+        var mockResolver = ITenantResolver.Mock().Object;
         Mock.Get(mockResolver).ResolveAsync(Arg.Any<TenantResolverContext>()).Returns(result);
         return mockResolver;
     }
@@ -136,13 +136,13 @@ public class DefaultTenantResolverPipelineInvokerTests
         List<Tenant> tenants,
         TenantResolverResult resolverResult)
     {
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).Returns(tenants);
 
         var mockResolver = CreateMockResolver(resolverResult);
 
         // Use a mock pipeline builder that directly returns our mock resolver
-        var pipelineBuilder = Mock.Of<ITenantResolverPipelineBuilder>().Object;
+        var pipelineBuilder = ITenantResolverPipelineBuilder.Mock().Object;
         Mock.Get(pipelineBuilder).Build(Arg.Any<IServiceProvider>()).Returns(new[] { mockResolver });
 
         var options = Microsoft.Extensions.Options.Options.Create(new MultitenancyOptions
@@ -150,7 +150,7 @@ public class DefaultTenantResolverPipelineInvokerTests
             TenantResolverPipelineBuilder = pipelineBuilder
         });
 
-        var serviceProvider = Mock.Of<IServiceProvider>().Object;
+        var serviceProvider = IServiceProvider.Mock().Object;
         var logger = NullLogger<DefaultTenantResolverPipelineInvoker>.Instance;
         var invoker = new DefaultTenantResolverPipelineInvoker(options, tenantsProvider, serviceProvider, logger);
 
@@ -161,11 +161,11 @@ public class DefaultTenantResolverPipelineInvokerTests
         List<Tenant> tenants,
         params ITenantResolver[] resolvers)
     {
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).Returns(tenants);
 
         // Use a mock pipeline builder that directly returns our mock resolvers
-        var pipelineBuilder = Mock.Of<ITenantResolverPipelineBuilder>().Object;
+        var pipelineBuilder = ITenantResolverPipelineBuilder.Mock().Object;
         Mock.Get(pipelineBuilder).Build(Arg.Any<IServiceProvider>()).Returns(resolvers);
 
         var options = Microsoft.Extensions.Options.Options.Create(new MultitenancyOptions
@@ -173,7 +173,7 @@ public class DefaultTenantResolverPipelineInvokerTests
             TenantResolverPipelineBuilder = pipelineBuilder
         });
 
-        var serviceProvider = Mock.Of<IServiceProvider>().Object;
+        var serviceProvider = IServiceProvider.Mock().Object;
         var logger = NullLogger<DefaultTenantResolverPipelineInvoker>.Instance;
         return new(options, tenantsProvider, serviceProvider, logger);
     }

@@ -24,7 +24,7 @@ public class BookmarkQueueTenantIsolationTests
         var tenantB = Tenant("tenant-b");
         var resumed = new List<string>();
         var resumedLock = new Lock();
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
 
         var (workerA, processorA) = CreateResumingWorker(signaler, accessor, tenantA, "bookmark-a", resumed, resumedLock, tenantsProvider);
         var (workerB, processorB) = CreateResumingWorker(signaler, accessor, tenantB, "bookmark-b", resumed, resumedLock, tenantsProvider);
@@ -69,7 +69,7 @@ public class BookmarkQueueTenantIsolationTests
     {
         var accessor = new DefaultTenantAccessor();
         var signaler = new BookmarkQueueSignaler(accessor);
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         var (worker, scopes) = CreateRecordingWorker(signaler, accessor, Tenant("tenant-a"), tenantsProvider);
 
         try
@@ -95,7 +95,7 @@ public class BookmarkQueueTenantIsolationTests
         var signaler = new BookmarkQueueSignaler(accessor);
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         var (workerA, processorA, scopesA) = CreateCountingWorker(signaler, accessor, tenantA, tenantsProvider);
         var (workerB, processorB, scopesB) = CreateCountingWorker(signaler, accessor, tenantB, tenantsProvider);
 
@@ -132,7 +132,7 @@ public class BookmarkQueueTenantIsolationTests
         var signaler = new BookmarkQueueSignaler(accessor);
         var tenantA = Tenant("tenant-a");
         var tenantB = Tenant("tenant-b");
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         var (workerA, processorA, scopesA) = CreateCountingWorker(signaler, accessor, tenantA, tenantsProvider);
         var (workerB, processorB, _) = CreateCountingWorker(signaler, accessor, tenantB, tenantsProvider);
 
@@ -191,7 +191,7 @@ public class BookmarkQueueTenantIsolationTests
     {
         var accessor = new DefaultTenantAccessor();
         var signaler = new BookmarkQueueSignaler(accessor);
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         var (worker, processor, _) = CreateCountingWorker(signaler, accessor, Elsa.Common.Multitenancy.Tenant.Default, tenantsProvider);
 
         try
@@ -229,7 +229,7 @@ public class BookmarkQueueTenantIsolationTests
             CreatedAt = DateTimeOffset.UtcNow
         }).GetAwaiter().GetResult();
 
-        var resumer = Mock.Of<IWorkflowResumer>().Object;
+        var resumer = IWorkflowResumer.Mock().Object;
         Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
                     .Returns((global::Elsa.Workflows.Runtime.Filters.BookmarkFilter __arg0, global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions? __arg1, global::System.Threading.CancellationToken __arg2) =>
                     {
@@ -243,7 +243,7 @@ public class BookmarkQueueTenantIsolationTests
 
         var inner = new BookmarkQueueProcessor(
             store,
-            Mock.Of<IBookmarkQueueDeadLetterManager>().Object,
+            IBookmarkQueueDeadLetterManager.Mock().Object,
             resumer,
             new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
             Microsoft.Extensions.Options.Options.Create(new BookmarkQueuePurgeOptions()),

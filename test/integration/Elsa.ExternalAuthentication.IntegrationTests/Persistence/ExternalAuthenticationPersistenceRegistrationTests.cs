@@ -31,7 +31,7 @@ public class ExternalAuthenticationPersistenceRegistrationTests
         var services = new ServiceCollection();
         services.AddExternalAuthenticationServices();
 
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         var feature = new EFCoreIdentityPersistenceFeature(module);
         feature.UsePostgreSql("Host=localhost;Database=elsa;Username=elsa;Password=elsa");
@@ -81,7 +81,7 @@ public class ExternalAuthenticationPersistenceRegistrationTests
 
     private static EFCoreExternalAuthenticationPersistenceFeature CreatePersistenceFeature(IServiceCollection services)
     {
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         return new EFCoreExternalAuthenticationPersistenceFeature(module)
             .UsePostgreSql("Host=localhost;Database=elsa;Username=elsa;Password=elsa");

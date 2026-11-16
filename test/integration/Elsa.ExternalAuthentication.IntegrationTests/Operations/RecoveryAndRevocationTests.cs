@@ -15,7 +15,7 @@ public class RecoveryAndRevocationTests
     [Test]
     public async Task FinalNormalConnectionRequiresBreakGlassOrConfirmedPrivilegedOverride()
     {
-        var registry = Mock.Of<IIdentityProviderConnectionRegistry>().Object;
+        var registry = IIdentityProviderConnectionRegistry.Mock().Object;
         Mock.Get(registry).GetAsync("tenant-a", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new EffectiveConnectionRegistry([], [], "1")));
         var options = Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions { LocalLogin = new LocalLoginMethodOptions { IsEnabled = false } });
         var guard = new FinalLoginPathGuard(registry, options, new PermissionEvaluator());

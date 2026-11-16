@@ -103,14 +103,14 @@ public class DefaultCommitStateHandlerTests
         public ActivityExecutionContext ActivityExecutionContext { get; }
         public WorkflowState WorkflowState { get; }
         public WorkflowInstance WorkflowInstance { get; }
-        public IWorkflowInstanceManager WorkflowInstanceManager { get; } = Mock.Of<IWorkflowInstanceManager>().Object;
-        public IBookmarksPersister BookmarkPersister { get; } = Mock.Of<IBookmarksPersister>().Object;
-        public IVariablePersistenceManager VariablePersistenceManager { get; } = Mock.Of<IVariablePersistenceManager>().Object;
-        public IMediator Mediator { get; } = Mock.Of<IMediator>().Object;
+        public IWorkflowInstanceManager WorkflowInstanceManager { get; } = IWorkflowInstanceManager.Mock().Object;
+        public IBookmarksPersister BookmarkPersister { get; } = IBookmarksPersister.Mock().Object;
+        public IVariablePersistenceManager VariablePersistenceManager { get; } = IVariablePersistenceManager.Mock().Object;
+        public IMediator Mediator { get; } = IMediator.Mock().Object;
         public WorkflowCommitNotificationBuffer NotificationBuffer { get; }
-        public INotificationSender NotificationSender { get; } = Mock.Of<INotificationSender>().Object;
-        public ILogRecordSink<ActivityExecutionRecord> ActivityExecutionLogSink { get; } = Mock.Of<ILogRecordSink<ActivityExecutionRecord>>().Object;
-        public ILogRecordSink<WorkflowExecutionLogRecord> WorkflowExecutionLogSink { get; } = Mock.Of<ILogRecordSink<WorkflowExecutionLogRecord>>().Object;
+        public INotificationSender NotificationSender { get; } = INotificationSender.Mock().Object;
+        public ILogRecordSink<ActivityExecutionRecord> ActivityExecutionLogSink { get; } = ILogRecordSink<ActivityExecutionRecord>.Mock().Object;
+        public ILogRecordSink<WorkflowExecutionLogRecord> WorkflowExecutionLogSink { get; } = ILogRecordSink<WorkflowExecutionLogRecord>.Mock().Object;
         public RecordingWorkflowCommitTransaction Transaction { get; } = new();
         public DefaultCommitStateHandler Handler { get; }
 
@@ -128,7 +128,7 @@ public class DefaultCommitStateHandlerTests
         }
     }
 
-    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, Mock.Of<ILogger<WorkflowCommitNotificationBuffer>>().Object);
+    private static WorkflowCommitNotificationBuffer CreateBuffer(IMediator mediator) => new(mediator, ILogger<WorkflowCommitNotificationBuffer>.Mock().Object);
 
     private class TestNotification : INotification;
 

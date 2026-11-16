@@ -18,8 +18,8 @@ public class PermissionStampValidatorTests : IDisposable
     private const string SharedUserName = "admin";
 
     private readonly IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
-    private readonly IPermissionStampCalculator _calculator = Mock.Of<IPermissionStampCalculator>().Object;
+    private readonly IUserProvider _userProvider = IUserProvider.Mock().Object;
+    private readonly IPermissionStampCalculator _calculator = IPermissionStampCalculator.Mock().Object;
 
     private PermissionStampValidator CreateValidator(ITenantAccessor tenantAccessor) =>
         new(_userProvider, _calculator, _cache, tenantAccessor, MsOptions.Create(new PermissionStampOptions { IsEnabled = true }));

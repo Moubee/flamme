@@ -11,11 +11,11 @@ namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 
 public class ElsaWorkflowPersistenceHealthCheckTests
 {
-    private readonly IServiceProvider _serviceProvider = Mock.Of<IServiceProvider>().Object;
-    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-    private readonly ITriggerStore _triggerStore = Mock.Of<ITriggerStore>().Object;
-    private readonly IBookmarkQueueStore _bookmarkQueueStore = Mock.Of<IBookmarkQueueStore>().Object;
+    private readonly IServiceProvider _serviceProvider = IServiceProvider.Mock().Object;
+    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = IWorkflowDefinitionStore.Mock().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
+    private readonly ITriggerStore _triggerStore = ITriggerStore.Mock().Object;
+    private readonly IBookmarkQueueStore _bookmarkQueueStore = IBookmarkQueueStore.Mock().Object;
     private readonly ElsaWorkflowPersistenceHealthCheck _sut;
 
     public ElsaWorkflowPersistenceHealthCheckTests()

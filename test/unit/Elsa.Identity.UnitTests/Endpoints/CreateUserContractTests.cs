@@ -64,10 +64,10 @@ public class CreateUserContractTests
     public async Task EndpointNeverSerializesCredentialMaterial(string? suppliedPassword, bool generated, string? expectedGeneratedPassword)
     {
         var plainText = suppliedPassword ?? "generated-secret";
-        var userManager = Mock.Of<IUserManager>().Object;
+        var userManager = IUserManager.Mock().Object;
         Mock.Get(userManager).CreateUserAsync("alice", suppliedPassword, Arg.Any<ICollection<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new CreateUserResult(StoredUser, plainText, generated));
-        var roleAuthorization = Mock.Of<IRoleAuthorizationService>().Object;
+        var roleAuthorization = IRoleAuthorizationService.Mock().Object;
         Mock.Get(roleAuthorization).CanAssignRolesAsync(Arg.Any<System.Security.Claims.ClaimsPrincipal>(), Arg.Any<IEnumerable<string>?>(), Arg.Any<CancellationToken>()).Returns(true);
         var body = new MemoryStream();
         var endpoint = Factory.Create<Create>(context => context.Response.Body = body, userManager, roleAuthorization);

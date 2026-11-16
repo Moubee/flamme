@@ -62,8 +62,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         _adapter = new TestAdapter();
         _settingsMigrations = new TestAdapterSettingsMigrationService();
         _roleAuthorizationService = new TestRoleAuthorizationService();
-        _notifications = Mock.Of<INotificationSender>().Object;
-        _sessions = Mock.Of<IExternalAuthenticationSessionStore>().Object;
+        _notifications = INotificationSender.Mock().Object;
+        _sessions = IExternalAuthenticationSessionStore.Mock().Object;
         _managedSecretWriter = new TestManagedSecretBindingWriter();
     }
 
@@ -93,15 +93,15 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         services.AddSingleton<IIdentityProviderConnectionValidityAssessor, IdentityProviderConnectionValidityAssessor>();
         services.AddSingleton<IUnlinkedIdentityPolicyRegistry>(new TestUnlinkedIdentityPolicyRegistry());
         services.AddSingleton<IExternalUserMatcherRegistry>(new TestExternalUserMatcherRegistry("allowed-matcher", "disallowed-matcher"));
-        services.AddScoped(_ => Mock.Of<IPermissionGrantSourceRegistry>().Object);
-        services.AddSingleton<IPermissionDelegationAuthorizer>(Mock.Of<IPermissionDelegationAuthorizer>().Object);
+        services.AddScoped(_ => IPermissionGrantSourceRegistry.Mock().Object);
+        services.AddSingleton<IPermissionDelegationAuthorizer>(IPermissionDelegationAuthorizer.Mock().Object);
         services.AddSingleton<IRoleAuthorizationService>(_roleAuthorizationService);
         services.AddSingleton(_notifications);
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow));
         services.AddSingleton(_sessions);
         services.AddSingleton<IManagedSecretBindingWriter>(_managedSecretWriter);
         services.AddSingleton<ISecretBindingResolver>(new TestSecretBindingResolver());
-        var tenant = Mock.Of<ITenantAccessor>().Object;
+        var tenant = ITenantAccessor.Mock().Object;
         Mock.Get(tenant).TenantId.Returns(() => _tenantId);
         services.AddSingleton(tenant);
         services.AddScoped<IdentityProviderConnectionManagementService>();

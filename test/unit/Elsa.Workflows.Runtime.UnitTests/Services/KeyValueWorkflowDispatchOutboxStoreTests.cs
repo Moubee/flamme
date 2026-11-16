@@ -13,7 +13,7 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class KeyValueWorkflowDispatchOutboxStoreTests
 {
-    private readonly IKeyValueStore _keyValueStore = Mock.Of<IKeyValueStore>().Object;
+    private readonly IKeyValueStore _keyValueStore = IKeyValueStore.Mock().Object;
     private readonly TestPayloadSerializer _payloadSerializer = new();
     private readonly KeyValueWorkflowDispatchOutboxStore _store;
 

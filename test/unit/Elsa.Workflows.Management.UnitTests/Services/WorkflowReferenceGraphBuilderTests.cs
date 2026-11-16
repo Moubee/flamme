@@ -8,7 +8,7 @@ namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowReferenceGraphBuilderTests
 {
-    private readonly IWorkflowReferenceQuery _query = Mock.Of<IWorkflowReferenceQuery>().Object;
+    private readonly IWorkflowReferenceQuery _query = IWorkflowReferenceQuery.Mock().Object;
 
     [Test]
     public async Task BuildGraphAsync_WithNoConsumers_ReturnsEmptyGraph()

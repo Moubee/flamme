@@ -135,7 +135,7 @@ public class ExpressionEvaluatorTests
             HandlerFactory = _ => mockHandler
         };
 
-        var mockProvider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        var mockProvider = IExpressionDescriptorProvider.Mock().Object;
         Mock.Get(mockProvider).GetDescriptors().Returns([mockDescriptor]);
 
         var activity = new WriteLine("Hello, World!");
@@ -151,7 +151,7 @@ public class ExpressionEvaluatorTests
 
     private static IExpressionHandler CreateMockHandler(object returnValue)
     {
-        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        var mockHandler = IExpressionHandler.Mock().Object;
         Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),
@@ -163,7 +163,7 @@ public class ExpressionEvaluatorTests
 
     private static IExpressionHandler CreateMockHandlerThatThrows(Exception exception)
     {
-        var mockHandler = Mock.Of<IExpressionHandler>().Object;
+        var mockHandler = IExpressionHandler.Mock().Object;
         Mock.Get(mockHandler).EvaluateAsync(
                 Arg.Any<Expression>(),
                 Arg.Any<Type>(),

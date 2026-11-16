@@ -26,7 +26,7 @@ public class InMemoryExternalIdentityProvisionerTests
         var provisioner = new InMemoryExternalIdentityProvisioner(
             users,
             provider,
-            Mock.Of<IRoleProvider>().Object,
+            IRoleProvider.Mock().Object,
             new GuidIdentityGenerator(),
             new FakeTimeProvider(DateTimeOffset.UtcNow),
             hasher,
@@ -79,7 +79,7 @@ public class InMemoryExternalIdentityProvisionerTests
         InMemoryExternalIdentityProvisionerState state) => new(
         users,
         provider,
-        Mock.Of<IRoleProvider>().Object,
+        IRoleProvider.Mock().Object,
         new GuidIdentityGenerator(),
         new FakeTimeProvider(DateTimeOffset.UtcNow),
         hasher,

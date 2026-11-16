@@ -15,7 +15,7 @@ public class CorrelatedSingletonStrategyTests
     [Arguments(" ")]
     public async Task Throws_WhenCorrelationIdIsBlank(string? correlationId)
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         var strategy = new CorrelatedSingletonStrategy(store);
 
         await Assert.ThrowsExactlyAsync<ArgumentException>(async () =>
@@ -27,7 +27,7 @@ public class CorrelatedSingletonStrategyTests
     [Test]
     public async Task AllowsActivation_WhenNoRunningInstanceExistsForDefinitionAndCorrelation()
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(0);
         var strategy = new CorrelatedSingletonStrategy(store);
 
@@ -44,7 +44,7 @@ public class CorrelatedSingletonStrategyTests
     [Test]
     public async Task DeniesActivation_WhenRunningInstanceExistsForDefinitionAndCorrelation()
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(1);
         var strategy = new CorrelatedSingletonStrategy(store);
 

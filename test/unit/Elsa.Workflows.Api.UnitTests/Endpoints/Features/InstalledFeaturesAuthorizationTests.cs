@@ -38,7 +38,7 @@ public class InstalledFeaturesAuthorizationTests
         });
 
         var feature = new FeatureDescriptor("SecretsFeature", "Elsa.Secrets", "Secrets");
-        var installedFeatureProvider = Mock.Of<IInstalledFeatureProvider>().Object;
+        var installedFeatureProvider = IInstalledFeatureProvider.Mock().Object;
         Mock.Get(installedFeatureProvider).List().Returns([feature]);
         Mock.Get(installedFeatureProvider).Find(FeatureFullName).Returns(feature);
         builder.Services.AddSingleton(installedFeatureProvider);

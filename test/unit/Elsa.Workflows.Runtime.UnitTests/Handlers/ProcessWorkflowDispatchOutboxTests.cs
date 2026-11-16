@@ -11,13 +11,13 @@ namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
 
 public class ProcessWorkflowDispatchOutboxTests
 {
-    private readonly IWorkflowDispatchOutboxProcessor _processor = Mock.Of<IWorkflowDispatchOutboxProcessor>().Object;
+    private readonly IWorkflowDispatchOutboxProcessor _processor = IWorkflowDispatchOutboxProcessor.Mock().Object;
     private readonly WorkflowDispatcherOptions _options = new()
     {
         UseTransactionalOutbox = true,
         ProcessOutboxAfterCommit = true
     };
-    private readonly IServiceProvider _serviceProvider = Mock.Of<IServiceProvider>().Object;
+    private readonly IServiceProvider _serviceProvider = IServiceProvider.Mock().Object;
 
     public ProcessWorkflowDispatchOutboxTests()
     {

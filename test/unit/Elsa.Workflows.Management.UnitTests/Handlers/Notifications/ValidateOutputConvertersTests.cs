@@ -85,11 +85,11 @@ public class ValidateOutputConvertersTests
         public TestActivity Activity { get; }
         public ActivityNode Node { get; }
         public WorkflowGraph Graph { get; }
-        public IWorkflowGraphBuilder GraphBuilder { get; } = Mock.Of<IWorkflowGraphBuilder>().Object;
-        public IActivityRegistryLookupService ActivityRegistry { get; } = Mock.Of<IActivityRegistryLookupService>().Object;
-        public IOutputConverterRegistry Registry { get; } = Mock.Of<IOutputConverterRegistry>().Object;
-        public IOutputBindingDestinationResolver DestinationResolver { get; } = Mock.Of<IOutputBindingDestinationResolver>().Object;
-        public IOutputConverterSettingsValidator SettingsValidator { get; } = Mock.Of<IOutputConverterSettingsValidator>().Object;
+        public IWorkflowGraphBuilder GraphBuilder { get; } = IWorkflowGraphBuilder.Mock().Object;
+        public IActivityRegistryLookupService ActivityRegistry { get; } = IActivityRegistryLookupService.Mock().Object;
+        public IOutputConverterRegistry Registry { get; } = IOutputConverterRegistry.Mock().Object;
+        public IOutputBindingDestinationResolver DestinationResolver { get; } = IOutputBindingDestinationResolver.Mock().Object;
+        public IOutputConverterSettingsValidator SettingsValidator { get; } = IOutputConverterSettingsValidator.Mock().Object;
         public ServiceProvider ServiceProvider { get; }
 
         public async Task<ICollection<WorkflowValidationError>> ValidateAsync()

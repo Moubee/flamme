@@ -15,20 +15,20 @@ namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowDefinitionImporterOriginalSourceTests
 {
-    private readonly IActivitySerializer _serializer = Mock.Of<IActivitySerializer>().Object;
-    private readonly IWorkflowDefinitionPublisher _publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
+    private readonly IActivitySerializer _serializer = IActivitySerializer.Mock().Object;
+    private readonly IWorkflowDefinitionPublisher _publisher = IWorkflowDefinitionPublisher.Mock().Object;
     private readonly WorkflowDefinitionImporter _importer;
     private readonly WorkflowDefinitionMapper _mapper;
 
     public WorkflowDefinitionImporterOriginalSourceTests()
     {
-        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
+        var scopeFactory = IServiceScopeFactory.Mock().Object;
         var variableDefinitionMapper = new VariableDefinitionMapper(
             SerializationTypeRegistry.CreateDefault(),
             scopeFactory,
             NullLogger<VariableDefinitionMapper>.Instance);
         _importer = new(_serializer, _publisher, variableDefinitionMapper);
-        _mapper = new(_serializer, Mock.Of<IWorkflowDefinitionService>().Object, variableDefinitionMapper);
+        _mapper = new(_serializer, IWorkflowDefinitionService.Mock().Object, variableDefinitionMapper);
     }
 
     [Test]

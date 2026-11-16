@@ -11,11 +11,11 @@ namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
 public class ScheduledTaskDisposalTests : IDisposable
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 14, 12, 0, 0, TimeSpan.Zero);
-    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
-    private readonly IServiceScopeFactory _scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
-    private readonly IServiceScope _scope = Mock.Of<IServiceScope>().Object;
+    private readonly ICommandSender _commandSender = ICommandSender.Mock().Object;
+    private readonly IServiceScopeFactory _scopeFactory = IServiceScopeFactory.Mock().Object;
+    private readonly IServiceScope _scope = IServiceScope.Mock().Object;
     private readonly FakeTimeProvider _timeProvider = new(Now);
-    private readonly ICronParser _cronParser = Mock.Of<ICronParser>().Object;
+    private readonly ICronParser _cronParser = ICronParser.Mock().Object;
     private readonly ServiceProvider _services;
 
     public ScheduledTaskDisposalTests()
@@ -97,7 +97,7 @@ public class ScheduledTaskDisposalTests : IDisposable
 
     private IDisposable CreateScheduledTask(ScheduledTaskKind kind)
     {
-        var task = Mock.Of<ITask>().Object;
+        var task = ITask.Mock().Object;
         return kind switch
         {
             ScheduledTaskKind.Cron => new ScheduledCronTask(task, "0 * * * * *", _cronParser, _scopeFactory, _timeProvider, NullLogger<ScheduledCronTask>.Instance),

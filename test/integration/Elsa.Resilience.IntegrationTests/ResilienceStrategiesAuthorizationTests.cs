@@ -16,7 +16,7 @@ public class ResilienceStrategiesAuthorizationTests : WebApplicationTest<Resilie
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
-        var catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
+        var catalog = IResilienceStrategyCatalog.Mock().Object;
         Mock.Get(catalog).ListAsync(Arg.Any<CancellationToken>()).Returns([new HttpResilienceStrategy()]);
         services.AddSingleton(catalog);
         services.Configure<ResilienceOptions>(options => options.StrategyTypes.Add(typeof(HttpResilienceStrategy)));

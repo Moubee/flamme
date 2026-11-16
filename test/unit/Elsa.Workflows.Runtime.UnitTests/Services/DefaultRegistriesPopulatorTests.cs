@@ -15,9 +15,9 @@ public class DefaultRegistriesPopulatorTests
 
     public DefaultRegistriesPopulatorTests()
     {
-        _workflowDefinitionStorePopulatorMock = Mock.Of<IWorkflowDefinitionStorePopulator>().Object;
-        _activityRegistryPopulatorMock = Mock.Of<IActivityRegistryPopulator>().Object;
-        _notificationSenderMock = Mock.Of<INotificationSender>().Object;
+        _workflowDefinitionStorePopulatorMock = IWorkflowDefinitionStorePopulator.Mock().Object;
+        _activityRegistryPopulatorMock = IActivityRegistryPopulator.Mock().Object;
+        _notificationSenderMock = INotificationSender.Mock().Object;
 
         _populator = new(
             _workflowDefinitionStorePopulatorMock,

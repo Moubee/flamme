@@ -189,7 +189,7 @@ public class SwitchTests
     
     private static IActivity CreateActivityMock()
     {
-        var mock = Mock.Of<IActivity>();
+        var mock = IActivity.Mock();
         mock.SetupAllProperties();
         return mock.Object;
     }

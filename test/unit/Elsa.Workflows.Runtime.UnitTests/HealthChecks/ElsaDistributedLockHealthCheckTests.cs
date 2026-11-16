@@ -12,8 +12,8 @@ namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
 {
     private static readonly TimeSpan ExpectedLockAcquisitionTimeout = TimeSpan.FromMilliseconds(250);
-    private readonly IDistributedLockProvider _distributedLockProvider = Mock.Of<IDistributedLockProvider>().Object;
-    private readonly IDistributedLock _distributedLock = Mock.Of<IDistributedLock>().Object;
+    private readonly IDistributedLockProvider _distributedLockProvider = IDistributedLockProvider.Mock().Object;
+    private readonly IDistributedLock _distributedLock = IDistributedLock.Mock().Object;
     private readonly ServiceProvider _serviceProvider;
     private readonly ElsaDistributedLockHealthCheck _sut;
 
@@ -21,7 +21,7 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
     {
         Mock.Get(_distributedLockProvider).CreateLock(Arg.Any<string>()).Returns(_distributedLock);
         Mock.Get(_distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-                    .Returns(Mock.Of<IDistributedSynchronizationHandle>().Object);
+                    .Returns(IDistributedSynchronizationHandle.Mock().Object);
         _serviceProvider = CreateServiceProvider(_distributedLockProvider);
         _sut = new ElsaDistributedLockHealthCheck(_serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
     }
@@ -41,11 +41,11 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
     public async Task UsesUniqueProbeLockNameForEachCheck()
     {
         var lockNames = new List<string>();
-        var distributedLockProvider = Mock.Of<IDistributedLockProvider>().Object;
-        var distributedLock = Mock.Of<IDistributedLock>().Object;
+        var distributedLockProvider = IDistributedLockProvider.Mock().Object;
+        var distributedLock = IDistributedLock.Mock().Object;
         Mock.Get(distributedLockProvider).CreateLock(Arg.Any<string>()).Callback((string name) => lockNames.Add(name)).Returns(distributedLock);
         Mock.Get(distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-                    .Returns(Mock.Of<IDistributedSynchronizationHandle>().Object);
+                    .Returns(IDistributedSynchronizationHandle.Mock().Object);
         await using var serviceProvider = CreateServiceProvider(distributedLockProvider);
         var sut = new ElsaDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
 

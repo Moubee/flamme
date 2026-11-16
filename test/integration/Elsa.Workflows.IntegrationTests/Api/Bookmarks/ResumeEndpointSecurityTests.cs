@@ -11,11 +11,11 @@ namespace Elsa.Workflows.IntegrationTests.Api.Bookmarks;
 public class ResumeEndpointSecurityTests
 {
     private const int MaxRequestBodySize = 1024 * 1024;
-    private readonly ITokenService _tokenService = Mock.Of<ITokenService>().Object;
-    private readonly IPayloadSerializer _payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
-    private readonly IApiSerializer _apiSerializer = Mock.Of<IApiSerializer>().Object;
-    private readonly IWorkflowResumer _workflowResumer = Mock.Of<IWorkflowResumer>().Object;
-    private readonly IBookmarkQueue _bookmarkQueue = Mock.Of<IBookmarkQueue>().Object;
+    private readonly ITokenService _tokenService = ITokenService.Mock().Object;
+    private readonly IPayloadSerializer _payloadSerializer = IPayloadSerializer.Mock().Object;
+    private readonly IApiSerializer _apiSerializer = IApiSerializer.Mock().Object;
+    private readonly IWorkflowResumer _workflowResumer = IWorkflowResumer.Mock().Object;
+    private readonly IBookmarkQueue _bookmarkQueue = IBookmarkQueue.Mock().Object;
 
     public ResumeEndpointSecurityTests()
     {

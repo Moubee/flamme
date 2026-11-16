@@ -489,7 +489,7 @@ public sealed class ExternalAuthenticationStoreScenario(
         var provisioner = new InMemoryExternalIdentityProvisioner(
             users,
             userProvider,
-            Mock.Of<IRoleProvider>().Object,
+            IRoleProvider.Mock().Object,
             new GuidIdentityGenerator(),
             clock,
             hasher,
@@ -542,7 +542,7 @@ public sealed class ExternalAuthenticationStoreScenario(
                 dbContextFactory,
                 users,
                 userProvider,
-                Mock.Of<IRoleProvider>().Object,
+                IRoleProvider.Mock().Object,
                 hasher,
                 new GuidIdentityGenerator(),
                 clock,

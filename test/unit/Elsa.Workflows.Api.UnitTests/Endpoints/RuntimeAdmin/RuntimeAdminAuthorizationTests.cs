@@ -38,7 +38,7 @@ public class RuntimeAdminAuthorizationTests
             endpointType,
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             null,
-            [Mock.Of<IWorkflowRuntimeAdminService>().Object],
+            [IWorkflowRuntimeAdminService.Mock().Object],
             null)!;
         var (requestDtoType, responseDtoType) = GetEndpointDtoTypes(endpointType);
         var definition = new EndpointDefinition(endpointType, requestDtoType, responseDtoType);

@@ -22,7 +22,7 @@ public class QuiescenceSignalPersistFailureTests
     public QuiescenceSignalPersistFailureTests()
     {
         _timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-        _cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
+        _cycleRegistry = IExecutionCycleRegistry.Mock().Object;
     }
 
     [Test]

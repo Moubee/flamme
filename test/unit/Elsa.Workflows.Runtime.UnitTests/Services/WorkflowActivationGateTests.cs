@@ -15,7 +15,7 @@ public class WorkflowActivationGateTests
     [Test]
     public async Task AllowsWithoutLock_WhenWorkflowHasNoActivationStrategy()
     {
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(true);
         var lockProvider = new InMemoryDistributedLockProvider();
         var gate = CreateGate(evaluator, lockProvider);
@@ -32,7 +32,7 @@ public class WorkflowActivationGateTests
     [Test]
     public async Task ReturnsDenied_WhenEvaluatorDisallows()
     {
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(false);
         var lockProvider = new InMemoryDistributedLockProvider();
         var gate = CreateGate(evaluator, lockProvider);
@@ -46,7 +46,7 @@ public class WorkflowActivationGateTests
     [Test]
     public async Task ReleasesActivationLock_WhenEvaluatorThrows()
     {
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>())
                     .Returns(() => Task.FromException<bool>(new InvalidOperationException("evaluation failed")));
         var lockProvider = new InMemoryDistributedLockProvider();
@@ -61,7 +61,7 @@ public class WorkflowActivationGateTests
     public async Task ReleasesActivationLock_WhenEvaluatorIsCancelled()
     {
         using var cancellationSource = new CancellationTokenSource();
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>())
                     .Returns(() =>
                     {
@@ -83,7 +83,7 @@ public class WorkflowActivationGateTests
         var evaluatorStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var completeEvaluation = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         CancellationToken strategyToken = default;
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>())
                     .Returns((global::Elsa.Workflows.Runtime.WorkflowActivationStrategyEvaluationContext __arg0) =>
                     {
@@ -109,7 +109,7 @@ public class WorkflowActivationGateTests
     public async Task CancelsLeaseToken_WhenDistributedLeaseIsLostAfterEvaluation()
     {
         using var handleLostSource = new CancellationTokenSource();
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(true);
         var lockProvider = new HandleLostTokenDistributedLockProvider(handleLostSource.Token);
         var gate = CreateGate(evaluator, lockProvider);
@@ -128,7 +128,7 @@ public class WorkflowActivationGateTests
     public async Task SerializesCheckAndCreate_WhenTwoCallersRaceOnSameCorrelation()
     {
         var started = 0;
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>())
                     .Returns(() => Interlocked.CompareExchange(ref started, 1, 0) == 0);
         var lockProvider = new InMemoryDistributedLockProvider();
@@ -173,7 +173,7 @@ public class WorkflowActivationGateTests
         const string tenantB = "tenant-secret-b";
         const string definitionId = "definition-secret";
         const string correlationId = "correlation-secret";
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(true);
         var lockProvider = new InMemoryDistributedLockProvider();
         var singleton = CreateWorkflow(typeof(SingletonStrategy), definitionId);
@@ -205,7 +205,7 @@ public class WorkflowActivationGateTests
     [Test]
     public async Task UsesDefaultTenantScope_WhenTenantAccessorIsNotRegistered()
     {
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(true);
         var lockProvider = new InMemoryDistributedLockProvider();
         using var serviceProvider = new ServiceCollection()
@@ -239,7 +239,7 @@ public class WorkflowActivationGateTests
     [Test]
     public async Task CustomStrategy_IsEvaluatedWithoutInventedDistributedScope()
     {
-        var evaluator = Mock.Of<IWorkflowActivationStrategyEvaluator>().Object;
+        var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>()).Returns(true);
         var lockProvider = new InMemoryDistributedLockProvider();
         var gate = CreateGate(evaluator, lockProvider);
@@ -253,7 +253,7 @@ public class WorkflowActivationGateTests
 
     private static WorkflowActivationGate CreateGate(IWorkflowActivationStrategyEvaluator evaluator, IDistributedLockProvider lockProvider, string tenantId = "tenant-a")
     {
-        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        var tenantAccessor = ITenantAccessor.Mock().Object;
         Mock.Get(tenantAccessor).TenantId.Returns(tenantId);
         return new(
             evaluator,

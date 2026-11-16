@@ -61,13 +61,13 @@ public class ActivityRegistryPopulatorTests
 
     private static ActivityRegistry CreateRegistry()
     {
-        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        var tenantAccessor = ITenantAccessor.Mock().Object;
         Mock.Get(tenantAccessor).TenantId.Returns("tenant-1");
         return new ActivityRegistry(
-            Mock.Of<IActivityDescriber>().Object,
+            IActivityDescriber.Mock().Object,
             [],
             tenantAccessor,
-            Mock.Of<ILogger<ActivityRegistry>>().Object);
+            ILogger<ActivityRegistry>.Mock().Object);
     }
 
     private sealed class CountingTenantAgnosticProvider(CallCounter callCounter) : ITenantAgnosticActivityProvider

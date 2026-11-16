@@ -13,7 +13,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureResolvesThePreferredAccessTokenIssuerConstructor()
     {
         var services = CreateServices();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
 
@@ -24,7 +24,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureRegistersUserDeletionCoordinator()
     {
         var services = CreateServices();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
         await AssertUserDeletionCoordinatorResolves(services);
@@ -34,7 +34,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
     public async Task ModuleFeatureRegistersInMemorySessionRevocation()
     {
         var services = CreateServices();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new ModuleIdentityFeature(module).Apply();
 
@@ -48,7 +48,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
 
     private static async Task AssertAccessTokenIssuerResolves(IServiceCollection services)
     {
-        services.AddScoped(_ => Mock.Of<IElsaTokenService>().Object);
+        services.AddScoped(_ => IElsaTokenService.Mock().Object);
         using var serviceProvider = services.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAccessTokenIssuer>()).IsOfType(typeof(DefaultAccessTokenIssuer));

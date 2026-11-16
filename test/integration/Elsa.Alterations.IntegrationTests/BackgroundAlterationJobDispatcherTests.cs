@@ -17,7 +17,7 @@ public class BackgroundAlterationJobDispatcherTests : IAsyncDisposable
 
     public BackgroundAlterationJobDispatcherTests()
     {
-        var jobQueue = Mock.Of<IJobQueue>().Object;
+        var jobQueue = IJobQueue.Mock().Object;
         Mock.Get(jobQueue)
             .Enqueue(Arg.Any<Func<CancellationToken, Task>>())
             .Returns((Func<CancellationToken, Task> callback) =>

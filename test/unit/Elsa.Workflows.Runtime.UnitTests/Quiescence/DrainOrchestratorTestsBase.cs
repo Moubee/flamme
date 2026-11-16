@@ -17,11 +17,11 @@ namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
 public abstract class DrainOrchestratorTestsBase
 {
     protected readonly FakeTimeProvider TimeProvider = new(DateTimeOffset.Parse("2026-04-25T10:00:00Z"));
-    protected readonly IQuiescenceSignal Signal = Mock.Of<IQuiescenceSignal>().Object;
-    protected readonly IIngressSourceRegistry Registry = Mock.Of<IIngressSourceRegistry>().Object;
-    protected readonly IExecutionCycleRegistry ExecutionCycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
-    protected readonly IWorkflowInstanceStore InstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-    protected readonly IWorkflowExecutionLogStore LogStore = Mock.Of<IWorkflowExecutionLogStore>().Object;
+    protected readonly IQuiescenceSignal Signal = IQuiescenceSignal.Mock().Object;
+    protected readonly IIngressSourceRegistry Registry = IIngressSourceRegistry.Mock().Object;
+    protected readonly IExecutionCycleRegistry ExecutionCycleRegistry = IExecutionCycleRegistry.Mock().Object;
+    protected readonly IWorkflowInstanceStore InstanceStore = IWorkflowInstanceStore.Mock().Object;
+    protected readonly IWorkflowExecutionLogStore LogStore = IWorkflowExecutionLogStore.Mock().Object;
     protected readonly GracefulShutdownOptions Options = new();
     protected readonly HostOptions HostOptionsValue = new() { ShutdownTimeout = TimeSpan.FromSeconds(60) };
 
@@ -43,15 +43,15 @@ public abstract class DrainOrchestratorTestsBase
 
     protected DrainOrchestrator BuildSut()
     {
-        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
-        var scope = Mock.Of<IServiceScope>().Object;
-        var sp = Mock.Of<IServiceProvider>().Object;
+        var scopeFactory = IServiceScopeFactory.Mock().Object;
+        var scope = IServiceScope.Mock().Object;
+        var sp = IServiceProvider.Mock().Object;
         Mock.Get(sp).GetService(typeof(IWorkflowInstanceStore)).Returns(InstanceStore);
         Mock.Get(sp).GetService(typeof(IWorkflowExecutionLogStore)).Returns(LogStore);
         Mock.Get(scope).ServiceProvider.Returns(sp);
         Mock.Get(scopeFactory).CreateScope().Returns(scope);
 
-        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        var identityGenerator = IIdentityGenerator.Mock().Object;
         Mock.Get(identityGenerator).GenerateId().Returns(() => Guid.NewGuid().ToString("N"));
 
         return new DrainOrchestrator(
@@ -63,12 +63,12 @@ public abstract class DrainOrchestratorTestsBase
             Microsoft.Extensions.Options.Options.Create(HostOptionsValue),
             TimeProvider,
             identityGenerator,
-            Mock.Of<ILogger<DrainOrchestrator>>().Object);
+            ILogger<DrainOrchestrator>.Mock().Object);
     }
 
     protected static IIngressSource CreateSource(string name, TimeSpan? pauseTimeout = null, Func<CancellationToken, ValueTask>? pauseImpl = null)
     {
-        var source = Mock.Of<IIngressSource>().Object;
+        var source = IIngressSource.Mock().Object;
         Mock.Get(source).Name.Returns(name);
         Mock.Get(source).PauseTimeout.Returns(pauseTimeout ?? TimeSpan.FromSeconds(5));
         Mock.Get(source).CurrentState.Returns(IngressSourceState.Running);

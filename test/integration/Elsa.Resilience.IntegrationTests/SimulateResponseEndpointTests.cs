@@ -18,7 +18,7 @@ public class SimulateResponseEndpointTests : WebApplicationTest<ResilienceWebApp
         services.AddScoped<IRetryAttemptReader>(_ => VoidRetryAttemptReader.Instance);
         services.AddScoped(_ =>
         {
-            var catalog = Mock.Of<IResilienceStrategyCatalog>().Object;
+            var catalog = IResilienceStrategyCatalog.Mock().Object;
             Mock.Get(catalog).ListAsync(Arg.Any<CancellationToken>()).Returns([]);
             return catalog;
         });

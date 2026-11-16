@@ -14,9 +14,9 @@ public class DefaultTriggerSchedulerTests
     [Test]
     public async Task ScheduleAsync_SchedulesPastDueStartAtTriggerForCatchUp()
     {
-        var workflowScheduler = Mock.Of<IWorkflowScheduler>().Object;
+        var workflowScheduler = IWorkflowScheduler.Mock().Object;
         var timeProvider = new FakeTimeProvider(DateTimeOffset.UnixEpoch);
-        var logger = Mock.Of<ILogger<DefaultTriggerScheduler>>().Object;
+        var logger = ILogger<DefaultTriggerScheduler>.Mock().Object;
         var scheduler = new DefaultTriggerScheduler(workflowScheduler, timeProvider, logger);
         var now = new DateTimeOffset(2025, 11, 06, 22, 50, 00, TimeSpan.Zero);
         var executeAt = now.AddMinutes(-5);

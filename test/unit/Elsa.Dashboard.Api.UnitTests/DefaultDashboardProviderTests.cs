@@ -204,10 +204,10 @@ public class DefaultDashboardProviderTests
     [Test]
     public async Task GetOverviewAsync_WithRuntimeOnlyCaller_DoesNotQueryTheInstanceStore()
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(99L);
         Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(Array.Empty<WorkflowInstanceSummary>());
-        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        var runtime = IWorkflowRuntimeAdminService.Mock().Object;
         Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
 
         var overview = await CreateProvider(new WorkflowDashboardContributor(store, runtime))
@@ -223,10 +223,10 @@ public class DefaultDashboardProviderTests
     [Test]
     public async Task GetNeedsAttentionAsync_WithFailingInstanceStore_StillReturnsRuntimeFindings()
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("secret"));
         Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("secret"));
-        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        var runtime = IWorkflowRuntimeAdminService.Mock().Object;
         Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation") with { Reason = QuiescenceReason.AdministrativePause }, [], 0));
 
         var response = await CreateProvider(new WorkflowDashboardContributor(store, runtime))
@@ -295,10 +295,10 @@ public class DefaultDashboardProviderTests
 
     private static WorkflowDashboardContributor CreateWorkflowContributorWithFailingInstanceStore()
     {
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         Mock.Get(store).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("Store down"));
         Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Throws(new InvalidOperationException("Store down"));
-        var runtime = Mock.Of<IWorkflowRuntimeAdminService>().Object;
+        var runtime = IWorkflowRuntimeAdminService.Mock().Object;
         Mock.Get(runtime).GetStatus().Returns(new RuntimeAdminStatus(QuiescenceState.Initial("generation"), [], 0));
         return new(store, runtime);
     }
@@ -366,7 +366,7 @@ public class DefaultDashboardProviderTests
     [Test]
     public async Task GetOverviewAsync_WithCallerWhoMayReadNothing_DoesNotDiscloseWhichModulesAreInstalled()
     {
-        var provider = CreateProvider(new WorkflowDashboardContributor(Mock.Of<IWorkflowInstanceStore>().Object, Mock.Of<IWorkflowRuntimeAdminService>().Object));
+        var provider = CreateProvider(new WorkflowDashboardContributor(IWorkflowInstanceStore.Mock().Object, IWorkflowRuntimeAdminService.Mock().Object));
 
         var overview = await provider.GetOverviewAsync(new() { CanRead = _ => false });
 

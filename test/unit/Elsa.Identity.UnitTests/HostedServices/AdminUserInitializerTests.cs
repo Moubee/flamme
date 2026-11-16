@@ -60,10 +60,10 @@ public class AdminUserInitializerTests
             AdminRolePermissions = permissions
         });
         return new(
-            Mock.Of<IUserStore>().Object,
+            IUserStore.Mock().Object,
             roleStore,
-            Mock.Of<IUserManager>().Object,
-            Mock.Of<IRoleManager>().Object,
+            IUserManager.Mock().Object,
+            IRoleManager.Mock().Object,
             options,
             NullLogger<AdminUserInitializer>.Instance);
     }

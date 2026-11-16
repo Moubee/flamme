@@ -45,6 +45,6 @@ public class FastEndpointsResolverTests
                 throw new InvalidOperationException($"Unsupported endpoint host test class: {hostTestClass}.");
         }
 
-        await Assert.That(Factory.Create<List>(Mock.Of<IWorkflowDefinitionStore>().Object, Mock.Of<IWorkflowDefinitionLinker>().Object, Array.Empty<IWorkflowDefinitionFilterProvider>())).IsNotNull();
+        await Assert.That(Factory.Create<List>(IWorkflowDefinitionStore.Mock().Object, IWorkflowDefinitionLinker.Mock().Object, Array.Empty<IWorkflowDefinitionFilterProvider>())).IsNotNull();
     }
 }

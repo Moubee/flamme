@@ -71,7 +71,7 @@ public class GenerateWorkflowVariableAccessorsTests
         var options = Microsoft.Extensions.Options.Options.Create(csharpOptions);
         var accessors = new GenerateWorkflowVariableAccessors(options);
         var assemblies = new AddAssembliesAndReferencesFromOptions(options);
-        var notificationSender = Mock.Of<INotificationSender>().Object;
+        var notificationSender = INotificationSender.Mock().Object;
 
         Mock.Get(notificationSender)
             .SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())

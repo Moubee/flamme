@@ -24,10 +24,10 @@ public class DistributedWorkflowClientTests
     [Test]
     public async Task CreateAndRunInstanceAsync_PreservesSchedulingMetadata()
     {
-        var instanceManager = Mock.Of<IWorkflowInstanceManager>().Object;
-        var definitionService = Mock.Of<IWorkflowDefinitionService>().Object;
-        var runner = Mock.Of<IWorkflowRunner>().Object;
-        var activationGate = Mock.Of<IWorkflowActivationGate>().Object;
+        var instanceManager = IWorkflowInstanceManager.Mock().Object;
+        var definitionService = IWorkflowDefinitionService.Mock().Object;
+        var runner = IWorkflowRunner.Mock().Object;
+        var activationGate = IWorkflowActivationGate.Mock().Object;
         Mock.Get(activationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
                     .Returns(new WorkflowActivationLease(true, null));
 
@@ -72,9 +72,9 @@ public class DistributedWorkflowClientTests
                         return Task.FromResult(new RunWorkflowResult(null!, resultState, workflow, null, Journal.Empty));
                     });
 
-        var lockProvider = Mock.Of<IDistributedLockProvider>().Object;
-        var distributedLock = Mock.Of<IDistributedLock>().Object;
-        var lockHandle = Mock.Of<IDistributedSynchronizationHandle>().Object;
+        var lockProvider = IDistributedLockProvider.Mock().Object;
+        var distributedLock = IDistributedLock.Mock().Object;
+        var lockHandle = IDistributedSynchronizationHandle.Mock().Object;
         Mock.Get(lockProvider).CreateLock(Arg.Any<string>()).Returns(distributedLock);
         Mock.Get(distributedLock).AcquireAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
                     .Returns(lockHandle);
@@ -83,19 +83,19 @@ public class DistributedWorkflowClientTests
             .AddSingleton(instanceManager)
             .AddSingleton(definitionService)
             .AddSingleton(runner)
-            .AddSingleton(Mock.Of<IWorkflowCanceler>().Object)
+            .AddSingleton(IWorkflowCanceler.Mock().Object)
             .AddSingleton(activationGate)
-            .AddSingleton(Mock.Of<WorkflowStateMapper>().Object)
-            .AddSingleton(Mock.Of<ILogger<LocalWorkflowClient>>().Object)
+            .AddSingleton(WorkflowStateMapper.Mock().Object)
+            .AddSingleton(ILogger<LocalWorkflowClient>.Mock().Object)
             .BuildServiceProvider();
 
         var client = new DistributedWorkflowClient(
             "instance-1",
             lockProvider,
-            Mock.Of<ITransientExceptionDetector>().Object,
+            ITransientExceptionDetector.Mock().Object,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             services,
-            Mock.Of<ILogger<DistributedWorkflowClient>>().Object);
+            ILogger<DistributedWorkflowClient>.Mock().Object);
 
         var response = await client.CreateAndRunInstanceAsync(new CreateAndRunWorkflowInstanceRequest
         {

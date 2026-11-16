@@ -310,7 +310,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
             var database = new PostgreSqlTestDatabase();
             var tenantAccessor = new DefaultTenantAccessor();
             var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-04-24T10:00:00Z"));
-            var cycleRegistry = Mock.Of<IExecutionCycleRegistry>().Object;
+            var cycleRegistry = IExecutionCycleRegistry.Mock().Object;
             var migrationsAssembly = typeof(RuntimeDbContextFactory).Assembly;
 
             var services = new ServiceCollection()

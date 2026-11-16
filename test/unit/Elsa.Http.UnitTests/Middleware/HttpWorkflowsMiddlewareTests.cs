@@ -108,7 +108,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     public async Task InvokeAsync_WithMultiplePrefixSegmentsBeforeBasePath_SkipsRouteMatchingAndCallsNext()
     {
         var nextCalled = false;
-        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
+        var routeMatcher = IRouteMatcher.Mock().Object;
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {
             nextCalled = true;
@@ -138,7 +138,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     public async Task InvokeAsync_WithNonTenantPrefixedBasePathSegment_CallsNext()
     {
         var nextCalled = false;
-        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
+        var routeMatcher = IRouteMatcher.Mock().Object;
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {
             nextCalled = true;
@@ -167,7 +167,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     [Test]
     public async Task InvokeAsync_WithConfiguredBasePathAndMatchingPath_StillResolvesRoute()
     {
-        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
+        var routeMatcher = IRouteMatcher.Mock().Object;
         Mock.Get(routeMatcher).Match("/workflows/colliding", "/workflows/colliding").Returns(new RouteValueDictionary());
         var bookmarkStore = new CapturingBookmarkStore(CurrentTenantId, CreateCollidingHttpEndpointBookmarks());
         await using var serviceProvider = new ServiceCollection()
@@ -197,7 +197,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
     public async Task InvokeAsync_WithResolvedTenantPath_StillResolvesRoute()
     {
         var nextCalled = false;
-        var routeMatcher = Mock.Of<IRouteMatcher>().Object;
+        var routeMatcher = IRouteMatcher.Mock().Object;
         var stimulusHasher = new CapturingStimulusHasher();
         var middleware = new HttpWorkflowsMiddleware(_ =>
         {

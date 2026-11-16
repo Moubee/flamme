@@ -13,10 +13,10 @@ namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowDefinitionServiceTests
 {
-    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
-    private readonly IWorkflowGraphBuilder _workflowGraphBuilder = Mock.Of<IWorkflowGraphBuilder>().Object;
-    private readonly IMaterializerRegistry _materializerRegistry = Mock.Of<IMaterializerRegistry>().Object;
-    private readonly ILogger<WorkflowDefinitionService> _logger = Mock.Of<ILogger<WorkflowDefinitionService>>().Object;
+    private readonly IWorkflowDefinitionStore _workflowDefinitionStore = IWorkflowDefinitionStore.Mock().Object;
+    private readonly IWorkflowGraphBuilder _workflowGraphBuilder = IWorkflowGraphBuilder.Mock().Object;
+    private readonly IMaterializerRegistry _materializerRegistry = IMaterializerRegistry.Mock().Object;
+    private readonly ILogger<WorkflowDefinitionService> _logger = ILogger<WorkflowDefinitionService>.Mock().Object;
 
     [Test]
     public async Task MaterializeWorkflowAsync_WithValidMaterializer_ReturnsMaterializedGraph()
@@ -200,7 +200,7 @@ public class WorkflowDefinitionServiceTests
                     .Returns(definition);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -225,7 +225,7 @@ public class WorkflowDefinitionServiceTests
         Mock.Get(_workflowDefinitionStore).FindAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -255,7 +255,7 @@ public class WorkflowDefinitionServiceTests
         var filter = new WorkflowDefinitionFilter();
         Mock.Get(_workflowDefinitionStore).FindManyAsync(filter, Arg.Any<CancellationToken>()).Returns(definitions);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition1, Arg.Any<CancellationToken>()).Returns(workflow1);
         Mock.Get(materializer).MaterializeAsync(definition2, Arg.Any<CancellationToken>()).Returns(workflow2);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
@@ -285,7 +285,7 @@ public class WorkflowDefinitionServiceTests
                     .Returns(definition);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -368,7 +368,7 @@ public class WorkflowDefinitionServiceTests
                     .Returns(definition);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -395,7 +395,7 @@ public class WorkflowDefinitionServiceTests
         Mock.Get(_workflowDefinitionStore).FindAsync(filter, Arg.Any<CancellationToken>()).Returns(definition);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -427,7 +427,7 @@ public class WorkflowDefinitionServiceTests
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("materializer").Returns(true);
         Mock.Get(_materializerRegistry).IsMaterializerAvailable("unavailable-materializer").Returns(false);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition1, Arg.Any<CancellationToken>()).Returns(workflow1);
         Mock.Get(_materializerRegistry).GetMaterializer("materializer").Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow1, Arg.Any<CancellationToken>()).Returns(graph1);
@@ -468,7 +468,7 @@ public class WorkflowDefinitionServiceTests
         var workflow = new Workflow { Identity = new(definition.DefinitionId, 1, "v1") };
         var workflowGraph = TestHelpers.CreateWorkflowGraph(workflow);
 
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
         Mock.Get(_materializerRegistry).GetMaterializer(definition.MaterializerName).Returns(materializer);
         Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);
@@ -501,7 +501,7 @@ public class WorkflowDefinitionServiceTests
 
         if (materializerAvailable)
         {
-            var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+            var materializer = IWorkflowMaterializer.Mock().Object;
             Mock.Get(materializer).MaterializeAsync(definition, Arg.Any<CancellationToken>()).Returns(workflow);
             Mock.Get(_materializerRegistry).GetMaterializer(definition.MaterializerName).Returns(materializer);
             Mock.Get(_workflowGraphBuilder).BuildAsync(workflow, Arg.Any<CancellationToken>()).Returns(workflowGraph);

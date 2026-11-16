@@ -12,9 +12,9 @@ namespace Elsa.Resilience.Core.UnitTests;
 
 public class ResilientActivityInvokerTests
 {
-    private readonly IResilienceStrategyConfigEvaluator _evaluator = Mock.Of<IResilienceStrategyConfigEvaluator>().Object;
-    private readonly IRetryAttemptRecorder _recorder = Mock.Of<IRetryAttemptRecorder>().Object;
-    private readonly IIdentityGenerator _identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+    private readonly IResilienceStrategyConfigEvaluator _evaluator = IResilienceStrategyConfigEvaluator.Mock().Object;
+    private readonly IRetryAttemptRecorder _recorder = IRetryAttemptRecorder.Mock().Object;
+    private readonly IIdentityGenerator _identityGenerator = IIdentityGenerator.Mock().Object;
     private readonly TestResilientActivity _activity = new();
     private readonly ResilientActivityInvoker _invoker;
 

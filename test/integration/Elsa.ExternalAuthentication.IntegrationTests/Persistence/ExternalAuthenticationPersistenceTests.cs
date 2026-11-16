@@ -69,7 +69,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         new(dbContextFactory ?? _dbContextFactory,
             userStore ?? _userStore,
             userProvider ?? new StoreBasedUserProvider(userStore ?? _userStore),
-            Mock.Of<IRoleProvider>().Object,
+            IRoleProvider.Mock().Object,
             hasher,
             new GuidIdentityGenerator(),
             _clock,
@@ -770,10 +770,10 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task CallbackCompletionPersistsTheSessionBeforeAnyRefreshTokenIsIssued()
     {
-        var identityResolver = Mock.Of<IExternalIdentityResolver>().Object;
+        var identityResolver = IExternalIdentityResolver.Mock().Object;
         Mock.Get(identityResolver).ResolveAsync(Arg.Any<ExternalIdentityResolutionContext>(), Arg.Any<CancellationToken>())
             .ReturnsAsync(ValueTask.FromResult(new ExternalIdentityResolution("user-a", false)));
-        var permissionGrantResolver = Mock.Of<IPermissionGrantResolver>().Object;
+        var permissionGrantResolver = IPermissionGrantResolver.Mock().Object;
         Mock.Get(permissionGrantResolver).ResolveAsync(Arg.Any<PermissionGrantResolutionContext>(), Arg.Any<CancellationToken>())
             .ReturnsAsync(ValueTask.FromResult(new PermissionGrantResult([], [])));
         var adapter = new Broker.BrokerSecurityTests.RecordingAdapter

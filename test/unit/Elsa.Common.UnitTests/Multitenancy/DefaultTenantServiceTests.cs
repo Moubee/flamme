@@ -124,16 +124,16 @@ public class DefaultTenantServiceTests
         var tenantList = tenants.ToList();
         var getTenants = tenantsFactory ?? (() => tenantList);
 
-        var tenantsProvider = Mock.Of<ITenantsProvider>().Object;
+        var tenantsProvider = ITenantsProvider.Mock().Object;
         Mock.Get(tenantsProvider).ListAsync(Arg.Any<CancellationToken>()).Returns(() => getTenants());
 
         var services = new ServiceCollection();
         services.AddSingleton(_ => tenantsProvider);
         services.AddSingleton<ITenantScopeFactory, DefaultTenantScopeFactory>();
         services.AddSingleton<ITenantAccessor, DefaultTenantAccessor>();
-        services.AddSingleton<ITenantActivatedEvent>(Mock.Of<ITenantActivatedEvent>().Object);
-        services.AddSingleton<ITenantDeactivatedEvent>(Mock.Of<ITenantDeactivatedEvent>().Object);
-        services.AddSingleton<ITenantDeletedEvent>(Mock.Of<ITenantDeletedEvent>().Object);
+        services.AddSingleton<ITenantActivatedEvent>(ITenantActivatedEvent.Mock().Object);
+        services.AddSingleton<ITenantDeactivatedEvent>(ITenantDeactivatedEvent.Mock().Object);
+        services.AddSingleton<ITenantDeletedEvent>(ITenantDeletedEvent.Mock().Object);
         services.AddSingleton<TenantEventsManager>();
         services.AddSingleton<RecurringTaskScheduleManager>();
         services.AddSingleton<ITenantService, DefaultTenantService>();

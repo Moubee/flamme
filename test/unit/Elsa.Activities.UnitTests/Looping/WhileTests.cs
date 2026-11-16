@@ -14,7 +14,7 @@ public class WhileTests
     public async Task Should_Schedule_Body_Based_On_Condition(bool conditionValue, int expectedScheduledCount)
     {
         // Arrange
-        var bodyActivity = Mock.Of<IActivity>().Object;
+        var bodyActivity = IActivity.Mock().Object;
         var whileActivity = new While(new Input<bool>(conditionValue), bodyActivity);
 
         // Act
@@ -34,7 +34,7 @@ public class WhileTests
     public async Task Should_Use_True_Factory_Method()
     {
         // Arrange
-        var bodyActivity = Mock.Of<IActivity>().Object;
+        var bodyActivity = IActivity.Mock().Object;
         var whileActivity = While.True(bodyActivity);
 
         // Act
@@ -54,7 +54,7 @@ public class WhileTests
         // Arrange - Create separate condition functions for each test case to verify 
         // that each execution of the While activity evaluates the condition exactly once
         var conditionEvaluationCount = 0;
-        var bodyActivity = Mock.Of<IActivity>().Object;
+        var bodyActivity = IActivity.Mock().Object;
         
         // Create condition that tracks evaluation count across multiple While activity executions
         var condition = new Input<bool>(_ => 

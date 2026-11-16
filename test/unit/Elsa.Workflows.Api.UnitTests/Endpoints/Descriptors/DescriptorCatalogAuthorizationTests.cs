@@ -69,7 +69,7 @@ public class DescriptorCatalogAuthorizationTests
     public static IEnumerable<string> RefreshPermissions => [DefinitionsView, DescriptorsActivitiesView];
     public static IEnumerable<string> AuthenticatedOnlyPaths => [.. CatalogPathList, VersionsPath];
 
-    private readonly IActivityRegistryPopulator _registryPopulator = Mock.Of<IActivityRegistryPopulator>().Object;
+    private readonly IActivityRegistryPopulator _registryPopulator = IActivityRegistryPopulator.Mock().Object;
     private AuthorizationTestHost _host = null!;
 
     [Before(Test)]
@@ -190,33 +190,33 @@ public class DescriptorCatalogAuthorizationTests
 
     private void ConfigureServices(IServiceCollection services)
     {
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
         Mock.Get(activityRegistry).ListAll().Returns([new ActivityDescriptor { TypeName = TypeName }]);
-        var activityLookup = Mock.Of<IActivityRegistryLookupService>().Object;
+        var activityLookup = IActivityRegistryLookupService.Mock().Object;
         Mock.Get(activityLookup).FindAsync(TypeName).Returns(new ActivityDescriptor { TypeName = TypeName });
-        var expressionRegistry = Mock.Of<IExpressionDescriptorRegistry>().Object;
+        var expressionRegistry = IExpressionDescriptorRegistry.Mock().Object;
         Mock.Get(expressionRegistry).ListAll().Returns([]);
-        var storageDrivers = Mock.Of<IStorageDriverManager>().Object;
+        var storageDrivers = IStorageDriverManager.Mock().Object;
         Mock.Get(storageDrivers).List().Returns([]);
-        var logPersistence = Mock.Of<ILogPersistenceStrategyService>().Object;
+        var logPersistence = ILogPersistenceStrategyService.Mock().Object;
         Mock.Get(logPersistence).ListStrategies().Returns([]);
-        var commitStrategies = Mock.Of<ICommitStrategyRegistry>().Object;
+        var commitStrategies = ICommitStrategyRegistry.Mock().Object;
         Mock.Get(commitStrategies).ListWorkflowStrategyRegistrations().Returns([]);
         Mock.Get(commitStrategies).ListActivityStrategyRegistrations().Returns([]);
-        var definitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var definitionStore = IWorkflowDefinitionStore.Mock().Object;
         Mock.Get(definitionStore).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<WorkflowDefinitionOrder<int>>(), Arg.Any<CancellationToken>()).Returns([new WorkflowDefinition()]);
 
         services
             .AddSingleton(activityRegistry)
             .AddSingleton(_registryPopulator)
             .AddSingleton(activityLookup)
-            .AddSingleton(Mock.Of<IPropertyUIHandlerResolver>().Object)
+            .AddSingleton(IPropertyUIHandlerResolver.Mock().Object)
             .AddSingleton(expressionRegistry)
             .AddSingleton(storageDrivers)
             .AddSingleton(logPersistence)
             .AddSingleton(commitStrategies)
-            .AddSingleton(Mock.Of<IOutputConverterRegistry>().Object)
-            .AddSingleton(Mock.Of<IWellKnownTypeRegistry>().Object)
+            .AddSingleton(IOutputConverterRegistry.Mock().Object)
+            .AddSingleton(IWellKnownTypeRegistry.Mock().Object)
             .AddSingleton(SerializationTypeRegistry.CreateDefault())
             .AddSingleton(definitionStore)
             .AddSingleton<IOptions<ManagementOptions>>(new OptionsWrapper<ManagementOptions>(new ManagementOptions()));

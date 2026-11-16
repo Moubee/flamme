@@ -51,7 +51,7 @@ public class ParallelTests
     public async Task Should_Execute_Single_Activity()
     {
         // Arrange
-        var activity = Mock.Of<IActivity>().Object;
+        var activity = IActivity.Mock().Object;
         var parallel = new Workflows.Activities.Parallel(activity);
 
         // Act
@@ -69,7 +69,7 @@ public class ParallelTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = Mock.Of<IActivity>().Object;
+        var mockActivity = IActivity.Mock().Object;
 
         var parallel = new Workflows.Activities.Parallel(writeLine, setVariable, mockActivity);
 

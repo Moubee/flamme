@@ -32,7 +32,7 @@ public class WorkflowResumerConsumedBookmarkTests
         });
 
         var runCount = 0;
-        var client = Mock.Of<IWorkflowClient>().Object;
+        var client = IWorkflowClient.Mock().Object;
         Mock.Get(client).RunInstanceAsync(Arg.Any<RunWorkflowInstanceRequest>(), Arg.Any<CancellationToken>())
                     .Returns(() =>
                     {
@@ -40,12 +40,12 @@ public class WorkflowResumerConsumedBookmarkTests
                         return new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-1" };
                     });
 
-        var runtime = Mock.Of<IWorkflowRuntime>().Object;
+        var runtime = IWorkflowRuntime.Mock().Object;
         Mock.Get(runtime).CreateClientAsync("instance-1", Arg.Any<CancellationToken>()).Returns(client);
 
-        var lockProvider = Mock.Of<IDistributedLockProvider>().Object;
-        var distributedLock = Mock.Of<IDistributedLock>().Object;
-        var lockHandle = Mock.Of<IDistributedSynchronizationHandle>().Object;
+        var lockProvider = IDistributedLockProvider.Mock().Object;
+        var distributedLock = IDistributedLock.Mock().Object;
+        var lockHandle = IDistributedSynchronizationHandle.Mock().Object;
         Mock.Get(lockProvider).CreateLock(Arg.Any<string>()).Returns(distributedLock);
         Mock.Get(distributedLock).AcquireAsync(Arg.Any<TimeSpan?>(), Arg.Any<CancellationToken>())
                     .Returns(lockHandle);
@@ -53,7 +53,7 @@ public class WorkflowResumerConsumedBookmarkTests
         var resumer = new WorkflowResumer(
             runtime,
             store,
-            Mock.Of<IStimulusHasher>().Object,
+            IStimulusHasher.Mock().Object,
             lockProvider,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             NullLogger<WorkflowResumer>.Instance);

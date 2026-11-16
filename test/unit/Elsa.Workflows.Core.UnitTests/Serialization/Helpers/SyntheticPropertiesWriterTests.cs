@@ -88,7 +88,7 @@ public sealed class SyntheticPropertiesWriterTests
         using (var writer = new Utf8JsonWriter(buffer))
         {
             writer.WriteStartObject();
-            var sut = new SyntheticPropertiesWriter(Mock.Of<IExpressionDescriptorRegistry>().Object);
+            var sut = new SyntheticPropertiesWriter(IExpressionDescriptorRegistry.Mock().Object);
             sut.WriteSyntheticProperties(writer, activity, CreateActivityDescriptor(), CreateOptions());
             writer.WriteEndObject();
         }

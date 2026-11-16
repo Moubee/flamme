@@ -7,13 +7,13 @@ namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
 
 public class ElsaRuntimeHealthCheckTests
 {
-    private readonly IWorkflowRuntime _workflowRuntime = Mock.Of<IWorkflowRuntime>().Object;
-    private readonly IQuiescenceSignal _quiescenceSignal = Mock.Of<IQuiescenceSignal>().Object;
+    private readonly IWorkflowRuntime _workflowRuntime = IWorkflowRuntime.Mock().Object;
+    private readonly IQuiescenceSignal _quiescenceSignal = IQuiescenceSignal.Mock().Object;
     private readonly ElsaRuntimeHealthCheck _sut;
 
     public ElsaRuntimeHealthCheckTests()
     {
-        Mock.Get(_workflowRuntime).CreateClientAsync(Arg.Any<CancellationToken>()).Returns(Mock.Of<IWorkflowClient>().Object);
+        Mock.Get(_workflowRuntime).CreateClientAsync(Arg.Any<CancellationToken>()).Returns(IWorkflowClient.Mock().Object);
         Mock.Get(_quiescenceSignal).CurrentState.Returns(QuiescenceState.Initial("test"));
         Mock.Get(_quiescenceSignal).ActiveExecutionCycleCount.Returns(0);
         _sut = new ElsaRuntimeHealthCheck(_workflowRuntime, _quiescenceSignal, NullLogger<ElsaRuntimeHealthCheck>.Instance);

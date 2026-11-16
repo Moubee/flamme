@@ -88,7 +88,7 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithLabelFilter_RequiresLabelPermissionBeforeQuerying()
     {
-        var workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var workflowDefinitionStore = IWorkflowDefinitionStore.Mock().Object;
         ConfigureEmptyPage(workflowDefinitionStore);
         var labelStore = Mock.Of<IWorkflowDefinitionLabelStore, IWorkflowDefinitionLabelQuery>().Object;
         var labelProvider = new WorkflowDefinitionLabelFilterProvider(labelStore);
@@ -108,7 +108,7 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithUnrelatedApplicableProvider_LeavesLabelFilterUnsupported()
     {
-        var workflowDefinitionStore = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var workflowDefinitionStore = IWorkflowDefinitionStore.Mock().Object;
         ConfigureEmptyPage(workflowDefinitionStore);
         var endpoint = Factory.Create<List>(
             CreateHttpContext("workflows/definitions:view", "workflows/definitions/labels:view"),
@@ -125,7 +125,7 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task LabelFilterProvider_WithUnsupportedStoreThrowsExplicitly()
     {
-        var provider = new WorkflowDefinitionLabelFilterProvider(Mock.Of<IWorkflowDefinitionLabelStore>().Object);
+        var provider = new WorkflowDefinitionLabelFilterProvider(IWorkflowDefinitionLabelStore.Mock().Object);
         var filter = new WorkflowDefinitionFilter { LabelIds = ["red"] };
 
         await Assert.ThrowsExactlyAsync<WorkflowDefinitionFilterNotSupportedException>(() => provider.ApplyAsync(filter));
@@ -134,7 +134,7 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithoutLabelProvider_ReturnsNotImplemented()
     {
-        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var store = IWorkflowDefinitionStore.Mock().Object;
         var endpoint = Factory.Create<List>(new DefaultHttpContext(), store, new TestWorkflowDefinitionLinker(), Array.Empty<IWorkflowDefinitionFilterProvider>());
 
         await endpoint.ExecuteAsync(new Request { Labels = ["red"] }, CancellationToken.None);
@@ -146,8 +146,8 @@ public class WorkflowDefinitionLabelFilterTests
     [Test]
     public async Task List_WithUnsupportedLabelStore_ReturnsNotImplemented()
     {
-        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
-        var labelStore = Mock.Of<IWorkflowDefinitionLabelStore>().Object;
+        var store = IWorkflowDefinitionStore.Mock().Object;
+        var labelStore = IWorkflowDefinitionLabelStore.Mock().Object;
         var provider = new WorkflowDefinitionLabelFilterProvider(labelStore);
         var endpoint = Factory.Create<List>(
             CreateHttpContext("workflows/definitions:view", "workflows/definitions/labels:view"),

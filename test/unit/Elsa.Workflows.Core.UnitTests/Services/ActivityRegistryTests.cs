@@ -20,9 +20,9 @@ public class ActivityRegistryTests
 
     public ActivityRegistryTests()
     {
-        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
-        _activityDescriber = Mock.Of<IActivityDescriber>().Object;
-        _logger = Mock.Of<ILogger<ActivityRegistry>>().Object;
+        var tenantAccessor = ITenantAccessor.Mock().Object;
+        _activityDescriber = IActivityDescriber.Mock().Object;
+        _logger = ILogger<ActivityRegistry>.Mock().Object;
         _registry = new(_activityDescriber, [], tenantAccessor, _logger);
 
         // Set default tenant for all tests
@@ -240,7 +240,7 @@ public class ActivityRegistryTests
     public async Task RefreshDescriptorsAsync_CalledTwice_DoesNotLogWarnings()
     {
         // Arrange
-        var mockProvider = Mock.Of<IActivityProvider>().Object;
+        var mockProvider = IActivityProvider.Mock().Object;
         var descriptor1 = new ActivityDescriptor
         {
             TypeName = "TestActivity1",
@@ -299,7 +299,7 @@ public class ActivityRegistryTests
         _registry.Register(manualDescriptor);
 
         // Create a provider descriptor
-        var mockProvider = Mock.Of<IActivityProvider>().Object;
+        var mockProvider = IActivityProvider.Mock().Object;
         var providerDescriptor = new ActivityDescriptor
         {
             TypeName = "ProviderActivity",

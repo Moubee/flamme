@@ -21,9 +21,9 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class WorkflowDispatchOutboxProcessorTests
 {
-    private readonly IWorkflowDispatchOutboxStore _store = Mock.Of<IWorkflowDispatchOutboxStore>().Object;
-    private readonly IWorkflowInstanceStore _workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-    private readonly ICommandSender _commandSender = Mock.Of<ICommandSender>().Object;
+    private readonly IWorkflowDispatchOutboxStore _store = IWorkflowDispatchOutboxStore.Mock().Object;
+    private readonly IWorkflowInstanceStore _workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
+    private readonly ICommandSender _commandSender = ICommandSender.Mock().Object;
     private readonly FakeTimeProvider _timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
     private readonly WorkflowDispatcherOptions _options = new();
     private readonly WorkflowDispatchOutboxProcessor _processor;

@@ -41,7 +41,7 @@ public class MediatorHostedServiceTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
         new Elsa.Common.Features.MediatorFeature(module).Apply();
         services.AddSingleton<CommandSink>();

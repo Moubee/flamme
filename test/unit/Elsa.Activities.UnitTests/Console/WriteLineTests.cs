@@ -13,8 +13,8 @@ public class WriteLineTests
 
     public WriteLineTests()
     {
-        _mockTextWriter = Mock.Of<TextWriter>().Object;
-        _mockProvider = Mock.Of<IStandardOutStreamProvider>().Object;
+        _mockTextWriter = TextWriter.Mock().Object;
+        _mockProvider = IStandardOutStreamProvider.Mock().Object;
         Mock.Get(_mockProvider).GetTextWriter().Returns(_mockTextWriter);
     }
     

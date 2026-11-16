@@ -23,8 +23,8 @@ public class DefaultIdentityRefreshTokenServiceTests
         Issuer = "https://elsa.test",
         Audience = "elsa-api"
     };
-    private readonly IAccessTokenIssuer _accessTokenIssuer = Mock.Of<IAccessTokenIssuer>().Object;
-    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
+    private readonly IAccessTokenIssuer _accessTokenIssuer = IAccessTokenIssuer.Mock().Object;
+    private readonly IUserProvider _userProvider = IUserProvider.Mock().Object;
     private readonly DefaultElsaTokenService _tokenService;
     private readonly SessionRevoker _sessionRevoker;
     private readonly DefaultIdentityRefreshTokenService _service;

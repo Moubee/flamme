@@ -18,12 +18,12 @@ public class RestartInterruptedWorkflowsTaskTests
     [DisplayName("ExecuteAsync restarts each workflow within its tenant context")]
     public async Task ExecuteAsync_RestartsWithinWorkflowTenantContext()
     {
-        var workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+        var workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
         var tenantAccessor = new DefaultTenantAccessor();
-        var tenantService = Mock.Of<ITenantService>().Object;
-        var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
+        var tenantService = ITenantService.Mock().Object;
+        var workflowRestarter = IWorkflowRestarter.Mock().Object;
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
+        var logger = ILogger<RestartInterruptedWorkflowsTask>.Mock().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
         {
@@ -65,12 +65,12 @@ public class RestartInterruptedWorkflowsTaskTests
     [Arguments("*", DisplayName = "ExecuteAsync does not push tenant context for an agnostic tenant id")]
     public async Task ExecuteAsync_DefaultOrAgnosticTenant_DoesNotPushContext(string? tenantId)
     {
-        var workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+        var workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
         var tenantAccessor = new DefaultTenantAccessor();
-        var tenantService = Mock.Of<ITenantService>().Object;
-        var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
+        var tenantService = ITenantService.Mock().Object;
+        var workflowRestarter = IWorkflowRestarter.Mock().Object;
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
+        var logger = ILogger<RestartInterruptedWorkflowsTask>.Mock().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
         {
@@ -107,12 +107,12 @@ public class RestartInterruptedWorkflowsTaskTests
     [DisplayName("ExecuteAsync continues restarting later workflows after a failure")]
     public async Task ExecuteAsync_ContinuesAfterFailure()
     {
-        var workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
+        var workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
         var tenantAccessor = new DefaultTenantAccessor();
-        var tenantService = Mock.Of<ITenantService>().Object;
-        var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
+        var tenantService = ITenantService.Mock().Object;
+        var workflowRestarter = IWorkflowRestarter.Mock().Object;
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
+        var logger = ILogger<RestartInterruptedWorkflowsTask>.Mock().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
         {
@@ -148,10 +148,10 @@ public class RestartInterruptedWorkflowsTaskTests
     [DisplayName("ExecuteAsync restarts tenant-specific workflows when tenant services are unavailable")]
     public async Task ExecuteAsync_WithoutTenantServices_RestartsWorkflow()
     {
-        var workflowInstanceStore = Mock.Of<IWorkflowInstanceStore>().Object;
-        var workflowRestarter = Mock.Of<IWorkflowRestarter>().Object;
+        var workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
+        var workflowRestarter = IWorkflowRestarter.Mock().Object;
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var logger = Mock.Of<ILogger<RestartInterruptedWorkflowsTask>>().Object;
+        var logger = ILogger<RestartInterruptedWorkflowsTask>.Mock().Object;
         var now = DateTimeOffset.Parse("2026-04-14T12:00:00Z");
         var workflowInstances = new List<WorkflowInstanceSummary>
         {

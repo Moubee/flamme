@@ -32,10 +32,10 @@ public class DefaultApiKeyProviderTests
     private static async Task<IApiKey?> ProvideAsync(string roleId, IReadOnlyCollection<string> permissions)
     {
         var application = new Application { ClientId = $"client-{roleId}", Roles = [roleId] };
-        var validator = Mock.Of<IApplicationCredentialsValidator>().Object;
+        var validator = IApplicationCredentialsValidator.Mock().Object;
         Mock.Get(validator).ValidateAsync("key", Arg.Any<CancellationToken>()).Returns(application);
 
-        var roles = Mock.Of<IRoleProvider>().Object;
+        var roles = IRoleProvider.Mock().Object;
         Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
             .Returns([new Role { Id = roleId, Name = roleId, Permissions = permissions.ToList() }]);
 

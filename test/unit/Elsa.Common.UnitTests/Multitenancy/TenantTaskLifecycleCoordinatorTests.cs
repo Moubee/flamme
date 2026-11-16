@@ -150,10 +150,10 @@ public class TenantTaskLifecycleCoordinatorTests : IAsyncDisposable
 
     private static TenantScope CreateTenantScope(Tenant tenant, IServiceProvider serviceProvider)
     {
-        var serviceScope = Mock.Of<IServiceScope>().Object;
+        var serviceScope = IServiceScope.Mock().Object;
         Mock.Get(serviceScope).ServiceProvider.Returns(serviceProvider);
-        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
-        Mock.Get(tenantAccessor).PushContext(Arg.Any<Tenant?>()).Returns(Mock.Of<IDisposable>().Object);
+        var tenantAccessor = ITenantAccessor.Mock().Object;
+        Mock.Get(tenantAccessor).PushContext(Arg.Any<Tenant?>()).Returns(IDisposable.Mock().Object);
         return new TenantScope(serviceScope, tenantAccessor, tenant);
     }
 

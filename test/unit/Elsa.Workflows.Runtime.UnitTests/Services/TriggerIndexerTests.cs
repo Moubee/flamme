@@ -31,24 +31,24 @@ public class TriggerIndexerTests
     public TriggerIndexerTests()
     {
         var typeRegistry = SerializationTypeRegistry.CreateDefault();
-        var serviceProvider = Mock.Of<IServiceProvider>().Object;
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
-        var identityGenerator = Mock.Of<IIdentityGenerator>().Object;
+        var serviceProvider = IServiceProvider.Mock().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
+        var identityGenerator = IIdentityGenerator.Mock().Object;
         Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns(new ActivityDescriptor());
         Mock.Get(identityGenerator).GenerateId().Returns(() => Guid.NewGuid().ToString("N"));
         _hasher = new StimulusHasher(new Hasher(typeRegistry));
 
         _indexer = new(
             new ActivityVisitor([], serviceProvider),
-            Mock.Of<IWorkflowDefinitionService>().Object,
-            Mock.Of<IExpressionEvaluator>().Object,
+            IWorkflowDefinitionService.Mock().Object,
+            IExpressionEvaluator.Mock().Object,
             identityGenerator,
-            Mock.Of<ITriggerStore>().Object,
+            ITriggerStore.Mock().Object,
             activityRegistry,
-            Mock.Of<INotificationSender>().Object,
+            INotificationSender.Mock().Object,
             serviceProvider,
             _hasher,
-            Mock.Of<IDistributedLockProvider>().Object,
+            IDistributedLockProvider.Mock().Object,
             typeRegistry,
             Microsoft.Extensions.Options.Options.Create(new DistributedLockingOptions()),
             NullLogger<TriggerIndexer>.Instance);

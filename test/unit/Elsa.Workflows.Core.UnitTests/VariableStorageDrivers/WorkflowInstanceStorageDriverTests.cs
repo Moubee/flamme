@@ -195,9 +195,9 @@ public class WorkflowInstanceStorageDriverTests
     private static Harness CreateHarness(Variable variable, ISerializationTypeRegistry? typeRegistry = null)
     {
         var properties = new Dictionary<string, object>();
-        var executionContext = Mock.Of<IExecutionContext>().Object;
+        var executionContext = IExecutionContext.Mock().Object;
         Mock.Get(executionContext).Properties.Returns(properties);
-        var payloadSerializer = Mock.Of<IPayloadSerializer>().Object;
+        var payloadSerializer = IPayloadSerializer.Mock().Object;
         Mock.Get(payloadSerializer).GetOptions().Returns(CreatePayloadSerializerOptions(typeRegistry));
         var driver = new WorkflowInstanceStorageDriver(payloadSerializer, NullLogger<WorkflowInstanceStorageDriver>.Instance);
         var context = new StorageDriverContext(executionContext, variable, CancellationToken.None);

@@ -12,8 +12,8 @@ public class ActivityDescriberTests
 
     public ActivityDescriberTests()
     {
-        var defaultValueResolver = Mock.Of<IPropertyDefaultValueResolver>().Object;
-        var propertyUIHandlerResolver = Mock.Of<IPropertyUIHandlerResolver>().Object;
+        var defaultValueResolver = IPropertyDefaultValueResolver.Mock().Object;
+        var propertyUIHandlerResolver = IPropertyUIHandlerResolver.Mock().Object;
         Mock.Get(defaultValueResolver).GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
         Mock.Get(propertyUIHandlerResolver).GetUIPropertiesAsync(Arg.Any<PropertyInfo>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
                     .Returns(() => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));

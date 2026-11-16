@@ -167,7 +167,7 @@ public class MaterializerRegistryTests
 
     private static IWorkflowMaterializer CreateMaterializer(string name)
     {
-        var materializer = Mock.Of<IWorkflowMaterializer>().Object;
+        var materializer = IWorkflowMaterializer.Mock().Object;
         Mock.Get(materializer).Name.Returns(name);
         return materializer;
     }

@@ -12,7 +12,7 @@ public class WorkflowInstanceStoreExtensionsTests
     public async Task EnumerateSummariesAsync_AdvancesAcrossPagesWithoutRepeatingOffsets()
     {
         // Arrange
-        var store = Mock.Of<IWorkflowInstanceStore>().Object;
+        var store = IWorkflowInstanceStore.Mock().Object;
         var filter = new WorkflowInstanceFilter();
         var requestedPages = new List<PageArgs>();
         var page1 = new List<WorkflowInstanceSummary>

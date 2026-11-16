@@ -23,7 +23,7 @@ public class TenantResolutionMiddlewareTests
         var middleware = new TenantResolutionMiddleware(
             _ => Task.FromException(expectedException),
             tenantScopeFactory);
-        var tenantResolverPipelineInvoker = Mock.Of<ITenantResolverPipelineInvoker>().Object;
+        var tenantResolverPipelineInvoker = ITenantResolverPipelineInvoker.Mock().Object;
         Mock.Get(tenantResolverPipelineInvoker)
             .InvokePipelineAsync(Arg.Any<CancellationToken>())
             .ReturnsAsync(Task.FromResult<Tenant?>(null));

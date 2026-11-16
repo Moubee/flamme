@@ -25,10 +25,10 @@ public class ScheduledCronTaskTests : IDisposable
     {
         var services = new ServiceCollection();
         _timeProvider = new FakeTimeProvider(DefaultNow);
-        _cronParser = Mock.Of<ICronParser>().Object;
-        _logger = Mock.Of<ILogger<ScheduledCronTask>>().Object;
+        _cronParser = ICronParser.Mock().Object;
+        _logger = ILogger<ScheduledCronTask>.Mock().Object;
         
-        services.AddSingleton(Mock.Of<ICommandSender>().Object);
+        services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -37,7 +37,7 @@ public class ScheduledCronTaskTests : IDisposable
         ICronParser? cronParser = null,
         TimeProvider? timeProvider = null)
     {
-        var task = Mock.Of<ITask>().Object;
+        var task = ITask.Mock().Object;
         var scheduledTask = new ScheduledCronTask(
             task,
             cronExpression ?? DefaultCronExpression,

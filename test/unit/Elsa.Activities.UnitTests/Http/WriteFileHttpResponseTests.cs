@@ -287,7 +287,7 @@ public class WriteFileHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            var mockHttpContextAccessor = IHttpContextAccessor.Mock().Object;
             Mock.Get(mockHttpContextAccessor).HttpContext.Returns((HttpContext?)null);
             services.AddSingleton(mockHttpContextAccessor);
             AddMockServices(services);
@@ -374,7 +374,7 @@ public class WriteFileHttpResponseTests
 
     private static IContentTypeProvider CreateContentTypeProviderMock()
     {
-        var mockContentTypeProvider = Mock.Of<IContentTypeProvider>().Object;
+        var mockContentTypeProvider = IContentTypeProvider.Mock().Object;
         var contentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             [".txt"] = "text/plain",
@@ -402,14 +402,14 @@ public class WriteFileHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            var mockHttpContextAccessor = IHttpContextAccessor.Mock().Object;
             Mock.Get(mockHttpContextAccessor).HttpContext.Returns(httpContext);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions());
             AddHttpContentFactories(services);
             AddHttpContentParsers(services);
             AddMockServices(services);
-            services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
+            services.AddSingleton(IStimulusHasher.Mock().Object);
             services.AddLogging();
         });
 
@@ -422,7 +422,7 @@ public class WriteFileHttpResponseTests
         {
             WriteHttpResponseSynchronously = false
         };
-        var mockOptions = Mock.Of<Microsoft.Extensions.Options.IOptions<HttpActivityOptions>>().Object;
+        var mockOptions = Microsoft.Extensions.Options.IOptions<HttpActivityOptions>.Mock().Object;
         Mock.Get(mockOptions).Value.Returns(options);
         return mockOptions;
     }
@@ -448,10 +448,10 @@ public class WriteFileHttpResponseTests
     {
         services.AddSingleton(CreateDownloadableManagerMock());
         services.AddSingleton(CreateContentTypeProviderMock());
-        services.AddSingleton(Mock.Of<IFileCacheStorageProvider>().Object);
+        services.AddSingleton(IFileCacheStorageProvider.Mock().Object);
         services.AddSingleton(CreateFileCacheOptionsMock());
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UnixEpoch));
-        services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
+        services.AddSingleton(IStimulusHasher.Mock().Object);
         services.AddLogging();
         
         RegisterZipManager(services);
@@ -459,7 +459,7 @@ public class WriteFileHttpResponseTests
 
     private static IDownloadableManager CreateDownloadableManagerMock()
     {
-        var mock = Mock.Of<IDownloadableManager>().Object;
+        var mock = IDownloadableManager.Mock().Object;
         Mock.Get(mock).GetDownloadablesAsync(Arg.Any<object>(), Arg.Any<DownloadableOptions?>(), Arg.Any<CancellationToken>())
             .Returns((object content, DownloadableOptions? options, CancellationToken cancellationToken) =>
             {
@@ -470,7 +470,7 @@ public class WriteFileHttpResponseTests
 
     private static Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions> CreateFileCacheOptionsMock()
     {
-        var mock = Mock.Of<Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>>().Object;
+        var mock = Microsoft.Extensions.Options.IOptions<HttpFileCacheOptions>.Mock().Object;
         Mock.Get(mock).Value.Returns(new HttpFileCacheOptions { TimeToLive = TimeSpan.FromHours(1) });
         return mock;
     }

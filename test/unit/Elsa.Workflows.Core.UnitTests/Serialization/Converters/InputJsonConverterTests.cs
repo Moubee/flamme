@@ -71,7 +71,7 @@ public sealed class InputJsonConverterTests
 
     private static JsonSerializerOptions CreateOptions(ExpressionDescriptor? descriptor = null)
     {
-        var registry = Mock.Of<IExpressionDescriptorRegistry>().Object;
+        var registry = IExpressionDescriptorRegistry.Mock().Object;
 
         if (descriptor != null)
             Mock.Get(registry).Find(descriptor.Type).Returns(descriptor);

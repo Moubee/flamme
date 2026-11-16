@@ -18,7 +18,7 @@ public class WorkflowTimestampTests
     public async Task NewDefinitions_UseTheProviderAtEachCreation()
     {
         var time = new FakeTimeProvider(InitialUtc);
-        var publisher = CreatePublisher(time, Mock.Of<IWorkflowDefinitionStore>().Object);
+        var publisher = CreatePublisher(time, IWorkflowDefinitionStore.Mock().Object);
 
         var first = publisher.New();
         time.Advance(TimeSpan.FromTicks(37));
@@ -33,7 +33,7 @@ public class WorkflowTimestampTests
     {
         var time = new FakeTimeProvider(InitialUtc);
         var published = new WorkflowDefinition { Id = "version-1", DefinitionId = "definition", Version = 1, IsPublished = true, CreatedAt = InitialUtc };
-        var store = Mock.Of<IWorkflowDefinitionStore>().Object;
+        var store = IWorkflowDefinitionStore.Mock().Object;
         Mock.Get(store).FindLastVersionAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(published);
         Mock.Get(store).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<WorkflowDefinitionOrder<int>>(), Arg.Any<CancellationToken>()).Returns(published);
         var publisher = CreatePublisher(time, store);
@@ -50,7 +50,7 @@ public class WorkflowTimestampTests
     public async Task NewInstance_SharesOneCreationInstantWithItsWorkflowState()
     {
         var time = new FakeTimeProvider(InitialUtc) { AutoAdvanceAmount = TimeSpan.FromTicks(1) };
-        var factory = new WorkflowInstanceFactory(Mock.Of<IIdentityGenerator>().Object, time);
+        var factory = new WorkflowInstanceFactory(IIdentityGenerator.Mock().Object, time);
         var instance = factory.CreateWorkflowInstance(new Workflow(), new WorkflowInstanceOptions { WorkflowInstanceId = "instance" });
 
         await Assert.That(instance.CreatedAt).IsEqualTo(InitialUtc);
@@ -60,12 +60,12 @@ public class WorkflowTimestampTests
     }
 
     private static WorkflowDefinitionPublisher CreatePublisher(TimeProvider time, IWorkflowDefinitionStore store) => new(
-        Mock.Of<IWorkflowDefinitionService>().Object,
+        IWorkflowDefinitionService.Mock().Object,
         store,
-        Mock.Of<IWorkflowValidator>().Object,
-        Mock.Of<IIdentityGenerator>().Object,
-        Mock.Of<IActivitySerializer>().Object,
-        Mock.Of<IMediator>().Object,
+        IWorkflowValidator.Mock().Object,
+        IIdentityGenerator.Mock().Object,
+        IActivitySerializer.Mock().Object,
+        IMediator.Mock().Object,
         time,
         Microsoft.Extensions.Options.Options.Create(new ManagementOptions()));
 }

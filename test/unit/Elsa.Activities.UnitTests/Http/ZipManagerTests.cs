@@ -78,7 +78,7 @@ public class ZipManagerTests : IDisposable
     [Test]
     public async Task LoadAsync_ValidToken_OpensReturnedBlobFullPathWithinCacheDirectory()
     {
-        var provider = Mock.Of<IFileCacheStorageProvider>().Object;
+        var provider = IFileCacheStorageProvider.Mock().Object;
         var blobPath = Path.Join(_cacheDirectory, "download.tmp");
         var blobStorage = new BlobStorageStub("download.tmp", blobPath, [1, 2, 3], _now.AddMinutes(5));
         var zipManager = CreateZipManager(provider);
@@ -94,7 +94,7 @@ public class ZipManagerTests : IDisposable
     [Test]
     public async Task LoadAsync_RootedPathOutsideCacheDirectory_ReturnsNull()
     {
-        var provider = Mock.Of<IFileCacheStorageProvider>().Object;
+        var provider = IFileCacheStorageProvider.Mock().Object;
         var blobStorage = new BlobStorageStub("download.tmp", Path.Join(Path.GetTempPath(), "download.tmp"), [1, 2, 3], _now.AddMinutes(5));
         var zipManager = CreateZipManager(provider);
         Mock.Get(provider).GetStorage().Returns(blobStorage);

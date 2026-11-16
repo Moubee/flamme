@@ -9,8 +9,8 @@ namespace Elsa.Workflows.Runtime.UnitTests.Services;
 
 public class EventPublisherTests
 {
-    private readonly IStimulusSender _stimulusSender = Mock.Of<IStimulusSender>().Object;
-    private readonly IWorkflowDispatcher _workflowDispatcher = Mock.Of<IWorkflowDispatcher>().Object;
+    private readonly IStimulusSender _stimulusSender = IStimulusSender.Mock().Object;
+    private readonly IWorkflowDispatcher _workflowDispatcher = IWorkflowDispatcher.Mock().Object;
 
     [Test]
     public async Task PublishAsync_WhenAsynchronous_DispatchesThroughWorkflowDispatcher()

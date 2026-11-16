@@ -165,18 +165,18 @@ public class WorkflowDefinitionScriptAuthorizationServiceTests
                 Type = "CSharp",
                 DisplayName = "C#",
                 IsBrowsable = hostAllowsCSharp,
-                HandlerFactory = _ => Mock.Of<IExpressionHandler>().Object
+                HandlerFactory = _ => IExpressionHandler.Mock().Object
             },
             new ExpressionDescriptor
             {
                 Type = "Python",
                 DisplayName = "Python",
                 IsBrowsable = hostAllowsPython,
-                HandlerFactory = _ => Mock.Of<IExpressionHandler>().Object
+                HandlerFactory = _ => IExpressionHandler.Mock().Object
             }
         };
 
-        var provider = Mock.Of<IExpressionDescriptorProvider>().Object;
+        var provider = IExpressionDescriptorProvider.Mock().Object;
         Mock.Get(provider).GetDescriptors().Returns(expressionDescriptors);
 
         var registry = new ExpressionDescriptorRegistry([provider]);

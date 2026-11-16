@@ -16,8 +16,8 @@ public class ReadLineTests
 
     public ReadLineTests()
     {
-        _mockTextReader = Mock.Of<TextReader>().Object;
-        _mockProvider = Mock.Of<IStandardInStreamProvider>().Object;
+        _mockTextReader = TextReader.Mock().Object;
+        _mockProvider = IStandardInStreamProvider.Mock().Object;
         Mock.Get(_mockProvider).GetTextReader().Returns(_mockTextReader);
     }
 

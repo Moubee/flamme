@@ -16,9 +16,9 @@ namespace Elsa.ExternalAuthentication.IntegrationTests.Compatibility;
 /// </summary>
 public sealed class LegacyIdentityEndpointTests : WebApplicationTest<LegacyIdentityEndpointWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {
-    private readonly IUserCredentialsValidator _credentialsValidator = Mock.Of<IUserCredentialsValidator>().Object;
-    private readonly IUserProvider _userProvider = Mock.Of<IUserProvider>().Object;
-    private readonly IAccessTokenIssuer _tokenIssuer = Mock.Of<IAccessTokenIssuer>().Object;
+    private readonly IUserCredentialsValidator _credentialsValidator = IUserCredentialsValidator.Mock().Object;
+    private readonly IUserProvider _userProvider = IUserProvider.Mock().Object;
+    private readonly IAccessTokenIssuer _tokenIssuer = IAccessTokenIssuer.Mock().Object;
     private readonly TestAuthenticationState _authentication = new();
     private HttpClient? _client;
 

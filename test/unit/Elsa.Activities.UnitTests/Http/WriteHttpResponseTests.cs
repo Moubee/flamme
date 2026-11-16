@@ -154,8 +154,8 @@ public class WriteHttpResponseTests
     {
         // Arrange
         var activity = new WriteHttpResponse();
-        var mockHttpContext = Mock.Of<HttpContext>().Object;
-        var mockResponse = Mock.Of<HttpResponse>().Object;
+        var mockHttpContext = HttpContext.Mock().Object;
+        var mockResponse = HttpResponse.Mock().Object;
         var mockHeaders = new HeaderDictionary();
         var responseBody = new MemoryStream();
         
@@ -177,8 +177,8 @@ public class WriteHttpResponseTests
     {
         // Arrange
         var activity = new WriteHttpResponse();
-        var mockHttpContext = Mock.Of<HttpContext>().Object;
-        var mockResponse = Mock.Of<HttpResponse>().Object;
+        var mockHttpContext = HttpContext.Mock().Object;
+        var mockResponse = HttpResponse.Mock().Object;
         var mockHeaders = new HeaderDictionary();
         var responseBody = new MemoryStream();
         
@@ -203,12 +203,12 @@ public class WriteHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            var mockHttpContextAccessor = IHttpContextAccessor.Mock().Object;
             Mock.Get(mockHttpContextAccessor).HttpContext.Returns((HttpContext?)null);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions());
             AddHttpContentFactories(services);
-            services.AddSingleton(Mock.Of<IStimulusHasher>().Object);
+            services.AddSingleton(IStimulusHasher.Mock().Object);
         });
 
         // Act + Assert
@@ -248,7 +248,7 @@ public class WriteHttpResponseTests
         var fixture = new ActivityTestFixture(activity);
         fixture.ConfigureServices(services =>
         {
-            var mockHttpContextAccessor = Mock.Of<IHttpContextAccessor>().Object;
+            var mockHttpContextAccessor = IHttpContextAccessor.Mock().Object;
             Mock.Get(mockHttpContextAccessor).HttpContext.Returns(httpContext);
             services.AddSingleton(mockHttpContextAccessor);
             services.AddSingleton(CreateMockHttpActivityOptions(writeResponseSynchronously));
@@ -266,7 +266,7 @@ public class WriteHttpResponseTests
         {
             WriteHttpResponseSynchronously = writeResponseSynchronously
         };
-        var mockOptions = Mock.Of<IOptions<HttpActivityOptions>>().Object;
+        var mockOptions = IOptions<HttpActivityOptions>.Mock().Object;
         Mock.Get(mockOptions).Value.Returns(options);
         return mockOptions;
     }

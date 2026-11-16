@@ -32,9 +32,9 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
     {
         var services = new ServiceCollection();
         _timeProvider = new FakeTimeProvider(DefaultNow);
-        _logger = Mock.Of<ILogger<ScheduledSpecificInstantTask>>().Object;
+        _logger = ILogger<ScheduledSpecificInstantTask>.Mock().Object;
 
-        services.AddSingleton(Mock.Of<ICommandSender>().Object);
+        services.AddSingleton(ICommandSender.Mock().Object);
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -42,7 +42,7 @@ public class ScheduledSpecificInstantTaskTests : IDisposable
         DateTimeOffset? startAt = null,
         TimeProvider? timeProvider = null)
     {
-        var task = Mock.Of<ITask>().Object;
+        var task = ITask.Mock().Object;
         var scheduledTask = new ScheduledSpecificInstantTask(
             task,
             startAt ?? DefaultNow.AddMinutes(5),

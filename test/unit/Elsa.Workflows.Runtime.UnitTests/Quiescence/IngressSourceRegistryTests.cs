@@ -111,7 +111,7 @@ public class IngressSourceRegistryTests
 
     private static IIngressSource CreateSource(string name)
     {
-        var source = Mock.Of<IIngressSource>().Object;
+        var source = IIngressSource.Mock().Object;
         Mock.Get(source).Name.Returns(name);
         Mock.Get(source).PauseTimeout.Returns(TimeSpan.FromSeconds(5));
         Mock.Get(source).CurrentState.Returns(IngressSourceState.Running);

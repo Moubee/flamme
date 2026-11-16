@@ -16,10 +16,10 @@ namespace Elsa.Workflows.Management.UnitTests.Services;
 
 public class WorkflowDefinitionExporterRegressionTests
 {
-    private readonly IWorkflowDefinitionStore _store = Mock.Of<IWorkflowDefinitionStore>().Object;
-    private readonly IApiSerializer _serializer = Mock.Of<IApiSerializer>().Object;
-    private readonly IWorkflowDefinitionService _workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
-    private readonly IWorkflowReferenceGraphBuilder _workflowReferenceGraphBuilder = Mock.Of<IWorkflowReferenceGraphBuilder>().Object;
+    private readonly IWorkflowDefinitionStore _store = IWorkflowDefinitionStore.Mock().Object;
+    private readonly IApiSerializer _serializer = IApiSerializer.Mock().Object;
+    private readonly IWorkflowDefinitionService _workflowDefinitionService = IWorkflowDefinitionService.Mock().Object;
+    private readonly IWorkflowReferenceGraphBuilder _workflowReferenceGraphBuilder = IWorkflowReferenceGraphBuilder.Mock().Object;
 
     [Test]
     public async Task ExportManyAsync_WithSlashInWorkflowName_CreatesFlatZipEntry()
@@ -57,8 +57,8 @@ public class WorkflowDefinitionExporterRegressionTests
 
     private WorkflowDefinitionExporter CreateExporter()
     {
-        var activitySerializer = Mock.Of<IActivitySerializer>().Object;
-        var scopeFactory = Mock.Of<IServiceScopeFactory>().Object;
+        var activitySerializer = IActivitySerializer.Mock().Object;
+        var scopeFactory = IServiceScopeFactory.Mock().Object;
         var workflowJsonTypeRegistry = SerializationTypeRegistry.CreateDefault();
         var variableDefinitionMapper = new VariableDefinitionMapper(workflowJsonTypeRegistry, scopeFactory, NullLogger<VariableDefinitionMapper>.Instance);
         var workflowDefinitionMapper = new WorkflowDefinitionMapper(activitySerializer, _workflowDefinitionService, variableDefinitionMapper);

@@ -7,7 +7,7 @@ namespace Elsa.Workflows.IntegrationTests.Security;
 
 public class WorkflowDefinitionImportFileReaderTests
 {
-    private readonly IApiSerializer _apiSerializer = Mock.Of<IApiSerializer>().Object;
+    private readonly IApiSerializer _apiSerializer = IApiSerializer.Mock().Object;
 
     public WorkflowDefinitionImportFileReaderTests()
     {

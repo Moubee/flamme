@@ -42,7 +42,7 @@ public sealed class LogoutEndpointTests
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseTestServer();
-        var module = Mock.Of<IModule>().Object;
+        var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(builder.Services);
         new IdentityFeature(module) { TokenOptions = options => options.SigningKey = IdentityTokenTestConstants.SigningKey }.Apply();
         new DefaultAuthenticationFeature(module).Apply();

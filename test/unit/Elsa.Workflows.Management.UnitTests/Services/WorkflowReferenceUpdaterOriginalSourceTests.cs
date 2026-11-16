@@ -27,8 +27,8 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         var sourceOnlyGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var jsonGraph = CreateConsumerGraph(jsonConsumer, target, "json-consumer-workflow");
         var logger = new CollectingLogger();
-        var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var publisher = IWorkflowDefinitionPublisher.Mock().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
         var updater = CreateUpdater(target, [sourceOnlyConsumer, jsonConsumer], [sourceOnlyGraph, jsonGraph], publisher, logger, activityRegistry, out _);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
@@ -62,8 +62,8 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         var sourceOnlyConsumer = CreateSourceOnlyConsumer(isPublished: true);
         var consumerGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var logger = new CollectingLogger();
-        var publisher = Mock.Of<IWorkflowDefinitionPublisher>().Object;
-        var activityRegistry = Mock.Of<IActivityRegistry>().Object;
+        var publisher = IWorkflowDefinitionPublisher.Mock().Object;
+        var activityRegistry = IActivityRegistry.Mock().Object;
         var updater = CreateUpdater(target, [sourceOnlyConsumer], [consumerGraph], publisher, logger, activityRegistry, out var store);
 
         var result = await updater.UpdateWorkflowReferencesAsync(target);
@@ -100,12 +100,12 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         IActivityRegistry? activityRegistry,
         out IWorkflowDefinitionStore store)
     {
-        var workflowDefinitionService = Mock.Of<IWorkflowDefinitionService>().Object;
-        store = Mock.Of<IWorkflowDefinitionStore>().Object;
-        var graphBuilder = Mock.Of<IWorkflowReferenceGraphBuilder>().Object;
-        var serializer = Mock.Of<IApiSerializer>().Object;
+        var workflowDefinitionService = IWorkflowDefinitionService.Mock().Object;
+        store = IWorkflowDefinitionStore.Mock().Object;
+        var graphBuilder = IWorkflowReferenceGraphBuilder.Mock().Object;
+        var serializer = IApiSerializer.Mock().Object;
         var consumersById = consumers.ToDictionary(c => c.DefinitionId);
-        activityRegistry ??= Mock.Of<IActivityRegistry>().Object;
+        activityRegistry ??= IActivityRegistry.Mock().Object;
         Mock.Get(graphBuilder).BuildGraphAsync(target.DefinitionId, Arg.Any<CancellationToken>())
                     .Returns(new WorkflowReferenceGraph(
                         [target.DefinitionId],

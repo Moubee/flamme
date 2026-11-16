@@ -19,18 +19,18 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
     public DefaultWorkflowDefinitionStorePopulatorTests()
     {
-        _storeMock = Mock.Of<IWorkflowDefinitionStore>().Object;
+        _storeMock = IWorkflowDefinitionStore.Mock().Object;
         Mock.Get(_storeMock).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
                     .Returns(_workflowDefinitionsInStore);
         _populator = new(() => new List<IWorkflowsProvider>(),
-            Mock.Of<ITriggerIndexer>().Object,
+            ITriggerIndexer.Mock().Object,
             _storeMock,
-            Mock.Of<IActivitySerializer>().Object,
-            Mock.Of<IPayloadSerializer>().Object,
+            IActivitySerializer.Mock().Object,
+            IPayloadSerializer.Mock().Object,
             new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            Mock.Of<IIdentityGraphService>().Object,
-            Mock.Of<ITenantAccessor>().Object,
-            Mock.Of<ILogger<DefaultWorkflowDefinitionStorePopulator>>().Object);
+            IIdentityGraphService.Mock().Object,
+            ITenantAccessor.Mock().Object,
+            ILogger<DefaultWorkflowDefinitionStorePopulator>.Mock().Object);
     }
 
     [Test]
@@ -300,24 +300,24 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
     private DefaultWorkflowDefinitionStorePopulator CreatePopulatorWithTenant(string? tenantId, params MaterializedWorkflow[] workflows)
     {
-        var tenantAccessor = Mock.Of<ITenantAccessor>().Object;
+        var tenantAccessor = ITenantAccessor.Mock().Object;
         Mock.Get(tenantAccessor).Tenant.Returns(tenantId != null ? new Tenant { Id = tenantId } : null);
         Mock.Get(tenantAccessor).TenantId.Returns(tenantId.NormalizeTenantId());
 
-        var provider = Mock.Of<IWorkflowsProvider>().Object;
+        var provider = IWorkflowsProvider.Mock().Object;
         Mock.Get(provider).Name.Returns("TestProvider");
         Mock.Get(provider).GetWorkflowsAsync(Arg.Any<CancellationToken>())
                     .Returns(workflows);
 
         return new(
             () => new List<IWorkflowsProvider> { provider },
-            Mock.Of<ITriggerIndexer>().Object,
+            ITriggerIndexer.Mock().Object,
             _storeMock,
-            Mock.Of<IActivitySerializer>().Object,
-            Mock.Of<IPayloadSerializer>().Object,
+            IActivitySerializer.Mock().Object,
+            IPayloadSerializer.Mock().Object,
             new FakeTimeProvider(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-            Mock.Of<IIdentityGraphService>().Object,
+            IIdentityGraphService.Mock().Object,
             tenantAccessor,
-            Mock.Of<ILogger<DefaultWorkflowDefinitionStorePopulator>>().Object);
+            ILogger<DefaultWorkflowDefinitionStorePopulator>.Mock().Object);
     }
 }

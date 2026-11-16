@@ -12,7 +12,7 @@ namespace Elsa.Identity.UnitTests.Features;
 /// </summary>
 public class DefaultAuthenticationFeatureTests
 {
-    private readonly DefaultAuthenticationFeature _feature = new(Mock.Of<IModule>().Object);
+    private readonly DefaultAuthenticationFeature _feature = new(IModule.Mock().Object);
     private readonly AuthorizationOptions _options = new();
 
     [Test]
