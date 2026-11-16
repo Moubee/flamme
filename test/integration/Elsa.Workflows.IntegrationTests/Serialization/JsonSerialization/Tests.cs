@@ -48,6 +48,8 @@ public class SerializationTests : IAsyncDisposable
         await CompareJsonObjectsAsync(expected, result);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This compatibility test deliberately serializes through Newtonsoft.Json to verify its production contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This compatibility test deliberately serializes through Newtonsoft.Json to verify its production contract.")]
     [Test]
     [DisplayName("read: $type")]
     [Arguments(typeof(JsonObject), "JsonObjectIsland", "JsonObjectWithoutType")]
@@ -67,7 +69,13 @@ public class SerializationTests : IAsyncDisposable
         }
         else
         {
-            result = type == typeof(JsonObject) ? JsonObject.Create(JsonSerializer.SerializeToElement(transformationModel))!.ToString() : JsonArray.Create(JsonSerializer.SerializeToElement(transformationModel["Content"]))!.ToString();
+            result = type == typeof(JsonObject)
+                ? new JsonObject
+                {
+                    ["StatusCode"] = (string)transformationModel["StatusCode"],
+                    ["Content"] = ((JsonNode)transformationModel["Content"]).DeepClone()
+                }.ToJsonString()
+                : ((JsonNode)transformationModel["Content"]).ToJsonString();
         }
 
         var expected = File.ReadAllText(@$"Serialization/JsonSerialization/{compareFileName}.json");

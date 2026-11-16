@@ -35,6 +35,7 @@ public sealed class EFCoreUserTaskRepositoryTests
         serviceProvider = services.BuildServiceProvider();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Before(Test)]
     public async Task InitializeAsync()
     {
@@ -105,6 +106,7 @@ public sealed class EFCoreUserTaskRepositoryTests
         await Assert.That(loaded.Tags).Contains("risk_100%'");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Test]
     [Arguments("tenant{0}")]
     [Arguments("tenant{archive}\"")]

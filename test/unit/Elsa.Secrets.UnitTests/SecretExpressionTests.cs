@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.Json;
 using Elsa.Expressions.Contracts;
 using Elsa.Expressions.Models;
@@ -80,13 +83,15 @@ public class SecretExpressionTests
     }
 
     [Test]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Exercises the production expression/input converters, which serialize private anonymous models in the source assembly and currently require reflection metadata.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "Exercises the existing JIT-only production converter round trip; the anonymous serialization models must be migrated in the source assembly before this path supports AOT.")]
     public async Task SecretExpression_RoundTripsAsSecretReference()
     {
         var options = CreateSerializerOptions();
         var expression = SecretExpression.Create(new("api:key", SecretTypeNames.Text, "production"));
 
         var json = JsonSerializer.Serialize(expression, options);
-        var deserializedExpression = await Assert.That(JsonSerializer.Deserialize<Expression>(json, options)).IsNotNull();
+        var deserializedExpression = await Assert.That(JsonSerializer.Deserialize(json, ConverterTypeInfo<Expression>(options))).IsNotNull();
         var deserializedValue = await Assert.That(deserializedExpression.Value).IsNotNull();
         await Assert.That(deserializedValue).IsOfType(typeof(SecretReference));
         var deserializedReference = (SecretReference)deserializedValue;
@@ -106,7 +111,7 @@ public class SecretExpressionTests
         var options = CreateSerializerOptions();
         const string json = """{"type":"Secret","value":""}""";
 
-        var expression = await Assert.That(JsonSerializer.Deserialize<Expression>(json, options)).IsNotNull();
+        var expression = await Assert.That(JsonSerializer.Deserialize(json, ConverterTypeInfo<Expression>(options))).IsNotNull();
 
         await Assert.That(expression.Type).IsEqualTo(SecretExpression.TypeName);
         await Assert.That(expression.Value).IsNull();
@@ -118,7 +123,7 @@ public class SecretExpressionTests
         var options = CreateSerializerOptions();
         const string json = """{"type":"Secret","value":"api:key"}""";
 
-        var expression = await Assert.That(JsonSerializer.Deserialize<Expression>(json, options)).IsNotNull();
+        var expression = await Assert.That(JsonSerializer.Deserialize(json, ConverterTypeInfo<Expression>(options))).IsNotNull();
 
         var value = await Assert.That(expression.Value).IsNotNull();
         await Assert.That(value).IsOfType(typeof(SecretReference));
@@ -132,7 +137,7 @@ public class SecretExpressionTests
         var options = CreateSerializerOptions();
         const string json = """{"type":"Secret","value":"{\"name\":\"api:key\",\"typeName\":\"text\",\"scope\":\"production\"}"}""";
 
-        var expression = await Assert.That(JsonSerializer.Deserialize<Expression>(json, options)).IsNotNull();
+        var expression = await Assert.That(JsonSerializer.Deserialize(json, ConverterTypeInfo<Expression>(options))).IsNotNull();
 
         var value = await Assert.That(expression.Value).IsNotNull();
         await Assert.That(value).IsOfType(typeof(SecretReference));
@@ -141,13 +146,15 @@ public class SecretExpressionTests
     }
 
     [Test]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Exercises the production expression/input converters, which serialize private anonymous models in the source assembly and currently require reflection metadata.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "Exercises the existing JIT-only production converter round trip; the anonymous serialization models must be migrated in the source assembly before this path supports AOT.")]
     public async Task WorkflowInputJson_StoresSecretReferenceNotSecretValue()
     {
         var options = CreateSerializerOptions();
         var input = new Input<string>(SecretExpression.Create(new("api:key", SecretTypeNames.Text, "production")));
 
         var json = JsonSerializer.Serialize(input, options);
-        var deserializedInput = await Assert.That(JsonSerializer.Deserialize<Input<string>>(json, options)).IsNotNull();
+        var deserializedInput = await Assert.That(JsonSerializer.Deserialize(json, ConverterTypeInfo<Input<string>>(options))).IsNotNull();
         var expression = await Assert.That(deserializedInput.Expression).IsNotNull();
         var value = await Assert.That(expression.Value).IsNotNull();
         await Assert.That(value).IsOfType(typeof(SecretReference));
@@ -185,6 +192,16 @@ public class SecretExpressionTests
     private static ExpressionExecutionContext CreateContext(CancellationToken cancellationToken = default)
     {
         return new(new ServiceCollection().BuildServiceProvider(), new MemoryRegister(), cancellationToken: cancellationToken);
+    }
+
+    private static JsonTypeInfo<T> ConverterTypeInfo<T>(JsonSerializerOptions options)
+    {
+        options.TypeInfoResolver ??= SecretExpressionJsonContext.Default;
+        var converter = options.Converters.First(converter => converter.CanConvert(typeof(T)));
+        if (converter is JsonConverterFactory factory)
+            converter = factory.CreateConverter(typeof(T), options)
+                ?? throw new InvalidOperationException($"The configured factory returned no converter for {typeof(T)}.");
+        return JsonMetadataServices.CreateValueInfo<T>(options, (JsonConverter<T>)converter);
     }
 
     private static JsonSerializerOptions CreateSerializerOptions()
@@ -238,3 +255,12 @@ public class SecretExpressionTests
         public ExpressionDescriptor? Find(string type) => _descriptors.GetValueOrDefault(type);
     }
 }
+
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(Expression))]
+[JsonSerializable(typeof(Input<string>))]
+[JsonSerializable(typeof(SecretReference))]
+[JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(object))]
+[JsonSerializable(typeof(JsonElement))]
+internal partial class SecretExpressionJsonContext : JsonSerializerContext;

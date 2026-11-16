@@ -795,6 +795,8 @@ public class ExternalAuthenticationRoleDeletionDependencyContributorTests
         public Task<IEnumerable<Role>> FindManyAsync(RoleFilter filter, CancellationToken cancellationToken = default) =>
             Task.FromResult<IEnumerable<Role>>(ApplyFilter(filter).ToArray());
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         private IQueryable<Role> ApplyFilter(RoleFilter filter) => filter.Apply(roles.AsQueryable());
     }
 

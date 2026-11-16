@@ -137,6 +137,7 @@ public class Tests
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Test]
     [DisplayName("Concurrent dispatch on two runtime nodes sharing PostgreSQL and a distributed lock persists one Running instance")]
     public async Task ConcurrentDispatch_AcrossRuntimeNodes_CreatesOneRunningInstance()
@@ -230,7 +231,7 @@ public class Tests
         await commandProcessor.StartAsync(CancellationToken.None);
         try
         {
-            await finishedSignal.WaitForFinishAsync(parentInstanceId);
+            await finishedSignal.WaitForFinishAsync(parentInstanceId!);
 
             var persistedParent = (await Assert.That((await FindByDefinitionAsync(services, nameof(WaitForDeniedDispatchConversationWorkflow))).Where(instance => instance.Id == parentInstanceId)).HasSingleItem());
             await Assert.That(persistedParent.Status).IsEqualTo(WorkflowStatus.Finished);
@@ -280,7 +281,7 @@ public class Tests
         await commandProcessor.StartAsync(CancellationToken.None);
         try
         {
-            await finishedSignal.WaitForFinishAsync(parentInstanceId);
+            await finishedSignal.WaitForFinishAsync(parentInstanceId!);
 
             var persistedParent = (await Assert.That((await FindByDefinitionAsync(services, nameof(WaitForDeniedBulkDispatchConversationWorkflow))).Where(instance => instance.Id == parentInstanceId)).HasSingleItem());
             var activationDenied = await Assert.That(persistedParent.WorkflowState.Output["ActivationDenied"]).IsTypeOf<bool>();
@@ -347,7 +348,7 @@ public class Tests
             WorkflowDefinitionHandle = handle
         }));
 
-        await Assert.That(exception.Message).Contains("non-blank correlation ID").WithComparison(StringComparison.OrdinalIgnoreCase);
+        await Assert.That(exception!.Message).Contains("non-blank correlation ID").WithComparison(StringComparison.OrdinalIgnoreCase);
         await Assert.That(await FindByDefinitionAsync(services, definitionId)).IsEmpty();
     }
 
@@ -497,7 +498,7 @@ public class Tests
         var graph = await services.GetRequiredService<IWorkflowDefinitionService>()
             .FindWorkflowGraphAsync(definitionId, VersionOptions.Published);
         await Assert.That(graph).IsNotNull();
-        return graph;
+        return graph!;
     }
 
     private static async Task<List<WorkflowInstance>> FindRunningAsync(IServiceProvider services, string definitionId, string? correlationId)

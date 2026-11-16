@@ -105,6 +105,7 @@ public class EFCoreAIAuditSinkTests : IAsyncInitializer, IAsyncDisposable
         await Assert.That(await _dbContext.AuditRecords.AnyAsync()).IsFalse();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();

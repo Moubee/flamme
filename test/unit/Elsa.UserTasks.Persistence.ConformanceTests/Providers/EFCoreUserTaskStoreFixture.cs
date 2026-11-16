@@ -68,6 +68,7 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
     /// <summary>The isolated or operator-supplied PostgreSQL connection string for this run.</summary>
     protected abstract string ResolveConnectionString();
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     protected override async Task ActivateCoreAsync()
     {
         var services = new ServiceCollection();

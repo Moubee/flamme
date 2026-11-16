@@ -155,6 +155,7 @@ public sealed class PostgreSqlRevokedSessionStoreTests : RevokedSessionStoreTest
         await AssertRevokedUntilAsync("session-a", Now.AddHours(Math.Max(concurrentExpiryHours, 2)));
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     protected override async Task<IRevokedSessionStore> CreateStoreAsync()
     {
         await _database.OpenAsync();

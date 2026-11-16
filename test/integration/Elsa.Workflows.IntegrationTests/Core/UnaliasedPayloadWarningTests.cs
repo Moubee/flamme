@@ -22,6 +22,7 @@ public class UnaliasedPayloadWarningTests
     private class AliasedPayload { public string? Status { get; set; } }
     private class PayloadSerializedWhileWarningsOff { public string? Status { get; set; } }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task UnaliasedPayload_WarnsNamingTheTypeAndTheRemedy()
     {
@@ -35,6 +36,7 @@ public class UnaliasedPayloadWarningTests
         await Assert.That(warning).Contains("AddTypeAlias", StringComparison.CurrentCulture);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task UnaliasedPayload_WarnsOnlyOncePerType()
     {
@@ -49,6 +51,7 @@ public class UnaliasedPayloadWarningTests
         await Assert.That(log.Warnings.Where(x => x.Contains(nameof(RepeatedlySerializedPayload)))).HasSingleItem();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task AliasedPayload_DoesNotWarnAndKeepsItsPropertyCasing()
     {
@@ -64,6 +67,7 @@ public class UnaliasedPayloadWarningTests
         await Assert.That(payload.Status).IsEqualTo("Shipped");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task Dictionary_DoesNotWarnAndKeepsItsKeysVerbatim()
     {
@@ -79,6 +83,7 @@ public class UnaliasedPayloadWarningTests
         await Assert.That(dictionary["Status"]).IsEqualTo("Shipped");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task WarningSuppressedByLogLevel_IsStillReportedOnceTheLevelIsRaised()
     {

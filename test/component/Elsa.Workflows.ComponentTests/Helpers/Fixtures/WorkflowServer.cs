@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Concurrent;
 using System.Reflection;
 using Elsa.Alterations.Extensions;
@@ -227,7 +228,8 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
                 options.ConfigureEngine((engine, context) =>
                 {
                     var state = context.ServiceProvider.GetRequiredService<TestJavaScriptState>();
-                    engine.SetValue("getStaticValue", (Func<object?>)(() => state.Value));
+                    engine.SetValue("getStaticValue", new Jint.Runtime.Interop.ClrFunction(engine, "getStaticValue",
+                        (_, _) => Jint.Native.JsValue.FromObject(engine, state.Value)));
                 });
             })
             .UseAlterations(alterations => alterations.UseEntityFrameworkCore(ef =>
@@ -349,7 +351,8 @@ internal sealed class ComponentDatabaseMigrationService(
         await MigrateAsync<AlterationsElsaDbContext>(services, cancellationToken);
     }
 
-    private async Task MigrateAsync<TDbContext>(IServiceProvider services, CancellationToken cancellationToken)
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
+    private async Task MigrateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] TDbContext>(IServiceProvider services, CancellationToken cancellationToken)
         where TDbContext : DbContext
     {
         var factory = services.GetRequiredService<IDbContextFactory<TDbContext>>();
@@ -710,7 +713,7 @@ internal sealed class ElsaModuleRegistryLease
     private static ConcurrentDictionary<IServiceCollection, IModule> GetModules()
     {
         const string fieldName = "Modules";
-        var extensionsType = typeof(Elsa.Features.ElsaFeature).Assembly.GetType("Elsa.Extensions.ModuleExtensions", throwOnError: true)!;
+        var extensionsType = Type.GetType("Elsa.Extensions.ModuleExtensions, Elsa.Features", throwOnError: true)!;
         var field = extensionsType.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
             ?? throw new MissingFieldException(extensionsType.FullName, fieldName);
         var expectedType = typeof(IDictionary<IServiceCollection, IModule>);

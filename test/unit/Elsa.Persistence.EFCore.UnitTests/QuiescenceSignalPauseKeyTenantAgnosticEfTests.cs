@@ -305,6 +305,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
         public DefaultTenantAccessor TenantAccessor { get; }
         public EFCoreKeyValueStore Store { get; }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
         public static async Task<EfHarness> CreateAsync(bool tenancyEnabled)
         {
             var database = new PostgreSqlTestDatabase();

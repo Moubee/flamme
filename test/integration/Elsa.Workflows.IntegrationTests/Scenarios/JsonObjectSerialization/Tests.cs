@@ -1,4 +1,4 @@
-﻿using Elsa.Testing.Shared;
+using Elsa.Testing.Shared;
 using Elsa.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +19,7 @@ public class Tests : IAsyncDisposable
         _workflowStateSerializer = _services.GetRequiredService<IWorkflowStateSerializer>();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     [DisplayName("User-objects containing $id don't break deserialization into ExpandoObject.")]
     public async Task Test1()

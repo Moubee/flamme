@@ -45,6 +45,8 @@ public class KeyValueFilterTests
         await Assert.That(result).IsEquivalentTo(["key-c", "key-a", "key-b"], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
     private static IQueryable<SerializedKeyValuePair> CreateUnorderedPairs()
     {
         return new[]

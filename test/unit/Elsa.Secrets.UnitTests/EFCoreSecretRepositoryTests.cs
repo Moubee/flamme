@@ -35,6 +35,7 @@ public class EFCoreSecretRepositoryTests
         _serviceProvider = services.BuildServiceProvider();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Before(Test)]
     public async Task InitializeAsync()
     {
@@ -168,7 +169,7 @@ public class EFCoreSecretRepositoryTests
         await Assert.That(reloaded.Name).IsEqualTo("SMTP:PASSWORD");
         await Assert.That(whitespaceReloaded.Id).IsEqualTo(reloaded.Id);
         await Assert.That(activeReplacementResult).IsFalse();
-        await Assert.That(duplicateException.Message).IsEqualTo("A secret named 'smtp:password' already exists.");
+        await Assert.That(duplicateException!.Message).IsEqualTo("A secret named 'smtp:password' already exists.");
     }
 
     [Test]
@@ -338,7 +339,7 @@ public class EFCoreSecretRepositoryTests
                     DisplayName = "Forged update"
                 })).ThrowsExactly<InvalidOperationException>();
 
-                await Assert.That(exception.Message).IsEqualTo("A secret named 'SMTP:PASSWORD' belongs to another tenant.");
+                await Assert.That(exception!.Message).IsEqualTo("A secret named 'SMTP:PASSWORD' belongs to another tenant.");
                 var unchanged = await Assert.That(await repository.GetAsync("smtp:password")).IsNotNull();
                 await Assert.That(unchanged.Id).IsEqualTo("agnostic-id");
                 await Assert.That(unchanged.DisplayName).IsEqualTo("Agnostic secret");
@@ -449,6 +450,7 @@ public class EFCoreSecretRepositoryTests
         }, useLegacyConstructor: true);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     private static async Task WithTenantAwareRepositoryAsync(Func<EFCoreSecretRepository, DefaultTenantAccessor, Task> test, bool useLegacyConstructor = false)
     {
         await using var database = new PostgreSqlTestDatabase();

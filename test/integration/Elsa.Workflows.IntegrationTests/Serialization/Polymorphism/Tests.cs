@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,18 +19,20 @@ public class Tests
     {
         var model = CreateModel();
         var expectedJson = File.ReadAllText("Serialization/Polymorphism/data.json").TrimEnd();
-        var actualJson = JsonSerializer.Serialize(model, GetSerializerOptions());
+        var actualJson = JsonSerializer.Serialize(model, GetModelTypeInfo());
         await Assert.That(actualJson).IsEqualTo(expectedJson);
     }
 
     [Test]
     [DisplayName("Objects mixed with primitive, complex, expando objects and arrays of these can be round-tripped")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Preserves the legacy polymorphic converter regression over an init-only record with cyclic references; .NET 10 generated metadata cannot restore this shape through its constructor.")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The existing init-only reference-preserving converter path is a JIT regression boundary until production serializer metadata supports it.")]
     public async Task Test2()
     {
         var model = CreateModel();
-        var json = JsonSerializer.Serialize(model, GetSerializerOptions());
-        var deserializedModel = JsonSerializer.Deserialize<Model>(json, GetSerializerOptions());
-        var roundTrippedJson = JsonSerializer.Serialize(deserializedModel, GetSerializerOptions());
+        var json = JsonSerializer.Serialize(model, GetSerializerOptions(useSourceGeneration: false));
+        var deserializedModel = JsonSerializer.Deserialize<Model>(json, GetSerializerOptions(useSourceGeneration: false));
+        var roundTrippedJson = JsonSerializer.Serialize(deserializedModel, GetSerializerOptions(useSourceGeneration: false));
         await Assert.That(roundTrippedJson).IsEqualTo(json);
     }
 
@@ -75,7 +78,13 @@ public class Tests
         );
     }
 
-    private JsonSerializerOptions GetSerializerOptions()
+    private static JsonTypeInfo<Model> GetModelTypeInfo()
+    {
+        var options = GetSerializerOptions();
+        return (JsonTypeInfo<Model>)options.GetTypeInfo(typeof(Model));
+    }
+
+    private static JsonSerializerOptions GetSerializerOptions(bool useSourceGeneration = true)
     {
         var referenceHandler = new CrossScopedReferenceHandler();
         var workflowJsonTypeRegistry = new SerializationTypeRegistry(Microsoft.Extensions.Options.Options.Create(new SerializationTypeOptions()));
@@ -84,13 +93,13 @@ public class Tests
 
         var options = new JsonSerializerOptions
         {
+            TypeInfoResolver = useSourceGeneration ? PolymorphismJsonContext.Default : null,
             ReferenceHandler = referenceHandler,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        options.Converters.Add(new JsonStringEnumConverter());
         options.Converters.Add(JsonMetadataServices.TimeSpanConverter);
         options.Converters.Add(new PolymorphicObjectConverterFactory(workflowJsonTypeRegistry));
         return options;
@@ -104,17 +113,17 @@ public class Tests
         var model = new MyNumber { Number = 123UL };
         var options = GetSerializerOptions();
         var expectedJson = "123";
-        var json = JsonSerializer.Serialize<object>(model, options);
+        var json = JsonSerializer.Serialize<object>(model, (JsonTypeInfo<object>)options.GetTypeInfo(typeof(object)));
         await Assert.That(json).IsEqualTo(expectedJson);
     }
 
     [JsonConverter(typeof(MyNumberConverter))]
-    private struct MyNumber
+    internal struct MyNumber
     {
         public ulong Number { get; init; }
     }
 
-    private class MyNumberConverter : JsonConverter<MyNumber>
+    internal class MyNumberConverter : JsonConverter<MyNumber>
     {
         public override MyNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => new() { Number = reader.GetUInt64() };

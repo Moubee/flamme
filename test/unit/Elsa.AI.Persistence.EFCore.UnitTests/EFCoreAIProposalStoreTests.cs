@@ -360,6 +360,7 @@ public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
         await Assert.That(reloaded.Status).IsEqualTo(AIProposalStatus.Draft);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();

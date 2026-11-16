@@ -69,19 +69,19 @@ public abstract class ExternalAuthenticationStoreConformanceTests
         var transaction = CreateTransaction("state-hash", expiresAt);
         await scenario.StateStore.PutAsync("ExternalSignIn", transaction.HandleHash, transaction, expiresAt);
         var stateTaken = (await Assert.That(await scenario.StateStore.TryTakeAsync<BrokerTransaction>("ExternalSignIn", transaction.HandleHash)).IsTypeOf<TakeResult<BrokerTransaction>.Taken>());
-        await Assert.That(stateTaken.Value.HandleHash).IsEqualTo(transaction.HandleHash);
+        await Assert.That(stateTaken!.Value.HandleHash).IsEqualTo(transaction.HandleHash);
         await Assert.That(await scenario.StateStore.TryTakeAsync<BrokerTransaction>("ExternalSignIn", transaction.HandleHash)).IsTypeOf<TakeResult<BrokerTransaction>.AlreadyConsumed>();
 
         var grant = CreateGrant("grant-hash", expiresAt);
         await scenario.GrantStore.SaveAsync(grant);
         var grantTaken = (await Assert.That(await scenario.GrantStore.TryTakeAsync(grant.CodeHash)).IsTypeOf<TakeResult<AuthorizationGrant>.Taken>());
-        await Assert.That(grantTaken.Value.CodeHash).IsEqualTo(grant.CodeHash);
+        await Assert.That(grantTaken!.Value.CodeHash).IsEqualTo(grant.CodeHash);
         await Assert.That(await scenario.GrantStore.TryTakeAsync(grant.CodeHash)).IsTypeOf<TakeResult<AuthorizationGrant>.AlreadyConsumed>();
 
         var preview = CreatePreview("preview-hash", "administrator-a", expiresAt);
         await scenario.PreviewStore.SaveAsync(preview);
         var previewTaken = (await Assert.That(await scenario.PreviewStore.TryTakeAsync(preview.HandleHash, preview.AdministratorId)).IsTypeOf<TakeResult<PreviewResult>.Taken>());
-        await Assert.That(previewTaken.Value.HandleHash).IsEqualTo(preview.HandleHash);
+        await Assert.That(previewTaken!.Value.HandleHash).IsEqualTo(preview.HandleHash);
         await Assert.That(await scenario.PreviewStore.TryTakeAsync(preview.HandleHash, preview.AdministratorId)).IsTypeOf<TakeResult<PreviewResult>.AlreadyConsumed>();
 
         scenario.Clock.SetUtcNow(expiresAt);
@@ -193,16 +193,16 @@ public abstract class ExternalAuthenticationStoreConformanceTests
     {
         await using var scenario = await CreateScenarioAsync();
         var created = (await Assert.That(await scenario.ConnectionStore.CreateAsync(CreateConnection("connection-a", "tenant-a", "contoso"))).IsTypeOf<ConnectionMutationResult.Created>());
-        await Assert.That(created.Connection.Revision).IsEqualTo(1);
+        await Assert.That(created!.Connection.Revision).IsEqualTo(1);
         await Assert.That(await scenario.ConnectionStore.CreateAsync(CreateConnection("connection-b", "tenant-a", "contoso"))).IsTypeOf<ConnectionMutationResult.DuplicateKey>();
         await Assert.That(await scenario.ConnectionStore.CreateAsync(CreateConnection("connection-c", "tenant-b", "contoso"))).IsTypeOf<ConnectionMutationResult.Created>();
 
-        created.Connection.DisplayName = "Updated";
-        var updated = (await Assert.That(await scenario.ConnectionStore.UpdateAsync(created.Connection, 1)).IsTypeOf<ConnectionMutationResult.Updated>());
-        await Assert.That(updated.Connection.Revision).IsEqualTo(2);
-        await Assert.That(updated.Connection.DisplayName).IsEqualTo("Updated");
-        var conflict = (await Assert.That(await scenario.ConnectionStore.UpdateAsync(created.Connection, 1)).IsTypeOf<ConnectionMutationResult.RevisionConflict>());
-        await Assert.That(conflict.CurrentRevision).IsEqualTo(2);
+        created!.Connection.DisplayName = "Updated";
+        var updated = (await Assert.That(await scenario.ConnectionStore.UpdateAsync(created!.Connection, 1)).IsTypeOf<ConnectionMutationResult.Updated>());
+        await Assert.That(updated!.Connection.Revision).IsEqualTo(2);
+        await Assert.That(updated!.Connection.DisplayName).IsEqualTo("Updated");
+        var conflict = (await Assert.That(await scenario.ConnectionStore.UpdateAsync(created!.Connection, 1)).IsTypeOf<ConnectionMutationResult.RevisionConflict>());
+        await Assert.That(conflict!.CurrentRevision).IsEqualTo(2);
     }
 
     [Test]
@@ -221,15 +221,15 @@ public abstract class ExternalAuthenticationStoreConformanceTests
 
         var conflicting = await scenario.IdentityProvisioner.CreateLinkOrGetExistingAsync(new ProvisioningRequest("tenant-a", "contoso", Identity("subject-conflict"), null, "user-b"));
         var conflict = (await Assert.That(await scenario.IdentityProvisioner.ReplaceAsync(new ExternalIdentityLinkReplaceRequest("tenant-a", created.Link.Id, "user-a", "contoso", Identity("subject-conflict")))).IsTypeOf<ExternalIdentityLinkReplaceResult.Conflict>());
-        await Assert.That(conflict.ConflictingLink.Id).IsEqualTo(conflicting.Link.Id);
-        await Assert.That(conflict.OldLink.Id).IsEqualTo(created.Link.Id);
+        await Assert.That(conflict!.ConflictingLink.Id).IsEqualTo(conflicting.Link.Id);
+        await Assert.That(conflict!.OldLink.Id).IsEqualTo(created.Link.Id);
         await Assert.That((await scenario.IdentityProvisioner.FindLinkAsync("tenant-a", "contoso", oldIdentity))!.Id).IsEqualTo(created.Link.Id);
 
         var replaced = (await Assert.That(await scenario.IdentityProvisioner.ReplaceAsync(new ExternalIdentityLinkReplaceRequest("tenant-a", created.Link.Id, "user-b", "contoso", Identity("subject-new")))).IsTypeOf<ExternalIdentityLinkReplaceResult.Success>());
-        await Assert.That(replaced.NewLink.Id).IsNotEqualTo(created.Link.Id);
-        await Assert.That(replaced.NewLink.UserId).IsEqualTo("user-b");
+        await Assert.That(replaced!.NewLink.Id).IsNotEqualTo(created.Link.Id);
+        await Assert.That(replaced!.NewLink.UserId).IsEqualTo("user-b");
         await Assert.That(await scenario.IdentityProvisioner.FindLinkAsync("tenant-a", "contoso", oldIdentity)).IsNull();
-        await Assert.That((await scenario.IdentityProvisioner.FindLinkAsync("tenant-a", "contoso", Identity("subject-new")))!.Id).IsEqualTo(replaced.NewLink.Id);
+        await Assert.That((await scenario.IdentityProvisioner.FindLinkAsync("tenant-a", "contoso", Identity("subject-new")))!.Id).IsEqualTo(replaced!.NewLink.Id);
     }
 
     [Test]
@@ -513,6 +513,7 @@ public sealed class ExternalAuthenticationStoreScenario(
             });
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public static async Task<ExternalAuthenticationStoreScenario> CreatePostgreSqlAsync()
     {
         var database = new PostgreSqlTestDatabase();

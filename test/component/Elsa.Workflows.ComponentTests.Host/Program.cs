@@ -38,7 +38,7 @@ services.ConfigureElsa(elsa => elsa
     .UseHttp(http => http.UseCache()));
 
 services.AddActivityStateFilter<ComponentHttpRequestAuthenticationHeaderFilter>();
-services.AddControllers();
+AddTestControllers(services);
 
 var app = builder.Build();
 
@@ -52,3 +52,7 @@ app.MapWorkflowsApi("elsa/api");
 app.MapControllers();
 
 await app.RunAsync();
+
+[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026",
+    Justification = "This JIT-run component host intentionally exercises the production MVC controller endpoints.")]
+static void AddTestControllers(IServiceCollection services) => services.AddControllers();

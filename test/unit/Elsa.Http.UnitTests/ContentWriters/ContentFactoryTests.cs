@@ -11,6 +11,7 @@ public class ContentFactoryTests
     /// <summary>
     /// Tests that <see cref="JsonContentFactory"/> doesn't append charset to content type.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection-based content writer; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task JsonContentFactory_ShouldNotAppendCharset()
     {
@@ -68,6 +69,7 @@ public class ContentFactoryTests
     /// <summary>
     /// Tests that <see cref="JsonContentFactory"/> produces correct content length without BOM.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection-based content writer; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task JsonContentFactory_ShouldProduceCorrectContentLength()
     {
@@ -92,6 +94,7 @@ public class ContentFactoryTests
     /// <summary>
     /// Tests that <see cref="JsonContentFactory"/> handles multi-byte UTF-8 characters correctly.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection-based content writer; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task JsonContentFactory_ShouldHandleMultiByteCharacters()
     {

@@ -13,6 +13,8 @@ public class WorkflowInstanceFilterTimestampTests
     private readonly DateTimeOffset _matchingFinishedAt = new(2026, 5, 20, 12, 0, 0, TimeSpan.Zero);
     private readonly IQueryable<WorkflowInstance> _workflowInstances;
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
     public WorkflowInstanceFilterTimestampTests()
     {
         _workflowInstances = new[]
@@ -23,6 +25,7 @@ public class WorkflowInstanceFilterTimestampTests
         }.AsQueryable();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production expression-based query filter; production trimming support is tracked separately.")]
     [Test]
     [Arguments(nameof(WorkflowInstance.CreatedAt))]
     [Arguments(nameof(WorkflowInstance.UpdatedAt))]
@@ -48,6 +51,7 @@ public class WorkflowInstanceFilterTimestampTests
         await Assert.That(workflowInstance.Id).IsEqualTo("matching");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production expression-based query filter; production trimming support is tracked separately.")]
     [Test]
     public async Task Apply_WithInjectedTimestampColumn_RejectsColumnBeforeDynamicLinqParsesIt()
     {
@@ -73,6 +77,7 @@ public class WorkflowInstanceFilterTimestampTests
         await Assert.That(exception.ParamName).IsEqualTo($"{nameof(WorkflowInstanceFilter.TimestampFilters)}.Column");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production expression-based query filter; production trimming support is tracked separately.")]
     [Test]
     public async Task Apply_WithNullTimestampFilter_ThrowsClearArgumentException()
     {

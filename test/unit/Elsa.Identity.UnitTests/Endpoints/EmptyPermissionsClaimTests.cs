@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
@@ -33,6 +34,8 @@ public sealed class EmptyPermissionsClaimTests
     private WebApplication _app = null!;
     private HttpClient _client = null!;
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
     [Before(Test)]
     public async Task InitializeAsync()
     {
@@ -139,7 +142,7 @@ public sealed class EmptyPermissionsClaimTests
     public async Task MePermissionsReportsNoVerbsForAZeroGrantUser()
     {
         var response = await SendAuthorizedAsync(HttpMethod.Get, "/identity/me/permissions", (await LoginAsync(NoPerm)).AccessToken);
-        var body = await response.Content.ReadFromJsonAsync<MePermissionsResponse>(JsonSerializerOptions.Web);
+        var body = await response.Content.ReadFromJsonAsync(TestJsonSerializerContext.Default.MePermissionsResponse);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(body).IsNotNull();
@@ -154,7 +157,7 @@ public sealed class EmptyPermissionsClaimTests
     public async Task MePermissionsReportsHeldVerbsForAGrantedUser()
     {
         var response = await SendAuthorizedAsync(HttpMethod.Get, "/identity/me/permissions", (await LoginAsync(Reader)).AccessToken);
-        var body = await response.Content.ReadFromJsonAsync<MePermissionsResponse>(JsonSerializerOptions.Web);
+        var body = await response.Content.ReadFromJsonAsync(TestJsonSerializerContext.Default.MePermissionsResponse);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(body!.Grants).Contains(x => x.Resource == IdentityPermissions.Users && x.Verbs.Contains(CoreVerbs.View));
@@ -174,7 +177,7 @@ public sealed class EmptyPermissionsClaimTests
     }
 
     private async Task<IssuedTokens> LoginAsync(User user) =>
-        await ReadTokensAsync(await _client.PostAsJsonAsync("/identity/login", new { username = user.Name, password = "unchecked" }));
+        await ReadTokensAsync(await _client.PostAsync("/identity/login", new StringContent(new JsonObject { ["username"] = user.Name, ["password"] = "unchecked" }.ToJsonString(), System.Text.Encoding.UTF8, "application/json")));
 
     private async Task<IssuedTokens> RefreshTokensAsync(string refreshToken)
     {
@@ -193,14 +196,14 @@ public sealed class EmptyPermissionsClaimTests
     private static async Task<IssuedTokens> ReadTokensAsync(HttpResponseMessage response)
     {
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        var body = (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
+        var body = (await response.Content.ReadFromJsonAsync(TestJsonSerializerContext.Default.LoginResponse))!;
         await Assert.That(body.IsAuthenticated).IsTrue();
         return new(body.AccessToken!, body.RefreshToken!);
     }
 
-    private sealed record MePermissionsResponse(IReadOnlyCollection<MeResourceGrant> Grants);
+    internal sealed record MePermissionsResponse(IReadOnlyCollection<MeResourceGrant> Grants);
 
-    private sealed record MeResourceGrant(string Resource, IReadOnlyCollection<string> Verbs);
+    internal sealed record MeResourceGrant(string Resource, IReadOnlyCollection<string> Verbs);
 
     private sealed class NameOnlyCredentialsValidator(IUserProvider userProvider) : IUserCredentialsValidator
     {

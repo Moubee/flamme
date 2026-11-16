@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Elsa.Common.Multitenancy;
 using Elsa.Testing.Shared.Multitenancy;
 using Elsa.Workflows;
@@ -120,6 +122,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     }
 
     [Test]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import scenario uses the conformance serializer to build the same runtime-typed records imported by production.")]
     public async Task Import_WhenBookmarkHasForeignId_Refuses_AndForeignRecordTenantIdIsStampedToWriter()
     {
         await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a");
@@ -131,7 +134,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             var serializer = new ConformanceSafeSerializer();
 
             await ImportAsync(endpoint, new ExportedWorkflowState(
-                JsonSerializer.SerializeToElement(new { }),
+                JsonElement.Parse("{}"),
                 Bookmarks: null,
                 ActivityExecutionRecords: serializer.SerializeToElement(new[]
                 {
@@ -150,7 +153,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
 
             await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
                 ImportAsync(endpoint, new ExportedWorkflowState(
-                    JsonSerializer.SerializeToElement(new { }),
+                    JsonElement.Parse("{}"),
                     Bookmarks: ForeignBookmarkElement("foreign-bookmark"),
                     ActivityExecutionRecords: null,
                     WorkflowExecutionLogRecords: null)));
@@ -161,6 +164,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     }
 
     [Test]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import scenario uses the conformance serializer to build the same runtime-typed records imported by production.")]
     public async Task Import_StampsActivityAndLogRecordsWithImportingTenant_OnNonStampingStore()
     {
         var tenantAccessor = new TestTenantAccessor("tenant-b");
@@ -177,7 +181,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
         var serializer = new ConformanceSafeSerializer();
 
         await ImportAsync(CreateImportEndpoint(tenantAccessor, activityStore, logStore), new ExportedWorkflowState(
-            JsonSerializer.SerializeToElement(new { }),
+            JsonElement.Parse("{}"),
             Bookmarks: null,
             ActivityExecutionRecords: serializer.SerializeToElement(new[] { ActivityExecution("ae-1", "forged") }),
             WorkflowExecutionLogRecords: serializer.SerializeToElement(new[] { ExecutionLog("el-1", "forged") })));
@@ -279,21 +283,21 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
     }
 
     private static JsonElement ForeignBookmarkElement(string id) =>
-        JsonSerializer.SerializeToElement(new[]
+        JsonElement.Parse(new JsonArray
         {
-            new
+            new JsonObject
             {
-                id,
-                activityTypeName = "Elsa.HttpEndpoint",
-                workflowInstanceId = "instance-1",
-                activityInstanceId = (string?)null,
-                hash = "stolen",
-                correlationId = (string?)null,
-                createdAt = CreatedAt,
-                payload = new { },
-                metadata = new Dictionary<string, string>()
+                ["id"] = id,
+                ["activityTypeName"] = "Elsa.HttpEndpoint",
+                ["workflowInstanceId"] = "instance-1",
+                ["activityInstanceId"] = null,
+                ["hash"] = "stolen",
+                ["correlationId"] = null,
+                ["createdAt"] = CreatedAt,
+                ["payload"] = new JsonObject(),
+                ["metadata"] = new JsonObject()
             }
-        });
+        }.ToJsonString());
 
     private static readonly DateTimeOffset CreatedAt = new(2026, 9, 26, 12, 0, 0, TimeSpan.Zero);
 
@@ -305,13 +309,34 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             PropertyNameCaseInsensitive = true
         };
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public string Serialize(object payload) => JsonSerializer.Serialize(payload, Options);
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public JsonElement SerializeToElement(object payload) => JsonSerializer.SerializeToElement(payload, Options);
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public object Deserialize(string serializedData) => JsonSerializer.Deserialize<object>(serializedData, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public object Deserialize(string serializedData, Type type) => JsonSerializer.Deserialize(serializedData, type, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public object Deserialize(JsonElement serializedData) => serializedData.Deserialize<object>(Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public T Deserialize<T>(string serializedData) => JsonSerializer.Deserialize<T>(serializedData, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only import conformance serializer exercises runtime-selected payloads using the production serializer contracts; production AOT support is tracked separately.")]
         public T Deserialize<T>(JsonElement serializedData) => serializedData.Deserialize<T>(Options)!;
+
         public JsonSerializerOptions GetOptions() => Options;
     }
 
@@ -323,22 +348,38 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             PropertyNameCaseInsensitive = true
         };
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<string> SerializeAsync(object? value, CancellationToken cancellationToken = default) =>
             ValueTask.FromResult(Serialize(value));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<JsonElement> SerializeToElementAsync(object? value, CancellationToken cancellationToken = default) =>
             new(SerializeToElement(value));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<T> DeserializeAsync<T>(string json, CancellationToken cancellationToken = default) =>
             new(Deserialize<T>(json));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<T> DeserializeAsync<T>(JsonElement element, CancellationToken cancellationToken = default) =>
             new(Deserialize<T>(element));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public string Serialize(object? value) => JsonSerializer.Serialize(value, Options);
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public JsonElement SerializeToElement(object? value) => JsonSerializer.SerializeToElement(value, Options);
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public T Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, Options)!;
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public T Deserialize<T>(JsonElement element) => element.Deserialize<T>(Options)!;
+
         public JsonSerializerOptions GetOptions() => Options;
     }
 }

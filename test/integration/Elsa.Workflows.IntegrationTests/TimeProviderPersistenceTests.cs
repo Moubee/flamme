@@ -23,6 +23,7 @@ public class TimeProviderPersistenceTests
     private static readonly DateTimeOffset ResumedUtc = StartedUtc.AddHours(2);
     private static readonly DateTimeOffset DueUtc = StartedUtc.AddHours(1);
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Test]
     public async Task SuspendedWorkflow_PreservesPersistedInstantsAcrossProviderRebuildAndResumesWithNewTime()
     {
@@ -55,6 +56,8 @@ public class TimeProviderPersistenceTests
         await AssertResumesFromDatabaseAsync(database.ConnectionString, instanceId, bookmarkId);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     [Test]
     public async Task PreMigrationState_LoadsFromPostgreSqlAndResumesWithTimeProvider()
     {

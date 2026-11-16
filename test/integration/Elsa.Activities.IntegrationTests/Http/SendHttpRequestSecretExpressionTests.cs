@@ -20,6 +20,7 @@ public class SendHttpRequestSecretExpressionTests
     private const string SecretName = "api:authorization";
     private const string SecretValue = "Bearer resolved-token";
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     [DisplayName("SendHttpRequest resolves Authorization from Secret expression without persisting the secret")]
     public async Task ResolvesAuthorizationSecretExpressionWithoutPersistingSecret()

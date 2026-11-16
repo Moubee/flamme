@@ -21,6 +21,8 @@ public sealed class AlterationsWebApplicationFactory : TestWebApplicationFactory
 {
     protected override IHostBuilder CreateHostBuilder() => new HostBuilder();
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);

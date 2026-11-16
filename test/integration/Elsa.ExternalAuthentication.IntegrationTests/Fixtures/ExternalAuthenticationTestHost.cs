@@ -49,6 +49,8 @@ internal sealed class TestAuthenticationHandler(
 
 internal static class ExternalAuthenticationTestHost
 {
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
     public static void Configure(
         IWebHostBuilder builder,
         Assembly endpointAssembly,

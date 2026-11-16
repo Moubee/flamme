@@ -12,6 +12,10 @@ namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
 public class ExternalAuthenticationOptionsTests
 {
     [Test]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "This compatibility test exercises reflection binding for production options with init-only client records; generated binding does not populate those records.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "This compatibility test exercises reflection binding for production options with init-only client records; generated binding does not populate those records.")]
     public async Task BindsAuthenticationClientsFromConfiguration()
     {
         var configuration = new ConfigurationBuilder()

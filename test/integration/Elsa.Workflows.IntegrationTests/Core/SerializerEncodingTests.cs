@@ -29,6 +29,7 @@ public class SerializerUnicodeEncodingTests : IAsyncDisposable
         await TestSerializer(input => serializer.Serialize(input));
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task TestSafeSerializer()
     {
@@ -36,6 +37,7 @@ public class SerializerUnicodeEncodingTests : IAsyncDisposable
         await TestSerializer(input => serializer.Serialize(input));
     }
     
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production reflection serializer contract; replacing it would bypass the behavior under test.")]
     [Test]
     public async Task TestWorkflowStateSerializer()
     {

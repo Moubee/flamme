@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Elsa.Common;
@@ -189,10 +190,14 @@ public class ExpressionExecutionContextExtensionsTests
     {
         public JsonSerializerOptions GetOptions() => options;
         public void ApplyOptions(JsonSerializerOptions _) { }
+        [RequiresUnreferencedCode("Matches the reflection-based IJsonSerializer contract.")]
         public string Serialize(object value) => throw new NotSupportedException();
+        [RequiresUnreferencedCode("Matches the reflection-based IJsonSerializer contract.")]
         public string Serialize(object value, Type type) => throw new NotSupportedException();
         public string Serialize<T>(T value) => throw new NotSupportedException();
+        [RequiresUnreferencedCode("Matches the reflection-based IJsonSerializer contract.")]
         public object Deserialize(string json) => throw new NotSupportedException();
+        [RequiresUnreferencedCode("Matches the reflection-based IJsonSerializer contract.")]
         public object Deserialize(string json, Type type) => throw new NotSupportedException();
         public T Deserialize<T>(string json) => throw new NotSupportedException();
     }

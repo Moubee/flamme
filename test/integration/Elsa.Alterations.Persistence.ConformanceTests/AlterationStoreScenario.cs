@@ -111,6 +111,7 @@ public sealed class AlterationStoreScenario(
         DbTransactionInterceptor? transactionInterceptor = null) =>
         CreatePostgreSqlHostAsync(tenantId, connectionString, tenantsEnabled, commandInterceptor, dbExceptionHandler, transactionInterceptor);
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     private static async Task<AlterationStoreScenario> CreatePostgreSqlHostAsync(
         string tenantId,
         string connectionString,
@@ -172,15 +173,15 @@ public sealed class AlterationStoreScenario(
     /// </summary>
     private sealed class ConformanceAlterationSerializer : IAlterationSerializer
     {
-        public string Serialize(IAlteration alteration) => JsonSerializer.Serialize((TestAlteration)alteration);
+        public string Serialize(IAlteration alteration) => JsonSerializer.Serialize((TestAlteration)alteration, TestJsonSerializerContext.Default.TestAlteration);
 
         public string SerializeMany(IEnumerable<IAlteration> alterations) =>
-            JsonSerializer.Serialize(alterations.Cast<TestAlteration>().ToArray());
+            JsonSerializer.Serialize(alterations.Cast<TestAlteration>().ToArray(), TestJsonSerializerContext.Default.TestAlterationArray);
 
-        public IAlteration Deserialize(string json) => JsonSerializer.Deserialize<TestAlteration>(json)!;
+        public IAlteration Deserialize(string json) => JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.TestAlteration)!;
 
         public IEnumerable<IAlteration> DeserializeMany(string json) =>
-            JsonSerializer.Deserialize<TestAlteration[]>(json)!;
+            JsonSerializer.Deserialize(json, TestJsonSerializerContext.Default.TestAlterationArray)!;
     }
 }
 

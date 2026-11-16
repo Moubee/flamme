@@ -23,6 +23,7 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
     private ExternalAuthenticationDbContextLeaseFactory _contexts = null!;
     private readonly TimeProvider _clock = new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 0, 0, 0, TimeSpan.Zero));
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public async Task InitializeAsync()
     {
         _database = new PostgreSqlTestDatabase();

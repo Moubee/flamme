@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Elsa.Common;
 using Elsa.Common.Codecs;
@@ -88,6 +89,7 @@ public sealed class WorkflowStoreScenario(
 
     public static Task<WorkflowStoreScenario> CreatePostgreSqlAsync() => CreatePostgreSqlAsync("tenant-a");
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public static async Task<WorkflowStoreScenario> CreatePostgreSqlAsync(string tenantId, bool tenantsEnabled = true)
     {
         var managementDatabase = new PostgreSqlTestDatabase();
@@ -204,13 +206,34 @@ public sealed class WorkflowStoreScenario(
             PropertyNameCaseInsensitive = true
         };
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public string Serialize(object payload) => JsonSerializer.Serialize(payload, Options);
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public JsonElement SerializeToElement(object payload) => JsonSerializer.SerializeToElement(payload, Options);
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public object Deserialize(string serializedData) => JsonSerializer.Deserialize<object>(serializedData, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public object Deserialize(string serializedData, Type type) => JsonSerializer.Deserialize(serializedData, type, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public object Deserialize(JsonElement serializedData) => serializedData.Deserialize<object>(Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public T Deserialize<T>(string serializedData) => JsonSerializer.Deserialize<T>(serializedData, Options)!;
+
+        [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "The EF store passes its private workflow-definition state through this JIT-only conformance serializer; tests cannot generate metadata for that production type.")]
         public T Deserialize<T>(JsonElement serializedData) => serializedData.Deserialize<T>(Options)!;
+
         public JsonSerializerOptions GetOptions() => Options;
     }
 
@@ -222,22 +245,38 @@ public sealed class WorkflowStoreScenario(
             PropertyNameCaseInsensitive = true
         };
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<string> SerializeAsync(object? value, CancellationToken cancellationToken = default) =>
             ValueTask.FromResult(Serialize(value));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<JsonElement> SerializeToElementAsync(object? value, CancellationToken cancellationToken = default) =>
             new(SerializeToElement(value));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<T> DeserializeAsync<T>(string json, CancellationToken cancellationToken = default) =>
             new(Deserialize<T>(json));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
         public ValueTask<T> DeserializeAsync<T>(JsonElement element, CancellationToken cancellationToken = default) =>
             new(Deserialize<T>(element));
 
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public string Serialize(object? value) => JsonSerializer.Serialize(value, Options);
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public JsonElement SerializeToElement(object? value) => JsonSerializer.SerializeToElement(value, Options);
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public T Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, Options)!;
+
+        [RequiresUnreferencedCode("The type T may be trimmed.")]
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only conformance serializer retains the production interface trimming contract and reflection-based JSON behavior.")]
         public T Deserialize<T>(JsonElement element) => element.Deserialize<T>(Options)!;
+
         public JsonSerializerOptions GetOptions() => Options;
     }
 }

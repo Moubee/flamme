@@ -60,6 +60,10 @@ public class MigrationGuideTests
     /// modules whose permission descriptors are documented even when the reference server does not enable them.
     /// This keeps the catalog deterministic without depending on which assemblies earlier tests touched.
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2070",
+        Justification = "This JIT-only coverage check enumerates all permission-provider types and probes their constructors.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2067",
+        Justification = "This JIT-only coverage check instantiates each discovered permission provider with a public parameterless constructor.")]
     private static Dictionary<string, IReadOnlyCollection<string>> BuildCatalog() =>
         Directory.GetFiles(AppContext.BaseDirectory, "Elsa.*.dll")
             .Select(TryLoad)
@@ -84,6 +88,7 @@ public class MigrationGuideTests
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test deliberately enumerates the untrimmed production assembly to detect type-loading regressions.")]
     private static IEnumerable<Type> SafeGetTypes(Assembly assembly)
     {
         try

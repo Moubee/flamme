@@ -104,14 +104,14 @@ public class Tests
         var result = jsonNode.ConvertTo<ExpandoObject>(_objectConverterOptions);
 
         // Assert
-        dynamic expando = (await Assert.That(result).IsTypeOf<ExpandoObject>())!;
-        object value = expando.key;
+        var expando = (await Assert.That(result).IsTypeOf<ExpandoObject>())!;
+        var value = ((IDictionary<string, object?>)expando)["key"];
 
         // This is not the result I expect, I would have expected the JsonNode to have been recursively converted
 
         await Assert.That(value is JsonElement).IsTrue();
-        await Assert.That(((JsonElement)value).ValueKind).IsEqualTo(JsonValueKind.String);
-        await Assert.That(((JsonElement)value).GetString()).IsEqualTo("value");
+        await Assert.That(((JsonElement)value!).ValueKind).IsEqualTo(JsonValueKind.String);
+        await Assert.That(((JsonElement)value!).GetString()).IsEqualTo("value");
     }
 
     [Test]
@@ -156,7 +156,7 @@ public class Tests
         await Assert.That(result).IsEquivalentTo(new byte[]
         {
             1, 2, 3
-        }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        }, EqualityComparer<byte>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class Tests
             1,
             2,
             3
-        ], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        ], EqualityComparer<int>.Default, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]
@@ -327,6 +327,7 @@ public class Tests
         await Assert.That(result).IsNotNull();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test deliberately exercises the production runtime-type conversion contract.")]
     [Test]
     [Arguments("foo", false, typeof(bool))]
     [Arguments("true", true, typeof(bool))]
@@ -357,6 +358,7 @@ public class Tests
         await Assert.That(result).IsEqualTo(expected);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test deliberately exercises the production runtime-type conversion contract.")]
     [Test]
     [Arguments("foo", true, typeof(bool))]
     [Arguments("true", false, typeof(bool))]

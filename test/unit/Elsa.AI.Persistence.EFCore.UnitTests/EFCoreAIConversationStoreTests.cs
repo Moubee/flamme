@@ -521,6 +521,7 @@ public class EFCoreAIConversationStoreTests : IAsyncInitializer, IAsyncDisposabl
         await Assert.That(exception!.ParamName).IsEqualTo("conversation");
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public async Task InitializeAsync()
     {
         await _connection.OpenAsync();

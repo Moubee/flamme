@@ -70,6 +70,7 @@ public sealed class SecretRepositoryScenario(
             }));
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public static async Task<SecretRepositoryScenario> CreatePostgreSqlAsync()
     {
         var database = new PostgreSqlTestDatabase();

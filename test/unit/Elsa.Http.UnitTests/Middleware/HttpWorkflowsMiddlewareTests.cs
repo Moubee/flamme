@@ -34,6 +34,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             .BuildServiceProvider();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithCollidingHttpEndpointBookmarks_UsesTenantScopedBookmarkLookup()
     {
@@ -54,6 +55,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         await Assert.That(filter.TenantAgnostic).IsFalse();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithConfiguredBasePathAndNonMatchingPath_SkipsRouteMatchingAndCallsNext()
     {
@@ -79,6 +81,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         await Assert.That(nextCalled).IsTrue();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithSiblingPrefixPath_SkipsRouteMatchingAndCallsNext()
     {
@@ -104,6 +107,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         await Assert.That(nextCalled).IsTrue();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithMultiplePrefixSegmentsBeforeBasePath_SkipsRouteMatchingAndCallsNext()
     {
@@ -134,6 +138,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         Mock.Get(routeMatcher).Match(Arg.Any<string>(), Arg.Any<string>()).WasNeverCalled();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithNonTenantPrefixedBasePathSegment_CallsNext()
     {
@@ -164,6 +169,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         Mock.Get(routeMatcher).Match(Arg.Any<string>(), Arg.Any<string>()).WasNeverCalled();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithConfiguredBasePathAndMatchingPath_StillResolvesRoute()
     {
@@ -193,6 +199,7 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
         await Assert.That(bookmarkStore.LastFilter).IsNotNull();
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This test exercises the production HTTP workflow middleware; its trimming boundary belongs to the production implementation.")]
     [Test]
     public async Task InvokeAsync_WithResolvedTenantPath_StillResolvesRoute()
     {
@@ -301,6 +308,8 @@ public class HttpWorkflowsMiddlewareTests : IAsyncDisposable
             return new(bookmarksToDelete.Count);
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         private IEnumerable<StoredBookmark> Filter(BookmarkFilter filter)
         {
             var query = filter.Apply(_bookmarks.AsQueryable());

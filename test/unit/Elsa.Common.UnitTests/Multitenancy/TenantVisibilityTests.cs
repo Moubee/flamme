@@ -22,6 +22,8 @@ public class TenantVisibilityTests
         await Assert.That(TenantVisibility.IsVisible(entityTenantId, ambientTenantId)).IsEqualTo(expected);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
     [Test]
     public async Task WhereVisibleToTenant_WhenNotAgnostic_HidesOtherTenants()
     {
@@ -40,6 +42,8 @@ public class TenantVisibilityTests
         await Assert.That(visible).Contains(Tenant.AgnosticTenantId);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
     [Test]
     public async Task WhereVisibleToTenant_WhenAgnostic_ReturnsAllRows()
     {
@@ -88,6 +92,8 @@ public class TenantVisibilityTests
         await Assert.That(TenantVisibility.CanReplaceOwnedRow(existingTenantId, sourceTenantId, ambientTenantId)).IsEqualTo(expected);
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
     [Test]
     public async Task WhereVisibleToTenant_WhenAmbientIsDefault_IncludesNullTenantId()
     {

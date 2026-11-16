@@ -68,6 +68,7 @@ public sealed class OwnershipStoreScenario : IAsyncDisposable
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
     public static async Task<OwnershipStoreScenario> CreateAsync(
         string tenantId,
         bool tenantsEnabled,
@@ -148,8 +149,14 @@ public sealed class OwnershipStoreScenario : IAsyncDisposable
     }
 }
 
-public sealed class OwnershipDbContext(DbContextOptions<OwnershipDbContext> options) : DbContext(options)
+public sealed class OwnershipDbContext : DbContext
 {
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "This JIT-run test context exercises EF model discovery; production AOT support is tracked separately.")]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "This JIT-run test context exercises EF model discovery; production AOT support is tracked separately.")]
+    public OwnershipDbContext(DbContextOptions<OwnershipDbContext> options) : base(options) { }
+
     public DbSet<OwnedRow> Rows => Set<OwnedRow>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

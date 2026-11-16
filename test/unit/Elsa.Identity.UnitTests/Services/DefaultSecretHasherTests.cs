@@ -293,12 +293,16 @@ public class DefaultSecretHasherTests
 
         public Task DeleteAsync(UserFilter filter, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         public Task<IEnumerable<User>> FindManyAsync(UserFilter filter, CancellationToken cancellationToken = default)
         {
             var users = filter.Apply(new[] { _user }.AsQueryable()).ToList();
             return Task.FromResult<IEnumerable<User>>(users);
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         public Task<User?> FindAsync(UserFilter filter, CancellationToken cancellationToken = default)
         {
             var user = filter.Apply(new[] { _user }.AsQueryable()).FirstOrDefault();
@@ -343,6 +347,8 @@ public class DefaultSecretHasherTests
 
         public Task DeleteAsync(ApplicationFilter filter, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         public Task<Application?> FindAsync(ApplicationFilter filter, CancellationToken cancellationToken = default)
         {
             var application = filter.Apply(new[] { _application }.AsQueryable()).FirstOrDefault();
@@ -354,6 +360,8 @@ public class DefaultSecretHasherTests
     {
         private readonly User _user = user;
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         public Task<User?> FindAsync(UserFilter filter, CancellationToken cancellationToken = default)
         {
             var user = filter.Apply(new[] { _user }.AsQueryable()).FirstOrDefault();
@@ -365,6 +373,8 @@ public class DefaultSecretHasherTests
     {
         private readonly Application _application = application;
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-only fixture uses LINQ-to-Objects to exercise the production IQueryable filtering contract.")]
         public Task<Application?> FindAsync(ApplicationFilter filter, CancellationToken cancellationToken = default)
         {
             var application = filter.Apply(new[] { _application }.AsQueryable()).FirstOrDefault();
