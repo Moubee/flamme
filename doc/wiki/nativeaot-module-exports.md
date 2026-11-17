@@ -8,9 +8,8 @@ feature bindings remain in [Elsa.Features](../../src/common/Elsa.Features).
 The shared assembly has no Features, hosting, Workflow Core, Roslyn, or serializer
 dependency.
 
-These are runtime contracts for authored and future generated producers. They do
-not implement source generation, automatic build-mode selection, or complete
-NativeAOT workflow support.
+These runtime contracts define the typed exports consumed by authored hosts and
+compiler-selected bootstraps.
 
 ## Identity and compatibility
 
@@ -140,9 +139,11 @@ exports, build the combined catalog, then create/configure the module as before.
 Keep feature factories and state host-local. Export revisions are not inferred
 from assembly or package versions.
 
-This introduces no stored workflow or payload format change. Generated authoring
-attributes, generator packaging, compiler diagnostics, and automatic mode
-selection remain separate work.
+Existing workflow and payload data keep their formats. Later plan steps cover
+generation of feature declarations and richer authoring diagnostics.
+
+The compiler asset packages can select the host bootstrap at build time.
+[Build selection and compiler assets](nativeaot-build-selection.md)
 
 ## Validate producer/consumer boundaries
 

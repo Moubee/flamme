@@ -33,5 +33,6 @@
 * [2026-09-15. Refuse duplicate running instances through activation strategies](2026-09-15-correlated-workflow-activation.md)
 * [2026-11-14. Compose hosts statically and retire inherited runtime integrations](2026-11-14-static-host-composition.md)
 * [2026-11-15. Migrate the Elsa clock abstraction to TimeProvider](2026-11-15-timeprovider-migration.md)
+* [2026-11-17. Compile time selection of Elsa composition](2026-11-17-elsa-compiler-build-selection.md)
 * [2026-11-17. Explicit feature composition with independent admission policies](2026-11-17-explicit-feature-composition.md)
 * [2026-11-17. Versioned module exports before feature activation](2026-11-17-versioned-module-exports.md)
