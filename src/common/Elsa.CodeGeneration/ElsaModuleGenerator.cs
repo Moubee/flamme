@@ -75,7 +75,7 @@ public sealed class ElsaModuleGenerator : IIncrementalGenerator
         var attribute = input.Attributes[0];
         if (attribute.ApplicationSyntaxReference?.GetSyntax(token) is not AttributeSyntax syntax ||
             input.SemanticModel.GetOperation(syntax, token) is not IAttributeOperation { Operation: IObjectCreationOperation creation } ||
-            attribute.ConstructorArguments.Length != 3)
+            attribute.ConstructorArguments.Length != 3 || creation.Arguments.Length != 3)
             return null; // C# reports the failed attribute binding.
 
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
@@ -86,7 +86,7 @@ public sealed class ElsaModuleGenerator : IIncrementalGenerator
                 "Declare the export as a top-level public static partial class without type parameters. Choose a class name other than Manifest."));
 
         foreach (var member in shell.GetMembers().Where(member => member.Name == "Manifest" ||
-                     member is IMethodSymbol { Name: "get_Manifest", Arity: 0, Parameters.Length: 0 }))
+                     member is IMethodSymbol { Name: "get_Manifest", MethodKind: MethodKind.Ordinary, Arity: 0, Parameters.Length: 0 }))
         {
             diagnostics.Add(Diagnostic.Create(Shell, member.Locations.FirstOrDefault(location => location.IsInSource),
                 "The Elsa generator supplies the Manifest property. Rename the conflicting member."));
@@ -126,16 +126,16 @@ public sealed class ElsaModuleGenerator : IIncrementalGenerator
         {
             token.ThrowIfCancellationRequested();
             var location = (i < elements.Length ? elements[i] : argument).Syntax.GetLocation();
-            if (types.Values[i].Value is not INamedTypeSymbol type || !CanName(type, model.Compilation, shell))
+            if (types.Values[i] is not { Kind: TypedConstantKind.Type, Value: INamedTypeSymbol type } || !CanName(type, model.Compilation, shell))
             {
                 diagnostics.Add(Diagnostic.Create(Shape, location, "Declare a closed named type accessible from the generated export. Open, file-local, void and non-named types cannot be exported."));
                 continue;
             }
 
-            var name = type.ToDisplayString(TypeFormat);
+            var name = RuntimeTypeName(type);
             // Extern-alias-only and ambiguous metadata names cannot be referenced from a separate generated file.
             var bound = model.GetSpeculativeTypeInfo(declaration.Identifier.SpanStart, SyntaxFactory.ParseTypeName(name), SpeculativeBindingOption.BindAsTypeOrNamespace);
-            if (!SymbolEqualityComparer.Default.Equals(bound.Type, type))
+            if (bound.Type is null || !model.Compilation.ClassifyCommonConversion(type, bound.Type).IsIdentity)
                 diagnostics.Add(Diagnostic.Create(Shape, location, $"Expose '{name}' under an unambiguous, globally accessible name."));
             else if (!names.Add(name))
                 diagnostics.Add(Diagnostic.Create(RepeatedType, location, $"Type '{name}' is already declared by this module. Remove the repeated type."));
@@ -145,6 +145,7 @@ public sealed class ElsaModuleGenerator : IIncrementalGenerator
 
     private static bool CanName(ITypeSymbol type, Compilation compilation, INamedTypeSymbol shell) => type switch
     {
+        IDynamicTypeSymbol => true, // A dynamic generic argument represents System.Object at runtime.
         IArrayTypeSymbol array => CanName(array.ElementType, compilation, shell),
         INamedTypeSymbol named => named.TypeKind != TypeKind.Error && named.SpecialType != SpecialType.System_Void &&
             !named.IsUnboundGenericType && !named.IsFileLocal && compilation.IsSymbolAccessibleWithin(named, shell) &&
@@ -153,15 +154,32 @@ public sealed class ElsaModuleGenerator : IIncrementalGenerator
         _ => false
     };
 
+    private static string RuntimeTypeName(INamedTypeSymbol type) =>
+        string.Concat(type.ToDisplayParts(TypeFormat).Select(part => part.Kind == SymbolDisplayPartKind.Keyword
+            ? part.ToString() switch
+            {
+                "dynamic" => "global::System.Object",
+                "nint" => "global::System.IntPtr",
+                "nuint" => "global::System.UIntPtr",
+                var keyword => keyword
+            }
+            : part.ToString()));
+
     private static string Render(INamedTypeSymbol shell, string id, int version, SortedSet<string> types)
     {
         var ns = shell.ContainingNamespace.IsGlobalNamespace ? "" : $"namespace {shell.ContainingNamespace.ToDisplayString()};\n\n";
         var className = SyntaxFacts.GetKeywordKind(shell.Name) != SyntaxKind.None || SyntaxFacts.GetContextualKeywordKind(shell.Name) != SyntaxKind.None
             ? "@" + shell.Name : shell.Name;
+        // A field initializer in another partial declaration may read Manifest before this declaration runs.
+        var storage = "ElsaManifestStorage";
+        while (shell.Name == storage || !shell.GetMembers(storage).IsEmpty)
+            storage += "_";
         return "// <auto-generated/>\n#nullable enable\n" + ns + "public static partial class " + className + "\n{\n"
-            + "    public static global::Elsa.CodeGeneration.ModuleTypeManifest Manifest { get; } = new(\n"
-            + "        new global::Elsa.CodeGeneration.ModuleExportDescriptor(" + SymbolDisplay.FormatLiteral(id, true) + ", " + version.ToString(CultureInfo.InvariantCulture) + "),\n"
-            + "        [" + string.Join(", ", types.Select(type => $"typeof({type})")) + "]);\n}\n";
+            + "    public static global::Elsa.CodeGeneration.ModuleTypeManifest Manifest => " + storage + ".Value;\n\n"
+            + "    private static class " + storage + "\n    {\n"
+            + "        internal static readonly global::Elsa.CodeGeneration.ModuleTypeManifest Value = new(\n"
+            + "            new global::Elsa.CodeGeneration.ModuleExportDescriptor(" + SymbolDisplay.FormatLiteral(id, true) + ", " + version.ToString(CultureInfo.InvariantCulture) + "),\n"
+            + "            [" + string.Join(", ", types.Select(type => $"typeof({type})")) + "]);\n    }\n}\n";
     }
 
     private static string HintName(INamedTypeSymbol shell)
