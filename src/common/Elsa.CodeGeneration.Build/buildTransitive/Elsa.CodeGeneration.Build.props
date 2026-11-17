@@ -1,0 +1,6 @@
+<Project TreatAsLocalProperty="ElsaModuleExportSchemaVersion">
+  <PropertyGroup>
+    <!-- Keep this in sync with ModuleExportSchema.CurrentVersion. -->
+    <ElsaModuleExportSchemaVersion>1</ElsaModuleExportSchemaVersion>
+  </PropertyGroup>
+</Project>

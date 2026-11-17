@@ -1,0 +1,60 @@
+<Project TreatAsLocalProperty="ElsaEffectiveExecutionMode">
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ElsaExecutionMode;ElsaEffectiveExecutionMode;ElsaGenerateMetadata;ElsaIsHost;ElsaHostBootstrap;ElsaModuleExportSchemaVersion;RuntimeIdentifier" />
+  </ItemGroup>
+
+  <Target Name="ResolveElsaCodeGenerationSettings" BeforeTargets="PrepareForBuild;CollectPackageReferences;GenerateMSBuildEditorConfigFileShouldRun">
+    <PropertyGroup>
+      <!-- Evaluate after the application project had a chance to set these properties. -->
+      <ElsaExecutionMode Condition="'$(ElsaExecutionMode)' == ''">Auto</ElsaExecutionMode>
+      <ElsaGenerateMetadata Condition="'$(ElsaGenerateMetadata)' == ''">true</ElsaGenerateMetadata>
+      <ElsaIsHost Condition="'$(ElsaIsHost)' == '' And ('$(OutputType)' == 'Exe' Or '$(OutputType)' == 'WinExe')">true</ElsaIsHost>
+      <ElsaIsHost Condition="'$(ElsaIsHost)' == ''">false</ElsaIsHost>
+      <ElsaHostBootstrap Condition="'$(ElsaHostBootstrap)' == ''">Compiler</ElsaHostBootstrap>
+      <ElsaEffectiveExecutionMode Condition="'$(ElsaExecutionMode)' == 'Generated' Or
+          ('$(ElsaExecutionMode)' == 'Auto' And '$(PublishAot)' == 'true')">Generated</ElsaEffectiveExecutionMode>
+      <ElsaEffectiveExecutionMode Condition="'$(ElsaExecutionMode)' == 'Dynamic' Or
+          ('$(ElsaExecutionMode)' == 'Auto' And '$(PublishAot)' != 'true')">Dynamic</ElsaEffectiveExecutionMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(ElsaIsHost)' == 'true'">
+      <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated'">$(DefineConstants);ELSA_GENERATED</DefineConstants>
+      <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Dynamic'">$(DefineConstants);ELSA_DYNAMIC</DefineConstants>
+    </PropertyGroup>
+
+    <Error Code="ELSACG001" Condition="'$(ElsaExecutionMode)' != 'Auto' And '$(ElsaExecutionMode)' != 'Generated' And '$(ElsaExecutionMode)' != 'Dynamic'"
+           Text="ElsaExecutionMode must be Auto, Generated, or Dynamic. Received '$(ElsaExecutionMode)'." />
+    <Error Code="ELSACG002" Condition="'$(ElsaGenerateMetadata)' != 'true' And '$(ElsaGenerateMetadata)' != 'false'"
+           Text="ElsaGenerateMetadata must be true or false. Received '$(ElsaGenerateMetadata)'." />
+    <Error Code="ELSACG003" Condition="'$(ElsaIsHost)' != 'true' And '$(ElsaIsHost)' != 'false'"
+           Text="ElsaIsHost must be true or false. Received '$(ElsaIsHost)'." />
+    <Error Code="ELSACG004" Condition="'$(ElsaHostBootstrap)' != 'Compiler' And '$(ElsaHostBootstrap)' != 'Manual'"
+           Text="ElsaHostBootstrap must be Compiler or Manual. Received '$(ElsaHostBootstrap)'." />
+    <Error Code="ELSACG005" Condition="'$(ElsaExecutionMode)' == 'Dynamic' And '$(PublishAot)' == 'true'"
+           Text="ElsaExecutionMode=Dynamic cannot be used with PublishAot=true. Select Auto or Generated." />
+    <Error Code="ELSACG006" Condition="'$(ElsaIsHost)' == 'true' And '$(ElsaHostBootstrap)' == 'Compiler' And '$(ElsaGenerateMetadata)' == 'false'"
+           Text="Compiler bootstrap requires ElsaGenerateMetadata=true. Provide a manual bootstrap and set ElsaHostBootstrap=Manual to disable generation." />
+    <Error Code="ELSACG010" Condition="'$(GenerateMSBuildEditorConfigFile)' == 'false' And ('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true')"
+           Text="Elsa compiler assets require the SDK-generated MSBuild editorconfig file." />
+  </Target>
+
+  <Target Name="ValidateElsaCodeGenerationAssets" BeforeTargets="CoreCompile" DependsOnTargets="ResolveElsaCodeGenerationSettings" Condition="'$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <_ElsaGenerator Include="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'Elsa.CodeGeneration'" />
+      <_ElsaAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'Elsa.CodeGeneration.Analyzers'" />
+    </ItemGroup>
+    <Error Code="ELSACG007" Condition="'$(ElsaGenerateMetadata)' == 'true' And '@(_ElsaGenerator)' == ''"
+           Text="Elsa generation is enabled. Add Elsa.CodeGeneration with its analyzer assets enabled." />
+    <Error Code="ELSACG008" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And '@(_ElsaAnalyzer)' == ''"
+           Text="Elsa build validation requires Elsa.CodeGeneration.Analyzers with its analyzer assets enabled." />
+    <Error Code="ELSACG009" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And
+        ('$(RunAnalyzers)' == 'false' Or ('$(RunAnalyzers)' == '' And '$(RunAnalyzersDuringBuild)' == 'false'))"
+           Text="Elsa build validation requires compiler analyzers to run." />
+  </Target>
+
+  <Target Name="TrackElsaCodeGenerationInputs" BeforeTargets="_GenerateCompileDependencyCache" DependsOnTargets="ResolveElsaCodeGenerationSettings">
+    <ItemGroup>
+      <CoreCompileCache Include="ElsaCodeGeneration=$(ElsaExecutionMode)|$(ElsaEffectiveExecutionMode)|$(ElsaGenerateMetadata)|$(ElsaIsHost)|$(ElsaHostBootstrap)|$(ElsaModuleExportSchemaVersion)|$(RuntimeIdentifier)" />
+    </ItemGroup>
+  </Target>
+</Project>

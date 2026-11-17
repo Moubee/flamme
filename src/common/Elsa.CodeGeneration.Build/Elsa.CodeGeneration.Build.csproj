@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>MSBuild integration for selecting Elsa composition at compile time.</Description>
+    <PackageTags>elsa build nativeaot</PackageTags>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Remove="ConfigureAwait.Fody;Fody;JetBrains.Annotations" />
+    <None Update="buildTransitive/*" Pack="true" PackagePath="buildTransitive/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

@@ -64,6 +64,7 @@
   </Folder>
   <Folder Name="/src/common/">
     <Project Path="src/common/Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj" />
+    <Project Path="src/common/Elsa.CodeGeneration.Build/Elsa.CodeGeneration.Build.csproj" />
     <Project Path="src/common/Elsa.Api.Common/Elsa.Api.Common.csproj" />
     <Project Path="src/common/Elsa.Features/Elsa.Features.csproj" />
     <Project Path="src/common/Elsa.Mediator/Elsa.Mediator.csproj" />
