@@ -9,7 +9,11 @@ namespace Elsa.CodeGeneration;
 internal static partial class ElsaHost
 {
     // Names intentionally collide with common generated local names.
+#if FIXTURE_NULLABLE_ENTRY
+    internal static partial IModule? CreateModule(IServiceCollection exports, CompositionPolicy builder);
+#else
     internal static partial IModule CreateModule(IServiceCollection exports, CompositionPolicy builder);
+#endif
 
     private static IModule CreateDynamicModule(IServiceCollection services, CompositionPolicy policy)
     {
@@ -17,13 +21,17 @@ internal static partial class ElsaHost
         return new Module(services, policy);
     }
 
-    // EXPORT_HOOK_BEGIN
+#if !FIXTURE_MISSING_EXPORT_HOOK
     private static FeatureModuleExport[] GetModuleExports()
     {
         FixtureSelection.Provider = "Generated";
+#if FIXTURE_EMPTY_EXPORTS
+        return [];
+#else
         return [ProducerExports.Foundation];
+#endif
     }
-    // EXPORT_HOOK_END
+#endif
 }
 
 internal static class FixtureSelection

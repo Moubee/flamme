@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <DefineConstants>$(DefineConstants);$(FixtureHostCase)</DefineConstants>
     <IsPackable>false</IsPackable>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <FixtureIncludeGenerator Condition="'$(FixtureIncludeGenerator)' == ''">true</FixtureIncludeGenerator>
@@ -27,6 +28,7 @@
     <PackageReference Include="ConfigureAwait.Fody" PrivateAssets="All" />
     <PackageReference Include="Fody" PrivateAssets="All" />
     <Compile Remove="SourceLibrary/**/*.cs" />
+    <ProjectReference Include="SourceLibrary/SourceLibrary.csproj" Condition="Exists('SourceLibrary/SourceLibrary.csproj')" />
   </ItemGroup>
   <Target Name="IncludeFixtureCompilerFeatures" BeforeTargets="_GenerateCompileDependencyCache">
     <ItemGroup><CoreCompileCache Include="FixtureCompilerFeatures=$(Features)" /></ItemGroup>

@@ -15,7 +15,15 @@ internal static partial class ElsaHost
         => ((CreateDynamicModule(services, policy)));
 #else
     {
-#if ELSA_GENERATED
+#if FIXTURE_DISCARD_EXPORT
+        _ = GetModuleExports();
+        return CreateDynamicModule(services, policy);
+#elif FIXTURE_UNREACHABLE_EXPORT
+        if (false) return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
+        return CreateDynamicModule(services, policy);
+#elif FIXTURE_WRONG_HOOK
+        return CreateDynamicModule(services, policy);
+#elif ELSA_GENERATED
         return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
 #else
         return CreateDynamicModule(services, policy);
@@ -29,13 +37,15 @@ internal static partial class ElsaHost
         return new Module(services, policy);
     }
 
-    // EXPORT_HOOK_BEGIN
     private static FeatureModuleExport[] GetModuleExports()
     {
         FixtureSelection.Provider = "Generated";
+#if FIXTURE_EMPTY_EXPORTS
+        return [];
+#else
         return [ProducerExports.Foundation];
+#endif
     }
-    // EXPORT_HOOK_END
 }
 
 internal static class FixtureSelection
