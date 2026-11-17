@@ -5,6 +5,7 @@ import base64
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import sys
 import xml.etree.ElementTree as ET
@@ -118,6 +119,27 @@ def lock(path: Path) -> None:
     print(f"Verified complete two-framework lock: {path}")
 
 
+def compiler_settings(path: Path, framework: str, async_model: str) -> None:
+    properties = json.loads(path.read_text())["Properties"]
+    enabled = framework == "net11.0" and async_model == "default"
+    async_property = "true" if enabled else "false"
+    async_features = [
+        feature for feature in re.split(r"[,;\s]+", properties["Features"])
+        if feature.partition("=")[0].lower() == "runtime-async"
+    ]
+    expected_features = ["runtime-async=on"] if enabled else []
+    require(
+        properties["Configuration"] == "Release"
+        and properties["TargetFramework"] == framework
+        and properties["UseRuntimeAsync"].lower() == async_property
+        and async_features == expected_features,
+        f"{path}: expected Release {framework} runtime-async {async_model} "
+        f"(UseRuntimeAsync={async_property}, compiler feature {'on' if enabled else 'absent'}); "
+        f"observed {properties['Configuration']} {properties['TargetFramework']} "
+        f"UseRuntimeAsync={properties['UseRuntimeAsync']}, Features={properties['Features']!r}",
+    )
+
+
 if __name__ == "__main__":
     operation, *arguments = sys.argv[1:]
     if operation == "prepare":
@@ -130,5 +152,7 @@ if __name__ == "__main__":
         assets(Path(arguments[0]), Path(arguments[1]), arguments[2])
     elif operation == "lock":
         lock(Path(arguments[0]))
+    elif operation == "compiler-settings":
+        compiler_settings(Path(arguments[0]), *arguments[1:])
     else:
         raise SystemExit(f"Unknown operation: {operation}")

@@ -162,8 +162,10 @@ scripts/nativeaot/test-module-packages.sh
 The default package matrix covers managed/native execution on both frameworks
 and a separately repacked .NET 11 native runtime-async opt-out. The harness stages
 one NuGet package per referenced project, creates a fresh consumer outside the
-repository, checks exact package versions and SHA512 provenance, generates complete
-two-framework locks, and restores them in locked mode. The consumer uses package
+repository, and verifies the effective Release compiler settings for each packed
+and published target. It generates and verifies one complete two-framework lock
+per runtime-async model and publication mode, checking exact package versions
+and SHA512 provenance after locked restore. The consumer uses package
 references with explicit local-feed mappings, not source project references or
 repository build imports. Native linker/compiler IL warnings are errors.
 

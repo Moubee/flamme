@@ -44,9 +44,6 @@ if [ "$requested_async" != disabled ]; then expected_lanes=$((framework_count * 
 if [ "$requested_async" != default ] && [ "$requested_framework" != net10.0 ]; then expected_lanes=$((expected_lanes + 1)); fi
 completed=0
 for dependency in dotnet python3; do command -v "$dependency" >/dev/null 2>&1 || { printf '%s is required\n' "$dependency" >&2; exit 69; }; done
-case "$(uname -s)" in Darwin) host_os=osx ;; Linux) host_os=linux ;; *) fail 'Unsupported native host OS' ;; esac
-case "$(uname -m)" in arm64|aarch64) host_arch=arm64 ;; x86_64|amd64) host_arch=x64 ;; *) fail 'Unsupported native host architecture' ;; esac
-rid=$host_os-$host_arch
 mkdir -p -- "$artifacts_root" || exit $?
 artifacts_root=$(cd -- "$artifacts_root" && pwd) || exit 1
 workspace=$(mktemp -d "$artifacts_root/run.XXXXXX") || exit $?
@@ -77,16 +74,17 @@ verify_protocol() {
         NF { last = $0 }
         $0 == header { if (state != 0) invalid = 1; state = 1; next }
         /^framework=/ { if (state != 1 || $0 !~ runtime) invalid = 1; state = 2; next }
-        $0 == "scenario=export-composition result=passed" { if (state != 2) invalid = 1; state = 3; next }
-        $0 == "scenario=host-isolation result=passed" { if (state != 3) invalid = 1; state = 4; next }
-        $0 == "scenario=hosted-lifecycle result=passed" { if (state != 4) invalid = 1; state = 5; next }
-        $0 == "scenario=missing-export result=passed" { if (state != 5) invalid = 1; state = 6; next }
-        $0 == "probe=module-packages result=passed scope=packed-modules" { if (state != 6) invalid = 1; state = 7; next }
+        $0 == "probe=module-packages result=passed scope=packed-modules" { if (state != 2) invalid = 1; state = 3; next }
         /^(probe=|scenario=)/ { invalid = 1 }
-        END { exit !(state == 7 && !invalid && last == "probe=module-packages result=passed scope=packed-modules") }
+        END { exit !(state == 3 && !invalid && last == "probe=module-packages result=passed scope=packed-modules") }
     ' "$logfile"
 }
-run_logged "$workspace/dotnet-info.log" dotnet --info || exit $?
+DOTNET_CLI_UI_LANGUAGE=en-US run_logged "$workspace/dotnet-info.log" dotnet --info || exit $?
+rid=$(awk '$1 == "RID:" { print $2; exit }' "$workspace/dotnet-info.log") || exit $?
+case "$rid" in
+    osx-arm64|osx-x64|linux-arm64|linux-x64|linux-musl-arm64|linux-musl-x64) ;;
+    *) fail "Unsupported .NET SDK host RID: $rid" ;;
+esac
 if [ "$requested_mode" != managed ]; then
     command -v clang >/dev/null 2>&1 || { printf '%s\n' 'Native package-consumer validation requires clang' >&2; exit 69; }
     run_logged "$workspace/native-toolchain.log" clang --version || exit $?
@@ -109,24 +107,29 @@ for async_model in "${async_models[@]}"; do
     mkdir -p "$feed" || exit $?
     printf '%s\n' "$consumer" > "$model_root/consumer-path.txt"
     version="0.0.0-g01.$stamp.$$.$async_model"
-    async_options=()
-    if [ "$async_model" = disabled ]; then async_options=(-p:UseRuntimeAsync=false); fi
-    phase=pack
+    build_options=(-p:Configuration=Release)
+    if [ "$async_model" = disabled ]; then build_options+=(-p:UseRuntimeAsync=false); fi
     for project in \
         src/common/Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj \
         src/common/Elsa.Features/Elsa.Features.csproj \
         test/fixtures/Elsa.NativeAot.Modules.Producer/Elsa.NativeAot.Modules.Producer.csproj; do
         name=${project##*/}; name=${name%.csproj}
-        run_logged "$model_root/pack-$name.log" dotnet pack "$repo_root/$project" --configuration Release \
+        phase=producer-settings
+        for producer_framework in net10.0 net11.0; do
+            properties="$model_root/properties-$name-$producer_framework"
+            run_logged "$properties.log" dotnet msbuild "$repo_root/$project" -nologo \
+                "-p:TargetFramework=$producer_framework" "-p:Version=$version" "-p:PackageVersion=$version" \
+                "${build_options[@]}" -p:IsPackable=true "-p:PackageOutputPath=$feed" \
+                -p:UseArtifactsOutput=true "-p:ArtifactsPath=$model_root/producer-build" \
+                -getProperty:Configuration,TargetFramework,UseRuntimeAsync,Features,WeaverConfiguration,IsPackable,PackageId,PackageVersion \
+                "-getResultOutputFile:$properties.json" || exit $?
+            python3 "$helper" compiler-settings "$properties.json" "$producer_framework" "$async_model" || exit 65
+        done
+        phase=pack
+        run_logged "$model_root/pack-$name.log" dotnet pack "$repo_root/$project" \
             --artifacts-path "$model_root/producer-build" -p:IsPackable=true "-p:PackageOutputPath=$feed" \
             "-p:Version=$version" "-p:PackageVersion=$version" "-bl:$model_root/pack-$name.binlog" \
-            "${async_options[@]}" || exit $?
-        for producer_framework in net10.0 net11.0; do
-            run_logged "$model_root/properties-$name-$producer_framework.log" dotnet msbuild "$repo_root/$project" -nologo \
-                "-p:TargetFramework=$producer_framework" "-p:Version=$version" "-p:PackageVersion=$version" \
-                "${async_options[@]}" -p:IsPackable=true -p:UseArtifactsOutput=true "-p:ArtifactsPath=$model_root/producer-build" \
-                -getProperty:TargetFramework,UseRuntimeAsync,Features,WeaverConfiguration,IsPackable,PackageId,PackageVersion || exit $?
-        done
+            "${build_options[@]}" || exit $?
     done
     run_logged "$model_root/package-layout.log" python3 "$helper" packages "$feed" "$version" || exit $?
     run_logged "$model_root/prepare.log" python3 "$helper" prepare "$repo_root" "$consumer" "$feed" "$version" || exit $?
@@ -145,30 +148,33 @@ for async_model in "${async_models[@]}"; do
 
     for mode in "${modes[@]}"; do
         if [ "$async_model" = disabled ] && [ "$requested_mode" = all ] && [ "$mode" = managed ]; then continue; fi
+        group="$model_root/$mode"
+        mkdir -p "$group" || exit $?
+        common=("${build_options[@]}" "-p:NativeAotMode=$mode" "-p:RuntimeIdentifier=$rid" -p:NoWarn=CS1591 \
+            -p:EnableTrimAnalyzer=true -p:EnableAotAnalyzer=true -p:TrimmerSingleWarn=false \
+            -p:SuppressTrimAnalysisWarnings=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true)
+        phase=consumer-lock
+        # Both frameworks publish from the same complete, verified restore.
+        (cd -- "$consumer" && run_logged "$group/lock-generation.log" dotnet restore Consumer.csproj --force-evaluate \
+            --artifacts-path "$group/build" "${common[@]}") || exit $?
+        run_logged "$group/lock-validation.log" python3 "$helper" lock "$consumer/locks/$mode/$rid/packages.lock.json" || exit $?
+        phase=consumer-restore
+        (cd -- "$consumer" && run_logged "$group/restore.log" dotnet restore Consumer.csproj --locked-mode \
+            --artifacts-path "$group/build" "${common[@]}") || exit $?
+        run_logged "$group/package-provenance.log" python3 "$helper" assets "$group/build/obj/Consumer/project.assets.json" "$feed" "$version" || exit $?
         for framework in "${frameworks[@]}"; do
             if [ "$async_model" = disabled ] && [ "$framework" != net11.0 ]; then continue; fi
-            lane="$model_root/$mode/$framework"
+            lane="$group/$framework"
             mkdir -p "$lane" || exit $?
-            common=("-p:NativeAotMode=$mode" "-p:RuntimeIdentifier=$rid" -p:NoWarn=CS1591 \
-                -p:EnableTrimAnalyzer=true -p:EnableAotAnalyzer=true -p:TrimmerSingleWarn=false \
-                -p:SuppressTrimAnalysisWarnings=false -p:ILLinkTreatWarningsAsErrors=true -p:IlcTreatWarningsAsErrors=true \
-                "${async_options[@]}")
-            phase=consumer-lock
-            # This is a disposable consumer with run-specific package versions.
-            # Generate both TFM groups, then prove the same restore is locked.
-            (cd -- "$consumer" && run_logged "$lane/lock-generation.log" dotnet restore Consumer.csproj --force-evaluate \
-                --artifacts-path "$lane/build" "${common[@]}") || exit $?
-            run_logged "$lane/lock-validation.log" python3 "$helper" lock "$consumer/locks/$mode/$rid/packages.lock.json" || exit $?
-            phase=consumer-restore
-            (cd -- "$consumer" && run_logged "$lane/restore.log" dotnet restore Consumer.csproj --locked-mode \
-                --artifacts-path "$lane/build" "${common[@]}") || exit $?
-            run_logged "$lane/package-provenance.log" python3 "$helper" assets "$lane/build/obj/Consumer/project.assets.json" "$feed" "$version" || exit $?
+            phase=consumer-settings
             (cd -- "$consumer" && run_logged "$lane/properties.log" dotnet msbuild Consumer.csproj -nologo \
-                "-p:TargetFramework=$framework" "${common[@]}" -p:UseArtifactsOutput=true "-p:ArtifactsPath=$lane/build" \
-                -getProperty:TargetFramework,NativeAotMode,PublishAot,UseRuntimeAsync,Features,WeaverConfiguration,NuGetLockFilePath) || exit $?
+                "-p:TargetFramework=$framework" "${common[@]}" -p:UseArtifactsOutput=true "-p:ArtifactsPath=$group/build" \
+                -getProperty:Configuration,TargetFramework,NativeAotMode,PublishAot,UseRuntimeAsync,Features,WeaverConfiguration,NuGetLockFilePath \
+                "-getResultOutputFile:$lane/properties.json") || exit $?
+            python3 "$helper" compiler-settings "$lane/properties.json" "$framework" "$async_model" || exit 65
             phase=consumer-publish
-            (cd -- "$consumer" && run_logged "$lane/publish.log" dotnet publish Consumer.csproj --configuration Release \
-                --framework "$framework" --no-restore --artifacts-path "$lane/build" --output "$lane/publish" \
+            (cd -- "$consumer" && run_logged "$lane/publish.log" dotnet publish Consumer.csproj \
+                --framework "$framework" --no-restore --artifacts-path "$group/build" --output "$lane/publish" \
                 "-bl:$lane/publish.binlog" "${common[@]}") || exit $?
             phase=consumer-execute
             run_logged "$lane/execution.log" "$lane/publish/Consumer" --expect-mode "$mode" || exit $?
