@@ -7,18 +7,32 @@ using System.Xml.Linq;
 
 namespace Elsa.NativeAot.IntegrationTests;
 
-internal sealed class PackageFeed(bool disableRuntimeAsync)
+internal sealed class PackageFeed
 {
     private const string Producer = "Elsa.NativeAot.Modules.Producer";
     private const string Abstractions = "Elsa.CodeGeneration.Abstractions";
     private const string BuildPackage = "Elsa.CodeGeneration.Build";
     private static readonly string[] RuntimePackages = [Abstractions, "Elsa.Features", Producer];
     private static readonly string[] CompilerPackages = ["Elsa.CodeGeneration", "Elsa.CodeGeneration.Analyzers", BuildPackage];
+    private static readonly Lazy<DirectoryInfo> Consumers = new(() => Directory.CreateTempSubdirectory("flamme-consumers-"));
     private static readonly Lazy<Task<PackageFeed>> Default = new(() => Pack(false));
     private static readonly Lazy<Task<PackageFeed>> AsyncDisabled = new(() => Pack(true));
 
+    private PackageFeed(bool disableRuntimeAsync)
+    {
+        Artifacts = BuildTest.CreateDirectory(disableRuntimeAsync ? "pack-async-disabled" : "pack");
+        string[] asyncModel = disableRuntimeAsync ? ["-p:UseRuntimeAsync=false"] : [];
+        PackProperties =
+        [
+            "-p:Configuration=Release", "-p:IsPackable=true",
+            $"-p:Version={Version}", $"-p:PackageVersion={Version}", $"-p:PackageOutputPath={Feed}",
+            "-p:UseArtifactsOutput=true", $"-p:ArtifactsPath={Path.Combine(Artifacts, "build")}", .. asyncModel
+        ];
+    }
+
+    public string[] PackProperties { get; }
     public string Version { get; } = $"0.0.0-test.{Guid.NewGuid():N}";
-    public string Artifacts { get; } = BuildTest.CreateDirectory(disableRuntimeAsync ? "pack-async-disabled" : "pack");
+    public string Artifacts { get; }
     public string Feed => Path.Combine(Artifacts, "feed");
 
     public static Task<PackageFeed> Get(bool disableRuntimeAsync = false) =>
@@ -31,11 +45,8 @@ internal sealed class PackageFeed(bool disableRuntimeAsync)
         foreach (var id in RuntimePackages.Concat(CompilerPackages))
         {
             var project = Path.Combine(BuildTest.Root, id == Producer ? "test/fixtures" : "src/common", id, id + ".csproj");
-            string[] options = disableRuntimeAsync ? ["-p:UseRuntimeAsync=false"] : [];
             var result = await BuildTest.Run(BuildTest.Root, Path.Combine(packages.Artifacts, $"pack-{id}.log"), "dotnet",
-                ["pack", project, "-c", "Release", "--artifacts-path", Path.Combine(packages.Artifacts, "build"),
-                "-p:IsPackable=true", $"-p:Version={packages.Version}", $"-p:PackageVersion={packages.Version}",
-                $"-p:PackageOutputPath={packages.Feed}", $"-bl:{packages.Artifacts}/pack-{id}.binlog", ..options]);
+                ["pack", project, .. packages.PackProperties, $"-bl:{packages.Artifacts}/pack-{id}.binlog"]);
             result.EnsureSuccess();
             packages.VerifyLayout(id);
         }
@@ -45,26 +56,41 @@ internal sealed class PackageFeed(bool disableRuntimeAsync)
     // An external project can consume only the public NuGet assets. Give every test its own SDK inputs.
     public string PrepareConsumer(string name)
     {
-        var directory = Directory.CreateTempSubdirectory($"flamme-{name}-").FullName;
+        var directory = Consumers.Value.CreateSubdirectory($"{name}-{Guid.NewGuid():N}").FullName;
         File.Copy(Path.Combine(BuildTest.Root, "global.json"), Path.Combine(directory, "global.json"));
-        File.WriteAllText(Path.Combine(directory, "Directory.Build.props"), "<Project />");
+        // Reuse installed SDK dependencies while keeping freshly staged packages out of the user's cache.
+        using var producer = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(Artifacts, "build", "obj", Producer, "project.assets.json")));
+        var caches = producer.RootElement.GetProperty("packageFolders").EnumerateObject().Select(p => p.Name);
+        new XElement("Project", new XElement("PropertyGroup",
+            new XElement("RestorePackagesPath", Path.Combine(Artifacts, "consumer-packages")),
+            new XElement("RestoreAdditionalProjectFallbackFolders", string.Join(';', caches))))
+            .Save(Path.Combine(directory, "Directory.Build.props"));
         File.WriteAllText(Path.Combine(directory, "Directory.Build.targets"), "<Project />");
         var ids = RuntimePackages.Concat(CompilerPackages).ToArray();
         var central = XElement.Load(Path.Combine(BuildTest.Root, "Directory.Packages.props"));
         central.Add(new XElement("ItemGroup", ids.Select(id =>
             new XElement("PackageVersion", new XAttribute("Include", id), new XAttribute("Version", $"[{Version}]")))));
         central.Save(Path.Combine(directory, "Directory.Packages.props"));
+        CreateNuGetConfig(Feed).Save(Path.Combine(directory, "NuGet.Config"));
+        return directory;
+    }
+
+    [After(Assembly)]
+    public static void RemoveTemporaryConsumers()
+    {
+        if (Consumers.IsValueCreated)
+            Consumers.Value.Delete(recursive: true);
+    }
+
+    internal static XElement CreateNuGetConfig(string feed) =>
         new XElement("configuration",
             new XElement("packageSources", new XElement("clear"),
-                new XElement("add", new XAttribute("key", "fixture"), new XAttribute("value", Feed)),
+                new XElement("add", new XAttribute("key", "fixture"), new XAttribute("value", feed)),
                 new XElement("add", new XAttribute("key", "nuget.org"), new XAttribute("value", "https://api.nuget.org/v3/index.json"))),
             new XElement("packageSourceMapping", new XElement("clear"),
                 new XElement("packageSource", new XAttribute("key", "fixture"),
-                    ids.Select(id => new XElement("package", new XAttribute("pattern", id)))),
-                new XElement("packageSource", new XAttribute("key", "nuget.org"), new XElement("package", new XAttribute("pattern", "*")))))
-            .Save(Path.Combine(directory, "NuGet.Config"));
-        return directory;
-    }
+                    RuntimePackages.Concat(CompilerPackages).Select(id => new XElement("package", new XAttribute("pattern", id)))),
+                new XElement("packageSource", new XAttribute("key", "nuget.org"), new XElement("package", new XAttribute("pattern", "*")))));
 
     private string ArchivePath(string id) => Path.Combine(Feed, $"{id}.{Version}.nupkg");
 
@@ -132,6 +158,16 @@ internal sealed class PackageFeed(bool disableRuntimeAsync)
             Require(type == "package" || allowSourceLibrary && type == "project" && library.Name.StartsWith("SourceLibrary/"),
                 $"Unexpected project reference {library.Name} in {assetsFile}.");
             Require(!library.Name.StartsWith("Microsoft.CodeAnalysis"), $"Roslyn leaked into {assetsFile}.");
+        }
+        var frameworks = assets.GetProperty("project").GetProperty("restore").GetProperty("frameworks");
+        foreach (var framework in frameworks.EnumerateObject())
+        {
+            if (!framework.Value.TryGetProperty("projectReferences", out var references)) continue;
+            var sourceLibrary = Path.Combine(Path.GetDirectoryName(assets.GetProperty("project").GetProperty("restore")
+                .GetProperty("projectPath").GetString())!, "SourceLibrary", "SourceLibrary.csproj");
+            foreach (var reference in references.EnumerateObject())
+                Require(allowSourceLibrary && Path.GetFullPath(reference.Name) == sourceLibrary,
+                    $"Unexpected restore project reference {reference.Name} in {assetsFile}.");
         }
         foreach (var id in RuntimePackages.Concat(CompilerPackages))
         {
