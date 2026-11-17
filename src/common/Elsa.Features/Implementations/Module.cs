@@ -1,9 +1,5 @@
-using System.ComponentModel;
-using System.Reflection;
 using Elsa.Extensions;
-using Elsa.Features.Attributes;
 using Elsa.Features.Contracts;
-using Elsa.Features.Models;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,6 +12,7 @@ public class Module : IModule
 {
     private sealed record HostedServiceDescriptor(int Order, Type Type);
 
+    private readonly IFeatureProvider _provider;
     private Dictionary<Type, IFeature> _features = new();
     private readonly HashSet<IFeature> _configuredFeatures = new();
     private readonly List<HostedServiceDescriptor> _hostedServiceDescriptors = new();
@@ -26,6 +23,7 @@ public class Module : IModule
     public Module(IServiceCollection services)
     {
         Services = services;
+        _provider = new ReflectionFeatureProvider();
     }
 
     /// <inheritdoc />
@@ -49,7 +47,7 @@ public class Module : IModule
     /// <inheritdoc />
     public T Configure<T>(Action<T>? configure = null) where T : class, IFeature
     {
-        return Configure(module => (T)Activator.CreateInstance(typeof(T), module)!, configure);
+        return Configure(module => (T)_provider.CreateFeature(typeof(T), module), configure);
     }
 
     /// <inheritdoc />
@@ -94,7 +92,7 @@ public class Module : IModule
     {
         _isApplying = true;
         var featureTypes = GetFeatureTypes();
-        _features = featureTypes.ToDictionary(featureType => featureType, featureType => _features.TryGetValue(featureType, out var existingFeature) ? existingFeature : (IFeature)Activator.CreateInstance(featureType, this)!);
+        _features = featureTypes.ToDictionary(featureType => featureType, featureType => _features.TryGetValue(featureType, out var existingFeature) ? existingFeature : _provider.CreateFeature(featureType, this));
 
         // Iterate over a copy of the features to avoid concurrent modification exceptions.
         foreach (var feature in _features.Values.ToList())
@@ -128,12 +126,7 @@ public class Module : IModule
         var registry = new InstalledFeatureRegistry();
         foreach (var feature in _features.Values)
         {
-            var type = feature.GetType();
-            var name = type.Name.Replace("Feature", string.Empty);
-            var ns = "Elsa";
-            var displayName = type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? name;
-            var description = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-            registry.Add(new(name, ns, displayName, description));
+            registry.Add(_provider.GetDescriptor(feature.GetType()));
         }
 
         Services.AddSingleton<IInstalledFeatureRegistry>(registry);
@@ -145,8 +138,8 @@ public class Module : IModule
         return
             from feature in features
             let featureType = feature.GetType()
-            let dependencyOfAttributes = featureType.GetCustomAttributes<DependencyOfAttribute>(true).ToList()
-            let missingDependencies = dependencyOfAttributes.Where(x => !_features.ContainsKey(x.Type)).ToList()
+            let conditionalDependencies = _provider.GetConditionalDependencies(featureType)
+            let missingDependencies = conditionalDependencies.Where(x => !_features.ContainsKey(x)).ToList()
             where missingDependencies.Count == 0
             select feature;
     }
@@ -157,7 +150,7 @@ public class Module : IModule
         var appendIndex = Services.Count;
 
         foreach (var hostedServiceDescriptor in _hostedServiceDescriptors.OrderBy(x => x.Order))
-            Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IHostedService), hostedServiceDescriptor.Type));
+            Services.TryAddEnumerable(_provider.CreateHostedServiceDescriptor(hostedServiceDescriptor.Type));
 
         // TryAddEnumerable appends, so move what it added back to where hosted services configured through this module belong. Doing it this way rather
         // than inserting directly keeps the de-duplication behaviour of TryAddEnumerable, which also considers what the features registered themselves.
@@ -198,7 +191,7 @@ public class Module : IModule
 
     private IFeature GetOrCreateFeature(Type featureType)
     {
-        return _features.TryGetValue(featureType, out var existingFeature) ? existingFeature : (IFeature)Activator.CreateInstance(featureType, this)!;
+        return _features.TryGetValue(featureType, out var existingFeature) ? existingFeature : _provider.CreateFeature(featureType, this);
     }
 
     private HashSet<Type> GetFeatureTypes()
@@ -208,9 +201,9 @@ public class Module : IModule
         return featureTypesWithDependencies.TSort(GetDeclaredDependencyTypes).ToHashSet();
     }
 
-    private static IEnumerable<Type> GetDeclaredDependencyTypes(Type type)
+    private IEnumerable<Type> GetDeclaredDependencyTypes(Type type)
     {
-        return type.GetCustomAttributes<DependsOnAttribute>(true).Select(dependsOn => dependsOn.Type);
+        return _provider.GetDependencies(type);
     }
 
     // Recursively get dependency types.
