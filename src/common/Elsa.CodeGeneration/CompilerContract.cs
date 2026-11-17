@@ -180,6 +180,9 @@ internal static class CompilerContract
         ExpressionSyntax? expression = declaration.ExpressionBody?.Expression;
         if (expression is null && declaration.Body?.Statements.Count == 1 && declaration.Body.Statements[0] is ReturnStatementSyntax returned)
             expression = returned.Expression;
+        // Roslyn associates the operation with the expression inside the parentheses.
+        while (expression is ParenthesizedExpressionSyntax parentheses)
+            expression = parentheses.Expression;
         if (expression is null || Unwrap(compilation.GetSemanticModel(declaration.SyntaxTree).GetOperation(expression, cancellationToken)) is not IInvocationOperation invocation)
             return false;
         if (settings.IsDynamic)

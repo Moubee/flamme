@@ -5,8 +5,8 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
-import platform
 import re
 import runpy
 import shutil
@@ -44,18 +44,16 @@ class Validation:
         self.feed.mkdir()
         self.version = f"0.0.0-g02.{time.time_ns()}"
         self.options = options
-        self.rid = {"Darwin": "osx", "Linux": "linux"}.get(platform.system(), "unsupported") + "-" + {"arm64": "arm64", "aarch64": "arm64", "x86_64": "x64"}.get(platform.machine(), "unsupported")
-        require("unsupported" not in self.rid, "Unsupported validation host")
         self.completed = []
         self.expected = []
         self.phase = "prerequisites"
 
-    def run(self, name, command, cwd=REPO, expected=None, allow_failure=False):
+    def run(self, name, command, cwd=REPO, expected=None, allow_failure=False, env=None):
         log = self.root / f"{name}.log"
         log.parent.mkdir(parents=True, exist_ok=True)
         command = [str(item) for item in command]
         print(f"Running {name}", flush=True)
-        result = subprocess.run(command, cwd=cwd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        result = subprocess.run(command, cwd=cwd, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         log.write_text(result.stdout)
         (log.with_suffix(".command.json")).write_text(json.dumps({"arguments": command, "cwd": str(cwd), "exitCode": result.returncode}, indent=2))
         if expected is not None:
@@ -66,10 +64,15 @@ class Validation:
         return result
 
     def pack(self):
-        self.phase = "package"
-        self.run("dotnet-info", ["dotnet", "--info"])
+        info = self.run("dotnet-info", ["dotnet", "--info"], env={**os.environ, "DOTNET_CLI_UI_LANGUAGE": "en-US"})
+        rid = re.search(r"^[ \t]*RID:[ \t]*(\S+)", info.stdout, re.MULTILINE)
+        require(rid, "dotnet --info did not report the SDK host RID")
+        self.rid = rid.group(1)
+        require(self.rid in ("osx-x64", "osx-arm64", "linux-x64", "linux-arm64", "linux-musl-x64", "linux-musl-arm64"),
+                f"Unsupported .NET SDK host RID: {self.rid}")
         if not self.options.skip_native:
             self.run("native-toolchain", ["clang", "--version"])
+        self.phase = "package"
         for package in PACKAGES:
             area = "test/fixtures" if package == "Elsa.NativeAot.Modules.Producer" else "src/common"
             project = REPO / area / package / f"{package}.csproj"
@@ -90,7 +93,7 @@ class Validation:
                     require(binary in names, f"Missing compiler asset {binary}")
                     require(b".NETStandard,Version=v2.0" in archive.read(binary), f"{package} is not a netstandard2.0 compiler assembly")
 
-    def consumer(self, name, bootstrap="Compiler", missing_hook=False, empty_export=False, manual_failure=None, local_mode=None, source_library=False, host_disabled=False, late_mode=None, nullable_entry=False):
+    def consumer(self, name, bootstrap="Compiler", missing_hook=False, empty_export=False, manual_failure=None, local_mode=None, source_library=False, host_disabled=False, late_mode=None, nullable_entry=False, host_filename="ElsaHost.cs"):
         folder = Path(tempfile.mkdtemp(prefix="flamme-codegen-"))
         evidence = self.root / name
         evidence.mkdir(parents=True, exist_ok=True)
@@ -137,7 +140,7 @@ class Validation:
             elif manual_failure == "unreachable":
                 body = "        if (false) return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);\n" + body
             host = re.sub(r"#if ELSA_GENERATED.*?#endif", body, host, count=1, flags=re.S)
-        (folder / "ElsaHost.cs").write_text(host)
+        (folder / host_filename).write_text(host)
         shutil.copyfile(FIXTURES / "Program.cs", folder / "Program.cs")
         config = ET.Element("configuration")
         sources = ET.SubElement(config, "packageSources")
@@ -207,7 +210,10 @@ class Validation:
             require(f"framework={framework}" in observed and "host=false" in observed.lower() and f"mode={expected_child}" in observed, f"Unexpected actual child settings: {observed}")
             require("ELSA_GENERATED" not in observed and "ELSA_DYNAMIC" not in observed, "Host bootstrap constants leaked into a source library")
             (self.root / name / "observed-child.txt").write_text(observed)
-        snapshot = ["dotnet", "msbuild", "Consumer.csproj", "-nologo", "-t:ResolveElsaCodeGenerationSettings", f"-p:TargetFramework={framework}", "-p:UseArtifactsOutput=true", f"-p:ArtifactsPath={self.root / name / 'build'}", *[f"-p:{key}={value}" for key, value in settings.items()], "-getProperty:ElsaExecutionMode,ElsaEffectiveExecutionMode,ElsaGenerateMetadata,ElsaIsHost,ElsaHostBootstrap,DefineConstants"]
+        snapshot = ["dotnet", "msbuild", "Consumer.csproj", "-nologo", "-t:ResolveElsaCodeGenerationSettings",
+                    "-p:Configuration=Release", f"-p:TargetFramework={framework}", "-p:UseArtifactsOutput=true",
+                    f"-p:ArtifactsPath={self.root / name / 'build'}", *[f"-p:{key}={value}" for key, value in settings.items()],
+                    "-getProperty:Configuration,ElsaExecutionMode,ElsaEffectiveExecutionMode,ElsaGenerateMetadata,ElsaIsHost,ElsaHostBootstrap,DefineConstants"]
         if native:
             snapshot.append(f"-p:RuntimeIdentifier={self.rid}")
         self.run(f"{name}/effective-properties", snapshot, folder)
@@ -225,8 +231,8 @@ class Validation:
         if dependencies.exists():
             require("Microsoft.CodeAnalysis" not in dependencies.read_text(), "Roslyn leaked into application runtime dependencies")
 
-    def negative(self, name, framework, settings, diagnostic, bootstrap="Compiler", missing_hook=False, manual_failure=None, nullable_entry=False):
-        folder = self.consumer(name, bootstrap, missing_hook=missing_hook, manual_failure=manual_failure, nullable_entry=nullable_entry)
+    def negative(self, name, framework, settings, diagnostic, bootstrap="Compiler", missing_hook=False, manual_failure=None, nullable_entry=False, host_filename="ElsaHost.cs"):
+        folder = self.consumer(name, bootstrap, missing_hook=missing_hook, manual_failure=manual_failure, nullable_entry=nullable_entry, host_filename=host_filename)
         args = self.arguments(name, framework, settings, settings.get("PublishAot") == "true")
         restore = self.run(f"{name}/restore", ["dotnet", "restore", "Consumer.csproj", "--force-evaluate", *args], folder, allow_failure=True)
         if restore.returncode:
@@ -279,6 +285,8 @@ class Validation:
             ("auto-unset", {}, "Dynamic", {}),
             ("trimmed-auto", {"PublishTrimmed": "true", "PublishAot": "false"}, "Dynamic", {}),
             ("case-insensitive", {"ElsaExecutionMode": "gEnErAtEd", "ElsaGenerateMetadata": "TrUe"}, "Generated", {}),
+            ("manual-parenthesized-dynamic", {"ElsaExecutionMode": "Dynamic", "DefineConstants": "FIXTURE_PARENTHESIZED_RETURN"}, "Dynamic", {"bootstrap": "Manual"}),
+            ("manual-parenthesized-generated", {"ElsaExecutionMode": "Generated", "DefineConstants": "FIXTURE_PARENTHESIZED_RETURN"}, "Generated", {"bootstrap": "Manual"}),
             ("late-app-setting", {}, "Generated", {"late_mode": "Generated"}),
             ("app-local-setting", {}, "Generated", {"local_mode": "Generated", "source_library": True, "expected_child": "Dynamic"}),
             ("global-setting", {"ElsaExecutionMode": "Generated"}, "Generated", {"source_library": True, "expected_child": "Generated"}),
@@ -301,6 +309,7 @@ class Validation:
             ("missing-export-hook", {"ElsaExecutionMode": "Generated"}, "ELSAGEN003", {"missing_hook": True}),
             ("nullable-host", {"ElsaExecutionMode": "Generated"}, "ELSAGEN002", {"nullable_entry": True}),
             ("manual-wrong-hook", {"ElsaExecutionMode": "Generated"}, "ELSAGEN004", {"bootstrap": "Manual", "manual_failure": "wrong"}),
+            ("manual-wrong-hook-generated-source", {"ElsaExecutionMode": "Generated"}, "ELSAGEN004", {"bootstrap": "Manual", "manual_failure": "wrong", "host_filename": "ElsaHost.g.cs"}),
             ("manual-discard-export", {"ElsaExecutionMode": "Generated"}, "ELSAGEN004", {"bootstrap": "Manual", "manual_failure": "discard"}),
             ("manual-unreachable-export", {"ElsaExecutionMode": "Generated"}, "ELSAGEN004", {"bootstrap": "Manual", "manual_failure": "unreachable"}),
         ]
@@ -337,7 +346,8 @@ def main():
     except CommandFailure as exception:
         status = exception.status
         print(exception, file=sys.stderr)
-    except Exception as exception:
+    except (Exception, SystemExit) as exception:
+        # The shared package and lock validators raise SystemExit with their failure message.
         status = 65
         print(exception, file=sys.stderr)
     finally:

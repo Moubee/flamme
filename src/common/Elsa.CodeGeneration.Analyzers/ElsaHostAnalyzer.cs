@@ -16,7 +16,7 @@ public sealed class ElsaHostAnalyzer : DiagnosticAnalyzer
     public override void Initialize(AnalysisContext context)
     {
         context.EnableConcurrentExecution();
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.RegisterCompilationAction(static analysis =>
         {
             var settings = CompilerSettings.Read(analysis.Options.AnalyzerConfigOptionsProvider.GlobalOptions);

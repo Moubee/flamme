@@ -1,5 +1,9 @@
 # Elsa compiler assets and build selection
 
+Use .NET SDK 11.0.100 or later to build projects with the Elsa compiler packages,
+including projects targeting `net10.0`. The generator and analyzer require
+Roslyn 5.12 or later in the SDK that runs the build.
+
 Applications and module libraries can opt in to the compiler tooling with explicit
 references to `Elsa.CodeGeneration.Build`, `Elsa.CodeGeneration` and
 `Elsa.CodeGeneration.Analyzers`. Use matching package versions and set

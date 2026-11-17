@@ -9,6 +9,11 @@ namespace Elsa.CodeGeneration;
 internal static partial class ElsaHost
 {
     internal static IModule CreateModule(IServiceCollection services, CompositionPolicy policy)
+#if FIXTURE_PARENTHESIZED_RETURN && ELSA_GENERATED
+        => ((FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy)));
+#elif FIXTURE_PARENTHESIZED_RETURN
+        => ((CreateDynamicModule(services, policy)));
+#else
     {
 #if ELSA_GENERATED
         return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
@@ -16,6 +21,7 @@ internal static partial class ElsaHost
         return CreateDynamicModule(services, policy);
 #endif
     }
+#endif
 
     private static IModule CreateDynamicModule(IServiceCollection services, CompositionPolicy policy)
     {
