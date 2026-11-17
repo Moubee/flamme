@@ -21,6 +21,33 @@ public class ModuleRebuildTests
         """;
 
     [Test]
+    public async Task DisablingAndReenablingMetadataControlsBothSourceAndDiagnostics()
+    {
+        var input = CompilerTest.CreateCompilation(("Orders.cs", Orders),
+            ("Invalid.cs", """[Elsa.CodeGeneration.ElsaModule("invalid", 0)] public static partial class Invalid;"""));
+        var driver = CompilerTest.CreateDriver(new ElsaModuleGenerator());
+        foreach (var enabled in new[] { true, false, true })
+        {
+            driver = driver.WithUpdatedAnalyzerConfigOptions(new CompilerTest.ProducerBuildOptions(enabled)).Run(input, out var output);
+            var result = driver.GetRunResult();
+            if (enabled)
+            {
+                var error = await Assert.That(result.Diagnostics).HasSingleItem();
+                await Assert.That(error.Id).IsEqualTo("ELSAGEN006");
+                await Assert.That(result.GeneratedTrees).HasSingleItem();
+                await Assert.That(output.GetTypeByMetadataName("Sample.Orders")!.GetMembers("Manifest")).HasSingleItem();
+            }
+            else
+            {
+                await Assert.That(result.Diagnostics).IsEmpty();
+                await Assert.That(result.GeneratedTrees).IsEmpty();
+                await Assert.That(output.GetTypeByMetadataName("Sample.Orders")!.GetMembers("Manifest")).IsEmpty();
+            }
+            await output.AssertEmits();
+        }
+    }
+
+    [Test]
     public async Task RebuildMatchesCleanGenerationAfterEditingAndRemovingDeclarations()
     {
         var input = CompilerTest.CreateCompilation(("Orders.cs", Orders), ("Second.cs", Second));

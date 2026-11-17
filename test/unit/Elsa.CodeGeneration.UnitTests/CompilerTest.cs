@@ -38,14 +38,14 @@ internal static class CompilerTest
         await Assert.That(result.Success).IsTrue().Because(string.Join(Environment.NewLine, result.Diagnostics));
     }
 
-    private sealed class ProducerBuildOptions : AnalyzerConfigOptionsProvider
+    internal sealed class ProducerBuildOptions(bool generateMetadata = true) : AnalyzerConfigOptionsProvider
     {
         private static readonly AnalyzerConfigOptions Empty = new Options(new Dictionary<string, string>());
 
         public override AnalyzerConfigOptions GlobalOptions { get; } = new Options(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["build_property.ElsaIsHost"] = "false",
-            ["build_property.ElsaGenerateMetadata"] = "true",
+            ["build_property.ElsaGenerateMetadata"] = generateMetadata.ToString(),
             ["build_property.ElsaEffectiveExecutionMode"] = "Generated",
             ["build_property.ElsaHostBootstrap"] = "Compiler",
             ["build_property.ElsaModuleExportSchemaVersion"] = "1"

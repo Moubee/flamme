@@ -10,11 +10,14 @@ public class ModuleDiagnosticTests
     [Arguments("[ElsaModule(\"orders\", 1)] public static class «Orders»;", "ELSAGEN005")]
     [Arguments("[ElsaModule(\"orders\", 1)] internal static partial class «Orders»;", "ELSAGEN005")]
     [Arguments("[ElsaModule(\"orders\", 1)] public static partial class Orders { public const int «Manifest» = 1; }", "ELSAGEN005")]
+    [Arguments("[ElsaModule(\"orders\", 1)] public static partial class Orders { public static int «Manifest» { get; } }", "ELSAGEN005")]
     [Arguments("[ElsaModule(«\" orders\"», 1)] public static partial class Orders;", "ELSAGEN006")]
     [Arguments("[ElsaModule(\"orders\", «0»)] public static partial class Orders;", "ELSAGEN006")]
     [Arguments("[ElsaModule(\"orders\", 1, «typeof(Box<>)»)] public static partial class Orders;", "ELSAGEN007")]
     [Arguments("[ElsaModule(\"orders\", 1, «typeof(Box<Local>)»)] public static partial class Orders;", "ELSAGEN007")]
     [Arguments("[ElsaModule(\"orders\", 1, typeof(string), «typeof(System.String)»)] public static partial class Orders;", "ELSAGEN008")]
+    [Arguments("[ElsaModule(\"orders\", 1, typeof((int X, string Y)), «typeof(System.ValueTuple<int, string>)»)] public static partial class Orders;", "ELSAGEN008")]
+    [Arguments("[ElsaModule(\"orders\", 1, typeof(Box<object>), «typeof(Box<dynamic>)»)] public static partial class Orders;", "ELSAGEN008")]
     public async Task InvalidDeclarationReportsItsErrorAtTheOffendingToken(string markedDeclaration, string id)
     {
         const string path = "InvalidProducer.cs";
