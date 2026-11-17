@@ -22,7 +22,7 @@
     <PackageReference Remove="Fody;ConfigureAwait.Fody;JetBrains.Annotations" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" />
     <AdditionalFiles Include="../Elsa.CodeGeneration.Analyzers/AnalyzerReleases.Shipped.md" Link="AnalyzerReleases.Shipped.md" />
-    <AdditionalFiles Include="../Elsa.CodeGeneration.Analyzers/AnalyzerReleases.Unshipped.md" Link="AnalyzerReleases.Unshipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     <None Remove="../../../icon.png" />
     <None Include="$(MSBuildThisFileDirectory)../../../icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>

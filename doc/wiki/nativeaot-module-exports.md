@@ -11,6 +11,52 @@ dependency.
 These runtime contracts define the typed exports consumed by authored hosts and
 compiler-selected bootstraps.
 
+## Declare a producer's types
+
+Reference `Elsa.CodeGeneration.Abstractions` and install the
+[compiler packages](nativeaot-build-selection.md) in the producer project. With
+`ElsaGenerateMetadata=true`, a library can publish a type manifest in either
+Dynamic or Generated execution mode.
+
+```csharp
+using Elsa.CodeGeneration;
+
+namespace Orders;
+
+[ElsaModule("orders.messages", 2, typeof(OrderPlaced), typeof(Batch<OrderPlaced>))]
+public static partial class OrderMessages { }
+
+internal sealed record OrderPlaced(int OrderId);
+internal sealed record Batch<T>(T[] Items);
+```
+
+A consumer reads `Orders.OrderMessages.Manifest` directly. This generated public
+static property returns the same immutable `ModuleTypeManifest` on each access.
+Its `Descriptor` carries the module ID, contract revision, and schema.
+`DeclaredTypes` lists exactly the named CLR types from the attribute in
+deterministic order. A derived class adds one entry. Include its base class
+separately when the module also declares that type. Closed generic types and
+accessible internal types can appear in the table. Only the export class needs
+to be partial. A private nested type can appear when the export class can name it.
+
+This table reports declaration coverage. Supply the feature factories and
+capability IDs needed for host composition through the typed feature export below.
+
+| Compiler diagnostic | How to correct the declaration |
+| --- | --- |
+| `ELSAGEN005` | Put the attribute on a top-level public static partial class with no type parameters. Leave the `Manifest` member name available for the generator. |
+| `ELSAGEN006` | Use a nonblank module ID without surrounding whitespace and a positive contract revision. |
+| `ELSAGEN007` | Declare an accessible, closed named type that the generated file can reference. Replace open generics with specific instantiations and move file-local declarations to ordinary types. |
+| `ELSAGEN008` | List each CLR type once, including types referenced through aliases. |
+| `ELSAGEN009` | Choose a distinct ordinal module ID for each export in the producer compilation. |
+
+Run the managed compiler cases on both supported frameworks from the repository root.
+
+```bash
+project=test/unit/Elsa.CodeGeneration.UnitTests/Elsa.CodeGeneration.UnitTests.csproj
+dotnet test --project "$project" -c Release
+```
+
 ## Identity and compatibility
 
 | Fact | Contract |
@@ -130,7 +176,7 @@ remain valid. Callers need no migration unless they opt into versioned exports.
 
 | Owning assembly | Added public surface |
 | --- | --- |
-| `Elsa.CodeGeneration.Abstractions` | `ModuleExport`, `ModuleExportDescriptor`, `ModuleRequirement`, `ModuleExportSchema`, `ModuleExportRegistryBuilder<TExport>`, `ModuleExportRegistry<TExport>`. |
+| `Elsa.CodeGeneration.Abstractions` | `ElsaModuleAttribute`, `ModuleTypeManifest`, `ModuleExport`, `ModuleExportDescriptor`, `ModuleRequirement`, `ModuleExportSchema`, `ModuleExportRegistryBuilder<TExport>`, `ModuleExportRegistry<TExport>`. |
 | `Elsa.Features` | `FeatureModuleExport`, `FeatureModuleCatalogBuilder`, and `ExplicitFeatureCatalogBuilder.CreateExport`. |
 
 For a modular producer, replace its local final `Build()` with `CreateExport` and
@@ -140,7 +186,7 @@ Keep feature factories and state host-local. Export revisions are not inferred
 from assembly or package versions.
 
 Existing workflow and payload data keep their formats. Later plan steps cover
-generation of feature declarations and richer authoring diagnostics.
+generation of feature, execution, and codec bindings from producer declarations.
 
 The compiler asset packages can select the host bootstrap at build time.
 [Build selection and compiler assets](nativeaot-build-selection.md)
