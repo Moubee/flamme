@@ -72,6 +72,21 @@ compilation cannot hide diagnostics. A zero process exit also requires the
 ordered harness-control, selected production scenario, runtime identity, and
 final provider/mode/scope markers; missing or inconsistent results fail validation.
 
+## Compiled module exports and packages
+
+The explicit Features caller also consumes a separately compiled producer and a
+host-authored export, validating versioned dependencies before normal feature
+activation. For a fresh consumer that installs actual runtime/producer packages:
+
+```bash
+scripts/nativeaot/test-module-packages.sh
+```
+
+This independent matrix checks package versions/hashes, locked two-framework
+restores, native execution, host/scoped isolation, and failure controls. See the
+[export guide](nativeaot-module-exports.md#validate-producerconsumer-boundaries)
+for its package-only boundary, evidence locations, and public API contract.
+
 ## Dependency locks and maintenance
 
 Ordinary solution builds default to managed mode and use each executable's
@@ -119,6 +134,6 @@ component lifecycle fixture, not a production Generic Host or Elsa worker.
 
 The probes are diagnostic tools and are not required green NativeAOT CI gates.
 Generated exports, production metadata/provider fixes, broader workflow fixtures,
-packed-consumer parity, and Linux acceptance gates remain subsequent migration
+generated packed-consumer parity, and Linux acceptance gates remain subsequent migration
 work. Store run logs and review records as CI/PR artifacts rather than committing
 task transcripts.

@@ -53,6 +53,29 @@ def prepare(repo: Path, consumer: Path, feed: Path, version: str) -> None:
     ET.ElementTree(config).write(consumer / "NuGet.Config", encoding="utf-8", xml_declaration=True)
 
 
+def missing(folder: Path, version: str) -> None:
+    """Build an empty-feed control without interpolating paths into XML text."""
+    (folder / "empty-feed").mkdir(parents=True, exist_ok=True)
+    for name in ("Directory.Build.props", "Directory.Build.targets"):
+        ET.ElementTree(ET.Element("Project")).write(folder / name, encoding="utf-8", xml_declaration=True)
+    central = ET.Element("Project")
+    ET.SubElement(ET.SubElement(central, "PropertyGroup"), "ManagePackageVersionsCentrally").text = "false"
+    ET.ElementTree(central).write(folder / "Directory.Packages.props", encoding="utf-8", xml_declaration=True)
+
+    project = ET.Element("Project", Sdk="Microsoft.NET.Sdk")
+    properties = ET.SubElement(project, "PropertyGroup")
+    ET.SubElement(properties, "TargetFramework").text = "net11.0"
+    ET.SubElement(properties, "RestorePackagesPath").text = str(folder / "packages")
+    ET.SubElement(ET.SubElement(project, "ItemGroup"), "PackageReference", Include=PACKAGE_IDS[-1], Version=f"[{version}]")
+    ET.ElementTree(project).write(folder / "Missing.csproj", encoding="utf-8", xml_declaration=True)
+
+    config = ET.Element("configuration")
+    sources = ET.SubElement(config, "packageSources")
+    ET.SubElement(sources, "clear")
+    ET.SubElement(sources, "add", key="empty-fixture", value=str(folder / "empty-feed"))
+    ET.ElementTree(config).write(folder / "NuGet.Config", encoding="utf-8", xml_declaration=True)
+
+
 def packages(feed: Path, version: str) -> None:
     for package in PACKAGE_IDS:
         archive = feed / f"{package}.{version}.nupkg"
@@ -99,6 +122,8 @@ if __name__ == "__main__":
     operation, *arguments = sys.argv[1:]
     if operation == "prepare":
         prepare(*(Path(value) for value in arguments[:3]), arguments[3])
+    elif operation == "missing":
+        missing(Path(arguments[0]), arguments[1])
     elif operation == "packages":
         packages(Path(arguments[0]), arguments[1])
     elif operation == "assets":

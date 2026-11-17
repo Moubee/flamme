@@ -41,6 +41,7 @@ flowchart LR
 | [Repository Map](repository-map.md) | Top-level folders, projects, and where to look first. |
 | [Architecture](architecture.md) | The main system layers and request/execution flow. |
 | [Module System](module-system.md) | How `IModule`, `FeatureBase`, feature dependencies, and static host composition work. |
+| [Versioned module exports](nativeaot-module-exports.md) | Compose immutable producer exports, validate compatibility and ownership, and verify package consumers. |
 | [Workflow Core](workflow-core.md) | Activities, execution contexts, pipelines, variables, bookmarks, graphs, and flowchart execution. |
 | [Workflow Management](workflow-management.md) | Workflow definitions, instances, import/export, materializers, validation, and activity descriptors. |
 | [BPMN integration removal](bpmn-workflows.md) | Migrate definitions and deployments that depended on retired BPMN execution and interchange. |

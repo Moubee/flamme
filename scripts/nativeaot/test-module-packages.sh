@@ -118,14 +118,14 @@ for async_model in "${async_models[@]}"; do
         test/fixtures/Elsa.NativeAot.Modules.Producer/Elsa.NativeAot.Modules.Producer.csproj; do
         name=${project##*/}; name=${name%.csproj}
         run_logged "$model_root/pack-$name.log" dotnet pack "$repo_root/$project" --configuration Release \
-            --artifacts-path "$model_root/producer-build" "-p:PackageOutputPath=$feed" \
+            --artifacts-path "$model_root/producer-build" -p:IsPackable=true "-p:PackageOutputPath=$feed" \
             "-p:Version=$version" "-p:PackageVersion=$version" "-bl:$model_root/pack-$name.binlog" \
             "${async_options[@]}" || exit $?
         for producer_framework in net10.0 net11.0; do
             run_logged "$model_root/properties-$name-$producer_framework.log" dotnet msbuild "$repo_root/$project" -nologo \
                 "-p:TargetFramework=$producer_framework" "-p:Version=$version" "-p:PackageVersion=$version" \
-                "${async_options[@]}" -p:UseArtifactsOutput=true "-p:ArtifactsPath=$model_root/producer-build" \
-                -getProperty:TargetFramework,UseRuntimeAsync,Features,WeaverConfiguration,PackageId,PackageVersion || exit $?
+                "${async_options[@]}" -p:IsPackable=true -p:UseArtifactsOutput=true "-p:ArtifactsPath=$model_root/producer-build" \
+                -getProperty:TargetFramework,UseRuntimeAsync,Features,WeaverConfiguration,IsPackable,PackageId,PackageVersion || exit $?
         done
     done
     run_logged "$model_root/package-layout.log" python3 "$helper" packages "$feed" "$version" || exit $?
@@ -134,16 +134,7 @@ for async_model in "${async_models[@]}"; do
 
     phase=missing-package-control
     negative="$model_root/missing-package"
-    mkdir -p "$negative/empty-feed" || exit $?
-    printf '<Project />\n' > "$negative/Directory.Build.props"
-    printf '<Project />\n' > "$negative/Directory.Build.targets"
-    printf '<Project><PropertyGroup><ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally></PropertyGroup></Project>\n' > "$negative/Directory.Packages.props"
-    cat > "$negative/Missing.csproj" <<PROJECT
-<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net11.0</TargetFramework><RestorePackagesPath>$negative/packages</RestorePackagesPath></PropertyGroup><ItemGroup><PackageReference Include="Elsa.NativeAot.Modules.Producer" Version="[$version]" /></ItemGroup></Project>
-PROJECT
-    cat > "$negative/NuGet.Config" <<CONFIG
-<configuration><packageSources><clear/><add key="empty-fixture" value="$negative/empty-feed"/></packageSources></configuration>
-CONFIG
+    run_logged "$model_root/missing-package-preparation.log" python3 "$helper" missing "$negative" "$version" || exit $?
     run_logged "$model_root/missing-package.log" dotnet restore "$negative/Missing.csproj" --configfile "$negative/NuGet.Config" \
         --packages "$negative/packages" -p:RestoreFallbackFolders= -p:NuGetAudit=false
     missing_status=$?

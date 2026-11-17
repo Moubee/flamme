@@ -107,6 +107,15 @@ This is the runtime contract for future generated manifests. The
 [NativeAOT component probe](nativeaot-probes.md) exercises handwritten catalogs;
 source generation and full Workflow Core/native-host support remain separate work.
 
+### Versioned producer exports
+
+For separately compiled modules, freeze declarations with `CreateExport`, select
+them through `FeatureModuleCatalogBuilder`, and build one complete host catalog.
+Module schema/revision/capability and binding ownership checks run before feature
+activation. Export fragments allow external strong dependencies; ordinary catalog
+`Build()` remains strict. See [versioned module exports](nativeaot-module-exports.md)
+for the producer/consumer contract, exact replacement rules, and API inventory.
+
 ### Hosted services in a catalog
 
 Declare every queued hosted-service implementation with
