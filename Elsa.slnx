@@ -63,6 +63,7 @@
     <Project Path="src/clients/Elsa.Api.Client/Elsa.Api.Client.csproj" />
   </Folder>
   <Folder Name="/src/common/">
+    <Project Path="src/common/Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj" />
     <Project Path="src/common/Elsa.Api.Common/Elsa.Api.Common.csproj" />
     <Project Path="src/common/Elsa.Features/Elsa.Features.csproj" />
     <Project Path="src/common/Elsa.Mediator/Elsa.Mediator.csproj" />
@@ -184,6 +185,7 @@
   </Folder>
   <Folder Name="/test/unit/">
     <File Path="test/unit/Directory.Build.props" />
+    <Project Path="test/unit/Elsa.CodeGeneration.Abstractions.UnitTests/Elsa.CodeGeneration.Abstractions.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Activities.UnitTests/Elsa.Activities.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.AI.Abstractions.UnitTests/Elsa.AI.Abstractions.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.AI.Copilot.UnitTests/Elsa.AI.Copilot.UnitTests.csproj" />

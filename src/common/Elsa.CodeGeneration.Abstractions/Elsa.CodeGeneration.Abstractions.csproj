@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Elsa.CodeGeneration</RootNamespace>
+    <Description>Provides immutable module export contracts without runtime discovery or compiler dependencies.</Description>
+    <PackageTags>elsa common generation</PackageTags>
+  </PropertyGroup>
+</Project>
