@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Compiled producer fixture for NativeAOT module export validation.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../src/common/Elsa.Features/Elsa.Features.csproj" />
+  </ItemGroup>
+</Project>

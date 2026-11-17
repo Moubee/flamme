@@ -5,6 +5,8 @@ return await ProbeRunner.RunAsync(args, "features", async () =>
 {
     await ExplicitCompositionScenarios.RunAsync();
     await ExplicitHostedServiceScenarios.RunAsync();
+    Console.WriteLine("CHECK features.versioned-module-exports");
+    await Elsa.NativeAot.ModuleConsumer.ModuleConsumerScenarios.RunAsync();
 }, provider: "explicit-catalog");
 #else
 using Elsa.Features.Abstractions;

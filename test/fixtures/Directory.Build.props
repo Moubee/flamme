@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="../../src/Directory.Build.props" />
+  <PropertyGroup>
+    <IsTestProject>false</IsTestProject>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+</Project>

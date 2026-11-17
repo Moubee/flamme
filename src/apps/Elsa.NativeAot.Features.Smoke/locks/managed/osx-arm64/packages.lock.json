@@ -71,6 +71,12 @@
           "Microsoft.Extensions.Hosting.Abstractions": "[10.0.15, )"
         }
       },
+      "elsa.nativeaot.modules.producer": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.Features": "[1.0.0, )"
+        }
+      },
       "Microsoft.Extensions.Configuration.Abstractions": {
         "type": "CentralTransitive",
         "requested": "[10.0.15, )",
@@ -161,6 +167,12 @@
         "type": "Project",
         "dependencies": {
           "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
+      },
+      "elsa.nativeaot.modules.producer": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.Features": "[1.0.0, )"
         }
       }
     },

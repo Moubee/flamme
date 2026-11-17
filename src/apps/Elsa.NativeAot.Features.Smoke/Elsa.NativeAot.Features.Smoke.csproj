@@ -10,6 +10,9 @@
   </Target>
   <ItemGroup>
     <ProjectReference Include="../../common/Elsa.Features/Elsa.Features.csproj" />
+    <ProjectReference Include="../../../test/fixtures/Elsa.NativeAot.Modules.Producer/Elsa.NativeAot.Modules.Producer.csproj" />
+    <Compile Include="../../../scripts/nativeaot/module-consumer/ModuleConsumerScenarios.cs"
+             Link="ModuleConsumerScenarios.cs" Condition="'$(NativeAotFeatureProvider)' == 'explicit'" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 </Project>

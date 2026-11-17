@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <NativeAotMode Condition="'$(NativeAotMode)' == ''">managed</NativeAotMode>
+    <PublishAot Condition="'$(NativeAotMode)' == 'native'">true</PublishAot>
+    <DefineConstants Condition="'$(NativeAotMode)' == 'native'">$(DefineConstants);PACKED_CONSUMER_NATIVE</DefineConstants>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <NuGetLockFilePath>$(MSBuildProjectDirectory)/locks/$(NativeAotMode)/$(RuntimeIdentifier)/packages.lock.json</NuGetLockFilePath>
+    <WeaverConfiguration>
+      <Weavers><ConfigureAwait ContinueOnCapturedContext="false" /></Weavers>
+    </WeaverConfiguration>
+  </PropertyGroup>
+  <PropertyGroup>
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == '' And '$(TargetFramework)' == 'net11.0'">true</UseRuntimeAsync>
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == ''">false</UseRuntimeAsync>
+    <Features Condition="'$(UseRuntimeAsync)' == 'true' And '$(TargetFramework)' == 'net11.0'">$(Features);runtime-async=on</Features>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa.NativeAot.Modules.Producer" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="ConfigureAwait.Fody" PrivateAssets="All" />
+    <PackageReference Include="Fody" PrivateAssets="All" />
+  </ItemGroup>
+  <Target Name="ValidateConsumerMode" BeforeTargets="CollectPackageReferences;PrepareForBuild">
+    <Error Condition="'$(NativeAotMode)' != 'managed' And '$(NativeAotMode)' != 'native'" Text="Invalid consumer mode." />
+    <Error Condition="'$(NativeAotMode)' == 'managed' And '$(PublishAot)' == 'true'" Text="Managed consumers must not enable PublishAot." />
+    <Error Condition="'$(NativeAotMode)' == 'native' And '$(PublishAot)' != 'true'" Text="Native consumers require PublishAot." />
+    <Error Condition="'$(JsonSerializerIsReflectionEnabledByDefault)' != 'false'" Text="Package consumers require reflection JSON to be disabled." />
+  </Target>
+  <Target Name="IncludeCompilerFeaturesInCompileCache" BeforeTargets="_GenerateCompileDependencyCache">
+    <ItemGroup><CoreCompileCache Include="CompilerFeatures=$(Features)" /></ItemGroup>
+  </Target>
+</Project>
