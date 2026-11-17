@@ -37,6 +37,8 @@ public sealed class FeatureModuleCatalogBuilder
     public ExplicitFeatureCatalog Build()
     {
         var selected = _exports.Build().Exports;
+        var features = new Dictionary<Type, FeatureRegistration>();
+        var hostedServices = new Dictionary<Type, ServiceDescriptor>();
         var featureOwners = new Dictionary<Type, FeatureModuleExport>();
         var identityOwners = new Dictionary<string, FeatureModuleExport>(StringComparer.Ordinal);
         var hostedOwners = new Dictionary<Type, FeatureModuleExport>();
@@ -46,44 +48,57 @@ public sealed class FeatureModuleCatalogBuilder
             {
                 CheckOwnership(featureOwners, feature.Type, export, "feature type");
                 CheckOwnership(identityOwners, $"{feature.Namespace}.{feature.Name}", export, "installed feature identity");
+                features.Add(feature.Type, feature);
             }
             foreach (var service in export.HostedServices)
+            {
                 CheckOwnership(hostedOwners, service.Key, export, "hosted-service type");
+                hostedServices.Add(service.Key, service.Value);
+            }
         }
 
-        var modules = selected.ToDictionary(export => export.Descriptor.ModuleId, StringComparer.Ordinal);
-        var requirementClosures = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        Dictionary<string, FeatureModuleExport>? modules = null;
         foreach (var export in selected)
         {
-            var closure = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var requirement in export.Descriptor.Requirements)
-            {
-                closure.Add(requirement.ModuleId);
-                closure.UnionWith(requirementClosures[requirement.ModuleId]);
-            }
-            requirementClosures.Add(export.Descriptor.ModuleId, closure);
+            HashSet<string>? reachable = null;
             foreach (var feature in export.Features)
             {
                 foreach (var dependency in feature.Dependencies)
                 {
-                    if (featureOwners.TryGetValue(dependency, out var owner) && !ReferenceEquals(owner, export)
-                        && !closure.Contains(owner.Descriptor.ModuleId))
-                        throw new InvalidOperationException($"Module {export.Descriptor.ModuleId} feature {feature.Type} requires feature {dependency} from module {owner.Descriptor.ModuleId}, but that module is not in its declared requirement closure.");
+                    if (!featureOwners.TryGetValue(dependency, out var owner))
+                        throw new InvalidOperationException($"Module {export.Descriptor.ModuleId} feature {feature.Type} requires missing feature {dependency}.");
+                    if (ReferenceEquals(owner, export))
+                        continue;
+
+                    var ownerId = owner.Descriptor.ModuleId;
+                    if (reachable is null && export.Descriptor.Requirements.Any(requirement => requirement.ModuleId == ownerId))
+                        continue;
+                    modules ??= selected.ToDictionary(module => module.Descriptor.ModuleId, StringComparer.Ordinal);
+                    reachable ??= GetRequiredModules(export, modules);
+                    if (!reachable.Contains(ownerId))
+                        throw new InvalidOperationException($"Module {export.Descriptor.ModuleId} feature {feature.Type} requires feature {dependency} from module {ownerId}, but that module is not in its declared requirement closure.");
                 }
             }
         }
 
-        var builder = new ExplicitFeatureCatalogBuilder();
-        foreach (var export in selected)
-            builder.Import(export);
-        try
+        // Producers validate local cycles. Every cross-export edge follows the acyclic module graph.
+        return new ExplicitFeatureCatalog(features, hostedServices);
+    }
+
+    private static HashSet<string> GetRequiredModules(FeatureModuleExport export, Dictionary<string, FeatureModuleExport> modules)
+    {
+        var reachable = new HashSet<string>(StringComparer.Ordinal);
+        var pending = new Stack<FeatureModuleExport>();
+        pending.Push(export);
+        while (pending.TryPop(out var current))
         {
-            return builder.Build();
+            foreach (var requirement in current.Descriptor.Requirements)
+            {
+                if (reachable.Add(requirement.ModuleId))
+                    pending.Push(modules[requirement.ModuleId]);
+            }
         }
-        catch (InvalidOperationException exception)
-        {
-            throw new InvalidOperationException($"Modules [{string.Join(", ", modules.Keys)}] cannot compose their feature bindings: {exception.Message}", exception);
-        }
+        return reachable;
     }
 
     /// <summary>

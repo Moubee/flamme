@@ -90,12 +90,6 @@ public sealed class ExplicitFeatureCatalogBuilder
         }
     }
 
-    internal void Import(FeatureModuleExport export)
-    {
-        _features.AddRange(export.Features);
-        _hostedServices.AddRange(export.HostedServices);
-    }
-
     private Dictionary<Type, FeatureRegistration> CollectFeatures()
     {
         var entries = new Dictionary<Type, FeatureRegistration>();

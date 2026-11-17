@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Elsa.CodeGeneration;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace Elsa.CodeGeneration;
 /// </summary>
 public sealed class ModuleExportRegistry<TExport> where TExport : ModuleExport
 {
-    internal ModuleExportRegistry(IEnumerable<TExport> exports) => Exports = Array.AsReadOnly(exports.ToArray());
+    internal ModuleExportRegistry(IEnumerable<TExport> exports) => Exports = exports.ToImmutableArray();
 
     /// <summary>
     /// Exports in dependency-first order; simultaneously ready exports retain their original first-add order.

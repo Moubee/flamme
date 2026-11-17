@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Elsa.Features.Abstractions;
 using Elsa.Features.Contracts;
 using Elsa.Features.Implementations;
@@ -148,62 +147,24 @@ public class LegacyCompositionTests
     }
 
     [Test]
-    public async Task Apply_CyclicLegacyDependenciesFailInAnIsolatedProcess()
+    public async Task Apply_LegacyCycleRevisitsDependencyMetadataBeforeApplyingFeatures()
     {
-        const string childMarker = "FLAMME_FEATURE_CYCLE_CHILD";
-        const string testName = nameof(Apply_CyclicLegacyDependenciesFailInAnIsolatedProcess);
-        const string startedMarker = "Starting isolated legacy feature cycle.";
-        if (Environment.GetEnvironmentVariable(childMarker) == "1")
-        {
-            // StackOverflowException cannot be caught safely. Only the child reaches this path.
-            // Bypass the test runner's buffered Console capture: the child aborts before it can flush test output.
-            var childOutput = Console.OpenStandardOutput();
-            childOutput.Write(System.Text.Encoding.UTF8.GetBytes(startedMarker + Environment.NewLine));
-            childOutput.Flush();
-            var module = new Module(new ServiceCollection());
-            module.Configure<CycleAFeature>();
-            module.Apply();
-            throw new InvalidOperationException("A legacy cyclic dependency unexpectedly completed.");
-        }
+        var module = new Module(new ServiceCollection());
+        var root = module.Configure<CycleAFeature>();
 
-        var startInfo = new ProcessStartInfo
+        await Assert.That(() =>
         {
-            FileName = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false
-        };
-        startInfo.ArgumentList.Add(typeof(LegacyCompositionTests).Assembly.Location);
-        startInfo.ArgumentList.Add("--treenode-filter");
-        startInfo.ArgumentList.Add($"/*/*/{nameof(LegacyCompositionTests)}/{testName}");
-        startInfo.Environment[childMarker] = "1";
-        startInfo.Environment["DOTNET_DbgEnableMiniDump"] = "0";
-        startInfo.Environment["COMPlus_DbgEnableMiniDump"] = "0";
-        using var process = new Process { StartInfo = startInfo };
-        if (!process.Start())
-            throw new InvalidOperationException("Could not start isolated feature cycle process.");
-        var standardOutputTask = process.StandardOutput.ReadToEndAsync();
-        var standardErrorTask = process.StandardError.ReadToEndAsync();
-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        try
-        {
-            await process.WaitForExitAsync(timeout.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            process.Kill(entireProcessTree: true);
-            await process.WaitForExitAsync();
-            await Task.WhenAll(standardOutputTask, standardErrorTask);
-            throw new TimeoutException("The isolated feature cycle process did not fail within 30 seconds.");
-        }
+            try
+            {
+                module.Apply();
+            }
+            finally
+            {
+                _visitedCycleDependency = false;
+            }
+        }).Throws<CycleDependencyRevisitedException>();
 
-        var standardOutput = await standardOutputTask;
-        var standardError = await standardErrorTask;
-        await Assert.That(process.ExitCode != 0).IsTrue().Because("A legacy feature cycle must not complete successfully.");
-        await Assert.That(standardOutput.Contains(startedMarker, StringComparison.Ordinal)).IsTrue()
-            .Because("The filtered child must actually enter the cycle fixture.");
-        await Assert.That(standardError.Contains("Stack overflow", StringComparison.OrdinalIgnoreCase)).IsTrue()
-            .Because("Only the characterized legacy stack-overflow failure satisfies this fixture.");
+        await Assert.That(root.Applications).IsEqualTo(0);
     }
 
     [Test]
@@ -329,8 +290,25 @@ public class LegacyCompositionTests
     [Elsa.Features.Attributes.DependsOn(typeof(CustomFactoryFeature))]
     public sealed class UnconstructableDependencyRootFeature(IModule module) : CountingFeature(module);
 
-    [Elsa.Features.Attributes.DependsOn(typeof(CycleBFeature))]
+    [ThreadStatic]
+    private static bool _visitedCycleDependency;
+
+    [CycleDependency]
     public sealed class CycleAFeature(IModule module) : CountingFeature(module);
+
+    private sealed class CycleDependencyAttribute : Elsa.Features.Attributes.DependsOnAttribute
+    {
+        public CycleDependencyAttribute() : base(typeof(CycleBFeature))
+        {
+            // Stop the real legacy dependency traversal when it returns to A.
+            if (_visitedCycleDependency)
+                throw new CycleDependencyRevisitedException();
+
+            _visitedCycleDependency = true;
+        }
+    }
+
+    private sealed class CycleDependencyRevisitedException : Exception;
 
     [Elsa.Features.Attributes.DependsOn(typeof(CycleAFeature))]
     public sealed class CycleBFeature(IModule module) : CountingFeature(module);

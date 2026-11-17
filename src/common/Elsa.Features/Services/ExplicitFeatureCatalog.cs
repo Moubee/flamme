@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Collections.Immutable;
 using Elsa.Features.Models;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,9 +15,9 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
 
     internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices)
     {
-        FeatureTypes = Array.AsReadOnly(features.Keys.ToArray());
+        FeatureTypes = features.Keys.ToImmutableArray();
         _features = features.ToFrozenDictionary();
-        HostedServiceTypes = Array.AsReadOnly(hostedServices.Keys.ToArray());
+        HostedServiceTypes = hostedServices.Keys.ToImmutableArray();
         _hostedServices = hostedServices.ToFrozenDictionary();
     }
 

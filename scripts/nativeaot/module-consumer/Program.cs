@@ -42,10 +42,6 @@ internal static class PackageConsumer
             Require(!injectFailure, "Injected packed consumer assertion failure.");
 
             await ModuleConsumerScenarios.RunAsync();
-            Console.WriteLine("scenario=export-composition result=passed");
-            Console.WriteLine("scenario=host-isolation result=passed");
-            Console.WriteLine("scenario=hosted-lifecycle result=passed");
-            Console.WriteLine("scenario=missing-export result=passed");
             Console.WriteLine("probe=module-packages result=passed scope=packed-modules");
             return 0;
         }

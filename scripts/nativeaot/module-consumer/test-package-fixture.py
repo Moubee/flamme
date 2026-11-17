@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Cheap regression coverage for fixture XML paths; no SDK or feeds required."""
+"""Regression coverage for fixture preparation and evidence validation."""
 
+import json
 from pathlib import Path
 import runpy
 import tempfile
@@ -37,6 +38,40 @@ class FixtureXmlTests(unittest.TestCase):
             self.assertEqual(config.find("packageSources/add[@key='fixture']").attrib["value"], str(feed))
             packages = config.findall("packageSourceMapping/packageSource[@key='fixture']/package")
             self.assertEqual([package.attrib["pattern"] for package in packages], list(HELPERS["PACKAGE_IDS"]))
+
+
+class CompilerSettingsTests(unittest.TestCase):
+    def test_requires_runtime_async_for_default_net11(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="flamme-fixture-properties-") as temporary:
+            evidence = Path(temporary) / "properties.json"
+            properties = {
+                "Configuration": "Release",
+                "TargetFramework": "net11.0",
+                "UseRuntimeAsync": "false",
+                "Features": "",
+            }
+            evidence.write_text(json.dumps({"Properties": properties}))
+            HELPERS["compiler_settings"](evidence, "net11.0", "disabled")
+            with self.assertRaisesRegex(SystemExit, "expected Release net11.0 runtime-async default"):
+                HELPERS["compiler_settings"](evidence, "net11.0", "default")
+
+            properties.update(UseRuntimeAsync="true", Features=";runtime-async=on;other=on")
+            evidence.write_text(json.dumps({"Properties": properties}))
+            HELPERS["compiler_settings"](evidence, "net11.0", "default")
+            with self.assertRaisesRegex(SystemExit, "expected Release net11.0 runtime-async disabled"):
+                HELPERS["compiler_settings"](evidence, "net11.0", "disabled")
+
+    def test_rejects_missing_compiler_feature_even_when_opted_in(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="flamme-fixture-properties-") as temporary:
+            evidence = Path(temporary) / "properties.json"
+            evidence.write_text(json.dumps({"Properties": {
+                "Configuration": "Release",
+                "TargetFramework": "net11.0",
+                "UseRuntimeAsync": "true",
+                "Features": "unrelated-runtime-async=on",
+            }}))
+            with self.assertRaisesRegex(SystemExit, "compiler feature on"):
+                HELPERS["compiler_settings"](evidence, "net11.0", "default")
 
 
 if __name__ == "__main__":

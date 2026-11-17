@@ -103,15 +103,14 @@ public sealed class ModuleExportRegistryBuilder<TExport> where TExport : ModuleE
                 throw new InvalidOperationException($"Module export '{id}' uses schema {descriptor.SchemaVersion}; supported schema is {ModuleExportSchema.CurrentVersion}. Dependency path: {Format(path)}.");
             foreach (var requirement in descriptor.Requirements)
             {
-                var requirementPath = Format(path.Append(requirement.ModuleId));
                 if (!selected.TryGetValue(requirement.ModuleId, out var dependency))
-                    throw new InvalidOperationException($"Missing required module export '{requirement.ModuleId}'. Dependency path: {requirementPath}.");
+                    throw new InvalidOperationException($"Missing required module export '{requirement.ModuleId}'. Dependency path: {Format(path.Append(requirement.ModuleId))}.");
                 if (dependency.Descriptor.ContractVersion != requirement.ContractVersion)
-                    throw new InvalidOperationException($"Module export '{id}' requires '{requirement.ModuleId}' at exact contract revision {requirement.ContractVersion}, but selected revision is {dependency.Descriptor.ContractVersion}. Dependency path: {requirementPath}.");
+                    throw new InvalidOperationException($"Module export '{id}' requires '{requirement.ModuleId}' at exact contract revision {requirement.ContractVersion}, but selected revision is {dependency.Descriptor.ContractVersion}. Dependency path: {Format(path.Append(requirement.ModuleId))}.");
                 foreach (var capability in requirement.RequiredCapabilities)
                 {
                     if (!capabilities[requirement.ModuleId].Contains(capability))
-                        throw new InvalidOperationException($"Module export '{id}' requires capability '{capability}' from '{requirement.ModuleId}'. Dependency path: {requirementPath}.");
+                        throw new InvalidOperationException($"Module export '{id}' requires capability '{capability}' from '{requirement.ModuleId}'. Dependency path: {Format(path.Append(requirement.ModuleId))}.");
                 }
                 Visit(dependency);
             }

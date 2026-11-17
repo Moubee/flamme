@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Elsa.CodeGeneration;
 
 internal static class ModuleExportValidation
@@ -16,7 +18,7 @@ internal static class ModuleExportValidation
 
     internal static IReadOnlyList<string> SnapshotCapabilities(IEnumerable<string>? capabilities, string parameterName)
     {
-        var snapshot = capabilities?.ToArray() ?? [];
+        var snapshot = capabilities?.ToImmutableArray() ?? [];
         var identities = new HashSet<string>(StringComparer.Ordinal);
         foreach (var capability in snapshot)
         {
@@ -24,6 +26,6 @@ internal static class ModuleExportValidation
             if (!identities.Add(capability))
                 throw new ArgumentException($"Duplicate capability '{capability}'.", parameterName);
         }
-        return Array.AsReadOnly(snapshot);
+        return snapshot;
     }
 }

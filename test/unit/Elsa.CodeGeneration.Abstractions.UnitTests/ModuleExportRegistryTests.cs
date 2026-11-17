@@ -1,3 +1,4 @@
+using System.Collections;
 using Elsa.CodeGeneration;
 
 namespace Elsa.CodeGeneration.Abstractions.UnitTests;
@@ -27,6 +28,9 @@ public class ModuleExportRegistryTests
         await Assert.That(() => ((IList<string>)descriptor.Capabilities)[0] = "mutation").Throws<NotSupportedException>();
         await Assert.That(() => ((IList<ModuleRequirement>)descriptor.Requirements).Clear()).Throws<NotSupportedException>();
         await Assert.That(() => ((IList<string>)requirement.RequiredCapabilities).Clear()).Throws<NotSupportedException>();
+        await Assert.That(() => ((ICollection)descriptor.Capabilities).SyncRoot).Throws<NotSupportedException>();
+        await Assert.That(() => ((ICollection)descriptor.Requirements).SyncRoot).Throws<NotSupportedException>();
+        await Assert.That(() => ((ICollection)requirement.RequiredCapabilities).SyncRoot).Throws<NotSupportedException>();
     }
 
     [Test]
@@ -285,6 +289,7 @@ public class ModuleExportRegistryTests
         await Assert.That(Names(first.Build()).SequenceEqual(["shared", "first-only"])).IsTrue();
         await Assert.That(second.Build().Exports.Single().Descriptor.ContractVersion).IsEqualTo(2);
         await Assert.That(() => ((IList<TestExport>)firstSnapshot.Exports).Clear()).Throws<NotSupportedException>();
+        await Assert.That(() => ((ICollection)firstSnapshot.Exports).SyncRoot).Throws<NotSupportedException>();
         await Assert.That(new ModuleExportRegistryBuilder<TestExport>().Build().Exports.Count).IsEqualTo(0);
     }
 
