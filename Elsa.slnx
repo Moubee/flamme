@@ -178,6 +178,7 @@
     <Project Path="test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.JavaScript.IntegrationTests/Elsa.JavaScript.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Labels.Persistence.ConformanceTests/Elsa.Labels.Persistence.ConformanceTests.csproj" />
+    <Project Path="test/integration/Elsa.NativeAot.IntegrationTests/Elsa.NativeAot.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Resilience.IntegrationTests/Elsa.Resilience.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Workflows.IntegrationTests/Elsa.Workflows.IntegrationTests.csproj" />
     <Project Path="test/integration/Elsa.Workflows.Persistence.ConformanceTests/Elsa.Workflows.Persistence.ConformanceTests.csproj" />
