@@ -53,6 +53,7 @@ flowchart LR
 | [Persistence](persistence.md) | In-memory stores, EF Core stores, provider packages, migrations, and multi-provider rules. |
 | [Health Checks](health-checks.md) | Elsa runtime readiness probes, liveness/readiness mapping, and Kubernetes probe guidance. |
 | [Identity, Tenancy, And Security](identity-tenancy-security.md) | Users, applications, roles, API keys, tenant resolution, and authorization touch points. |
+| [NativeAOT diagnostic probes](nativeaot-probes.md) | Reproduce feature, workflow, and payload baselines with isolated native callers and locked builds. |
 | [Testing Guide](testing-guide.md) | TUnit and Microsoft Testing Platform project layout, fixture choices, and targeted commands. |
 | [Extension Guide](extension-guide.md) | How to add features, activities, expression providers, stores, endpoints, and ingress sources. |
 | [OpenTelemetry Workflow Instrumentation](opentelemetry-workflows.md) | First-party workflow and activity traces and metrics emitted through `System.Diagnostics`. |
