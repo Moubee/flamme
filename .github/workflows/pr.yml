@@ -8,6 +8,7 @@ on:
       - 'patch/*'
       - 'develop/*'
       - 'feat/nativeaot-*'
+      - 'test/nativeaot-*'
       - 'release/*'
     paths:
       - '**/*'

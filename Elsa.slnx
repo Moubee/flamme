@@ -194,6 +194,7 @@
   <Folder Name="/test/unit/">
     <File Path="test/unit/Directory.Build.props" />
     <Project Path="test/unit/Elsa.CodeGeneration.Abstractions.UnitTests/Elsa.CodeGeneration.Abstractions.UnitTests.csproj" />
+    <Project Path="test/unit/Elsa.CodeGeneration.UnitTests/Elsa.CodeGeneration.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.Activities.UnitTests/Elsa.Activities.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.AI.Abstractions.UnitTests/Elsa.AI.Abstractions.UnitTests.csproj" />
     <Project Path="test/unit/Elsa.AI.Copilot.UnitTests/Elsa.AI.Copilot.UnitTests.csproj" />

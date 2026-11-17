@@ -24,6 +24,7 @@
       "test/unit/Elsa.Alterations.Core.UnitTests/Elsa.Alterations.Core.UnitTests.csproj",
       "test/unit/Elsa.Api.Common.UnitTests/Elsa.Api.Common.UnitTests.csproj",
       "test/unit/Elsa.CodeGeneration.Abstractions.UnitTests/Elsa.CodeGeneration.Abstractions.UnitTests.csproj",
+      "test/unit/Elsa.CodeGeneration.UnitTests/Elsa.CodeGeneration.UnitTests.csproj",
       "test/unit/Elsa.Common.UnitTests/Elsa.Common.UnitTests.csproj",
       "test/unit/Elsa.Dashboard.Api.UnitTests/Elsa.Dashboard.Api.UnitTests.csproj",
       "test/unit/Elsa.Expressions.UnitTests/Elsa.Expressions.UnitTests.csproj",
