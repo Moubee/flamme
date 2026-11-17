@@ -250,6 +250,17 @@ public class FeatureModuleExportTests
     }
 
     [Test]
+    public async Task Compose_RejectsAStrongFeatureCycleAcrossAnAcyclicModuleGraph()
+    {
+        var consumer = Export("consumer", m => new RootFeature(m), "Root", [typeof(LeafFeature)],
+            requirements: [new ModuleRequirement("provider", 1)]);
+        var provider = Export("provider", m => new LeafFeature(m), "Leaf", [typeof(RootFeature)]);
+
+        await AssertFailureAsync(() => new FeatureModuleCatalogBuilder().Add(consumer).Add(provider).Build(),
+            "provider", "consumer", nameof(LeafFeature), nameof(RootFeature), "requirement closure");
+    }
+
+    [Test]
     public async Task Compose_FeatureTypeCollisionNamesBothExportOwners()
     {
         var first = Export("owner-a", m => new RootFeature(m), "First");

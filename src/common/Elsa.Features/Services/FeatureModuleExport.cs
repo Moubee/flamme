@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Elsa.CodeGeneration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,10 +12,10 @@ public sealed class FeatureModuleExport : ModuleExport
     internal FeatureModuleExport(ModuleExportDescriptor descriptor, IEnumerable<FeatureRegistration> features,
         IEnumerable<KeyValuePair<Type, ServiceDescriptor>> hostedServices) : base(descriptor)
     {
-        Features = Array.AsReadOnly(features.ToArray());
-        HostedServices = Array.AsReadOnly(hostedServices.ToArray());
-        FeatureTypes = Array.AsReadOnly(Features.Select(feature => feature.Type).ToArray());
-        HostedServiceTypes = Array.AsReadOnly(HostedServices.Select(service => service.Key).ToArray());
+        Features = features.ToImmutableArray();
+        HostedServices = hostedServices.ToImmutableArray();
+        FeatureTypes = Features.Select(feature => feature.Type).ToImmutableArray();
+        HostedServiceTypes = HostedServices.Select(service => service.Key).ToImmutableArray();
     }
 
     /// <summary>

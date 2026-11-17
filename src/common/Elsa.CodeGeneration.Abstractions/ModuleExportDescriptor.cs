@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Elsa.CodeGeneration;
 
 /// <summary>
@@ -17,7 +19,7 @@ public sealed class ModuleExportDescriptor
         ModuleId = moduleId;
         ContractVersion = contractVersion;
         SchemaVersion = schemaVersion;
-        var snapshot = requirements?.ToArray() ?? [];
+        var snapshot = requirements?.ToImmutableArray() ?? [];
         var identities = new HashSet<string>(StringComparer.Ordinal);
         foreach (var requirement in snapshot)
         {
@@ -26,7 +28,7 @@ public sealed class ModuleExportDescriptor
             if (!identities.Add(requirement.ModuleId))
                 throw new ArgumentException($"Duplicate requirement for module '{requirement.ModuleId}'.", nameof(requirements));
         }
-        Requirements = Array.AsReadOnly(snapshot);
+        Requirements = snapshot;
         Capabilities = ModuleExportValidation.SnapshotCapabilities(capabilities, nameof(capabilities));
     }
 
