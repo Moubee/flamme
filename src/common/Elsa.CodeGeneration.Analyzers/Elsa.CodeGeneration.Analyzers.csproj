@@ -24,6 +24,7 @@
     <None Remove="../../../icon.png" />
     <None Include="$(MSBuildThisFileDirectory)../../../icon.png" Pack="true" PackagePath="/" />
     <Compile Include="../Elsa.CodeGeneration/CompilerContract.cs" Link="CompilerContract.cs" />
+    <Compile Include="../Elsa.CodeGeneration/CompilerDiagnostics.cs" Link="CompilerDiagnostics.cs" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>

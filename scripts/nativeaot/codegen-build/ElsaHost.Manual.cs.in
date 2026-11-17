@@ -1,0 +1,38 @@
+using Elsa.Features.Implementations;
+using Elsa.Features.Models;
+using Elsa.Features.Services;
+using Elsa.NativeAot.Modules.Producer;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Elsa.CodeGeneration;
+
+internal static partial class ElsaHost
+{
+    internal static IModule CreateModule(IServiceCollection services, CompositionPolicy policy)
+    {
+#if ELSA_GENERATED
+        return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
+#else
+        return CreateDynamicModule(services, policy);
+#endif
+    }
+
+    private static IModule CreateDynamicModule(IServiceCollection services, CompositionPolicy policy)
+    {
+        FixtureSelection.Provider = "Dynamic";
+        return new Module(services, policy);
+    }
+
+    // EXPORT_HOOK_BEGIN
+    private static FeatureModuleExport[] GetModuleExports()
+    {
+        FixtureSelection.Provider = "Generated";
+        return [ProducerExports.Foundation];
+    }
+    // EXPORT_HOOK_END
+}
+
+internal static class FixtureSelection
+{
+    internal static string Provider { get; set; } = "Unselected";
+}

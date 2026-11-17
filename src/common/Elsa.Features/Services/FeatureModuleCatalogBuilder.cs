@@ -1,4 +1,7 @@
 using Elsa.CodeGeneration;
+using Elsa.Features.Implementations;
+using Elsa.Features.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.Features.Services;
 
@@ -81,6 +84,22 @@ public sealed class FeatureModuleCatalogBuilder
         {
             throw new InvalidOperationException($"Modules [{string.Join(", ", modules.Keys)}] cannot compose their feature bindings: {exception.Message}", exception);
         }
+    }
+
+    /// <summary>
+    /// Validates and composes a host's explicit exports before constructing its module.
+    /// </summary>
+    public static IModule CreateModule(IServiceCollection services, FeatureModuleExport[] exports, CompositionPolicy policy)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        if (exports is not { Length: > 0 })
+            throw new InvalidOperationException("ElsaHost.GetModuleExports must return at least one selected FeatureModuleExport.");
+
+        var builder = new FeatureModuleCatalogBuilder();
+        foreach (var export in exports)
+            builder.Add(export ?? throw new InvalidOperationException("ElsaHost.GetModuleExports returned a null module export."));
+
+        return new Module(services, builder.Build(), policy);
     }
 
     private static void CheckOwnership<TKey>(Dictionary<TKey, FeatureModuleExport> owners, TKey key, FeatureModuleExport export, string kind)

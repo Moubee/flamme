@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa.CodeGeneration.Build" PrivateAssets="All" />
+    <PackageReference Include="Elsa.CodeGeneration" PrivateAssets="All" />
+    <PackageReference Include="Elsa.CodeGeneration.Analyzers" PrivateAssets="All" />
+  </ItemGroup>
+  <Target Name="RecordFixtureLibrarySettings" AfterTargets="ResolveElsaCodeGenerationSettings">
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)/observed-mode.txt"
+                      Lines="framework=$(TargetFramework);host=$(ElsaIsHost);mode=$(ElsaEffectiveExecutionMode);constants=$(DefineConstants)" Overwrite="true" />
+  </Target>
+</Project>

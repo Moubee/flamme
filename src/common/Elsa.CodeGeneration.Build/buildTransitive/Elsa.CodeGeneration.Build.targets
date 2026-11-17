@@ -20,7 +20,7 @@
 
     <PropertyGroup Condition="'$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true'">
       <!-- A referenced compiler asset that cannot load must fail the opted-in build. -->
-      <WarningsAsErrors>$(WarningsAsErrors);CS8032;CS8033;CS8034;CS8040;CS8784;CS8785;CS9057</WarningsAsErrors>
+      <WarningsAsErrors>$(WarningsAsErrors);CS8032;CS8033;CS8034;CS8040;CS8784;CS8785;CS9057;AD0001;AD0002</WarningsAsErrors>
       <OptimizeImplicitlyTriggeredBuild Condition="'$(OptimizeImplicitlyTriggeredBuild)' == ''">false</OptimizeImplicitlyTriggeredBuild>
     </PropertyGroup>
 

@@ -11,12 +11,7 @@ namespace Elsa.CodeGeneration.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ElsaHostAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly DiagnosticDescriptor Host = Descriptor("ELSAGEN001", "Declare the Elsa host contract");
-    private static readonly DiagnosticDescriptor Entry = Descriptor("ELSAGEN002", "Declare the selected host bootstrap entry");
-    private static readonly DiagnosticDescriptor Hook = Descriptor("ELSAGEN003", "Declare the selected host hook");
-    private static readonly DiagnosticDescriptor Manual = Descriptor("ELSAGEN004", "Select the matching manual bootstrap hook");
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Host, Entry, Hook, Manual);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => CompilerDiagnostics.All;
 
     public override void Initialize(AnalysisContext context)
     {
@@ -25,22 +20,26 @@ public sealed class ElsaHostAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationAction(static analysis =>
         {
             var settings = CompilerSettings.Read(analysis.Options.AnalyzerConfigOptionsProvider.GlobalOptions);
-            if (!settings.IsHost)
+            // Compiler-owned partial declarations must be diagnosed by the generator: declaration
+            // pairing errors can prevent the compiler from running diagnostic analyzers.
+            if (!settings.HasIsHost)
+            {
+                var authored = analysis.Compilation.GetTypeByMetadataName(CompilerContract.HostMetadataName);
+                if (authored is not null && authored.DeclaringSyntaxReferences.Length > 0
+                    && SymbolEqualityComparer.Default.Equals(authored.ContainingAssembly, analysis.Compilation.Assembly))
+                {
+                    var missingSettings = CompilerContract.Validate(analysis.Compilation, settings, analysis.CancellationToken);
+                    analysis.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.For(missingSettings.Failure), missingSettings.Location, missingSettings.Message));
+                }
+                return;
+            }
+            if (!settings.IsHost || !settings.IsManual)
                 return;
             var result = CompilerContract.Validate(analysis.Compilation, settings, analysis.CancellationToken);
             if (result.Success)
                 return;
-            var descriptor = result.Failure switch
-            {
-                HostFailure.Entry => Entry,
-                HostFailure.Hook => Hook,
-                HostFailure.ManualSelection => Manual,
-                _ => Host
-            };
-            analysis.ReportDiagnostic(Diagnostic.Create(descriptor, result.Location, result.Message));
+            analysis.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.For(result.Failure), result.Location, result.Message));
         });
     }
 
-    private static DiagnosticDescriptor Descriptor(string id, string title) => new(id, title, "{0}", "Elsa.CodeGeneration", DiagnosticSeverity.Error, isEnabledByDefault: true,
-        description: "Elsa host bootstrap selection is explicit at compile time. Generated and manual hosts use the same typed runtime contracts.");
 }
