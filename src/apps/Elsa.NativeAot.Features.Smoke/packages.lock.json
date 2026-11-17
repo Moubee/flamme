@@ -54,9 +54,13 @@
         "resolved": "10.0.15",
         "contentHash": "NjzLiZ1/bYx8VwLqHxNnCfDTQQbCY7P1dwT7JM5FiANiaSfI6UKHi0/sla+jyRbOIbPAMJkhWQ/9pH3tMf+IrQ=="
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.features": {
         "type": "Project",
         "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.0.15, )"
         }
@@ -137,8 +141,14 @@
         "resolved": "11.0.0",
         "contentHash": "KygQMITBDDPXw7+AAgdwQvVAaTXuDsc1iCAuvhO73ERxKX+d92cdbgZmpoYF7DIUq2hfs/yO2KD87uIreRy3MA=="
       },
-      "elsa.features": {
+      "elsa.codegeneration.abstractions": {
         "type": "Project"
+      },
+      "elsa.features": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       }
     }
   }

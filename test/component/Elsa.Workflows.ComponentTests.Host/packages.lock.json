@@ -343,6 +343,9 @@
           "Scrutor": "[7.0.0, )"
         }
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -380,7 +383,10 @@
         }
       },
       "elsa.features": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.http": {
         "type": "Project",
@@ -1082,6 +1088,9 @@
           "Scrutor": "[7.0.0, )"
         }
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -1119,7 +1128,10 @@
         }
       },
       "elsa.features": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.http": {
         "type": "Project",

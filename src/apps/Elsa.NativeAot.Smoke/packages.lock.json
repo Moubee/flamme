@@ -109,6 +109,9 @@
         "resolved": "0.8.6",
         "contentHash": "iP4jVLQoQmUjMU88g1WObiNr6YKZGvh4aOXn3yOJsHqZsflwRsxZPcIBvNXgjXO3vQKSLctXGLTpcBPLnWPS8A=="
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -135,6 +138,7 @@
       "elsa.features": {
         "type": "Project",
         "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.0.15, )"
         }
@@ -395,6 +399,9 @@
         "resolved": "0.8.6",
         "contentHash": "iP4jVLQoQmUjMU88g1WObiNr6YKZGvh4aOXn3yOJsHqZsflwRsxZPcIBvNXgjXO3vQKSLctXGLTpcBPLnWPS8A=="
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -417,7 +424,10 @@
         }
       },
       "elsa.features": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.mediator": {
         "type": "Project",

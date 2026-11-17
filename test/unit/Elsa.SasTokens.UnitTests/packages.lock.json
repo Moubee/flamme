@@ -122,8 +122,14 @@
           "TUnit.Core": "1.84.0"
         }
       },
-      "elsa.features": {
+      "elsa.codegeneration.abstractions": {
         "type": "Project"
+      },
+      "elsa.features": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.sastokens": {
         "type": "Project",
@@ -259,8 +265,14 @@
           "TUnit.Core": "1.84.0"
         }
       },
-      "elsa.features": {
+      "elsa.codegeneration.abstractions": {
         "type": "Project"
+      },
+      "elsa.features": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.sastokens": {
         "type": "Project",

@@ -729,6 +729,9 @@
           "Scrutor": "[7.0.0, )"
         }
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -774,6 +777,7 @@
       "elsa.features": {
         "type": "Project",
         "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.15, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[10.0.15, )"
         }
@@ -2025,6 +2029,9 @@
           "Scrutor": "[7.0.0, )"
         }
       },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
       "elsa.common": {
         "type": "Project",
         "dependencies": {
@@ -2065,7 +2072,10 @@
         }
       },
       "elsa.features": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
       },
       "elsa.http": {
         "type": "Project",
