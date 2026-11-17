@@ -11,10 +11,11 @@ cat > "$fixture/bin/dotnet" <<'FAKE'
 set -eu
 printf '%s\n' "$*" >> "$FAKE_TRACE"
 phase=$1
-artifacts_path= framework=net11.0 previous=
+artifacts_path= framework=net11.0 feature_provider=legacy previous=
 for argument in "$@"; do
     if [ "$previous" = --artifacts-path ]; then artifacts_path=$argument; fi
     if [ "$previous" = --framework ]; then framework=$argument; fi
+    case "$argument" in -p:NativeAotFeatureProvider=*) feature_provider=${argument#*=} ;; esac
     previous=$argument
 done
 if [ "${FAKE_FAIL_PHASE:-}" = "$phase" ]; then
@@ -41,7 +42,7 @@ case "$phase" in
         if [ "${FAKE_MISSING_BINARY:-false}" = true ]; then exit 0; fi
         mkdir -p "$output"
         app=$(basename "$project" .csproj)
-        printf '#!/usr/bin/env bash\nfixture_framework=%q\n' "$framework" > "$output/$app"
+        printf '#!/usr/bin/env bash\nfixture_framework=%q\nfixture_provider=%q\n' "$framework" "$feature_provider" > "$output/$app"
         cat >> "$output/$app" <<'APP'
 printf 'execute %s\n' "$*" >> "$FAKE_TRACE"
 [ "$1" = --expect-mode ] || exit 90
@@ -52,7 +53,9 @@ case "${0##*/}" in
     Elsa.NativeAot.Payloads.Smoke) probe=payloads ;;
     Elsa.NativeAot.Smoke) probe=integrated ;;
 esac
-mode=$2 provider=legacy-baseline scope=legacy-baseline
+mode=$2 provider=legacy-baseline
+if [ "$fixture_provider" = explicit ]; then provider=explicit-catalog; fi
+scope=$provider
 rid=$FAKE_EXPECTED_RID version=${fixture_framework#net} dynamic_code=True reflection_json=False
 if [ "$mode" = native ]; then dynamic_code=False; fi
 fault=${FAKE_PROTOCOL_FAULT:-}
@@ -61,6 +64,7 @@ case "$fault" in
     wrong-probe) probe=wrong ;;
     wrong-mode) mode=wrong ;;
     wrong-provider) provider=wrong ;;
+    legacy-provider) provider=legacy-baseline; scope=legacy-baseline ;;
     wrong-scope) scope=harness-control ;;
     wrong-framework) version=8.0 ;;
     wrong-rid) rid=wrong ;;
@@ -123,6 +127,11 @@ args=(--probe features --rid "$host_rid" --artifacts-root "$artifacts")
 expect_status 0 help --help
 expect_status 64 'missing option value' --probe
 expect_status 64 'invalid probe' --probe invalid
+expect_status 64 'missing provider value' "${args[@]}" --provider
+expect_status 64 'invalid provider' "${args[@]}" --provider invalid
+for unsupported in execution payloads integrated; do
+    expect_status 64 "explicit catalog rejects $unsupported" "${args[@]}" --probe "$unsupported" --provider explicit-catalog
+done
 expect_status 64 'invalid mode' "${args[@]}" --mode invalid
 expect_status 64 'invalid framework' "${args[@]}" --framework net8.0
 expect_status 64 'invalid RID cannot become a path' "${args[@]}" --rid ../bad
@@ -133,6 +142,9 @@ expect_status 64 'cross-architecture execution rejection' "${args[@]}" --mode na
 expect_status 0 'managed publication and execution' "${args[@]}"
 assert_trace '^restore .*--locked-mode.*-p:NativeAotMode=managed'
 assert_trace '^publish .*--no-restore.*-p:NativeAotMode=managed'
+assert_trace '^restore .*NativeAotFeatureProvider=legacy'
+assert_trace '^publish .*NativeAotFeatureProvider=legacy'
+assert_trace '^msbuild .*NativeAotFeatureProvider=legacy'
 assert_trace '^execute --expect-mode managed$'
 assert_no_trace '^restore .*TargetFramework='
 result="$artifacts/legacy-baseline/features/managed/$host_rid/default/evidence/net11.0/result.json"
@@ -155,6 +167,20 @@ done
 unset FAKE_PROTOCOL_FAULT
 expect_status 0 'valid net10 result markers' "${args[@]}" --framework net10.0
 expect_status 0 'valid native result markers' "${args[@]}" --mode native
+
+explicit_args=("${args[@]}" --provider explicit-catalog)
+expect_status 0 'explicit catalog managed result markers' "${explicit_args[@]}"
+explicit_result="$artifacts/explicit-catalog/features/managed/$host_rid/default/evidence/net11.0/result.json"
+rg -q '"provider":"explicit-catalog".*"phase":"completed","exitCode":0' "$explicit_result"
+rg -q '^provider=explicit-catalog$' "$(dirname "$explicit_result")/inputs.txt"
+assert_trace '^restore .*NativeAotFeatureProvider=explicit'
+assert_trace '^publish .*NativeAotFeatureProvider=explicit'
+assert_trace '^msbuild .*NativeAotFeatureProvider=explicit'
+expect_status 0 'explicit catalog net10 result markers' "${explicit_args[@]}" --framework net10.0
+expect_status 0 'explicit catalog native result markers' "${explicit_args[@]}" --mode native
+export FAKE_PROTOCOL_FAULT=legacy-provider
+expect_status 65 'explicit catalog cannot accept legacy result markers' "${explicit_args[@]}"
+unset FAKE_PROTOCOL_FAULT
 
 export FAKE_FAIL_PHASE=restore
 expect_status 37 'restore failure preserved' "${args[@]}"

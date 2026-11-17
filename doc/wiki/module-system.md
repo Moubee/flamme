@@ -58,6 +58,55 @@ Feature dependencies are explicit attributes. Examples:
 
 This is why feature classes are the best way to learn a module. They encode its runtime assumptions.
 
+## Explicit feature composition
+
+`ExplicitFeatureCatalogBuilder` supplies factories, installed-feature metadata,
+strong dependencies, and conditional-presence keys without reading attributes.
+Build the catalog before creating the module:
+
+```csharp
+var catalog = new ExplicitFeatureCatalogBuilder()
+    .Add(m => new ApplicationFeature(m),
+        new FeatureDescriptor("Application", "Example", "Application"))
+    .Build();
+var module = services.CreateModule(catalog, CompositionPolicy.ValidatedV1);
+module.Configure<ApplicationFeature>();
+module.Apply();
+```
+
+The builder snapshots input metadata and collections. `Build()` rejects duplicate
+CLR types or installed identities, missing strong dependencies, open/abstract
+feature types, and dependency cycles. Conditional targets may be absent; their
+presence filters a feature rather than installing the target. Catalogs are
+immutable and reusable across modules; factories create each module's instances.
+Installed descriptors are copied for each module. Runtime configuration values
+and `Configure` actions remain dynamic, and a custom factory can override a
+cataloged type's construction. Its result must have the exact declared type.
+
+The provider and admission policy are independent:
+
+| Policy | Behavior with either provider |
+| --- | --- |
+| `LegacyV1` (default) | Preserves the existing single-pass initial conditional filter, late additions, and repeated `Apply` behavior. |
+| `ValidatedV1` | Filters conditionals to a fixed point and rejects surviving strong dependencies whose targets were filtered out, for both initial and late batches. |
+
+`new Module(services, policy)` selects managed discovery with the same chosen
+policy. `new Module(services, catalog, policy)` and the corresponding `CreateModule`
+overload use only catalog metadata. They never fall back to managed discovery.
+Neither NativeAOT publication nor the provider implicitly selects a new policy.
+Within either policy, `Configure` and `ConfigureHostedServices` run once per
+instance; every `Apply` batch reapplies the surviving instances once.
+
+An explicit module, or a managed module using `ValidatedV1`, becomes faulted after
+an admission, factory, or callback failure. Further composition requires a fresh
+module and service collection. Catching a nested admission error inside a feature
+cannot resume a faulted module. Arbitrary callback effects are not rolled back.
+The existing default managed path retains its legacy failure behavior.
+
+This is the runtime contract for future generated manifests. The
+[NativeAOT component probe](nativeaot-probes.md) exercises handwritten catalogs;
+source generation and full Workflow Core/native-host support remain separate work.
+
 ## Module Properties
 
 `IModule.Properties` is used as a shared bag during feature configuration. A concrete example is FastEndpoints assembly collection in [Elsa.Api.Common/Extensions/ModuleExtensions.cs](../../src/common/Elsa.Api.Common/Extensions/ModuleExtensions.cs). Features call `AddFastEndpointsAssembly`, and later `AddFastEndpointsFromModule` registers all collected assemblies with FastEndpoints.

@@ -13,10 +13,12 @@ internal static class ProbeRunner
     private const string BuildMode = "managed";
 #endif
 
-    public static async Task<int> RunAsync(string[] args, string probe, Func<Task> scenario)
+    public static async Task<int> RunAsync(string[] args, string probe, Func<Task> scenario, string provider = "legacy-baseline")
     {
         try
         {
+            Require(provider is "legacy-baseline" or "explicit-catalog", "Provider must be legacy-baseline or explicit-catalog.");
+            Require(provider != "explicit-catalog" || probe == "features", "The explicit catalog is supported only by the features probe.");
             var expectedMode = BuildMode;
             var controlOnly = false;
             var injectFailure = false;
@@ -39,7 +41,7 @@ internal static class ProbeRunner
                 }
             }
 
-            Console.WriteLine($"probe={probe} provider=legacy-baseline build-mode={BuildMode} expected-mode={expectedMode}");
+            Console.WriteLine($"probe={probe} provider={provider} build-mode={BuildMode} expected-mode={expectedMode}");
             Console.WriteLine($"framework={RuntimeInformation.FrameworkDescription} rid={RuntimeInformation.RuntimeIdentifier} dynamic-code={RuntimeFeature.IsDynamicCodeSupported} reflection-json={JsonSerializer.IsReflectionEnabledByDefault}");
             Require(expectedMode == BuildMode, "Requested mode differs from the compiled probe mode.");
             Require((expectedMode == "native") == !RuntimeFeature.IsDynamicCodeSupported, "Execution mode does not match dynamic-code support. Publish and run the requested binary.");
@@ -61,7 +63,7 @@ internal static class ProbeRunner
                 Console.WriteLine($"scenario={probe} result=passed");
             }
 
-            Console.WriteLine($"probe={probe} result=passed scope={(controlOnly ? "harness-control" : "legacy-baseline")}");
+            Console.WriteLine($"probe={probe} result=passed scope={(controlOnly ? "harness-control" : provider)}");
             return 0;
         }
         catch (Exception exception)

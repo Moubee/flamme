@@ -12,9 +12,17 @@ or establish NativeAOT support for the libraries, server, persistence, or script
 | `payloads` | Standalone `JsonPayloadSerializer`, registered DTO/list aliases, nested bodies, and scalar contracts. An authored System.Text.Json context supplies an independent positive control. |
 | `integrated` | Default `WorkflowsFeature` activation, the real workflow runner, and production payload serialization. |
 
+The Features probe additionally accepts `--provider explicit-catalog`. It compiles
+an independent catalog caller covering dependency graphs, policies, runtime
+configuration, metadata isolation, and deterministic negative cases. The default
+`legacy-baseline` keeps the original reflection-based observation. Provider
+selection is a compiler input, so the explicit executable does not root the
+legacy bootstrap. Both providers use the same module lifecycle and explicitly
+select their admission policy; see [module composition](module-system.md#explicit-feature-composition).
+
 Each executable also runs an independent asynchronous/generated-JSON control.
-JSON reflection is disabled in managed and native publication. These baseline
-fixtures retain the current production provider; future generated providers need
+JSON reflection is disabled in managed and native publication. The default baseline
+fixtures retain managed discovery; the explicit catalog is a runtime oracle. Future generated providers need
 separate parity and native acceptance evidence.
 
 ## Run a baseline
@@ -27,7 +35,7 @@ host OS and architecture. Linux evidence must be produced on Linux.
 
 ```bash
 scripts/nativeaot/run.sh --probe features --mode managed --framework net10.0
-scripts/nativeaot/run.sh --probe features --mode native --framework net11.0
+scripts/nativeaot/run.sh --probe features --provider explicit-catalog --mode native --framework net11.0
 scripts/nativeaot/run.sh --probe execution --mode native --framework net11.0 --runtime-async disabled
 scripts/nativeaot/run.sh --probe payloads --mode native --framework net11.0
 ```
@@ -46,7 +54,7 @@ they migrate. It does not mark generated coverage complete.
 Evidence is written beneath:
 
 ```text
-artifacts/nativeaot/legacy-baseline/<probe>/<mode>/<rid>/<default|disabled>/
+artifacts/nativeaot/<legacy-baseline|explicit-catalog>/<probe>/<mode>/<rid>/<default|disabled>/
   build/                 # isolated restore/build intermediates, per target
   publish/<framework>/   # executable and dependencies
   evidence/<framework>/  # inputs, SDK/toolchain, evaluated properties,
@@ -82,6 +90,11 @@ for each affected probe/mode/RID after dependency changes, review the locks, the
 use normal locked runs. Restore and publication receive identical graph settings;
 the lock path is local to the entry point and never imposed on its references.
 No broad compatibility declarations, roots, or warning suppressions are added.
+Changing provider does not change dependencies and reuses the same lock variant.
+Source diagnostics from the legacy reflection provider remain visible even when
+its methods are unreachable from the explicit native caller. The all-source
+`--check` gate therefore remains stricter than a successful component execution;
+inspect source and native-compiler diagnostics separately.
 
 ## Check the harness
 

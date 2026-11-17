@@ -1,5 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../NativeAot/Probe.props" />
+  <PropertyGroup>
+    <NativeAotFeatureProvider Condition="'$(NativeAotFeatureProvider)' == ''">legacy</NativeAotFeatureProvider>
+    <DefineConstants Condition="'$(NativeAotFeatureProvider)' == 'explicit'">$(DefineConstants);EXPLICIT_FEATURE_CATALOG</DefineConstants>
+  </PropertyGroup>
+  <Target Name="ValidateNativeAotFeatureProvider" BeforeTargets="CollectPackageReferences;PrepareForBuild">
+    <Error Condition="'$(NativeAotFeatureProvider)' != 'legacy' And '$(NativeAotFeatureProvider)' != 'explicit'"
+           Code="ELSAOT005" Text="NativeAotFeatureProvider must be legacy or explicit." />
+  </Target>
   <ItemGroup>
     <ProjectReference Include="../../common/Elsa.Features/Elsa.Features.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />

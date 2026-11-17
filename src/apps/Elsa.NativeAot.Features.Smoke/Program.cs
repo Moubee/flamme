@@ -1,3 +1,8 @@
+#if EXPLICIT_FEATURE_CATALOG
+using Elsa.NativeAot;
+
+return await ProbeRunner.RunAsync(args, "features", ExplicitCompositionScenarios.RunAsync, provider: "explicit-catalog");
+#else
 using Elsa.Features.Abstractions;
 using Elsa.Features.Attributes;
 using Elsa.Features.Contracts;
@@ -37,3 +42,4 @@ public sealed class DependencyFeature(IModule module) : FeatureBase(module)
     public override void Configure() => ((List<string>)Module.Properties["trace"]).Add("dependency.configure");
     public override void Apply() => ((List<string>)Module.Properties["trace"]).Add("dependency.apply");
 }
+#endif

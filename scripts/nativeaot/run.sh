@@ -5,6 +5,9 @@ set -uo pipefail
 usage() {
     cat <<'USAGE'
 Usage: scripts/nativeaot/run.sh --probe features|execution|payloads|integrated [options]
+  --provider legacy-baseline|explicit-catalog
+                                 Feature provider (default: legacy-baseline).
+                                 explicit-catalog is supported only by features.
   --mode managed|native           Publication mode (default: managed).
   --framework net10.0|net11.0      Published target (default: net11.0).
   --rid <RID>                     linux[-musl]-x64/arm64 or osx-x64/arm64.
@@ -15,8 +18,9 @@ Usage: scripts/nativeaot/run.sh --probe features|execution|payloads|integrated [
   --check                        Fail on IL diagnostics; linker/ILC warnings are errors.
   --help                         Show this help.
 
-These probes use the legacy-baseline execution provider. They do not establish
-generated-mode acceptance. Normal runs restore locked dependencies, publish,
+These probes default to the legacy-baseline execution provider. The explicit
+catalog validates a runtime seam; it does not establish generated-mode acceptance.
+Normal runs restore locked dependencies, publish,
 execute assertions, and return the original failing command's status. Native
 publication and execution require a host matching the target OS and architecture.
 Lock maintenance can select another host's RID without a native compiler.
@@ -30,12 +34,13 @@ script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd) || exit 1
 repo_root=$(cd -- "$script_dir/../.." && pwd) || exit 1
 # SDK selection follows the working directory's global.json, not the csproj path.
 cd -- "$repo_root" || exit 1
-probe= mode=managed framework=net11.0 rid= runtime_async=default
+probe= provider=legacy-baseline mode=managed framework=net11.0 rid= runtime_async=default
 artifacts_root="$repo_root/artifacts/nativeaot"
 update_lock=false check=false
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --probe) require_value "$@"; probe=$2; shift 2 ;;
+        --provider) require_value "$@"; provider=$2; shift 2 ;;
         --mode) require_value "$@"; mode=$2; shift 2 ;;
         --framework) require_value "$@"; framework=$2; shift 2 ;;
         --rid) require_value "$@"; rid=$2; shift 2 ;;
@@ -54,6 +59,14 @@ case "$probe" in
     integrated) app=Elsa.NativeAot.Smoke ;;
     *) fail '--probe must select features, execution, payloads, or integrated' ;;
 esac
+case "$provider" in
+    legacy-baseline) feature_provider=legacy ;;
+    explicit-catalog) feature_provider=explicit ;;
+    *) fail 'Invalid --provider' ;;
+esac
+if [ "$provider" = explicit-catalog ] && [ "$probe" != features ]; then
+    fail 'The explicit-catalog provider is supported only by the features probe'
+fi
 case "$mode" in managed|native) ;; *) fail 'Invalid --mode' ;; esac
 case "$framework" in net10.0|net11.0) ;; *) fail 'Invalid --framework' ;; esac
 case "$runtime_async" in default|disabled) ;; *) fail 'Invalid --runtime-async' ;; esac
@@ -69,7 +82,7 @@ project="$repo_root/src/apps/$app/$app.csproj"
 [ -f "$project" ] || fail "Probe project does not exist: $project"
 mkdir -p -- "$artifacts_root" || exit $?
 artifacts_root=$(cd -- "$artifacts_root" && pwd) || exit 1
-output_root="$artifacts_root/legacy-baseline/$probe/$mode/$rid/$runtime_async"
+output_root="$artifacts_root/$provider/$probe/$mode/$rid/$runtime_async"
 evidence="$output_root/evidence/$framework"
 publish_dir="$output_root/publish/$framework"
 rm -rf -- "$evidence" || exit $?
@@ -80,8 +93,8 @@ finish() {
     trap - EXIT
     collect_diagnostics || { [ "$status" -ne 0 ] || status=74; }
     printf '%s\n' "$status" > "$evidence/exit-code.txt"
-    printf '{"provider":"legacy-baseline","probe":"%s","mode":"%s","framework":"%s","rid":"%s","runtimeAsync":"%s","phase":"%s","exitCode":%s}\n' \
-        "$probe" "$mode" "$framework" "$rid" "$runtime_async" "$phase" "$status" > "$evidence/result.json"
+    printf '{"provider":"%s","probe":"%s","mode":"%s","framework":"%s","rid":"%s","runtimeAsync":"%s","phase":"%s","exitCode":%s}\n' \
+        "$provider" "$probe" "$mode" "$framework" "$rid" "$runtime_async" "$phase" "$status" > "$evidence/result.json"
     printf 'Evidence: %s (exit %s, phase %s)\n' "$evidence" "$status" "$phase"
     exit "$status"
 }
@@ -112,15 +125,15 @@ if [ "$mode" = native ] && [ "$update_lock" = false ]; then
 fi
 
 common=(
-    "-p:NativeAotMode=$mode" "-p:RuntimeIdentifier=$rid"
+    "-p:NativeAotMode=$mode" "-p:NativeAotFeatureProvider=$feature_provider" "-p:RuntimeIdentifier=$rid"
     '-p:EnableTrimAnalyzer=true' '-p:EnableAotAnalyzer=true'
     '-p:NoWarn=CS1591' '-p:TrimmerSingleWarn=false'
     '-p:SuppressTrimAnalysisWarnings=false'
     "-p:ILLinkTreatWarningsAsErrors=$check" "-p:IlcTreatWarningsAsErrors=$check"
 )
 if [ "$runtime_async" = disabled ]; then common+=('-p:UseRuntimeAsync=false'); fi
-printf 'provider=legacy-baseline\nprobe=%s\nmode=%s\nframework=%s\nrid=%s\nruntime_async=%s\ncheck=%s\n' \
-    "$probe" "$mode" "$framework" "$rid" "$runtime_async" "$check" > "$evidence/inputs.txt"
+printf 'provider=%s\nprobe=%s\nmode=%s\nframework=%s\nrid=%s\nruntime_async=%s\ncheck=%s\n' \
+    "$provider" "$probe" "$mode" "$framework" "$rid" "$runtime_async" "$check" > "$evidence/inputs.txt"
 
 phase=restore
 restore_options=(--locked-mode)
@@ -135,7 +148,7 @@ run_logged "$evidence/restore.log" dotnet restore "$project" "${restore_options[
     --artifacts-path "$output_root/build" "${common[@]}" || exit $?
 
 phase=evaluate
-properties=TargetFramework,TargetFrameworks,RuntimeIdentifier,NativeAotMode,PublishAot,JsonSerializerIsReflectionEnabledByDefault,EnableTrimAnalyzer,EnableAotAnalyzer,NoWarn,TrimmerSingleWarn,SuppressTrimAnalysisWarnings,ILLinkTreatWarningsAsErrors,IlcTreatWarningsAsErrors,NuGetLockFilePath,UseRuntimeAsync,Features,WeaverConfiguration,ArtifactsPath
+properties=TargetFramework,TargetFrameworks,RuntimeIdentifier,NativeAotMode,NativeAotFeatureProvider,PublishAot,JsonSerializerIsReflectionEnabledByDefault,EnableTrimAnalyzer,EnableAotAnalyzer,NoWarn,TrimmerSingleWarn,SuppressTrimAnalysisWarnings,ILLinkTreatWarningsAsErrors,IlcTreatWarningsAsErrors,NuGetLockFilePath,UseRuntimeAsync,Features,WeaverConfiguration,ArtifactsPath
 evaluation=("${common[@]}" "-p:TargetFramework=$framework" '-p:UseArtifactsOutput=true' "-p:ArtifactsPath=$output_root/build")
 run_logged "$evidence/probe-properties.log" dotnet msbuild "$project" -nologo "${evaluation[@]}" "-getProperty:$properties" || exit $?
 representative="$repo_root/src/common/Elsa.Features/Elsa.Features.csproj"
@@ -170,10 +183,10 @@ dynamic_code=True
 if [ "$mode" = native ]; then dynamic_code=False; fi
 # Exit zero alone cannot prove that the selected production scenario ran. Validate
 # the ordered protocol, including identities and the final scope, independently.
-awk -v header="probe=$probe provider=legacy-baseline build-mode=$mode expected-mode=$mode" \
+awk -v header="probe=$probe provider=$provider build-mode=$mode expected-mode=$mode" \
     -v runtime="^framework=[.]NET $framework_major[.][^ ]+ rid=$rid dynamic-code=$dynamic_code reflection-json=False$" \
     -v started="scenario=$probe result=started" -v passed="scenario=$probe result=passed" \
-    -v final="probe=$probe result=passed scope=legacy-baseline" '
+    -v final="probe=$probe result=passed scope=$provider" '
     NF { last = $0 }
     $0 == header { if (state != 0) invalid = 1; state = 1; next }
     /^framework=/ { if (state != 1 || $0 !~ runtime) invalid = 1; state = 2; next }
