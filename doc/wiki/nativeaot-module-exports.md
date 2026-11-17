@@ -147,34 +147,14 @@ The compiler asset packages can select the host bootstrap at build time.
 
 ## Validate producer/consumer boundaries
 
-The Features probe links the reusable consumer scenario and references a
-separately compiled producer:
+The explicit Features probe references the separately compiled producer. The package tests also install that producer into a fresh consumer outside the checkout. Run them from the repository root on a host with the native compiler and both runtimes installed.
 
 ```bash
-scripts/nativeaot/run.sh --probe features --provider explicit-catalog --mode native --framework net11.0
+project=test/integration/Elsa.NativeAot.IntegrationTests/Elsa.NativeAot.IntegrationTests.csproj
+dotnet restore "$project" --locked-mode
+dotnet test --project "$project" -c Release --no-restore -- --treenode-filter '/*/*/ModulePackageTests/*'
 ```
 
-For actual package consumption, run:
+The published consumer exercises feature registration, service lifetimes, and isolation between two hosts. Cases cover managed and native publication on .NET 10 and .NET 11, including .NET 11 with runtime async disabled in both the producer and consumer. The .NET 11 suite also publishes both framework targets from the same locked restore and intermediate directory. Each case checks Release compiler settings, performs a locked restore covering both target frameworks, and verifies the installed package version and SHA-512 hash against the staged archive. The empty-feed control checks the restore diagnostic for a missing producer. An injected failure checks that assertions in the published process reach the test runner.
 
-```bash
-scripts/nativeaot/test-module-packages.sh
-```
-
-The default package matrix covers managed/native execution on both frameworks
-and a separately repacked .NET 11 native runtime-async opt-out. The harness stages
-one NuGet package per referenced project, creates a fresh consumer outside the
-repository, and verifies the effective Release compiler settings for each packed
-and published target. It generates and verifies one complete two-framework lock
-per runtime-async model and publication mode, checking exact package versions
-and SHA512 provenance after locked restore. The consumer uses package
-references with explicit local-feed mappings, not source project references or
-repository build imports. Native linker/compiler IL warnings are errors.
-
-Evidence is retained under `artifacts/nativeaot/module-packages/run.*`: staged
-packages, package layouts, source snapshots and external-consumer paths,
-SDK/toolchain and evaluated properties, locks, provenance checks, logs/binlogs,
-and per-lane/aggregate results. Failure controls reject an unavailable package,
-an injected assertion failure, and malformed output. The fixture tests real
-feature/service/lifecycle behavior and two isolated hosts. It does not establish
-source-generator output or whole-worker capability parity. Native execution must
-run on the target OS; macOS results do not establish Linux support.
+Logs, evaluated properties and build artifacts are under `artifacts/nativeaot/<framework>/`. The [probe guide](nativeaot-probes.md#run-the-tests) covers host prerequisites and the full acceptance category.

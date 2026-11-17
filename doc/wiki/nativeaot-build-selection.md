@@ -107,12 +107,12 @@ subsequent plan steps.
 ## Run the package validation
 
 ```bash
-scripts/nativeaot/test-codegen-build.sh
+project=test/integration/Elsa.NativeAot.IntegrationTests/Elsa.NativeAot.IntegrationTests.csproj
+dotnet restore "$project" --locked-mode
+dotnet test --project "$project" -c Release --no-restore -- --treenode-filter '/*/*/ManagedCodeGenerationTests/*'
+dotnet test --project "$project" -c Release --no-restore -- --treenode-filter '/*/*/CodeGenerationTests/*'
 ```
 
-The harness stages actual packages and builds fresh consumers using the
-repository SDK. It writes packages, logs, and results under
-`artifacts/nativeaot/codegen-build/run.*`. It exercises mode selection and failure cases, validates
-property propagation to source project references, and switches a compiled
-consumer between modes without cleaning. Managed and native fixture runs
-assert which module provider the application used.
+These TUnit cases pack the generator, analyzer, build assets and runtime libraries with the repository SDK. An external consumer installs those packages and runs on each target framework. The tests check provider selection for managed and native executables, diagnostics for invalid inputs, generated source, propagation to child projects, and incremental mode changes in the same build directory.
+
+Inspect packages, build logs, generated sources and publish outputs under `artifacts/nativeaot/<framework>/`. For host prerequisites and the complete acceptance category, see the [probe guide](nativeaot-probes.md#run-the-tests).

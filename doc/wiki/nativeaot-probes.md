@@ -12,7 +12,7 @@ or establish NativeAOT support for the libraries, server, persistence, or script
 | `payloads` | Standalone `JsonPayloadSerializer`, registered DTO/list aliases, nested bodies, and scalar contracts. An authored System.Text.Json context supplies an independent positive control. |
 | `integrated` | Default `WorkflowsFeature` activation, the real workflow runner, and production payload serialization. |
 
-The Features probe additionally accepts `--provider explicit-catalog`. It compiles
+The Features probe also supports the `explicit-catalog` provider. It compiles
 an independent catalog caller covering dependency graphs, policies, runtime
 configuration, metadata isolation, typed hosted-service identities, and deterministic negative cases. The default
 `legacy-baseline` keeps the original reflection-based observation. Provider
@@ -25,115 +25,41 @@ JSON reflection is disabled in managed and native publication. The default basel
 fixtures retain managed discovery; the explicit catalog is a runtime oracle. Future generated providers need
 separate parity and native acceptance evidence.
 
-## Run a baseline
+## Run the tests
 
-Use the SDK selected by [global.json](../../global.json), both supported runtimes,
-and Bash. Native publication also needs the target OS compiler and development
-libraries; see Microsoft's [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/).
-The wrapper publishes and executes on the current host, so its RID must match the
-host OS and architecture. Linux evidence must be produced on Linux.
+Run from the repository root with the SDK selected by `global.json` and both supported runtimes installed. Native tests publish for the current host and execute that binary. The committed probe locks cover Linux x64 and macOS arm64. Each host needs its platform compiler and development libraries. [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/)
 
 ```bash
-scripts/nativeaot/run.sh --probe features --mode managed --framework net10.0
-scripts/nativeaot/run.sh --probe features --provider explicit-catalog --mode native --framework net11.0
-scripts/nativeaot/run.sh --probe execution --mode native --framework net11.0 --runtime-async disabled
-scripts/nativeaot/run.sh --probe payloads --mode native --framework net11.0
+project=test/integration/Elsa.NativeAot.IntegrationTests/Elsa.NativeAot.IntegrationTests.csproj
+dotnet restore "$project" --locked-mode
+dotnet test --project "$project" -c Release --no-restore
+dotnet test --project "$project" -c Release --no-restore -- --treenode-filter '/*/*/*/*[Category=NativeAotAcceptance]'
 ```
 
-Supported framework inputs are `net10.0` and `net11.0`. Keep the default .NET 11
-runtime-async lane as well as the rebuilt opt-out. ConfigureAwait.Fody remains
-active in the probes and their production references. Native execution checks
-that dynamic code is unavailable. A managed binary cannot satisfy a native check.
+The unfiltered run packs the compiler assets and builds and executes a managed consumer in Auto, Dynamic, and Generated modes on both frameworks. It also checks the validation logic. Select `NativeAotAcceptance` for the remaining build matrix and published executables. This category covers the explicit Features catalog, [packed module consumers](nativeaot-module-exports.md#validate-producerconsumer-boundaries), and [compiler build selection](nativeaot-build-selection.md#run-the-package-validation). Add `-f net10.0` or `-f net11.0` before `--` to select a target. The .NET 11 tests include the runtime-async opt-out.
 
-Every run returns the actual failing restore, evaluation, publication, or probe
-exit code. Expected baseline failures remain nonzero. Do not invert them into a
-passing support check. `--check` additionally treats linker/compiler IL warnings
-as errors and rejects source IL diagnostics; it is intended for capabilities as
-they migrate. It does not mark generated coverage complete.
+## Diagnose a legacy provider
 
-Evidence is written beneath:
-
-```text
-artifacts/nativeaot/<legacy-baseline|explicit-catalog>/<probe>/<mode>/<rid>/<default|disabled>/
-  build/                 # isolated restore/build intermediates, per target
-  publish/<framework>/   # executable and dependencies
-  evidence/<framework>/  # inputs, SDK/toolchain, evaluated properties,
-                         # restore/publish logs, binlog, IL diagnostics,
-                         # execution output, result.json, exit-code.txt
-```
-
-The current invocation replaces that target's evidence and publication output.
-Archive evidence before rerunning a lane. The raw IL inventory preserves member
-messages and original logs; triage diagnostic identity, assembly/member, framework,
-and dependency version rather than comparing warning totals. Diagnostic runs
-allow unresolved warnings so the native process can reveal runtime failures.
-Every publication run rebuilds sources and native outputs so incremental
-compilation cannot hide diagnostics. A zero process exit also requires the
-ordered harness-control, selected production scenario, runtime identity, and
-final provider/mode/scope markers; missing or inconsistent results fail validation.
-
-## Compiled module exports and packages
-
-The explicit Features caller also consumes a separately compiled producer and a
-host-authored export, validating versioned dependencies before normal feature
-activation. For a fresh consumer that installs actual runtime/producer packages:
+The four legacy probes exercise capabilities at different stages of migration. Select their diagnostic tests when investigating a specific runtime or framework. An unresolved failure produces a failed test and preserves the child process output.
 
 ```bash
-scripts/nativeaot/test-module-packages.sh
+dotnet test --project "$project" -c Release -f net11.0 --no-restore -- --treenode-filter '/*/*/*/*[Category=NativeAotDiagnostic]'
 ```
 
-This independent matrix checks package versions/hashes, locked two-framework
-restores, native execution, host/scoped isolation, and failure controls. See the
-[export guide](nativeaot-module-exports.md#validate-producerconsumer-boundaries)
-for its package-only boundary, evidence locations, and public API contract.
+To select one row, replace the category with its name, for example `legacy-baseline-payloads-native-default` or `explicit-catalog-features-native-disabled`. The runtime-async opt-out rows target .NET 11.
 
-## Dependency locks and maintenance
+Set `ELSA_NATIVEAOT_STRICT=true` to treat IL diagnostics as failures when investigating a probe. The diagnostic publish records source and native compiler output even when the exercised runtime path succeeds. The explicit catalog can still report source warnings for unused legacy reflection paths.
 
-Ordinary solution builds default to managed mode and use each executable's
-`packages.lock.json`. Wrapper runs select that executable's
-`locks/<mode>/<rid>/packages.lock.json`. Every lock includes both frameworks.
-Committed variants cover `managed`/`native` on `osx-arm64` and `linux-x64`.
-Other accepted RIDs require explicit lock generation and review first.
+Each test uses a fresh directory under `artifacts/nativeaot/<framework>/`. Inspect the restore and publish logs, evaluated MSBuild properties, publish binlog, IL diagnostics, and execution output for the failing case. A probe must report the expected framework, RID, dynamic-code and reflection-JSON settings, run the control and production scenario in order, and finish with the expected provider and scope. Evidence from a macOS publish describes macOS execution. Run on Linux for Linux evidence.
+
+## Maintain probe locks
+
+Solution restores use each executable's portable `packages.lock.json`. RID-specific restores use its `locks/<mode>/<rid>/packages.lock.json`. After a dependency change, regenerate and review each affected two-framework lock. For example, run this command for the Linux native Features lock. Lock generation works across operating systems and does not require a native compiler.
 
 ```bash
-scripts/nativeaot/run.sh --probe features --mode native --rid linux-x64 --update-lock
+dotnet restore src/apps/Elsa.NativeAot.Features.Smoke/Elsa.NativeAot.Features.Smoke.csproj --force-evaluate \
+  -p:NativeAotMode=native -p:RuntimeIdentifier=linux-x64 \
+  -p:EnableTrimAnalyzer=true -p:EnableAotAnalyzer=true
 ```
 
-`--update-lock` restores both frameworks without locked mode and stops before
-publication. It can prepare another OS's lock without a native compiler. Run it
-for each affected probe/mode/RID after dependency changes, review the locks, then
-use normal locked runs. Restore and publication receive identical graph settings;
-the lock path is local to the entry point and never imposed on its references.
-No broad compatibility declarations, roots, or warning suppressions are added.
-Changing provider does not change dependencies and reuses the same lock variant.
-Source diagnostics from the legacy reflection provider remain visible even when
-its methods are unreachable from the explicit native caller. The all-source
-`--check` gate therefore remains stricter than a successful component execution;
-inspect source and native-compiler diagnostics separately.
-
-## Check the harness
-
-```bash
-scripts/nativeaot/test-wrapper.sh
-dotnet run --project src/apps/Elsa.NativeAot.Features.Smoke -c Release -f net11.0 -- --control-only
-dotnet run --project src/apps/Elsa.NativeAot.Features.Smoke -c Release -f net11.0 -- --self-test-failure
-dotnet run --project src/apps/Elsa.NativeAot.Features.Smoke -c Release -f net11.0 -- --expect-mode native
-```
-
-The wrapper checks use a fake CLI to inject restore, publication, evaluation,
-execution, compiler, and diagnostic failures; they also test lock maintenance,
-argument validation, stale output, and runtime-async propagation. The last two
-commands above must fail. `--control-only` proves only the shared harness and
-generated JSON control, never the production scenario. Run these options against
-the published native executable too when checking the native harness.
-
-The explicit Features caller also resolves real singleton hosted services, starts
-them in registration order, stops them in reverse, and verifies owned scope
-disposal and rejection of captive scoped constructor dependencies. It is a
-component lifecycle fixture, not a production Generic Host or Elsa worker.
-
-The probes are diagnostic tools and are not required green NativeAOT CI gates.
-Generated exports, production metadata/provider fixes, broader workflow fixtures,
-generated packed-consumer parity, and Linux acceptance gates remain subsequent migration
-work. Store run logs and review records as CI/PR artifacts rather than committing
-task transcripts.
+Use the same analyzer settings for managed and native restores. Omit the target framework during restore to include both frameworks. The catalog providers share the same dependencies and lock. The test runner uses locked restore before publishing a single framework with the same graph settings.
