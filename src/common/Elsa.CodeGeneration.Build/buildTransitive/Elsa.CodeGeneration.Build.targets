@@ -1,9 +1,10 @@
 <Project TreatAsLocalProperty="ElsaEffectiveExecutionMode">
-  <ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true'">
     <CompilerVisibleProperty Include="ElsaExecutionMode;ElsaEffectiveExecutionMode;ElsaGenerateMetadata;ElsaIsHost;ElsaHostBootstrap;ElsaModuleExportSchemaVersion;RuntimeIdentifier" />
   </ItemGroup>
 
-  <Target Name="ResolveElsaCodeGenerationSettings" BeforeTargets="PrepareForBuild;CollectPackageReferences;GenerateMSBuildEditorConfigFileShouldRun">
+  <Target Name="ResolveElsaCodeGenerationSettings" BeforeTargets="PrepareForBuild;CollectPackageReferences;GenerateMSBuildEditorConfigFileShouldRun"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true'">
     <PropertyGroup>
       <!-- Evaluate after the application project had a chance to set these properties. -->
       <ElsaExecutionMode Condition="'$(ElsaExecutionMode)' == ''">Auto</ElsaExecutionMode>
@@ -15,6 +16,12 @@
           ('$(ElsaExecutionMode)' == 'Auto' And '$(PublishAot)' == 'true')">Generated</ElsaEffectiveExecutionMode>
       <ElsaEffectiveExecutionMode Condition="'$(ElsaExecutionMode)' == 'Dynamic' Or
           ('$(ElsaExecutionMode)' == 'Auto' And '$(PublishAot)' != 'true')">Dynamic</ElsaEffectiveExecutionMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true'">
+      <!-- A referenced compiler asset that cannot load must fail the opted-in build. -->
+      <WarningsAsErrors>$(WarningsAsErrors);CS8032;CS8033;CS8034;CS8040;CS8784;CS8785;CS9057</WarningsAsErrors>
+      <OptimizeImplicitlyTriggeredBuild Condition="'$(OptimizeImplicitlyTriggeredBuild)' == ''">false</OptimizeImplicitlyTriggeredBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(ElsaIsHost)' == 'true'">
@@ -38,7 +45,8 @@
            Text="Elsa compiler assets require the SDK-generated MSBuild editorconfig file." />
   </Target>
 
-  <Target Name="ValidateElsaCodeGenerationAssets" BeforeTargets="CoreCompile" DependsOnTargets="ResolveElsaCodeGenerationSettings" Condition="'$(DesignTimeBuild)' != 'true'">
+  <Target Name="ValidateElsaCodeGenerationAssets" BeforeTargets="CoreCompile" DependsOnTargets="ResolveElsaCodeGenerationSettings;_ComputeSkipAnalyzers"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true' And '$(DesignTimeBuild)' != 'true'">
     <ItemGroup>
       <_ElsaGenerator Include="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'Elsa.CodeGeneration'" />
       <_ElsaAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'Elsa.CodeGeneration.Analyzers'" />
@@ -48,11 +56,12 @@
     <Error Code="ELSACG008" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And '@(_ElsaAnalyzer)' == ''"
            Text="Elsa build validation requires Elsa.CodeGeneration.Analyzers with its analyzer assets enabled." />
     <Error Code="ELSACG009" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And
-        ('$(RunAnalyzers)' == 'false' Or ('$(RunAnalyzers)' == '' And '$(RunAnalyzersDuringBuild)' == 'false'))"
+        '$(_SkipAnalyzers)' == 'true'"
            Text="Elsa build validation requires compiler analyzers to run." />
   </Target>
 
-  <Target Name="TrackElsaCodeGenerationInputs" BeforeTargets="_GenerateCompileDependencyCache" DependsOnTargets="ResolveElsaCodeGenerationSettings">
+  <Target Name="TrackElsaCodeGenerationInputs" BeforeTargets="_GenerateCompileDependencyCache" DependsOnTargets="ResolveElsaCodeGenerationSettings"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true'">
     <ItemGroup>
       <CoreCompileCache Include="ElsaCodeGeneration=$(ElsaExecutionMode)|$(ElsaEffectiveExecutionMode)|$(ElsaGenerateMetadata)|$(ElsaIsHost)|$(ElsaHostBootstrap)|$(ElsaModuleExportSchemaVersion)|$(RuntimeIdentifier)" />
     </ItemGroup>

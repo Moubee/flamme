@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Elsa.CodeGeneration.Generators</RootNamespace>
+    <Description>Provides the compiler-host bootstrap generator for explicit Elsa module composition.</Description>
+    <PackageTags>elsa source-generator analyzer</PackageTags>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- Analyzer assets have no lib symbol payload for the repository-wide snupkg setting. -->
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <WeaverConfiguration />
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeCompilerAssemblyInPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Remove="Fody;ConfigureAwait.Fody;JetBrains.Annotations" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" />
+    <None Remove="../../../icon.png" />
+    <None Include="$(MSBuildThisFileDirectory)../../../icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <Target Name="IncludeCompilerAssemblyInPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+</Project>
