@@ -10,17 +10,25 @@ namespace Elsa.Features.Services;
 public sealed class ExplicitFeatureCatalog : IFeatureProvider
 {
     private readonly FrozenDictionary<Type, FeatureRegistration> _features;
+    private readonly FrozenDictionary<Type, ServiceDescriptor> _hostedServices;
 
-    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features)
+    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices)
     {
         FeatureTypes = Array.AsReadOnly(features.Keys.ToArray());
         _features = features.ToFrozenDictionary();
+        HostedServiceTypes = Array.AsReadOnly(hostedServices.Keys.ToArray());
+        _hostedServices = hostedServices.ToFrozenDictionary();
     }
 
     /// <summary>
     /// Gets the declared feature types in declaration order.
     /// </summary>
     public IReadOnlyList<Type> FeatureTypes { get; }
+
+    /// <summary>
+    /// Gets the declared hosted-service implementation types in declaration order.
+    /// </summary>
+    public IReadOnlyList<Type> HostedServiceTypes { get; }
 
     IFeature IFeatureProvider.CreateFeature(Type type, IModule module)
     {
@@ -39,7 +47,9 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
     }
 
     ServiceDescriptor IFeatureProvider.CreateHostedServiceDescriptor(Type type)
-        => throw new InvalidOperationException($"Missing catalog entry for hosted service {type}.");
+        => _hostedServices.TryGetValue(type, out var descriptor)
+            ? descriptor
+            : throw new InvalidOperationException($"Missing catalog entry for hosted service {type}.");
 
     private FeatureRegistration Get(Type type) => _features.TryGetValue(type, out var entry)
         ? entry

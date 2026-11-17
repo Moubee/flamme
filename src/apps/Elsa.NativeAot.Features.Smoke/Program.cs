@@ -1,7 +1,11 @@
 #if EXPLICIT_FEATURE_CATALOG
 using Elsa.NativeAot;
 
-return await ProbeRunner.RunAsync(args, "features", ExplicitCompositionScenarios.RunAsync, provider: "explicit-catalog");
+return await ProbeRunner.RunAsync(args, "features", async () =>
+{
+    await ExplicitCompositionScenarios.RunAsync();
+    await ExplicitHostedServiceScenarios.RunAsync();
+}, provider: "explicit-catalog");
 #else
 using Elsa.Features.Abstractions;
 using Elsa.Features.Attributes;

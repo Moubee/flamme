@@ -21,7 +21,7 @@ Feature classes usually use three lifecycle methods:
 2. `ConfigureHostedServices()`: register hosted services with optional priority.
 3. `Apply()`: add concrete services, options, stores, handlers, endpoints, and providers to DI.
 
-`Module.Apply()` topologically sorts configured features and dependencies, configures them once, filters features with missing optional dependencies, registers hosted services, applies services, and finally registers installed-feature metadata.
+`Module.Apply()` topologically sorts configured features and dependencies, configures them once, filters conditional features, and remembers the hosted-service insertion point. It applies feature registrations, inserts newly queued hosted-service descriptors at that point, and publishes installed-feature metadata.
 
 A feature may introduce another feature from `Apply()`, for example by calling `Module.Configure<OtherFeature>()` directly or through a helper such as `AddActivity<T>()`. `Module.Apply()` keeps applying until no new features show up, so the introduced feature (and its dependencies) are configured and applied as well.
 
@@ -106,6 +106,28 @@ The existing default managed path retains its legacy failure behavior.
 This is the runtime contract for future generated manifests. The
 [NativeAOT component probe](nativeaot-probes.md) exercises handwritten catalogs;
 source generation and full Workflow Core/native-host support remain separate work.
+
+### Hosted services in a catalog
+
+Declare every queued hosted-service implementation with
+`builder.AddHostedService<Worker>()` before building the catalog. This records a
+closed singleton descriptor with its implementation identity and required public
+constructor metadata. The declaration alone does not install or instantiate the
+service. Features still call `ConfigureHostedService<Worker>(priority)` or the
+covered `Type` overload at runtime; unknown types fail before activation.
+
+Module registrations preserve stable priority ordering and implementation-type
+deduplication, including services registered directly during `Apply`. Existing
+direct duplicates retain their original descriptor and position; newly added
+module descriptors occupy the remembered insertion point. Repeated Apply does
+not create duplicate hosted-service descriptors. Duplicate declarations in the
+catalog are rejected, while a frozen catalog can serve multiple independent hosts.
+
+Use DI scope validation to reject singleton constructors that capture scoped
+services. A hosted service that needs scoped work should create and dispose an
+owned scope through `IServiceScopeFactory` during execution. The
+[architecture decision](../adr/2026-11-17-explicit-feature-composition.md)
+records this provider, policy, and hosted-service boundary.
 
 ## Module Properties
 

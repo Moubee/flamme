@@ -1,4 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Features.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Elsa.Features.Services;
 
@@ -8,6 +11,7 @@ namespace Elsa.Features.Services;
 public sealed class ExplicitFeatureCatalogBuilder
 {
     private readonly List<FeatureRegistration> _features = [];
+    private readonly List<KeyValuePair<Type, ServiceDescriptor>> _hostedServices = [];
 
     /// <summary>
     /// Adds a typed factory and snapshots its metadata and dependency keys.
@@ -41,6 +45,19 @@ public sealed class ExplicitFeatureCatalogBuilder
     }
 
     /// <summary>
+    /// Declares a closed hosted-service implementation, retaining its public constructors for DI.
+    /// </summary>
+    public ExplicitFeatureCatalogBuilder AddHostedService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>()
+        where TService : class, IHostedService
+    {
+        var type = typeof(TService);
+        if (type.ContainsGenericParameters || !type.IsClass || type.IsAbstract)
+            throw new InvalidOperationException($"Hosted service {type} must be a closed, concrete IHostedService type.");
+        _hostedServices.Add(new(type, ServiceDescriptor.Singleton<IHostedService, TService>()));
+        return this;
+    }
+
+    /// <summary>
     /// Freezes the catalog and rejects duplicate identities, missing dependencies, and cycles.
     /// </summary>
     public ExplicitFeatureCatalog Build()
@@ -58,7 +75,13 @@ public sealed class ExplicitFeatureCatalogBuilder
         FeatureGraph.Sort(entries.Keys, type => entries.TryGetValue(type, out var entry)
             ? entry.Dependencies
             : throw new InvalidOperationException($"Missing catalog entry for feature {type}."));
-        return new ExplicitFeatureCatalog(entries);
+        var hostedServices = new Dictionary<Type, ServiceDescriptor>();
+        foreach (var entry in _hostedServices)
+        {
+            if (!hostedServices.TryAdd(entry.Key, entry.Value))
+                throw new InvalidOperationException($"Duplicate hosted-service type {entry.Key}.");
+        }
+        return new ExplicitFeatureCatalog(entries, hostedServices);
     }
 
     private static void ValidateType(Type type)

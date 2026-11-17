@@ -14,7 +14,7 @@ or establish NativeAOT support for the libraries, server, persistence, or script
 
 The Features probe additionally accepts `--provider explicit-catalog`. It compiles
 an independent catalog caller covering dependency graphs, policies, runtime
-configuration, metadata isolation, and deterministic negative cases. The default
+configuration, metadata isolation, typed hosted-service identities, and deterministic negative cases. The default
 `legacy-baseline` keeps the original reflection-based observation. Provider
 selection is a compiler input, so the explicit executable does not root the
 legacy bootstrap. Both providers use the same module lifecycle and explicitly
@@ -111,6 +111,11 @@ argument validation, stale output, and runtime-async propagation. The last two
 commands above must fail. `--control-only` proves only the shared harness and
 generated JSON control, never the production scenario. Run these options against
 the published native executable too when checking the native harness.
+
+The explicit Features caller also resolves real singleton hosted services, starts
+them in registration order, stops them in reverse, and verifies owned scope
+disposal and rejection of captive scoped constructor dependencies. It is a
+component lifecycle fixture, not a production Generic Host or Elsa worker.
 
 The probes are diagnostic tools and are not required green NativeAOT CI gates.
 Generated exports, production metadata/provider fixes, broader workflow fixtures,
