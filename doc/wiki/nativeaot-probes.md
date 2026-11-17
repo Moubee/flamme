@@ -59,7 +59,10 @@ Archive evidence before rerunning a lane. The raw IL inventory preserves member
 messages and original logs; triage diagnostic identity, assembly/member, framework,
 and dependency version rather than comparing warning totals. Diagnostic runs
 allow unresolved warnings so the native process can reveal runtime failures.
-Strict runs rebuild sources to ensure incremental compilation cannot hide them.
+Every publication run rebuilds sources and native outputs so incremental
+compilation cannot hide diagnostics. A zero process exit also requires the
+ordered harness-control, selected production scenario, runtime identity, and
+final provider/mode/scope markers; missing or inconsistent results fail validation.
 
 ## Dependency locks and maintenance
 

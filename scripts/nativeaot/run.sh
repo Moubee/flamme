@@ -125,9 +125,9 @@ printf 'provider=legacy-baseline\nprobe=%s\nmode=%s\nframework=%s\nrid=%s\nrunti
 phase=restore
 restore_options=(--locked-mode)
 if [ "$update_lock" = true ]; then restore_options=(--force-evaluate); fi
-if [ "$check" = true ]; then
-    # Compiler warning output is not replayed by an incremental no-op build.
-    # A strict run must analyze every source again, even on repeated invocations.
+if [ "$update_lock" = false ]; then
+    # Compiler and ILC warning output is not replayed by incremental no-op builds.
+    # Every publication must produce its complete current diagnostic inventory.
     rm -rf -- "$output_root/build" || exit $?
 fi
 # No TargetFramework here: every committed lock contains both supported targets.
@@ -163,6 +163,30 @@ executable="$publish_dir/$app"
 run_logged "$evidence/execution.log" "$executable" --expect-mode "$mode"
 status=$?
 [ "$status" -eq 0 ] || exit "$status"
+phase=verify
+framework_version=${framework#net}
+framework_major=${framework_version%%.*}
+dynamic_code=True
+if [ "$mode" = native ]; then dynamic_code=False; fi
+# Exit zero alone cannot prove that the selected production scenario ran. Validate
+# the ordered protocol, including identities and the final scope, independently.
+awk -v header="probe=$probe provider=legacy-baseline build-mode=$mode expected-mode=$mode" \
+    -v runtime="^framework=[.]NET $framework_major[.][^ ]+ rid=$rid dynamic-code=$dynamic_code reflection-json=False$" \
+    -v started="scenario=$probe result=started" -v passed="scenario=$probe result=passed" \
+    -v final="probe=$probe result=passed scope=legacy-baseline" '
+    NF { last = $0 }
+    $0 == header { if (state != 0) invalid = 1; state = 1; next }
+    /^framework=/ { if (state != 1 || $0 !~ runtime) invalid = 1; state = 2; next }
+    $0 == "scenario=harness-control result=passed" { if (state != 2) invalid = 1; state = 3; next }
+    $0 == started { if (state != 3) invalid = 1; state = 4; next }
+    $0 == passed { if (state != 4) invalid = 1; state = 5; next }
+    $0 == final { if (state != 5) invalid = 1; state = 6; next }
+    /^(probe=|scenario=)/ { invalid = 1 }
+    END { exit !(state == 6 && !invalid && last == final) }
+' "$evidence/execution.log" || {
+    printf '%s\n' 'Missing, inconsistent, or incomplete probe result markers; inspect execution.log' >&2
+    exit 65
+}
 if [ "$check" = true ] && [ -s "$evidence/il-diagnostics.log" ]; then
     phase=diagnostics
     printf '%s\n' 'Unresolved IL diagnostics remain; inspect il-diagnostics.log' >&2
