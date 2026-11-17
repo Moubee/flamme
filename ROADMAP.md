@@ -4,6 +4,10 @@ Flamme is a .NET process orchestrator forked from [Elsa Workflows 3.9](https://g
 
 The [README](README.md) introduces the project, and [Project direction](doc/project-direction.md) explains the fork and its scope. This roadmap describes priorities rather than a release schedule. Unchecked items are planned work; they are not claims of completed validation or guaranteed delivery dates.
 
+## Current focus
+
+[Measure throughput and p95 latency for one PostgreSQL-backed workflow (#40)](https://github.com/Moubee/flamme/issues/40). The first baseline will report completed workflows per second and p95 end-to-end latency for one reproducible workload.
+
 ## Current foundation
 
 The repository already contains the following building blocks. Their presence does not establish throughput targets or prove every clustered deployment scenario.
