@@ -53,7 +53,6 @@ internal sealed class CodeGenerationConsumer
             File.Copy(Template("SourceLibrary.csproj.in"), Path.Combine(library, "SourceLibrary.csproj"));
         }
 
-        File.WriteAllText(Path.Combine(evidence, "consumer-path.txt"), source);
         foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
         {
             var snapshot = Path.Combine(evidence, "source", Path.GetRelativePath(source, file));
@@ -136,17 +135,25 @@ internal sealed class CodeGenerationConsumer
         await VerifyExecution(provider, native);
 
         // Ask the installed targets which settings reached the compiler in this lane.
+        var propertiesFile = Path.Combine(_evidence, "effective-properties.json");
         var snapshot = await Run("effective-properties", "dotnet", ["msbuild", "Consumer.csproj", "-nologo", "-t:ResolveElsaCodeGenerationSettings",
             "-p:Configuration=Release", $"-p:TargetFramework={BuildTest.Framework}", "-p:UseArtifactsOutput=true", $"-p:ArtifactsPath={BuildDirectory}",
-            "-getProperty:ElsaExecutionMode,ElsaEffectiveExecutionMode,ElsaGenerateMetadata,ElsaIsHost,ElsaHostBootstrap,DefineConstants", .. settings]);
+            "-getProperty:ElsaExecutionMode,ElsaEffectiveExecutionMode,ElsaGenerateMetadata,ElsaIsHost,ElsaHostBootstrap,DefineConstants",
+            $"-getResultOutputFile:{propertiesFile}", .. settings]);
         snapshot.EnsureSuccess();
-        using var document = JsonDocument.Parse(snapshot.Output);
+        using var document = JsonDocument.Parse(File.ReadAllBytes(propertiesFile));
         var properties = document.RootElement.GetProperty("Properties");
         await Assert.That(properties.GetProperty("ElsaEffectiveExecutionMode").GetString()).IsEqualTo(provider);
 
         var generationEnabled = bool.Parse(properties.GetProperty("ElsaGenerateMetadata").GetString()!);
         var markers = Directory.GetFiles(IntermediateDirectory, "ElsaGenerationBuildMarker.g.cs", SearchOption.AllDirectories);
         await Assert.That(markers.Length).IsEqualTo(generationEnabled ? 1 : 0);
+        if (generationEnabled)
+        {
+            var source = File.ReadAllText(markers.Single());
+            await Assert.That(source).Contains("class ElsaGenerationBuildMarker");
+            await Assert.That(source).Contains($"const string EffectiveExecutionMode = \"{provider}\"");
+        }
     }
 
     public async Task VerifyChildMode(string expected)
@@ -156,7 +163,7 @@ internal sealed class CodeGenerationConsumer
         await Assert.That(observed).Contains($"framework={BuildTest.Framework}");
         await Assert.That(observed).Contains($"mode={expected}");
         await Assert.That(observed).Contains("host=false");
-        await Assert.That(observed).DoesNotContain("ELSA_GENERATED");
-        await Assert.That(observed).DoesNotContain("ELSA_DYNAMIC");
+        // The first constant is prefixed by "constants=" in MSBuild's output.
+        await Assert.That(string.Join('\n', observed)).DoesNotMatch(@"\b(?:ELSA_GENERATED|ELSA_DYNAMIC)\b");
     }
 }

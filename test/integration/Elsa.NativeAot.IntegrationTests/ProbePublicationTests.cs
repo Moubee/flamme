@@ -1,4 +1,6 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Elsa.NativeAot.IntegrationTests;
 
@@ -6,7 +8,7 @@ namespace Elsa.NativeAot.IntegrationTests;
 [NotInParallel("NativeAotBuild")]
 public class ProbePublicationTests
 {
-    public static IEnumerable<(string Mode, bool DisableRuntimeAsync)> PublicationModes()
+    private static IEnumerable<(string Mode, bool DisableRuntimeAsync)> PublicationModes()
     {
         foreach (var mode in new[] { "managed", "native" })
         {
@@ -17,15 +19,27 @@ public class ProbePublicationTests
         }
     }
 
-    public static IEnumerable<(string Probe, string Mode, bool DisableRuntimeAsync)> LegacyProbeCases()
+    public static IEnumerable<TestDataRow<(string, bool)>> ExplicitProbeCases()
+    {
+        foreach (var (mode, disabled) in PublicationModes())
+        {
+            var lane = $"explicit-catalog-features-{mode}-{(disabled ? "disabled" : "default")}";
+            yield return new((mode, disabled), DisplayName: lane, Categories: [lane]);
+        }
+    }
+
+    public static IEnumerable<TestDataRow<(string, string, bool)>> LegacyProbeCases()
     {
         foreach (var probe in new[] { "features", "execution", "payloads", "integrated" })
-        foreach (var (mode, disableRuntimeAsync) in PublicationModes())
-            yield return (probe, mode, disableRuntimeAsync);
+        foreach (var (mode, disabled) in PublicationModes())
+        {
+            var lane = $"legacy-baseline-{probe}-{mode}-{(disabled ? "disabled" : "default")}";
+            yield return new((probe, mode, disabled), DisplayName: lane, Categories: [lane]);
+        }
     }
 
     [Test, Category("NativeAotAcceptance")]
-    [MethodDataSource(nameof(PublicationModes))]
+    [MethodDataSource(nameof(ExplicitProbeCases))]
     public Task ExplicitCatalogRunsPublishedScenario(string mode, bool disableRuntimeAsync) =>
         PublishAndRun("features", "explicit-catalog", mode, disableRuntimeAsync);
 
@@ -87,9 +101,31 @@ public class ProbePublicationTests
             const string evaluated = "TargetFramework,TargetFrameworks,RuntimeIdentifier,NativeAotMode,NativeAotFeatureProvider,PublishAot,JsonSerializerIsReflectionEnabledByDefault,EnableTrimAnalyzer,EnableAotAnalyzer,NoWarn,TrimmerSingleWarn,SuppressTrimAnalysisWarnings,ILLinkTreatWarningsAsErrors,IlcTreatWarningsAsErrors,NuGetLockFilePath,UseRuntimeAsync,Features,WeaverConfiguration,ArtifactsPath";
             foreach (var (name, path) in new[] { ("probe", project), ("library", library) })
             {
+                var propertiesFile = Path.Combine(artifacts, name + "-properties.json");
                 (await Run(name + "-properties", "dotnet", ["msbuild", path, "-nologo", .. properties,
                     $"-p:TargetFramework={BuildTest.Framework}", "-p:Configuration=Release", "-p:UseArtifactsOutput=true",
-                    $"-p:ArtifactsPath={build}", $"-getProperty:{evaluated}"])).EnsureSuccess();
+                    $"-p:ArtifactsPath={build}", $"-getProperty:{evaluated}", $"-getResultOutputFile:{propertiesFile}"])).EnsureSuccess();
+                using var snapshot = JsonDocument.Parse(File.ReadAllBytes(propertiesFile));
+                var evaluatedProperties = snapshot.RootElement.GetProperty("Properties");
+                string Get(string key) => evaluatedProperties.GetProperty(key).GetString()!;
+                await Assert.That(Get("TargetFramework")).IsEqualTo(BuildTest.Framework);
+                await Assert.That(Get("RuntimeIdentifier")).IsEqualTo(BuildTest.Rid);
+                await Assert.That(Get("NativeAotMode")).IsEqualTo(mode);
+                await Assert.That(Get("NativeAotFeatureProvider")).IsEqualTo(provider == "explicit-catalog" ? "explicit" : "legacy");
+                var runtimeAsync = BuildTest.Framework == "net11.0" && !disableRuntimeAsync;
+                await Assert.That(bool.Parse(Get("UseRuntimeAsync"))).IsEqualTo(runtimeAsync);
+                await Assert.That(Get("Features").Split(';').Contains("runtime-async=on")).IsEqualTo(runtimeAsync);
+                var weaver = XElement.Parse(Get("WeaverConfiguration")).Element("ConfigureAwait");
+                await Assert.That((string?)weaver?.Attribute("ContinueOnCapturedContext")).IsEqualTo("false");
+                if (name == "probe")
+                {
+                    await Assert.That(string.Equals(Get("PublishAot"), "true", StringComparison.OrdinalIgnoreCase)).IsEqualTo(mode == "native");
+                    await Assert.That(Get("JsonSerializerIsReflectionEnabledByDefault")).IsEqualTo("false");
+                    var expectedLock = Path.Combine(Path.GetDirectoryName(path)!, "locks", mode, BuildTest.Rid, "packages.lock.json");
+                    await Assert.That(Get("NuGetLockFilePath")).IsEqualTo(expectedLock);
+                }
+                else
+                    await Assert.That(Get("NuGetLockFilePath")).IsEmpty();
             }
             (await Run("publish", "dotnet", ["publish", project, "-c", "Release", "-f", BuildTest.Framework, "--no-restore",
                 "--artifacts-path", build, "-o", publish, $"-bl:{Path.Combine(artifacts, "publish.binlog")}", .. properties])).EnsureSuccess();

@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace Elsa.NativeAot.IntegrationTests;
 
 internal static class BuildTest
 {
     public static readonly string Root = FindRepository();
-    public static string Framework => $"net{Environment.Version.Major}.0";
+    public static string Framework { get; } = $"net{new FrameworkName(AppContext.TargetFrameworkName!).Version.ToString(2)}";
     public static string Rid => RuntimeInformation.RuntimeIdentifier;
 
     public static string CreateDirectory(string name) =>
@@ -26,6 +27,9 @@ internal static class BuildTest
             start.ArgumentList.Add(argument);
         start.Environment["DOTNET_CLI_UI_LANGUAGE"] = "en-US";
         start.Environment["DOTNET_NOLOGO"] = "true";
+        // Keep nested builds owned by this process when another test host exits or is cancelled.
+        start.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "false";
+        start.Environment["MSBUILDDISABLENODEREUSE"] = "1";
         // Redirected SDK output is inspected for compiler diagnostics.
         start.Environment["MSBUILDTERMINALLOGGER"] = "off";
 

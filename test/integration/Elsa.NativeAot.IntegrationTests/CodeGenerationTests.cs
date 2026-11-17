@@ -1,9 +1,7 @@
 namespace Elsa.NativeAot.IntegrationTests;
 
-[Explicit]
-[Category("NativeAotAcceptance")]
 [NotInParallel("NativeAotBuild")]
-public class CodeGenerationTests
+public class ManagedCodeGenerationTests
 {
     [Test]
     [Arguments("Auto", "Dynamic")]
@@ -14,7 +12,13 @@ public class CodeGenerationTests
         var consumer = await CodeGenerationConsumer.Create($"managed-{mode}");
         await consumer.Verify(provider, [$"-p:ElsaExecutionMode={mode}", "-p:PublishAot=false"]);
     }
+}
 
+[Explicit]
+[Category("NativeAotAcceptance")]
+[NotInParallel("NativeAotBuild")]
+public class CodeGenerationTests
+{
     [Test]
     [Arguments("Dynamic")]
     [Arguments("Generated")]
