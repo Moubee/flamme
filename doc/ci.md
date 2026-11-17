@@ -13,6 +13,8 @@ of truth for triggers and commands. Use the SDK selected by
 | [ADR index](../.github/workflows/adr-toc.yml) | ADR/index/script changes | Generated architecture decision index is current. |
 
 Pull requests and manual PR workflow runs execute the complete .NET matrix.
+The NativeAOT stack also runs the matrix when a pull request targets a
+`feat/nativeaot-*` branch.
 The required `ubuntu-latest` result check succeeds only when both framework lanes
 pass; failed, canceled, or skipped tests fail the gate.
 
