@@ -37,14 +37,16 @@ public class GeneratedSdkCompositionTests
         using var scope = provider.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<ICommitStateHandler>();
         await Assert.That(handler).IsSameReferenceAs(scope.ServiceProvider.GetRequiredService<ExecutionCycleAwareCommitStateHandler>());
+        using var other = provider.CreateScope();
+        await Assert.That(ReferenceEquals(other.ServiceProvider.GetRequiredService<ICommitStateHandler>(), handler)).IsFalse();
     }
 
     [Test]
-    [Arguments(false, false)]
-    [Arguments(false, true)]
-    [Arguments(true, false)]
-    [Arguments(true, true)]
-    public async Task RuntimeReleasesTheCycleOnlyAfterTheHostTerminalCommit(bool withState, bool fail)
+    [Arguments(false, false, false)]
+    [Arguments(true, true, false)]
+    [Arguments(true, false, true)]
+    [Arguments(false, true, true)]
+    public async Task RuntimeReleasesTheCycleOnlyAfterTheHostTerminalCommit(bool withState, bool fail, bool replaceHandle)
     {
         var services = new ServiceCollection();
         var custom = new RecordingCommitHandler(fail);
@@ -73,14 +75,25 @@ public class GeneratedSdkCompositionTests
         await Assert.That(registry.ActiveCount).IsEqualTo(1);
         await Assert.That(handle.Disposed.IsCompleted).IsFalse();
 
+        using var replacement = replaceHandle ? registry.BeginCycle("replacement", null, default) : null;
+        custom.DuringCommit = ctx =>
+        {
+            if (replacement == null)
+                ctx.TransientProperties.Clear();
+            else
+                ctx.TransientProperties = new Dictionary<object, object> { [ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey] = replacement };
+        };
         Task CommitFinal() => handler.CommitFinalAsync(context, new WorkflowState());
         if (fail)
             await Assert.That(CommitFinal).Throws<InvalidOperationException>().WithMessage("host commit failed");
         else
             await CommitFinal();
 
-        await Assert.That(registry.ActiveCount).IsEqualTo(0);
+        await Assert.That(custom.ActiveDuringCommit).IsEqualTo(replaceHandle ? 2 : 1);
+        await Assert.That(registry.ActiveCount).IsEqualTo(replaceHandle ? 1 : 0);
         await Assert.That(handle.Disposed.IsCompletedSuccessfully).IsTrue();
+        if (replacement != null)
+            await Assert.That(replacement.Disposed.IsCompleted).IsFalse();
     }
 
     [Test]
@@ -88,6 +101,8 @@ public class GeneratedSdkCompositionTests
     {
         var services = new ServiceCollection();
         List<RecordingCommitHandler> handlers = [];
+        using var external = new RecordingCommitHandler(false);
+        services.AddSingleton<ICommitStateHandler>(external);
         services.AddLogging();
         services.AddSingleton<IConfiguration, ConfigurationManager>();
         services.AddElsa(elsa => elsa.UseWorkflows(workflows => workflows.CommitStateHandler = _ =>
@@ -96,20 +111,27 @@ public class GeneratedSdkCompositionTests
             handlers.Add(handler);
             return handler;
         }));
+        var firstRegistrations = services.Where(d => d.ServiceType == typeof(ICommitStateHandler)).ToArray();
         services.AddElsa();
-        using var provider = services.BuildServiceProvider();
-        for (var i = 0; i < 2; i++)
+        await Assert.That(firstRegistrations.All(services.Contains)).IsTrue();
+        using (var provider = services.BuildServiceProvider())
         {
-            using var scope = provider.CreateScope();
-            var handler = scope.ServiceProvider.GetRequiredService<ICommitStateHandler>();
-            await Assert.That(handler).IsAssignableTo<ExecutionCycleAwareCommitStateHandler>();
-            await Assert.That(scope.ServiceProvider.GetRequiredService<ICommitStateHandler>()).IsSameReferenceAs(handler);
+            for (var i = 0; i < 2; i++)
+            {
+                using var scope = provider.CreateScope();
+                var resolved = scope.ServiceProvider.GetServices<ICommitStateHandler>().ToArray();
+                await Assert.That(resolved.Length).IsEqualTo(3);
+                await Assert.That(resolved.All(handler => handler is ExecutionCycleAwareCommitStateHandler)).IsTrue();
+                await Assert.That(scope.ServiceProvider.GetRequiredService<ICommitStateHandler>()).IsSameReferenceAs(resolved.Last());
+            }
         }
-        await Assert.That(handlers.Select(handler => handler.DisposeCount).SequenceEqual([1, 1])).IsTrue();
+        await Assert.That(external.DisposeCount).IsEqualTo(0);
+        await Assert.That(handlers.Select(handler => handler.DisposeCount).SequenceEqual([1, 1, 1, 1])).IsTrue();
     }
 
     private sealed class RecordingCommitHandler(bool fail) : ICommitStateHandler, IDisposable
     {
+        public Action<WorkflowExecutionContext>? DuringCommit { get; set; }
         public bool? WithState { get; private set; }
         public int ActiveDuringCommit { get; private set; }
         public int DisposeCount { get; private set; }
@@ -122,6 +144,7 @@ public class GeneratedSdkCompositionTests
         {
             WithState = withState;
             ActiveDuringCommit = context.GetRequiredService<IExecutionCycleRegistry>().ActiveCount;
+            DuringCommit?.Invoke(context);
             return fail ? Task.FromException(new InvalidOperationException("host commit failed")) : Task.CompletedTask;
         }
     }

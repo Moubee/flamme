@@ -268,9 +268,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
 
     public override void Apply()
     {
-        Services.Decorate<ICommitStateHandler>(static handler => handler is ExecutionCycleAwareCommitStateHandler
-            ? handler
-            : new ExecutionCycleAwareCommitStateHandler(handler));
+        ExecutionCycleAwareCommitStateHandler.DecorateRegistrations(Services);
 
         // Options.
         Services.Configure(DistributedLockingOptions);

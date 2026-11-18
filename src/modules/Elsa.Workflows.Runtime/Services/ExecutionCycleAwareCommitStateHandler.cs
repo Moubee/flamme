@@ -1,6 +1,7 @@
 using Elsa.Workflows.CommitStates;
 using Elsa.Workflows.Runtime.Middleware.Workflows;
 using Elsa.Workflows.State;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Elsa.Workflows.Runtime.Services;
 
@@ -22,6 +23,33 @@ public sealed class ExecutionCycleAwareCommitStateHandler : ICommitStateHandler
 
     internal ExecutionCycleAwareCommitStateHandler(ICommitStateHandler inner) => _inner = inner;
 
+    internal static void DecorateRegistrations(IServiceCollection services)
+    {
+        for (var i = 0; i < services.Count; i++)
+        {
+            var descriptor = services[i];
+            if (descriptor.ServiceType != typeof(ICommitStateHandler) || descriptor.IsKeyedService || descriptor is DecoratedRegistration)
+                continue;
+
+            // Keep the original registration's lifetime and disposal ownership under a private key.
+            var key = new object();
+            var inner = descriptor switch
+            {
+                { ImplementationInstance: { } instance } => ServiceDescriptor.KeyedSingleton(descriptor.ServiceType, key, instance),
+                { ImplementationType: { } type } => ServiceDescriptor.DescribeKeyed(descriptor.ServiceType, key, type, descriptor.Lifetime),
+                _ => ServiceDescriptor.DescribeKeyed(descriptor.ServiceType, key, (sp, _) => descriptor.ImplementationFactory!(sp), descriptor.Lifetime)
+            };
+            services[i] = new DecoratedRegistration(key, descriptor.Lifetime);
+            services.Add(inner);
+        }
+    }
+
+    private sealed class DecoratedRegistration(object key, ServiceLifetime lifetime) : ServiceDescriptor(typeof(ICommitStateHandler), sp =>
+    {
+        var inner = sp.GetRequiredKeyedService<ICommitStateHandler>(key);
+        return inner is ExecutionCycleAwareCommitStateHandler ? inner : new ExecutionCycleAwareCommitStateHandler(inner);
+    }, lifetime);
+
     /// <inheritdoc />
     public Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, CancellationToken cancellationToken = default) =>
         _inner.CommitAsync(workflowExecutionContext, cancellationToken);
@@ -33,13 +61,10 @@ public sealed class ExecutionCycleAwareCommitStateHandler : ICommitStateHandler
     /// <inheritdoc />
     public async Task CommitFinalAsync(WorkflowExecutionContext workflowExecutionContext, WorkflowState workflowState, CancellationToken cancellationToken = default)
     {
+        // A host commit handler can clear or replace transient properties while persisting.
+        workflowExecutionContext.TransientProperties.TryGetValue(ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey, out var activeCycle);
+        var handle = activeCycle as ExecutionCycleHandle;
         try { await _inner.CommitFinalAsync(workflowExecutionContext, workflowState, cancellationToken); }
-        finally { DisposeCycleHandleIfPresent(workflowExecutionContext); }
-    }
-
-    private static void DisposeCycleHandleIfPresent(WorkflowExecutionContext context)
-    {
-        if (context.TransientProperties.TryGetValue(ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey, out var raw) && raw is ExecutionCycleHandle handle)
-            handle.Dispose();
+        finally { handle?.Dispose(); }
     }
 }
