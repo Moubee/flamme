@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Elsa.Mediator.Middleware;
@@ -13,7 +14,7 @@ public static class MiddlewareHelpers
     /// <param name="middleware">The middleware type.</param>
     /// <returns>The Invoke or InvokeAsync method.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the Invoke or InvokeAsync method cannot be found or the return type is not Task or ValueTask.</exception>
-    public static MethodInfo GetInvokeMethod(Type middleware)
+    public static MethodInfo GetInvokeMethod([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type middleware)
     {
         const string invokeMethodName = "Invoke";
         const string invokeAsyncMethodName = "InvokeAsync";

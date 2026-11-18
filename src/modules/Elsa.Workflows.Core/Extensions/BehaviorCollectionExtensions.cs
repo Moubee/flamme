@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Workflows;
 
 // ReSharper disable once CheckNamespace
@@ -7,7 +8,7 @@ public static class BehaviorCollectionExtensions
 {
     extension(ICollection<IBehavior> behaviors)
     {
-        public void Add<T>(IActivity owner) where T : IBehavior => behaviors.Add((T)Activator.CreateInstance(typeof(T), owner)!);
+        public void Add<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(IActivity owner) where T : IBehavior => behaviors.Add((T)Activator.CreateInstance(typeof(T), owner)!);
 
         public void Remove<T>() where T : IBehavior
         {

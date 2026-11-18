@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Mediator.Middleware.Request.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,7 @@ public static class MiddlewareExtensions
     /// <param name="builder">The request pipeline builder.</param>
     /// <param name="args">The arguments to pass to the middleware constructor.</param>
     /// <typeparam name="TMiddleware">The middleware type.</typeparam>
-    public static IRequestPipelineBuilder UseMiddleware<TMiddleware>(this IRequestPipelineBuilder builder, params object[] args) where TMiddleware : IRequestMiddleware
+    public static IRequestPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(this IRequestPipelineBuilder builder, params object[] args) where TMiddleware : IRequestMiddleware
     {
         var middleware = typeof(TMiddleware);
 

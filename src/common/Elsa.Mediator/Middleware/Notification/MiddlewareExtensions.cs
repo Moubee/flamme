@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Mediator.Middleware.Notification.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,7 @@ public static class MiddlewareExtensions
     /// <param name="builder">The notification pipeline builder.</param>
     /// <param name="args">The arguments to pass to the middleware constructor.</param>
     /// <typeparam name="TMiddleware">The middleware type.</typeparam>
-    public static INotificationPipelineBuilder UseMiddleware<TMiddleware>(this INotificationPipelineBuilder builder, params object[] args) where TMiddleware : INotificationMiddleware
+    public static INotificationPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(this INotificationPipelineBuilder builder, params object[] args) where TMiddleware : INotificationMiddleware
     {
         var middleware = typeof(TMiddleware);
 

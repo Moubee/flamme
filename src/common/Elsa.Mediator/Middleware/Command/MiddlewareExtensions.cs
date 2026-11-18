@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Mediator.Middleware.Command.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ public static class MiddlewareExtensions
     /// <summary>
     /// Adds middleware to the pipeline.
     /// </summary>
-    public static ICommandPipelineBuilder UseMiddleware<TMiddleware>(this ICommandPipelineBuilder builder, params object[] args) where TMiddleware : ICommandMiddleware
+    public static ICommandPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(this ICommandPipelineBuilder builder, params object[] args) where TMiddleware : ICommandMiddleware
     {
         return builder.Use(next => BuildMiddlewareDelegate<TMiddleware>(builder, next, args));
     }
@@ -19,7 +20,7 @@ public static class MiddlewareExtensions
     /// <summary>
     /// Inserts middleware at a specific index in the pipeline.
     /// </summary>
-    public static ICommandPipelineBuilder UseMiddleware<TMiddleware>(this ICommandPipelineBuilder builder, int index, params object[] args) where TMiddleware : ICommandMiddleware
+    public static ICommandPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(this ICommandPipelineBuilder builder, int index, params object[] args) where TMiddleware : ICommandMiddleware
     {
         return builder.Use(index, next => BuildMiddlewareDelegate<TMiddleware>(builder, next, args));
     }
@@ -27,7 +28,7 @@ public static class MiddlewareExtensions
     /// <summary>
     /// Builds a delegate for the middleware type.
     /// </summary>
-    private static CommandMiddlewareDelegate BuildMiddlewareDelegate<TMiddleware>(
+    private static CommandMiddlewareDelegate BuildMiddlewareDelegate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(
         ICommandPipelineBuilder builder,
         CommandMiddlewareDelegate next,
         object[] args

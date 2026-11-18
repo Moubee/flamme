@@ -13,7 +13,7 @@ public static class WorkflowExecutionMiddlewareExtensions
         /// <summary>
         /// Installs the specified middleware component into the pipeline being built.
         /// </summary>
-        public IWorkflowExecutionPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
+        public IWorkflowExecutionPipelineBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
         {
             var delegateFactory = CreateMiddlewareDelegateFactory<TMiddleware>(pipelineBuilder, args);
             return pipelineBuilder.Use(delegateFactory);
@@ -22,7 +22,7 @@ public static class WorkflowExecutionMiddlewareExtensions
         /// <summary>
         /// Installs the specified middleware component into the pipeline being built.
         /// </summary>
-        public IWorkflowExecutionPipelineBuilder Insert<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int index, params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
+        public IWorkflowExecutionPipelineBuilder Insert<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(int index, params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
         {
             var delegateFactory = CreateMiddlewareDelegateFactory<TMiddleware>(pipelineBuilder, args);
             return pipelineBuilder.Insert(index, delegateFactory);
@@ -31,7 +31,7 @@ public static class WorkflowExecutionMiddlewareExtensions
         /// <summary>
         /// Replaces the terminal middleware component with the specified middleware component.
         /// </summary>
-        public IWorkflowExecutionPipelineBuilder ReplaceTerminal<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
+        public IWorkflowExecutionPipelineBuilder ReplaceTerminal<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
         {
             var index = pipelineBuilder.Components.Count() - 1;
             return pipelineBuilder.Replace<TMiddleware>(index, args);
@@ -40,7 +40,7 @@ public static class WorkflowExecutionMiddlewareExtensions
         /// <summary>
         /// Replaces the middleware component at the specified index with the specified middleware component.
         /// </summary>
-        public IWorkflowExecutionPipelineBuilder Replace<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int index, params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
+        public IWorkflowExecutionPipelineBuilder Replace<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(int index, params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
         {
             var delegateFactory = CreateMiddlewareDelegateFactory<TMiddleware>(pipelineBuilder, args);
             return pipelineBuilder.Replace(index, delegateFactory);
@@ -49,7 +49,7 @@ public static class WorkflowExecutionMiddlewareExtensions
         /// <summary>
         /// Creates a middleware delegate for the specified middleware component.
         /// </summary>
-        public Func<WorkflowMiddlewareDelegate, WorkflowMiddlewareDelegate> CreateMiddlewareDelegateFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
+        public Func<WorkflowMiddlewareDelegate, WorkflowMiddlewareDelegate> CreateMiddlewareDelegateFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TMiddleware>(params object[] args) where TMiddleware : IWorkflowExecutionMiddleware
         {
             var middleware = typeof(TMiddleware);
 

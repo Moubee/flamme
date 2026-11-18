@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Elsa.Workflows.Pipelines;
 
 public static class MiddlewareHelpers
 {
-    public static MethodInfo GetInvokeMethod(Type middleware)
+    public static MethodInfo GetInvokeMethod([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type middleware)
     {
         const string invokeMethodName = "Invoke";
         const string invokeAsyncMethodName = "InvokeAsync";
