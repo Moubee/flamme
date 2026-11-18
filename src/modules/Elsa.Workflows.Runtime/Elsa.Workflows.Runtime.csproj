@@ -24,4 +24,5 @@
         <ProjectReference Include="..\Elsa.Workflows.Management\Elsa.Workflows.Management.csproj" />
     </ItemGroup>
 
+  <Import Project="../../common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>

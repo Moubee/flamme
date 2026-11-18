@@ -10,6 +10,18 @@ internal static class CompilerDiagnostics
     private static readonly DiagnosticDescriptor Hook = Descriptor("ELSAGEN003", "Declare the selected host hook");
     private static readonly DiagnosticDescriptor Manual = Descriptor("ELSAGEN004", "Select the matching manual bootstrap hook");
 
+    internal static readonly DiagnosticDescriptor DirectConstruction = new("ELSAGEN005", "Use a module creation entry point",
+        "Creating Module here bypasses compiled feature registration. Use services.CreateModule() or supply an explicit catalog.",
+        "Elsa.CodeGeneration", DiagnosticSeverity.Error, true);
+    internal static readonly DiagnosticDescriptor IndirectCreation = new("ELSAGEN006", "Call the module creation entry point directly",
+        "The {0} method group bypasses compiled feature registration. Invoke the method in a lambda or supply an explicit catalog.",
+        "Elsa.CodeGeneration", DiagnosticSeverity.Error, true);
+
+    internal static readonly DiagnosticDescriptor InaccessibleRequest = new("ELSAGEN010",
+        "Provide an accessible binding for the requested type",
+        "'{0}' requests '{1}', which cannot be bound by the generated Features helper: {2}",
+        "Elsa.CodeGeneration", DiagnosticSeverity.Error, isEnabledByDefault: true);
+
     internal static ImmutableArray<DiagnosticDescriptor> All => ImmutableArray.Create(Host, Entry, Hook, Manual);
     internal static DiagnosticDescriptor For(HostFailure failure) => failure switch
     {

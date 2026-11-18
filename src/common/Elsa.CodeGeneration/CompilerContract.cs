@@ -89,6 +89,9 @@ internal sealed class HostContractResult
 
 internal static class CompilerContract
 {
+    internal static bool HasAuthoredHost(Compilation compilation) =>
+        compilation.Assembly.GetTypeByMetadataName(HostMetadataName) is not null;
+
     internal const string HostMetadataName = "Elsa.CodeGeneration.ElsaHost";
     internal const string BootstrapHintName = "ElsaHost.Bootstrap.g.cs";
     private const string ModuleTypeName = "Elsa.Features.Services.IModule";

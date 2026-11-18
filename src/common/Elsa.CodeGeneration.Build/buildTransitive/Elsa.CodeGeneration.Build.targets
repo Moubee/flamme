@@ -25,6 +25,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(ElsaIsHost)' == 'true'">
+      <InterceptorsNamespaces Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated' And '$(ElsaHostBootstrap)' == 'Compiler'">$(InterceptorsNamespaces);Elsa.CodeGeneration.Interceptors</InterceptorsNamespaces>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated'">$(DefineConstants);ELSA_GENERATED</DefineConstants>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Dynamic'">$(DefineConstants);ELSA_DYNAMIC</DefineConstants>
     </PropertyGroup>
