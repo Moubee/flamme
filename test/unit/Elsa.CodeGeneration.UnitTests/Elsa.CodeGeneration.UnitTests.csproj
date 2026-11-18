@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <ProjectReference Include="../../../src/common/Elsa.Features/Elsa.Features.csproj" />
     <ProjectReference Include="../../../src/common/RegistrationCompiler/RegistrationCompiler.csproj" />
     <ProjectReference Include="../../../src/common/Elsa.CodeGeneration/Elsa.CodeGeneration.csproj" />
     <ProjectReference Include="../../../src/common/Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj" />

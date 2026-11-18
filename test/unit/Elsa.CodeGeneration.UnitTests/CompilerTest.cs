@@ -20,9 +20,11 @@ internal static class CompilerTest
         CSharpCompilation.Create("Example", sources.Select(s => CSharpSyntaxTree.ParseText(s.Source, ParseOptions, s.Path)),
             References, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
 
-    public static GeneratorDriver CreateDriver(params IIncrementalGenerator[] generators) =>
+    public static GeneratorDriver CreateDriver(params IIncrementalGenerator[] generators) => CreateDriver(false, generators);
+
+    public static GeneratorDriver CreateDriver(bool isHost, params IIncrementalGenerator[] generators) =>
         CSharpGeneratorDriver.Create(generators.Select(generator => generator.AsSourceGenerator()),
-            parseOptions: ParseOptions, optionsProvider: new ProducerBuildOptions());
+            parseOptions: ParseOptions, optionsProvider: new ProducerBuildOptions(isHost));
 
     public static GeneratorDriver Run(this GeneratorDriver driver, CSharpCompilation input, out CSharpCompilation output)
     {
@@ -38,13 +40,13 @@ internal static class CompilerTest
         await Assert.That(result.Success).IsTrue().Because(string.Join(Environment.NewLine, result.Diagnostics));
     }
 
-    private sealed class ProducerBuildOptions : AnalyzerConfigOptionsProvider
+    private sealed class ProducerBuildOptions(bool isHost = false) : AnalyzerConfigOptionsProvider
     {
         private static readonly AnalyzerConfigOptions Empty = new Options(new Dictionary<string, string>());
 
         public override AnalyzerConfigOptions GlobalOptions { get; } = new Options(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["build_property.ElsaIsHost"] = "false",
+            ["build_property.ElsaIsHost"] = isHost ? "true" : "false",
             ["build_property.ElsaGenerateMetadata"] = "true",
             ["build_property.ElsaEffectiveExecutionMode"] = "Generated",
             ["build_property.ElsaHostBootstrap"] = "Compiler",
