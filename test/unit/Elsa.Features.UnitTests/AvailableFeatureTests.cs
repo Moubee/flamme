@@ -47,6 +47,22 @@ public class AvailableFeatureTests
         await Assert.That(module.Configure<ThrowingFeature>()).IsSameReferenceAs(retry);
     }
 
+    [Test]
+    [Arguments(CompositionPolicy.LegacyV1)]
+    [Arguments(CompositionPolicy.ValidatedV1)]
+    public async Task ADependencyWithoutADefaultFactoryReportsItsRequester(CompositionPolicy policy)
+    {
+        var catalog = new ExplicitFeatureCatalogBuilder()
+            .AddAvailable<BrokenFeature>(m => new(m), Metadata, [typeof(CustomFeature)])
+            .AddAvailable<CustomFeature>(null, Metadata)
+            .BuildAvailable();
+        var module = new ServiceCollection().CreateModule(catalog, policy);
+        module.Configure<BrokenFeature>();
+
+        var error = await Assert.That(module.Apply).Throws<MissingMethodException>();
+        await Assert.That(error!.Message).Contains($"{typeof(BrokenFeature).FullName} -> {typeof(CustomFeature).FullName}");
+    }
+
     private sealed class BrokenFeature(IModule module) : FeatureBase(module);
     private sealed class MissingFeature(IModule module) : FeatureBase(module);
     private sealed class CustomFeature(IModule module, int value) : FeatureBase(module)

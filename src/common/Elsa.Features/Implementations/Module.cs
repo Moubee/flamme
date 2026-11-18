@@ -340,10 +340,42 @@ public class Module : IModule
                 throw new InvalidOperationException($"Factory for feature {type} returned {feature?.GetType().ToString() ?? "null"}; an exact feature identity is required.");
             return feature!;
         }
+        catch (MissingFeatureConstructorException exception)
+        {
+            var path = FindRequestPath(type, previous);
+            throw new MissingMethodException($"Feature admission {FeatureGraph.Format(path)}: {exception.Message}", exception);
+        }
         finally
         {
             _activeFeature = previous;
             _constructingFeatures.Remove(type);
+        }
+    }
+
+    // Reconstruct the path only on failure. The normal lifecycle keeps its existing ordering.
+    private IReadOnlyList<Type> FindRequestPath(Type target, Type? caller)
+    {
+        if (caller != null && caller != target)
+            return [caller, target];
+
+        var seen = new HashSet<Type>();
+        var path = new List<Type>();
+        foreach (var root in _features.Keys)
+            if (Visit(root))
+                return path;
+        return [target];
+
+        bool Visit(Type current)
+        {
+            if (!seen.Add(current))
+                return false;
+            path.Add(current);
+            if (current == target)
+                return true;
+            if (_provider is ExplicitFeatureCatalog catalog && catalog.AvailableDependencies(current).Any(Visit))
+                return true;
+            path.RemoveAt(path.Count - 1);
+            return false;
         }
     }
 

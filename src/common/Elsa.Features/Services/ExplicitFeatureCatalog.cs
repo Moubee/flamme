@@ -34,10 +34,12 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
 
     internal bool CompiledDeclarations { get; }
 
+    internal IReadOnlyList<Type> AvailableDependencies(Type type) =>
+        _features.TryGetValue(type, out var feature) ? feature.Dependencies : [];
+
     IFeature IFeatureProvider.CreateFeature(Type type, IModule module)
     {
-        var factory = Get(type).Factory ?? throw new MissingMethodException(
-            $"Feature {type} has no public module constructor. Supply a factory with Configure<T>(factory, configure).");
+        var factory = Get(type).Factory ?? throw new MissingFeatureConstructorException(type);
         IFeature feature;
         try
         {
@@ -70,3 +72,6 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
         ? entry
         : throw new InvalidOperationException($"Missing catalog entry for feature {type}.");
 }
+
+internal sealed class MissingFeatureConstructorException(Type featureType) : MissingMethodException(
+    $"Feature {featureType} has no supported public module constructor. Supply a factory with Configure<T>(factory, configure).");
