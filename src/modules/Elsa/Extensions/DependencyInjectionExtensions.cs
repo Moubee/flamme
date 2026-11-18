@@ -38,22 +38,16 @@ public static class ModuleExtensions
 
     private static IModule AddElsa(CachedModule cached, Action<IModule>? configure)
     {
-        lock (cached)
-        {
-            cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
-            cached.Module.Apply();
-            return cached.Module;
-        }
+        cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
+        cached.Module.Apply();
+        return cached.Module;
     }
 
     private static IModule ConfigureElsa(CachedModule cached, Action<IModule>? configure)
     {
-        lock (cached)
-        {
-            if (configure != null)
-                cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
-            return cached.Module;
-        }
+        if (configure != null)
+            cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
+        return cached.Module;
     }
 
     private static CachedModule GetOrCreateModule(IServiceCollection services, ExplicitFeatureCatalog? catalog)
