@@ -52,6 +52,16 @@ aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHos
 aspire describe server --format Json --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
 ```
 
+To run the managed reference server with generated feature factories from a
+fresh worktree, set the build property when starting the AppHost.
+
+```bash
+ElsaExecutionMode=Generated aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+```
+
+The server's ordinary `AddElsa` and `UseX` calls use the registrations compiled
+into the referenced modules. [Feature build selection](wiki/nativeaot-build-selection.md)
+
 Use `aspire wait` before sending requests. Copy a published `server` URL from
 the dashboard or `aspire describe`; ports are allocated dynamically and can
 change after a restart. The AppHost supplies the generated PostgreSQL connection

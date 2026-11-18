@@ -103,9 +103,10 @@ module and service collection. Catching a nested admission error inside a featur
 cannot resume a faulted module. Arbitrary callback effects are not rolled back.
 The existing default managed path retains its legacy failure behavior.
 
-This is the runtime contract for future generated manifests. The
-[NativeAOT component probe](nativeaot-probes.md) exercises handwritten catalogs;
-source generation and full Workflow Core/native-host support remain separate work.
+Feature packages also supply compiler-generated registrations for the same
+lifecycle. A host enables these with `ElsaExecutionMode=Generated` and keeps
+its ordinary `AddElsa` and `UseX` calls. The [build selection guide](nativeaot-build-selection.md)
+covers automatic tooling delivery and locating a constructor factory in Rider.
 
 ### Versioned producer exports
 
