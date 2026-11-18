@@ -46,7 +46,7 @@ On this workload, NativeAOT shortened the median first Apply by 18.48 ms and use
 
 A separate osx-arm64 publication of the actual `Elsa.Server.Web` project produced a 61,475,024-byte (58.63 MiB) ARM64 Mach-O executable. On launch, `WorkflowsApiFeature.Apply()` threw `InvalidOperationException: FastEndpoints was unable to find any endpoint declarations!` The process exited via SIGABRT before HTTP startup. The seven-feature results above cover the completed workload. The full reference server has no native startup or HTTP throughput measurement.
 
-The full-server check and workload measurements both used version 4 of the binding metadata and production sources at `ae2edb41a8993f78b29e3bb192f850e966e64342`. To repeat the web check, set `<PublishAot>true</PublishAot>` in the web project’s property group in a scratch checkout. This confines the native setting to the executable and lets the compiler tools build for .NET Standard.
+The full-server check and both workload publications used the schema 4 generator, runtime, and reference server composition in [the benchmark commit](https://github.com/Moubee/flamme/commit/92a32851a4fad3471165ef056d1632921df25c13). To repeat the web check, set `<PublishAot>true</PublishAot>` in the web project’s property group in a scratch checkout. This confines the native setting to the executable and lets the compiler tools build for .NET Standard.
 
 ```sh
 dotnet publish src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj -c Release -r osx-arm64 \
