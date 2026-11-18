@@ -154,8 +154,11 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 case IInvocationOperation invocation when invocation.Instance == result:
                     result = invocation;
                     continue;
-                case IArgumentOperation argument when argument.Parent is IInvocationOperation or IObjectCreationOperation && IsModuleOrFeature(result.Type):
+                case IArgumentOperation argument when argument.Parent is IInvocationOperation or IObjectCreationOperation or IPropertyReferenceOperation && IsModuleOrFeature(result.Type):
                     result = argument.Parent;
+                    continue;
+                case IAssignmentOperation { Target: IPropertyReferenceOperation } write:
+                    result = write;
                     continue;
             }
             break;
@@ -510,8 +513,17 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             else if (selector == null)
                 Error(site.GetLocation(), $"The property accessor '{method}' needs compiler-visible feature-selection metadata. Rebuild the package with the Elsa generator.");
             else if (bound.Count == inputs.Count)
-                AddSelector(selector, method, site.GetLocation(), conditional);
-            else if (SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly) && selector.Error == null &&
+                AddSelector(selector, accessorMethod!, site.GetLocation(), conditional, (name, guarded, isFactory) =>
+                {
+                    var parameter = accessorMethod!.Parameters.FirstOrDefault(p => p.Name == name);
+                    var assigned = property.Parent is ICompoundAssignmentOperation ? null : value;
+                    if (FixedProducerModel.SuppliedArgument(parameter, property.Arguments, assigned) is {} argument)
+                        ReadArgument(parameter!, argument, guarded, isFactory);
+                    else
+                        Error(site.GetLocation(), $"Cannot bind callback '{name}' on '{property.Property}'. Supply the callback directly using a simple assignment or index argument.");
+                });
+            else if (selector.ConfigurationParameters.Length == 0 && selector.ConditionalConfigurationParameters.Length == 0 &&
+                     SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly) && selector.Error == null &&
                      (!method.IsVirtual && !method.IsOverride || method.IsSealed || method.ContainingType.IsSealed) &&
                      method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken) is { } accessor && _activeCallbacks.Add(method))
             {
@@ -553,43 +565,75 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         void ReadArguments(IEnumerable<IArgumentOperation> arguments, bool conditional, Func<string, bool> invoked, bool isFactory = false)
         {
             foreach (var argument in arguments)
+                if (!argument.IsImplicit && argument.Parameter is {} parameter && invoked(parameter.Name))
+                    ReadArgument(parameter, argument.Value, conditional, isFactory);
+        }
+
+        void ReadArgument(IParameterSymbol parameter, IOperation value, bool conditional, bool isFactory)
+        {
+            while (value is IParameterReferenceOperation forwarded && _localArguments.TryGetValue(forwarded.Parameter, out var supplied) && supplied != value)
+                value = supplied;
+            if (parameter.ContainingSymbol is IMethodSymbol { MethodKind: MethodKind.PropertyGet or MethodKind.PropertySet } accessor)
             {
-                if (argument.IsImplicit || argument.Parameter == null || !invoked(argument.Parameter.Name))
-                    continue;
-                var value = argument.Value;
-                if (isFactory && argument.Parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} factorySignature })
+                var target = DelegateTargets.Resolve(value, compilation, output.CancellationToken);
+                if (target?.ConstantValue is { HasValue: true, Value: null }) return;
+                if (target is IConditionalOperation choice)
                 {
-                    while (value is IParameterReferenceOperation forwarded && _localArguments.TryGetValue(forwarded.Parameter, out var supplied) && supplied != value)
-                        value = supplied;
-                    if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation factory)
-                        handledCallbacks.Add(factory.Syntax);
-                    var method = (IMethodSymbol)argument.Parameter.ContainingSymbol;
-                    var effects = producers.ReadFactory(value, method, BindType(factorySignature.ReturnType)!, output.CancellationToken);
-                    if (effects.ConfigurationParameters.Length != 0 || effects.ConditionalConfigurationParameters.Length != 0)
-                        Error(argument.Syntax.GetLocation(), "Cannot inspect the feature factory at this host call. Supply a lambda that constructs the feature with its module parameter.");
-                    else
-                        AddSelector(effects, method, argument.Syntax.GetLocation(), conditional);
-                    continue;
+                    foreach (var (candidate, guarded) in DelegateTargets.Choices(choice))
+                        ReadArgument(parameter, candidate, conditional || guarded, isFactory);
+                    return;
                 }
-                if (argument.Parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} delegateMethod } && !delegateMethod.Parameters.Any(p => IsModuleOrFeature(p.Type)))
+                if (target is not (IAnonymousFunctionOperation or IMethodReferenceOperation))
                 {
-                    if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation deferred)
-                        handledCallbacks.Add(deferred.Syntax);
-                    ReadDelegate(value, [], argument.Syntax, conditional);
-                    continue;
+                    Error(value.Syntax.GetLocation(), $"Cannot inspect callback '{parameter.Name}' on '{accessor.AssociatedSymbol}'. Assign a visible lambda or method group.");
+                    return;
                 }
-                while (value is IDelegateCreationOperation or IConversionOperation)
-                    value = value is IDelegateCreationOperation d ? d.Target : ((IConversionOperation)value).Operand;
-                if (value is IAnonymousFunctionOperation function)
+                if (target is IAnonymousFunctionOperation callback && callback.Body.DescendantsAndSelf().Any(op =>
+                    {
+                        var declaration = op switch
+                        {
+                            ILocalReferenceOperation local => local.Local.Locations.FirstOrDefault(),
+                            IParameterReferenceOperation p => p.Parameter.Locations.FirstOrDefault(),
+                            _ => null
+                        };
+                        return declaration != null && IsModuleOrFeature(op.Type) && !callback.Syntax.Span.Contains(declaration.SourceSpan) && !Owned(op);
+                    }))
                 {
-                    handledCallbacks.Add(function.Syntax);
-                    var bound = new HashSet<ISymbol>(helperOwners ?? [], SymbolEqualityComparer.Default);
-                    foreach (var parameter in function.Symbol.Parameters) bound.Add(parameter);
-                    ReadBody(function.Syntax, semantic, owner, creation, function.Syntax, conditional, bound);
+                    Error(value.Syntax.GetLocation(), $"Callback '{parameter.Name}' on '{accessor.AssociatedSymbol}' captures a different module or feature. Register its features on that module directly.");
+                    return;
                 }
-                else if (value is IMethodReferenceOperation or ILocalReferenceOperation)
-                    ReadCallback(value, semantic, argument.Syntax.GetLocation(), new HashSet<ISymbol>(SymbolEqualityComparer.Default), conditional);
+                value = target;
             }
+            if (isFactory && parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} factorySignature })
+            {
+                if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation factory)
+                    handledCallbacks.Add(factory.Syntax);
+                var method = (IMethodSymbol)parameter.ContainingSymbol;
+                var effects = producers.ReadFactory(value, method, BindType(factorySignature.ReturnType)!, output.CancellationToken);
+                if (effects.ConfigurationParameters.Length != 0 || effects.ConditionalConfigurationParameters.Length != 0)
+                    Error(value.Syntax.GetLocation(), "Cannot inspect the feature factory at this host call. Supply a lambda that constructs the feature with its module parameter.");
+                else
+                    AddSelector(effects, method, value.Syntax.GetLocation(), conditional);
+                return;
+            }
+            if (parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} delegateMethod } && !delegateMethod.Parameters.Any(p => IsModuleOrFeature(p.Type)))
+            {
+                if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation deferred)
+                    handledCallbacks.Add(deferred.Syntax);
+                ReadDelegate(value, [], value.Syntax, conditional);
+                return;
+            }
+            while (value is IDelegateCreationOperation or IConversionOperation)
+                value = value is IDelegateCreationOperation d ? d.Target : ((IConversionOperation)value).Operand;
+            if (value is IAnonymousFunctionOperation function)
+            {
+                handledCallbacks.Add(function.Syntax);
+                var bound = new HashSet<ISymbol>(helperOwners ?? [], SymbolEqualityComparer.Default);
+                foreach (var input in function.Symbol.Parameters) bound.Add(input);
+                ReadBody(function.Syntax, semantic, owner, creation, function.Syntax, conditional, bound);
+            }
+            else if (value is IMethodReferenceOperation or ILocalReferenceOperation)
+                ReadCallback(value, semantic, value.Syntax.GetLocation(), new HashSet<ISymbol>(SymbolEqualityComparer.Default), conditional);
         }
 
         bool IsOwned(IOperation? value, HashSet<ISymbol> seen, bool compositionRead = false)

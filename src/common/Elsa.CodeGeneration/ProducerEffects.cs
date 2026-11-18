@@ -52,6 +52,16 @@ internal sealed partial class FixedProducerModel
         RequiresVirtualDispatch(method) &&
         property.Syntax is not MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax } and not ElementAccessExpressionSyntax { Expression: BaseExpressionSyntax };
 
+    // Roslyn represents the setter's final parameter as the assignment RHS, outside
+    // the index arguments. Bind by ordinal so named indices and overrides agree.
+    internal static IOperation? SuppliedArgument(IParameterSymbol? parameter, IEnumerable<IArgumentOperation> arguments, IOperation? assignedValue)
+    {
+        if (parameter == null) return null;
+        if (parameter.ContainingSymbol is IMethodSymbol { MethodKind: MethodKind.PropertySet } setter && parameter.Ordinal == setter.Parameters.Length - 1)
+            return assignedValue;
+        return arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal)?.Value;
+    }
+
     internal static IMethodSymbol? BindVirtualMethod(IMethodSymbol method, INamedTypeSymbol receiver)
     {
         var implementation = FindOverride(receiver, MethodKey(method));
@@ -369,7 +379,8 @@ internal sealed partial class FixedProducerModel
                     VisitProperty(property, result, conditional, read: assignment is not ISimpleAssignmentOperation || property.Property.ReturnsByRef);
                     var conditionalWrite = conditional || assignment is ICoalesceAssignmentOperation;
                     Visit(assignment.Value, result, conditionalWrite);
-                    VisitAccessor(property, property.Property.SetMethod, result, conditionalWrite);
+                    VisitAccessor(property, property.Property.SetMethod, result, conditionalWrite,
+                        assignment is ICompoundAssignmentOperation ? null : assignment.Value);
                     return;
                 case ICoalesceAssignmentOperation assignment:
                     Visit(assignment.Target, result, conditional);
@@ -412,15 +423,22 @@ internal sealed partial class FixedProducerModel
             if (read) VisitAccessor(property, property.Property.GetMethod, result, conditional);
         }
 
-        private void VisitAccessor(IPropertyReferenceOperation property, IMethodSymbol? method, Effects result, bool conditional)
+        private void VisitAccessor(IPropertyReferenceOperation property, IMethodSymbol? method, Effects result, bool conditional, IOperation? assignedValue = null)
         {
             if (method == null || IsFrameworkProperty(property.Property) || !model.IsCompositionMethod(method)) return;
             var dispatch = CallsVirtualAccessor(property, method);
+            if (property.Instance is {} receiver && model.CompositionType(receiver.Type) &&
+                method.Parameters.Any(p => p.Type.TypeKind == TypeKind.Delegate) && !FromInput(receiver) &&
+                (dispatch || Read(method).OrderedResolutions().Any(step => step.Callback != null)))
+            {
+                result.Error ??= $"cannot establish which module receives the callback on '{property.Property}'. Assign the callback on the configured feature directly";
+                return;
+            }
             if (dispatch && property.Instance is IParameterReferenceOperation parameter && !parameter.Type!.IsSealed && FromInput(parameter))
             {
                 if (ConfiguredSlot(parameter) is {} slot && BindVirtualMethod(method, slot) is {} implementation)
                 {
-                    AddCallEffects(implementation, property.Arguments, result, conditional, foreignReceiver: true);
+                    AddCallEffects(implementation, property.Arguments, result, conditional, foreignReceiver: true, insideFactory: InsideFactory(property), assignedValue: assignedValue);
                     return;
                 }
                 if (result.Owns(parameter.Parameter))
@@ -429,7 +447,7 @@ internal sealed partial class FixedProducerModel
                     return;
                 }
             }
-            VisitMethod(method, dispatch, property.Instance, property.Arguments, result, conditional, InsideFactory(property));
+            VisitMethod(method, dispatch, property.Instance, property.Arguments, result, conditional, InsideFactory(property), assignedValue);
         }
 
         private INamedTypeSymbol? ConfiguredSlot(IParameterReferenceOperation parameter, bool insideFactory = false)
@@ -532,20 +550,20 @@ internal sealed partial class FixedProducerModel
             }
         }
 
-        private void VisitMethod(IMethodSymbol method, bool isVirtual, IOperation? instance, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool insideFactory)
+        private void VisitMethod(IMethodSymbol method, bool isVirtual, IOperation? instance, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool insideFactory, IOperation? assignedValue = null)
         {
             var foreign = instance != null && instance is not IInstanceReferenceOperation;
             if (!isVirtual || !RequiresVirtualDispatch(method))
-                AddCallEffects(method, arguments, result, conditional, foreignReceiver: foreign, insideFactory: insideFactory);
+                AddCallEffects(method, arguments, result, conditional, foreignReceiver: foreign, insideFactory: insideFactory, assignedValue: assignedValue);
             else if (instance?.Type is INamedTypeSymbol { IsSealed: true } receiver && BindVirtualMethod(method, receiver) is {} implementation)
-                AddCallEffects(implementation, arguments, result, conditional, foreignReceiver: foreign, insideFactory: insideFactory);
+                AddCallEffects(implementation, arguments, result, conditional, foreignReceiver: foreign, insideFactory: insideFactory, assignedValue: assignedValue);
             else if (instance is IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance } && model.CompositionType(method.ContainingType))
                 result.AddVirtualCall(method, conditional);
             else
                 result.Error ??= $"cannot bind virtual feature method '{method}' to a concrete receiver";
         }
 
-        private void AddCallEffects(IMethodSymbol method, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool constructing = false, bool foreignReceiver = false, bool insideFactory = false)
+        private void AddCallEffects(IMethodSymbol method, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool constructing = false, bool foreignReceiver = false, bool insideFactory = false, IOperation? assignedValue = null)
         {
             var effects = Read(method);
             if (insideFactory && (effects.Error != null || effects.OrderedResolutions().Any() || effects.HostedTypes.Length > 0 || effects.HasVirtualCalls))
@@ -563,20 +581,23 @@ internal sealed partial class FixedProducerModel
             result.Add(effects, conditional, (name, guarded, isFactory) =>
             {
                 var parameter = method.Parameters.FirstOrDefault(parameter => parameter.Name == name);
-                var argument = parameter == null ? null : arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal);
+                var argument = SuppliedArgument(parameter, arguments, assignedValue);
                 if (argument != null)
                 {
-                    if (arguments.Any(arg => model.CompositionType(arg.Value.Type) && !FromInput(arg.Value)))
+                    if (arguments.Any(arg => model.CompositionType(arg.Value.Type) && !FromInput(arg.Value)) ||
+                        model.CompositionType(assignedValue?.Type) && !FromInput(assignedValue))
                         result.Error ??= $"cannot establish the module passed to a configuration callback in '{method}'";
                     else
-                        BoundCallback(argument.Value, argument.Parameter!.Type, result, guarded, isFactory);
+                        BoundCallback(argument, parameter!.Type, result, guarded, isFactory);
                 }
                 // A local function can invoke a callback captured from its enclosing method.
                 else if (method.MethodKind == MethodKind.LocalFunction)
                     result.AddResolution(new SlotResolution(null, guarded, isFactory, name));
+                else if (method.MethodKind is MethodKind.PropertySet or MethodKind.PropertyGet)
+                    result.Error ??= $"cannot bind callback '{name}' on '{method}'. Supply the callback directly using a simple assignment or index argument";
             }, call =>
             {
-                var receiver = arguments.FirstOrDefault(arg => arg.Parameter?.Name == call.ReceiverParameter)?.Value;
+                var receiver = SuppliedArgument(method.Parameters.FirstOrDefault(p => p.Name == call.ReceiverParameter), arguments, assignedValue);
                 while (receiver is IConversionOperation { OperatorMethod: null } conversion) receiver = conversion.Operand;
                 return receiver is IParameterReferenceOperation p && result.Owns(p.Parameter) && FromInput(p)
                     ? new VirtualCall(call.MethodKey, call.Arguments, p.Parameter.Name) : null;

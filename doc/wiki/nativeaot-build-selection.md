@@ -97,8 +97,9 @@ If the factory calls `m.Use<Extra>()`, select `Extra` outside the factory on
 the same module. For example, select it in the host or declare it as a
 dependency. This keeps the graph fixed whether the factory runs or is skipped.
 Use the module passed to the factory to construct its feature. When upgrading,
-rebuild feature packages produced with binding schema 1 or 2. Schema 3 records
-conditional selections from factories and callbacks, including virtual calls.
+rebuild feature packages produced with binding schemas 1 through 3. Schema 4 records
+selections from callbacks invoked by property setters and indexers, as well as
+conditional selections from factories and callbacks.
 The host rejects older bindings because they can omit required features.
 
 A feature without a default constructor needs a factory at its first resolution.

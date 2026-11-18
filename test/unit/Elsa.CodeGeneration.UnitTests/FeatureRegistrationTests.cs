@@ -622,6 +622,106 @@ public class FeatureRegistrationTests
     [Test]
     [Arguments(false)]
     [Arguments(true)]
+    public async Task PropertyAssignmentsBindOnlyTheDelegatesTheirAccessorsInvoke(bool packed)
+    {
+        const string registrations = """
+            root.Installer = m => m.Use<Leaf>();
+            root.Saved = m => m.Use<Deferred>();
+            root.Skipped = m => m.Use<Deferred>();
+            root[after: m => m.Use<Index>(), unused: m => m.Use<Deferred>()] = m => m.Use<Value>();
+            _ = root[after: m => m.Use<Read>(), unused: m => m.Use<Deferred>()];
+            """;
+        foreach (var lifecycle in new[] { true, false })
+        {
+            var features = $$"""
+                using System;
+                using Elsa.Extensions;
+                using Elsa.Features.Abstractions;
+                using Elsa.Features.Services;
+                public sealed class Leaf(IModule m) : FeatureBase(m);
+                public sealed class Index(IModule m) : FeatureBase(m);
+                public sealed class Value(IModule m) : FeatureBase(m);
+                public sealed class Read(IModule m) : FeatureBase(m);
+                public sealed class Deferred(IModule m) : FeatureBase(m);
+                public sealed class Root(IModule m) : FeatureBase(m)
+                {
+                    public Action<IModule> Installer { set => value(Module); }
+                    public Action<IModule> Saved { private get; set; } = null!;
+                    public Action<IModule> Skipped { set { } }
+                    public Action<IModule> this[Action<IModule> unused, Action<IModule> after]
+                    {
+                        set { value(Module); after(Module); }
+                        get { after(Module); return Saved; }
+                    }
+                    public override void Configure()
+                    {
+                        var root = this;
+                        {{(lifecycle ? registrations : "")}}
+                    }
+                }
+                """;
+            var host = $$"""
+                using Elsa.Extensions;
+                using Microsoft.Extensions.DependencyInjection;
+                public static class Host
+                {
+                    public static bool Start(IServiceCollection services)
+                    {
+                        var module = services.CreateModule();
+                        var root = module.Configure<Root>();
+                        {{(lifecycle ? "" : registrations)}}
+                        module.Apply();
+                        return module.HasFeature<Leaf>() && module.HasFeature<Index>() && module.HasFeature<Value>() &&
+                            module.HasFeature<Read>() && !module.HasFeature<Deferred>();
+                    }
+                }
+                """;
+            await RunGeneratedHost(features, host, packed);
+        }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task InvokedSettersRequireAVisibleCallbackBoundToTheModule(bool packed)
+    {
+        const string library = """
+            using System;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class Root(IModule m) : FeatureBase(m)
+            {
+                public Action<IModule> Installer { get => _ => {}; set => value(Module); }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services)
+                {
+                    services.CreateModule().Configure<Root>().Installer += m => m.Use<Leaf>();
+                }
+            }
+            """;
+        var diagnostic = RunHost(library, host, packed).Diagnostics.Single();
+        await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(diagnostic.GetMessage()).Contains("simple assignment");
+
+        var foreign = host.Replace("services.CreateModule().Configure<Root>().Installer += m => m.Use<Leaf>();", """
+            var other = services.CreateModule();
+            services.CreateModule().Configure<Root>().Installer = m => other.Use<Leaf>();
+            """);
+        var ownership = RunHost(library, foreign, packed).Diagnostics.Single();
+        await Assert.That(ownership.Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(ownership.GetMessage()).Contains("captures a different module");
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
     public async Task VirtualSettersFollowTheConcreteLifecycleReceiverAndExplicitBase(bool packed)
     {
         const string features = """
@@ -1840,10 +1940,7 @@ public class FeatureRegistrationTests
         return CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
     }
 
-    [Test]
-    [Arguments(1)]
-    [Arguments(2)]
-    public async Task HostRequiresProducerBindingsThatDescribeCurrentCompositionEffects(int schema)
+    private static CSharpCompilation CompileExternalFeature(out int schemaVersion)
     {
         const string feature = """
             using Elsa.Features.Abstractions;
@@ -1851,8 +1948,20 @@ public class FeatureRegistrationTests
             public sealed class ExternalFeature(IModule module) : FeatureBase(module);
             """;
         var compiled = Compile(Create("External", ("Feature.cs", feature)));
+        var version = compiled.GetTypeByMetadataName("Elsa.FixedFeatures.V1.PExternal.Bindings")!.GetMembers("SchemaVersion").OfType<IFieldSymbol>().Single();
+        schemaVersion = (int)version.ConstantValue!;
+        return compiled;
+    }
+
+    [Test]
+    [Arguments(1)]
+    [Arguments(2)]
+    [Arguments(3)]
+    public async Task HostRequiresProducerBindingsThatDescribeCurrentCompositionEffects(int schema)
+    {
+        var compiled = CompileExternalFeature(out var current);
         var bindings = compiled.SyntaxTrees.Single(tree => tree.ToString().Contains("const int SchemaVersion"));
-        var legacy = bindings.WithChangedText(SourceText.From(bindings.ToString().Replace("const int SchemaVersion = 3", $"const int SchemaVersion = {schema}")));
+        var legacy = bindings.WithChangedText(SourceText.From(bindings.ToString().Replace($"const int SchemaVersion = {current}", $"const int SchemaVersion = {schema}")));
         var package = MetadataReference.CreateFromImage(Emit(compiled.ReplaceSyntaxTree(bindings, legacy)));
         const string host = """
             using Elsa.Extensions;
@@ -1870,7 +1979,8 @@ public class FeatureRegistrationTests
     [Test]
     public async Task MalformedProducerSchemaCannotCrashTheHostGenerator()
     {
-        const string source = """
+        CompileExternalFeature(out var current);
+        var source = $$"""
             using System;
             using Elsa.Features.Services;
             using Elsa.Features.Abstractions;
@@ -1883,7 +1993,7 @@ public class FeatureRegistrationTests
                 }
                 public static class Bindings
                 {
-                    public const int SchemaVersion = 3;
+                    public const int SchemaVersion = {{current}};
                     [Slot(typeof(ExternalFeature))] public static void Broken() { }
                 }
             }
