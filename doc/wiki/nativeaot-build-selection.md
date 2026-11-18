@@ -159,6 +159,8 @@ referenced while the application publishes. Selecting that feature exposes
 the constructor's native compilation requirement.
 [Run the packed consumer](nativeaot-probes.md#run-the-tests)
 
+The managed benchmark compares startup time, allocations, feature lookups and workflow throughput on a small graph and the reference web server graph. [Results and reproduction steps](../../test/performance/feature-composition/README.md)
+
 ## Inspect a generated factory in Rider
 
 Open the project that declares the feature and expand **Dependencies → Source
