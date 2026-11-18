@@ -120,19 +120,29 @@ internal sealed partial class FixedProducerModel
                 else if (reference.GetSyntax(token) is TypeDeclarationSyntax { BaseList: {} bases })
                     initializers.AddRange(bases.Types.OfType<PrimaryConstructorBaseTypeSyntax>());
             }
+            // Only the constructor that calls base runs the instance initializers. They
+            // execute before the base arguments and constructor, even for a primary constructor.
+            if (!initializers.Any(init => init is ConstructorInitializerSyntax { ThisOrBaseKeyword.ValueText: "this" }))
+                ReadMemberInitializers(ctor, summary);
             if (initializers.Count == 0 && ctor.ContainingType.BaseType is {} parent)
             {
                 var implicitBase = parent.InstanceConstructors.FirstOrDefault(m => m.Parameters.Length == 0);
-                if (implicitBase is not null && model.CompositionType(parent)) summary.Add(Read(implicitBase), false);
+                if (implicitBase != null && model.CompositionType(parent)) summary.Add(Read(implicitBase), false);
             }
             foreach (var init in initializers)
             {
                 var semantic = model._compilation.GetSemanticModel(init.SyntaxTree);
-                foreach (var arg in init.ChildNodes().OfType<ArgumentListSyntax>().SelectMany(a => a.Arguments))
-                    if (semantic.GetOperation(arg.Expression, token) is {} operation) Visit(operation, summary, false);
-                if (semantic.GetSymbolInfo(init, token).Symbol is IMethodSymbol target && model.IsCompositionMethod(target))
-                    summary.Add(Read(target), false);
+                var arguments = init.ChildNodes().OfType<ArgumentListSyntax>().SelectMany(list => list.Arguments)
+                    .Select(arg => semantic.GetOperation(arg, token)).OfType<IArgumentOperation>().ToArray();
+                foreach (var arg in arguments) Visit(arg.Value, summary, false);
+                if (semantic.GetSymbolInfo(init, token).Symbol is IMethodSymbol target &&
+                    (model.IsCompositionMethod(target) || SymbolEqualityComparer.Default.Equals(target.ContainingType, ctor.ContainingType)))
+                    AddCallEffects(target, arguments, summary, false);
             }
+        }
+
+        private void ReadMemberInitializers(IMethodSymbol ctor, Effects summary)
+        {
             // Field and auto-property initializers execute as part of construction, including
             // in primary- and implicit-constructor classes. Stored delegates remain deferred.
             foreach (var reference in ctor.ContainingType.OriginalDefinition.DeclaringSyntaxReferences)
@@ -239,6 +249,12 @@ internal sealed partial class FixedProducerModel
                     return;
                 case IAnonymousFunctionOperation or ILocalFunctionOperation or INameOfOperation:
                     return;
+                case IObjectCreationOperation creation:
+                    foreach (var argument in creation.Arguments) Visit(argument.Value, result, conditional);
+                    if (creation.Constructor is {} ctor && model.IsCompositionMethod(ctor))
+                        AddCallEffects(ctor, creation.Arguments, result, conditional, constructing: true);
+                    if (creation.Initializer != null) Visit(creation.Initializer, result, conditional);
+                    return;
                 case IInvocationOperation call:
                     if (call.Instance != null) Visit(call.Instance, result, conditional);
                     foreach (var arg in call.Arguments) Visit(arg.Value, result, conditional);
@@ -338,16 +354,20 @@ internal sealed partial class FixedProducerModel
                 result.AddVirtualCall(method, conditional);
                 return;
             }
-            var local = SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, model._compilation.Assembly);
-            var effects = local ? Read(method) : model.GetSelector(method, allowOpen: true);
-            if (effects is null)
+            AddCallEffects(method, call.Arguments, result, conditional);
+        }
+
+        private void AddCallEffects(IMethodSymbol method, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool constructing = false)
+        {
+            var effects = Read(method);
+            if (constructing && (effects.VirtualCalls.Length != 0 || effects.ConditionalVirtualCalls.Length != 0))
             {
-                result.Error ??= $"the package method '{method}' has no compiled feature-selection metadata";
+                result.Error ??= $"cannot bind virtual feature selections during construction of '{method.ContainingType}'";
                 return;
             }
             result.Add(effects, conditional, (name, guarded) =>
             {
-                var argument = call.Arguments.FirstOrDefault(arg => arg.Parameter?.Name == name);
+                var argument = arguments.FirstOrDefault(arg => arg.Parameter?.Name == name);
                 if (argument != null) Callback(argument.Value, result, guarded);
                 // A local function can invoke a callback captured from its enclosing method.
                 else if (method.MethodKind == MethodKind.LocalFunction)

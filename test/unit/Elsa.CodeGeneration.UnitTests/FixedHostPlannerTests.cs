@@ -223,6 +223,39 @@ public class FixedHostPlannerTests
     }
 
     [Test]
+    [Arguments("(IModule)services.CreateModule()")]
+    [Arguments("services.CreateModule()!")]
+    [Arguments("(((IModule)(((services.CreateModule())!))))!")]
+    [Arguments("(services.CreateModule() as IModule)!")]
+    public async Task TransparentWrappersPreserveTheAssignedRootsConsumers(string root)
+    {
+        var result = Generate($$"""
+            var first = {{root}};
+            var second = other.CreateModule();
+            first.Use<Leaf>();
+            second.Use<Unused>();
+            first.Apply();
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task WidenedModuleRemainsOwnedThroughReferenceConversions()
+    {
+        var result = Generate("""
+            object boxed = services.CreateModule();
+            var forwarded = boxed;
+            ((IModule)forwarded).Use<Leaf>();
+            ((IModule)(object)other.CreateModule()).Use<Unused>();
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+    }
+
+    [Test]
     public async Task DeconstructionReadsBothOwnersBeforeUpdatingEitherLocal()
     {
         var result = Generate("""
