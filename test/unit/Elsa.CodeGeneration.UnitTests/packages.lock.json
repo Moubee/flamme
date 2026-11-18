@@ -154,6 +154,9 @@
       "elsa.codegeneration.analyzers": {
         "type": "Project"
       },
+      "registrationcompiler": {
+        "type": "Project"
+      },
       "Microsoft.Extensions.DependencyModel": {
         "type": "CentralTransitive",
         "requested": "[10.0.15, )",
@@ -312,6 +315,9 @@
         "type": "Project"
       },
       "elsa.codegeneration.analyzers": {
+        "type": "Project"
+      },
+      "registrationcompiler": {
         "type": "Project"
       },
       "Microsoft.Extensions.DependencyModel": {
