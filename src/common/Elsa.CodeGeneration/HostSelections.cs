@@ -311,9 +311,10 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 continue;
             var inputs = !api && selectedMethod != null ? CompositionInputs(invocation) : null;
             var receiver = Receiver(semantic, call);
-            if (inputs is { Count: > 0 } ? !inputs.Any(input => Owned(input.Value)) :
-                !IsOwned(receiver, new HashSet<ISymbol>(SymbolEqualityComparer.Default)) &&
-                !invocation.Arguments.Any(arg => !arg.IsImplicit && IsModuleOrFeature(arg.Value.Type) && Owned(arg.Value)))
+            var ownsInputs = inputs is { Count: > 0 } ? inputs.Any(input => Owned(input.Value)) :
+                invocation.Arguments.Any(arg => !arg.IsImplicit && IsModuleOrFeature(arg.Value.Type) && Owned(arg.Value));
+            var receiverMatters = inputs is not { Count: > 0 } || selectedMethod?.Error != null && producers.MayUseStoredModule(method);
+            if (!ownsInputs && !(receiverMatters && IsOwned(receiver, new HashSet<ISymbol>(SymbolEqualityComparer.Default), compositionRead: true)))
                 continue;
             var executed = Execution(call, boundary, creation, semantic);
             if (executed == false)
@@ -501,7 +502,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (value != null && IsModuleOrFeature(value.Type))
                 inputs.Add((method.Parameters.Last(), value));
             var bound = new HashSet<ISymbol>(inputs.Where(input => Owned(input.Value)).Select(input => input.Parameter), SymbolEqualityComparer.Default);
-            if (inputs.Count == 0 ? !IsOwned(property.Instance, new HashSet<ISymbol>(SymbolEqualityComparer.Default)) : bound.Count == 0)
+            if (inputs.Count == 0 ? !IsOwned(property.Instance, new HashSet<ISymbol>(SymbolEqualityComparer.Default), compositionRead: true) : bound.Count == 0)
                 return;
             var conditional = runs == null || ambientCondition || inConditionalCallback || conditionalWrite;
             if (unresolvedDispatch)
@@ -624,6 +625,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                         IsOwned(ExpressionOperation(semantic, source), seen, compositionRead || IsModuleOrFeature(local.Type));
                 case IInstanceReferenceOperation instance:
                     return instance.Type != null && helperOwners?.Contains(instance.Type) == true;
+                case IObjectCreationOperation constructed:
+                    return constructed.Arguments.Any(arg => IsModuleOrFeature(arg.Parameter?.Type) && Owned(arg.Value));
                 case IParameterReferenceOperation parameter:
                     if (helperOwners?.Contains(parameter.Parameter) == true)
                         return true;

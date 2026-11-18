@@ -96,8 +96,10 @@ action runs after resolution, including when the module reuses an instance.
 If the factory calls `m.Use<Extra>()`, select `Extra` outside the factory on
 the same module. For example, select it in the host or declare it as a
 dependency. This keeps the graph fixed whether the factory runs or is skipped.
-Use the module passed to the factory to construct its feature. Rebuild feature
-packages with the current generator so their bindings describe factory effects.
+Use the module passed to the factory to construct its feature. When upgrading,
+rebuild feature packages produced with binding schema 1 or 2. Schema 3 records
+conditional selections from factories and callbacks, including virtual calls.
+The host rejects older bindings because they can omit required features.
 
 A feature without a default constructor needs a factory at its first resolution.
 For example, `module.Configure(m => new CustomFeature(m, value))` can run in
@@ -132,6 +134,11 @@ calls, or call a registration helper separately on the original collection.
 The same diagnostic applies when a source helper receives the collection and its
 Elsa calls would use a different plan from the caller. Keep those Elsa calls
 together or move their feature selections into one shared configurator.
+Pass the module to a static helper that selects features, for example
+`Installer.Install(module)`. If a helper stores the module in its constructor
+and later selects features through a field, the compiler cannot establish which
+module owns those selections.
+
 Application code can pass a configured module into a previously compiled helper.
 Module creation inside a precompiled helper must itself use a generated plan.
 

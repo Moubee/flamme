@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,13 +22,20 @@ internal sealed partial class FixedProducerModel
         return seen.Add(parameter) && parameter.ConstraintTypes.Any(constraint => CompositionType(constraint, seen));
     }
 
+    private readonly ConcurrentDictionary<INamedTypeSymbol, bool> _moduleConstructedHelpers = new(SymbolEqualityComparer.Default);
+
+    internal bool MayUseStoredModule(IMethodSymbol method) =>
+        !method.IsStatic && method.MethodKind is MethodKind.Ordinary or MethodKind.PropertyGet or MethodKind.PropertySet &&
+        !CompositionType(method.ContainingType) && _moduleConstructedHelpers.GetOrAdd(method.ContainingType.OriginalDefinition,
+            type => type.InstanceConstructors.Any(ctor => ctor.Parameters.Any(p => CompositionType(p.Type))));
+
     internal bool IsCompositionMethod(IMethodSymbol method)
     {
         // Binding an otherwise unconstrained T in Assert.That<T>(value) to IModule
         // does not turn the package method into an Elsa composition API.
         var declared = (method.ReducedFrom ?? method).OriginalDefinition;
         return CompositionType(declared.ContainingType) || CompositionType(declared.ContainingType.ExtensionParameter?.Type)
-            || declared.Parameters.Any(p => CompositionType(p.Type));
+            || declared.Parameters.Any(p => CompositionType(p.Type)) || MayUseStoredModule(declared);
     }
 
     internal static bool IsFrameworkProperty(IPropertySymbol property) => property.ContainingAssembly.Name == "Elsa.Features" &&
@@ -166,6 +174,8 @@ internal sealed partial class FixedProducerModel
             if (method.MethodKind == MethodKind.Constructor)
                 ReadInitialization(method, summary);
             var implementation = key.PartialImplementationPart ?? key;
+            var helperReceiver = model.MayUseStoredModule(key);
+            var usesReceiver = helperReceiver && !key.Parameters.Any(p => model.CompositionType(p.Type));
             foreach (var reference in implementation.DeclaringSyntaxReferences)
             {
                 var syntax = reference.GetSyntax(token);
@@ -181,10 +191,19 @@ internal sealed partial class FixedProducerModel
                     _ => null
                 };
                 if (body is not null && semantic.GetOperation(body, token) is {} operation)
+                {
+                    // A primary-constructor parameter read by an instance method also uses
+                    // receiver state, even when Roslyn exposes it as a parameter reference.
+                    if (helperReceiver && !usesReceiver)
+                        usesReceiver = operation.DescendantsAndSelf().Any(op => op is IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance } ||
+                            op is IParameterReferenceOperation { Parameter.ContainingSymbol: IMethodSymbol { MethodKind: MethodKind.Constructor } });
                     Visit(operation, summary, false);
+                }
             }
             _reading.Remove(key);
             var symbolic = summary.Finish();
+            if (usesReceiver && (symbolic.OrderedResolutions().Any() || symbolic.HostedTypes.Length != 0 || symbolic.HasVirtualCalls))
+                symbolic.Error ??= $"'{method}' may change the graph through a module stored by its receiver. Pass the module explicitly to a static helper and register features through that parameter";
             _cache[key] = symbolic;
             return symbolic.Bind(method, allowOpen: true);
         }
@@ -498,20 +517,18 @@ internal sealed partial class FixedProducerModel
         {
             foreach (var argument in arguments.Where(arg => arg.Parameter?.Type.TypeKind == TypeKind.Delegate))
             {
+                if (!insideFactory)
+                {
+                    // Preserve callback errors and virtual, hosted, and slot selections.
+                    // The unmodeled caller may run the delegate later or skip it entirely.
+                    Callback(argument.Value, result, conditional: true, required: IsConfigurationDelegate(argument.Parameter!.Type));
+                    continue;
+                }
                 var callback = new Effects(result.Owner);
-                Callback(argument.Value, callback, conditional: false, required: insideFactory || IsConfigurationDelegate(argument.Parameter!.Type));
+                Callback(argument.Value, callback, conditional: false);
                 var effects = callback.Finish();
-                if (insideFactory)
-                {
-                    if (effects.Error != null || effects.OrderedResolutions().Any() || effects.HostedTypes.Length > 0 || effects.HasVirtualCalls)
-                        result.Error ??= $"cannot prove when callback '{argument.Syntax}' runs inside the feature factory. Move feature selection to Configure";
-                }
-                else if (effects.OrderedResolutions().Any(step => step.Type != null) || effects.HostedTypes.Length > 0)
-                {
-                    // A helper or constructor can hide the same registration. Export it as
-                    // conditional so neither an unmodeled callback nor its caller admits a slot.
-                    result.Add(effects, conditional: true);
-                }
+                if (effects.Error != null || effects.OrderedResolutions().Any() || effects.HostedTypes.Length > 0 || effects.HasVirtualCalls)
+                    result.Error ??= $"cannot prove when callback '{argument.Syntax}' runs inside the feature factory. Move feature selection to Configure";
             }
         }
 

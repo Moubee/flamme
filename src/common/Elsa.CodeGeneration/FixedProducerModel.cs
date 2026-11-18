@@ -56,7 +56,7 @@ internal sealed partial class FixedProducerModel
     private readonly string _namespace;
     private readonly string _bridge;
     private readonly string? _source;
-    private const int BindingSchemaVersion = 2; // Includes the effects of conditionally invoked feature factories.
+    private const int BindingSchemaVersion = 3; // Includes callbacks and instance helpers that retain a composition input.
     private const string Runtime = "global::Elsa.Features.Services.";
 
     internal IReadOnlyList<FixedProducerFeature> Features => _features.Values.ToArray();
