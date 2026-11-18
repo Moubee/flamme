@@ -171,7 +171,7 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
                 continue;
             }
             if (request.HostedService)
-                statements.Add($"target.AddHostedService<{FeatureBinding.TypeName(type)}>();");
+                statements.Add($"target.AddHostedService<{binding.TypeName(type)}>();");
             else if (type.IsGenericType)
                 pending.Enqueue(type);
         }
@@ -193,7 +193,7 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
 
         if (statements.Count == 0 && !(settings.IsHost && settings.IsGenerated))
             return;
-        var source = RegistrationSource.EmitProducer(compilation.AssemblyName!, AdapterId, BuilderType, statements);
+        var source = RegistrationSource.EmitProducer(compilation.AssemblyName!, AdapterId, BuilderType, statements, binding.ExternAliases);
         context.AddSource("ElsaFeatureRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
 
         void ReportIfCompiled(Request request, string reason)

@@ -61,6 +61,9 @@ public class TaskRegistrationTests
         await File.WriteAllTextAsync(Path.Combine(host, "Program.cs"), """
             extern alias feature;
             using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Attributes;
+            using Elsa.Features.Services;
             using Microsoft.Extensions.DependencyInjection;
             using TaskRunner;
             using Producer = feature::Elsa.NativeAot.Modules.Producer;
@@ -68,9 +71,12 @@ public class TaskRegistrationTests
             var state = new Producer.ProducerState();
             var module = new ServiceCollection().CreateModule();
             module.Properties[Producer.ProducerState.StatePropertyKey] = state;
-            module.Configure<Producer.FoundationFeature>();
+            module.Configure<LocalRoot<Producer.ProducerState>>();
             module.Apply();
             Console.WriteLine($"{GeneratedTasks.Create().Single()().Run()}|{string.Join(",", state.Events)}");
+
+            [DependsOn(typeof(Producer.FoundationFeature))]
+            internal sealed class LocalRoot<T>(IModule module) : FeatureBase(module);
             """);
 
         var products = Path.Combine(artifacts, "build");

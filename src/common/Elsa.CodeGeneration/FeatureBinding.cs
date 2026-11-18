@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using RegistrationCompiler;
 
 namespace Elsa.CodeGeneration.Generators;
 
@@ -14,7 +15,9 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
     private readonly INamedTypeSymbol? _hostedService = compilation.GetTypeByMetadataName("Microsoft.Extensions.Hosting.IHostedService");
 
     internal bool IsFeature(INamedTypeSymbol type) => type.AllInterfaces.Contains(feature, SymbolEqualityComparer.Default);
-    internal static string TypeName(ITypeSymbol type) => type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    private readonly RegistrationTypeNames _names = new(compilation);
+    internal IEnumerable<string> ExternAliases => _names.ExternAliases;
+    internal string TypeName(ITypeSymbol type) => _names.Format(type);
 
     internal static bool IsClosed(ITypeSymbol type) => type switch
     {
@@ -125,7 +128,7 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
         return conversion.IsIdentity || conversion.IsImplicit && conversion.IsReference;
     }
 
-    private static string TypeArray(IReadOnlyCollection<INamedTypeSymbol> types) => types.Count == 0 ? "null" :
+    private string TypeArray(IReadOnlyCollection<INamedTypeSymbol> types) => types.Count == 0 ? "null" :
         "new global::System.Type[] { " + string.Join(", ", types.Select(type => $"typeof({TypeName(type)})")) + " }";
 
     private static string Literal(string value) => SymbolDisplay.FormatLiteral(value, quote: true);
