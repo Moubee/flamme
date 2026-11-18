@@ -41,7 +41,7 @@ public class SchedulingFeature : FeatureBase
     /// <inheritdoc />
     public override void Configure()
     {
-        Module.Configure<WorkflowManagementFeature>(management => management.AddActivitiesFrom<SchedulingFeature>());
+        Module.Configure<WorkflowManagementFeature>(management => management.AddDefaultActivitiesFrom<SchedulingFeature>());
     }
 
     /// <inheritdoc />

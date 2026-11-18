@@ -55,6 +55,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     private const string DataCategory = "Data";
     private const string SystemCategory = "System";
 
+    private readonly HashSet<Type> _removedActivityTypes = [];
     private Func<IServiceProvider, IWorkflowDefinitionPublisher> _workflowDefinitionPublisher = sp => ActivatorUtilities.CreateInstance<WorkflowDefinitionPublisher>(sp);
     private Func<IServiceProvider, IWorkflowReferenceQuery> _workflowReferenceQuery = sp => ActivatorUtilities.CreateInstance<DefaultWorkflowReferenceQuery>(sp);
 
@@ -64,7 +65,8 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     private bool FailOnValidationErrors { get; set; } = true;
 
     /// <summary>
-    /// A set of activity types to make available to the system. 
+    /// The set of currently registered activities. Use <see cref="RemoveActivity(Type)"/> to exclude
+    /// an activity from future automatic registrations.
     /// </summary>
     public HashSet<Type> ActivityTypes { get; } = [];
 
@@ -106,6 +108,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     /// </summary>
     public WorkflowManagementFeature AddActivity(Type activityType)
     {
+        _removedActivityTypes.Remove(activityType);
         ActivityTypes.Add(activityType);
         return this;
     }
@@ -113,21 +116,40 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     /// <summary>
     /// Adds all types implementing <see cref="IActivity"/> to the system.
     /// </summary>
-    public WorkflowManagementFeature AddActivitiesFrom<TMarker>()
-    {
-        var activityTypes = typeof(TMarker).Assembly.GetExportedTypes()
-            .Where(x => typeof(IActivity).IsAssignableFrom(x) && x is { IsAbstract: false, IsInterface: false, IsGenericType: false })
-            .ToList();
-        return AddActivities(activityTypes);
-    }
+    public WorkflowManagementFeature AddActivitiesFrom<TMarker>() => AddActivities(GetActivityTypes<TMarker>());
+
+    private static IEnumerable<Type> GetActivityTypes<TMarker>() => typeof(TMarker).Assembly.GetExportedTypes()
+        .Where(x => typeof(IActivity).IsAssignableFrom(x) && x is { IsAbstract: false, IsInterface: false, IsGenericType: false });
 
     /// <summary>
     /// Adds the specified activity types to the system.
     /// </summary>
     public WorkflowManagementFeature AddActivities(IEnumerable<Type> activityTypes)
     {
-        ActivityTypes.AddRange(activityTypes);
+        foreach (var activityType in activityTypes)
+            AddActivity(activityType);
+
         return this;
+    }
+
+    /// <summary>
+    /// Registers a feature-provided activity unless the application has explicitly removed it.
+    /// </summary>
+    public void AddDefaultActivity<T>() where T : IActivity
+    {
+        if (!_removedActivityTypes.Contains(typeof(T)))
+            ActivityTypes.Add(typeof(T));
+    }
+
+    /// <summary>
+    /// Registers feature-provided activities from the marker assembly, respecting explicit removals.
+    /// The optional excluded type stays available for an explicit opt-in.
+    /// </summary>
+    public void AddDefaultActivitiesFrom<TMarker>(Type? excludedType = null)
+    {
+        foreach (var activityType in GetActivityTypes<TMarker>())
+            if (activityType != excludedType && !_removedActivityTypes.Contains(activityType))
+                ActivityTypes.Add(activityType);
     }
 
     /// <summary>
@@ -136,10 +158,11 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     public WorkflowManagementFeature RemoveActivity<T>() where T : IActivity => RemoveActivity(typeof(T));
 
     /// <summary>
-    /// Adds the specified activity type to the system.
+    /// Excludes the specified activity type from automatic registrations until explicitly added again.
     /// </summary>
     public WorkflowManagementFeature RemoveActivity(Type activityType)
     {
+        _removedActivityTypes.Add(activityType);
         ActivityTypes.Remove(activityType);
         return this;
     }
@@ -263,7 +286,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     [RequiresUnreferencedCode("The assembly containing the specified marker type will be scanned for activity types.")]
     public override void Configure()
     {
-        AddActivitiesFrom<WorkflowManagementFeature>();
+        AddDefaultActivitiesFrom<WorkflowManagementFeature>();
     }
 
     /// <inheritdoc />

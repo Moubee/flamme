@@ -56,7 +56,7 @@ public class JavaScriptFeature : FeatureBase
     public override void Configure()
     {
         Module.AddFastEndpointsAssembly<JavaScriptFeature>();
-        Module.UseWorkflowManagement(management => management.AddActivity<RunJavaScript>());
+        Module.UseWorkflowManagement(management => management.AddDefaultActivity<RunJavaScript>());
     }
 
     /// <inheritdoc />

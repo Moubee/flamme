@@ -21,7 +21,7 @@ public static class ModuleExtensions
     {
         module.Configure<WorkflowManagementFeature>(management =>
         {
-            management.AddActivity<NotFoundActivity>();
+            management.AddDefaultActivity<NotFoundActivity>();
             configure?.Invoke(management);
         });
         return module;

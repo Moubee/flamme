@@ -243,7 +243,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
     /// <inheritdoc />
     public override void Configure()
     {
-        Module.AddActivitiesFrom<WorkflowRuntimeFeature>();
+        Module.UseWorkflowManagement(management => management.AddDefaultActivitiesFrom<WorkflowRuntimeFeature>());
         Module.Configure<WorkflowsFeature>(workflows =>
         {
             // ExecutionCycleAwareCommitStateHandler decorates DefaultCommitStateHandler — disposes the execution cycle handle AFTER

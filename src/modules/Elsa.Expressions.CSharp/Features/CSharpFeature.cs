@@ -37,7 +37,7 @@ public class CSharpFeature : FeatureBase
     /// <inheritdoc />
     public override void Configure()
     {
-        Module.AddActivitiesFrom<CSharpFeature>();
+        Module.UseWorkflowManagement(management => management.AddDefaultActivitiesFrom<CSharpFeature>());
     }
 
     /// <inheritdoc />

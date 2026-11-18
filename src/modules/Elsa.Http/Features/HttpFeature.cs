@@ -143,7 +143,7 @@ public class HttpFeature(IModule module) : FeatureBase(module)
                 typeof(Downloadable)
             ], "HTTP");
 
-            management.AddActivitiesFrom<HttpFeature>();
+            management.AddDefaultActivitiesFrom<HttpFeature>();
         });
 
         Module.UseResilience(resilience => resilience.AddResilienceStrategyType<HttpResilienceStrategy>());

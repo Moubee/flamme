@@ -1,20 +1,58 @@
 using Elsa.Common.Features;
 using Elsa.Extensions;
+using Elsa.Expressions.CSharp.Activities;
 using Elsa.Expressions.CSharp.Features;
 using Elsa.Expressions.Liquid.Features;
 using Elsa.Features;
 using Elsa.Features.Contracts;
 using Elsa.Features.Services;
 using Elsa.Workflows;
+using Elsa.Workflows.Activities;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Management.Features;
+using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Runtime.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Elsa.Common.IntegrationTests;
 
 public class GeneratedSdkCompositionTests
 {
+    [Test]
+    public async Task HostCanOptIntoReadLineAndRemoveABuiltInActivity()
+    {
+        var services = new ServiceCollection();
+        var module = services.AddElsa(elsa => elsa.UseWorkflowManagement(management => management
+            .AddActivity<ReadLine>()
+            .RemoveActivity<WriteLine>()));
+        var activityTypes = module.Configure<WorkflowManagementFeature>().ActivityTypes;
+        await Assert.That(activityTypes.Contains(typeof(ReadLine))).IsTrue();
+        await Assert.That(activityTypes.Contains(typeof(WriteLine))).IsFalse();
+
+        using var provider = services.BuildServiceProvider();
+        var options = provider.GetRequiredService<IOptions<ManagementOptions>>().Value;
+        await Assert.That(options.ActivityTypes.Contains(typeof(ReadLine))).IsTrue();
+        await Assert.That(options.ActivityTypes.Contains(typeof(WriteLine))).IsFalse();
+    }
+
+    [Test]
+    public async Task AutomaticRegistrationsRespectTheLastExplicitSelectionAcrossFeatures()
+    {
+        var services = new ServiceCollection();
+        services.ConfigureElsa(elsa => elsa.UseWorkflowManagement(management => management
+            .RemoveActivity<WriteLine>()
+            .RemoveActivity<NotFoundActivity>()
+            .RemoveActivity<RunCSharp>()));
+        var module = services.AddElsa(elsa => elsa.UseCSharp().AddActivity<WriteLine>());
+
+        var activities = module.Configure<WorkflowManagementFeature>().ActivityTypes;
+        await Assert.That(activities.Contains(typeof(WriteLine))).IsTrue();
+        await Assert.That(activities.Contains(typeof(ReadLine))).IsFalse();
+        await Assert.That(activities.Contains(typeof(NotFoundActivity))).IsFalse();
+        await Assert.That(activities.Contains(typeof(RunCSharp))).IsFalse();
+    }
+
     [Test]
     public async Task BuildSelectedFeaturesHaveClosedMembership()
     {

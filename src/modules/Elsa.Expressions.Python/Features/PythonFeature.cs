@@ -42,7 +42,7 @@ public class PythonFeature : FeatureBase
     /// <inheritdoc />
     public override void Configure()
     {
-        Module.AddActivitiesFrom<PythonFeature>();
+        Module.UseWorkflowManagement(management => management.AddDefaultActivitiesFrom<PythonFeature>());
     }
 
     /// <inheritdoc />
