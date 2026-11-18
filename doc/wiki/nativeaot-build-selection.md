@@ -91,6 +91,14 @@ Calls inside
 `Configure` and `Apply` can configure a selected feature. When opaque code
 requests an absent type, the fixed module throws before invoking the factory
 or configuration action. A custom factory receives the actual host module.
+The custom factory runs only when the slot has no instance. The configuration
+action runs after resolution, including when the module reuses an instance.
+If the factory calls `m.Use<Extra>()`, select `Extra` outside the factory on
+the same module. For example, select it in the host or declare it as a
+dependency. This keeps the graph fixed whether the factory runs or is skipped.
+Use the module passed to the factory to construct its feature. Rebuild feature
+packages with the current generator so their bindings describe factory effects.
+
 A feature without a default constructor needs a factory at its first resolution.
 For example, `module.Configure(m => new CustomFeature(m, value))` can run in
 the host, in a package helper, or in the `Configure` or `ConfigureHostedServices`

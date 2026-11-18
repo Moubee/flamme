@@ -1,6 +1,7 @@
 using Elsa.CodeGeneration.Generators;
 using Elsa.Features.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -484,6 +485,34 @@ public class FixedHostPlannerTests
     }
 
     [Test]
+    public async Task HostFactoriesRequireSelectionsOnTheResolvingModule()
+    {
+        const string factory = "module.Configure(m => { m.Use<Unused>(); return new Leaf(m); });";
+        var missing = Generate("var module = services.CreateModule(); other.CreateModule().Use<Unused>(); " + factory);
+        await Assert.That(missing.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(missing.Diagnostics.Single().GetMessage()).Contains("Unused");
+
+        var selected = Generate("var module = services.CreateModule().Use<Unused>(); " + factory);
+        await Assert.That(selected.Diagnostics).IsEmpty();
+
+        var reentrant = Generate("services.CreateModule().Configure(m => { m.Configure<Leaf>(); return new Leaf(m); });");
+        await Assert.That(reentrant.Diagnostics.Single().GetMessage()).Contains("same slot");
+    }
+
+    [Test]
+    public async Task ApplyingTheModuleInsideADefaultConstructorIsDiagnosed()
+    {
+        const string feature = """
+            public sealed class Reentrant : FeatureBase
+            {
+                public Reentrant(IModule m) : base(m) => m.Apply();
+            }
+            """;
+        var result = Generate("services.CreateModule().Use<Reentrant>();", feature);
+        await Assert.That(result.Diagnostics.Single().GetMessage()).Contains("during construction");
+    }
+
+    [Test]
     public async Task GraphChangingConstructorsAreDiagnosedAndAnImmediateSafeFactoryCanOverrideTheDefault()
     {
         const string declarations = """
@@ -652,6 +681,8 @@ public class FixedHostPlannerTests
                     public static void UseDatabase(this Elsa.Features.Management management) => management.Module.Use<Elsa.Features.Database>();
                     public static IModule AddElsa(this IServiceCollection services, Action<IModule>? configure = null) => throw new Exception();
                     public static IModule ConfigureElsa(this IServiceCollection services, Action<IModule>? configure = null) => throw new Exception();
+                    public static IModule AddElsa(this IServiceCollection services, Action<IModule>? configure, Func<IServiceCollection, FixedFeatureModule> create) => create(services);
+                    public static IModule ConfigureElsa(this IServiceCollection services, Action<IModule>? configure, Func<IServiceCollection, FixedFeatureModule> create) => create(services);
                 }
             }
             """;
@@ -686,7 +717,6 @@ public class FixedHostPlannerTests
     [Test]
     [Arguments("var module = services.ConfigureElsa(m => m.Configure(x => new ExplicitOnly(x, 1))); module.Use<ExplicitOnly>(); services.AddElsa();", true)]
     [Arguments("var module = services.ConfigureElsa(m => m.Use<ExplicitOnly>()); module.Configure(x => new ExplicitOnly(x, 1)); services.AddElsa();", false)]
-    [Arguments("services.AddElsa(); services.ConfigureElsa(m => m.Configure(x => new ExplicitOnly(x, 1)));", true)]
     public async Task QueuedFactoriesRunDuringTheFirstApply(string calls, bool missingFactory)
     {
         var result = Generate(calls, "public sealed class ExplicitOnly(IModule module, int value) : FeatureBase(module);", SdkReference());
@@ -694,6 +724,20 @@ public class FixedHostPlannerTests
             await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("ELSAGEN011");
         else
             await Assert.That(result.Diagnostics).IsEmpty();
+    }
+
+    [Test]
+    [Arguments("services.AddElsa(m => m.Use<Leaf>());")]
+    [Arguments("var module = services.ConfigureElsa(m => m.Use<Leaf>()); module.Apply();")]
+    public async Task SdkCallbacksQueuedAfterTheFirstApplyDoNotSelectFeatures(string apply)
+    {
+        var input = ApplicationInput(apply + " services.ConfigureElsa(m => m.Use<Unused>());", "", SdkReference());
+        var result = CompilerTest.RunHostGenerators(input, out var output);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        var plan = result.GeneratedTrees.Single(tree => tree.FilePath.EndsWith("ElsaFeatureInterceptors.g.cs")).ToString();
+        await Assert.That(plan).Contains(".DeclareLeaf_");
+        await Assert.That(plan.Contains(".DeclareUnused_", StringComparison.Ordinal)).IsFalse();
+        await output.AssertEmits();
     }
 
     [Test]
@@ -854,7 +898,10 @@ public class FixedHostPlannerTests
     private static string HostSource(GeneratorDriverRunResult result) =>
         result.Results.Single().GeneratedSources.Single().SourceText.ToString();
 
-    private static GeneratorDriverRunResult Generate(string selection, string extra = "", MetadataReference? sdk = null)
+    private static GeneratorDriverRunResult Generate(string selection, string extra = "", MetadataReference? sdk = null) =>
+        CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(ApplicationInput(selection, extra, sdk), out _).GetRunResult();
+
+    private static CSharpCompilation ApplicationInput(string selection, string extra, MetadataReference? sdk)
     {
         var source = $$"""
             using Elsa.Extensions;
@@ -875,8 +922,7 @@ public class FixedHostPlannerTests
             }
             """;
         var input = CompilerTest.CreateCompilation(("App.cs", source)).AddReferences(References());
-        if (sdk != null) input = input.AddReferences(sdk);
-        return CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+        return sdk == null ? input : input.AddReferences(sdk);
     }
 
     private static MetadataReference[] References() =>

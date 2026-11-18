@@ -58,8 +58,9 @@ Existing AddElsa/IModule callers and default managed behavior remain available.
 Explicit catalogs remain available to handwritten hosts. Compiler-generated
 hosts use the [fixed feature graph](2026-11-18-fixed-feature-graphs.md).
 The native component probe exercises explicit catalog behavior.
-Generators, versioned cross-module exports, source diagnostics, payload codecs,
-workflow execution, and worker/server capability migration remain separate work.
+The fixed-graph ADR covers generation and feature-selection diagnostics.
+Cross-module export versioning, broader source diagnostics, payload codecs,
+workflow execution, and worker/server capability migration are separate decisions.
 
 The standalone Features probe uses a handwritten catalog. It tests
 both policies, lifecycle, failures, hosted-service identities and owned scopes

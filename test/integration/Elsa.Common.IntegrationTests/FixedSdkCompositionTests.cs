@@ -1,5 +1,6 @@
 using Elsa.Extensions;
 using Elsa.Features.Abstractions;
+using Elsa.Expressions.Liquid.Features;
 using Elsa.Features.Contracts;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,23 @@ public class FixedSdkCompositionTests
         await Assert.That(ReferenceEquals(fresh, applied)).IsFalse();
 
         await Assert.That(() => services.ConfigureElsa(null, Alternate)).Throws<InvalidOperationException>().WithMessageContaining("different feature provider");
+    }
+
+    [Test]
+    public async Task AddElsaRejectsAnAbsentSlotBeforeInvokingItsCallbacks()
+    {
+        var constructed = false;
+        var configured = false;
+        Action<IModule> callback = module => module.Configure<LiquidFeature>(m =>
+        {
+            constructed = true;
+            return new LiquidFeature(m);
+        }, _ => configured = true);
+
+        await Assert.That(() => new ServiceCollection().AddElsa(callback, Create))
+            .Throws<InvalidOperationException>().WithMessageContaining(nameof(LiquidFeature));
+        await Assert.That(constructed).IsFalse();
+        await Assert.That(configured).IsFalse();
     }
 
     private static FixedFeatureModule Create(IServiceCollection services) => new Plan(services);

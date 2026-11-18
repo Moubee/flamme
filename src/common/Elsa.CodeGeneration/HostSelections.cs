@@ -15,6 +15,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
     // ConfigureElsa queues its callback until Apply. Consumers of the returned module
     // can resolve a slot immediately, before any of the queued factories have run.
     private readonly List<(SyntaxNode Site, Request? Request, bool Queued)> _resolutions = [];
+    private readonly HashSet<StatementSyntax> _applyStatements = [];
     private SyntaxNode? _resolutionSite;
     private bool _queued;
 
@@ -103,7 +104,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             }
             if (executed == false) return;
             var configure = operation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "configure");
-            if (configure != null && !configure.IsImplicit && configure.Value.ConstantValue is not { HasValue: true, Value: null })
+            if (configure != null && !configure.IsImplicit && configure.Value.ConstantValue is not { HasValue: true, Value: null } && !AlreadyApplied(syntax, semantic))
             {
                 _resolutionSite = syntax;
                 _queued = true;
@@ -111,7 +112,11 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 _queued = false;
                 _resolutionSite = null;
             }
-            if (site.Name == "AddElsa") _resolutions.Add((syntax, null, false));
+            if (site.Name == "AddElsa")
+            {
+                _resolutions.Add((syntax, null, false));
+                RememberApply(syntax);
+            }
             ReadConsumers(syntax, semantic, executed == null);
             return;
         }
@@ -322,6 +327,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (method.Name == "Apply" && SymbolEqualityComparer.Default.Equals(method.ContainingType, _module))
             {
                 RecordApply(call.GetLocation());
+                if (!_queued && _resolutionSite == call) RememberApply(call);
                 continue;
             }
             if (api && method.Name is "Configure" or "Use")
@@ -333,6 +339,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 }
                 var custom = method.Name == "Configure" && method.Parameters.Any(parameter => parameter.Name == "factory");
                 var immediate = custom && CheckFactory(invocation, feature, semantic, creation);
+                if (custom)
+                    ReadArguments(invocation.Arguments, true, name => name == "factory", isFactory: true);
                 Record(new Request(feature, call.GetLocation(), conditional, custom, immediate));
                 ReadArguments(invocation.Arguments, conditional, name => name == "configure");
                 continue;
@@ -340,7 +348,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (api && method.Name == "ConfigureHostedService")
             {
                 var service = BindType(invocation.TargetMethod.TypeArguments.FirstOrDefault() ??
-                              (invocation.Arguments.FirstOrDefault()?.Value as ITypeOfOperation)?.TypeOperand) as INamedTypeSymbol;
+                              (invocation.Arguments.FirstOrDefault(arg => arg.Parameter?.Name == "hostedServiceType")?.Value as ITypeOfOperation)?.TypeOperand) as INamedTypeSymbol;
                 if (service != null && FeatureBinding.IsClosed(service))
                     HostedServices.Add(new Request(service, call.GetLocation()));
                 else
@@ -355,7 +363,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     continue;
                 }
                 AddSelector(selector, hostMethod, call.GetLocation(), conditional,
-                    (name, guarded) => ReadArguments(invocation.Arguments, guarded, parameter => parameter == name), invocation);
+                    (name, guarded, isFactory) => ReadArguments(invocation.Arguments, guarded, parameter => parameter == name, isFactory), invocation);
             }
             else if (!api && method.MethodKind != MethodKind.DelegateInvoke && method.ContainingAssembly != null &&
                      !SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly) &&
@@ -428,7 +436,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 if (known == null) UnboundVirtual(site.GetLocation(), method);
                 else if (inputs.Any(arg => !Owned(arg))) Error(site.GetLocation(), $"Cannot assign the delegate '{method}' to independent feature modules.");
                 else if (producers.GetSelector(known) is {} selector) AddSelector(selector, known, site.GetLocation(), conditional,
-                    (name, guarded) => ReadArguments(arguments.Where(arg => arg.Parameter?.Ordinal == known.Parameters.FirstOrDefault(p => p.Name == name)?.Ordinal), guarded, _ => true));
+                    (name, guarded, isFactory) => ReadArguments(arguments.Where(arg => arg.Parameter?.Ordinal == known.Parameters.FirstOrDefault(p => p.Name == name)?.Ordinal), guarded, _ => true, isFactory));
                 else if (producers.IsCompositionMethod(known)) Error(site.GetLocation(), $"Cannot bind the feature selections in delegate '{known}'.");
                 return;
             }
@@ -468,7 +476,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 // syntax ends inside this object's span. Use the argument boundary for ordering.
                 if (outerSite == null && site.ArgumentList != null) _resolutionSite = site.ArgumentList;
                 AddSelector(selector, constructor, site.GetLocation(), ambientCondition || runs == null || inConditionalCallback,
-                    (name, guarded) => ReadArguments(constructed.Arguments, guarded, parameter => parameter == name));
+                    (name, guarded, isFactory) => ReadArguments(constructed.Arguments, guarded, parameter => parameter == name, isFactory));
             }
         }
 
@@ -541,13 +549,27 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             _activeCallbacks.Remove(method);
         }
 
-        void ReadArguments(IEnumerable<IArgumentOperation> arguments, bool conditional, Func<string, bool> invoked)
+        void ReadArguments(IEnumerable<IArgumentOperation> arguments, bool conditional, Func<string, bool> invoked, bool isFactory = false)
         {
             foreach (var argument in arguments)
             {
                 if (argument.IsImplicit || argument.Parameter == null || !invoked(argument.Parameter.Name))
                     continue;
                 var value = argument.Value;
+                if (isFactory && argument.Parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} factorySignature })
+                {
+                    while (value is IParameterReferenceOperation forwarded && _localArguments.TryGetValue(forwarded.Parameter, out var supplied) && supplied != value)
+                        value = supplied;
+                    if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation factory)
+                        handledCallbacks.Add(factory.Syntax);
+                    var method = (IMethodSymbol)argument.Parameter.ContainingSymbol;
+                    var effects = producers.ReadFactory(value, method, BindType(factorySignature.ReturnType)!, output.CancellationToken);
+                    if (effects.ConfigurationParameters.Length != 0 || effects.ConditionalConfigurationParameters.Length != 0)
+                        Error(argument.Syntax.GetLocation(), "Cannot inspect the feature factory at this host call. Supply a lambda that constructs the feature with its module parameter.");
+                    else
+                        AddSelector(effects, method, argument.Syntax.GetLocation(), conditional);
+                    continue;
+                }
                 if (argument.Parameter.Type is INamedTypeSymbol { DelegateInvokeMethod: {} delegateMethod } && !delegateMethod.Parameters.Any(p => IsModuleOrFeature(p.Type)))
                 {
                     if (DelegateTargets.Resolve(value, compilation, output.CancellationToken) is IAnonymousFunctionOperation deferred)
@@ -707,15 +729,6 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             factory = factory is IConversionOperation convert ? convert.Operand : ((IDelegateCreationOperation)factory).Target;
         if (factory is not IAnonymousFunctionOperation { Syntax: LambdaExpressionSyntax lambda })
             return false;
-        foreach (var syntax in lambda.Body.DescendantNodesAndSelf(n => n is not AnonymousFunctionExpressionSyntax and not LocalFunctionStatementSyntax).OfType<BaseObjectCreationExpressionSyntax>())
-        {
-            if (semantic.GetOperation(syntax) is IObjectCreationOperation { Constructor: { } candidate }
-                && SymbolEqualityComparer.Default.Equals(candidate.ContainingType, feature) && producers.GetSelector(candidate) is { } candidateFacts
-                && ChangesGraph(candidateFacts))
-                output.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InvalidPlan, syntax.GetLocation(),
-                    $"Feature factory invokes '{candidate}', which may change the feature graph. Move feature selection to Configure and declare required dependencies."));
-        }
-
         var expression = lambda.Body as ExpressionSyntax ??
             (lambda.Body is BlockSyntax { Statements.Count: 1 } block && block.Statements[0] is ReturnStatementSyntax returned ? returned.Expression : null);
         var result = expression == null ? null : semantic.GetOperation(expression);
@@ -724,7 +737,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         if (result is not IObjectCreationOperation { Constructor: { } constructor } || !SymbolEqualityComparer.Default.Equals(constructor.ContainingType, feature))
             return false;
         var facts = producers.GetSelector(constructor);
-        if (facts == null || ChangesGraph(facts))
+        if (facts == null || AffectsComposition(facts))
             return false;
         if (creation == null || creation.Expression is not MemberAccessExpressionSyntax { Name.Identifier.ValueText: "CreateModule" })
             return false;
@@ -736,15 +749,33 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             Receiver(semantic, (InvocationExpressionSyntax)registration.Syntax) is ILocalReferenceOperation &&
             createStatement != null && configureStatement != null &&
             configureStatement.GetFirstToken().GetPreviousToken() == createStatement.GetLastToken();
-
-        static bool ChangesGraph(FixedProducerSelector facts) => facts.Error != null || facts.Features.Length != 0 ||
-            facts.ConditionalFeatures.Length != 0 || facts.Hosted.Length != 0 || facts.VirtualCalls.Length != 0 || facts.ConditionalVirtualCalls.Length != 0;
     }
 
     private static bool AffectsComposition(FixedProducerSelector selector) =>
         selector.Error != null || selector.Resolutions.Length != 0 || selector.Features.Length != 0 || selector.ConditionalFeatures.Length != 0 ||
         selector.Hosted.Length != 0 || selector.ConfigurationParameters.Length != 0 ||
         selector.ConditionalConfigurationParameters.Length != 0 || selector.HasVirtualCalls;
+
+    // A subsequent SDK call on this collection discards its callback when an
+    // earlier statement in the same block has already applied the module.
+    private void RememberApply(InvocationExpressionSyntax call)
+    {
+        var statement = call.Parent switch
+        {
+            ExpressionStatementSyntax expression => (StatementSyntax)expression,
+            EqualsValueClauseSyntax { Parent.Parent.Parent: LocalDeclarationStatementSyntax declaration } => declaration,
+            _ => null
+        };
+        if (statement != null) _applyStatements.Add(statement);
+    }
+
+    private bool AlreadyApplied(InvocationExpressionSyntax call, SemanticModel semantic)
+    {
+        var current = call.Ancestors().OfType<StatementSyntax>().FirstOrDefault();
+        if (current == null) return false;
+        return _applyStatements.Any(prior => prior.Parent == current.Parent && prior.Span.End <= current.SpanStart &&
+            semantic.AnalyzeControlFlow(prior, current) is { Succeeded: true, EntryPoints.IsEmpty: true });
+    }
 
     private void RecordApply(Location location)
     {
@@ -760,7 +791,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         _resolutions.Add((_resolutionSite!, request, _queued));
     }
 
-    private void AddSelector(FixedProducerSelector selector, IMethodSymbol method, Location location, bool conditional, Action<string, bool>? invoke = null, IInvocationOperation? invocation = null)
+    private void AddSelector(FixedProducerSelector selector, IMethodSymbol method, Location location, bool conditional, Action<string, bool, bool>? invoke = null, IInvocationOperation? invocation = null)
     {
         // Metadata preserves the order of slot resolutions, but lists virtual calls
         // separately. Only one effectful override can be inserted without guessing.
@@ -783,7 +814,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             Error(location, $"Cannot resolve fixed selection in '{method}': {selector.Error}.");
         foreach (var step in selector.OrderedResolutions())
         {
-            if (step.Callback != null) invoke?.Invoke(step.Callback, conditional || step.Conditional);
+            if (step.Callback != null) invoke?.Invoke(step.Callback, conditional || step.Conditional, step.Factory);
             else if (step.Type == null) RecordApply(location);
             else if (step.Type.Value.Concrete is { } type)
                 Record(new Request(type, location, conditional || step.Conditional, step.Factory));

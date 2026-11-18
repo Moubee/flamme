@@ -285,10 +285,15 @@ public class GeneratedSdkCompositionTests
             workflows.WorkflowExecutionPipeline = customPipeline;
             workflows.ActivityExecutionPipeline = customActivityPipeline;
         }));
-        services.ConfigureElsa(_ => configured.Add("after"));
+        services.ConfigureElsa(module =>
+        {
+            configured.Add("after");
+            module.UseLiquid();
+        });
         var repeated = services.AddElsa();
         await Assert.That(ReferenceEquals(first, applied) && ReferenceEquals(applied, repeated)).IsTrue();
         await Assert.That(string.Join(",", configured)).IsEqualTo("before,workflows");
+        await Assert.That(applied.HasFeature<LiquidFeature>()).IsFalse();
         await Assert.That(applied.HasFeature<AppFeature>()).IsTrue();
         await Assert.That(applied.HasFeature<WorkflowManagementFeature>()).IsTrue();
         await Assert.That(applied.HasFeature<WorkflowRuntimeFeature>()).IsTrue();

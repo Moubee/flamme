@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Elsa.CodeGeneration.Generators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -31,6 +32,15 @@ internal static class CompilerTest
         driver = driver.RunGeneratorsAndUpdateCompilation(input, out var compilation, out _);
         output = (CSharpCompilation)compilation;
         return driver;
+    }
+
+    public static GeneratorDriverRunResult RunHostGenerators(CSharpCompilation input, out CSharpCompilation output)
+    {
+        var options = ((CSharpParseOptions)input.SyntaxTrees.First().Options)
+            .WithFeatures(new Dictionary<string, string> { ["InterceptorsNamespaces"] = "Elsa.CodeGeneration.Interceptors" });
+        input = input.RemoveAllSyntaxTrees().AddSyntaxTrees(input.SyntaxTrees.Select(tree => tree.WithRootAndOptions(tree.GetRoot(), options)));
+        return CreateDriver(true, new ElsaFeatureGenerator(), new ElsaCompositionHostGenerator())
+            .WithUpdatedParseOptions(options).Run(input, out output).GetRunResult();
     }
 
     public static async Task AssertEmits(this Compilation output)

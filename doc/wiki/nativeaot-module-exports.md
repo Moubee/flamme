@@ -154,7 +154,9 @@ per-host `Configure<T>(factory)` are the supported explicit override boundaries.
 ## Public API and migration inventory
 
 Existing `AddElsa`, `IModule`, `Module`, explicit catalog, and hosted-service APIs
-remain valid. Callers need no migration unless they opt into versioned exports.
+remain valid. Callers using `ExplicitFeatureCatalogBuilder.AddAvailable` or
+`BuildAvailable` must migrate to generated feature selection or use `Add` and
+`Build` in an authored catalog. [Build-selection migration guide](nativeaot-build-selection.md)
 
 | Owning assembly | Added public surface |
 | --- | --- |

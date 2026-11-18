@@ -65,9 +65,7 @@ public class GenericSelectorTests
         }
         else input = input.AddSyntaxTrees(CSharpSyntaxTree.ParseText(Helpers, (CSharpParseOptions)input.SyntaxTrees.Single().Options, "Helpers.cs"));
 
-        var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
-        await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
-        var generated = result.GeneratedTrees.Single().ToString();
+        var generated = await EmitHost(input);
         var plans = generated.Split(" : FixedFeatureModule");
         await Assert.That(plans.Length).IsEqualTo(3);
         await Assert.That(plans[1]).Contains(".DeclareLeaf_");
@@ -110,9 +108,8 @@ public class GenericSelectorTests
                 }
             }
             """;
-        var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(Create("Host", host), out _).GetRunResult();
-        await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
-        var plans = result.GeneratedTrees.Single().ToString().Split(" : FixedFeatureModule");
+        var generated = await EmitHost(Create("Host", host));
+        var plans = generated.Split(" : FixedFeatureModule");
         await Assert.That(plans.Length).IsEqualTo(3);
         await Assert.That(plans[1]).Contains(".DeclareLeft_");
         await Assert.That(plans[1]).Contains(".DeclareLocal_");
@@ -146,6 +143,50 @@ public class GenericSelectorTests
         var diagnostic = result.Diagnostics.Single();
         await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
         await Assert.That(diagnostic.GetMessage()).Contains("not statically known");
+    }
+
+    [Test]
+    public async Task InferredClosedSelectorKeepsItsPackageBindingAndInternalDependency()
+    {
+        const string features = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Attributes;
+            using Elsa.Features.Services;
+            internal sealed class Foundation(IModule m) : FeatureBase(m);
+            [DependsOn(typeof(Foundation))]
+            public sealed class Wrapper<T>(IModule m) : FeatureBase(m);
+            public static class Selectors
+            {
+                public static void Select<T>(IModule module, T? hint) where T : class, IFeature => module.Use<T>();
+                public static void Install(IModule module) => Select(module, (Wrapper<int>?)null);
+            }
+            """;
+        var package = Create("External", features);
+        CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(package, out var compiled);
+        using var binary = new MemoryStream();
+        var emitted = compiled.Emit(binary, options: new EmitOptions(metadataOnly: true, includePrivateMembers: false));
+        await Assert.That(emitted.Success).IsTrue().Because(string.Join("\n", emitted.Diagnostics));
+
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services) => Selectors.Select<Wrapper<int>>(services.CreateModule(), null);
+            }
+            """;
+        var plan = await EmitHost(Create("Host", host).AddReferences(MetadataReference.CreateFromImage(binary.ToArray())));
+        await Assert.That(plan).Contains("PExternal.Bindings.DeclareWrapper_");
+        await Assert.That(plan).Contains("PExternal.Bindings.DeclareFoundation_");
+    }
+
+    private static async Task<string> EmitHost(CSharpCompilation input)
+    {
+        var result = CompilerTest.RunHostGenerators(input, out var output);
+        await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
+        await output.AssertEmits();
+        return result.Results.SelectMany(r => r.GeneratedSources).Single(s => s.HintName == "ElsaFeatureInterceptors.g.cs").SourceText.ToString();
     }
 
     private static CSharpCompilation Create(string name, string source) => CompilerTest.CreateCompilation((name + ".cs", source))

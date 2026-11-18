@@ -56,6 +56,7 @@ internal sealed partial class FixedProducerModel
     private readonly string _namespace;
     private readonly string _bridge;
     private readonly string? _source;
+    private const int BindingSchemaVersion = 2; // Includes the effects of conditionally invoked feature factories.
     private const string Runtime = "global::Elsa.Features.Services.";
 
     internal IReadOnlyList<FixedProducerFeature> Features => _features.Values.ToArray();
@@ -118,9 +119,8 @@ internal sealed partial class FixedProducerModel
                 // A closed generic feature or hosted service may only appear as a type
                 // argument to a selector in a package. Produce bindings here, where the
                 // specialization is visible. The bound selector determines membership.
-                if (node is GenericNameSyntax { Parent: InvocationExpressionSyntax or MemberAccessExpressionSyntax or MemberBindingExpressionSyntax
-                        or ArgumentSyntax or EqualsValueClauseSyntax } name &&
-                    semantic.GetSymbolInfo(name, token).Symbol is IMethodSymbol invoked && IsCompositionMethod(invoked.ReducedFrom ?? invoked))
+                if ((node is InvocationExpressionSyntax || node is GenericNameSyntax { Parent: ArgumentSyntax or EqualsValueClauseSyntax or MemberAccessExpressionSyntax or MemberBindingExpressionSyntax }) &&
+                    semantic.GetSymbolInfo(node, token).Symbol is IMethodSymbol { IsGenericMethod: true } invoked && IsCompositionMethod(invoked.ReducedFrom ?? invoked))
                 {
                     foreach (var argument in invoked.TypeArguments.OfType<INamedTypeSymbol>().Where(FeatureBinding.IsClosed))
                     {
@@ -143,6 +143,7 @@ internal sealed partial class FixedProducerModel
         while (pending.Count > 0)
         {
             var type = pending.Dequeue();
+            if (_features.ContainsKey(type)) continue; // A producer can name its own internal dependencies.
             var error = _binding.FeatureError(type, compilation.Assembly);
             var (strong, conditional) = _binding.Dependencies(type);
             var name = BridgeName("Declare", type);
@@ -208,7 +209,7 @@ internal sealed partial class FixedProducerModel
             if (_binding.DefaultConstructor(item.Type) is { } ctor)
             {
                 var construction = effectsReader.Read(ctor);
-                if (construction.Error is not null || construction.Features.Length + construction.ConditionalFeatures.Length + construction.Hosted.Length
+                if (construction.Error is not null || construction.Resolutions.Length != 0 || construction.Features.Length + construction.ConditionalFeatures.Length + construction.Hosted.Length
                     + construction.VirtualCalls.Length + construction.ConditionalVirtualCalls.Length > 0)
                     item.ConstructorError = $"'{ctor}' changes or may change feature composition during construction. Move feature selection to Configure and declare required dependencies."
                         + (construction.Error is null ? "" : " " + construction.Error);
@@ -283,9 +284,9 @@ internal sealed partial class FixedProducerModel
                 steps.Add(new SlotResolution(null));
                 continue;
             }
-            if (entry.Length > 2 && (entry[0] is '?' or '!') && entry[1] == '@')
+            if (entry.Length > 2 && (entry[0] is '?' or '!') && entry[1] is '@' or '&')
             {
-                steps.Add(new SlotResolution(null, entry[0] == '?', callback: entry.Substring(2)));
+                steps.Add(new SlotResolution(null, entry[0] == '?', entry[1] == '&', callback: entry.Substring(2)));
                 continue;
             }
             if (entry.Length > 2 && (entry[0] is '?' or '!') && (entry[1] is '+' or '-'))
@@ -339,7 +340,7 @@ internal sealed partial class FixedProducerModel
     // incompatible or malformed exports as a unit, before decoding any slot/selector.
     private static bool HasCurrentSchema(INamedTypeSymbol bridge)
     {
-        if (bridge.GetMembers("SchemaVersion").OfType<IFieldSymbol>().FirstOrDefault()?.ConstantValue is not 1) return false;
+        if (bridge.GetMembers("SchemaVersion").OfType<IFieldSymbol>().FirstOrDefault()?.ConstantValue is not BindingSchemaVersion) return false;
         foreach (var attr in bridge.GetAttributes().Where(a => IsAttribute(a, bridge, "SelectorAttribute")))
             if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "ResolutionOrder" && !IsStringArray(pair.Value) ||
                 pair.Key == "ReturnOwner" && (pair.Value.Kind != TypedConstantKind.Primitive || pair.Value.Value is not string))) return false;
@@ -436,7 +437,7 @@ internal sealed partial class FixedProducerModel
         var body = new StringBuilder();
         foreach (var p in _exportedSelectors.OrderBy(e => e.Key, StringComparer.Ordinal))
             body.AppendLine(SelectorAttributeSource(p.Key, p.Value));
-        body.AppendLine("public static class Bindings").AppendLine("{").AppendLine("    public const int SchemaVersion = 1;");
+        body.AppendLine("public static class Bindings").AppendLine("{").AppendLine($"    public const int SchemaVersion = {BindingSchemaVersion};");
         foreach (var item in _local)
         {
             foreach (var requirement in _binding.ConstructorRequirements(item.Type)) body.Append("    ").AppendLine(requirement);
@@ -483,7 +484,7 @@ internal sealed partial class FixedProducerModel
     }
 
     private static string ResolutionOrder(SlotResolution[] steps) => steps.Length == 0 ? "" : ", ResolutionOrder = " + StringArray(steps.Select(step =>
-            step.Callback is { } callback ? (step.Conditional ? "?@" : "!@") + callback :
+            step.Callback is { } callback ? (step.Conditional ? "?" : "!") + (step.Factory ? "&" : "@") + callback :
             step.Type is { } type ? (step.Conditional ? "?" : "!") + (step.Factory ? "+" : "-") + SelectorKey(type) : "*"));
 
     private static string Calls(IEnumerable<VirtualCall> calls) =>

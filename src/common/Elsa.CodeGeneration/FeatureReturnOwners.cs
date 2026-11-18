@@ -45,6 +45,7 @@ internal sealed partial class FixedProducerModel
         internal string? Read(IMethodSymbol method)
         {
             method = (method.ReducedFrom ?? method).OriginalDefinition;
+            method = method.PartialDefinitionPart ?? method;
             if (method.ContainingAssembly.Name == "Elsa.Features")
             {
                 var type = method.ContainingType.ToDisplayString();
@@ -62,7 +63,7 @@ internal sealed partial class FixedProducerModel
             if (!model.CompositionType(method.ReturnType) && method.ReturnType.TypeKind != TypeKind.TypeParameter)
                 return null;
 
-            var declaration = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+            var declaration = (method.PartialImplementationPart ?? method).DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
             var body = declaration switch
             {
                 MethodDeclarationSyntax ordinary => (SyntaxNode?)ordinary.ExpressionBody?.Expression ?? ordinary.Body,
@@ -118,7 +119,7 @@ internal sealed partial class FixedProducerModel
                     case IParameterReferenceOperation parameter when !modified.Contains(parameter.Parameter) && (parameter.Parameter.RefKind == RefKind.None || !writesThroughReference):
                         if (SymbolEqualityComparer.Default.Equals(parameter.Parameter, declared.ContainingType.ExtensionParameter))
                             return Instance;
-                        return SymbolEqualityComparer.Default.Equals(parameter.Parameter.ContainingSymbol, declared) ? parameter.Parameter.Name : null;
+                        return SymbolEqualityComparer.Default.Equals(parameter.Parameter.ContainingSymbol, declared) ? method.Parameters[parameter.Parameter.Ordinal].Name : null;
                     case IInstanceReferenceOperation:
                         return Instance;
                     case ILocalReferenceOperation local when !modified.Contains(local.Local) && seen.Add(local.Local):
