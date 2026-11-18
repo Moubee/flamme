@@ -1,0 +1,14 @@
+<Project>
+  <!-- Earlier standalone tooling could be imported after Elsa.Features. Its resolver
+       set the generated host constants before the compiler supported interceptors. -->
+  <Target Name="ResolveElsaCodeGenerationSettings" BeforeTargets="PrepareForBuild;CollectPackageReferences;GenerateMSBuildEditorConfigFileShouldRun"
+          Condition="'$(IsCrossTargetingBuild)' != 'true'">
+    <PropertyGroup>
+      <ElsaIsHost>true</ElsaIsHost>
+      <ElsaGenerateMetadata>true</ElsaGenerateMetadata>
+      <ElsaHostBootstrap>Compiler</ElsaHostBootstrap>
+      <ElsaEffectiveExecutionMode>Generated</ElsaEffectiveExecutionMode>
+      <DefineConstants>$(DefineConstants);ELSA_GENERATED</DefineConstants>
+    </PropertyGroup>
+  </Target>
+</Project>

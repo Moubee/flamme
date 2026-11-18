@@ -86,6 +86,13 @@ public class CodeGenerationTests
     }
 
     [Test]
+    public async Task OlderStandaloneBuildSettingsAllowBundledInterception()
+    {
+        var consumer = await CodeGenerationConsumer.Create("pre-interception-tooling", compiledFeatures: true, preInterceptionBuild: true);
+        await consumer.Verify("Generated", ["-p:ElsaExecutionMode=Generated"]);
+    }
+
+    [Test]
     [Arguments(true, "Dynamic")]
     [Arguments(false, "Generated")]
     public async Task SourceLibraryOnlyInheritsTheGlobalMode(bool appLocal, string childProvider)

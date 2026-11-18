@@ -29,7 +29,7 @@ internal sealed class CodeGenerationConsumer
 
     public static async Task<CodeGenerationConsumer> Create(string name, bool manual = false, bool sourceLibrary = false,
         bool localMode = false, bool lateMode = false, bool generatedFilename = false, bool compiledFeatures = false,
-        bool disableRuntimeAsync = false, bool unsafeProducer = false)
+        bool disableRuntimeAsync = false, bool unsafeProducer = false, bool preInterceptionBuild = false)
     {
         var feed = await PackageFeed.Get(disableRuntimeAsync);
         var source = feed.PrepareConsumer(name);
@@ -46,6 +46,9 @@ internal sealed class CodeGenerationConsumer
         if (lateMode)
             new XDocument(new XElement("Project", new XElement("PropertyGroup", new XElement("ElsaExecutionMode", "Generated"))))
                 .Save(Path.Combine(source, "Directory.Build.targets"));
+
+        if (preInterceptionBuild)
+            File.Copy(Template("PreInterceptionBuild.targets.in"), Path.Combine(source, "Directory.Build.targets"), overwrite: true);
 
         if (sourceLibrary)
             project.Descendants("PackageReference").Single(p => (string?)p.Attribute("Include") == PackageFeed.Producer).Remove();
