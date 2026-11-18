@@ -111,3 +111,11 @@ public sealed class FoundationHostedService : IHostedService
         _state.Events.Add("foundation.stop");
     }
 }
+
+
+// Importing this producer must never activate its unused features.
+internal sealed class UnselectedFeature : FeatureBase
+{
+    public UnselectedFeature(IModule module) : base(module) =>
+        throw new InvalidOperationException("The host did not select this feature.");
+}

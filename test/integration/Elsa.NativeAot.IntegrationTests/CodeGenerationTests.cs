@@ -9,7 +9,7 @@ public class ManagedCodeGenerationTests
     [Arguments("Generated", "Generated")]
     public async Task ManagedCompilerSelectsProvider(string mode, string provider)
     {
-        var consumer = await CodeGenerationConsumer.Create($"managed-{mode}");
+        var consumer = await CodeGenerationConsumer.Create($"managed-{mode}", compiledFeatures: true);
         await consumer.Verify(provider, [$"-p:ElsaExecutionMode={mode}", "-p:PublishAot=false"]);
     }
 }
@@ -26,6 +26,31 @@ public class CodeGenerationTests
     {
         var consumer = await CodeGenerationConsumer.Create($"manual-{mode}", manual: true);
         await consumer.Verify(mode, [$"-p:ElsaExecutionMode={mode}", "-p:ElsaGenerateMetadata=false", "-p:FixtureIncludeGenerator=false", "-p:PublishAot=false"]);
+    }
+
+#if NET11_0_OR_GREATER
+    [Test]
+    public async Task RuntimeAsyncOptOutRunsPackedFeatures()
+    {
+        foreach (var (mode, native) in new[] { ("Dynamic", false), ("Generated", false), ("Generated", true) })
+        {
+            var consumer = await CodeGenerationConsumer.Create($"async-disabled-{mode}-{native}", compiledFeatures: true, disableRuntimeAsync: true);
+            await consumer.Verify(mode, [$"-p:ElsaExecutionMode={mode}", "-p:UseRuntimeAsync=false"], native);
+        }
+    }
+
+#endif
+
+    [Test]
+    public async Task UnselectedDynamicCodeProducerExposesItsNativeRequirement()
+    {
+        var consumer = await CodeGenerationConsumer.Create("optional-dynamic-plugin", compiledFeatures: true, unsafeProducer: true);
+        await consumer.Verify("Generated", ["-p:ElsaExecutionMode=Generated"]);
+        string[] native = ["-p:PublishAot=true", $"-p:RuntimeIdentifier={BuildTest.Rid}"];
+        await consumer.RestoreLocked(native);
+        var publish = await consumer.Build(native, native: true);
+        await Assert.That(publish.ExitCode).IsNotEqualTo(0);
+        await Assert.That(publish.Output).Matches(@"error IL3050[^\r\n]*OptionalPlugin\.DynamicFeature");
     }
 
     [Test]
@@ -168,7 +193,7 @@ public class CodeGenerationTests
     [Arguments("Generated", true)]
     public async Task NativeConsumerRunsGeneratedProvider(string mode, bool manual)
     {
-        var consumer = await CodeGenerationConsumer.Create($"native-{mode}-manual-{manual}", manual);
+        var consumer = await CodeGenerationConsumer.Create($"native-{mode}-manual-{manual}", manual, compiledFeatures: !manual);
         string[] settings = [$"-p:ElsaExecutionMode={mode}"];
         if (manual)
             settings = [.. settings, "-p:ElsaGenerateMetadata=false", "-p:FixtureIncludeGenerator=false"];

@@ -10,14 +10,16 @@ internal sealed class CodeGenerationConsumer
     private readonly string _source;
     private readonly string _evidence;
     private readonly bool _hasSourceLibrary;
+    private readonly bool _compiledFeatures;
     private int _step;
 
-    private CodeGenerationConsumer(PackageFeed feed, string source, string evidence, bool hasSourceLibrary)
+    private CodeGenerationConsumer(PackageFeed feed, string source, string evidence, bool hasSourceLibrary, bool compiledFeatures)
     {
         _feed = feed;
         _source = source;
         _evidence = evidence;
         _hasSourceLibrary = hasSourceLibrary;
+        _compiledFeatures = compiledFeatures;
     }
 
     private string BuildDirectory => Path.Combine(_evidence, "build");
@@ -26,14 +28,17 @@ internal sealed class CodeGenerationConsumer
     private static string Template(string file) => Path.Combine(BuildTest.Root, "test", "fixtures", "nativeaot", "codegen-build", file);
 
     public static async Task<CodeGenerationConsumer> Create(string name, bool manual = false, bool sourceLibrary = false,
-        bool localMode = false, bool lateMode = false, bool generatedFilename = false)
+        bool localMode = false, bool lateMode = false, bool generatedFilename = false, bool compiledFeatures = false,
+        bool disableRuntimeAsync = false, bool unsafeProducer = false)
     {
-        var feed = await PackageFeed.Get();
+        var feed = await PackageFeed.Get(disableRuntimeAsync);
         var source = feed.PrepareConsumer(name);
         var evidence = BuildTest.CreateDirectory(name);
         var project = XDocument.Load(Template("Consumer.csproj.in"));
         var properties = project.Root!.Element("PropertyGroup")!;
 
+        if (disableRuntimeAsync)
+            properties.Add(new XElement("UseRuntimeAsync", false));
         if (manual)
             properties.Add(new XElement("ElsaHostBootstrap", "Manual"));
         if (localMode)
@@ -43,14 +48,21 @@ internal sealed class CodeGenerationConsumer
                 .Save(Path.Combine(source, "Directory.Build.targets"));
 
         project.Save(Path.Combine(source, "Consumer.csproj"));
-        File.Copy(Template("Program.cs"), Path.Combine(source, "Program.cs"));
-        File.Copy(Template(manual ? "ElsaHost.Manual.cs.in" : "ElsaHost.Compiler.cs.in"),
-            Path.Combine(source, generatedFilename ? "ElsaHost.g.cs" : "ElsaHost.cs"));
+        File.Copy(Template(compiledFeatures ? "CompiledFeatures.cs.in" : "Program.cs"), Path.Combine(source, "Program.cs"));
+        if (!compiledFeatures)
+            File.Copy(Template(manual ? "ElsaHost.Manual.cs.in" : "ElsaHost.Compiler.cs.in"),
+                Path.Combine(source, generatedFilename ? "ElsaHost.g.cs" : "ElsaHost.cs"));
 
-        if (sourceLibrary)
+        if (sourceLibrary || unsafeProducer)
         {
             var library = Directory.CreateDirectory(Path.Combine(source, "SourceLibrary")).FullName;
-            File.Copy(Template("SourceLibrary.csproj.in"), Path.Combine(library, "SourceLibrary.csproj"));
+            var libraryProject = XDocument.Load(Template("SourceLibrary.csproj.in"));
+            if (unsafeProducer)
+            {
+                libraryProject.Root!.Element("ItemGroup")!.Add(new XElement("PackageReference", new XAttribute("Include", "Elsa.Features")));
+                File.Copy(Template("UnsafeFeature.cs.in"), Path.Combine(library, "UnsafeFeature.cs"));
+            }
+            libraryProject.Save(Path.Combine(library, "SourceLibrary.csproj"));
         }
 
         foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
@@ -60,7 +72,7 @@ internal sealed class CodeGenerationConsumer
             File.Copy(file, snapshot);
         }
 
-        return new CodeGenerationConsumer(feed, source, evidence, sourceLibrary);
+        return new CodeGenerationConsumer(feed, source, evidence, sourceLibrary || unsafeProducer, compiledFeatures);
     }
 
     private Task<CommandResult> Run(string name, string executable, params string[] args) =>
@@ -116,9 +128,14 @@ internal sealed class CodeGenerationConsumer
 
         var output = ExecutableDirectory(native);
         await Assert.That(Directory.EnumerateFiles(output, "Microsoft.CodeAnalysis*.dll")).IsEmpty();
+        await Assert.That(Directory.EnumerateFiles(output, "RegistrationCompiler.dll")).IsEmpty();
         var dependencies = Path.Combine(output, "Consumer.deps.json");
         if (File.Exists(dependencies))
-            await Assert.That(File.ReadAllText(dependencies)).DoesNotContain("Microsoft.CodeAnalysis");
+        {
+            var manifest = File.ReadAllText(dependencies);
+            await Assert.That(manifest).DoesNotContain("Microsoft.CodeAnalysis");
+            await Assert.That(manifest).DoesNotContain("RegistrationCompiler");
+        }
     }
 
     public async Task Verify(string provider, string[] settings, bool native = false)
@@ -133,6 +150,18 @@ internal sealed class CodeGenerationConsumer
         var diagnostics = Regex.Matches(result.Output, @"\b(?:warning|error) (?:CS878[45]|CS803[24]|AD0001|IL\d+)\b");
         await Assert.That(diagnostics.Where(match => native || !match.Value.Contains(" IL"))).IsEmpty();
         await VerifyExecution(provider, native);
+
+        if (_compiledFeatures)
+        {
+            var interceptors = Directory.GetFiles(IntermediateDirectory, "ElsaFeatureInterceptors.g.cs", SearchOption.AllDirectories);
+            await Assert.That(interceptors.Length).IsEqualTo(provider == "Generated" ? 1 : 0);
+            if (provider == "Generated")
+            {
+                var generated = File.ReadAllText(interceptors.Single());
+                await Assert.That(generated).Contains("InterceptCreateModule");
+                await Assert.That(generated).Contains("BuildAvailable()");
+            }
+        }
 
         // Ask the installed targets which settings reached the compiler in this lane.
         var propertiesFile = Path.Combine(_evidence, "effective-properties.json");

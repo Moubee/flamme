@@ -5,4 +5,5 @@
   <ItemGroup>
     <ProjectReference Include="../../../src/common/Elsa.Features/Elsa.Features.csproj" />
   </ItemGroup>
+  <Import Project="../../../src/common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>
