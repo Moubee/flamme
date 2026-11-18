@@ -22,8 +22,7 @@ select their admission policy; see [module composition](module-system.md#explici
 
 Each executable also runs an independent asynchronous/generated-JSON control.
 JSON reflection is disabled in managed and native publication. The default baseline
-fixtures retain managed discovery; the explicit catalog is a runtime oracle. Future generated providers need
-separate parity and native acceptance evidence.
+fixtures retain managed discovery; the explicit catalog is a runtime oracle. The packaged compiler consumer below exercises generated composition separately.
 
 ## Run the tests
 
@@ -36,7 +35,18 @@ dotnet test --project "$project" -c Release --no-restore
 dotnet test --project "$project" -c Release --no-restore -- --treenode-filter '/*/*/*/*[Category=NativeAotAcceptance]'
 ```
 
-The unfiltered run packs the compiler assets and builds and executes a managed consumer in Auto, Dynamic, and Generated modes on both frameworks. It also checks the validation logic. Select `NativeAotAcceptance` for the remaining build matrix and published executables. This category covers the explicit Features catalog, [packed module consumers](nativeaot-module-exports.md#validate-producerconsumer-boundaries), and [compiler build selection](nativeaot-build-selection.md#run-the-package-validation). Add `-f net10.0` or `-f net11.0` before `--` to select a target. The .NET 11 tests include the runtime-async opt-out.
+The unfiltered run packs a feature producer and compiler assets. A fresh two-target consumer restores the staged packages in locked mode and exercises `services.CreateModule()` in Auto, Dynamic, and Generated builds. The fixture checks the caller-supplied constructor, the imported dependency, repeated Apply, installed metadata and hosted-service callbacks. It also checks the validation logic. Select `NativeAotAcceptance` for the remaining build matrix and published executables. This category covers the explicit Features catalog, [packed module consumers](nativeaot-module-exports.md#validate-producerconsumer-boundaries), and [compiler build selection](nativeaot-build-selection.md#run-the-package-validation). Add `-f net10.0` or `-f net11.0` before `--` to select a target. The .NET 11 tests include the runtime-async opt-out.
+
+To run the compiled Features publish and execution cases separately, use the
+following filters. Each process reports its observed provider, runtime and RID.
+The optional dynamic-code producer test checks that importing its factory
+reports IL3050 at publish time.
+
+```bash
+dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/NativeConsumerRunsGeneratedProvider*'
+dotnet test --project "$project" -c Release -f net11.0 -- --treenode-filter '/*/*/CodeGenerationTests/RuntimeAsyncOptOutRunsPackedFeatures'
+dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/UnselectedDynamicCodeProducerExposesItsNativeRequirement'
+```
 
 ## Diagnose a legacy provider
 

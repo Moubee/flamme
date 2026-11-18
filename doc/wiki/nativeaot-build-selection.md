@@ -13,9 +13,9 @@ the runtime APIs used by the host.
 
 The Build package contributes MSBuild imports under `buildTransitive`. The other
 two packages contribute C# compiler assemblies under `analyzers/dotnet/cs`.
-The tooling adds no runtime assembly and does not add package references to the
-consumer. Producer assemblies expose typed exports through the versioned export
-contract. [Versioned module exports](nativeaot-module-exports.md)
+The neutral registration compiler ships alongside the Elsa generator as a build
+asset. Each participating library publishes its own feature registration helper
+and assembly marker in its compile assets.
 
 ## Choose a composition mode
 
@@ -43,9 +43,52 @@ application. A global `-p:ElsaExecutionMode=Generated` also reaches source
 project references that import the build tooling, subject to MSBuild property
 propagation rules.
 
-## Author a host bootstrap
+## Use compiled features
 
-The default `ElsaHostBootstrap=Compiler` uses an authored partial entry point.
+In a host with the compiler package references above, enable compiled composition
+for a managed build with this project setting.
+
+```xml
+<PropertyGroup>
+  <ElsaExecutionMode>Generated</ElsaExecutionMode>
+</PropertyGroup>
+```
+
+Use the ordinary SDK entry points in application source.
+
+```csharp
+services.ConfigureElsa(elsa => elsa.UseWorkflows());
+services.AddElsa();
+```
+
+The generator connects calls to the producer helpers at compile time. The first
+`AddElsa` or `ConfigureElsa` on a service collection selects the provider.
+Subsequent calls share that module and must use the same provider instance.
+On a concrete `Module`, `Catalog` exposes the selected catalog and is null for managed discovery.
+`services.CreateModule()` and `services.CreateModule(policy)` each create a
+fresh module. An app-source `new Module(services)` or a delegate to an ordinary
+creation method gets a diagnostic in a generated host. A previously compiled
+wrapper can accept a catalog explicitly. Precompiled `UseX(IModule)` helpers
+receive the module selected by their caller.
+
+A participating library supplies closed feature constructor calls, inherited
+dependency and installed-feature metadata, and typed hosted-service descriptors.
+These bindings are available as soon as the host references the library. The
+application still selects features, supplies options and custom factories, and
+runs their callbacks. Use `Configure<T>(factory, action)` when construction
+requires other arguments. Feature classes added in the host participate too.
+
+The native acceptance consumer uses only Features. A reachable constructor can
+introduce a native compiler requirement even for a feature the application
+never selects. Keep optional features with dynamic-code requirements in
+separately referenced libraries when native consumers need to omit them.
+[Run the packed consumer](nativeaot-probes.md#run-the-tests)
+
+## Continue using authored module exports
+
+An existing host with an authored partial entry point can keep its versioned
+module exports. [Versioned module exports](nativeaot-module-exports.md)
+
 This example uses managed discovery in Dynamic builds and an explicitly selected
 producer export in Generated builds.
 
