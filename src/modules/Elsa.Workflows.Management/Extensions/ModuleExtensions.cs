@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Elsa.Features.Services;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
@@ -48,6 +49,7 @@ public static class ModuleExtensions
     /// <summary>
     /// Adds all types implementing <see cref="IActivity"/> to the system.
     /// </summary>
+    [RequiresUnreferencedCode(WorkflowManagementFeature.ActivityScanWarning)]
     public static IModule AddActivitiesFrom<TMarkerType>(this IModule module) => module.UseWorkflowManagement(management => management.AddActivitiesFrom<TMarkerType>());
 
     /// <summary>

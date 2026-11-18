@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Elsa.Expressions.Extensions;
+using Elsa.Workflows.Management.Features;
 using Elsa.Workflows.Management.Models;
 using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Options;
@@ -46,6 +48,7 @@ public static class ManagementServiceCollectionExtensions
     /// Scans <paramref name="assembly"/> and registers every concrete, non-generic
     /// <see cref="IActivity"/> implementation found.
     /// </summary>
+    [RequiresUnreferencedCode(WorkflowManagementFeature.ActivityScanWarning)]
     public static IServiceCollection AddActivitiesFrom(this IServiceCollection services, Assembly assembly)
     {
         var types = assembly.GetExportedTypes()
@@ -58,6 +61,7 @@ public static class ManagementServiceCollectionExtensions
     /// Scans the assembly that contains <typeparamref name="TMarker"/> and registers every
     /// concrete, non-generic <see cref="IActivity"/> implementation found.
     /// </summary>
+    [RequiresUnreferencedCode(WorkflowManagementFeature.ActivityScanWarning)]
     public static IServiceCollection AddActivitiesFrom<TMarker>(this IServiceCollection services) =>
         services.AddActivitiesFrom(typeof(TMarker).Assembly);
 

@@ -46,6 +46,10 @@ Built-in activities live in [Activities](../../src/modules/Elsa.Workflows.Core/A
 
 Activities are described by `IActivityDescriber` and registered in `IActivityRegistry`. Workflow management adds activities to the available designer/API surface.
 
+The `AddActivitiesFrom<TMarker>()` and `AddDefaultActivitiesFrom<TMarker>()` methods scan the marker assembly and require unreferenced code. For a trimmed activity registration path, register each required activity explicitly with `AddActivity<T>()` or `AddDefaultActivity<T>()`.
+
+When saved workflow JSON refers to an unknown activity, the serializer preserves its original JSON in a `NotFoundActivity` placeholder. If the host removes that fallback, loading the workflow throws a `JsonException` identifying the missing activity type and version.
+
 ## Execution Contexts And State
 
 Core execution state lives under [State](../../src/modules/Elsa.Workflows.Core/State) and [Models](../../src/modules/Elsa.Workflows.Core/Models). Important concepts:

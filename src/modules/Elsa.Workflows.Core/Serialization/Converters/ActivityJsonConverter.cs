@@ -42,7 +42,8 @@ public class ActivityJsonConverter(
         // If the activity type is not found, create a NotFoundActivity instead.
         if (activityDescriptor == null)
         {
-            var notFoundActivityDescriptor = activityRegistry.Find<NotFoundActivity>()!;
+            var notFoundActivityDescriptor = activityRegistry.Find<NotFoundActivity>()
+                ?? throw new JsonException($"Cannot load activity '{activityTypeName}' version {activityTypeVersion}. Register its activity type or the {nameof(NotFoundActivity)} fallback.");
             var notFoundActivityResult = JsonActivityConstructorContextHelper.CreateActivity<NotFoundActivity>(notFoundActivityDescriptor, activityRoot, clonedOptions);
             LogExceptionsIfAny(notFoundActivityResult);
 

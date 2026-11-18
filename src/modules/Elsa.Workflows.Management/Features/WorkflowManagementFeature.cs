@@ -49,6 +49,7 @@ namespace Elsa.Workflows.Management.Features;
 [UsedImplicitly]
 public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
 {
+    internal const string ActivityScanWarning = "Assembly scanning can miss activities removed by trimming. Register the required activity types explicitly.";
     private const string PrimitivesCategory = "Primitives";
     private const string LookupsCategory = "Lookups";
     private const string DynamicCategory = "Dynamic";
@@ -116,8 +117,10 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     /// <summary>
     /// Adds all types implementing <see cref="IActivity"/> to the system.
     /// </summary>
+    [RequiresUnreferencedCode(ActivityScanWarning)]
     public WorkflowManagementFeature AddActivitiesFrom<TMarker>() => AddActivities(GetActivityTypes<TMarker>());
 
+    [RequiresUnreferencedCode(ActivityScanWarning)]
     private static IEnumerable<Type> GetActivityTypes<TMarker>() => typeof(TMarker).Assembly.GetExportedTypes()
         .Where(x => typeof(IActivity).IsAssignableFrom(x) && x is { IsAbstract: false, IsInterface: false, IsGenericType: false });
 
@@ -145,6 +148,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     /// Registers feature-provided activities from the marker assembly, respecting explicit removals.
     /// The optional excluded type stays available for an explicit opt-in.
     /// </summary>
+    [RequiresUnreferencedCode(ActivityScanWarning)]
     public void AddDefaultActivitiesFrom<TMarker>(Type? excludedType = null)
     {
         foreach (var activityType in GetActivityTypes<TMarker>())
@@ -283,7 +287,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     }
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("The assembly containing the specified marker type will be scanned for activity types.")]
+    [RequiresUnreferencedCode(ActivityScanWarning)]
     public override void Configure()
     {
         AddDefaultActivitiesFrom<WorkflowManagementFeature>();

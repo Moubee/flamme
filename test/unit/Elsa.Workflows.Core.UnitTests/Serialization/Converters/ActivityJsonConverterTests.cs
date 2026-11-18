@@ -72,6 +72,14 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task UnknownActivityWithoutFallbackReportsTheMissingRegistration()
+    {
+        var sut = CreateSut(IActivityRegistry.Mock().Object);
+        await Assert.That(() => Execute(sut, UnknownActivityJson)).Throws<JsonException>()
+            .WithMessageContaining($"Cannot load activity '{UnknownActivityTypeName}' version 0. Register its activity type or the NotFoundActivity fallback.");
+    }
+
+    [Test]
     public async Task When_DeserializeWorkflowAsActivity_And_WorkflowDefinitionIdSpecified_Then_FindsAndInstantiatesActivity()
     {
         // Arrange
