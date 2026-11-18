@@ -125,6 +125,23 @@ public class GeneratedSdkCompositionTests
 #endif
 
     [Test]
+    public async Task LoggingRegistrationPreservesTheCollectionPlan()
+    {
+        var services = new ServiceCollection();
+        var first = services.ConfigureElsa(module => module.UseCSharp());
+        var applied = services.AddLogging().AddElsa();
+        await Assert.That(applied).IsSameReferenceAs(first);
+        await Assert.That(applied.HasFeature<CSharpFeature>()).IsTrue();
+
+        var other = new ServiceCollection();
+        var withLogging = LoggingServiceCollectionExtensions.AddLogging(other, _ => { });
+        var separate = withLogging.ConfigureElsa(module => module.UseLiquid());
+        await Assert.That(other.AddElsa()).IsSameReferenceAs(separate);
+        await Assert.That(separate.HasFeature<CSharpFeature>()).IsFalse();
+        await Assert.That(applied.HasFeature<LiquidFeature>()).IsFalse();
+    }
+
+    [Test]
     public async Task ConfigureBeforeAddReusesThePlanAndRunsTheApplicationCallbackOnce()
     {
         var services = new ServiceCollection();

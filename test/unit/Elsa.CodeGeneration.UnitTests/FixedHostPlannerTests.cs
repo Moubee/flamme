@@ -482,6 +482,27 @@ public class FixedHostPlannerTests
         await Assert.That(mutable.Diagnostics).IsEmpty();
         await Assert.That(HostSource(mutable).Split(" : FixedFeatureModule").Length - 1).IsEqualTo(2);
 
+        foreach (var entry in new[] { "services.Replace().AddElsa();", "var replacement = services.Replace(); replacement.AddElsa();" })
+        {
+            var opaque = Generate("services.ConfigureElsa(m => m.Use<Leaf>()); " + entry, """
+                public static class CollectionExtensions
+                {
+                    public static IServiceCollection Replace(this IServiceCollection services) => new ServiceCollection();
+                }
+                """, sdkOutput.ToMetadataReference());
+            var diagnostic = opaque.Diagnostics.Single();
+            await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
+            await Assert.That(diagnostic.GetMessage()).Contains("Replace");
+        }
+
+        const string factory = "public static class Factory { public static IServiceCollection GetServices() => new ServiceCollection(); }";
+        var distinct = Generate("other.ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa(); Factory.GetServices().AddElsa();", factory, sdkOutput.ToMetadataReference());
+        await Assert.That(distinct.Diagnostics).IsEmpty();
+        var captured = Generate("var saved = Factory.GetServices(); saved.ConfigureElsa(m => m.Use<Leaf>()); saved.AddElsa();", factory, sdkOutput.ToMetadataReference());
+        await Assert.That(captured.Diagnostics).IsEmpty();
+        var repeated = Generate("Factory.GetServices().ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa();", factory, sdkOutput.ToMetadataReference());
+        await Assert.That(repeated.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("GetServices"))).IsTrue();
+
         var branch = Generate("""
             services.ConfigureElsa(m => m.Use<Leaf>());
             if (flag) services.AddElsa(m => m.Use<Unused>());

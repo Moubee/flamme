@@ -108,6 +108,11 @@ services.Replace(ServiceDescriptor.Scoped<ITriggerStore, CustomTriggerStore>());
 `ConfigureElsa` and `AddElsa` share a module for the same service collection.
 `CreateModule` returns a fresh module on each invocation. Keep related registrations
 on a visibly shared service collection so the compiler can associate them.
+Both Microsoft `AddLogging` overloads preserve that collection, including when
+their result is assigned to a local. When an opaque helper might return a
+collection used by another Elsa call with a different plan, the compiler reports
+`ELSAGEN012`. Capture a factory result once and use that variable for both Elsa
+calls, or call a registration helper separately on the original collection.
 Application code can pass a configured module into a previously compiled helper.
 Module creation inside a precompiled helper must itself use a generated plan.
 
