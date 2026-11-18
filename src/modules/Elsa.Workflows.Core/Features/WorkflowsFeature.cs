@@ -67,10 +67,19 @@ public class WorkflowsFeature : FeatureBase
     /// </summary>
     public Func<IServiceProvider, IIdentityGenerator> IdentityGenerator { get; set; } = sp => new RandomLongIdentityGenerator();
 
+    private Func<IServiceProvider, ICommitStateHandler>? _commitStateHandler;
+
     /// <summary>
     /// A handler for committing workflow execution state.
     /// </summary>
-    public Func<IServiceProvider, ICommitStateHandler> CommitStateHandler { get; set; } = sp => new NoopCommitStateHandler();
+    public Func<IServiceProvider, ICommitStateHandler> CommitStateHandler
+    {
+        get => _commitStateHandler ?? (static _ => new NoopCommitStateHandler());
+        set => _commitStateHandler = value;
+    }
+
+    /// <summary>Supplies the runtime's commit handler when the host has not configured one.</summary>
+    public void SetDefaultCommitStateHandler(Func<IServiceProvider, ICommitStateHandler> factory) => _commitStateHandler ??= factory;
 
     /// <summary>
     /// A factory that instantiates a concrete <see cref="ILoggerStateGenerator{WorkflowExecutionContext}"/>.

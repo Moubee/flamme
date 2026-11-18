@@ -91,6 +91,17 @@ or configuration action. A custom factory receives the actual host module.
 A package helper can select a feature without a default constructor by calling
 `module.Configure(m => new CustomFeature(m, value))` unconditionally.
 
+The host callback runs before the selected features' `Configure()` methods.
+An optional provider can assign its own service factory during that later
+phase. For example, the EF Core runtime provider assigns `TriggerStore`.
+To override a service installed by that provider, replace its DI registration
+after `AddElsa` returns, preserving the service lifetime.
+
+```csharp
+// Requires Microsoft.Extensions.DependencyInjection.Extensions.
+services.Replace(ServiceDescriptor.Scoped<ITriggerStore, CustomTriggerStore>());
+```
+
 `ConfigureElsa` and `AddElsa` share a module for the same service collection.
 `CreateModule` returns a fresh module on each invocation. Keep related registrations
 on a visibly shared service collection so the compiler can associate them.

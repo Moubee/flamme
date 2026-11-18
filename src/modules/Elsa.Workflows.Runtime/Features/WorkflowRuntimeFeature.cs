@@ -248,7 +248,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
         {
             // ExecutionCycleAwareCommitStateHandler decorates DefaultCommitStateHandler — disposes the execution cycle handle AFTER
             // commit so the drain orchestrator's await-disposed sequencing can land its Interrupted write last.
-            workflows.CommitStateHandler = sp => sp.GetRequiredService<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>();
+            workflows.SetDefaultCommitStateHandler(static sp => sp.GetRequiredService<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>());
         });
 
         Services.Configure<RecurringTaskOptions>(options =>

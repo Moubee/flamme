@@ -8,10 +8,13 @@ using Elsa.Features.Contracts;
 using Elsa.Features.Services;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
+using Elsa.Workflows.CommitStates;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Management.Features;
 using Elsa.Workflows.Management.Options;
 using Elsa.Workflows.Runtime.Features;
+using Elsa.Workflows.Runtime.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +22,34 @@ namespace Elsa.Common.IntegrationTests;
 
 public class GeneratedSdkCompositionTests
 {
+    [Test]
+    public async Task RuntimeResolvesTheExecutionCycleAwareCommitHandlerByDefault()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<IConfiguration, ConfigurationManager>();
+        services.AddElsa();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommitStateHandler>();
+        await Assert.That(handler).IsSameReferenceAs(scope.ServiceProvider.GetRequiredService<ExecutionCycleAwareCommitStateHandler>());
+    }
+
+    [Test]
+    public async Task RuntimeResolvesTheHostConfiguredCommitHandler()
+    {
+        var services = new ServiceCollection();
+        var custom = new NoopCommitStateHandler();
+        services.AddLogging();
+        services.AddSingleton<IConfiguration, ConfigurationManager>();
+        services.AddElsa(elsa => elsa.UseWorkflows(workflows => workflows.CommitStateHandler = _ => custom));
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        await Assert.That(scope.ServiceProvider.GetRequiredService<ICommitStateHandler>()).IsSameReferenceAs(custom);
+    }
+
     [Test]
     public async Task HostCanOptIntoReadLineAndRemoveABuiltInActivity()
     {
