@@ -100,8 +100,9 @@ See the [CI guide](doc/ci.md) for workflow policy, dependency locks, and artifac
 manifests, GitHub Actions (including composite actions), and Docker base images.
 The hosted app discovers manifests automatically. Routine updates can open on
 Mondays in Minsk after a seven-day release delay, with up to two open update
-PRs. Use the Dependency Dashboard to approve proposed major updates. Merging
-updates to the Microsoft runtime packages across target-framework majors
+PRs. Each GitHub Action or reusable workflow gets its own major-update PR
+automatically. Use the Dependency Dashboard to approve other proposed major
+updates. Moving Microsoft runtime packages to a new target-framework major
 requires an intentional framework migration.
 
 Review dependency PRs against the upstream release notes and the existing

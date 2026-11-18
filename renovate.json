@@ -90,6 +90,13 @@
     },
     {
       "matchManagers": ["github-actions"],
+      "matchDepTypes": ["action", "workflow"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": false,
+      "groupName": null
+    },
+    {
+      "matchManagers": ["github-actions"],
       "matchPackageNames": ["actions/**"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "GitHub-maintained actions"
