@@ -58,6 +58,11 @@ public class Module : IModule
         _policy = policy;
     }
 
+    /// <summary>
+    /// Gets the catalog selected at creation, or null when this module uses managed discovery.
+    /// </summary>
+    public ExplicitFeatureCatalog? Catalog => _provider as ExplicitFeatureCatalog;
+
     /// <inheritdoc />
     public IServiceCollection Services { get; }
 

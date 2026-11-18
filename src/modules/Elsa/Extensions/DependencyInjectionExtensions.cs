@@ -1,5 +1,6 @@
-using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
 using Elsa.Features;
+using Elsa.Features.Implementations;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,9 @@ namespace Elsa.Extensions;
 /// </summary>
 public static class ModuleExtensions
 {
-    private static readonly ConditionalWeakTable<IServiceCollection, CachedModule> Modules = new();
+    // The component host detaches its exact service collection/module pair when it stops.
+    private static readonly IDictionary<IServiceCollection, IModule> Modules =
+        new ConcurrentDictionary<IServiceCollection, IModule>(ReferenceEqualityComparer.Instance);
 
     /// <summary>
     /// Adds the Elsa features using managed discovery and applies the accumulated configuration.
@@ -36,28 +39,27 @@ public static class ModuleExtensions
     public static IModule ConfigureElsa(this IServiceCollection services, Action<IModule>? configure, ExplicitFeatureCatalog catalog)
         => ConfigureElsa(GetOrCreateModule(services, catalog ?? throw new ArgumentNullException(nameof(catalog))), configure);
 
-    private static IModule AddElsa(CachedModule cached, Action<IModule>? configure)
+    private static IModule AddElsa(IModule module, Action<IModule>? configure)
     {
-        cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
-        cached.Module.Apply();
-        return cached.Module;
+        module.Configure<AppFeature>(app => app.Configurator += configure);
+        module.Apply();
+        return module;
     }
 
-    private static IModule ConfigureElsa(CachedModule cached, Action<IModule>? configure)
+    private static IModule ConfigureElsa(IModule module, Action<IModule>? configure)
     {
         if (configure != null)
-            cached.Module.Configure<AppFeature>(app => app.Configurator += configure);
-        return cached.Module;
+            module.Configure<AppFeature>(app => app.Configurator += configure);
+        return module;
     }
 
-    private static CachedModule GetOrCreateModule(IServiceCollection services, ExplicitFeatureCatalog? catalog)
+    private static IModule GetOrCreateModule(IServiceCollection services, ExplicitFeatureCatalog? catalog)
     {
-        var entry = Modules.GetValue(services, key =>
-            new CachedModule(catalog is null ? key.CreateModule() : key.CreateModule(catalog), catalog));
-        if (!ReferenceEquals(entry.Catalog, catalog))
+        var registry = (ConcurrentDictionary<IServiceCollection, IModule>)Modules;
+        var module = (Module)registry.GetOrAdd(services,
+            static (key, provider) => provider is null ? key.CreateModule() : key.CreateModule(provider), catalog);
+        if (!ReferenceEquals(module.Catalog, catalog))
             throw new InvalidOperationException("The Elsa module for this service collection was created with a different feature provider. Use the same provider at every AddElsa and ConfigureElsa call.");
-        return entry;
+        return module;
     }
-
-    private sealed record CachedModule(IModule Module, ExplicitFeatureCatalog? Catalog);
 }
