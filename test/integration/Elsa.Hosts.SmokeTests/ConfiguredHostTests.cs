@@ -11,9 +11,6 @@ namespace Elsa.Hosts.SmokeTests;
 
 public class ConfiguredHostTests : WebApplicationTest<ConfiguredHostFactory, ConfiguredHostTests>
 {
-    protected override void ConfigureTestOptions(WebApplicationTestOptions options) =>
-        options.AutoPropagateHttpClientFactory = false;
-
     [Test]
     public async Task ConfiguredApiRoutesChallengeAnonymousRequests()
     {
