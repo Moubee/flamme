@@ -25,16 +25,17 @@ internal sealed class FixedProducerFeature(INamedTypeSymbol type, string bridge,
     internal INamedTypeSymbol[] Hosted { get; set; } = [];
 }
 
-internal sealed class FixedProducerSelector
+internal sealed partial class FixedProducerSelector
 {
-    public INamedTypeSymbol[] Features { get; internal set; } = [];
-    public INamedTypeSymbol[] ConditionalFeatures { get; internal set; } = [];
+    public INamedTypeSymbol[] Features { get => ConcreteTypes(SelectedTypes); set => SelectedTypes = ConcreteTerms(value); }
+    public INamedTypeSymbol[] FactoryFeatures { get => ConcreteTypes(FactoryTypes); set => FactoryTypes = ConcreteTerms(value); }
+    public INamedTypeSymbol[] ConditionalFeatures { get => ConcreteTypes(ConditionalTypes); set => ConditionalTypes = ConcreteTerms(value); }
     public string[] ConfigurationParameters { get; internal set; } = [];
     public string[] ConditionalConfigurationParameters { get; internal set; } = [];
     internal string[] VirtualCalls { get; set; } = [];
     internal string[] ConditionalVirtualCalls { get; set; } = [];
     public string? Error { get; internal set; }
-    internal INamedTypeSymbol[] Hosted { get; set; } = [];
+    internal INamedTypeSymbol[] Hosted { get => ConcreteTypes(HostedTypes); set => HostedTypes = ConcreteTerms(value); }
 }
 
 /// <summary>Compile-time facts, shared by the producer and the host within one compilation.</summary>
@@ -111,6 +112,19 @@ internal sealed partial class FixedProducerModel
                 if (node is AccessorDeclarationSyntax accessor && semantic.GetDeclaredSymbol(accessor, token) is
                     IMethodSymbol { MethodKind: MethodKind.PropertySet } setter && CompositionType(setter.ContainingType))
                     methods.Add(setter);
+                // A closed generic feature or hosted service may only appear as a type
+                // argument to a selector in a package. Produce bindings here, where the
+                // specialization is visible. The bound selector determines membership.
+                if (node is GenericNameSyntax { Parent: InvocationExpressionSyntax or MemberAccessExpressionSyntax or MemberBindingExpressionSyntax
+                        or ArgumentSyntax or EqualsValueClauseSyntax } name &&
+                    semantic.GetSymbolInfo(name, token).Symbol is IMethodSymbol invoked && IsCompositionMethod(invoked.ReducedFrom ?? invoked))
+                {
+                    foreach (var argument in invoked.TypeArguments.OfType<INamedTypeSymbol>().Where(FeatureBinding.IsClosed))
+                    {
+                        if (argument.IsGenericType && _binding.IsFeature(argument)) localTypes.Add(argument);
+                        if (_binding.HostedServiceError(argument) is null) closedServices.Add(argument);
+                    }
+                }
                 if (node is not InvocationExpressionSyntax call || !IsRegistrationName(call) ||
                     semantic.GetOperation(call, token) is not IInvocationOperation operation)
                     continue;
@@ -151,7 +165,9 @@ internal sealed partial class FixedProducerModel
             foreach (var attr in helper.GetAttributes().Where(a => IsAttribute(a, helper, "SelectorAttribute")))
             {
                 var key = assembly.Identity.Name + "|" + (string)attr.ConstructorArguments[0].Value!;
-                var effects = ReadEffects(attr.ConstructorArguments, 1, 6);
+                var effects = ReadEffects(attr.ConstructorArguments, 1, 6, selector: true);
+                var factoryKeys = new HashSet<string>(NamedStrings(attr, "Factories"), StringComparer.Ordinal);
+                effects.FactoryTypes = effects.SelectedTypes.Where(type => factoryKeys.Contains(SelectorKey(type))).ToArray();
                 effects.ConfigurationParameters = attr.ConstructorArguments[4].Values.Select(a => (string)a.Value!).ToArray();
                 effects.VirtualCalls = Strings(attr, 5);
                 effects.ConditionalVirtualCalls = Strings(attr, 7);
@@ -203,26 +219,27 @@ internal sealed partial class FixedProducerModel
         ExternAliases = _binding.ExternAliases.ToArray();
     }
 
-    internal FixedProducerSelector? GetSelector(IMethodSymbol method) =>
-        _selectors.TryGetValue(MethodKey(method), out var selector) ? selector : null;
+    internal FixedProducerSelector? GetSelector(IMethodSymbol method, bool allowOpen = false) =>
+        _selectors.TryGetValue(MethodKey(method), out var selector) ? selector.Bind(method, allowOpen) : null;
     internal string? GetHostedServiceBridge(INamedTypeSymbol type) =>
         _services.TryGetValue(type, out var bridge) ? bridge : null;
 
-    private FixedProducerSelector ReadEffects(System.Collections.Immutable.ImmutableArray<TypedConstant> args, int start, int conditional)
+    private FixedProducerSelector ReadEffects(System.Collections.Immutable.ImmutableArray<TypedConstant> args, int start, int conditional, bool selector = false)
     {
         var result = new FixedProducerSelector { Error = args[start + 2].Value as string };
-        result.Features = ReadTypes(args[start]);
-        result.Hosted = ReadTypes(args[start + 1]);
-        result.ConditionalFeatures = args.Length > conditional ? ReadTypes(args[conditional]) : [];
+        result.SelectedTypes = ReadTypes(args[start]);
+        result.HostedTypes = ReadTypes(args[start + 1]);
+        result.ConditionalTypes = args.Length > conditional ? ReadTypes(args[conditional]) : [];
         return result;
 
-        INamedTypeSymbol[] ReadTypes(TypedConstant array)
+        SelectorType[] ReadTypes(TypedConstant array)
         {
-            var types = new List<INamedTypeSymbol>();
+            var types = new List<SelectorType>();
             foreach (var value in array.Values)
             {
                 var key = (string)value.Value!;
-                if (_types.TryGetValue(key, out var type)) types.Add(type);
+                if (_types.TryGetValue(key, out var type)) types.Add(new SelectorType(type));
+                else if (selector && SelectorType.TryReadParameter(key, out var parameter)) types.Add(parameter);
                 else result.Error ??= $"no compiled registration for '{key}'";
             }
             return types.ToArray();
@@ -240,7 +257,7 @@ internal sealed partial class FixedProducerModel
     {
         if (bridge.GetMembers("SchemaVersion").OfType<IFieldSymbol>().FirstOrDefault()?.ConstantValue is not 1) return false;
         foreach (var attr in bridge.GetAttributes().Where(a => IsAttribute(a, bridge, "SelectorAttribute")))
-            if (!Matches(attr, SelectorArguments)) return false;
+            if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "Factories" && !IsStringArray(pair.Value))) return false;
         foreach (var method in bridge.GetMembers().OfType<IMethodSymbol>())
         foreach (var attr in method.GetAttributes())
         {
@@ -259,7 +276,7 @@ internal sealed partial class FixedProducerModel
                 {
                     TypeArgument => arg.Kind == TypedConstantKind.Type && arg.Value is INamedTypeSymbol,
                     BooleanArgument => arg.Kind == TypedConstantKind.Primitive && arg.Value is bool,
-                    TextArray => arg.Kind == TypedConstantKind.Array && !arg.IsNull && arg.Values.All(v => v.Kind == TypedConstantKind.Primitive && v.Value is string),
+                    TextArray => IsStringArray(arg),
                     _ => arg.Kind == TypedConstantKind.Primitive && (arg.IsNull || arg.Value is string)
                 };
                 if (!valid) return false;
@@ -270,6 +287,12 @@ internal sealed partial class FixedProducerModel
 
     private static string[] Strings(AttributeData data, int ordinal) => data.ConstructorArguments.Length > ordinal
         ? data.ConstructorArguments[ordinal].Values.Select(a => (string)a.Value!).ToArray() : [];
+
+    private static bool IsStringArray(TypedConstant value) => value.Kind == TypedConstantKind.Array && !value.IsNull &&
+        value.Values.All(item => item.Kind == TypedConstantKind.Primitive && item.Value is string);
+
+    private static IEnumerable<string> NamedStrings(AttributeData data, string name) =>
+        data.NamedArguments.Where(pair => pair.Key == name).SelectMany(pair => pair.Value.Values).Select(item => (string)item.Value!);
 
     private void Remember(INamedTypeSymbol type) => _types[TypeKey(type)] = type;
     private static INamedTypeSymbol[] Types(IEnumerable<INamedTypeSymbol> types) =>
@@ -326,7 +349,7 @@ internal sealed partial class FixedProducerModel
         if (_local.Count == 0 && _localServices.Count == 0 && _exportedSelectors.Count == 0) return null;
         var body = new StringBuilder();
         foreach (var p in _exportedSelectors.OrderBy(e => e.Key, StringComparer.Ordinal))
-            body.AppendLine($"[Selector({Literal(p.Key)}, {Keys(p.Value.Features)}, {Keys(p.Value.Hosted)}, {Literal(p.Value.Error)}, {StringArray(p.Value.ConfigurationParameters)}, {StringArray(p.Value.VirtualCalls)}, {Keys(p.Value.ConditionalFeatures)}, {StringArray(p.Value.ConditionalVirtualCalls)}, {StringArray(p.Value.ConditionalConfigurationParameters)})]");
+            body.AppendLine(SelectorAttributeSource(p.Key, p.Value));
         body.AppendLine("public static class Bindings").AppendLine("{").AppendLine("    public const int SchemaVersion = 1;");
         foreach (var item in _local)
         {
@@ -359,11 +382,20 @@ internal sealed partial class FixedProducerModel
             internal sealed class SelectorAttribute : global::System.Attribute
             {
                 public SelectorAttribute(string method, string[] features, string[] hosted, string? error, string[] configurationParameters, string[] virtualCalls, string[] conditional, string[] conditionalVirtualCalls, string[] conditionalConfigurationParameters) { }
+                public string[]? Factories { get; set; }
             }
             """).Append(body);
         return source.ToString();
     }
 
+    private static string SelectorAttributeSource(string key, FixedProducerSelector selector)
+    {
+        var factories = selector.FactoryTypes.Length == 0 ? "" : ", Factories = " + Keys(selector.FactoryTypes);
+        return $"[Selector({Literal(key)}, {Keys(selector.SelectedTypes)}, {Keys(selector.HostedTypes)}, {Literal(selector.Error)}, {StringArray(selector.ConfigurationParameters)}, {StringArray(selector.VirtualCalls)}, {Keys(selector.ConditionalTypes)}, {StringArray(selector.ConditionalVirtualCalls)}, {StringArray(selector.ConditionalConfigurationParameters)}{factories})]";
+    }
+
+    private static string SelectorKey(SelectorType type) => type.Concrete is {} symbol ? TypeKey(symbol) : type.ParameterKey;
+    private static string Keys(IEnumerable<SelectorType> types) => StringArray(types.Select(SelectorKey).Distinct(StringComparer.Ordinal));
     private static string Keys(IEnumerable<INamedTypeSymbol> types) => StringArray(types.Select(TypeKey));
     private static string StringArray(IEnumerable<string> values) => "new string[] { " + string.Join(", ", values.Select(Literal)) + " }";
     private static string Literal(string? value) => value is null ? "null" : SymbolDisplay.FormatLiteral(value, true);

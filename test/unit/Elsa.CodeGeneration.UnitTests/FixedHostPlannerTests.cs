@@ -1,6 +1,7 @@
 using Elsa.CodeGeneration.Generators;
 using Elsa.Features.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,6 +27,116 @@ public class FixedHostPlannerTests
         await Assert.That(host).Contains("_root.Apply();");
         await Assert.That(host.Contains("BuildAvailable", StringComparison.Ordinal)).IsFalse();
     }
+
+    [Test]
+    public async Task SourceHelpersAssignEffectsToTheSpecifiedModuleParameterOrFeatureReceiver()
+    {
+        const string helpers = """
+            public static class Helpers
+            {
+                public static void Install(IModule first, IModule second) { first.Use<Leaf>(); second.Use<Unused>(); }
+                public static IModule Forward(IModule first, IModule second) => second;
+            }
+            public sealed class OwnerFeature(IModule m) : FeatureBase(m)
+            {
+                public void Install(IModule other) { Module.Use<Root>(); other.Use<Unused>(); }
+            }
+            """;
+        var simple = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            Helpers.Install(first, second);
+            """, helpers);
+        await Assert.That(simple.Diagnostics).IsEmpty();
+        await Assert.That(Slots(simple, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(simple, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+
+        var returned = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            Helpers.Forward(first, second).Use<Leaf>();
+            """, helpers);
+        await Assert.That(returned.Diagnostics).IsEmpty();
+        await Assert.That(Slots(returned, "Plan0")).IsEmpty();
+        await Assert.That(Slots(returned, "Plan1").SequenceEqual(new[] { "_leaf" })).IsTrue();
+
+        var result = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            Helpers.Install(second: second, first: first);
+            var feature = first.Configure<OwnerFeature>();
+            feature.Install(second);
+            """, helpers);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_leaf", "_ownerFeature", "_root" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task FeatureValuedSetterSeparatesItsReceiverFromTheAssignedFeature()
+    {
+        const string declaration = """
+            public sealed class PairFeature(IModule module) : FeatureBase(module)
+            {
+                public PairFeature Other { set { Module.Use<Leaf>(); value.Module.Use<Unused>(); } }
+            }
+            """;
+        var result = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            var left = first.Configure<PairFeature>();
+            var right = second.Configure<PairFeature>();
+            left.Other = right;
+            """, declaration);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_leaf", "_pairFeature" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").Order().SequenceEqual(new[] { "_pairFeature", "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task PackageHelpersCanShareOneOwnerAndDiagnoseIndependentInputsAtTheCall()
+    {
+        const string packageSource = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class A(IModule m) : FeatureBase(m);
+            public sealed class B(IModule m) : FeatureBase(m);
+            public static class PackageHelpers
+            {
+                public static void Install(this IModule first, IModule second) { first.Use<A>(); second.Use<B>(); }
+                public static bool Observe(IModule first, IModule second) => object.ReferenceEquals(first, second);
+            }
+            """;
+        var package = CompilerTest.CreateCompilation(("Package.cs", packageSource)).WithAssemblyName("TwoOwners").AddReferences(References());
+        CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(package, out var output);
+        using var assembly = new MemoryStream();
+        var compiled = output.Emit(assembly);
+        await Assert.That(compiled.Success).IsTrue().Because(string.Join("\n", compiled.Diagnostics));
+        var reference = MetadataReference.CreateFromImage(assembly.ToArray());
+
+        var shared = Generate("""
+            var first = services.CreateModule();
+            var alias = first;
+            var second = other.CreateModule();
+            _ = PackageHelpers.Observe(first, second);
+            first.Install(alias);
+            """, sdk: reference);
+        await Assert.That(shared.Diagnostics).IsEmpty();
+        await Assert.That(Slots(shared, "Plan0").Order().SequenceEqual(new[] { "_a", "_b" })).IsTrue();
+        await Assert.That(Slots(shared, "Plan1")).IsEmpty();
+
+        const string splitCall = "first.Install(second)";
+        var split = Generate("var first = services.CreateModule(); var second = other.CreateModule(); " + splitCall + ";", sdk: reference);
+        var diagnostic = split.Diagnostics.Single();
+        await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(diagnostic.Location.SourceTree!.GetText().ToString(diagnostic.Location.SourceSpan)).IsEqualTo(splitCall);
+        await Assert.That(diagnostic.GetMessage()).Contains("separate helper call per module");
+    }
+
+    private static string[] Slots(GeneratorDriverRunResult result, string plan) =>
+        result.GeneratedTrees.Single().GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(c => c.Identifier.ValueText == plan)
+            .Members.OfType<FieldDeclarationSyntax>().SelectMany(f => f.Declaration.Variables).Select(v => v.Identifier.ValueText).ToArray();
 
     [Test]
     public async Task RuntimeBranchSelectingAnotherFeatureIsAnErrorAndAConstantFalseBranchAddsNothing()

@@ -52,10 +52,10 @@ internal sealed partial class FixedProducerModel
         public FixedProducerSelector Read(IMethodSymbol method)
         {
             var key = (method.ReducedFrom ?? method).OriginalDefinition;
-            if (_cache.TryGetValue(key, out var cached)) return cached;
+            if (_cache.TryGetValue(key, out var cached)) return cached.Bind(method, allowOpen: true);
             if (!SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, model._compilation.Assembly))
             {
-                if (model.GetSelector(method) is {} imported) return imported;
+                if (model.GetSelector(method, allowOpen: true) is {} imported) return imported;
                 // Elsa's base lifecycle methods are empty. A third-party base can execute
                 // arbitrary composition, even when a derived type declares no overrides.
                 var emptyBase = method.ContainingAssembly.Name == "Elsa.Features"
@@ -83,7 +83,9 @@ internal sealed partial class FixedProducerModel
                     Visit(operation, summary, false);
             }
             _reading.Remove(key);
-            return _cache[key] = summary.Finish();
+            var symbolic = summary.Finish();
+            _cache[key] = symbolic;
+            return symbolic.Bind(method, allowOpen: true);
         }
 
         private void ReadInitialization(IMethodSymbol ctor, Effects summary)
@@ -231,13 +233,21 @@ internal sealed partial class FixedProducerModel
             var (type, hosted) = Registration(call);
             if (hosted || type is not null)
             {
-                if (type is not INamedTypeSymbol closed || !FeatureBinding.IsClosed(closed))
+                var term = type switch
+                {
+                    INamedTypeSymbol closed when FeatureBinding.IsClosed(closed) => new SelectorType(closed),
+                    ITypeParameterSymbol { TypeParameterKind: TypeParameterKind.Method } parameter => new SelectorType(parameter),
+                    _ => (SelectorType?)null
+                };
+                if (!term.HasValue)
                     result.Error ??= $"the selected type in '{method}' is not statically known";
                 else if (hosted)
-                    result.Hosted.Add(closed);
+                    result.Hosted.Add(term.Value);
                 else
                 {
-                    result.AddType(closed, conditional);
+                    result.AddType(term.Value, conditional);
+                    if (!conditional && call.Arguments.Any(argument => argument.Parameter?.Name == "factory"))
+                        result.FactoryFeatures.Add(term.Value);
                     foreach (var arg in call.Arguments.Where(a => a.Parameter?.Type is INamedTypeSymbol { Name: "Action" }))
                         Callback(arg.Value, result, conditional);
                 }
@@ -264,7 +274,7 @@ internal sealed partial class FixedProducerModel
                 return;
             }
             var local = SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, model._compilation.Assembly);
-            var effects = local ? Read(method) : model.GetSelector(method);
+            var effects = local ? Read(method) : model.GetSelector(method, allowOpen: true);
             if (effects is null)
             {
                 result.Error ??= $"the package method '{method}' has no compiled feature-selection metadata";
@@ -307,30 +317,33 @@ internal sealed partial class FixedProducerModel
 
         private sealed class Effects
         {
-            public readonly List<INamedTypeSymbol> Features = [];
-            public readonly List<INamedTypeSymbol> Hosted = [];
-            public readonly List<INamedTypeSymbol> ConditionalFeatures = [];
+            public readonly List<SelectorType> Features = [];
+            public readonly List<SelectorType> FactoryFeatures = [];
+            public readonly List<SelectorType> Hosted = [];
+            public readonly List<SelectorType> ConditionalFeatures = [];
             public readonly HashSet<string> Callbacks = new(StringComparer.Ordinal);
             public readonly HashSet<string> ConditionalCallbacks = new(StringComparer.Ordinal);
             public readonly HashSet<string> VirtualCalls = new(StringComparer.Ordinal);
             public readonly HashSet<string> ConditionalVirtualCalls = new(StringComparer.Ordinal);
             public string? Error;
-            public void AddType(INamedTypeSymbol type, bool conditional)
+            public void AddType(SelectorType type, bool conditional)
             {
                 (conditional ? ConditionalFeatures : Features).Add(type);
             }
             public void Add(FixedProducerSelector selector, bool conditional)
             {
                 Error ??= selector.Error;
-                foreach (var feature in selector.Features) AddType(feature, conditional);
-                Hosted.AddRange(selector.Hosted);
-                ConditionalFeatures.AddRange(selector.ConditionalFeatures);
+                foreach (var feature in selector.SelectedTypes) AddType(feature, conditional);
+                if (!conditional) FactoryFeatures.AddRange(selector.FactoryTypes);
+                Hosted.AddRange(selector.HostedTypes);
+                ConditionalFeatures.AddRange(selector.ConditionalTypes);
                 ConditionalVirtualCalls.UnionWith(selector.ConditionalVirtualCalls);
                 (conditional ? ConditionalVirtualCalls : VirtualCalls).UnionWith(selector.VirtualCalls);
             }
             public FixedProducerSelector Finish() => new()
             {
-                Features = Types(Features), ConditionalFeatures = Types(ConditionalFeatures), Hosted = Types(Hosted), Error = Error,
+                SelectedTypes = Features.ToArray(), ConditionalTypes = ConditionalFeatures.ToArray(), HostedTypes = Hosted.ToArray(), Error = Error,
+                FactoryTypes = FactoryFeatures.ToArray(),
                 ConfigurationParameters = Callbacks.OrderBy(s => s, StringComparer.Ordinal).ToArray(),
                 ConditionalConfigurationParameters = ConditionalCallbacks.Except(Callbacks).OrderBy(s => s, StringComparer.Ordinal).ToArray(),
                 VirtualCalls = VirtualCalls.OrderBy(s => s, StringComparer.Ordinal).ToArray(),

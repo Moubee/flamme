@@ -11,7 +11,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
 {
     private readonly Dictionary<INamedTypeSymbol, FixedProducerFeature> _available = new(SymbolEqualityComparer.Default);
     private readonly List<Plan> _plans = [];
-    private readonly HashSet<AssignmentExpressionSyntax> _reportedWrites = [];
+    private readonly HashSet<SyntaxNode> _reportedOwnershipErrors = [];
 
     internal List<Plan> Build(RootSite[] sites)
     {
@@ -100,7 +100,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
 
     private void Build(List<RootSite> sites)
     {
-        var selection = new HostSelections(compilation, producers, output, _reportedWrites);
+        var selection = new HostSelections(compilation, producers, output, _reportedOwnershipErrors);
         foreach (var site in sites)
             selection.Read(site, sites);
         var graph = new List<FixedProducerFeature>();

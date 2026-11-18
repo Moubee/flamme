@@ -132,6 +132,55 @@ public class FeatureRegistrationTests
     }
 
     [Test]
+    [Arguments("Select", false)]
+    [Arguments("SelectConditionally", true)]
+    public async Task PackedHelpersPreserveUnconditionalFactoryRegistrations(string entryPoint, bool missingFactory)
+    {
+        const string package = """
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class CustomFeature(IModule module, int value) : FeatureBase(module);
+            public static class FeatureSetup
+            {
+                public static void Select(IModule module, bool enabled) => SupplyFactory(module);
+                public static void SelectConditionally(IModule module, bool enabled)
+                {
+                    if (enabled) SupplyFactory(module);
+                    module.Configure<CustomFeature>();
+                }
+                private static void SupplyFactory(IModule module) => module.Configure(m => new CustomFeature(m, 42));
+            }
+            """;
+        var reference = MetadataReference.CreateFromImage(Emit(Compile(Create("Package", ("Setup.cs", package)))));
+        var app = $$"""
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class App
+            {
+                public static void Start(IServiceCollection services, bool enabled)
+                {
+                    var module = services.CreateModule();
+                    FeatureSetup.{{entryPoint}}(module, enabled);
+                    module.Apply();
+                }
+            }
+            """;
+        var input = Create("Host", ("Host.cs", app)).AddReferences(reference);
+        var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+        if (missingFactory)
+        {
+            var diagnostic = result.Diagnostics.Single();
+            await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+            await Assert.That(diagnostic.GetMessage()).Contains("requires an explicit factory");
+        }
+        else
+        {
+            await Assert.That(result.Diagnostics).IsEmpty();
+            await Assert.That(result.GeneratedTrees.Single().ToString()).Contains(".DeclareCustomFeature_");
+        }
+    }
+
+    [Test]
     public async Task ProducerForwardsOnlyItsSelectedConstructorsPublicationRequirements()
     {
         const string source = """

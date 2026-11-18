@@ -86,15 +86,29 @@ such as `#if`, or the application must choose between separately compiled host
 entry points. The generator reports `ELSAGEN012` for unsupported runtime
 selection, and `ELSAGEN011` for an invalid fixed graph. Calls inside
 `Configure` and `Apply` can configure a selected feature. When opaque code
-requests an absent type, the fixed module throws
-before invoking the factory or configuration action. A custom factory for a
-selected type still receives the actual host module.
+requests an absent type, the fixed module throws before invoking the factory
+or configuration action. A custom factory receives the actual host module.
+A package helper can select a feature without a default constructor by calling
+`module.Configure(m => new CustomFeature(m, value))` unconditionally.
 
 `ConfigureElsa` and `AddElsa` share a module for the same service collection.
 `CreateModule` returns a fresh module on each invocation. Keep related registrations
 on a visibly shared service collection so the compiler can associate them.
 Application code can pass a configured module into a previously compiled helper.
 Module creation inside a precompiled helper must itself use a generated plan.
+
+When a helper configures two independent modules, the host compiler can follow
+the receiver and parameters in an available source body. Compiled package
+helpers expose one combined selection summary. Call a package helper separately
+for each module when its parameters would otherwise target different modules.
+The compiler reports `ELSAGEN012` if it cannot assign a helper's effects to
+the correct module. Passing the same module through several parameters is supported.
+
+A source or package helper can forward its method type parameter directly.
+For example, `Select<T>(IModule module)` can call `module.Use<T>()`. Calling
+`Select<Wrapper<int>>(module)` selects the closed feature `Wrapper<int>`.
+If the helper itself calls `module.Use<Wrapper<T>>()`, the compiler reports
+`ELSAGEN012`. Pass the complete feature type to the helper at the call site.
 
 The native acceptance consumer tests both sides of constructor reachability.
 An unselected optional producer with a dynamic-code constructor can stay
