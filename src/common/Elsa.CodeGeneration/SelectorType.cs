@@ -36,23 +36,30 @@ internal readonly struct SelectorType
     internal SelectorType Bind(IMethodSymbol method, bool allowOpen, ref string? error)
     {
         if (Concrete != null) return this;
+        var argument = ResolveParameter(method, allowOpen, ref error);
+        if (From(argument) is {} bound) return bound;
+        error ??= $"type argument {Ordinal + 1} of '{method}' must be a closed registration type at this composition site";
+        return this;
+    }
+
+    internal ITypeSymbol? ResolveParameter(IMethodSymbol method, bool allowOpen, ref string? error)
+    {
         var definition = (method.ReducedFrom ?? method).OriginalDefinition;
         // A local function can capture the enclosing method's type parameter. Its
         // invocation leaves that parameter for the enclosing method's caller to bind.
         if (SourceParameter != null && !SymbolEqualityComparer.Default.Equals(SourceParameter.DeclaringMethod?.OriginalDefinition, definition))
         {
             if (!allowOpen) error ??= $"feature type parameter '{SourceParameter}' is not fixed at this composition site";
-            return this;
+            return SourceParameter;
         }
         if (Ordinal < method.TypeArguments.Length)
         {
             var argument = method.TypeArguments[Ordinal];
-            if (argument is INamedTypeSymbol named && FeatureBinding.IsClosed(named)) return new SelectorType(named);
-            if (allowOpen && argument is ITypeParameterSymbol { TypeParameterKind: TypeParameterKind.Method } parameter)
-                return new SelectorType(parameter);
+            if (FeatureBinding.IsClosed(argument) || allowOpen && argument is ITypeParameterSymbol { TypeParameterKind: TypeParameterKind.Method })
+                return argument;
         }
         error ??= $"type argument {Ordinal + 1} of '{method}' must be a closed registration type at this composition site";
-        return this;
+        return null;
     }
 }
 
@@ -65,23 +72,46 @@ internal readonly struct SlotResolution(SelectorType? type, bool conditional = f
     internal string? Callback { get; } = callback;
 }
 
+// Slot types must be named registrations. A virtual method can also receive an array.
+internal readonly struct VirtualArgument(ITypeSymbol? concrete, SelectorType parameter = default)
+{
+    internal ITypeSymbol? Concrete => concrete;
+    internal static VirtualArgument? From(ITypeSymbol? type) => type switch
+    {
+        INamedTypeSymbol or IArrayTypeSymbol when FeatureBinding.IsClosed(type) => new VirtualArgument(type),
+        ITypeParameterSymbol { TypeParameterKind: TypeParameterKind.Method } p => new VirtualArgument(null, new SelectorType(p)),
+        _ => null
+    };
+
+    internal VirtualArgument Bind(IMethodSymbol method, bool allowOpen, ref string? error) => concrete != null ? this :
+        From(parameter.ResolveParameter(method, allowOpen, ref error)) ?? this;
+
+    internal static string AssemblyName(ITypeSymbol type)
+    {
+        while (type is IArrayTypeSymbol array) type = array.ElementType;
+        return type.ContainingAssembly?.Identity.Name ?? "";
+    }
+
+    internal string Key => concrete == null ? parameter.ParameterKey : AssemblyName(concrete) + "|" + DocumentationCommentId.CreateReferenceId(concrete);
+}
+
 /// <summary>Virtual dispatch is resolved on the admitted feature type, using the arguments from the original call.</summary>
-internal sealed class VirtualCall(string methodKey, SelectorType[] arguments)
+internal sealed class VirtualCall(string methodKey, VirtualArgument[] arguments, string? receiverParameter = null)
 {
     internal string MethodKey => methodKey;
-    internal SelectorType[] Arguments => arguments;
+    internal string? ReceiverParameter => receiverParameter;
+    internal VirtualArgument[] Arguments => arguments;
     internal VirtualCall Bind(IMethodSymbol method, bool allowOpen, ref string? error)
     {
         if (arguments.All(argument => argument.Concrete != null)) return this;
-        var bound = new SelectorType[arguments.Length];
+        var bound = new VirtualArgument[arguments.Length];
         for (var i = 0; i < bound.Length; i++)
             bound[i] = arguments[i].Bind(method, allowOpen, ref error);
-        return new VirtualCall(methodKey, bound);
+        return new VirtualCall(methodKey, bound, receiverParameter);
     }
 
     // Documentation IDs contain no newlines. Non-generic calls retain their original metadata.
-    internal string Encode() => string.Join("\n", new[] { methodKey }.Concat(arguments.Select(argument =>
-        argument.Concrete is {} type ? type.ContainingAssembly.Identity.Name + "|" + DocumentationCommentId.CreateReferenceId(type) : argument.ParameterKey)));
+    internal string Encode() => string.Join("\n", new[] { receiverParameter == null ? methodKey : "@" + receiverParameter + "\n" + methodKey }.Concat(arguments.Select(argument => argument.Key)));
 }
 
 internal sealed partial class FixedProducerSelector
@@ -100,7 +130,7 @@ internal sealed partial class FixedProducerSelector
     internal FixedProducerSelector Bind(IMethodSymbol method, bool allowOpen)
     {
         if (!HasParameters(SelectedTypes) && !HasParameters(ConditionalTypes) && !HasParameters(HostedTypes) &&
-            !VirtualCalls.Any(call => HasParameters(call.Arguments)) && !ConditionalVirtualCalls.Any(call => HasParameters(call.Arguments)))
+            !VirtualCalls.Concat(ConditionalVirtualCalls).Any(call => call.Arguments.Any(arg => arg.Concrete == null)))
             return this;
 
         // Keep definition summaries immutable. Two calls to Select<T> can belong to

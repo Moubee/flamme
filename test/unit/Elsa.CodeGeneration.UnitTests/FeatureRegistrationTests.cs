@@ -269,6 +269,68 @@ public class FeatureRegistrationTests
     [Test]
     [Arguments(false)]
     [Arguments(true)]
+    public async Task LifecycleFactoryMustRunBeforeTheGeneratedSlotResolves(bool packed)
+    {
+        const string library = """
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Attributes;
+            using Elsa.Features.Services;
+            public sealed class Custom(IModule m, int value) : FeatureBase(m) { public int Value => value; }
+            public sealed class Early(IModule m) : FeatureBase(m)
+            {
+                public override void Configure() => Module.Configure(x => new Custom(x, 42));
+            }
+            public sealed class Hosted(IModule m) : FeatureBase(m)
+            {
+                public override void ConfigureHostedServices() => Module.Configure(x => new Custom(x, 42));
+            }
+            public sealed class Late(IModule m) : FeatureBase(m)
+            {
+                public override void Apply() => Module.Configure(x => new Custom(x, 42));
+            }
+            [DependsOn(typeof(Custom))]
+            public sealed class AfterDependency(IModule m) : FeatureBase(m)
+            {
+                public override void Configure() => Module.Configure(x => new Custom(x, 42));
+            }
+            public sealed class ReadsFirst(IModule m) : FeatureBase(m)
+            {
+                public override void Configure() { Module.Configure<Custom>(); Module.Configure(x => new Custom(x, 42)); }
+            }
+            """;
+        foreach (var selection in new[] { "Early", "Hosted", "Late", "AfterDependency", "ReadsFirst" })
+        {
+            var host = $$"""
+                using Elsa.Extensions;
+                using Microsoft.Extensions.DependencyInjection;
+                public static class Host
+                {
+                    public static bool Start(IServiceCollection services)
+                    {
+                        var module = services.CreateModule();
+                        module.Use<{{selection}}>();
+                        module.Apply();
+                        return module.Configure<Custom>().Value == 42;
+                    }
+                }
+                """;
+            if (selection is "Early" or "Hosted") await RunGeneratedHost(library, host, packed);
+            else
+            {
+                var input = packed
+                    ? Create("Host", ("Host.cs", host)).AddReferences(MetadataReference.CreateFromImage(Emit(Compile(Create("Package", ("Features.cs", library))))))
+                    : Create("Host", ("Host.cs", host), ("Features.cs", library));
+                var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+                var diagnostic = result.Diagnostics.Single();
+                await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+                await Assert.That(diagnostic.GetMessage()).Contains("requires an explicit factory");
+            }
+        }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
     public async Task HelperConstructorSuppliesFactoryBeforeObjectInitializerRuns(bool packed)
     {
         const string library = """
@@ -381,6 +443,164 @@ public class FeatureRegistrationTests
         {
             context.Unload();
         }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task VirtualSettersFollowTheConcreteLifecycleReceiverAndExplicitBase(bool packed)
+    {
+        const string features = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class BaseOnly(IModule m) : FeatureBase(m);
+            public abstract class Parent(IModule m) : FeatureBase(m)
+            {
+                public virtual int Option { set => Module.Use<BaseOnly>(); }
+                public override void Configure() => Option = 1;
+            }
+            public sealed class Root(IModule m) : Parent(m)
+            {
+                public override int Option { set => Module.Use<Leaf>(); }
+            }
+            public sealed class Direct(IModule m) : Parent(m)
+            {
+                public override int Option { set => Module.Use<Leaf>(); }
+                public override void Configure() => base.Option = 1;
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static bool Start(IServiceCollection services)
+                {
+                    var root = services.CreateModule().Use<Root>();
+                    var direct = services.CreateModule().Use<Direct>();
+                    root.Apply();
+                    direct.Apply();
+                    return root.HasFeature<Leaf>() && !root.HasFeature<BaseOnly>() &&
+                        direct.HasFeature<BaseOnly>() && !direct.HasFeature<Leaf>();
+                }
+            }
+            """;
+        await RunGeneratedHost(features, host, packed);
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task SetterOnAnOrdinaryClassCanConfigureAnAssignedModule(bool packed)
+    {
+        const string library = """
+            using Elsa.Extensions;
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class Installer
+            {
+                public IModule Target { set => value.Use<Leaf>(); }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static bool Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    new Installer().Target = module;
+                    module.Apply();
+                    return module.HasFeature<Leaf>();
+                }
+            }
+            """;
+        await RunGeneratedHost(library, host, packed);
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task ForwardedVirtualSetterUsesTheKnownOverrideOnOwnedFeatureSlots(bool packed)
+    {
+        const string library = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public abstract class Parent<T>(IModule m) : FeatureBase(m) { public virtual int Option { set { } } }
+            public class Root(IModule m) : Parent<Root>(m)
+            {
+                public override int Option { set => Module.Configure<Child>(child => child.Value = value); }
+            }
+            public class Child(IModule m) : FeatureBase(m) { public virtual int Value { get; set; } }
+            public static class Options
+            {
+                public static void Forward<T>(this Parent<T> input) => Write(input);
+                public static void Write<T>(Parent<T> target) => target.Option = 17;
+                public static void Mixed(Parent<Root> target) { target.Module.Use<Leaf>(); target.Option = 17; }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static bool Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    var root = module.Configure<Root>();
+                    root.Forward();
+                    module.Apply();
+                    return module.HasFeature<Child>();
+                }
+            }
+            """;
+        await RunGeneratedHost(library, host, packed);
+        var mixed = RunHost(library, host.Replace("root.Forward();", "Options.Mixed(root);"), packed);
+        await Assert.That(mixed.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("virtual feature selection"))).IsTrue();
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task ConditionalVirtualSetterAndOpenHostSetterAreDiagnosed(bool packed)
+    {
+        const string library = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public abstract class Parent(IModule m) : FeatureBase(m)
+            {
+                public bool Enabled { get; set; }
+                public virtual int Option { set { } }
+                public override void Configure() { if (Enabled) Option = 1; }
+            }
+            public sealed class Root(IModule m) : Parent(m)
+            {
+                public override int Option { set => Module.Use<Leaf>(); }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services)
+                {
+                    var root = services.CreateModule().Configure<Root>();
+                    ((Parent)root).Option = 1;
+                }
+            }
+            """;
+        var result = RunHost(library, host, packed);
+        await Assert.That(result.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("conditionally selects 'Leaf'"))).IsTrue();
+        await Assert.That(result.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("virtual feature selection"))).IsTrue();
     }
 
     [Test]
@@ -927,6 +1147,169 @@ public class FeatureRegistrationTests
             if (selected) await Assert.That(result.Diagnostics).IsEmpty();
             else await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
         }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task LifecycleDelegatesCanCaptureFeatureSelections(bool packed)
+    {
+        const string library = """
+            using System;
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class Other(IModule m) : FeatureBase(m);
+            public sealed class Unused(IModule m) : FeatureBase(m);
+            public sealed class Root(IModule m) : FeatureBase(m)
+            {
+                public Action? Notify { get; set; }
+                public override void Configure()
+                {
+                    Action install = () => Module.Use<Leaf>();
+                    var alias = install;
+                    alias();
+                    Action<int> other = Select;
+                    Action<Action> dispatch = callback => callback();
+                    dispatch(() => other?.Invoke(1));
+                    Action deferred = () => Module.Use<Unused>();
+                    Action<int>? skipped = null;
+                    skipped?.Invoke(Module.Configure<Unused>() == null ? 1 : 0);
+                    Notify?.Invoke();
+                    Action<string> log = Console.WriteLine;
+                    log("");
+                }
+                private void Select(int option) => Module.Use<Other>();
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static bool Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    module.Use<Root>();
+                    module.Apply();
+                    return module.HasFeature<Leaf>() && module.HasFeature<Other>() && !module.HasFeature<Unused>();
+                }
+            }
+            """;
+        await RunGeneratedHost(library, host, packed);
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task DelegatesInvokedConditionallyRequireAnAdmittedSlot(bool packed)
+    {
+        const string library = """
+            using System;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class Root(IModule m) : FeatureBase(m)
+            {
+                public bool Enabled { get; set; }
+                public override void Configure()
+                {
+                    Action install = () => Module.Configure<Leaf>();
+                    if (Enabled) install();
+                }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host { public static void Start(IServiceCollection services) => services.CreateModule().Use<Root>(); }
+            """;
+        var diagnostic = RunHost(library, host, packed).Diagnostics.Single();
+        await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(diagnostic.GetMessage()).Contains("Leaf");
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task CallbackArgumentsMustBelongToTheComposedModule(bool packed)
+    {
+        const string library = """
+            using System;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public static class Helpers
+            {
+                public static IModule Other { get; set; } = null!;
+                public static void Run(this IModule first, Action<IModule> configure) => configure(Other);
+                public static void Forward(this IModule first, Action<IModule> configure) { var same = first; configure?.Invoke(same); }
+            }
+            """;
+        foreach (var name in new[] { "Run", "Forward" })
+        {
+            var host = $$"""
+                using Elsa.Extensions;
+                using Microsoft.Extensions.DependencyInjection;
+                public static class Host
+                {
+                    public static void Start(IServiceCollection services) =>
+                        services.CreateModule().{{name}}(m => m.Configure<Leaf>());
+                }
+                """;
+            var result = RunHost(library, host, packed);
+            if (name == "Run")
+            {
+                var diagnostic = result.Diagnostics.Single();
+                await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
+                await Assert.That(diagnostic.GetMessage()).Contains("module passed to");
+            }
+            else
+            {
+                await Assert.That(result.Diagnostics).IsEmpty();
+                await Assert.That(result.GeneratedTrees.Single().ToString()).Contains(".DeclareLeaf_");
+            }
+        }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task VirtualLifecycleCallsPreserveClosedArrayTypeArguments(bool packed)
+    {
+        const string library = """
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public abstract class Foundation(IModule m) : FeatureBase(m)
+            {
+                public override void Configure() => Forward<int[][,]>();
+                private void Forward<T>() => Probe<T>();
+                protected abstract void Probe<T>();
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            using Microsoft.Extensions.DependencyInjection;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public sealed class Root(IModule m) : Foundation(m)
+            {
+                protected override void Probe<T>() => Module.Configure<Leaf>();
+            }
+            public static class Host
+            {
+                public static bool Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    module.Use<Root>();
+                    module.Apply();
+                    return module.HasFeature<Leaf>();
+                }
+            }
+            """;
+        await RunGeneratedHost(library, host, packed);
     }
 
     [Test]

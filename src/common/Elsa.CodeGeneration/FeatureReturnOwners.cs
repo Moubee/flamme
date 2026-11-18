@@ -25,7 +25,18 @@ internal sealed partial class FixedProducerModel
         internal IOperation? ReturnedInput(IPropertyReferenceOperation property)
         {
             if (property.Property.GetMethod is not { } getter) return null;
-            if (property.Property.Name == "Module" && IsFrameworkProperty(property.Property)) return property.Instance;
+            if (property.Property.Name == "Module" && IsFrameworkProperty(property.Property))
+            {
+                if (getter.ContainingType.ToDisplayString() == "Elsa.Features.Abstractions.FeatureBase") return property.Instance;
+                // An explicit IFeature.Module implementation can return a different module.
+                var receiver = property.Instance;
+                while (receiver is IConversionOperation conversion && (conversion.Conversion.IsIdentity || conversion.Conversion.IsReference))
+                    receiver = conversion.Operand;
+                if (receiver?.Type is not INamedTypeSymbol { IsSealed: true } concrete || BindVirtualMethod(getter, concrete) is not {} implementation)
+                    return null;
+                if (implementation.ContainingType.ToDisplayString() == "Elsa.Features.Abstractions.FeatureBase") return receiver;
+                getter = implementation;
+            }
             var owner = Read(getter);
             if (owner == null) return null;
             return owner == Instance ? property.Instance : property.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == owner)?.Value;

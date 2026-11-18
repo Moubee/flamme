@@ -256,6 +256,47 @@ public class FixedHostPlannerTests
     }
 
     [Test]
+    public async Task ExplicitFeatureModuleCannotSilentlyRedirectASelection()
+    {
+        const string declarations = """
+            public sealed class Redirect(IModule m) : FeatureBase(m), IFeature
+            {
+                public IModule Other { get; set; } = null!;
+                IModule IFeature.Module => Other;
+            }
+            """;
+        var redirected = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            var feature = first.Configure<Redirect>();
+            feature.Other = second;
+            ((IFeature)feature).Module.Use<Leaf>();
+            """, declarations);
+        await Assert.That(redirected.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(HostSource(redirected).Contains("_leaf", StringComparison.Ordinal)).IsFalse();
+
+        var inherited = Generate("var feature = services.CreateModule().Configure<Unused>(); ((IFeature)feature).Module.Use<Leaf>();");
+        await Assert.That(inherited.Diagnostics).IsEmpty();
+        await Assert.That(Slots(inherited, "Plan0").Order().SequenceEqual(new[] { "_leaf", "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task AmbiguousObjectAliasesAreDiagnosedWhenUsedAsModules()
+    {
+        const string setup = """
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            object target = first;
+            if (flag) target = second;
+            var alias = target;
+            """;
+        var used = Generate(setup + " ((IModule)alias).Use<Leaf>();");
+        await Assert.That(used.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        var observed = Generate(setup + " System.GC.KeepAlive(alias);");
+        await Assert.That(observed.Diagnostics).IsEmpty();
+    }
+
+    [Test]
     public async Task DeconstructionReadsBothOwnersBeforeUpdatingEitherLocal()
     {
         var result = Generate("""
@@ -324,6 +365,35 @@ public class FixedHostPlannerTests
         await Assert.That(selected.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
         var alreadyPresent = Generate("var module = services.CreateModule(); module.Use<Unused>(); " + guarded);
         await Assert.That(alreadyPresent.Diagnostics).IsEmpty();
+    }
+
+    [Test]
+    public async Task NullDelegateSkipsItsFeatureSelectingArgument()
+    {
+        var result = Generate("""
+            var module = services.CreateModule();
+            System.Action<object>? observe = null;
+            observe?.Invoke(module.Configure<Leaf>());
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
+        await Assert.That(Slots(result, "Plan0")).IsEmpty();
+    }
+
+    [Test]
+    [Arguments("install();")]
+    [Arguments("install.Invoke();")]
+    public async Task CallingACapturedDelegateSelectsFeaturesOnlyForItsModule(string invocation)
+    {
+        var result = Generate($$"""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            System.Action install = () => second.Use<Leaf>();
+            System.Action deferred = () => first.Use<Unused>();
+            {{invocation}}
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
+        await Assert.That(Slots(result, "Plan0")).IsEmpty();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(["_leaf"])).IsTrue();
     }
 
     [Test]
@@ -513,6 +583,46 @@ public class FixedHostPlannerTests
         }
     }
 
+    [Test]
+    public async Task CapturedLocalUsesItsValueAtTheLocalFunctionCall()
+    {
+        var result = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            var target = first;
+            void Install() { var captured = target; captured.Use<Leaf>(); }
+            target = second;
+            Install();
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0")).IsEmpty();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_leaf" })).IsTrue();
+    }
+
+    [Test]
+    [Arguments("services.AddElsa(m => m.Apply());", true)]
+    [Arguments("services.ConfigureElsa(m => Helpers.Finish(m)); services.AddElsa();", true)]
+    [Arguments("services.ConfigureElsa().Apply();", false)]
+    public async Task SdkCallbacksCannotApplyTheirOwnModuleRecursively(string calls, bool recursive)
+    {
+        var result = Generate(calls, "public static class Helpers { public static void Finish(IModule m) => m.Apply(); }", SdkReference());
+        if (recursive)
+        {
+            var diagnostic = result.Diagnostics.Single();
+            await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+            await Assert.That(diagnostic.GetMessage()).Contains("recursive Apply");
+        }
+        else await Assert.That(result.Diagnostics).IsEmpty();
+    }
+
+    [Test]
+    public async Task LifecycleCannotApplyItsOwnModuleRecursively()
+    {
+        var result = Generate("services.CreateModule().Use<Recursive>();",
+            "public sealed class Recursive(IModule m) : FeatureBase(m) { public override void Configure() => Module.Apply(); }");
+        await Assert.That(result.Diagnostics.Single().GetMessage()).Contains("apply its own module recursively");
+    }
+
     private static MetadataReference SdkReference()
     {
         const string sdk = """
@@ -615,6 +725,21 @@ public class FixedHostPlannerTests
         await Assert.That(result.Diagnostics).IsEmpty();
         await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_appFeature", "_unused" })).IsTrue();
         await Assert.That(Slots(result, "Plan1").Order().SequenceEqual(new[] { "_appFeature", "_leaf" })).IsTrue();
+    }
+
+    [Test]
+    public async Task SdkCollectionOwnershipFollowsInvokedMethodGroups()
+    {
+        const string setup = "public static class Helpers { public static void Setup(IServiceCollection target) => target.ConfigureElsa(m => m.Use<Unused>()); }";
+        var sdk = SdkReference();
+        const string callback = "System.Action<IServiceCollection> setup = Helpers.Setup; var alias = setup; ";
+        var conflict = Generate(callback + "alias(services); services.AddElsa(m => m.Use<Leaf>());", setup, sdk);
+        await Assert.That(conflict.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        var independent = Generate(callback + "alias(other); services.AddElsa(m => m.Use<Leaf>());", setup, sdk);
+        await Assert.That(independent.Diagnostics).IsEmpty();
+        var shared = Generate(callback + "alias(services); services.AddElsa(m => m.Use<Unused>());", setup, sdk);
+        await Assert.That(shared.Diagnostics).IsEmpty();
+        await Assert.That(HostSource(shared).Split(" : FixedFeatureModule").Length - 1).IsEqualTo(1);
     }
 
     [Test]

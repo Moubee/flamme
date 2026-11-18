@@ -137,6 +137,11 @@ module descriptors occupy the remembered insertion point. Repeated Apply does
 not create duplicate hosted-service descriptors. Duplicate declarations in the
 catalog are rejected, while a frozen catalog can serve multiple independent hosts.
 
+A generated fixed module also honors priority when a new hosted service is
+requested between two calls to `Apply`. If a feature decorates an existing
+registration in place, a replacement with the same service type and key keeps
+its position ahead of newly queued hosted services.
+
 Use DI scope validation to reject singleton constructors that capture scoped
 services. A hosted service that needs scoped work should create and dispose an
 owned scope through `IServiceScopeFactory` during execution. The

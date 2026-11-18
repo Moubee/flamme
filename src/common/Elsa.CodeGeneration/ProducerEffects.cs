@@ -37,9 +37,9 @@ internal sealed partial class FixedProducerModel
     internal static bool RequiresVirtualDispatch(IMethodSymbol method) => !method.IsStatic && !method.IsSealed && !method.ContainingType.IsSealed &&
         (method.IsVirtual || method.IsOverride || method.IsAbstract || method.ContainingType.TypeKind == TypeKind.Interface);
 
-    internal static bool CallsVirtualGetter(IPropertyReferenceOperation property, IMethodSymbol method) =>
-        method.MethodKind == MethodKind.PropertyGet && RequiresVirtualDispatch(method) &&
-        property.Syntax is not MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax };
+    internal static bool CallsVirtualAccessor(IPropertyReferenceOperation property, IMethodSymbol method) =>
+        RequiresVirtualDispatch(method) &&
+        property.Syntax is not MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax } and not ElementAccessExpressionSyntax { Expression: BaseExpressionSyntax };
 
     internal static IMethodSymbol? BindVirtualMethod(IMethodSymbol method, INamedTypeSymbol receiver)
     {
@@ -47,7 +47,7 @@ internal sealed partial class FixedProducerModel
         return implementation is { IsGenericMethod: true } ? implementation.ConstructedFrom.Construct(method.TypeArguments.ToArray()) : implementation;
     }
 
-    private static IMethodSymbol? FindOverride(INamedTypeSymbol receiver, string target)
+    internal static IMethodSymbol? FindOverride(INamedTypeSymbol receiver, string target)
     {
         for (var type = receiver; type != null; type = type.BaseType)
             foreach (var member in type.GetMembers().OfType<IMethodSymbol>())
@@ -89,6 +89,9 @@ internal sealed partial class FixedProducerModel
         // can all lack documentation IDs. Only exported, externally callable members use IDs.
         private readonly Dictionary<IMethodSymbol, FixedProducerSelector> _cache = new(SymbolEqualityComparer.Default);
         private readonly HashSet<IMethodSymbol> _reading = new(SymbolEqualityComparer.Default);
+        private readonly HashSet<SyntaxNode> _invoking = [];
+        private readonly Stack<(SyntaxNode Function, SyntaxNode Call)> _delegateCalls = new();
+        private readonly FeatureReturnOwners _returnOwners = new(model);
         public FixedProducerSelector Read(IMethodSymbol method)
         {
             var key = (method.ReducedFrom ?? method).OriginalDefinition;
@@ -107,7 +110,7 @@ internal sealed partial class FixedProducerModel
             }
             if (!_reading.Add(key))
                 return new FixedProducerSelector { Error = $"recursive feature selection through '{method}'" };
-            var summary = new Effects();
+            var summary = new Effects(key);
             if (method.MethodKind == MethodKind.Constructor)
                 ReadInitialization(method, summary);
             var implementation = key.PartialImplementationPart ?? key;
@@ -199,12 +202,13 @@ internal sealed partial class FixedProducerModel
                 yield return new FixedProducerSelector { Error = $"cannot bind the configuration callback invoked by virtual feature method '{method}'. Move the selection into the override or use a non-virtual helper" };
             yield return conditional ? new FixedProducerSelector
             {
-                ConditionalFeatures = Types(summary.Features.Concat(summary.ConditionalFeatures)), Hosted = summary.Hosted, Error = summary.Error
+                ConditionalFeatures = Types(summary.Features.Concat(summary.ConditionalFeatures)), Hosted = summary.Hosted, Error = summary.Error,
+                Resolutions = summary.Resolutions.Select(step => new SlotResolution(step.Type, conditional: true, step.Factory, step.Callback)).ToArray()
             } : summary;
             foreach (var (call, guarded) in summary.VirtualCalls.Select(call => (call, conditional))
                          .Concat(summary.ConditionalVirtualCalls.Select(call => (call, true))))
             {
-                var implementation = FindOverride(feature, call.MethodKey);
+                var implementation = call.ReceiverParameter == null ? FindOverride(feature, call.MethodKey) : null;
                 if (implementation == null || implementation.Arity != call.Arguments.Length || call.Arguments.Any(argument => argument.Concrete == null))
                     yield return new FixedProducerSelector { Error = $"cannot bind virtual feature callback '{call.MethodKey}' on '{feature}'" };
                 else
@@ -246,9 +250,14 @@ internal sealed partial class FixedProducerModel
                 // invocation. The surrounding branch can still make that invocation conditional.
                 case IConditionalAccessOperation { Operation: {} receiver,
                     WhenNotNull: IInvocationOperation { TargetMethod.MethodKind: MethodKind.DelegateInvoke } invoke }
-                    when receiver.Type is {} delegateType && IsConfigurationDelegate(delegateType):
-                    foreach (var argument in invoke.Arguments) Visit(argument.Value, result, conditional);
-                    Callback(receiver, result, conditional);
+                    when receiver.Type?.TypeKind == TypeKind.Delegate:
+                    Visit(receiver, result, conditional);
+                    var target = DelegateTargets.Resolve(receiver, model._compilation, token,
+                        receiver is ILocalReferenceOperation captured ? DelegateTargets.CapturedRead(captured, _delegateCalls) : receiver.Syntax);
+                    if (target?.ConstantValue is { HasValue: true, Value: null }) return;
+                    foreach (var argument in invoke.Arguments)
+                        Visit(argument.Value, result, conditional || target is not (IAnonymousFunctionOperation or IMethodReferenceOperation));
+                    InvokeDelegate(receiver, invoke.Arguments, result, conditional);
                     return;
                 case IConditionalAccessOperation access:
                     Visit(access.Operation, result, conditional);
@@ -308,14 +317,34 @@ internal sealed partial class FixedProducerModel
         private void VisitAccessor(IPropertyReferenceOperation property, IMethodSymbol? method, Effects result, bool conditional)
         {
             if (method == null || IsFrameworkProperty(property.Property) || !model.IsCompositionMethod(method)) return;
-            if (!CallsVirtualGetter(property, method))
-                result.Add(Read(method), conditional);
-            else if (property.Instance is IInstanceReferenceOperation)
-                result.AddVirtualCall(method, conditional);
-            else if (property.Instance?.Type is INamedTypeSymbol { IsSealed: true } receiver && FindOverride(receiver, MethodKey(method)) is { } implementation)
-                result.Add(Read(implementation), conditional);
-            else
-                result.Error ??= $"cannot bind virtual feature accessor '{method}' to a concrete receiver";
+            var dispatch = CallsVirtualAccessor(property, method);
+            if (dispatch && property.Instance is IParameterReferenceOperation parameter && !parameter.Type!.IsSealed && FromInput(parameter))
+            {
+                if (ConfiguredSlot(parameter) is {} slot && BindVirtualMethod(method, slot) is {} implementation)
+                {
+                    AddCallEffects(implementation, property.Arguments, result, conditional, foreignReceiver: true);
+                    return;
+                }
+                if (result.Owns(parameter.Parameter))
+                {
+                    result.AddVirtualCall(method, conditional, parameter.Parameter.Name);
+                    return;
+                }
+            }
+            VisitMethod(method, dispatch, property.Instance, property.Arguments, result, conditional);
+        }
+
+        private static INamedTypeSymbol? ConfiguredSlot(IParameterReferenceOperation parameter)
+        {
+            for (var parent = parameter.Parent; parent != null; parent = parent.Parent)
+            {
+                if (parent is not IAnonymousFunctionOperation lambda || !SymbolEqualityComparer.Default.Equals(lambda.Symbol, parameter.Parameter.ContainingSymbol)) continue;
+                var argument = lambda.Parent;
+                while (argument is IDelegateCreationOperation or IConversionOperation) argument = argument.Parent;
+                return argument is IArgumentOperation { Parameter.Name: "configure", Parent: IInvocationOperation registration } &&
+                    Registration(registration) is { Hosted: false, Type: INamedTypeSymbol feature } ? feature : null;
+            }
+            return null;
         }
 
         // A successful early return before a selector makes that selector conditional too.
@@ -335,6 +364,12 @@ internal sealed partial class FixedProducerModel
             var (type, hosted) = Registration(call);
             if (hosted || type is not null)
             {
+                if (_delegateCalls.Any(frame => frame.Function.SyntaxTree == call.Syntax.SyntaxTree && frame.Function.Span.Contains(call.Syntax.Span)) &&
+                    (call.Instance ?? call.Arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == 0)?.Value) is {} module && !FromInput(module))
+                {
+                    result.Error ??= $"cannot establish the module used by captured feature registration '{call.Syntax}'";
+                    return;
+                }
                 var term = SelectorType.From(type);
                 if (!term.HasValue)
                     result.Error ??= $"the selected type in '{method}' is not statically known";
@@ -351,8 +386,7 @@ internal sealed partial class FixedProducerModel
             }
             if (method.MethodKind == MethodKind.DelegateInvoke)
             {
-                if (call.Instance?.Type is {} delegateType && IsConfigurationDelegate(delegateType))
-                    Callback(call.Instance, result, conditional);
+                if (call.Instance != null) InvokeDelegate(call.Instance, call.Arguments, result, conditional);
                 return;
             }
             var fullMethod = method.ReducedFrom ?? method;
@@ -396,63 +430,122 @@ internal sealed partial class FixedProducerModel
             {
                 var parameter = method.Parameters.FirstOrDefault(parameter => parameter.Name == name);
                 var argument = parameter == null ? null : arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal);
-                if (argument != null) Callback(argument.Value, result, guarded);
+                if (argument != null)
+                {
+                    if (arguments.Any(arg => model.CompositionType(arg.Value.Type) && !FromInput(arg.Value)))
+                        result.Error ??= $"cannot establish the module passed to a configuration callback in '{method}'";
+                    else
+                        Callback(argument.Value, result, guarded, IsConfigurationDelegate(argument.Parameter!.Type));
+                }
                 // A local function can invoke a callback captured from its enclosing method.
                 else if (method.MethodKind == MethodKind.LocalFunction)
                     result.AddResolution(new SlotResolution(null, guarded, callback: name));
+            }, call =>
+            {
+                var receiver = arguments.FirstOrDefault(arg => arg.Parameter?.Name == call.ReceiverParameter)?.Value;
+                while (receiver is IConversionOperation { OperatorMethod: null } conversion) receiver = conversion.Operand;
+                return receiver is IParameterReferenceOperation p && result.Owns(p.Parameter) && FromInput(p)
+                    ? new VirtualCall(call.MethodKey, call.Arguments, p.Parameter.Name) : null;
             });
         }
 
         private bool IsConfigurationDelegate(ITypeSymbol type) => type is INamedTypeSymbol { DelegateInvokeMethod: {} invoke } &&
             invoke.Parameters.Any(p => model.CompositionType(p.Type));
 
-        private void Callback(IOperation op, Effects result, bool conditional)
+        private void InvokeDelegate(IOperation receiver, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional)
         {
-            switch (op)
+            if (arguments.Any(arg => model.CompositionType(arg.Parameter?.Type) && !FromInput(arg.Value)))
+                result.Error ??= $"cannot establish the module passed to configuration callback '{receiver.Syntax}'";
+            else
+                Callback(receiver, result, conditional, receiver.Type != null && IsConfigurationDelegate(receiver.Type), arguments);
+        }
+
+        // Exported callbacks are attached to the helper's input module in the host.
+        // An independent module from a field, property or factory would select the wrong plan.
+        private bool FromInput(IOperation? value)
+        {
+            switch (value)
             {
-                case IDelegateCreationOperation creation: Callback(creation.Target, result, conditional); break;
-                case IConversionOperation conversion: Callback(conversion.Operand, result, conditional); break;
-                case IAnonymousFunctionOperation lambda: Visit(lambda.Body, result, conditional); break;
-                case ILocalReferenceOperation local:
-                    if (CallbackAlias(local) is {} value)
-                        Callback(value, result, conditional);
-                    else
-                        result.Error ??= $"cannot establish which feature configuration callback '{local.Local.Name}' invokes";
+                case IInstanceReferenceOperation instance:
+                    return model.CompositionType(instance.Type);
+                case IParameterReferenceOperation parameter:
+                    var semantic = model._compilation.GetSemanticModel(parameter.Syntax.SyntaxTree);
+                    return model.CompositionType(parameter.Type) && parameter.Parameter.RefKind == RefKind.None &&
+                        !HostSelections.FindWrites(parameter.Parameter, semantic).Any();
+                case ILocalReferenceOperation local: return FromInput(DelegateTargets.LocalValue(local, model._compilation, token, DelegateTargets.CapturedRead(local, _delegateCalls)));
+                case IConversionOperation { OperatorMethod: null } conversion: return FromInput(conversion.Operand);
+                case IParenthesizedOperation parentheses: return FromInput(parentheses.Operand);
+                case IInvocationOperation call: return FromInput(_returnOwners.ReturnedInput(call));
+                case IPropertyReferenceOperation property: return FromInput(_returnOwners.ReturnedInput(property));
+                default: return false;
+            }
+        }
+
+        private void Callback(IOperation op, Effects result, bool conditional, bool required = true, IEnumerable<IArgumentOperation>? arguments = null)
+        {
+            var read = op is ILocalReferenceOperation captured ? DelegateTargets.CapturedRead(captured, _delegateCalls) : op.Syntax;
+            var target = DelegateTargets.Resolve(op, model._compilation, token, read);
+            switch (target)
+            {
+                case IAnonymousFunctionOperation lambda:
+                    if (_invoking.Add(lambda.Syntax))
+                    {
+                        _delegateCalls.Push((lambda.Syntax, read));
+                        if (arguments == null || !lambda.Symbol.Parameters.Any(p => p.Type.TypeKind == TypeKind.Delegate))
+                            Visit(lambda.Body, result, conditional);
+                        else
+                        {
+                            var body = new Effects(lambda.Symbol);
+                            Visit(lambda.Body, body, false);
+                            result.Add(body.Finish(), conditional, (name, guarded) =>
+                            {
+                                var parameter = lambda.Symbol.Parameters.FirstOrDefault(p => p.Name == name);
+                                var supplied = parameter == null ? null : arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal);
+                                if (supplied != null) Callback(supplied.Value, result, guarded, IsConfigurationDelegate(parameter!.Type));
+                                else result.AddResolution(new SlotResolution(null, guarded, callback: name));
+                            });
+                        }
+                        _delegateCalls.Pop();
+                        _invoking.Remove(lambda.Syntax);
+                    }
                     break;
                 // Generated SDK calls queue their known callbacks on FixedFeatureModule.
-                // AppFeature's managed callback stays null, and direct writes are diagnosed.
                 case IPropertyReferenceOperation property when IsAppConfigurator(property.Property): break;
-                case IMethodReferenceOperation group: VisitMethod(group.Method, group.IsVirtual, group.Instance, [], result, conditional); break;
+                case IMethodReferenceOperation group:
+                    if (required || model.IsCompositionMethod(group.Method) ||
+                        SymbolEqualityComparer.Default.Equals(group.Method.ContainingAssembly, model._compilation.Assembly))
+                        VisitMethod(group.Method, group.IsVirtual, group.Instance, arguments ?? [], result, conditional);
+                    break;
                 case IParameterReferenceOperation parameter:
                     result.AddResolution(new SlotResolution(null, conditional, callback: parameter.Parameter.Name));
                     break;
+                case IConditionalOperation branch:
+                    foreach (var (choice, guarded) in DelegateTargets.Choices(branch))
+                        Callback(choice, result, conditional || guarded, required, arguments);
+                    break;
+                case null when op is ILocalReferenceOperation local:
+                    if (required)
+                        result.Error ??= $"cannot establish which feature configuration callback '{local.Local.Name}' invokes";
+                    else if (_invoking.Add(local.Syntax))
+                    {
+                        foreach (var possible in DelegateTargets.PossibleValues(local, model._compilation, read))
+                            Callback(possible, result, true, false, arguments);
+                        _invoking.Remove(local.Syntax);
+                    }
+                    break;
                 default:
-                    if (op.ConstantValue is not { HasValue: true, Value: null })
+                    if (required && op.ConstantValue is not { HasValue: true, Value: null })
                         result.Error ??= $"cannot inspect feature configuration callback '{op.Syntax}'";
                     break;
             }
         }
 
-        private IOperation? CallbackAlias(ILocalReferenceOperation local)
+        private sealed class Effects(IMethodSymbol method)
         {
-            if (local.Local.RefKind != RefKind.None || local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(token) is not VariableDeclaratorSyntax declaration)
-                return null;
-            var semantic = model._compilation.GetSemanticModel(declaration.SyntaxTree);
-            var writes = HostSelections.FindWrites(local.Local, semantic).ToArray();
-            // A captured write or read can execute at a different time from its source position.
-            var function = EnclosingFunction(local.Syntax);
-            if (writes.Any(write => EnclosingFunction(write.Site) != function)) return null;
-            var write = writes.LastOrDefault(candidate => candidate.Site.Span.End <= local.Syntax.SpanStart);
-            if (write != null && (write.Value == null || HostSelections.AmbiguousWrite(write.Site, local.Syntax, semantic))) return null;
-            var value = write?.Value ?? declaration.Initializer?.Value;
-            return value != null && value.Span.End <= local.Syntax.SpanStart ? HostSelections.ExpressionOperation(semantic, value) : null;
+            public bool Owns(IParameterSymbol parameter) =>
+                SymbolEqualityComparer.Default.Equals(parameter.ContainingSymbol.OriginalDefinition, method) ||
+                SymbolEqualityComparer.Default.Equals(parameter.ContainingSymbol, method.PartialImplementationPart);
 
-            static SyntaxNode? EnclosingFunction(SyntaxNode node) => node.Ancestors()
-                .FirstOrDefault(parent => parent is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax or BaseMethodDeclarationSyntax);
-        }
-
-        private sealed class Effects
-        {
             public readonly List<SelectorType> Features = [];
             private readonly List<SlotResolution> _resolutions = [];
             public readonly List<SelectorType> Hosted = [];
@@ -462,13 +555,13 @@ internal sealed partial class FixedProducerModel
             public readonly List<VirtualCall> VirtualCalls = [];
             public readonly List<VirtualCall> ConditionalVirtualCalls = [];
 
-            public void AddVirtualCall(IMethodSymbol method, bool conditional)
+            public void AddVirtualCall(IMethodSymbol method, bool conditional, string? receiver = null)
             {
-                var arguments = method.TypeArguments.Select(SelectorType.From).ToArray();
+                var arguments = method.TypeArguments.Select(VirtualArgument.From).ToArray();
                 if (arguments.Any(argument => !argument.HasValue))
                     Error ??= $"the type arguments for virtual feature callback '{method}' are not statically known";
                 else
-                    (conditional ? ConditionalVirtualCalls : VirtualCalls).Add(new VirtualCall(MethodKey(method), arguments.Select(argument => argument!.Value).ToArray()));
+                    (conditional ? ConditionalVirtualCalls : VirtualCalls).Add(new VirtualCall(MethodKey(method), arguments.Select(argument => argument!.Value).ToArray(), receiver));
             }
             public string? Error;
             public void AddResolution(SlotResolution step)
@@ -479,7 +572,7 @@ internal sealed partial class FixedProducerModel
                 if (step.Callback != null)
                     (step.Conditional ? ConditionalCallbacks : Callbacks).Add(step.Callback);
             }
-            public void Add(FixedProducerSelector selector, bool conditional, Action<string, bool>? invoke = null)
+            public void Add(FixedProducerSelector selector, bool conditional, Action<string, bool>? invoke = null, Func<VirtualCall, VirtualCall?>? forward = null)
             {
                 Error ??= selector.Error;
                 foreach (var step in selector.OrderedResolutions())
@@ -491,8 +584,12 @@ internal sealed partial class FixedProducerModel
                         AddResolution(new SlotResolution(step.Type, guarded, step.Factory));
                 }
                 Hosted.AddRange(selector.HostedTypes);
-                ConditionalVirtualCalls.AddRange(selector.ConditionalVirtualCalls);
-                (conditional ? ConditionalVirtualCalls : VirtualCalls).AddRange(selector.VirtualCalls);
+                foreach (var (call, guarded) in selector.VirtualCalls.Select(call => (call, conditional)).Concat(selector.ConditionalVirtualCalls.Select(call => (call, true))))
+                {
+                    var bound = call.ReceiverParameter == null ? call : forward?.Invoke(call);
+                    if (bound == null) Error ??= $"cannot bind the receiver of virtual feature accessor '{call.MethodKey}'";
+                    else (guarded ? ConditionalVirtualCalls : VirtualCalls).Add(bound);
+                }
             }
             public FixedProducerSelector Finish() => new()
             {

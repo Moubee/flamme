@@ -91,12 +91,14 @@ Calls inside
 `Configure` and `Apply` can configure a selected feature. When opaque code
 requests an absent type, the fixed module throws before invoking the factory
 or configuration action. A custom factory receives the actual host module.
-A package helper can select a feature without a default constructor by calling
-`module.Configure(m => new CustomFeature(m, value))` unconditionally before
-the first `Use<CustomFeature>()`, default `Configure<CustomFeature>()`, or
-`Apply()`. This order also applies inside package helpers and their callbacks.
-A `ConfigureElsa` callback runs when the module is first applied. Code that
-uses the returned module before that point must supply its own factory first.
+A feature without a default constructor needs a factory at its first resolution.
+For example, `module.Configure(m => new CustomFeature(m, value))` can run in
+the host, in a package helper, or in the `Configure` or `ConfigureHostedServices`
+callback of a feature that precedes `CustomFeature` in the generated order.
+A factory in a feature’s `Apply` callback is too late because all selected slots
+have already run their configuration callbacks. An SDK configurator passed to
+`ConfigureElsa` or `AddElsa` runs inside the module’s first `Apply()`. To use a
+slot on the returned module before that point, supply its factory first.
 
 Pass the host callback to `AddElsa` or `ConfigureElsa`. Assigning
 `AppFeature.Configurator` directly in a generated host reports `ELSAGEN012`.

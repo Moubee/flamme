@@ -21,7 +21,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
 
         // ConfigureElsa accumulates requests for the subsequent AddElsa on this service collection.
         // CreateModule always constructs an independent module, even when the receiver is shared.
-        var calls = new Dictionary<IMethodSymbol, IInvocationOperation[]>(SymbolEqualityComparer.Default);
+        var calls = new Dictionary<IMethodSymbol, CollectionCall[]>(SymbolEqualityComparer.Default);
         var groups = new List<List<RootSite>>();
         var collections = new Dictionary<CollectionPath, List<RootSite>>();
         var potentialAliases = new Dictionary<CollectionPath, List<(RootSite Site, IInvocationOperation? Origin)>>();
@@ -65,28 +65,67 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
         }
         return _plans;
 
-        IInvocationOperation[] CallsTo(IMethodSymbol method)
+        CollectionCall[] CallsTo(IMethodSymbol method)
         {
             if (calls.TryGetValue(method, out var known)) return known;
-            var result = new List<IInvocationOperation>();
+            var result = new List<CollectionCall>();
+            var groups = new List<IMethodReferenceOperation>();
             foreach (var tree in compilation.SyntaxTrees)
             {
                 var model = compilation.GetSemanticModel(tree);
-                foreach (var invocation in tree.GetRoot(output.CancellationToken).DescendantNodes().OfType<InvocationExpressionSyntax>())
+                foreach (var name in tree.GetRoot(output.CancellationToken).DescendantNodes().OfType<SimpleNameSyntax>().Where(name => name.Identifier.ValueText == method.Name))
                 {
-                    var name = invocation.Expression switch
+                    ExpressionSyntax expression = name.Parent switch
                     {
-                        MemberAccessExpressionSyntax member => member.Name,
-                        MemberBindingExpressionSyntax binding => binding.Name,
-                        SimpleNameSyntax simple => simple,
-                        _ => null
+                        MemberAccessExpressionSyntax member when member.Name == name => member,
+                        MemberBindingExpressionSyntax binding when binding.Name == name => binding,
+                        _ => name
                     };
-                    if (name?.Identifier.ValueText == method.Name && model.GetOperation(invocation, output.CancellationToken) is IInvocationOperation call &&
-                        SymbolEqualityComparer.Default.Equals((call.TargetMethod.ReducedFrom ?? call.TargetMethod).OriginalDefinition, method))
-                        result.Add(call);
+                    if (expression.Parent is InvocationExpressionSyntax invocation && invocation.Expression == expression)
+                    {
+                        if (model.GetOperation(invocation, output.CancellationToken) is IInvocationOperation call && Matches(call.TargetMethod))
+                            result.Add(new CollectionCall(call));
+                    }
+                    else if (model.GetOperation(expression, output.CancellationToken) is IMethodReferenceOperation group && Matches(group.Method))
+                        groups.Add(group);
                 }
             }
+            if (groups.Count != 0)
+                foreach (var tree in compilation.SyntaxTrees)
+                {
+                    var model = compilation.GetSemanticModel(tree);
+                    foreach (var invocation in tree.GetRoot(output.CancellationToken).DescendantNodes().OfType<InvocationExpressionSyntax>())
+                    {
+                        if (model.GetOperation(invocation, output.CancellationToken) is not IInvocationOperation { TargetMethod.MethodKind: MethodKind.DelegateInvoke } call)
+                            continue;
+                        var target = DelegateTargets.Resolve(call.Instance, compilation, output.CancellationToken);
+                        if (target is IMethodReferenceOperation reference)
+                        {
+                            if (Matches(reference.Method)) result.Add(new CollectionCall(call, reference));
+                        }
+                        else if (target is not IAnonymousFunctionOperation)
+                            foreach (var group in groups.Where(group => SymbolEqualityComparer.Default.Equals(group.Parent?.Type, call.Instance?.Type)))
+                                result.Add(new CollectionCall(call, group));
+                    }
+                }
             return calls[method] = result.ToArray();
+
+            bool Matches(IMethodSymbol candidate) => SymbolEqualityComparer.Default.Equals((candidate.ReducedFrom ?? candidate).OriginalDefinition, method);
+        }
+    }
+
+    private sealed class CollectionCall(IInvocationOperation call, IMethodReferenceOperation? group = null)
+    {
+        internal IInvocationOperation Invocation => call;
+
+        internal IOperation? Argument(IParameterSymbol parameter)
+        {
+            // Invoke's parameter names belong to the delegate. Match its arguments by
+            // position, accounting for an extension method bound to its first argument.
+            var boundExtension = group == null ? call.TargetMethod.ReducedFrom != null :
+                group.Method.IsExtensionMethod && group.Instance != null;
+            if (boundExtension && parameter.Ordinal == 0) return group?.Instance ?? call.Instance;
+            return call.Arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal - (boundExtension ? 1 : 0))?.Value;
         }
     }
 
@@ -102,7 +141,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
         public override bool Equals(object? other) => other is CollectionPath path && Equals(path);
         public override int GetHashCode() => unchecked(SymbolEqualityComparer.Default.GetHashCode(symbol) * 31 + (owner?.GetHashCode() ?? 0) + version);
 
-        internal static CollectionPath? For(IOperation? operation, SemanticModel model, Func<IMethodSymbol, IInvocationOperation[]> callsTo, Action<Location, string> ambiguous,
+        internal static CollectionPath? For(IOperation? operation, SemanticModel model, Func<IMethodSymbol, CollectionCall[]> callsTo, Action<Location, string> ambiguous,
             Action<CollectionPath, IInvocationOperation?> possible, HashSet<ISymbol>? seen = null)
         {
             switch (operation)
@@ -129,11 +168,10 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
                         if (seen.Add(parameter.Parameter))
                             foreach (var call in callsTo(enclosing.OriginalDefinition))
                             {
-                                var arg = call.Arguments.FirstOrDefault(a => a.Parameter?.Name == parameter.Parameter.Name)?.Value;
-                                if (arg == null && call.TargetMethod.ReducedFrom != null && parameter.Parameter.Ordinal == 0) arg = call.Instance;
+                                var arg = call.Argument(parameter.Parameter);
                                 if (arg != null && For(arg, arg.SemanticModel!, callsTo, ambiguous, possible,
                                     new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default)) is { } path)
-                                    possible(path, call);
+                                    possible(path, call.Invocation);
                             }
                     }
                     return new CollectionPath(parameter.Parameter);
@@ -248,7 +286,8 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             else
                 ReportExcludedRegistration(request.Type, request.Location, "This call");
 
-        foreach (var item in graph.Where(item => present.Contains(item.Type)))
+        var features = graph.Where(item => present.Contains(item.Type)).ToList();
+        foreach (var item in features)
         {
             if (item.ConstructorError != null && !selection.Features.Any(root => root.ImmediateFactory && !root.Conditional && SymbolEqualityComparer.Default.Equals(root.Type, item.Type)))
                 Error($"Cannot construct '{item.Type}' in a fixed graph: {item.ConstructorError}.");
@@ -262,10 +301,9 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             if (selection.Validated)
                 foreach (var dependency in item.Strong.Where(type => !present.Contains(type)))
                     Error($"Feature '{item.Type}' requires '{dependency}', which was excluded by its presence condition.");
-            if (!item.HasDefaultFactory && !selection.HasFactoryBeforeResolution(item.Type))
-                Error($"Feature '{item.Type}' requires an explicit factory before its first resolution. Call Configure<T>(factory, configure) before Use, default Configure, or Apply.");
+            if (!item.HasDefaultFactory && !selection.HasFactoryBeforeResolution(item.Type, SuppliedDuringConfiguration(item.Type)))
+                Error($"Feature '{item.Type}' requires an explicit factory before its first resolution. Call Configure<T>(factory, configure) in the host or in an earlier feature configuration callback.");
         }
-        var features = graph.Where(item => present.Contains(item.Type)).ToList();
         var hosted = new List<string>();
         foreach (var request in selection.HostedServices)
         {
@@ -283,6 +321,22 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             _plans.Add(plan);
         }
         plan.Sites.AddRange(sites);
+
+        bool SuppliedDuringConfiguration(INamedTypeSymbol type)
+        {
+            foreach (var feature in features)
+            {
+                // FixedFeatureSlot resolves itself before invoking its two configuration callbacks.
+                if (SymbolEqualityComparer.Default.Equals(type, feature.Type)) return false;
+                foreach (var step in feature.ConfigureResolutions)
+                {
+                    if (!SymbolEqualityComparer.Default.Equals(type, step.Type?.Concrete)) continue;
+                    if (!step.Factory) return false;
+                    if (!step.Conditional) return true;
+                }
+            }
+            return false;
+        }
 
         // A conditional dependency can be omitted by the policy, but an actual
         // Configure/Use call needs a slot even when its configuration action is empty.
