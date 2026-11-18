@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <UseElsaSourceTooling>true</UseElsaSourceTooling>
         <ElsaExecutionMode>Generated</ElsaExecutionMode>
     </PropertyGroup>
 
@@ -9,5 +10,4 @@
         <ProjectReference Include="..\..\..\src\modules\Elsa.Common\Elsa.Common.csproj"/>
     </ItemGroup>
     
-    <Import Project="../../../src/common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>

@@ -31,6 +31,11 @@
     <UseProjectReferences>true</UseProjectReferences>
   </PropertyGroup>
 
+  <!-- Module libraries and application hosts consume the same compiler assets as
+       their packaged counterparts. Project references to analyzers do not flow transitively. -->
+  <Import Project="src/common/Elsa.CodeGeneration.Build/SourceTooling.targets"
+          Condition="'$(UseElsaSourceTooling)' == 'true'" />
+
   <!-- Locked mode otherwise creates a missing file, leaving a new entrypoint unpinned in CI. -->
   <Target Name="ValidateNuGetLockFile" BeforeTargets="CollectPackageReferences"
           Condition="'$(RestoreLockedMode)' == 'true' And '$(RestorePackagesWithLockFile)' == 'true'">

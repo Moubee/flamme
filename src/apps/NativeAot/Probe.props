@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
+    <!-- Keep the legacy and explicitly authored diagnostic probe paths selectable. -->
+    <UseElsaSourceTooling>false</UseElsaSourceTooling>
     <OutputType>Exe</OutputType>
     <NativeAotMode Condition="'$(NativeAotMode)' == ''">managed</NativeAotMode>
     <DefineConstants Condition="'$(NativeAotMode)' == 'native'">$(DefineConstants);NATIVEAOT_PROBE_NATIVE</DefineConstants>

@@ -27,5 +27,4 @@
         <ProjectReference Include="..\Elsa.Expressions\Elsa.Expressions.csproj" />
     </ItemGroup>
 
-  <Import Project="../../common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>
