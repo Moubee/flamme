@@ -30,31 +30,62 @@ public static class RegistrationSource
         return source.Append("        }\n    }\n}\n").ToString();
     }
 
-    /// <summary>Produces calls to the local and referenced helpers belonging to this adapter.</summary>
-    public static IEnumerable<string> ImportCalls(Compilation compilation, string adapterId, string targetExpression, bool includeLocalProducer)
+    /// <summary>Produces calls to compatible local and referenced helpers, including aliased references.</summary>
+    public static RegistrationImports GetImports(Compilation compilation, string adapterId, string targetExpression, bool includeLocalProducer)
     {
         var helpers = new SortedSet<string>(StringComparer.Ordinal);
+        var directives = new SortedSet<string>(StringComparer.Ordinal);
         if (includeLocalProducer)
             helpers.Add("global::" + ProducerNamespace(compilation.Assembly.Name, adapterId) + ".Bindings");
 
-        foreach (var assembly in compilation.SourceModule.ReferencedAssemblySymbols)
+        // One assembly may be reachable via multiple references or aliases. Invoke each helper once.
+        var byAssembly = new Dictionary<IAssemblySymbol, SortedSet<string>>(SymbolEqualityComparer.Default);
+        foreach (var reference in compilation.References)
         {
-            var marker = assembly.GetTypeByMetadataName(ProducerNamespace(assembly.Name, adapterId) + ".ProducerAttribute");
-            if (marker is null)
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assembly)
                 continue;
-            foreach (var attribute in assembly.GetAttributes())
-            {
-                if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, marker)
-                    || attribute.ConstructorArguments.Length != 2
-                    || attribute.ConstructorArguments[0].Value is not string id || id != adapterId
-                    || attribute.ConstructorArguments[1].Kind != TypedConstantKind.Type
-                    || attribute.ConstructorArguments[1].Value is not INamedTypeSymbol helper
-                    || !SymbolEqualityComparer.Default.Equals(helper.ContainingAssembly, assembly))
-                    continue;
-                helpers.Add(helper.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-            }
+            if (!byAssembly.TryGetValue(assembly, out var aliases))
+                byAssembly.Add(assembly, aliases = new SortedSet<string>(StringComparer.Ordinal));
+            if (reference.Properties.Aliases.IsDefaultOrEmpty)
+                aliases.Add("global");
+            else
+                aliases.UnionWith(reference.Properties.Aliases);
         }
-        return helpers.Select(helper => helper + ".Register(" + targetExpression + ");");
+
+        foreach (var entry in byAssembly)
+        foreach (var helper in FindHelpers(entry.Key, adapterId))
+        {
+            var name = helper.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            if (!entry.Value.Contains("global"))
+            {
+                var alias = "@" + entry.Value.Min;
+                directives.Add("extern alias " + alias + ";");
+                name = alias + name.Substring("global".Length);
+            }
+            helpers.Add(name);
+        }
+
+        return new RegistrationImports(directives.ToArray(), helpers.Select(helper => helper + ".Register(" + targetExpression + ");").ToArray());
+    }
+
+    /// <summary>Checks whether an assembly exports bindings for the requested adapter.</summary>
+    public static bool HasProducer(IAssemblySymbol assembly, string adapterId) => FindHelpers(assembly, adapterId).Any();
+
+    private static IEnumerable<INamedTypeSymbol> FindHelpers(IAssemblySymbol assembly, string adapterId)
+    {
+        var marker = assembly.GetTypeByMetadataName(ProducerNamespace(assembly.Name, adapterId) + ".ProducerAttribute");
+        if (marker is null)
+            yield break;
+        foreach (var attribute in assembly.GetAttributes())
+        {
+            if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, marker)
+                && attribute.ConstructorArguments.Length == 2
+                && attribute.ConstructorArguments[0].Value is string id && id == adapterId
+                && attribute.ConstructorArguments[1].Kind == TypedConstantKind.Type
+                && attribute.ConstructorArguments[1].Value is INamedTypeSymbol helper
+                && SymbolEqualityComparer.Default.Equals(helper.ContainingAssembly, assembly))
+                yield return helper;
+        }
     }
 
     private static string ProducerNamespace(string assemblyName, string adapterId) =>
@@ -73,4 +104,13 @@ public static class RegistrationSource
         }
         return result.ToString();
     }
+}
+
+/// <summary>File-scope alias directives and registration calls for a generated host.</summary>
+public sealed class RegistrationImports
+{
+    internal RegistrationImports(string[] externAliases, string[] calls) => (ExternAliases, Calls) = (externAliases, calls);
+
+    public IReadOnlyList<string> ExternAliases { get; }
+    public IReadOnlyList<string> Calls { get; }
 }
