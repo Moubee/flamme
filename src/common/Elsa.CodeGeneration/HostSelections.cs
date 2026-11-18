@@ -16,6 +16,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
     private readonly Dictionary<ILocalSymbol, AssignmentExpressionSyntax[]> _writeCache = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<IParameterSymbol, IOperation> _localArguments = new(SymbolEqualityComparer.Default);
     private Dictionary<ITypeParameterSymbol, ITypeSymbol> _typeArguments = new(SymbolEqualityComparer.Default);
+    private readonly FixedProducerModel.FeatureReturnOwners _returnOwners = new(producers);
     private readonly HashSet<InvocationExpressionSyntax> _collectionRoots = [];
     private readonly HashSet<ISymbol> _activeCallbacks = new(SymbolEqualityComparer.Default);
     private readonly INamedTypeSymbol? _module = compilation.GetTypeByMetadataName("Elsa.Features.Services.IModule");
@@ -83,8 +84,16 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
     private void ReadConsumers(InvocationExpressionSyntax syntax, SemanticModel semantic, bool conditional)
     {
         SyntaxNode result = syntax;
-        while (result.Parent is MemberAccessExpressionSyntax or InvocationExpressionSyntax or ParenthesizedExpressionSyntax)
-            result = result.Parent;
+        while (true)
+        {
+            if (result.Parent is MemberAccessExpressionSyntax or InvocationExpressionSyntax or ParenthesizedExpressionSyntax)
+                result = result.Parent;
+            else if (result.Parent is ArgumentSyntax { Parent.Parent: InvocationExpressionSyntax wrapper } &&
+                     result is ExpressionSyntax argument && IsModuleOrFeature(semantic.GetTypeInfo(argument).Type))
+                result = wrapper;
+            else
+                break;
+        }
         var tracked = result is ExpressionSyntax expression && IsModuleOrFeature(semantic.GetTypeInfo(expression).Type);
         var localDeclaration = tracked && result.Parent is EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax declaration } ? declaration : null;
         var local = localDeclaration == null ? null : semantic.GetDeclaredSymbol(localDeclaration);
@@ -95,7 +104,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         // Track the assigned module by symbol, including calls later in the same method.
         // An unassigned inline root owns only the fluent call immediately above it.
         if (local != null)
-            ReadBody(scope, semantic, local, syntax, scope, conditional);
+            ReadBody(scope, semantic, result == syntax ? local : null, syntax, scope, conditional);
         else
             ReadBody(result, semantic, null, syntax, result, conditional);
     }
@@ -349,12 +358,11 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     if (!seen.Add(local.Local))
                         return false;
                     var initializer = (local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as VariableDeclaratorSyntax)?.Initializer?.Value;
-                    if (initializer == null || initializer.SyntaxTree != semantic.SyntaxTree)
+                    var assigned = Writes(local.Local, semantic).LastOrDefault(a => a.Span.End <= value.Syntax.SpanStart);
+                    var source = assigned?.Right ?? initializer;
+                    if (source == null || source.SyntaxTree != semantic.SyntaxTree || Ambiguous(assigned, local))
                         return false;
-                    var assigned = Writes(local.Local, semantic).LastOrDefault(a => a.SpanStart < value.Syntax.SpanStart);
-                    if (Ambiguous(assigned, local))
-                        return false;
-                    return IsOwned(semantic.GetOperation(assigned?.Right ?? initializer), seen);
+                    return IsOwned(semantic.GetOperation(source), seen);
                 case IInstanceReferenceOperation instance:
                     return instance.Type != null && helperOwners?.Contains(instance.Type) == true;
                 case IParameterReferenceOperation parameter:
@@ -377,31 +385,12 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 case IInvocationOperation call when call.Syntax is InvocationExpressionSyntax syntax:
                     if (IsModuleOrFeature(call.Type))
                     {
-                        var inputs = CompositionInputs(call);
-                        if (inputs.Count > 1)
-                        {
-                            var belongs = inputs.Select(input => IsOwned(input.Value, new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default))).ToArray();
-                            if (!belongs.Any(owned => owned)) return false;
-                            if (belongs.All(owned => owned)) return true;
-                            // A source wrapper returning an argument directly has a known
-                            // owner even when its side effects touch two separate modules.
-                            var method = call.TargetMethod.ReducedFrom ?? call.TargetMethod;
-                            var declaration = SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly)
-                                ? method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken) as MethodDeclarationSyntax : null;
-                            var returned = declaration?.ExpressionBody?.Expression ??
-                                (declaration?.Body is { Statements.Count: 1 } block && block.Statements[0] is ReturnStatementSyntax ret ? ret.Expression : null);
-                            if (returned != null)
-                            {
-                                var returnedValue = compilation.GetSemanticModel(returned.SyntaxTree).GetOperation(returned);
-                                var parameter = returnedValue is IParameterReferenceOperation arg ? (ISymbol)arg.Parameter :
-                                    returnedValue is IInstanceReferenceOperation ? method.ContainingType : null;
-                                for (var i = 0; i < inputs.Count; i++)
-                                    if (SymbolEqualityComparer.Default.Equals(inputs[i].Parameter, parameter))
-                                        return belongs[i];
-                            }
-                            AmbiguousHelper(call);
-                            return false;
-                        }
+                        var input = _returnOwners.ReturnedInput(call);
+                        if (input != null) return IsOwned(input, seen);
+                        if (CompositionInputs(call).Any(arg => IsOwned(arg.Value, new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default))) &&
+                            reportedOwnershipErrors.Add(syntax))
+                            Error(syntax.GetLocation(), $"Cannot establish which module '{call.TargetMethod}' returns. Configure the intended module directly or return its input explicitly from the helper.");
+                        return false;
                     }
                     return IsOwned(Receiver(semantic, syntax), seen);
                 case IConditionalAccessInstanceOperation access:

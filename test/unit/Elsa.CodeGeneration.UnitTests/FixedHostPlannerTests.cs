@@ -73,6 +73,68 @@ public class FixedHostPlannerTests
     }
 
     [Test]
+    public async Task SelectionsThroughSingleArgumentForwardersFollowTheirReturnedModule()
+    {
+        const string helpers = """
+            public static class Helpers
+            {
+                public static IModule Forward(IModule m) => m;
+                public static IModule Alias(IModule m) { var same = m; m.Configure<Unused>(); return same; }
+            }
+            """;
+        var result = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            var alias = first;
+            Helpers.Forward(alias).Use<Leaf>();
+            var returned = Helpers.Alias(second);
+            returned.Use<Root>();
+            """, helpers);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").Order().SequenceEqual(new[] { "_leaf", "_root", "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task StaticWrapperArgumentsAssociateInlineAndAssignedFreshRoots()
+    {
+        const string helpers = "public static class H { public static IModule Forward(IModule m) => m; }";
+        var result = Generate("""
+            H.Forward(services.CreateModule()).Use<Leaf>();
+            var forwarded = H.Forward(other.CreateModule());
+            forwarded.Use<Unused>();
+            """, helpers);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+    }
+
+    [Test]
+    [Arguments("H.Fresh(original, other)")]
+    [Arguments("H.Reassign(original, other)")]
+    [Arguments("original.Another()")]
+    public async Task HelpersReturningAnotherModuleDoNotGrowTheirInputPlan(string helper)
+    {
+        const string helpers = """
+            public static class H
+            {
+                public static IModule Fresh(IModule ignored, IServiceCollection services) => services.CreateModule();
+                public static IModule Reassign(IModule m, IServiceCollection services) { m = services.CreateModule(); return m; }
+                internal static IModule External = null!;
+                public static IModule Another(this IModule m) => External;
+            }
+            """;
+        var source = "var original = services.CreateModule(); var result = " + helper + ";";
+        var observation = Generate(source + " System.GC.KeepAlive(result);", helpers);
+        await Assert.That(observation.Diagnostics).IsEmpty();
+        var configured = Generate(source + " result.Use<Leaf>();", helpers);
+        var error = configured.Diagnostics.Single();
+        await Assert.That(error.Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(error.GetMessage()).Contains("Cannot establish which module");
+        await Assert.That(HostSource(configured).Contains("_leaf", StringComparison.Ordinal)).IsFalse();
+    }
+
+    [Test]
     public async Task FeatureValuedSetterSeparatesItsReceiverFromTheAssignedFeature()
     {
         const string declaration = """
@@ -104,6 +166,10 @@ public class FixedHostPlannerTests
             public sealed class B(IModule m) : FeatureBase(m);
             public static class PackageHelpers
             {
+                public static IModule Forward(IModule m) { var alias = m; return alias; }
+                public static IModule ForwardAgain(IModule m) => Forward(m);
+                internal static IModule Other = null!;
+                public static IModule External(this IModule m) => Other;
                 public static void Install(this IModule first, IModule second) { first.Use<A>(); second.Use<B>(); }
                 public static bool Observe(IModule first, IModule second) => object.ReferenceEquals(first, second);
             }
@@ -125,6 +191,18 @@ public class FixedHostPlannerTests
         await Assert.That(shared.Diagnostics).IsEmpty();
         await Assert.That(Slots(shared, "Plan0").Order().SequenceEqual(new[] { "_a", "_b" })).IsTrue();
         await Assert.That(Slots(shared, "Plan1")).IsEmpty();
+
+        var chain = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            PackageHelpers.ForwardAgain(first).Use<Leaf>();
+            """, sdk: reference);
+        await Assert.That(chain.Diagnostics).IsEmpty();
+        await Assert.That(Slots(chain, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(chain, "Plan1")).IsEmpty();
+        var external = Generate("var supplied = services.CreateModule(); supplied.External().Use<Leaf>();", sdk: reference);
+        await Assert.That(external.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(Slots(external, "Plan0")).IsEmpty();
 
         const string splitCall = "first.Install(second)";
         var split = Generate("var first = services.CreateModule(); var second = other.CreateModule(); " + splitCall + ";", sdk: reference);

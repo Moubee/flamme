@@ -32,6 +32,7 @@ internal sealed partial class FixedProducerSelector
     public INamedTypeSymbol[] ConditionalFeatures { get => ConcreteTypes(ConditionalTypes); set => ConditionalTypes = ConcreteTerms(value); }
     public string[] ConfigurationParameters { get; internal set; } = [];
     public string[] ConditionalConfigurationParameters { get; internal set; } = [];
+    internal string? ReturnOwner { get; set; }
     internal string[] VirtualCalls { get; set; } = [];
     internal string[] ConditionalVirtualCalls { get; set; } = [];
     public string? Error { get; internal set; }
@@ -169,6 +170,7 @@ internal sealed partial class FixedProducerModel
                 var factoryKeys = new HashSet<string>(NamedStrings(attr, "Factories"), StringComparer.Ordinal);
                 effects.FactoryTypes = effects.SelectedTypes.Where(type => factoryKeys.Contains(SelectorKey(type))).ToArray();
                 effects.ConfigurationParameters = attr.ConstructorArguments[4].Values.Select(a => (string)a.Value!).ToArray();
+                effects.ReturnOwner = attr.NamedArguments.FirstOrDefault(arg => arg.Key == "ReturnOwner").Value.Value as string;
                 effects.VirtualCalls = Strings(attr, 5);
                 effects.ConditionalVirtualCalls = Strings(attr, 7);
                 effects.ConditionalConfigurationParameters = Strings(attr, 8);
@@ -187,9 +189,11 @@ internal sealed partial class FixedProducerModel
             }
         }
         var effectsReader = new ProducerEffects(this, token);
+        var returns = new FeatureReturnOwners(this);
         foreach (var method in methods.Distinct<IMethodSymbol>(SymbolEqualityComparer.Default))
         {
             var facts = effectsReader.Read(method);
+            facts.ReturnOwner = returns.Read(method);
             var key = MethodKey(method);
             _selectors[key] = facts;
             if (method.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal or Accessibility.Protected or Accessibility.ProtectedAndInternal or Accessibility.ProtectedOrInternal)
@@ -257,7 +261,8 @@ internal sealed partial class FixedProducerModel
     {
         if (bridge.GetMembers("SchemaVersion").OfType<IFieldSymbol>().FirstOrDefault()?.ConstantValue is not 1) return false;
         foreach (var attr in bridge.GetAttributes().Where(a => IsAttribute(a, bridge, "SelectorAttribute")))
-            if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "Factories" && !IsStringArray(pair.Value))) return false;
+            if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "Factories" && !IsStringArray(pair.Value) ||
+                pair.Key == "ReturnOwner" && (pair.Value.Kind != TypedConstantKind.Primitive || pair.Value.Value is not string))) return false;
         foreach (var method in bridge.GetMembers().OfType<IMethodSymbol>())
         foreach (var attr in method.GetAttributes())
         {
@@ -382,6 +387,7 @@ internal sealed partial class FixedProducerModel
             internal sealed class SelectorAttribute : global::System.Attribute
             {
                 public SelectorAttribute(string method, string[] features, string[] hosted, string? error, string[] configurationParameters, string[] virtualCalls, string[] conditional, string[] conditionalVirtualCalls, string[] conditionalConfigurationParameters) { }
+                public string? ReturnOwner { get; set; }
                 public string[]? Factories { get; set; }
             }
             """).Append(body);
@@ -391,7 +397,8 @@ internal sealed partial class FixedProducerModel
     private static string SelectorAttributeSource(string key, FixedProducerSelector selector)
     {
         var factories = selector.FactoryTypes.Length == 0 ? "" : ", Factories = " + Keys(selector.FactoryTypes);
-        return $"[Selector({Literal(key)}, {Keys(selector.SelectedTypes)}, {Keys(selector.HostedTypes)}, {Literal(selector.Error)}, {StringArray(selector.ConfigurationParameters)}, {StringArray(selector.VirtualCalls)}, {Keys(selector.ConditionalTypes)}, {StringArray(selector.ConditionalVirtualCalls)}, {StringArray(selector.ConditionalConfigurationParameters)}{factories})]";
+        var owner = selector.ReturnOwner == null ? "" : ", ReturnOwner = " + Literal(selector.ReturnOwner);
+        return $"[Selector({Literal(key)}, {Keys(selector.SelectedTypes)}, {Keys(selector.HostedTypes)}, {Literal(selector.Error)}, {StringArray(selector.ConfigurationParameters)}, {StringArray(selector.VirtualCalls)}, {Keys(selector.ConditionalTypes)}, {StringArray(selector.ConditionalVirtualCalls)}, {StringArray(selector.ConditionalConfigurationParameters)}{factories}{owner})]";
     }
 
     private static string SelectorKey(SelectorType type) => type.Concrete is {} symbol ? TypeKey(symbol) : type.ParameterKey;
