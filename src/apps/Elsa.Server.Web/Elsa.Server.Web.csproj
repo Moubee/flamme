@@ -1,5 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <ElsaExecutionMode>Generated</ElsaExecutionMode>
+    </PropertyGroup>
+
     <ItemGroup>
 		<ProjectReference Include="..\Elsa.ServiceDefaults\Elsa.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\..\modules\Elsa.Caching\Elsa.Caching.csproj" />
