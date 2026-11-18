@@ -21,13 +21,13 @@ The unfiltered run builds a feature producer against the packed `Elsa.Features` 
 
 To run the compiled Features publish and execution cases separately, use the
 following filters. Each process reports its observed provider, runtime and RID.
-The optional dynamic-code producer test checks that importing its factory
-reports IL3050 at publish time.
+The optional dynamic-code producer test publishes and runs with the feature
+excluded, then selects it and verifies that native publication reports IL3050.
 
 ```bash
 dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/NativeConsumerRunsGeneratedProvider*'
 dotnet test --project "$project" -c Release -f net11.0 -- --treenode-filter '/*/*/CodeGenerationTests/RuntimeAsyncOptOutRunsPackedFeatures'
-dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/UnselectedDynamicCodeProducerExposesItsNativeRequirement'
+dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/OnlySelectingTheOptionalProducerRootsItsDynamicConstructor'
 ```
 
 The tests record build logs, evaluated MSBuild properties and process output in

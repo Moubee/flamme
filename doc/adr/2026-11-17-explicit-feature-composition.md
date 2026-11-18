@@ -55,8 +55,9 @@ opaque hosted-service factory declarations are not added to this API.
 ## Consequences
 
 Existing AddElsa/IModule callers and default managed behavior remain available.
-New catalogs are a runtime seam for generated manifests; handwritten native
-component success does not establish generator or complete workflow support.
+Explicit catalogs remain available to handwritten hosts. Compiler-generated
+hosts use the [fixed feature graph](2026-11-18-fixed-feature-graphs.md).
+The native component probe exercises explicit catalog behavior.
 Generators, versioned cross-module exports, source diagnostics, payload codecs,
 workflow execution, and worker/server capability migration remain separate work.
 

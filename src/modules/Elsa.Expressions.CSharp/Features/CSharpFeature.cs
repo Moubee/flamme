@@ -35,6 +35,12 @@ public class CSharpFeature : FeatureBase
     public Action<CSharpOptions> CSharpOptions { get; set; } = _ => { };
 
     /// <inheritdoc />
+    public override void Configure()
+    {
+        Module.AddActivitiesFrom<CSharpFeature>();
+    }
+
+    /// <inheritdoc />
     public override void Apply()
     {
         Services.Configure(CSharpOptions);
@@ -49,9 +55,6 @@ public class CSharpFeature : FeatureBase
         // Handlers.
         Services.AddNotificationHandlersFrom<CSharpFeature>();
 
-        // Activities.
-        Module.AddActivitiesFrom<CSharpFeature>();
-        
         // UI property handlers.
         Services.AddScoped<IPropertyUIHandler, RunCSharpOptionsProvider>();
     }

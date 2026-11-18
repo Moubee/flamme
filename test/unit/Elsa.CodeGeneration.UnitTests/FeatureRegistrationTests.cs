@@ -46,8 +46,8 @@ public class FeatureRegistrationTests
         [DependencyOf(typeof(UnselectedFeature), Type = typeof(DatabaseFeature))]
         internal sealed class PluginFeature : PluginBase
         {
-            public PluginFeature(IModule module) : base(module) => throw new Exception("wrong overload");
-            public PluginFeature(Module module) : base(module) => module.Properties["steps"] = "module;";
+            public PluginFeature(IModule module) : base(module) => module.Properties["steps"] = "module;";
+            public PluginFeature(Module module) : base(module) => throw new Exception("wrong overload");
             public int Priority { get; set; }
             public override void ConfigureHostedServices()
             {
@@ -85,16 +85,14 @@ public class FeatureRegistrationTests
 
         public static class Scenario
         {
-            public static string Run(ExplicitFeatureCatalog catalog)
+            public static string Run(FixedFeatureModule module)
             {
-                if (!catalog.FeatureTypes.Contains(typeof(UnselectedFeature)))
-                    throw new Exception("missing available direct IFeature implementation");
-                var services = new ServiceCollection();
-                var module = services.CreateModule(catalog);
+                if (module.HasFeature<UnselectedFeature>() || module.HasFeature<ExcludedFeature>())
+                    throw new Exception("unselected feature was declared");
+                var services = module.Services;
                 module.Configure<PluginFeature>(p => p.Priority = 42);
                 module.Configure(m => new CustomFeature(m) { Value = "caller" });
                 module.Use<GenericFeature<int>>();
-                module.Configure<ExcludedFeature>();
                 module.Apply();
                 module.Apply();
                 var registry = (IInstalledFeatureRegistry)services.Last(x => x.ServiceType == typeof(IInstalledFeatureRegistry)).ImplementationInstance!;
@@ -120,17 +118,277 @@ public class FeatureRegistrationTests
         {
             var infrastructure = context.LoadFromStream(new MemoryStream(dependencyImage));
             var app = context.LoadFromStream(new MemoryStream(Emit(producer)));
-            var builder = new ExplicitFeatureCatalogBuilder();
-            Register(infrastructure, builder);
-            Register(app, builder);
+            var plan = new TestPlan(
+                Bridge(infrastructure, "DatabaseFeature"), Bridge(app, "PluginFeature"),
+                Bridge(app, "CustomFeature"), Bridge(app, "GenericFeature`1"));
             var run = app.GetType("Application.Scenario", throwOnError: true)!.GetMethod("Run")!;
-            var actual = run.CreateDelegate<Func<ExplicitFeatureCatalog, string>>()(builder.BuildAvailable());
+            var actual = run.CreateDelegate<Func<FixedFeatureModule, string>>()(plan);
             await Assert.That(actual).IsEqualTo("module;database;plugin;database;plugin;|caller|Host \"plugin\"|Inherited description|Generic`1|First/Singleton,Second/Singleton");
         }
         finally
         {
             context.Unload();
         }
+    }
+
+    [Test]
+    public async Task ProducerForwardsOnlyItsSelectedConstructorsPublicationRequirements()
+    {
+        const string source = """
+            using System.Diagnostics.CodeAnalysis;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class OptionalFeature : FeatureBase
+            {
+                [RequiresDynamicCode("Needs runtime generation.", Url = "https://example.org/native")]
+                [RequiresUnreferencedCode("Reads metadata.")]
+                public OptionalFeature(IModule module) : base(module) { }
+                [RequiresAssemblyFiles("This overload is unused.")]
+                public OptionalFeature(IModule module, object value) : base(module) { }
+            }
+            """;
+        var result = CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(Create("Producer", ("Optional.cs", source)), out var produced);
+        await produced.AssertEmits();
+        var generated = result.GetRunResult().GeneratedTrees.Single().ToString();
+        await Assert.That(generated).Contains("""RequiresDynamicCodeAttribute("OptionalFeature: Needs runtime generation.", Url = "https://example.org/native")""");
+        await Assert.That(generated).Contains("""RequiresUnreferencedCodeAttribute("OptionalFeature: Reads metadata.")""");
+        await Assert.That(generated.Contains("RequiresAssemblyFiles", StringComparison.Ordinal)).IsFalse();
+    }
+
+    [Test]
+    public async Task PackedWrapperExportsItsSelectedInternalFeaturesAndSkipsDeferredCallbacks()
+    {
+        const string source = """
+            using System;
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            namespace Package;
+            public sealed class InstalledFeature(IModule module) : FeatureBase(module);
+            internal sealed class AdditionalFeature(IModule module) : FeatureBase(module);
+            internal sealed class DeferredFeature(IModule module) : FeatureBase(module);
+            public static class Extras
+            {
+                public static Action Later = () => { };
+                public static void SelectAdditional(this InstalledFeature feature) => feature.Module.Configure<AdditionalFeature>();
+                public static void InstallExtras(this IModule module, Action<InstalledFeature>? configure = null)
+                {
+                    void Install() => module.Configure<InstalledFeature>();
+                    void ConfigureInstalled() => module.Configure<InstalledFeature>(feature => { configure?.Invoke(feature); });
+                    Install();
+                    ConfigureInstalled();
+                    Later = () => module.Configure<DeferredFeature>();
+                }
+            }
+            """;
+        var producer = Compile(Create("Example.Package_002E", ("Package.cs", source)));
+        using var referenceAssembly = new MemoryStream();
+        var emitted = producer.Emit(referenceAssembly, options: new Microsoft.CodeAnalysis.Emit.EmitOptions(metadataOnly: true, includePrivateMembers: false));
+        await Assert.That(emitted.Success).IsTrue().Because(string.Join("\n", emitted.Diagnostics));
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            using Package;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services) => services.CreateModule().InstallExtras(f => f.SelectAdditional());
+            }
+            """;
+        var input = Create("Host", ("Host.cs", host)).AddReferences(MetadataReference.CreateFromImage(referenceAssembly.ToArray()));
+        var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+        await Assert.That(result.Diagnostics).IsEmpty();
+        var hook = result.GeneratedTrees.Single().ToString();
+        await Assert.That(hook).Contains("PExample_002EPackage_005F002E.Bindings.DeclareInstalledFeature_");
+        await Assert.That(hook).Contains(".DeclareAdditionalFeature_");
+        await Assert.That(hook.Contains(".DeclareDeferredFeature_", StringComparison.Ordinal)).IsFalse();
+    }
+
+    [Test]
+    public async Task ClosedFeatureUsesItsProtectedOverrideFromACompiledBase()
+    {
+        const string foundation = """
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public abstract class Foundation<T>(IModule module) : FeatureBase(module)
+            {
+                public override void ConfigureHostedServices() => Install();
+                protected virtual void Install() { }
+            }
+            """;
+        var parent = Compile(Create("Foundation", ("Base.cs", foundation)));
+        const string derived = """
+            using Elsa.Features.Services;
+            using Microsoft.Extensions.Hosting;
+            using System.Threading;
+            using System.Threading.Tasks;
+            internal class Worker<T> : IHostedService
+            {
+                public Task StartAsync(CancellationToken token) => Task.CompletedTask;
+                public Task StopAsync(CancellationToken token) => Task.CompletedTask;
+            }
+            public sealed class Plugin(IModule module) : Foundation<int>(module)
+            {
+                protected override void Install() => Module.ConfigureHostedService<Worker<int>>();
+            }
+            """;
+        var child = Create("Producer", ("Plugin.cs", derived)).AddReferences(MetadataReference.CreateFromImage(Emit(parent)));
+        var result = CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(child, out var output);
+        await output.AssertEmits();
+        var bridge = result.GetRunResult().GeneratedTrees.Single().ToString();
+        await Assert.That(bridge).Contains(".DeclareHostedWorker_");
+        await Assert.That(bridge).Contains("module.DeclareHostedService<global::Worker<int>>();");
+    }
+
+    [Test]
+    public async Task PackageConditionalSelectionIsLegalOnlyWhenItsFeatureAlreadyBelongsToThePlan()
+    {
+        const string package = """
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class Feature(IModule m) : FeatureBase(m);
+            public static class PackageExtensions
+            {
+                public static void Maybe(this IModule m, bool enable)
+                {
+                    if (!enable) return;
+                    m.Configure<Feature>();
+                }
+            }
+            """;
+        var reference = MetadataReference.CreateFromImage(Emit(Compile(Create("External", ("Package.cs", package)))));
+        foreach (var selected in new[] { false, true })
+        {
+            var host = $$"""
+                using Elsa.Extensions;
+                using Microsoft.Extensions.DependencyInjection;
+                public static class Host
+                {
+                    public static void Start(IServiceCollection services, bool flag)
+                    {
+                        var module = services.CreateModule();
+                        {{(selected ? "module.Configure<Feature>();" : "")}}
+                        module.Maybe(flag);
+                    }
+                }
+                """;
+            var input = Create("Host", ("Host.cs", host)).AddReferences(reference);
+            var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+            if (selected) await Assert.That(result.Diagnostics).IsEmpty();
+            else await Assert.That(result.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error && d.GetMessage().Contains("Feature"))).IsTrue();
+        }
+    }
+
+    [Test]
+    public async Task SelectedFeatureRejectsOpaqueBaseCallbacksAndIncludesExplicitInterfaceImplementations()
+    {
+        const string dependency = """
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public abstract class LegacyBase(IModule m) : FeatureBase(m)
+            {
+                public override void Apply() => Module.Configure<PrivateFeature>();
+                private sealed class PrivateFeature(IModule m) : FeatureBase(m);
+            }
+            """;
+        var opaque = MetadataReference.CreateFromImage(Emit(Create("Legacy", ("Legacy.cs", dependency))));
+        const string declarations = """
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class Derived(IModule m) : LegacyBase(m);
+            public sealed class Extra(IModule m) : FeatureBase(m);
+            public sealed class Explicit(IModule module) : IFeature
+            {
+                public IModule Module => module;
+                void IFeature.Configure() => Module.Configure<Extra>();
+                void IFeature.ConfigureHostedServices() { }
+                void IFeature.Apply() { }
+            }
+            """;
+        foreach (var root in new[] { "Derived", "Explicit" })
+        {
+            var host = $$"""
+                using Elsa.Extensions;
+                using Microsoft.Extensions.DependencyInjection;
+                public static class App
+                {
+                    public static void Start(IServiceCollection services) => services.CreateModule().Configure<{{root}}>();
+                }
+                """;
+            var input = Create("Host", ("Features.cs", declarations), ("Host.cs", host)).AddReferences(opaque);
+            var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+            if (root == "Derived") await Assert.That(result.Diagnostics.Any(d => d.GetMessage().Contains("LegacyBase.Apply"))).IsTrue();
+            else
+            {
+                await Assert.That(result.Diagnostics).IsEmpty();
+                await Assert.That(result.GeneratedTrees.Single().ToString()).Contains(".DeclareExtra_");
+            }
+        }
+    }
+
+    [Test]
+    public async Task ProducerMarksComposingConstructorsAndKeepsBypassOverloadsDistinct()
+    {
+        const string source = """
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class Extra(IModule module) : FeatureBase(module);
+            public abstract class Base : FeatureBase
+            {
+                protected Base(IModule module, bool marker) : base(module) => module.Configure<Extra>();
+                protected Base(IModule module) : base(module) { }
+            }
+            public sealed class Plugin : Base
+            {
+                public Plugin(IModule module) : base(module, true) { }
+                public Plugin(IModule module, string value) : base(module) { }
+            }
+            public sealed class Primary(IModule module) : FeatureBase(module)
+            {
+                public Extra Child { get; } = module.Configure<Extra>();
+            }
+            """;
+        var result = CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(Create("CtorPlugin", ("Ctor.cs", source)), out var output);
+        await output.AssertEmits();
+        var generated = result.GetRunResult().GeneratedTrees.Single().ToString();
+        await Assert.That(generated).Contains("'Plugin.Plugin(Elsa.Features.Services.IModule)' changes or may change feature composition");
+        await Assert.That(generated).Contains("'Primary.Primary(Elsa.Features.Services.IModule)' changes or may change feature composition");
+        var overload = generated.Split('\n').Single(line => line.Contains("M:Plugin.#ctor(Elsa.Features.Services.IModule,System.String)"));
+        await Assert.That(overload.Contains("Extra", StringComparison.Ordinal)).IsFalse();
+    }
+
+    [Test]
+    public async Task MalformedProducerSchemaCannotCrashTheHostGenerator()
+    {
+        const string source = """
+            using System;
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class ExternalFeature(IModule module) : FeatureBase(module);
+            namespace Elsa.FixedFeatures.V1.PExternal
+            {
+                internal sealed class SlotAttribute : Attribute
+                {
+                    public SlotAttribute(int wrong) { }
+                }
+                public static class Bindings
+                {
+                    public const int SchemaVersion = 1;
+                    [Slot(42)] public static void Broken() { }
+                }
+            }
+            """;
+        var package = MetadataReference.CreateFromImage(Emit(Create("External", ("Package.cs", source))));
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class App
+            {
+                public static void Start(IServiceCollection services) => services.CreateModule().Configure<ExternalFeature>();
+            }
+            """;
+        var input = Create("Host", ("Host.cs", host)).AddReferences(package);
+        var result = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _).GetRunResult();
+        await Assert.That(result.Diagnostics.All(d => d.Id.StartsWith("ELSAGEN", StringComparison.Ordinal))).IsTrue();
+        await Assert.That(result.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error && d.GetMessage().Contains("ExternalFeature"))).IsTrue();
     }
 
     [Test]
@@ -258,7 +516,8 @@ public class FeatureRegistrationTests
         var clean = CompilerTest.CreateDriver(true, new ElsaFeatureGenerator()).Run(repaired, out _);
         await Assert.That(driver.GetRunResult().Diagnostics).IsEmpty();
         await Assert.That(clean.GetRunResult().Diagnostics).IsEmpty();
-        await Assert.That(driver.GetRunResult().GeneratedTrees.Single().ToString()).IsEqualTo(clean.GetRunResult().GeneratedTrees.Single().ToString());
+        await Assert.That(driver.GetRunResult().GeneratedTrees.Select(t => t.ToString()).SequenceEqual(
+            clean.GetRunResult().GeneratedTrees.Select(t => t.ToString()))).IsTrue();
         await output.AssertEmits();
     }
 
@@ -276,11 +535,33 @@ public class FeatureRegistrationTests
         return output;
     }
 
-    private static void Register(Assembly assembly, ExplicitFeatureCatalogBuilder builder)
+    private static Func<FixedFeatureModule, FixedFeatureSlot> Bridge(Assembly assembly, string featureName)
     {
-        var marker = assembly.GetCustomAttributesData().Single(a => a.AttributeType.Name == "ProducerAttribute");
-        var bindings = (Type)marker.ConstructorArguments[1].Value!;
-        bindings.GetMethod("Register")!.CreateDelegate<Action<ExplicitFeatureCatalogBuilder>>()(builder);
+        var method = assembly.GetExportedTypes().Single(t => t.Name == "Bindings").GetMethods()
+            .Single(m => m.GetCustomAttributesData().Any(a =>
+                a.AttributeType.Name == "SlotAttribute" && ((Type)a.ConstructorArguments[0].Value!).Name == featureName));
+        return method.CreateDelegate<Func<FixedFeatureModule, FixedFeatureSlot>>();
+    }
+
+    private sealed class TestPlan : FixedFeatureModule
+    {
+        private readonly FixedFeatureSlot[] _slots;
+
+        public TestPlan(params Func<FixedFeatureModule, FixedFeatureSlot>[] bindings) : base(new ServiceCollection())
+        {
+            _slots = bindings.Select(binding => binding(this)).ToArray();
+            SealDeclarations();
+        }
+
+        protected override void ConfigureFeatures()
+        {
+            foreach (var slot in _slots) slot.Configure();
+        }
+
+        protected override void ApplyFeatures()
+        {
+            foreach (var slot in _slots) slot.Apply();
+        }
     }
 
     private static byte[] Emit(CSharpCompilation compilation)

@@ -19,12 +19,12 @@ public interface IModule
     IDictionary<object, object> Properties { get; }
     
     /// <summary>
-    /// Returns true if a feature of the specified type has been configured.
+    /// Returns true if a feature of the specified type is selected for the module.
     /// </summary>
     bool HasFeature<T>() where T : class, IFeature;
     
     /// <summary>
-    /// Returns true if a feature of the specified type has been configured.
+    /// Returns true if a feature of the specified type is selected for the module.
     /// </summary>
     bool HasFeature(Type featureType);
 
@@ -52,8 +52,9 @@ public interface IModule
     /// Will apply all configured features, causing the <see cref="Services"/> collection to be populated. 
     /// </summary>
     /// <remarks>
-    /// Features are allowed to introduce additional features from their own <see cref="IFeature.Apply"/> method, e.g. by calling <see cref="Configure{T}(Action{T})"/>.
-    /// Those features are configured and applied as part of the same call.
+    /// Dynamic modules allow features to introduce additional features from their own <see cref="IFeature.Apply"/> method, e.g. by calling <see cref="Configure{T}(Action{T})"/>.
+    /// Those features are configured and applied as part of the same call in dynamic composition.
+    /// A fixed feature plan resolves configuration requests only for its build-time selection.
     /// </remarks>
     void Apply();
 }

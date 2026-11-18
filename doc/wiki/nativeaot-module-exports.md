@@ -65,26 +65,54 @@ or registration callback is used to import its bindings.
 
 ## Host selection and ordering
 
-A consumer may freeze its own fragment with a strong feature dependency on the
-producer's public feature type:
+For a host that selects versioned exports explicitly, put these properties in the
+executable project. Both managed and native builds then use its authored export
+entry point.
+
+```xml
+<PropertyGroup>
+  <ElsaExecutionMode>Generated</ElsaExecutionMode>
+  <ElsaHostBootstrap>Manual</ElsaHostBootstrap>
+</PropertyGroup>
+```
+
+Declare the entry point and the host’s own export in the application. The
+example declares a requirement on the foundation provider and a strong
+dependency on its public feature.
 
 ```csharp
-var application = new ExplicitFeatureCatalogBuilder()
-    .Add(m => new ApplicationFeature(m),
-        new FeatureDescriptor("Application", "Example", "Application"),
-        dependencies: [typeof(FoundationFeature)])
-    .CreateExport(new ModuleExportDescriptor("example.application", 1,
-        requirements: [new ModuleRequirement("example.foundation", 1,
-            requiredCapabilities: ["example.foundation-service"])]));
+using Elsa.Features.Models;
+using Elsa.Features.Services;
+using Microsoft.Extensions.DependencyInjection;
 
-var catalog = new FeatureModuleCatalogBuilder()
-    .Add(application)
-    .Add(ProducerExports.Foundation)
-    .Build();
-var module = services.CreateModule(catalog, CompositionPolicy.ValidatedV1);
-module.Configure<ApplicationFeature>();
-module.Apply();
+namespace Elsa.CodeGeneration;
+
+internal static partial class ElsaHost
+{
+    internal static IModule CreateModule(IServiceCollection services, CompositionPolicy policy)
+        => FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
+
+    private static FeatureModuleExport[] GetModuleExports()
+        => [ApplicationExports.Application, ProducerExports.Foundation];
+}
+
+internal static class ApplicationExports
+{
+    internal static FeatureModuleExport Application { get; } = new ExplicitFeatureCatalogBuilder()
+        .Add(m => new ApplicationFeature(m),
+            new FeatureDescriptor("Application", "Example", "Application"),
+            dependencies: [typeof(FoundationFeature)])
+        .CreateExport(new ModuleExportDescriptor("example.application", 1,
+            requirements: [new ModuleRequirement("example.foundation", 1,
+                requiredCapabilities: ["example.foundation-service"])]));
+}
 ```
+
+Create the module with `ElsaHost.CreateModule(services, CompositionPolicy.ValidatedV1)`,
+configure the selected features, then call `module.Apply()`. The package consumer
+fixture also shows how a second host can reuse the first host’s immutable catalog
+with separate feature and service instances. [Authored entry point](../../test/fixtures/nativeaot/module-consumer/ElsaHost.cs)
+and [two-host consumer](../../test/fixtures/nativeaot/module-consumer/ModuleConsumerScenarios.cs).
 
 Composition validates module dependencies before merging typed bindings. Modules
 are ordered dependency-first; among ready modules, the earliest first-add slot

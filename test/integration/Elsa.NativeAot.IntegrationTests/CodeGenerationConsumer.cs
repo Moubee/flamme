@@ -167,15 +167,20 @@ internal sealed class CodeGenerationConsumer
         await Assert.That(diagnostics.Where(match => native || !match.Value.Contains(" IL"))).IsEmpty();
         await VerifyExecution(provider, native);
 
+        var targetDirectory = Path.Combine(IntermediateDirectory, $"release_{BuildTest.Framework}" + (native ? $"_{BuildTest.Rid}" : ""));
         if (_compiledFeatures)
         {
-            var interceptors = Directory.GetFiles(IntermediateDirectory, "ElsaFeatureInterceptors.g.cs", SearchOption.AllDirectories);
+            var interceptors = Directory.GetFiles(targetDirectory, "ElsaFeatureInterceptors.g.cs", SearchOption.AllDirectories);
             await Assert.That(interceptors.Length).IsEqualTo(provider == "Generated" ? 1 : 0);
             if (provider == "Generated")
             {
                 var generated = File.ReadAllText(interceptors.Single());
                 await Assert.That(generated).Contains("InterceptCreateModule");
-                await Assert.That(generated).Contains("BuildAvailable()");
+                await Assert.That(generated).Contains("FixedFeatureModule");
+                await Assert.That(generated).Contains(".Configure();");
+                await Assert.That(generated).Contains(".Apply();");
+                await Assert.That(generated).DoesNotContain("BuildAvailable");
+                await Assert.That(generated).DoesNotContain("UnselectedFeature");
             }
         }
 
@@ -197,7 +202,7 @@ internal sealed class CodeGenerationConsumer
         await Assert.That(properties.GetProperty("ElsaEffectiveExecutionMode").GetString()).IsEqualTo(provider);
 
         var generationEnabled = bool.Parse(properties.GetProperty("ElsaGenerateMetadata").GetString()!);
-        var markers = Directory.GetFiles(IntermediateDirectory, "ElsaGenerationBuildMarker.g.cs", SearchOption.AllDirectories);
+        var markers = Directory.GetFiles(targetDirectory, "ElsaGenerationBuildMarker.g.cs", SearchOption.AllDirectories);
         await Assert.That(markers.Length).IsEqualTo(generationEnabled ? 1 : 0);
         if (generationEnabled)
         {

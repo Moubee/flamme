@@ -94,7 +94,7 @@ public class ModulePackageTests
         var build = Path.Combine(evidence, "build");
         var templates = Path.Combine(BuildTest.Root, "test", "fixtures", "nativeaot", "module-consumer");
         File.Copy(Path.Combine(templates, "Consumer.csproj.in"), Path.Combine(consumer, ConsumerProject));
-        foreach (var file in new[] { "Program.cs", "ModuleConsumerScenarios.cs" })
+        foreach (var file in new[] { "Program.cs", "ModuleConsumerScenarios.cs", "ElsaHost.cs" })
             File.Copy(Path.Combine(templates, file), Path.Combine(consumer, file));
         var snapshot = Directory.CreateDirectory(Path.Combine(evidence, "source")).FullName;
         foreach (var file in Directory.EnumerateFiles(consumer))

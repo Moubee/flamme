@@ -34,9 +34,7 @@ public class ElsaFeature : FeatureBase
     public override void Configure()
     {
         Module
-            .UseWorkflows(workflows => workflows
-                .WithDefaultWorkflowExecutionPipeline()
-                .WithDefaultActivityExecutionPipeline())
+            .UseWorkflows(workflows => workflows.SetDefaultRuntimePipelines())
             .UseWorkflowManagement(management =>
             {
                 if (!DisableAutomaticActivityRegistration)

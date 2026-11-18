@@ -70,10 +70,10 @@ public static class RegistrationSource
     }
 
     private static string ProducerNamespace(string assemblyName, string adapterId) =>
-        "RegistrationCompiler.Generated.P" + Identifier(assemblyName) + ".A" + Identifier(adapterId);
+        "RegistrationCompiler.Generated.P" + EscapeIdentifier(assemblyName) + ".A" + EscapeIdentifier(adapterId);
 
-    // Escape underscores too, so a literal escape sequence and the character it represents stay distinct.
-    private static string Identifier(string value)
+    /// <summary>Escapes a name for use after a generated identifier prefix, including literal underscores.</summary>
+    public static string EscapeIdentifier(string value)
     {
         var result = new StringBuilder(value.Length);
         foreach (var c in value)

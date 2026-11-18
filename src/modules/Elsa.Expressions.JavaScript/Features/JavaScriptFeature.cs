@@ -56,6 +56,7 @@ public class JavaScriptFeature : FeatureBase
     public override void Configure()
     {
         Module.AddFastEndpointsAssembly<JavaScriptFeature>();
+        Module.UseWorkflowManagement(management => management.AddActivity<RunJavaScript>());
     }
 
     /// <inheritdoc />
@@ -89,9 +90,6 @@ public class JavaScriptFeature : FeatureBase
 
         // Handlers.
         Services.AddNotificationHandlersFrom<JavaScriptFeature>();
-
-        // Activities.
-        Module.UseWorkflowManagement(management => management.AddActivity<RunJavaScript>());
 
         // Type Script definitions.
         Services.AddFunctionDefinitionProvider<InputFunctionsDefinitionProvider>();

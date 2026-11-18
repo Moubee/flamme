@@ -29,14 +29,20 @@ public static class PipelineWorkflowsFeatureExtensions
     {
         return workflowsFeature.WithActivityExecutionPipeline(pipeline =>
         {
-            pipeline
-                .UseExceptionHandling()
-                .UseExecutionLogging()
-                .UseNotifications()
-                .UseLogPersistenceModeEvaluation()
-                .UseBackgroundActivityInvoker();
+            ConfigureDefaultActivityPipeline(pipeline);
 
             configurePipeline?.Invoke(pipeline);
         });
     }
+
+    /// <summary>Installs runtime defaults for pipelines the host has not overridden.</summary>
+    public static void SetDefaultRuntimePipelines(this WorkflowsFeature feature) =>
+        feature.SetDefaultExecutionPipelines(static pipeline => pipeline.UseDefaultPipeline(), ConfigureDefaultActivityPipeline);
+
+    private static void ConfigureDefaultActivityPipeline(IActivityExecutionPipelineBuilder pipeline) =>
+        pipeline.UseExceptionHandling()
+            .UseExecutionLogging()
+            .UseNotifications()
+            .UseLogPersistenceModeEvaluation()
+            .UseBackgroundActivityInvoker();
 }

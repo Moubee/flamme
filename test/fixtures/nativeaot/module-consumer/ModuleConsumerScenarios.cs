@@ -12,23 +12,25 @@ namespace Elsa.NativeAot.ModuleConsumer;
 
 internal static class ModuleConsumerScenarios
 {
+    internal static FeatureModuleExport ConsumerExport { get; } = new ExplicitFeatureCatalogBuilder()
+        .Add(module => new ConsumerFeature(module), new FeatureDescriptor("Consumer", "Fixture", "Consumer fixture"), [typeof(FoundationFeature)])
+        .CreateExport(new ModuleExportDescriptor("fixture.consumer", 1,
+            [new ModuleRequirement("fixture.foundation", 1, ["fixture.foundation-service"])], ["fixture.consumer-service"]));
+
     public static async Task RunAsync()
     {
         var firstState = new ProducerState();
         var secondState = new ProducerState();
-        var consumer = new ExplicitFeatureCatalogBuilder()
-            .Add(module => new ConsumerFeature(module), new FeatureDescriptor("Consumer", "Fixture", "Consumer fixture"), [typeof(FoundationFeature)])
-            .CreateExport(new ModuleExportDescriptor("fixture.consumer", 1,
-                [new ModuleRequirement("fixture.foundation", 1, ["fixture.foundation-service"])], ["fixture.consumer-service"]));
-        var catalog = new FeatureModuleCatalogBuilder()
-            .Add(consumer)
-            .Add(ProducerExports.Foundation)
-            .Add(ProducerExports.Foundation)
-            .Build();
+        var firstServices = new ServiceCollection();
+        var secondServices = new ServiceCollection();
+        var firstModule = ElsaHost.CreateModule(firstServices, CompositionPolicy.ValidatedV1);
+        var catalog = ((Module)firstModule).Catalog!;
+        var secondModule = new Module(secondServices, catalog, CompositionPolicy.ValidatedV1);
+        Require(ReferenceEquals(catalog, secondModule.Catalog), "Both hosts must reuse the same immutable catalog.");
         Require(firstState.Constructors == 0 && secondState.Constructors == 0, "Composing exports must not activate producer features.");
         Require(catalog.FeatureTypes.SequenceEqual([typeof(FoundationFeature), typeof(ConsumerFeature)]), "Module merge must put dependencies first and deduplicate the same export.");
-        var firstServices = ComposeHost(catalog, firstState, "first-host");
-        var secondServices = ComposeHost(catalog, secondState, "second-host");
+        ConfigureHost(firstModule, firstState, "first-host");
+        ConfigureHost(secondModule, secondState, "second-host");
         foreach (var state in new[] { firstState, secondState })
         {
             Require(state.Constructors == 1 && state.Configurations == 1 && state.Applications == 1, "Repeated exports must not repeat feature lifecycle callbacks.");
@@ -61,7 +63,7 @@ internal static class ModuleConsumerScenarios
         }
 
         var rejected = false;
-        try { new FeatureModuleCatalogBuilder().Add(consumer).Build(); }
+        try { new FeatureModuleCatalogBuilder().Add(ConsumerExport).Build(); }
         catch (InvalidOperationException exception)
         {
             rejected = exception.Message.Contains("fixture.foundation", StringComparison.Ordinal);
@@ -69,18 +71,15 @@ internal static class ModuleConsumerScenarios
         Require(rejected, "An uncovered producer requirement must fail with its module identity.");
     }
 
-    private static ServiceCollection ComposeHost(ExplicitFeatureCatalog catalog, ProducerState state, string value)
+    private static void ConfigureHost(IModule module, ProducerState state, string value)
     {
-        var services = new ServiceCollection();
-        var module = new Module(services, catalog, CompositionPolicy.ValidatedV1);
         module.Properties[ProducerState.StatePropertyKey] = state;
         module.Configure<FoundationFeature>(feature => feature.Value = value);
         module.Configure<ConsumerFeature>();
         module.Apply();
-        var metadata = services.Single(x => x.ServiceType == typeof(IInstalledFeatureRegistry)).ImplementationInstance as IInstalledFeatureRegistry;
+        var metadata = module.Services.Single(x => x.ServiceType == typeof(IInstalledFeatureRegistry)).ImplementationInstance as IInstalledFeatureRegistry;
         Require(metadata?.Find("Fixture.Foundation")?.DisplayName == "Foundation fixture", "Compiled producer metadata must survive package consumption.");
         Require(metadata?.Find("Fixture.Consumer")?.DisplayName == "Consumer fixture", "Consumer metadata must remain registered.");
-        return services;
     }
 
     private static async Task CheckScopesAsync(ServiceProvider provider, string expected)

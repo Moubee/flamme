@@ -5,7 +5,6 @@ using Elsa.Extensions;
 using Elsa.Features.Abstractions;
 using Elsa.Features.Attributes;
 using Elsa.Features.Contracts;
-using Elsa.Features.Implementations;
 using Elsa.Features.Services;
 using Elsa.NativeAot.Modules.Producer;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +17,9 @@ try
     var state = new ProducerState();
     module.Properties[ProducerState.StatePropertyKey] = state;
     var root = module.Configure(m => new ConsumerFeature(m, "caller"));
+#if FIXTURE_SELECT_UNSAFE_FEATURE
+    OptionalPlugin.OptionalFeatures.UseDynamicFeature(module);
+#endif
     module.Apply();
     module.Apply();
 
@@ -33,7 +35,7 @@ try
         installed.Find("Elsa.Consumer") is null || installed.Find("Elsa.Unselected") is not null)
         throw new InvalidOperationException($"Unexpected feature lifecycle: {string.Join(", ", state.Events)}");
 
-    var observed = ((Module)module).Catalog is null ? "Dynamic" : "Generated";
+    var observed = module is FixedFeatureModule ? "Generated" : "Dynamic";
     if (args.Length != 4 || args[0] != "--expect-provider" || args[1] != observed || args[2] != "--expect-native" ||
         bool.Parse(args[3]) == RuntimeFeature.IsDynamicCodeSupported || JsonSerializer.IsReflectionEnabledByDefault)
         throw new InvalidOperationException($"Unexpected provider or publication settings: {observed}.");

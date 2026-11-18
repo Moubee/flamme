@@ -68,7 +68,8 @@ internal enum HostFailure
     Host,
     Entry,
     Hook,
-    ManualSelection
+    ManualSelection,
+    AuthoredGeneratedBootstrap
 }
 
 internal sealed class HostContractResult
@@ -133,6 +134,11 @@ internal static class CompilerContract
         }
         else if (entrySyntax.Modifiers.Any(SyntaxKind.PartialKeyword) || !HasBody(entrySyntax))
             return Fail(HostFailure.Entry, "Manual bootstrap requires an ordinary authored internal static IModule CreateModule(IServiceCollection services, CompositionPolicy policy) method with a body.", SourceLocation(entry));
+
+        if (settings.IsCompiler && settings.IsGenerated)
+            return Fail(HostFailure.AuthoredGeneratedBootstrap,
+                "An authored ElsaHost bootstrap returning module exports cannot produce a fixed feature graph. Remove the partial ElsaHost bootstrap and call services.CreateModule(), ConfigureElsa(), or AddElsa() with build-time feature selections. For an explicitly authored export catalog, use ElsaHostBootstrap=Manual.",
+                SourceLocation(entry));
 
         var hookName = settings.IsGenerated ? "GetModuleExports" : "CreateDynamicModule";
         var hooks = host.GetMembers(hookName).OfType<IMethodSymbol>().Where(method => method.PartialDefinitionPart is null).ToArray();

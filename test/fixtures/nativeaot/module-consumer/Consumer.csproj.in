@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
+    <!-- Both JIT and native lanes exercise the producer's authored versioned exports. -->
+    <ElsaExecutionMode>Generated</ElsaExecutionMode>
+    <ElsaHostBootstrap>Manual</ElsaHostBootstrap>
     <NativeAotMode Condition="'$(NativeAotMode)' == ''">managed</NativeAotMode>
     <PublishAot Condition="'$(NativeAotMode)' == 'native'">true</PublishAot>
     <DefineConstants Condition="'$(NativeAotMode)' == 'native'">$(DefineConstants);PACKED_CONSUMER_NATIVE</DefineConstants>

@@ -7,7 +7,8 @@ The module system is the backbone of Elsa. It is a thin abstraction over `IServi
 | Type | File | Role |
 | --- | --- | --- |
 | `IModule` | [src/common/Elsa.Features/Services/IModule.cs](../../src/common/Elsa.Features/Services/IModule.cs) | Holds `IServiceCollection`, module properties, configured features, hosted service descriptors, and `Apply()`. |
-| `Module` | [src/common/Elsa.Features/Implementations/Module.cs](../../src/common/Elsa.Features/Implementations/Module.cs) | Concrete feature graph builder and applier. |
+| `Module` | [src/common/Elsa.Features/Implementations/Module.cs](../../src/common/Elsa.Features/Implementations/Module.cs) | Builds and applies the graph for managed discovery and authored catalogs. |
+| `FixedFeatureModule` | [FixedFeatureModule.cs](../../src/common/Elsa.Features/Services/FixedFeatureModule.cs) | Holds each generated host’s selected instances and executes its compiled lifecycle order. |
 | `IFeature` | [src/common/Elsa.Features/Services/IFeature.cs](../../src/common/Elsa.Features/Services/IFeature.cs) | Feature lifecycle contract. |
 | `FeatureBase` | [src/common/Elsa.Features/Abstractions/FeatureBase.cs](../../src/common/Elsa.Features/Abstractions/FeatureBase.cs) | Base class for most code-first features. |
 | `DependsOnAttribute` | [src/common/Elsa.Features/Attributes/DependsOn.cs](../../src/common/Elsa.Features/Attributes/DependsOn.cs) | Declares feature dependencies. |
@@ -23,7 +24,9 @@ Feature classes usually use three lifecycle methods:
 
 `Module.Apply()` topologically sorts configured features and dependencies, configures them once, filters conditional features, and remembers the hosted-service insertion point. It applies feature registrations, inserts newly queued hosted-service descriptors at that point, and publishes installed-feature metadata.
 
-A feature may introduce another feature from `Apply()`, for example by calling `Module.Configure<OtherFeature>()` directly or through a helper such as `AddActivity<T>()`. `Module.Apply()` keeps applying until no new features show up, so the introduced feature (and its dependencies) are configured and applied as well.
+In a managed-discovery or authored-catalog module, a feature may introduce another feature from `Apply()`, for example by calling `Module.Configure<OtherFeature>()` directly or through a helper such as `AddActivity<T>()`. `Module.Apply()` keeps applying until no new features show up, so the introduced feature (and its dependencies) are configured and applied as well.
+
+With `ElsaExecutionMode=Generated`, the host compiler selects the reachable features, evaluates their presence conditions, and orders their callbacks. On the first `Apply()`, the fixed module runs queued application configuration, then each selected feature’s `Configure()` and `ConfigureHostedServices()`. Each `Apply()` runs the selected features’ service registrations in the compiled order. `HasFeature<T>()` reports final membership from the moment the module is returned.
 
 ## Entry Points
 
@@ -46,7 +49,7 @@ Implementation links:
 - [ElsaFeature](../../src/modules/Elsa/Features/ElsaFeature.cs)
 - [AppFeature](../../src/modules/Elsa/Features/AppFeature.cs)
 
-`AppFeature` is a small wrapper that lets application-specific configuration run after the default `ElsaFeature` dependencies.
+The SDK includes `AppFeature` and its `ElsaFeature` dependency. In managed discovery, `AppFeature.Configure()` invokes the application callback after the defaults. In generated hosts, the fixed module queues SDK callbacks in registration order and runs them before feature configuration, so the host can supply a custom factory before a selected feature is constructed.
 
 ## Feature Dependencies
 
@@ -103,10 +106,11 @@ module and service collection. Catching a nested admission error inside a featur
 cannot resume a faulted module. Arbitrary callback effects are not rolled back.
 The existing default managed path retains its legacy failure behavior.
 
-Feature packages also supply compiler-generated registrations for the same
-lifecycle. A host enables these with `ElsaExecutionMode=Generated` and keeps
-its ordinary `AddElsa` and `UseX` calls. The [build selection guide](nativeaot-build-selection.md)
-covers automatic tooling delivery and locating a constructor factory in Rider.
+Generated hosts use ordinary `AddElsa` and `UseX` calls. Their compiler reads
+the selections exported by feature packages and emits calls to the individual
+constructor bindings that the host needs. Runtime options can configure any
+selected feature. A request for an absent feature fails before invoking its
+factory or configuration action. [Build selection and migration guide](nativeaot-build-selection.md)
 
 ### Versioned producer exports
 
@@ -170,4 +174,4 @@ When adding a new module, follow this shape:
 - Do not register services in extension methods when the module already has a feature class. Put service registration in `Apply()`.
 - Do not bypass dependencies with direct service provider access in unrelated modules. Add a contract and dependency if the relationship is real.
 - Use `TryAdd*` for overridable defaults and normal `Add*` for deliberate multiple registrations such as handlers, validators, and descriptors.
-- If a feature uses `Module.Configure<OtherFeature>()`, verify that the other feature is already a dependency or that optional behavior is intentional. Introducing a feature this way works from `Configure()` and from `Apply()`, but declaring `[DependsOn(typeof(OtherFeature))]` keeps the relationship visible and gives the dependency the normal ordering.
+- If a feature uses `Module.Configure<OtherFeature>()`, verify that the other feature is already a dependency or that optional behavior is intentional. Declare `[DependsOn(typeof(OtherFeature))]` when the other feature must run first. Place option contributions in `Configure()` so the receiving feature can use them when it registers services in `Apply()`.

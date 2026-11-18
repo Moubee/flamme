@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using RegistrationCompiler;
 
 namespace Elsa.CodeGeneration.Generators;
 
@@ -26,7 +26,7 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
             return settings.IsHost && settings.IsGenerated && settings.IsCompiler && settings.GenerateMetadata;
         });
         var roots = context.SyntaxProvider.CreateSyntaxProvider(
-                static (node, _) => node is BaseObjectCreationExpressionSyntax { ArgumentList.Arguments.Count: 1 or 2 } ||
+                static (node, _) => node is BaseObjectCreationExpressionSyntax { ArgumentList.Arguments.Count: >= 1 and <= 3 } ||
                     node is IdentifierNameSyntax name && name.Identifier.ValueText is "AddElsa" or "ConfigureElsa" or "CreateModule",
                 static (syntax, _) => syntax.Node)
             .Combine(enabled)
@@ -48,22 +48,26 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
                     output.ReportDiagnostic(site.Error);
             }
             if (sites.Any(site => site!.Attribute != null))
-                output.AddSource("ElsaFeatureInterceptors.g.cs", SourceText.From(Emit(compilation, sites), Encoding.UTF8));
+            {
+                var source = Generate(compilation, sites.Where(site => site!.Attribute != null).Select(site => site!).ToArray(), output);
+                output.AddSource("ElsaFeatureInterceptors.g.cs", SourceText.From(source, Encoding.UTF8));
+            }
         });
     }
 
     private static RootSite? Observe(SemanticModel model, SyntaxNode node, CancellationToken token)
     {
-        // An authored legacy dynamic hook owns its choice of discovery. Other source in the
-        // same application still receives compiled registrations at ordinary creation roots.
+        // The bootstrap generator already diagnoses an authored partial entry in Generated
+        // mode. Avoid a second message inside its Dynamic-only implementation.
         if (node.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault()?.Identifier.ValueText == "CreateDynamicModule"
-            && model.GetEnclosingSymbol(node.SpanStart, token)?.ContainingType?.ToDisplayString() == CompilerContract.HostMetadataName)
+            && model.GetEnclosingSymbol(node.SpanStart, token)?.ContainingType is { } host
+            && host.ToDisplayString() == CompilerContract.HostMetadataName
+            && host.GetMembers("CreateModule").OfType<IMethodSymbol>().Any(method => method.IsPartialDefinition))
             return null;
         if (node is BaseObjectCreationExpressionSyntax creation)
         {
             if (model.GetSymbolInfo(creation, token).Symbol is IMethodSymbol ctor &&
-                IsType(ctor.ContainingType, "Elsa.Features", "Elsa.Features.Implementations.Module") &&
-                ctor.Parameters.All(parameter => !IsType(parameter.Type, "Elsa.Features", "Elsa.Features.Services.ExplicitFeatureCatalog")))
+                IsType(ctor.ContainingType, "Elsa.Features", "Elsa.Features.Implementations.Module"))
             {
                 var location = creation is ObjectCreationExpressionSyntax explicitCreation
                     ? explicitCreation.Type.GetLocation() : creation.NewKeyword.GetLocation();
@@ -85,6 +89,11 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
         if (model.GetSymbolInfo((SyntaxNode?)invocation ?? expression, token).Symbol is not IMethodSymbol method)
             return null;
         method = method.ReducedFrom ?? method;
+        var catalog = method.Parameters.Any(parameter => IsType(parameter.Type, "Elsa.Features", "Elsa.Features.Services.ExplicitFeatureCatalog"));
+        if (method.Name == "CreateModule" && (IsType(method.ContainingType, "Elsa.Features", "Elsa.Features.Services.FeatureModuleCatalogBuilder") ||
+            catalog && IsType(method.ContainingType, "Elsa.Features", "Elsa.Extensions.DependencyInjectionExtensions")) ||
+            method.Name is "AddElsa" or "ConfigureElsa" && catalog && IsType(method.ContainingType, "Elsa", "Elsa.Extensions.ModuleExtensions"))
+            return new RootSite(Diagnostic.Create(CompilerDiagnostics.MutableComposition, name.GetLocation(), method.Name));
         if (!method.IsExtensionMethod || !IsRoot(method))
             return null;
         if (invocation == null)
@@ -97,7 +106,7 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
         var locationData = model.GetInterceptableLocation(invocation, token);
         return locationData == null ? new RootSite(Diagnostic.Create(CompilerDiagnostics.IndirectCreation, name.GetLocation(), method.Name)) :
             new RootSite(method.Name, method.Name == "CreateModule" && method.Parameters.Length == 2,
-                locationData.GetInterceptsLocationAttributeSyntax());
+                locationData.GetInterceptsLocationAttributeSyntax(), invocation);
     }
 
     private static bool IsRoot(IMethodSymbol method)
@@ -113,13 +122,15 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
     private static bool IsType(ITypeSymbol symbol, string assembly, string qualifiedName) =>
         symbol.ContainingAssembly?.Name == assembly && symbol.ToDisplayString() == qualifiedName;
 
-    private static string Emit(Compilation compilation, ImmutableArray<RootSite?> sites)
+    private static string Generate(Compilation compilation, RootSite[] sites, SourceProductionContext output)
     {
-        var imports = RegistrationSource.GetImports(compilation, ElsaFeatureGenerator.AdapterId, "builder", includeLocalProducer: true);
+        var producers = FixedProducerModel.Read(compilation, output.CancellationToken);
+        var planner = new FixedHostPlanner(compilation, producers, output);
+        var plans = planner.Build(sites);
         var source = new StringBuilder("// <auto-generated/>\n#nullable enable\n");
-        foreach (var directive in imports.ExternAliases)
-            source.Append(directive).Append('\n');
-        source.Append("""
+        foreach (var directive in producers.ExternAliases)
+            source.AppendLine(directive);
+        source.AppendLine("""
             namespace System.Runtime.CompilerServices
             {
                 [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
@@ -128,51 +139,89 @@ public sealed class ElsaCompositionHostGenerator : IIncrementalGenerator
                     public InterceptsLocationAttribute(int version, string data) { }
                 }
             }
-
             namespace Elsa.CodeGeneration.Interceptors
             {
                 using global::Elsa.Extensions;
                 using global::Elsa.Features.Models;
                 using global::Elsa.Features.Services;
                 using global::Microsoft.Extensions.DependencyInjection;
-
                 internal static class ElsaFeatureInterceptors
                 {
-                    internal static readonly ExplicitFeatureCatalog Catalog = BuildCatalog();
-
-                    private static ExplicitFeatureCatalog BuildCatalog()
-                    {
-                        var builder = new ExplicitFeatureCatalogBuilder();
-
             """);
-        foreach (var call in imports.Calls)
-            source.Append("            ").Append(call).Append('\n');
-        source.Append("            return builder.BuildAvailable();\n        }\n");
-        foreach (var group in sites.Where(site => site!.Attribute != null).Select(site => site!)
-                     .GroupBy(site => (site.Name, site.HasPolicy)).OrderBy(group => group.Key.Name, StringComparer.Ordinal)
-                     .ThenBy(group => group.Key.HasPolicy))
+        for (var n = 0; n < plans.Count; n++)
         {
-            foreach (var site in group.OrderBy(site => site.Attribute, StringComparer.Ordinal))
-                source.Append("        ").Append(site.Attribute).Append('\n');
-            var (name, hasPolicy) = group.Key;
-            var create = name == "CreateModule";
-            source.Append("        internal static IModule Intercept").Append(name)
-                .Append("(this IServiceCollection services")
-                .Append(create ? (hasPolicy ? ", CompositionPolicy policy" : "") : ", global::System.Action<IModule>? configure").Append(")\n")
-                .Append("            => services.").Append(name)
-                .Append(create ? "(Catalog" : "(configure, Catalog")
-                .Append(hasPolicy ? ", policy" : "").Append(");\n");
+            var plan = plans[n];
+            var name = "Plan" + n;
+            var slots = SlotNames(plan.Features);
+            source.Append("        private sealed class ").Append(name).AppendLine(" : FixedFeatureModule")
+                .AppendLine("        {");
+            for (var i = 0; i < plan.Features.Count; i++)
+                source.Append("            private readonly FixedFeatureSlot ").Append(slots[i]).AppendLine(";");
+            source.Append("            internal ").Append(name).AppendLine("(IServiceCollection services) : base(services)")
+                .AppendLine("            {");
+            for (var i = 0; i < plan.Features.Count; i++)
+                source.Append("                ").Append(slots[i]).Append(" = ").Append(plan.Features[i].Bridge).AppendLine("(this);");
+            foreach (var hosted in plan.HostedServices)
+                source.Append("                ").Append(hosted).AppendLine("(this);");
+            source.AppendLine("                SealDeclarations();").AppendLine("            }");
+            foreach (var phase in new[] { "Configure", "Apply" })
+            {
+                source.Append("            protected override void ").Append(phase).AppendLine("Features()")
+                    .AppendLine("            {");
+                for (var i = 0; i < plan.Features.Count; i++)
+                    source.Append("                ").Append(slots[i]).Append('.').Append(phase).AppendLine("();");
+                source.AppendLine("            }");
+            }
+            source.AppendLine("        }");
+            var needsSdk = plan.Sites.Any(site => site.Name != "CreateModule");
+            if (needsSdk)
+                source.Append("        private static readonly global::System.Func<IServiceCollection, FixedFeatureModule> Create")
+                    .Append(name).Append(" = static services => new ").Append(name).AppendLine("(services);");
+            foreach (var group in plan.Sites.GroupBy(site => (site.Name, site.HasPolicy)))
+            {
+                foreach (var site in group)
+                    source.Append("        ").AppendLine(site.Attribute);
+                var (method, hasPolicy) = group.Key;
+                var create = method == "CreateModule";
+                source.Append("        internal static IModule Intercept").Append(method).Append(n)
+                    .Append("(this IServiceCollection services")
+                    .Append(create ? (hasPolicy ? ", CompositionPolicy policy" : "") : ", global::System.Action<IModule>? configure").AppendLine(")")
+                    .Append("            => ");
+                if (create)
+                    source.Append("new ").Append(name).AppendLine("(services);");
+                else
+                    source.Append("services.").Append(method)
+                        .Append("(configure, Create").Append(name).AppendLine(");");
+            }
         }
-        return source.Append("    }\n}\n").ToString();
+        return source.AppendLine("    }").AppendLine("}").ToString();
     }
 
-    private sealed class RootSite
+    private static List<string> SlotNames(IReadOnlyList<FixedProducerFeature> features)
     {
-        internal RootSite(string name, bool hasPolicy, string attribute) => (Name, HasPolicy, Attribute) = (name, hasPolicy, attribute);
+        var used = new HashSet<string>(StringComparer.Ordinal);
+        var names = new List<string>(features.Count);
+        foreach (var feature in features)
+        {
+            var type = feature.Type.Name;
+            var prefix = "_" + char.ToLowerInvariant(type[0]) + type.Substring(1);
+            var name = prefix;
+            for (var suffix = 2; !used.Add(name); suffix++)
+                name = prefix + suffix;
+            names.Add(name);
+        }
+        return names;
+    }
+
+    internal sealed class RootSite
+    {
+        internal RootSite(string name, bool hasPolicy, string attribute, InvocationExpressionSyntax invocation)
+            => (Name, HasPolicy, Attribute, Invocation) = (name, hasPolicy, attribute, invocation);
         internal RootSite(Diagnostic error) => Error = error;
         internal string? Name { get; }
         internal bool HasPolicy { get; }
         internal string? Attribute { get; }
+        internal InvocationExpressionSyntax? Invocation { get; }
         internal Diagnostic? Error { get; }
     }
 }

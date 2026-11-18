@@ -28,19 +28,16 @@ compile inputs. `Auto` resolves to Generated for a native publication and Dynami
 for other builds. `Generated` can also execute using JIT. `Dynamic` with
 `PublishAot=true` is a build error. Metadata generation is a separate switch.
 
-For ordinary feature composition, the producer generator discovers feature
-declarations and the generated host intercepts its application-source module
-creation calls. Hosts with an authored partial module entry point can continue
-to use it.
-The Dynamic body invokes the managed hook. The Generated body composes explicitly
-selected versioned exports into an existing feature catalog. The mode does not
-select the composition policy or alter feature lifecycle behavior. A manual
-entry point can use the same compile time selection with explicit or prebuilt
-exports. The analyzer validates authored entry points and selected hooks.
+Ordinary generated hosts resolve their entire feature graph during compilation.
+Feature producers publish typed bindings and the selections made by package
+helpers. The host emits the selected bindings and dependency-ordered lifecycle
+calls behind its application-source module creation calls. The default managed
+discovery path and deliberately handwritten module exports retain their own
+lifecycle contracts. See the [fixed graph decision](2026-11-18-fixed-feature-graphs.md).
 
 ## Consequences
 
-Hosts can use the same catalog composition under JIT and NativeAOT.
+Hosts can execute the same generated feature plan under JIT and NativeAOT.
 Application-local choices stay local to the app. Shared imports or global
 properties can also configure source dependencies. Repository source builds
 apply the same compiler settings to feature projects and hosts through shared

@@ -42,11 +42,12 @@ public class CodeGenerationTests
 #endif
 
     [Test]
-    public async Task UnselectedDynamicCodeProducerExposesItsNativeRequirement()
+    public async Task OnlySelectingTheOptionalProducerRootsItsDynamicConstructor()
     {
         var consumer = await CodeGenerationConsumer.Create("optional-dynamic-plugin", compiledFeatures: true, unsafeProducer: true);
         await consumer.Verify("Generated", ["-p:ElsaExecutionMode=Generated"]);
-        string[] native = ["-p:PublishAot=true", $"-p:RuntimeIdentifier={BuildTest.Rid}"];
+        await consumer.Verify("Generated", ["-p:ElsaExecutionMode=Generated"], native: true);
+        string[] native = ["-p:PublishAot=true", $"-p:RuntimeIdentifier={BuildTest.Rid}", "-p:FixtureHostCase=FIXTURE_SELECT_UNSAFE_FEATURE"];
         await consumer.RestoreLocked(native);
         var publish = await consumer.Build(native, native: true);
         await Assert.That(publish.ExitCode).IsNotEqualTo(0);
@@ -65,7 +66,7 @@ public class CodeGenerationTests
     [Test]
     public async Task ModeAndGenerationSettingsAreCaseInsensitive()
     {
-        var consumer = await CodeGenerationConsumer.Create("case-insensitive");
+        var consumer = await CodeGenerationConsumer.Create("case-insensitive", compiledFeatures: true);
         await consumer.Verify("Generated", ["-p:ElsaExecutionMode=gEnErAtEd", "-p:ElsaGenerateMetadata=TrUe"]);
     }
 
@@ -81,7 +82,7 @@ public class CodeGenerationTests
     [Test]
     public async Task LateDirectoryBuildTargetsSelectsGeneratedBootstrap()
     {
-        var consumer = await CodeGenerationConsumer.Create("late-app-setting", lateMode: true);
+        var consumer = await CodeGenerationConsumer.Create("late-app-setting", lateMode: true, compiledFeatures: true);
         await consumer.Verify("Generated", []);
     }
 
@@ -134,7 +135,8 @@ public class CodeGenerationTests
     }
 
     [Test]
-    [Arguments("FIXTURE_MISSING_EXPORT_HOOK", "ELSAGEN003")]
+    [Arguments("FIXTURE_MISSING_EXPORT_HOOK", "ELSAGEN013")]
+    [Arguments("FIXTURE_EMPTY_EXPORTS", "ELSAGEN013")]
     [Arguments("FIXTURE_NULLABLE_ENTRY", "ELSAGEN002")]
     public async Task InvalidCompilerBootstrapReportsItsDiagnostic(string hostCase, string diagnostic)
     {
@@ -164,14 +166,11 @@ public class CodeGenerationTests
     }
 
     [Test]
-    [Arguments(false)]
-    [Arguments(true)]
-    public async Task EmptyExportsFailRuntimeAdmission(bool manual)
+    public async Task ManualEmptyExportsFailRuntimeAdmission()
     {
-        var consumer = await CodeGenerationConsumer.Create($"empty-exports-manual-{manual}", manual);
-        string[] settings = ["-p:ElsaExecutionMode=Generated", "-p:FixtureHostCase=FIXTURE_EMPTY_EXPORTS"];
-        if (manual)
-            settings = [.. settings, "-p:ElsaGenerateMetadata=false", "-p:FixtureIncludeGenerator=false"];
+        var consumer = await CodeGenerationConsumer.Create("empty-exports-manual", manual: true);
+        string[] settings = ["-p:ElsaExecutionMode=Generated", "-p:FixtureHostCase=FIXTURE_EMPTY_EXPORTS",
+            "-p:ElsaGenerateMetadata=false", "-p:FixtureIncludeGenerator=false"];
 
         await consumer.RestoreLocked(settings);
         (await consumer.Build(settings)).EnsureSuccess();
@@ -184,7 +183,7 @@ public class CodeGenerationTests
     [Test]
     public async Task IncrementalBuildSwitchesProvidersInTheSameOutputDirectory()
     {
-        var consumer = await CodeGenerationConsumer.Create("mode-transitions");
+        var consumer = await CodeGenerationConsumer.Create("mode-transitions", compiledFeatures: true);
         foreach (var mode in new[] { "Dynamic", "Generated", "Dynamic" })
         {
             string[] settings = [$"-p:ElsaExecutionMode={mode}", "-p:PublishAot=false"];

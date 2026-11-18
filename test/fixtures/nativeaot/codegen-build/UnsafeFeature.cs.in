@@ -5,6 +5,11 @@ using Elsa.Features.Services;
 
 namespace OptionalPlugin;
 
+public static class OptionalFeatures
+{
+    public static void UseDynamicFeature(IModule module) => module.Configure<DynamicFeature>();
+}
+
 internal sealed class DynamicFeature : FeatureBase
 {
     [RequiresDynamicCode("This optional plugin requires runtime code generation.")]

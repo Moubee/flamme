@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
-using RegistrationCompiler;
 
 namespace Elsa.CodeGeneration.Generators;
 
@@ -14,27 +13,19 @@ namespace Elsa.CodeGeneration.Generators;
 [Generator(LanguageNames.CSharp)]
 public sealed class ElsaFeatureGenerator : IIncrementalGenerator
 {
-    internal const string AdapterId = "Elsa.Features";
-    internal const string BuilderType = "global::Elsa.Features.Services.ExplicitFeatureCatalogBuilder";
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Classes without a base list cannot introduce an IFeature implementation. For partial
-        // classes the declaration carrying the base list sees attributes from all its parts.
-        var declarations = context.SyntaxProvider.CreateSyntaxProvider(
-                static (node, _) => node is TypeDeclarationSyntax { BaseList: not null },
-                static (ctx, ct) => ctx.SemanticModel.GetDeclaredSymbol((TypeDeclarationSyntax)ctx.Node, ct) as INamedTypeSymbol)
-            .Where(static symbol => symbol is { TypeKind: TypeKind.Class, IsAbstract: false });
         var requests = context.SyntaxProvider.CreateSyntaxProvider(
                 static (node, _) => node is InvocationExpressionSyntax invocation && IsRegistrationName(invocation),
                 static (ctx, ct) => GetRequest(ctx, ct))
             .Where(static request => request is not null);
         var settings = context.AnalyzerConfigOptionsProvider.Select(static (options, _) => CompilerSettings.Read(options.GlobalOptions));
-        var inputs = context.CompilationProvider.Combine(settings).Combine(declarations.Collect()).Combine(requests.Collect());
+        var inputs = context.CompilationProvider.Combine(settings).Combine(requests.Collect());
         context.RegisterSourceOutput(inputs, static (ctx, input) =>
         {
-            var (((compilation, configuration), types), calls) = input;
+            var ((compilation, configuration), calls) = input;
             if (configuration.GenerateMetadata)
-                Emit(ctx, compilation, configuration, types, calls);
+                Emit(ctx, compilation, configuration, calls);
         });
     }
 
@@ -128,79 +119,29 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
     }
 
     private static void Emit(SourceProductionContext context, Compilation compilation, CompilerSettings settings,
-        ImmutableArray<INamedTypeSymbol?> declarations, ImmutableArray<Request?> requests)
+        ImmutableArray<Request?> requests)
     {
         var feature = compilation.GetTypeByMetadataName("Elsa.Features.Services.IFeature");
         if (feature is null)
             return;
 
-        var binding = new FeatureBinding(compilation, feature);
-        var pending = new Queue<INamedTypeSymbol>();
-        var processed = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-        var statements = new SortedSet<string>(StringComparer.Ordinal);
-        foreach (var type in declarations)
-            if (type is not null && binding.IsFeature(type) && FeatureBinding.IsClosed(type))
-                pending.Enqueue(type);
-
-        var generatedHost = settings.IsHost && settings.IsGenerated && settings.IsCompiler;
-        foreach (var request in requests)
+        var model = FixedProducerModel.Read(compilation, context.CancellationToken);
+        if (settings.IsHost && settings.IsGenerated && settings.IsCompiler)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            if (request is null)
-                continue;
-            var type = request.Type;
-            // A referenced non-generic feature's metadata belongs to its defining assembly.
-            // Its helper may legitimately refer to internal dependency types hidden from us.
-            if (!request.HostedService && !type.IsGenericType && !SymbolEqualityComparer.Default.Equals(type.ContainingAssembly, compilation.Assembly))
+            var binding = new FeatureBinding(compilation, feature);
+            foreach (var request in requests)
             {
-                if (generatedHost)
-                {
-                    var issue = RegistrationSource.HasProducer(type.ContainingAssembly, AdapterId)
-                        ? binding.FeatureError(type, type.ContainingAssembly)
-                        : $"compile '{type.ContainingAssembly.Name}' with the Elsa feature generator";
-                    if (issue is not null)
-                        ReportIfCompiled(request, issue);
-                }
-                continue;
+                if (request is null || request.HostedService || !IsCompiledRoot(request, compilation, context.CancellationToken))
+                    continue;
+                var reason = binding.FeatureError(request.Type, request.Type.ContainingAssembly);
+                if (reason is null && !model.Features.Any(f => SymbolEqualityComparer.Default.Equals(f.Type, request.Type)))
+                    reason = $"compile '{request.Type.ContainingAssembly.Name}' with the Elsa feature generator";
+                if (reason is not null)
+                    context.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InaccessibleRequest, request.Syntax.GetLocation(),
+                        request.Requester, request.Type, reason));
             }
-
-            var reason = request.HostedService ? binding.HostedServiceError(type) : binding.FeatureError(type, compilation.Assembly);
-            if (reason is not null)
-            {
-                ReportIfCompiled(request, reason);
-                continue;
-            }
-            if (request.HostedService)
-                statements.Add($"target.AddHostedService<{binding.TypeName(type)}>();");
-            else if (type.IsGenericType)
-                pending.Enqueue(type);
         }
-
-        while (pending.Count > 0)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            var type = pending.Dequeue();
-            if (!processed.Add(type) || binding.FeatureError(type, compilation.Assembly) is not null)
-                continue;
-            var (strong, conditional) = binding.Dependencies(type);
-            statements.Add(binding.Registration(type, strong, conditional));
-            // The producer that sees the closed specialization can name it, including when
-            // the open feature was defined in a different assembly.
-            foreach (var dependency in strong.Concat(conditional))
-                if (dependency.IsGenericType && FeatureBinding.IsClosed(dependency))
-                    pending.Enqueue(dependency);
-        }
-
-        if (statements.Count == 0 && !(settings.IsHost && settings.IsGenerated))
-            return;
-        var source = RegistrationSource.EmitProducer(compilation.AssemblyName!, AdapterId, BuilderType, statements, binding.ExternAliases);
-        context.AddSource("ElsaFeatureRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
-
-        void ReportIfCompiled(Request request, string reason)
-        {
-            if (generatedHost && IsCompiledRoot(request, compilation, context.CancellationToken))
-                context.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InaccessibleRequest, request.Syntax.GetLocation(),
-                    request.Requester, request.Type, reason));
-        }
+        if (model.EmitProducer() is {} source)
+            context.AddSource("ElsaFeatureRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 }

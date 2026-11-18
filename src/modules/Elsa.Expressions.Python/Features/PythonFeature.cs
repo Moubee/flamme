@@ -40,6 +40,12 @@ public class PythonFeature : FeatureBase
     }
 
     /// <inheritdoc />
+    public override void Configure()
+    {
+        Module.AddActivitiesFrom<PythonFeature>();
+    }
+
+    /// <inheritdoc />
     public override void Apply()
     {
         Services.Configure(PythonOptions);
@@ -54,9 +60,6 @@ public class PythonFeature : FeatureBase
         // Handlers.
         Services.AddNotificationHandlersFrom<PythonFeature>();
 
-        // Activities.
-        Module.AddActivitiesFrom<PythonFeature>();
-        
         // UI property handlers.
         Services.AddScoped<IPropertyUIHandler, RunPythonOptionsProvider>();
     }

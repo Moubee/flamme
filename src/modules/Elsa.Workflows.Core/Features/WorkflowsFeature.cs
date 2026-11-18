@@ -82,22 +82,33 @@ public class WorkflowsFeature : FeatureBase
     /// </summary>
     public Func<IServiceProvider, ILoggerStateGenerator<ActivityExecutionContext>> ActivityLoggerStateGenerator { get; set; } = sp => new ActivityLoggerStateGenerator();
 
+    private Action<IWorkflowExecutionPipelineBuilder>? _workflowPipeline;
+    private Action<IActivityExecutionPipelineBuilder>? _activityPipeline;
+
     /// <summary>
     /// A delegate to configure the <see cref="IWorkflowExecutionPipeline"/>.
     /// </summary>
-    public Action<IWorkflowExecutionPipelineBuilder> WorkflowExecutionPipeline { get; set; } = builder => builder
-        .UseExceptionHandling()
-        .UseDefaultActivityScheduler();
+    public Action<IWorkflowExecutionPipelineBuilder> WorkflowExecutionPipeline
+    {
+        get => _workflowPipeline ?? (static builder => builder.UseExceptionHandling().UseDefaultActivityScheduler());
+        set => _workflowPipeline = value;
+    }
 
     /// <summary>
     /// A delegate to configure the <see cref="IActivityExecutionPipeline"/>.
     /// </summary>
-    public Action<IActivityExecutionPipelineBuilder> ActivityExecutionPipeline { get; set; } = builder => builder
-        .UseLogging()
-        .UseExceptionHandling()
-        .UseExecutionLogging()
-        .UseNotifications()
-        .UseDefaultActivityInvoker();
+    public Action<IActivityExecutionPipelineBuilder> ActivityExecutionPipeline
+    {
+        get => _activityPipeline ?? (static builder => builder.UseLogging().UseExceptionHandling().UseExecutionLogging().UseNotifications().UseDefaultActivityInvoker());
+        set => _activityPipeline = value;
+    }
+
+    /// <summary>Supplies host defaults for pipelines that application code has not configured.</summary>
+    public void SetDefaultExecutionPipelines(Action<IWorkflowExecutionPipelineBuilder> workflow, Action<IActivityExecutionPipelineBuilder> activity)
+    {
+        _workflowPipeline ??= workflow;
+        _activityPipeline ??= activity;
+    }
 
     /// <summary>
     /// Fluent method to set <see cref="StandardInStreamProvider"/>.

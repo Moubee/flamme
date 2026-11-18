@@ -5,6 +5,7 @@
             Provides common features to modules that expose API endpoints.
         </Description>
         <RootNamespace>Elsa</RootNamespace>
+        <UseElsaSourceTooling>true</UseElsaSourceTooling>
         <PackageTags>elsa api common</PackageTags>
     </PropertyGroup>
 

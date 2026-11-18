@@ -36,3 +36,4 @@
 * [2026-11-17. Compile time selection of Elsa composition](2026-11-17-elsa-compiler-build-selection.md)
 * [2026-11-17. Explicit feature composition with independent admission policies](2026-11-17-explicit-feature-composition.md)
 * [2026-11-17. Versioned module exports before feature activation](2026-11-17-versioned-module-exports.md)
+* [2026-11-18. Compile generated hosts with fixed feature graphs](2026-11-18-fixed-feature-graphs.md)

@@ -27,6 +27,8 @@ public class CompositionRootDiagnosticTests
                     Func<IModule> create = services.CreateModule;
                     _ = new Module(services, catalog);
                     _ = services.CreateModule(catalog);
+                    _ = FeatureModuleCatalogBuilder.CreateModule(services, [], default);
+                    _ = new Module(services, catalog, Elsa.Features.Models.CompositionPolicy.ValidatedV1);
                     Func<IModule> supported = () => services.CreateModule();
                     _ = new Other().CreateModule();
                 }
@@ -46,12 +48,17 @@ public class CompositionRootDiagnosticTests
         var driver = CompilerTest.CreateDriver(true, new ElsaCompositionHostGenerator()).Run(input, out _);
         var result = driver.GetRunResult();
         var diagnostics = result.Diagnostics.OrderBy(diagnostic => diagnostic.Location.SourceSpan.Start).ToArray();
-        await Assert.That(diagnostics.Length).IsEqualTo(3);
+        await Assert.That(diagnostics.Length).IsEqualTo(8);
         foreach (var (index, id, token, start) in new[]
                  {
                      (0, "ELSAGEN005", "Module", source.IndexOf("Module(services)", StringComparison.Ordinal)),
                      (1, "ELSAGEN005", "new", source.IndexOf("new(services)", StringComparison.Ordinal)),
-                     (2, "ELSAGEN006", "CreateModule", source.IndexOf("CreateModule;", StringComparison.Ordinal))
+                     (2, "ELSAGEN006", "CreateModule", source.IndexOf("CreateModule;", StringComparison.Ordinal)),
+                     (3, "ELSAGEN005", "Module", source.IndexOf("Module(services, catalog)", StringComparison.Ordinal)),
+                     (4, "ELSAGEN014", "CreateModule", source.IndexOf("CreateModule(catalog)", StringComparison.Ordinal)),
+                     (5, "ELSAGEN014", "CreateModule", source.IndexOf("CreateModule(services, []", StringComparison.Ordinal)),
+                     (6, "ELSAGEN005", "Module", source.IndexOf("Module(services, catalog,", StringComparison.Ordinal)),
+                     (7, "ELSAGEN005", "Module", source.LastIndexOf("Module(services)", StringComparison.Ordinal))
                  })
         {
             await Assert.That(diagnostics[index].Id).IsEqualTo(id);

@@ -25,19 +25,6 @@ public sealed class ExplicitFeatureCatalogBuilder
     }
 
     /// <summary>
-    /// Records a compiled feature declaration. A caller can supply a factory for a feature
-    /// with no default module constructor. Dependencies become requirements upon selection.
-    /// </summary>
-    public ExplicitFeatureCatalogBuilder AddAvailable<TFeature>(Func<IModule, TFeature>? factory, FeatureDescriptor metadata,
-        IEnumerable<Type>? dependencies = null, IEnumerable<Type>? dependencyOf = null) where TFeature : class, IFeature
-    {
-        ArgumentNullException.ThrowIfNull(metadata);
-        _features.Add(new(typeof(TFeature), factory, metadata.Name, metadata.Namespace, metadata.DisplayName, metadata.Description,
-            Array.AsReadOnly(dependencies?.ToArray() ?? []), Array.AsReadOnly(dependencyOf?.ToArray() ?? [])));
-        return this;
-    }
-
-    /// <summary>
     /// Adds an explicitly constructed feature identified by a closed runtime type.
     /// </summary>
     public ExplicitFeatureCatalogBuilder Add(Type featureType, Func<IModule, IFeature> factory, FeatureDescriptor metadata,
@@ -81,17 +68,6 @@ public sealed class ExplicitFeatureCatalogBuilder
             ? entry.Dependencies
             : throw new InvalidOperationException($"Missing catalog entry for feature {type}."));
         return new ExplicitFeatureCatalog(entries, CollectHostedServices());
-    }
-
-    /// <summary>
-    /// Makes the imported bindings available for runtime selection. Multiple producers can
-    /// observe the same closed generic feature or hosted-service registration.
-    /// </summary>
-    public ExplicitFeatureCatalog BuildAvailable()
-    {
-        var features = _features.DistinctBy(entry => entry.Type).ToDictionary(entry => entry.Type);
-        var hostedServices = _hostedServices.DistinctBy(entry => entry.Key).ToDictionary();
-        return new ExplicitFeatureCatalog(features, hostedServices, compiledDeclarations: true);
     }
 
     /// <summary>
@@ -147,5 +123,5 @@ public sealed class ExplicitFeatureCatalogBuilder
     }
 }
 
-internal sealed record FeatureRegistration(Type Type, Func<IModule, IFeature>? Factory, string Name, string Namespace,
+internal sealed record FeatureRegistration(Type Type, Func<IModule, IFeature> Factory, string Name, string Namespace,
     string DisplayName, string Description, IReadOnlyList<Type> Dependencies, IReadOnlyList<Type> DependencyOf);

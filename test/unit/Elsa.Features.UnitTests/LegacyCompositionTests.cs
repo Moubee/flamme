@@ -13,6 +13,23 @@ namespace Elsa.Features.UnitTests;
 public class LegacyCompositionTests
 {
     [Test]
+    public async Task LegacyConstructorFailureAllowsRetryWithACustomFactory()
+    {
+        var module = new Module(new ServiceCollection());
+        var failure = await Assert.That(() => module.Configure<ThrowingFeature>()).Throws<System.Reflection.TargetInvocationException>();
+        await Assert.That(failure!.InnerException).IsTypeOf<FormatException>();
+        var retry = module.Configure(m => new ThrowingFeature(m, 1));
+        await Assert.That(module.Configure<ThrowingFeature>()).IsSameReferenceAs(retry);
+    }
+
+    private sealed class ThrowingFeature : FeatureBase
+    {
+        public ThrowingFeature(IModule module) : base(module) => throw new FormatException();
+        public ThrowingFeature(IModule module, int value) : base(module) => Value = value;
+        public int Value { get; }
+    }
+
+    [Test]
     public async Task Configure_RetainsCustomFactoryInstanceAndRunsEveryConfigurationAction()
     {
         var module = new Module(new ServiceCollection());

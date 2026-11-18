@@ -10,12 +10,13 @@ library against the Features API alone, reference `Elsa.Features` directly.
 The Features package delivers the generator, diagnostics and MSBuild settings
 to the C# compiler through NuGet. The analyzer assemblies are build assets.
 
-A library build compiles its existing `IFeature` implementations into a helper
-in the library assembly. Pack the library normally and keep its dependency on
-Features available to consumers. A host compiled against that package can
-import the helper directly from its reference metadata. Rebuild older feature
-packages to give them generated helpers. Existing explicit tooling references
-can be removed when upgrading to a Features package with bundled tooling.
+A library build emits a constructor binding for each supported closed `IFeature`
+and publishes the feature selections made by its configuration helpers in assembly
+metadata. The host compiler can read this information from a NuGet reference
+assembly. Pack the library normally and keep its dependency on Features available
+to consumers. Rebuild feature packages compiled with the earlier catalog
+generator. Existing explicit tooling references can be removed when upgrading to
+a Features package with bundled tooling.
 
 In this repository, libraries under `src/modules` and hosts under `src/apps`
 get the same tooling from shared build settings. A new feature module in that
@@ -64,27 +65,41 @@ services.ConfigureElsa(elsa => elsa.UseWorkflows());
 services.AddElsa();
 ```
 
-The generator connects calls to the producer helpers at compile time. The first
-`AddElsa` or `ConfigureElsa` on a service collection selects the provider.
-Subsequent calls share that module and must use the same provider instance.
-On a concrete `Module`, `Catalog` exposes the selected catalog and is null for managed discovery.
-`services.CreateModule()` and `services.CreateModule(policy)` each create a
-fresh module. An app-source `new Module(services)` or a delegate to an ordinary
-creation method gets a diagnostic in a generated host. A previously compiled
-wrapper can accept a catalog explicitly. Precompiled `UseX(IModule)` helpers
-receive the module selected by their caller.
+The host compiler determines the complete set of features and their order. Each
+generated module owns its feature instances and calls their configuration and
+application methods in that order. A package reference alone selects zero roots.
+The ordinary SDK path includes `AppFeature` and its dependencies. A direct
+`services.CreateModule()` starts with the selections made for that module.
+`HasFeature<T>()` reports final membership as soon as the module is returned.
 
-The generated producer helper supplies closed feature constructor calls, inherited
-dependency and installed-feature metadata, and typed hosted-service descriptors.
-These bindings are available as soon as the host references the library. The
-application still selects features, supplies options and custom factories, and
-runs their callbacks. Use `Configure<T>(factory, action)` when construction
-requires other arguments. Feature classes added in the host participate too.
+Select features unconditionally through `UseX`, `Use<T>` or `Configure<T>`.
+Use runtime values for feature options. The following host reads scripting
+options at startup.
 
-The native acceptance consumer uses only Features. A reachable constructor can
-introduce a native compiler requirement even for a feature the application
-never selects. Keep optional features with dynamic-code requirements in
-separately referenced libraries when native consumers need to omit them.
+```csharp
+services.AddElsa(elsa => elsa.UseCSharp(csharp =>
+    csharp.CSharpOptions += options => configuration.GetSection("Scripting:CSharp").Bind(options)));
+```
+
+A runtime flag that changes feature membership must move to a build-time choice
+such as `#if`, or the application must choose between separately compiled host
+entry points. The generator reports `ELSAGEN012` for unsupported runtime
+selection, and `ELSAGEN011` for an invalid fixed graph. Calls inside
+`Configure` and `Apply` can configure a selected feature. When opaque code
+requests an absent type, the fixed module throws
+before invoking the factory or configuration action. A custom factory for a
+selected type still receives the actual host module.
+
+`ConfigureElsa` and `AddElsa` share a module for the same service collection.
+`CreateModule` returns a fresh module on each invocation. Keep related registrations
+on a visibly shared service collection so the compiler can associate them.
+Application code can pass a configured module into a previously compiled helper.
+Module creation inside a precompiled helper must itself use a generated plan.
+
+The native acceptance consumer tests both sides of constructor reachability.
+An unselected optional producer with a dynamic-code constructor can stay
+referenced while the application publishes. Selecting that feature exposes
+the constructor's native compilation requirement.
 [Run the packed consumer](nativeaot-probes.md#run-the-tests)
 
 ## Inspect a generated factory in Rider
@@ -93,69 +108,39 @@ Open the project that declares the feature and expand **Dependencies → Source
 Generators → ElsaFeatureGenerator → ElsaFeatureRegistrations.g.cs**. For
 `IdentityFeature`, open `Elsa.Identity`. A generated server uses
 `ElsaFeatureInterceptors.g.cs` in the host project to call the producer helpers.
+For example, the web server's generated `ConfigureFeatures()` contains these
+consecutive calls. Its `ApplyFeatures()` calls `Apply()` in the same order.
+
+```csharp
+_workflowsFeature.Configure();
+_flowchartFeature.Configure();
+_workflowRuntimeFeature.Configure();
+```
+
 If the constructor usage popup reports a result outside **Solution**, expand the
 search scope to **All Places**. For an installed NuGet module, follow the helper
 call from the host interceptor into the compiled module in Rider.
 [Rider source generator navigation](https://www.jetbrains.com/help/rider/Source_generators.html)
 
-## Continue using authored module exports
+## Migrate an authored bootstrap
 
-An existing host with an authored partial entry point can keep its versioned
-module exports. [Versioned module exports](nativeaot-module-exports.md)
+If the build reports `ELSAGEN013`, replace the compiler-implemented `ElsaHost.CreateModule(services, policy)` and
+its `GetModuleExports()` hook with the ordinary `services.CreateModule(policy)`
+call and typed feature selections in application source. The policy for a fixed
+graph must be known at build time. Keep module-specific configuration in its
+existing feature classes. To inspect the resulting feature order, open the
+generated `ElsaFeatureInterceptors.g.cs` in the host project.
 
-This example uses managed discovery in Dynamic builds and an explicitly selected
-producer export in Generated builds.
+The former `AddAvailable` and `BuildAvailable` registration APIs have been
+removed. A generated host uses ordinary feature selections. A handwritten
+catalog can use `Add` and `Build` to validate its explicitly declared graph.
+Calling a mutable catalog creation overload from compiler-generated mode
+reports `ELSAGEN014`.
 
-```csharp
-using Elsa.Extensions;
-using Elsa.Features.Models;
-using Elsa.Features.Services;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Elsa.CodeGeneration;
-
-internal static partial class ElsaHost
-{
-    internal static partial IModule CreateModule(
-        IServiceCollection services, CompositionPolicy policy);
-
-    private static IModule CreateDynamicModule(
-        IServiceCollection services, CompositionPolicy policy)
-        => services.CreateModule(policy);
-
-    private static FeatureModuleExport[] GetModuleExports()
-        => [ProducerExports.Foundation];
-}
-```
-
-Call `ElsaHost.CreateModule(services, policy)` and configure and apply the module
-as usual. The C# generator implements the partial method with one dispatch path.
-Generated mode builds a catalog from the selected exports and passes it and the
-requested policy to the same runtime lifecycle used for explicit composition.
-It requires a nonempty typed export selection. Catalog and module validation
-reject incompatible versions, missing bindings, and ownership conflicts.
-
-The compiler assets check the host shape and the hook required by the selected
-mode. The generator reports missing compiler hooks during source generation.
-The build reports missing compiler assets and treats asset load failures as errors.
-A project that disables generation can use `ElsaHostBootstrap=Manual` and provide
-an ordinary `CreateModule` method with the same signature. Use the compilation
-symbols to return the selected call with the original services and policy:
-
-```csharp
-internal static IModule CreateModule(IServiceCollection services, CompositionPolicy policy)
-{
-#if ELSA_GENERATED
-    return FeatureModuleCatalogBuilder.CreateModule(services, GetModuleExports(), policy);
-#else
-    return CreateDynamicModule(services, policy);
-#endif
-}
-```
-
-The analyzer validates this return shape. The shared factory checks the concrete
-exports and builds the catalog before constructing the module. Supply an explicit
-export for each selected capability.
+Applications that explicitly manage versioned catalogs can continue to own
+their entire entry point with `ElsaHostBootstrap=Manual`. That handwritten
+API has its own composition and admission contract.
+[Versioned module exports](nativeaot-module-exports.md)
 
 ## Run the package validation
 

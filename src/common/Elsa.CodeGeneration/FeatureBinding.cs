@@ -11,7 +11,7 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
     private readonly INamedTypeSymbol? _dependencyOf = compilation.GetTypeByMetadataName("Elsa.Features.Attributes.DependencyOfAttribute");
     private readonly INamedTypeSymbol? _displayName = compilation.GetTypeByMetadataName("System.ComponentModel.DisplayNameAttribute");
     private readonly INamedTypeSymbol? _description = compilation.GetTypeByMetadataName("System.ComponentModel.DescriptionAttribute");
-    private readonly INamedTypeSymbol? _module = compilation.GetTypeByMetadataName("Elsa.Features.Implementations.Module");
+    private readonly INamedTypeSymbol? _module = compilation.GetTypeByMetadataName("Elsa.Features.Services.IModule");
     private readonly INamedTypeSymbol? _hostedService = compilation.GetTypeByMetadataName("Microsoft.Extensions.Hosting.IHostedService");
 
     internal bool IsFeature(INamedTypeSymbol type) => type.AllInterfaces.Contains(feature, SymbolEqualityComparer.Default);
@@ -86,30 +86,53 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
         return value.Value as ITypeSymbol;
     }
 
-    internal string Registration(INamedTypeSymbol type, INamedTypeSymbol[] strong, INamedTypeSymbol[] conditional)
+    internal string Declaration(INamedTypeSymbol type)
     {
         var name = type.MetadataName.Replace("Feature", string.Empty);
         var displayName = ReadStringAttribute(type, _displayName) ?? name;
         var description = ReadStringAttribute(type, _description) ?? string.Empty;
         var metadata = $"new global::Elsa.Features.Models.FeatureDescriptor({Literal(name)}, \"Elsa\", {Literal(displayName)}, {Literal(description)})";
-        return $"target.AddAvailable<{TypeName(type)}>({Factory(type)}, {metadata}, {TypeArray(strong)}, {TypeArray(conditional)});";
+        return $"module.Declare<{TypeName(type)}>({Factory(type)}, {metadata})";
     }
 
-    private string Factory(INamedTypeSymbol type)
+    internal string Factory(INamedTypeSymbol type)
     {
-        // Activator receives the concrete Module. Select the most specific applicable public
-        // parameter, even if an overload accepts object or IModule. A custom factory can still
-        // supply a feature with no usable default constructor.
+        var constructor = DefaultConstructor(type);
+        return constructor is null ? "null" :
+            $"static module => new {TypeName(type)}(({TypeName(constructor.Parameters[0].Type)})module)";
+    }
+
+    // The bridge is the API a generated host calls. Forward the default constructor's
+    // requirements there so publishing a host checks precisely the selected features.
+    internal IEnumerable<string> ConstructorRequirements(INamedTypeSymbol type)
+    {
+        if (DefaultConstructor(type) is not { } constructor) yield break;
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var attribute in constructor.GetAttributes().Concat(type.GetAttributes()))
+        {
+            var name = attribute.AttributeClass?.ToDisplayString();
+            if (name is not ("System.Diagnostics.CodeAnalysis.RequiresDynamicCodeAttribute"
+                or "System.Diagnostics.CodeAnalysis.RequiresUnreferencedCodeAttribute"
+                or "System.Diagnostics.CodeAnalysis.RequiresAssemblyFilesAttribute") || !seen.Add(name)) continue;
+            var reason = attribute.ConstructorArguments.FirstOrDefault().Value as string;
+            var message = Literal(reason is null ? $"Constructs {type}." : $"{type}: {reason}");
+            var url = attribute.NamedArguments.FirstOrDefault(pair => pair.Key == "Url").Value.Value as string;
+            yield return $"[global::{name}({message}{(url is null ? "" : ", Url = " + Literal(url))})]";
+        }
+    }
+
+    internal IMethodSymbol? DefaultConstructor(INamedTypeSymbol type)
+    {
+        // Fixed plans supply IModule. A caller can override construction for a feature
+        // that has no usable default constructor.
         if (_module is null)
-            return "null";
+            return null;
         var constructors = type.InstanceConstructors
             .Where(ctor => ctor.DeclaredAccessibility == Accessibility.Public && ctor.Parameters.Length == 1 &&
                            ctor.Parameters[0].RefKind == RefKind.None && Assignable(_module, ctor.Parameters[0].Type))
             .ToArray();
         var best = constructors.FirstOrDefault(ctor => constructors.All(other => Assignable(ctor.Parameters[0].Type, other.Parameters[0].Type)));
-        if (best is null || HasUnsatisfiedRequiredMembers(best))
-            return "null";
-        return $"static module => new {TypeName(type)}(({TypeName(best.Parameters[0].Type)})module)";
+        return best is null || HasUnsatisfiedRequiredMembers(best) ? null : best;
     }
 
     private static bool HasUnsatisfiedRequiredMembers(IMethodSymbol ctor)
@@ -127,9 +150,6 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
         var conversion = compilation.ClassifyCommonConversion(from, to);
         return conversion.IsIdentity || conversion.IsImplicit && conversion.IsReference;
     }
-
-    private string TypeArray(IReadOnlyCollection<INamedTypeSymbol> types) => types.Count == 0 ? "null" :
-        "new global::System.Type[] { " + string.Join(", ", types.Select(type => $"typeof({TypeName(type)})")) + " }";
 
     private static string Literal(string value) => SymbolDisplay.FormatLiteral(value, quote: true);
 

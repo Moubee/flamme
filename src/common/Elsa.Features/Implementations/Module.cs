@@ -1,9 +1,7 @@
 using Elsa.Extensions;
-using Elsa.Features.Contracts;
 using Elsa.Features.Models;
 using Elsa.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace Elsa.Features.Implementations;
@@ -20,7 +18,7 @@ public class Module : IModule
     private Exception? _fault;
     private Type? _activeFeature;
     private bool _applyInProgress;
-    private bool TracksFailures => _provider is ExplicitFeatureCatalog { CompiledDeclarations: false } || _policy == CompositionPolicy.ValidatedV1;
+    private bool TracksFailures => _provider is ExplicitFeatureCatalog || _policy == CompositionPolicy.ValidatedV1;
     private Dictionary<Type, IFeature> _features = new();
     private readonly HashSet<IFeature> _configuredFeatures = new();
     private readonly List<HostedServiceDescriptor> _hostedServiceDescriptors = new();
@@ -240,24 +238,9 @@ public class Module : IModule
             select feature;
     }
 
-    // Registers the configured hosted services in order of priority, starting at the specified index.
-    private void RegisterHostedServices(int index)
-    {
-        var appendIndex = Services.Count;
-
-        foreach (var hostedServiceDescriptor in _hostedServiceDescriptors.OrderBy(x => x.Order))
-            Services.TryAddEnumerable(_provider.CreateHostedServiceDescriptor(hostedServiceDescriptor.Type));
-
-        // TryAddEnumerable appends, so move what it added back to where hosted services configured through this module belong. Doing it this way rather
-        // than inserting directly keeps the de-duplication behaviour of TryAddEnumerable, which also considers what the features registered themselves.
-        var appendedDescriptors = Services.Skip(appendIndex).ToList();
-
-        for (var i = 0; i < appendedDescriptors.Count; i++)
-            Services.RemoveAt(appendIndex);
-
-        for (var i = 0; i < appendedDescriptors.Count; i++)
-            Services.Insert(index + i, appendedDescriptors[i]);
-    }
+    private void RegisterHostedServices(int index) =>
+        FeatureServiceRegistration.RegisterHostedServices(Services, index,
+            _hostedServiceDescriptors.OrderBy(entry => entry.Order).Select(entry => _provider.CreateHostedServiceDescriptor(entry.Type)));
 
     // Returns the features that have not been applied yet, sorted so that dependencies are applied before the features that depend on them.
     private List<IFeature> GetFeaturesPendingApply(IReadOnlySet<IFeature> appliedFeatures)
@@ -267,7 +250,7 @@ public class Module : IModule
 
         // Sorting pulls in dependencies that are not pending themselves, so filter those out again.
         return pendingFeatureTypes
-            .TSort(GetDeclaredDependencyTypes)
+            .TSort(_provider.GetDependencies)
             .Where(pendingFeatureTypeLookup.Contains)
             .Select(x => _features[x])
             .Distinct()
@@ -306,28 +289,14 @@ public class Module : IModule
     {
         var featureTypes = _features.Keys.ToHashSet();
         var featureTypesWithDependencies = featureTypes.Concat(featureTypes.SelectMany(GetDependencyTypes)).ToHashSet();
-        return featureTypesWithDependencies.TSort(GetDeclaredDependencyTypes).ToHashSet();
-    }
-
-    private IReadOnlyList<Type> GetDeclaredDependencyTypes(Type type)
-    {
-        return _provider.GetDependencies(type);
+        return featureTypesWithDependencies.TSort(_provider.GetDependencies).ToHashSet();
     }
 
     // Recursively get dependency types.
     private IEnumerable<Type> GetDependencyTypes(Type type)
     {
-        // Explicit exports validate their entire graph when built. Compiled declarations
-        // can include unrelated features, so validate only the requested closure here.
-        if (_provider is ExplicitFeatureCatalog { CompiledDeclarations: true })
-            FeatureGraph.Sort([type], GetDeclaredDependencyTypes);
-        return Enumerate(type);
-
-        IEnumerable<Type> Enumerate(Type root)
-        {
-            var dependencies = GetDeclaredDependencyTypes(root);
-            return dependencies.Concat(dependencies.SelectMany(Enumerate));
-        }
+        var dependencies = _provider.GetDependencies(type).ToList();
+        return dependencies.Concat(dependencies.SelectMany(GetDependencyTypes));
     }
 
     private IFeature ConstructFeature(Type type, Func<IModule, IFeature> factory)
@@ -341,46 +310,14 @@ public class Module : IModule
             _activeFeature = type;
             var feature = factory(this);
             EnsureUsable();
-            if (_provider is ExplicitFeatureCatalog { CompiledDeclarations: false } && (feature is null || feature.GetType() != type))
+            if (_provider is ExplicitFeatureCatalog && (feature is null || feature.GetType() != type))
                 throw new InvalidOperationException($"Factory for feature {type} returned {feature?.GetType().ToString() ?? "null"}; an exact feature identity is required.");
             return feature!;
-        }
-        catch (MissingFeatureConstructorException exception)
-        {
-            var path = FindRequestPath(type, previous);
-            throw new MissingMethodException($"Feature admission {FeatureGraph.Format(path)}: {exception.Message}", exception);
         }
         finally
         {
             _activeFeature = previous;
             _constructingFeatures.Remove(type);
-        }
-    }
-
-    // Reconstruct the path only on failure. The normal lifecycle keeps its existing ordering.
-    private IReadOnlyList<Type> FindRequestPath(Type target, Type? caller)
-    {
-        if (caller != null && caller != target)
-            return [caller, target];
-
-        var seen = new HashSet<Type>();
-        var path = new List<Type>();
-        foreach (var root in _features.Keys)
-            if (Visit(root))
-                return path;
-        return [target];
-
-        bool Visit(Type current)
-        {
-            if (!seen.Add(current))
-                return false;
-            path.Add(current);
-            if (current == target)
-                return true;
-            if (_provider is ExplicitFeatureCatalog catalog && catalog.AvailableDependencies(current).Any(Visit))
-                return true;
-            path.RemoveAt(path.Count - 1);
-            return false;
         }
     }
 
@@ -529,12 +466,6 @@ public class Module : IModule
         }
     }
 
-    private void PublishInstalledFeatures()
-    {
-        var registry = new InstalledFeatureRegistry();
-        foreach (var feature in _features.Values)
-            registry.Add(_provider.GetDescriptor(feature.GetType()));
-        Services.AddSingleton<IInstalledFeatureRegistry>(registry);
-        Services.AddSingleton<IInstalledFeatureProvider>(sp => new InstalledFeatureProvider(sp.GetRequiredService<IInstalledFeatureRegistry>()));
-    }
+    private void PublishInstalledFeatures() =>
+        FeatureServiceRegistration.PublishInstalledFeatures(Services, _features.Values.Select(feature => _provider.GetDescriptor(feature.GetType())));
 }

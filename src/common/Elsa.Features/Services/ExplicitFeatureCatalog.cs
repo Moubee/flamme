@@ -6,16 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Elsa.Features.Services;
 
 /// <summary>
-/// Immutable feature metadata and factories shared by explicit and generated composition.
+/// Immutable feature metadata and factories for authored module exports and explicit composition.
 /// </summary>
 public sealed class ExplicitFeatureCatalog : IFeatureProvider
 {
     private readonly FrozenDictionary<Type, FeatureRegistration> _features;
     private readonly FrozenDictionary<Type, ServiceDescriptor> _hostedServices;
 
-    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices, bool compiledDeclarations = false)
+    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices)
     {
-        CompiledDeclarations = compiledDeclarations;
         FeatureTypes = features.Keys.ToImmutableArray();
         _features = features.ToFrozenDictionary();
         HostedServiceTypes = hostedServices.Keys.ToImmutableArray();
@@ -32,24 +31,9 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
     /// </summary>
     public IReadOnlyList<Type> HostedServiceTypes { get; }
 
-    internal bool CompiledDeclarations { get; }
-
-    internal IReadOnlyList<Type> AvailableDependencies(Type type) =>
-        _features.TryGetValue(type, out var feature) ? feature.Dependencies : [];
-
     IFeature IFeatureProvider.CreateFeature(Type type, IModule module)
     {
-        var factory = Get(type).Factory ?? throw new MissingFeatureConstructorException(type);
-        IFeature feature;
-        try
-        {
-            feature = factory(module);
-        }
-        catch (Exception exception) when (CompiledDeclarations)
-        {
-            // Activator.CreateInstance wraps exceptions from the selected constructor.
-            throw new System.Reflection.TargetInvocationException(exception);
-        }
+        var feature = Get(type).Factory(module);
         if (feature is null || feature.GetType() != type)
             throw new InvalidOperationException($"Factory for feature {type} returned {feature?.GetType().ToString() ?? "null"}; an exact feature identity is required.");
         return feature;
@@ -72,6 +56,3 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
         ? entry
         : throw new InvalidOperationException($"Missing catalog entry for feature {type}.");
 }
-
-internal sealed class MissingFeatureConstructorException(Type featureType) : MissingMethodException(
-    $"Feature {featureType} has no supported public module constructor. Supply a factory with Configure<T>(factory, configure).");

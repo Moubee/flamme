@@ -39,6 +39,12 @@ public class SchedulingFeature : FeatureBase
     public Func<IServiceProvider, ICronParser> CronParser { get; set; } = sp => sp.GetRequiredService<CronosCronParser>();
 
     /// <inheritdoc />
+    public override void Configure()
+    {
+        Module.Configure<WorkflowManagementFeature>(management => management.AddActivitiesFrom<SchedulingFeature>());
+    }
+
+    /// <inheritdoc />
     public override void Apply()
     {
         Services
@@ -71,7 +77,5 @@ public class SchedulingFeature : FeatureBase
             options.RegisterTypeAlias(typeof(TimerBookmarkPayload), nameof(TimerBookmarkPayload));
             options.RegisterTypeAlias(typeof(TimerTriggerPayload), nameof(TimerTriggerPayload));
         });
-
-        Module.Configure<WorkflowManagementFeature>(management => management.AddActivitiesFrom<SchedulingFeature>());
     }
 }
