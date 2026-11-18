@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Remove="Fody;ConfigureAwait.Fody;JetBrains.Annotations" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" />
+    <ProjectReference Include="../RegistrationCompiler/RegistrationCompiler.csproj" PrivateAssets="all" />
     <AdditionalFiles Include="../Elsa.CodeGeneration.Analyzers/AnalyzerReleases.Shipped.md" Link="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="../Elsa.CodeGeneration.Analyzers/AnalyzerReleases.Unshipped.md" Link="AnalyzerReleases.Unshipped.md" />
     <None Remove="../../../icon.png" />
@@ -28,7 +29,7 @@
   </ItemGroup>
   <Target Name="IncludeCompilerAssemblyInPackage">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(TargetPath);$(TargetDir)RegistrationCompiler.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 </Project>

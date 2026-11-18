@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <WeaverConfiguration />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Remove="Fody;ConfigureAwait.Fody;JetBrains.Annotations" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <ProjectReference Include="../../../src/common/RegistrationCompiler/RegistrationCompiler.csproj" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

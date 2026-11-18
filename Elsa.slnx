@@ -67,6 +67,7 @@
     <Project Path="src/common/Elsa.CodeGeneration.Analyzers/Elsa.CodeGeneration.Analyzers.csproj" />
     <Project Path="src/common/Elsa.CodeGeneration.Build/Elsa.CodeGeneration.Build.csproj" />
     <Project Path="src/common/Elsa.CodeGeneration/Elsa.CodeGeneration.csproj" />
+    <Project Path="src/common/RegistrationCompiler/RegistrationCompiler.csproj" />
     <Project Path="src/common/Elsa.Api.Common/Elsa.Api.Common.csproj" />
     <Project Path="src/common/Elsa.Features/Elsa.Features.csproj" />
     <Project Path="src/common/Elsa.Mediator/Elsa.Mediator.csproj" />
@@ -190,6 +191,9 @@
   <Folder Name="/test/fixtures/">
     <File Path="test/fixtures/Directory.Build.props" />
     <Project Path="test/fixtures/Elsa.NativeAot.Modules.Producer/Elsa.NativeAot.Modules.Producer.csproj" />
+    <Project Path="test/fixtures/TaskRunner.Consumer/TaskRunner.Consumer.csproj" />
+    <Project Path="test/fixtures/TaskRunner.Generator/TaskRunner.Generator.csproj" />
+    <Project Path="test/fixtures/TaskRunner.Producer/TaskRunner.Producer.csproj" />
   </Folder>
   <Folder Name="/test/unit/">
     <File Path="test/unit/Directory.Build.props" />
