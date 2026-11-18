@@ -34,9 +34,32 @@ internal sealed partial class FixedProducerModel
     private static bool IsAppConfigurator(IPropertySymbol property) => property.Name == "Configurator" &&
         property.ContainingAssembly.Name == "Elsa" && property.ContainingType.ToDisplayString() == "Elsa.Features.AppFeature";
 
+    internal static bool RequiresVirtualDispatch(IMethodSymbol method) => !method.IsStatic && !method.IsSealed && !method.ContainingType.IsSealed &&
+        (method.IsVirtual || method.IsOverride || method.IsAbstract || method.ContainingType.TypeKind == TypeKind.Interface);
+
     internal static bool CallsVirtualGetter(IPropertyReferenceOperation property, IMethodSymbol method) =>
-        method.MethodKind == MethodKind.PropertyGet && (method.IsVirtual || method.IsOverride || method.IsAbstract) && !method.IsSealed && !method.ContainingType.IsSealed &&
+        method.MethodKind == MethodKind.PropertyGet && RequiresVirtualDispatch(method) &&
         property.Syntax is not MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax };
+
+    internal static IMethodSymbol? BindVirtualMethod(IMethodSymbol method, INamedTypeSymbol receiver)
+    {
+        var implementation = FindOverride(receiver, MethodKey(method));
+        return implementation is { IsGenericMethod: true } ? implementation.ConstructedFrom.Construct(method.TypeArguments.ToArray()) : implementation;
+    }
+
+    private static IMethodSymbol? FindOverride(INamedTypeSymbol receiver, string target)
+    {
+        for (var type = receiver; type != null; type = type.BaseType)
+            foreach (var member in type.GetMembers().OfType<IMethodSymbol>())
+                for (var parent = member; parent != null; parent = parent.OverriddenMethod)
+                    if (MethodKey(parent) == target) return member;
+
+        foreach (var contract in receiver.AllInterfaces)
+            foreach (var member in contract.GetMembers().OfType<IMethodSymbol>())
+                if (MethodKey(member) == target && receiver.FindImplementationForInterfaceMember(member) is IMethodSymbol implementation)
+                    return implementation.ContainingType.TypeKind == TypeKind.Interface ? implementation : FindOverride(receiver, MethodKey(implementation));
+        return null;
+    }
 
     private static bool IsRegistrationName(InvocationExpressionSyntax call) => (call.Expression switch
     {
@@ -170,6 +193,10 @@ internal sealed partial class FixedProducerModel
             var key = MethodKey(method);
             if (!visiting.Add(key)) yield break;
             var summary = Read(method);
+            // Lifecycle entry points have no parameters. A virtual override that consumes
+            // a callback needs its caller's delegate, which the virtual-call metadata omits.
+            if (summary.ConfigurationParameters.Length != 0 || summary.ConditionalConfigurationParameters.Length != 0)
+                yield return new FixedProducerSelector { Error = $"cannot bind the configuration callback invoked by virtual feature method '{method}'. Move the selection into the override or use a non-virtual helper" };
             yield return conditional ? new FixedProducerSelector
             {
                 ConditionalFeatures = Types(summary.Features.Concat(summary.ConditionalFeatures)), Hosted = summary.Hosted, Error = summary.Error
@@ -188,15 +215,6 @@ internal sealed partial class FixedProducerModel
                 }
             }
             visiting.Remove(key);
-        }
-
-        private static IMethodSymbol? FindOverride(INamedTypeSymbol feature, string target)
-        {
-            for (var type = feature; type is not null; type = type.BaseType)
-                foreach (var member in type.GetMembers().OfType<IMethodSymbol>())
-                    for (var parent = member; parent is not null; parent = parent.OverriddenMethod)
-                        if (MethodKey(parent) == target) return member;
-            return null;
         }
 
         private void Visit(IOperation op, Effects result, bool conditional)
@@ -342,32 +360,42 @@ internal sealed partial class FixedProducerModel
                 fullMethod.ContainingAssembly.Name == "Elsa.Features")
                 result.AddResolution(new SlotResolution(null, conditional));
             if (fullMethod.ContainingType.ContainingAssembly.Name == "Elsa.Features" &&
-                fullMethod.ContainingType.ToDisplayString() is "Elsa.Features.Services.IModule" or "Elsa.Features.Abstractions.FeatureBase")
+                (fullMethod.ContainingType.ToDisplayString() == "Elsa.Features.Services.IModule" ||
+                 fullMethod.ContainingType.ToDisplayString() == "Elsa.Features.Abstractions.FeatureBase" && !call.IsVirtual))
                 return;
             if (!model.IsCompositionMethod(fullMethod) && method.MethodKind != MethodKind.LocalFunction)
                 return;
             if (fullMethod.Name == "Use" && fullMethod.ContainingType.ToDisplayString() == "Elsa.Extensions.DependencyInjectionExtensions"
                 && fullMethod.ContainingAssembly.Name == "Elsa.Features")
                 return;
-            if (call.IsVirtual && call.Instance is IInstanceReferenceOperation && model.CompositionType(method.ContainingType))
-            {
-                result.AddVirtualCall(method, conditional);
-                return;
-            }
-            AddCallEffects(method, call.Arguments, result, conditional);
+            VisitMethod(method, call.IsVirtual, call.Instance, call.Arguments, result, conditional);
         }
 
-        private void AddCallEffects(IMethodSymbol method, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool constructing = false)
+        private void VisitMethod(IMethodSymbol method, bool isVirtual, IOperation? instance, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional)
+        {
+            var foreign = instance != null && instance is not IInstanceReferenceOperation;
+            if (!isVirtual || !RequiresVirtualDispatch(method))
+                AddCallEffects(method, arguments, result, conditional, foreignReceiver: foreign);
+            else if (instance?.Type is INamedTypeSymbol { IsSealed: true } receiver && BindVirtualMethod(method, receiver) is {} implementation)
+                AddCallEffects(implementation, arguments, result, conditional, foreignReceiver: foreign);
+            else if (instance is IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance } && model.CompositionType(method.ContainingType))
+                result.AddVirtualCall(method, conditional);
+            else
+                result.Error ??= $"cannot bind virtual feature method '{method}' to a concrete receiver";
+        }
+
+        private void AddCallEffects(IMethodSymbol method, IEnumerable<IArgumentOperation> arguments, Effects result, bool conditional, bool constructing = false, bool foreignReceiver = false)
         {
             var effects = Read(method);
-            if (constructing && (effects.VirtualCalls.Length != 0 || effects.ConditionalVirtualCalls.Length != 0))
+            if ((constructing || foreignReceiver) && effects.HasVirtualCalls)
             {
-                result.Error ??= $"cannot bind virtual feature selections during construction of '{method.ContainingType}'";
+                result.Error ??= $"cannot bind nested virtual feature selections in '{method}' to the feature being configured";
                 return;
             }
             result.Add(effects, conditional, (name, guarded) =>
             {
-                var argument = arguments.FirstOrDefault(arg => arg.Parameter?.Name == name);
+                var parameter = method.Parameters.FirstOrDefault(parameter => parameter.Name == name);
+                var argument = parameter == null ? null : arguments.FirstOrDefault(arg => arg.Parameter?.Ordinal == parameter.Ordinal);
                 if (argument != null) Callback(argument.Value, result, guarded);
                 // A local function can invoke a callback captured from its enclosing method.
                 else if (method.MethodKind == MethodKind.LocalFunction)
@@ -394,7 +422,7 @@ internal sealed partial class FixedProducerModel
                 // Generated SDK calls queue their known callbacks on FixedFeatureModule.
                 // AppFeature's managed callback stays null, and direct writes are diagnosed.
                 case IPropertyReferenceOperation property when IsAppConfigurator(property.Property): break;
-                case IMethodReferenceOperation group: result.Add(Read(group.Method), conditional); break;
+                case IMethodReferenceOperation group: VisitMethod(group.Method, group.IsVirtual, group.Instance, [], result, conditional); break;
                 case IParameterReferenceOperation parameter:
                     result.AddResolution(new SlotResolution(null, conditional, callback: parameter.Parameter.Name));
                     break;

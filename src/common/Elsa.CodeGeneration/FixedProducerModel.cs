@@ -34,6 +34,7 @@ internal sealed partial class FixedProducerSelector
     internal string? ReturnOwner { get; set; }
     internal VirtualCall[] VirtualCalls { get; set; } = [];
     internal VirtualCall[] ConditionalVirtualCalls { get; set; } = [];
+    internal bool HasVirtualCalls => VirtualCalls.Length != 0 || ConditionalVirtualCalls.Length != 0;
     public string? Error { get; internal set; }
     internal INamedTypeSymbol[] Hosted { get => ConcreteTypes(HostedTypes); set => HostedTypes = ConcreteTerms(value); }
 }

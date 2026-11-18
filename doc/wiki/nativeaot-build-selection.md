@@ -132,6 +132,11 @@ for each module when its parameters would otherwise target different modules.
 The compiler reports `ELSAGEN012` if it cannot assign a helper's effects to
 the correct module. Passing the same module through several parameters is supported.
 
+When a host configurator or feature lifecycle method calls an overridable method,
+the compiler needs to know which implementation runs, which features it selects,
+and which configuration callbacks it invokes. If the build reports unresolved virtual dispatch, move the
+feature selection into the host configurator or a nonvirtual helper.
+
 A source or package helper can forward its method type parameter directly.
 For example, `Select<T>(IModule module)` can call `module.Use<T>()`. Calling
 `Select<Wrapper<int>>(module)` selects the closed feature `Wrapper<int>`.

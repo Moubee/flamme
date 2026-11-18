@@ -930,6 +930,170 @@ public class FeatureRegistrationTests
     }
 
     [Test]
+    [Arguments("invoke")]
+    [Arguments("conditional")]
+    [Arguments("store")]
+    public async Task VirtualLifecycleOverrideChecksWhetherTheCallbackRuns(string behavior)
+    {
+        const string library = """
+            using System;
+            using Elsa.Extensions;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule module) : FeatureBase(module);
+            public abstract class Foundation(IModule module) : FeatureBase(module)
+            {
+                public override void Configure() => Install(m => m.Use<Leaf>());
+                protected abstract void Install(Action<IModule> configure);
+            }
+            """;
+        var body = behavior switch
+        {
+            "invoke" => "callback(Module);",
+            "conditional" => "if (Module.Properties.ContainsKey(\"enabled\")) callback(Module);",
+            _ => "_later = callback;"
+        };
+        var host = $$"""
+            using System;
+            using Elsa.Extensions;
+            using Elsa.Features.Services;
+            using Microsoft.Extensions.DependencyInjection;
+            public sealed class Root(IModule module) : Foundation(module)
+            {
+                private Action<IModule>? _later;
+                protected override void Install(Action<IModule> callback) { {{body}} }
+            }
+            public static class Host
+            {
+                public static void Start(IServiceCollection services) => services.CreateModule().Use<Root>();
+            }
+            """;
+        foreach (var packed in new[] { false, true })
+        {
+            var result = RunHost(library, host, packed);
+            if (behavior == "store")
+            {
+                await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
+                await Assert.That(result.GeneratedTrees.Single().ToString().Contains(".DeclareLeaf_", StringComparison.Ordinal)).IsFalse();
+            }
+            else
+            {
+                var diagnostic = result.Diagnostics.Single();
+                await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+                await Assert.That(diagnostic.GetMessage()).Contains("Install");
+            }
+        }
+    }
+
+    [Test]
+    [Arguments("base.Install", false)]
+    [Arguments("Module.Configure<SealedReceiver>().Install", false)]
+    [Arguments("Module.Configure<FinalMethodReceiver>().Install", false)]
+    [Arguments("Other.Install", true)]
+    public async Task VirtualLifecycleCallsBindOnlyKnownFeatureReceivers(string target, bool unknownReceiver)
+    {
+        var library = $$"""
+            using System;
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Services;
+            public sealed class Leaf(IModule module) : FeatureBase(module);
+            public class Receiver(IModule module) : FeatureBase(module)
+            {
+                public virtual void Install(Action<IModule> callback) => callback(Module);
+            }
+            public sealed class SealedReceiver(IModule module) : Receiver(module);
+            public class FinalMethodReceiver(IModule module) : Receiver(module)
+            {
+                public sealed override void Install(Action<IModule> callback) => callback(Module);
+            }
+            public sealed class Root(IModule module) : Receiver(module)
+            {
+                private Receiver Other => Module.Properties.TryGetValue("other", out var value) ? (Receiver)value : this;
+                public override void Configure() => {{target}}(m => m.Configure<Leaf>());
+                public override void Install(Action<IModule> callback) { }
+            }
+            """;
+        const string host = """
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services) => services.CreateModule().Use<Root>();
+            }
+            """;
+        foreach (var packed in new[] { false, true })
+        {
+            var result = RunHost(library, host, packed);
+            if (unknownReceiver)
+            {
+                var diagnostic = result.Diagnostics.Single();
+                await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+                await Assert.That(diagnostic.GetMessage()).Contains("Install");
+            }
+            else
+            {
+                await Assert.That(result.Diagnostics).IsEmpty().Because(string.Join("\n", result.Diagnostics));
+                await Assert.That(result.GeneratedTrees.Single().ToString()).Contains(".DeclareLeaf_");
+            }
+        }
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task HostSelectorsCannotLoseUnresolvedVirtualDispatch(bool packed)
+    {
+        const string library = """
+            using Elsa.Extensions;
+            using Elsa.Features.Services;
+            using Elsa.Features.Abstractions;
+            public sealed class Leaf(IModule m) : FeatureBase(m);
+            public class Root(IModule m) : FeatureBase(m)
+            {
+                public void Install() => Select();
+                public void MaybeInstall(bool flag) { if (flag) Select(); }
+                public virtual void Select() { }
+            }
+            public sealed class Derived(IModule m) : Root(m)
+            {
+                public override void Select() => Module.Use<Leaf>();
+            }
+            public static class Options
+            {
+                public static void Install(Root root) => root.Install();
+            }
+            public class Setup { public virtual void Configure(Root root) { } }
+            public sealed class DerivedSetup : Setup
+            {
+                public override void Configure(Root root) => root.Module.Use<Leaf>();
+            }
+            """;
+        foreach (var callback in new[] { "root => root.Install()", "root => root.MaybeInstall(flag)", "root => root.Select()", "Options.Install", "setup.Configure" })
+        {
+            var result = Generate("module.Configure<Root>(m => new Derived(m), " + callback + ");");
+            await Assert.That(result.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("virtual feature selection")))
+                .IsTrue().Because(callback + ": " + string.Join("\n", result.Diagnostics));
+        }
+        var known = Generate("module.Configure<Derived>(root => root.Select());");
+        await Assert.That(known.Diagnostics).IsEmpty().Because(string.Join("\n", known.Diagnostics));
+        await Assert.That(known.GeneratedTrees.Single().ToString()).Contains(".DeclareLeaf_");
+
+        GeneratorDriverRunResult Generate(string selection) => RunHost(library, $$"""
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                public static void Start(IServiceCollection services, bool flag)
+                {
+                    Setup setup = new DerivedSetup();
+                    var module = services.CreateModule();
+                    {{selection}}
+                }
+            }
+            """, packed);
+    }
+
+    [Test]
     public async Task VirtualLifecycleOverridesBindTheTypeArgumentsSuppliedByACompiledBase()
     {
         const string library = """

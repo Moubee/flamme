@@ -181,7 +181,19 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             case IMethodReferenceOperation reference:
                 if (reference.Method.Parameters.Length != 1)
                     break;
-                var callbackMethod = reference.Method.PartialImplementationPart ?? reference.Method;
+                var callbackMethod = HostMethod(BindMethod(reference.Method), reference.IsVirtual, reference.Instance);
+                if (callbackMethod == null)
+                {
+                    UnboundVirtual(callSite, reference.Method);
+                    return;
+                }
+                var callbackSelector = producers.GetSelector(callbackMethod);
+                if (callbackSelector?.HasVirtualCalls == true)
+                {
+                    UnboundVirtual(callSite, callbackMethod);
+                    return;
+                }
+                callbackMethod = callbackMethod.PartialImplementationPart ?? callbackMethod;
                 var declaration = callbackMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken);
                 if (declaration != null)
                 {
@@ -190,11 +202,11 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                         Error(callSite, $"A feature configurator recursively calls '{reference.Method}'.");
                         return;
                     }
-                    ReadMethodBody(reference.Method, declaration, semantic, callbackMethod.OriginalDefinition.Parameters[0], null, conditional);
+                    ReadMethodBody(callbackMethod, declaration, semantic, callbackMethod.OriginalDefinition.Parameters[0], null, conditional);
                     _activeCallbacks.Remove(reference.Method);
                 }
-                else if (producers.GetSelector(BindMethod(reference.Method)) is { } selector)
-                    AddSelector(selector, reference.Method, callSite, conditional);
+                else if (callbackSelector != null)
+                    AddSelector(callbackSelector, callbackMethod, callSite, conditional);
                 else
                     break;
                 return;
@@ -270,7 +282,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             var api = SymbolEqualityComparer.Default.Equals(method.ContainingType, _module) ||
                       method.ContainingType.ContainingAssembly.Name == "Elsa.Features" &&
                       method.ContainingType.ToDisplayString() is "Elsa.Extensions.DependencyInjectionExtensions" or "Elsa.Features.Implementations.Module";
-            var selectedMethod = producers.GetSelector(BindMethod(invocation.TargetMethod));
+            var hostMethod = HostMethod(BindMethod(invocation.TargetMethod), !api && invocation.IsVirtual && producers.IsCompositionMethod(method), invocation.Instance);
+            var selectedMethod = hostMethod == null ? null : producers.GetSelector(hostMethod);
             // Resolve aliases only where their identity affects the plan. Passing an
             // IModule as T to an assertion or collection is ordinary application code.
             if (!api && (selectedMethod == null ? !producers.IsCompositionMethod(method) : !AffectsComposition(selectedMethod)))
@@ -285,6 +298,11 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (executed == false)
                 continue;
             var conditional = executed == null || ambientCondition || inConditionalCallback;
+            if (hostMethod == null)
+            {
+                UnboundVirtual(call.GetLocation(), method);
+                continue;
+            }
             if (method.Name == "Apply" && SymbolEqualityComparer.Default.Equals(method.ContainingType, _module))
             {
                 RecordApply();
@@ -320,7 +338,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     ReadIndependentInputs(invocation, inputs, selector, conditional);
                     continue;
                 }
-                AddSelector(selector, method, call.GetLocation(), conditional,
+                AddSelector(selector, hostMethod, call.GetLocation(), conditional,
                     (name, guarded) => ReadArguments(invocation.Arguments, guarded, parameter => parameter == name));
             }
             else if (!api && method.MethodKind != MethodKind.DelegateInvoke && method.ContainingAssembly != null &&
@@ -375,7 +393,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (runs == false) return;
             if (selector == null)
                 Error(site.GetLocation(), $"The constructor '{constructor}' needs compiler-visible feature-selection metadata. Rebuild the package with the Elsa generator.");
-            else if (inputs.Any(input => !Owned(input.Value)) || selector.VirtualCalls.Length != 0 || selector.ConditionalVirtualCalls.Length != 0)
+            else if (inputs.Any(input => !Owned(input.Value)) || selector.HasVirtualCalls)
             {
                 if (reportedOwnershipErrors.Add(site))
                     Error(site.GetLocation(), $"Cannot bind the selections of '{constructor}' to one fixed feature module. Configure the intended module directly.");
@@ -394,9 +412,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         {
             if (method == null || FixedProducerModel.IsFrameworkProperty(property.Property) || !producers.IsCompositionMethod(method)) return;
             var selector = producers.GetSelector(method);
-            var unresolvedDispatch = method.MethodKind == MethodKind.PropertyGet &&
-                (FixedProducerModel.CallsVirtualGetter(property, method) && property.Instance?.Type?.IsSealed != true ||
-                 selector is { VirtualCalls.Length: > 0 } or { ConditionalVirtualCalls.Length: > 0 });
+            var unresolvedDispatch = FixedProducerModel.CallsVirtualGetter(property, method) && property.Instance?.Type?.IsSealed != true ||
+                selector?.HasVirtualCalls == true;
             if (!unresolvedDispatch && selector != null && !AffectsComposition(selector)) return;
             for (IOperation? parent = property.Parent; parent != null; parent = parent.Parent)
                 if (parent is INameOfOperation) return;
@@ -416,7 +433,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 return;
             var conditional = runs == null || ambientCondition || inConditionalCallback || conditionalWrite;
             if (unresolvedDispatch)
-                Error(site.GetLocation(), $"Cannot bind the virtual feature selection in '{method}' to a concrete receiver.");
+                UnboundVirtual(site.GetLocation(), method);
             else if (selector == null)
                 Error(site.GetLocation(), $"The property accessor '{method}' needs compiler-visible feature-selection metadata. Rebuild the package with the Elsa generator.");
             else if (bound.Count == inputs.Count)
@@ -652,7 +669,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
     private static bool AffectsComposition(FixedProducerSelector selector) =>
         selector.Error != null || selector.Resolutions.Length != 0 || selector.Features.Length != 0 || selector.ConditionalFeatures.Length != 0 ||
         selector.Hosted.Length != 0 || selector.ConfigurationParameters.Length != 0 ||
-        selector.ConditionalConfigurationParameters.Length != 0 || selector.VirtualCalls.Length != 0 || selector.ConditionalVirtualCalls.Length != 0;
+        selector.ConditionalConfigurationParameters.Length != 0 || selector.HasVirtualCalls;
 
     private void RecordApply() => _resolutions.Add((_resolutionSite!, null, _queued));
 
@@ -664,6 +681,13 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
 
     private void AddSelector(FixedProducerSelector selector, IMethodSymbol method, Location location, bool conditional, Action<string, bool>? invoke = null)
     {
+        // Virtual calls are exported separately from ordered slot resolutions. The
+        // host cannot infer their execution order or the callbacks passed to them.
+        if (selector.HasVirtualCalls)
+        {
+            UnboundVirtual(location, method);
+            return;
+        }
         if (selector.Error != null)
             Error(location, $"Cannot resolve fixed selection in '{method}': {selector.Error}.");
         foreach (var step in selector.OrderedResolutions())
@@ -715,6 +739,13 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         }
         return true;
     }
+
+    private static IMethodSymbol? HostMethod(IMethodSymbol method, bool isVirtual, IOperation? instance) =>
+        !isVirtual || !FixedProducerModel.RequiresVirtualDispatch(method) ? method :
+        instance?.Type is INamedTypeSymbol { IsSealed: true } receiver ? FixedProducerModel.BindVirtualMethod(method, receiver) : null;
+
+    private void UnboundVirtual(Location location, IMethodSymbol method) =>
+        Error(location, $"Cannot bind the virtual feature selection in '{method}' at this host call. Declare the selections in a nonvirtual helper.");
 
     private bool IsModuleOrFeature(ITypeSymbol? type) => producers.CompositionType(type);
 
