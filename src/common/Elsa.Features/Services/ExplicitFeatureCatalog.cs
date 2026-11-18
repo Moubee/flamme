@@ -13,8 +13,9 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
     private readonly FrozenDictionary<Type, FeatureRegistration> _features;
     private readonly FrozenDictionary<Type, ServiceDescriptor> _hostedServices;
 
-    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices)
+    internal ExplicitFeatureCatalog(IDictionary<Type, FeatureRegistration> features, IDictionary<Type, ServiceDescriptor> hostedServices, bool compiledDeclarations = false)
     {
+        CompiledDeclarations = compiledDeclarations;
         FeatureTypes = features.Keys.ToImmutableArray();
         _features = features.ToFrozenDictionary();
         HostedServiceTypes = hostedServices.Keys.ToImmutableArray();
@@ -31,9 +32,22 @@ public sealed class ExplicitFeatureCatalog : IFeatureProvider
     /// </summary>
     public IReadOnlyList<Type> HostedServiceTypes { get; }
 
+    internal bool CompiledDeclarations { get; }
+
     IFeature IFeatureProvider.CreateFeature(Type type, IModule module)
     {
-        var feature = Get(type).Factory(module);
+        var factory = Get(type).Factory ?? throw new MissingMethodException(
+            $"Feature {type} has no public module constructor. Supply a factory with Configure<T>(factory, configure).");
+        IFeature feature;
+        try
+        {
+            feature = factory(module);
+        }
+        catch (Exception exception) when (CompiledDeclarations)
+        {
+            // Activator.CreateInstance wraps exceptions from the selected constructor.
+            throw new System.Reflection.TargetInvocationException(exception);
+        }
         if (feature is null || feature.GetType() != type)
             throw new InvalidOperationException($"Factory for feature {type} returned {feature?.GetType().ToString() ?? "null"}; an exact feature identity is required.");
         return feature;

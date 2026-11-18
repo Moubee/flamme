@@ -20,7 +20,7 @@ public class Module : IModule
     private Exception? _fault;
     private Type? _activeFeature;
     private bool _applyInProgress;
-    private bool TracksFailures => _provider is ExplicitFeatureCatalog || _policy == CompositionPolicy.ValidatedV1;
+    private bool TracksFailures => _provider is ExplicitFeatureCatalog { CompiledDeclarations: false } || _policy == CompositionPolicy.ValidatedV1;
     private Dictionary<Type, IFeature> _features = new();
     private readonly HashSet<IFeature> _configuredFeatures = new();
     private readonly List<HostedServiceDescriptor> _hostedServiceDescriptors = new();
@@ -304,7 +304,7 @@ public class Module : IModule
         return featureTypesWithDependencies.TSort(GetDeclaredDependencyTypes).ToHashSet();
     }
 
-    private IEnumerable<Type> GetDeclaredDependencyTypes(Type type)
+    private IReadOnlyList<Type> GetDeclaredDependencyTypes(Type type)
     {
         return _provider.GetDependencies(type);
     }
@@ -312,8 +312,17 @@ public class Module : IModule
     // Recursively get dependency types.
     private IEnumerable<Type> GetDependencyTypes(Type type)
     {
-        var dependencies = GetDeclaredDependencyTypes(type).ToList();
-        return dependencies.Concat(dependencies.SelectMany(GetDependencyTypes));
+        // Explicit exports validate their entire graph when built. Compiled declarations
+        // can include unrelated features, so validate only the requested closure here.
+        if (_provider is ExplicitFeatureCatalog { CompiledDeclarations: true })
+            FeatureGraph.Sort([type], GetDeclaredDependencyTypes);
+        return Enumerate(type);
+
+        IEnumerable<Type> Enumerate(Type root)
+        {
+            var dependencies = GetDeclaredDependencyTypes(root);
+            return dependencies.Concat(dependencies.SelectMany(Enumerate));
+        }
     }
 
     private IFeature ConstructFeature(Type type, Func<IModule, IFeature> factory)
@@ -327,7 +336,7 @@ public class Module : IModule
             _activeFeature = type;
             var feature = factory(this);
             EnsureUsable();
-            if (_provider is ExplicitFeatureCatalog && (feature is null || feature.GetType() != type))
+            if (_provider is ExplicitFeatureCatalog { CompiledDeclarations: false } && (feature is null || feature.GetType() != type))
                 throw new InvalidOperationException($"Factory for feature {type} returned {feature?.GetType().ToString() ?? "null"}; an exact feature identity is required.");
             return feature!;
         }
