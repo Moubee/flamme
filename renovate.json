@@ -57,6 +57,14 @@
       "allowedVersions": "/^11\\.0$/"
     },
     {
+      "description": "Look up the SDK image's numeric tags in Microsoft's dated SDK release feed so they pass the same age check as global.json.",
+      "matchManagers": ["dockerfile"],
+      "matchDepNames": ["mcr.microsoft.com/dotnet/sdk"],
+      "matchCurrentValue": "/^\\d+\\.\\d+\\.\\d+$/",
+      "overrideDatasource": "dotnet-version",
+      "overridePackageName": "dotnet-sdk"
+    },
+    {
       "description": "Build the containers with the SDK used by the repository.",
       "matchManagers": ["nuget", "dockerfile"],
       "matchPackageNames": ["dotnet-sdk", "mcr.microsoft.com/dotnet/sdk"],
