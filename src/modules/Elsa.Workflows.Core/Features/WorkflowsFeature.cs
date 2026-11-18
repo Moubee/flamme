@@ -50,6 +50,10 @@ public class WorkflowsFeature : FeatureBase
     /// <inheritdoc />
     public WorkflowsFeature(IModule module) : base(module)
     {
+        // A host can append to either pipeline before Elsa configures the runtime defaults.
+        // Resolve the default when the pipeline is built so += and full replacements both work.
+        WorkflowExecutionPipeline = builder => (_defaultWorkflowPipeline ?? ConfigureCoreWorkflowPipeline)(builder);
+        ActivityExecutionPipeline = builder => (_defaultActivityPipeline ?? ConfigureCoreActivityPipeline)(builder);
     }
 
     /// <summary>
@@ -91,32 +95,30 @@ public class WorkflowsFeature : FeatureBase
     /// </summary>
     public Func<IServiceProvider, ILoggerStateGenerator<ActivityExecutionContext>> ActivityLoggerStateGenerator { get; set; } = sp => new ActivityLoggerStateGenerator();
 
-    private Action<IWorkflowExecutionPipelineBuilder>? _workflowPipeline;
-    private Action<IActivityExecutionPipelineBuilder>? _activityPipeline;
+    private Action<IWorkflowExecutionPipelineBuilder>? _defaultWorkflowPipeline;
+    private Action<IActivityExecutionPipelineBuilder>? _defaultActivityPipeline;
+
+    private static void ConfigureCoreWorkflowPipeline(IWorkflowExecutionPipelineBuilder builder) =>
+        builder.UseExceptionHandling().UseDefaultActivityScheduler();
+
+    private static void ConfigureCoreActivityPipeline(IActivityExecutionPipelineBuilder builder) =>
+        builder.UseLogging().UseExceptionHandling().UseExecutionLogging().UseNotifications().UseDefaultActivityInvoker();
 
     /// <summary>
     /// A delegate to configure the <see cref="IWorkflowExecutionPipeline"/>.
     /// </summary>
-    public Action<IWorkflowExecutionPipelineBuilder> WorkflowExecutionPipeline
-    {
-        get => _workflowPipeline ?? (static builder => builder.UseExceptionHandling().UseDefaultActivityScheduler());
-        set => _workflowPipeline = value;
-    }
+    public Action<IWorkflowExecutionPipelineBuilder> WorkflowExecutionPipeline { get; set; }
 
     /// <summary>
     /// A delegate to configure the <see cref="IActivityExecutionPipeline"/>.
     /// </summary>
-    public Action<IActivityExecutionPipelineBuilder> ActivityExecutionPipeline
-    {
-        get => _activityPipeline ?? (static builder => builder.UseLogging().UseExceptionHandling().UseExecutionLogging().UseNotifications().UseDefaultActivityInvoker());
-        set => _activityPipeline = value;
-    }
+    public Action<IActivityExecutionPipelineBuilder> ActivityExecutionPipeline { get; set; }
 
-    /// <summary>Supplies host defaults for pipelines that application code has not configured.</summary>
+    /// <summary>Supplies the defaults used by unmodified and appended pipelines.</summary>
     public void SetDefaultExecutionPipelines(Action<IWorkflowExecutionPipelineBuilder> workflow, Action<IActivityExecutionPipelineBuilder> activity)
     {
-        _workflowPipeline ??= workflow;
-        _activityPipeline ??= activity;
+        _defaultWorkflowPipeline ??= workflow;
+        _defaultActivityPipeline ??= activity;
     }
 
     /// <summary>

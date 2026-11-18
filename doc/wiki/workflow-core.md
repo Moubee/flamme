@@ -132,6 +132,8 @@ flowchart LR
 
 Pipeline extension methods live under [Extensions](../../src/modules/Elsa.Workflows.Core/Extensions) and middleware under [Middleware](../../src/modules/Elsa.Workflows.Core/Middleware). Pipelines are configured by `WorkflowsFeature`.
 
+Use `+=` on `WorkflowExecutionPipeline` or `ActivityExecutionPipeline` to append middleware to the defaults installed by `AddElsa`. Assigning a delegate with `=` replaces that pipeline.
+
 ## Commit Strategies
 
 Commit strategies determine persistence boundaries. Related files:
@@ -140,7 +142,7 @@ Commit strategies determine persistence boundaries. Related files:
 - [CommitStrategies](../../src/modules/Elsa.Workflows.Core/CommitStates)
 - workflow sample configuration in [Elsa.Server.Web/Program.cs](../../src/apps/Elsa.Server.Web/Program.cs)
 
-Runtime replaces the default no-op commit handler with an execution-cycle-aware handler so state changes are persisted at runtime boundaries.
+The runtime uses `DefaultCommitStateHandler` to persist workflow state. To supply a custom implementation, set `WorkflowsFeature.CommitStateHandler`. The runtime wraps the selected handler so a commit releases its execution-cycle handle on success or failure.
 
 ## Serialization
 

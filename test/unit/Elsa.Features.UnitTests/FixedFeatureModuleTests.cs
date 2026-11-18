@@ -43,6 +43,31 @@ public class FixedFeatureModuleTests
     }
 
     [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task QueuedHostedServicesFollowSurvivingRegistrationsAndPrecedeThoseAddedDuringApply(bool removeAll)
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(new object());
+        services.AddSingleton(new Uri("about:blank"));
+        var module = new TestPlan(services);
+        module.Configure<ChildFeature>(child => child.WhenApplied = () =>
+        {
+            services.RemoveAt(0);
+            if (removeAll)
+                services.RemoveAt(0);
+        });
+
+        module.Apply();
+
+        var order = services.Select(descriptor => descriptor.ImplementationType ?? descriptor.ServiceType).ToArray();
+        var firstHosted = removeAll ? 0 : 1;
+        if (!removeAll)
+            await Assert.That(order[0]).IsEqualTo(typeof(Uri));
+        await Assert.That(order.Skip(firstHosted).Take(3).SequenceEqual([typeof(LowService), typeof(HighService), typeof(string)])).IsTrue();
+    }
+
+    [Test]
     public async Task SelectedFeatureWithoutDefaultConstructorAcceptsHostFactory()
     {
         var module = new TestPlan(new ServiceCollection(), hasDefaultFactory: false);

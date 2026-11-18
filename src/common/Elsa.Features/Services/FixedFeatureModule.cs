@@ -155,10 +155,10 @@ public abstract class FixedFeatureModule : IModule
                 EnsureUsable();
                 ConfigureFeatures();
             }
-            var insertion = Services.Count;
+            var beforeApply = new HashSet<ServiceDescriptor>(Services, ReferenceEqualityComparer.Instance);
             ApplyFeatures();
             EnsureUsable();
-            FeatureServiceRegistration.RegisterHostedServices(Services, insertion, _requestedServices.OrderBy(entry => entry.Priority).Select(entry => entry.Descriptor));
+            FeatureServiceRegistration.RegisterHostedServices(Services, beforeApply, _requestedServices.OrderBy(entry => entry.Priority).Select(entry => entry.Descriptor));
             FeatureServiceRegistration.PublishInstalledFeatures(Services, _slots.Values.Select(slot => slot.GetDescriptor()));
         }
         catch (Exception exception)

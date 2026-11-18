@@ -9,6 +9,7 @@ using Elsa.Features.Abstractions;
 using Elsa.Features.Attributes;
 using Elsa.Features.Services;
 using Elsa.Mediator.Contracts;
+using Elsa.Workflows.CommitStates;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Management;
 using Elsa.Workflows.Management.Contracts;
@@ -32,6 +33,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Elsa.Common.Serialization;
+using ExecutionCycleAwareCommitStateHandler = Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler;
 
 namespace Elsa.Workflows.Runtime.Features;
 
@@ -248,7 +250,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
         {
             // ExecutionCycleAwareCommitStateHandler decorates DefaultCommitStateHandler — disposes the execution cycle handle AFTER
             // commit so the drain orchestrator's await-disposed sequencing can land its Interrupted write last.
-            workflows.SetDefaultCommitStateHandler(static sp => sp.GetRequiredService<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>());
+            workflows.SetDefaultCommitStateHandler(static sp => sp.GetRequiredService<ExecutionCycleAwareCommitStateHandler>());
         });
 
         Services.Configure<RecurringTaskOptions>(options =>
@@ -266,6 +268,10 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
 
     public override void Apply()
     {
+        Services.Decorate<ICommitStateHandler>(static handler => handler is ExecutionCycleAwareCommitStateHandler
+            ? handler
+            : new ExecutionCycleAwareCommitStateHandler(handler));
+
         // Options.
         Services.Configure(DistributedLockingOptions);
         Services.Configure(WorkflowInboxCleanupOptions);
@@ -373,7 +379,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
             .AddScoped<INotificationSender, WorkflowCommitNotificationSender>()
             .AddScoped<IWorkflowCommitTransaction, NoopWorkflowCommitTransaction>()
             .AddScoped<DefaultCommitStateHandler>()
-            .AddScoped<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>()
+            .AddScoped<ExecutionCycleAwareCommitStateHandler>()
             .AddScoped<WorkflowHeartbeatGeneratorFactory>()
 
             // Deprecated services.

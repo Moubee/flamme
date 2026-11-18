@@ -7,9 +7,14 @@ namespace Elsa.Features.Services;
 
 internal static class FeatureServiceRegistration
 {
-    internal static void RegisterHostedServices(IServiceCollection services, int insertion, IEnumerable<ServiceDescriptor> descriptors)
+    internal static void RegisterHostedServices(IServiceCollection services, HashSet<ServiceDescriptor> beforeApply, IEnumerable<ServiceDescriptor> descriptors)
     {
         var appended = services.Count;
+        // Features can remove existing services as well as append new ones during Apply.
+        var insertion = appended;
+        while (insertion > 0 && !beforeApply.Contains(services[insertion - 1]))
+            insertion--;
+
         foreach (var descriptor in descriptors)
             services.TryAddEnumerable(descriptor);
 

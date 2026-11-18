@@ -16,9 +16,11 @@ namespace Elsa.Workflows.Runtime.Services;
 /// </summary>
 public sealed class ExecutionCycleAwareCommitStateHandler : ICommitStateHandler
 {
-    private readonly DefaultCommitStateHandler _inner;
+    private readonly ICommitStateHandler _inner;
 
-    public ExecutionCycleAwareCommitStateHandler(DefaultCommitStateHandler inner) => _inner = inner;
+    public ExecutionCycleAwareCommitStateHandler(DefaultCommitStateHandler inner) : this((ICommitStateHandler)inner) { }
+
+    internal ExecutionCycleAwareCommitStateHandler(ICommitStateHandler inner) => _inner = inner;
 
     /// <inheritdoc />
     public async Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, CancellationToken cancellationToken = default)

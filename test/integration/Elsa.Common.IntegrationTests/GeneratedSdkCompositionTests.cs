@@ -12,8 +12,11 @@ using Elsa.Workflows.CommitStates;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Management.Features;
 using Elsa.Workflows.Management.Options;
+using Elsa.Workflows.Runtime;
 using Elsa.Workflows.Runtime.Features;
+using Elsa.Workflows.Runtime.Middleware.Workflows;
 using Elsa.Workflows.Runtime.Services;
+using Elsa.Workflows.State;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -37,17 +40,112 @@ public class GeneratedSdkCompositionTests
     }
 
     [Test]
-    public async Task RuntimeResolvesTheHostConfiguredCommitHandler()
+    [Arguments(false, false)]
+    [Arguments(false, true)]
+    [Arguments(true, false)]
+    [Arguments(true, true)]
+    public async Task RuntimeReleasesTheCycleAfterTheHostCommit(bool withState, bool fail)
     {
         var services = new ServiceCollection();
-        var custom = new NoopCommitStateHandler();
+        var custom = new RecordingCommitHandler(fail);
         services.AddLogging();
         services.AddSingleton<IConfiguration, ConfigurationManager>();
         services.AddElsa(elsa => elsa.UseWorkflows(workflows => workflows.CommitStateHandler = _ => custom));
 
         using var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
-        await Assert.That(scope.ServiceProvider.GetRequiredService<ICommitStateHandler>()).IsSameReferenceAs(custom);
+        var scoped = scope.ServiceProvider;
+        var handler = scoped.GetRequiredService<ICommitStateHandler>();
+        var registry = scoped.GetRequiredService<IExecutionCycleRegistry>();
+        var graph = await scoped.GetRequiredService<IWorkflowGraphBuilder>().BuildAsync(new Workflow(new WriteLine("test")));
+        var context = await WorkflowExecutionContext.CreateAsync(scoped, graph, "custom-commit");
+        var handle = registry.BeginCycle(context.Id, null, default);
+        context.TransientProperties[ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey] = handle;
+
+        Task Commit() => withState ? handler.CommitAsync(context, new WorkflowState()) : handler.CommitAsync(context);
+        if (fail)
+            await Assert.That(Commit).Throws<InvalidOperationException>().WithMessage("host commit failed");
+        else
+            await Commit();
+
+        await Assert.That(custom.WithState).IsEqualTo(withState);
+        await Assert.That(custom.ActiveDuringCommit).IsEqualTo(1);
+        await Assert.That(registry.ActiveCount).IsEqualTo(0);
+        await Assert.That(handle.Disposed.IsCompletedSuccessfully).IsTrue();
+    }
+
+    [Test]
+    public async Task ReapplyingRuntimeKeepsTheHostCommitHandlerScopedAndDisposesItOnce()
+    {
+        var services = new ServiceCollection();
+        List<RecordingCommitHandler> handlers = [];
+        services.AddLogging();
+        services.AddSingleton<IConfiguration, ConfigurationManager>();
+        services.AddElsa(elsa => elsa.UseWorkflows(workflows => workflows.CommitStateHandler = _ =>
+        {
+            var handler = new RecordingCommitHandler(false);
+            handlers.Add(handler);
+            return handler;
+        }));
+        services.AddElsa();
+        using var provider = services.BuildServiceProvider();
+        for (var i = 0; i < 2; i++)
+        {
+            using var scope = provider.CreateScope();
+            var handler = scope.ServiceProvider.GetRequiredService<ICommitStateHandler>();
+            await Assert.That(handler).IsAssignableTo<ExecutionCycleAwareCommitStateHandler>();
+            await Assert.That(scope.ServiceProvider.GetRequiredService<ICommitStateHandler>()).IsSameReferenceAs(handler);
+        }
+        await Assert.That(handlers.Select(handler => handler.DisposeCount).SequenceEqual([1, 1])).IsTrue();
+    }
+
+    private sealed class RecordingCommitHandler(bool fail) : ICommitStateHandler, IDisposable
+    {
+        public bool? WithState { get; private set; }
+        public int ActiveDuringCommit { get; private set; }
+        public int DisposeCount { get; private set; }
+
+        public void Dispose() => DisposeCount++;
+        public Task CommitAsync(WorkflowExecutionContext context, CancellationToken cancellationToken = default) => Record(context, false);
+        public Task CommitAsync(WorkflowExecutionContext context, WorkflowState state, CancellationToken cancellationToken = default) => Record(context, true);
+
+        private Task Record(WorkflowExecutionContext context, bool withState)
+        {
+            WithState = withState;
+            ActiveDuringCommit = context.GetRequiredService<IExecutionCycleRegistry>().ActiveCount;
+            return fail ? Task.FromException(new InvalidOperationException("host commit failed")) : Task.CompletedTask;
+        }
+    }
+
+    [Test]
+    public async Task AppendingToPipelinesPreservesRuntimeMiddlewareAndHostActions()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<IConfiguration, ConfigurationManager>();
+        int? activeDuringWorkflow = null;
+        Type? firstActivityMiddleware = null;
+        services.AddElsa(elsa => elsa.UseWorkflows(workflows =>
+        {
+            workflows.WorkflowExecutionPipeline += builder => builder.Use(next => context =>
+            {
+                activeDuringWorkflow = context.GetRequiredService<IExecutionCycleRegistry>().ActiveCount;
+                return next(context);
+            });
+            workflows.ActivityExecutionPipeline += builder => builder.Insert(0, next =>
+            {
+                firstActivityMiddleware = next.Target?.GetType();
+                return next;
+            });
+        }));
+        await using var provider = services.BuildServiceProvider();
+        await using var scope = provider.CreateAsyncScope();
+        var scoped = scope.ServiceProvider;
+        await scoped.GetRequiredService<IWorkflowRunner>().RunAsync(new WriteLine("test"));
+
+        await Assert.That(activeDuringWorkflow).IsEqualTo(1);
+        await Assert.That(firstActivityMiddleware).IsEqualTo(typeof(Workflows.Middleware.Activities.ExceptionHandlingMiddleware));
+        await Assert.That(scoped.GetRequiredService<IExecutionCycleRegistry>().ActiveCount).IsEqualTo(0);
     }
 
     [Test]
@@ -148,10 +246,12 @@ public class GeneratedSdkCompositionTests
         List<string> configured = [];
         var first = services.ConfigureElsa(_ => configured.Add("before"));
         Action<IWorkflowExecutionPipelineBuilder> customPipeline = _ => { };
+        Action<IActivityExecutionPipelineBuilder> customActivityPipeline = _ => { };
         var applied = services.AddElsa(elsa => elsa.UseWorkflows(workflows =>
         {
             configured.Add("workflows");
             workflows.WorkflowExecutionPipeline = customPipeline;
+            workflows.ActivityExecutionPipeline = customActivityPipeline;
         }));
         services.ConfigureElsa(_ => configured.Add("after"));
         var repeated = services.AddElsa();
@@ -163,6 +263,7 @@ public class GeneratedSdkCompositionTests
         await Assert.That(applied.HasFeature<MediatorFeature>()).IsTrue();
         await Assert.That(applied.HasFeature<WorkflowsFeature>()).IsTrue();
         await Assert.That(ReferenceEquals(applied.Configure<WorkflowsFeature>().WorkflowExecutionPipeline, customPipeline)).IsTrue();
+        await Assert.That(ReferenceEquals(applied.Configure<WorkflowsFeature>().ActivityExecutionPipeline, customActivityPipeline)).IsTrue();
         using var provider = services.BuildServiceProvider();
         await Assert.That(provider.GetRequiredService<IInstalledFeatureProvider>().List().Count()).IsGreaterThan(5);
 
