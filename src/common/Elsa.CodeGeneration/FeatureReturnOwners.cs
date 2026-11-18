@@ -22,6 +22,15 @@ internal sealed partial class FixedProducerModel
             return call.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == owner)?.Value;
         }
 
+        internal IOperation? ReturnedInput(IPropertyReferenceOperation property)
+        {
+            if (property.Property.GetMethod is not { } getter) return null;
+            if (property.Property.Name == "Module" && IsFrameworkProperty(property.Property)) return property.Instance;
+            var owner = Read(getter);
+            if (owner == null) return null;
+            return owner == Instance ? property.Instance : property.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == owner)?.Value;
+        }
+
         internal string? Read(IMethodSymbol method)
         {
             method = (method.ReducedFrom ?? method).OriginalDefinition;
@@ -47,11 +56,15 @@ internal sealed partial class FixedProducerModel
             {
                 MethodDeclarationSyntax ordinary => (SyntaxNode?)ordinary.ExpressionBody?.Expression ?? ordinary.Body,
                 LocalFunctionStatementSyntax local => (SyntaxNode?)local.ExpressionBody?.Expression ?? local.Body,
+                AccessorDeclarationSyntax accessor => (SyntaxNode?)accessor.ExpressionBody?.Expression ?? accessor.Body,
+                ArrowExpressionClauseSyntax arrow => arrow.Expression,
+                PropertyDeclarationSyntax property => property.ExpressionBody?.Expression,
+                IndexerDeclarationSyntax indexer => indexer.ExpressionBody?.Expression,
                 _ => null
             };
             if (body == null) return null;
             var semantic = model._compilation.GetSemanticModel(body.SyntaxTree);
-            var declared = (IMethodSymbol)semantic.GetDeclaredSymbol(declaration!)!;
+            var declared = semantic.GetDeclaredSymbol(declaration!) as IMethodSymbol ?? method;
             var expressions = body is ExpressionSyntax expression ? [expression] :
                 body.DescendantNodes(node => node is not AnonymousFunctionExpressionSyntax and not LocalFunctionStatementSyntax)
                     .OfType<ReturnStatementSyntax>().Select(statement => statement.Expression).ToArray();
@@ -66,10 +79,12 @@ internal sealed partial class FixedProducerModel
                     case RefExpressionSyntax reference: MarkWritten(reference.Expression); break;
                 }
             }
+            // Writes through one by-reference parameter can change another parameter bound to the same storage.
+            var writesThroughReference = modified.OfType<IParameterSymbol>().Any(parameter => parameter.RefKind is RefKind.Ref or RefKind.Out);
             string? result = null;
             foreach (var returned in expressions)
             {
-                var owner = returned == null ? null : Origin(semantic.GetOperation(returned), new HashSet<ISymbol>(SymbolEqualityComparer.Default));
+                var owner = returned == null ? null : Origin(HostSelections.ExpressionOperation(semantic, returned), new HashSet<ISymbol>(SymbolEqualityComparer.Default));
                 if (owner == null || result != null && owner != result) return null;
                 result = owner;
             }
@@ -89,7 +104,7 @@ internal sealed partial class FixedProducerModel
             {
                 switch (value)
                 {
-                    case IParameterReferenceOperation parameter when !modified.Contains(parameter.Parameter):
+                    case IParameterReferenceOperation parameter when !modified.Contains(parameter.Parameter) && (parameter.Parameter.RefKind == RefKind.None || !writesThroughReference):
                         if (SymbolEqualityComparer.Default.Equals(parameter.Parameter, declared.ContainingType.ExtensionParameter))
                             return Instance;
                         return SymbolEqualityComparer.Default.Equals(parameter.Parameter.ContainingSymbol, declared) ? parameter.Parameter.Name : null;
@@ -97,17 +112,15 @@ internal sealed partial class FixedProducerModel
                         return Instance;
                     case ILocalReferenceOperation local when !modified.Contains(local.Local) && seen.Add(local.Local):
                         var initializer = (local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as VariableDeclaratorSyntax)?.Initializer?.Value;
-                        return initializer == null ? null : Origin(semantic.GetOperation(initializer), seen);
+                        return initializer == null ? null : Origin(HostSelections.ExpressionOperation(semantic, initializer), seen);
                     case IConversionOperation conversion when conversion.OperatorMethod == null:
                         return Origin(conversion.Operand, seen);
                     case IParenthesizedOperation parentheses:
                         return Origin(parentheses.Operand, seen);
                     case IInvocationOperation call:
                         return Origin(ReturnedInput(call), seen);
-                    case IPropertyReferenceOperation property when property.Property.Name == "Module" &&
-                        property.Property.ContainingAssembly.Name == "Elsa.Features" &&
-                        property.Property.ContainingType.ToDisplayString() is "Elsa.Features.Services.IFeature" or "Elsa.Features.Abstractions.FeatureBase":
-                        return Origin(property.Instance, seen);
+                    case IPropertyReferenceOperation property:
+                        return Origin(ReturnedInput(property), seen);
                     case IConditionalOperation conditional:
                         if (conditional.Condition.ConstantValue is { HasValue: true, Value: bool choice })
                             return Origin(choice ? conditional.WhenTrue : conditional.WhenFalse, seen);

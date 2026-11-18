@@ -212,6 +212,56 @@ public class FixedHostPlannerTests
         await Assert.That(diagnostic.GetMessage()).Contains("separate helper call per module");
     }
 
+    [Test]
+    [Arguments("var module = (services.CreateModule()); module.Use<Leaf>(); module.Use<Unused>();")]
+    [Arguments("var module = services.CreateModule(); module = module.Use<Leaf>(); module.Use<Unused>();")]
+    public async Task WrappedRootsAndFluentSelfAssignmentPreserveModuleOwnership(string selection)
+    {
+        var result = Generate(selection);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_leaf", "_unused" })).IsTrue();
+    }
+
+    [Test]
+    public async Task DeconstructionReadsBothOwnersBeforeUpdatingEitherLocal()
+    {
+        var result = Generate("""
+            var first = services.CreateModule();
+            var second = other.CreateModule();
+            (first, second) = (second, first);
+            first.Use<Unused>();
+            second.Use<Leaf>();
+            """);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").SequenceEqual(new[] { "_leaf" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").SequenceEqual(new[] { "_unused" })).IsTrue();
+    }
+
+    [Test]
+    [Arguments("Helpers.Redirect(ref first, ref first, second).Use<Leaf>();")]
+    [Arguments("var feature = first.Configure<Owner>(); feature.Other = second; feature.Other.Use<Leaf>();")]
+    public async Task UnprovenModuleOwnersAreDiagnosedAtTheRead(string body)
+    {
+        const string extra = """
+            public static class Helpers
+            {
+                public static IModule Redirect(ref IModule observed, ref IModule changed, IModule replacement)
+                {
+                    changed = replacement;
+                    return observed;
+                }
+            }
+            public sealed class Owner(IModule module) : FeatureBase(module)
+            {
+                public IModule Other { get; set; } = null!;
+            }
+            """;
+        var result = Generate("var first = services.CreateModule(); var second = other.CreateModule(); " + body, extra);
+        await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(result.Diagnostics.Single().GetMessage()).Contains("Cannot establish which module");
+        await Assert.That(HostSource(result).Contains("_leaf", StringComparison.Ordinal)).IsFalse();
+    }
+
     private static string[] Slots(GeneratorDriverRunResult result, string plan) =>
         result.GeneratedTrees.Single().GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single(c => c.Identifier.ValueText == plan)
             .Members.OfType<FieldDeclarationSyntax>().SelectMany(f => f.Declaration.Variables).Select(v => v.Identifier.ValueText).ToArray();
@@ -307,6 +357,27 @@ public class FixedHostPlannerTests
         await Assert.That(observed.Diagnostics).IsEmpty();
         var membership = Generate(observe + "\n_ = observed!.HasFeature<Leaf>();");
         await Assert.That(membership.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+    }
+
+    [Test]
+    [Arguments("module.Use<ExplicitOnly>(); module.Configure(m => new ExplicitOnly(m, 1));", true)]
+    [Arguments("module.Apply(); module.Configure(m => new ExplicitOnly(m, 1));", true)]
+    [Arguments("module.Configure<ExplicitOnly>(c => { module.Configure(m => new ExplicitOnly(m, 1)); });", true)]
+    [Arguments("module.Configure(m => new ExplicitOnly(m, 1), c => module.Use<ExplicitOnly>());", false)]
+    [Arguments("if (flag) module.Use<ExplicitOnly>(); module.Configure(m => new ExplicitOnly(m, 1));", true)]
+    [Arguments("module.Configure(m => new ExplicitOnly(m, 1)); module.Use<ExplicitOnly>(); module.Apply();", false)]
+    public async Task ExplicitFactoryMustPrecedeFirstResolution(string calls, bool missingFactory)
+    {
+        var result = Generate("var module = services.CreateModule(); " + calls,
+            "public sealed class ExplicitOnly(IModule module, int value) : FeatureBase(module);");
+        if (missingFactory)
+        {
+            var diagnostic = result.Diagnostics.Single();
+            await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+            await Assert.That(diagnostic.GetMessage()).Contains("requires an explicit factory");
+        }
+        else
+            await Assert.That(result.Diagnostics).IsEmpty();
     }
 
     [Test]
@@ -409,8 +480,7 @@ public class FixedHostPlannerTests
         }
     }
 
-    [Test]
-    public async Task SdkEntriesShareACollectionPlanAndResolveACallbackMethodGroup()
+    private static MetadataReference SdkReference()
     {
         const string sdk = """
             using System;
@@ -419,7 +489,11 @@ public class FixedHostPlannerTests
             using Microsoft.Extensions.DependencyInjection;
             namespace Elsa.Features
             {
-                public sealed class AppFeature(IModule m) : FeatureBase(m);
+                public sealed class AppFeature(IModule m) : FeatureBase(m)
+                {
+                    public Action<IModule>? Configurator { get; set; }
+                    public override void Configure() => Configurator?.Invoke(Module);
+                }
                 public sealed class Management(IModule m) : FeatureBase(m);
                 public sealed class Database(IModule m) : FeatureBase(m);
             }
@@ -440,12 +514,107 @@ public class FixedHostPlannerTests
             """;
         var assembly = CompilerTest.CreateCompilation(("Sdk.cs", sdk)).WithAssemblyName("Elsa").AddReferences(References());
         CompilerTest.CreateDriver(new ElsaFeatureGenerator()).Run(assembly, out var sdkOutput);
+        return sdkOutput.ToMetadataReference();
+    }
+
+    [Test]
+    public async Task GeneratedSdkCallbacksArePlannedAtTheHostEntry()
+    {
+        var sdk = SdkReference();
+        var known = Generate("services.AddElsa(m => m.Use<Leaf>());", sdk: sdk);
+        await Assert.That(known.Diagnostics).IsEmpty();
+        await Assert.That(Slots(known, "Plan0").Order().SequenceEqual(new[] { "_appFeature", "_leaf" })).IsTrue();
+
+        var bypass = Generate("""
+            services.AddElsa(m => m.Configure<Elsa.Features.AppFeature>(app => app.Configurator = other => other.Use<Leaf>()));
+            """, sdk: sdk);
+        await Assert.That(bypass.Diagnostics.Single().GetMessage()).Contains("through AddElsa or ConfigureElsa");
+
+        var unknown = Generate("services.CreateModule().Use<Other>();", """
+            public sealed class Other(IModule m) : FeatureBase(m)
+            {
+                public System.Action<IModule>? Configurator { get; set; }
+                public override void Configure() => Configurator?.Invoke(Module);
+            }
+            """, sdk);
+        await Assert.That(unknown.Diagnostics.Single().GetMessage()).Contains("cannot inspect feature configuration callback 'Configurator'");
+    }
+
+    [Test]
+    [Arguments("var module = services.ConfigureElsa(m => m.Configure(x => new ExplicitOnly(x, 1))); module.Use<ExplicitOnly>(); services.AddElsa();", true)]
+    [Arguments("var module = services.ConfigureElsa(m => m.Use<ExplicitOnly>()); module.Configure(x => new ExplicitOnly(x, 1)); services.AddElsa();", false)]
+    [Arguments("services.AddElsa(); services.ConfigureElsa(m => m.Configure(x => new ExplicitOnly(x, 1)));", true)]
+    public async Task QueuedFactoriesRunDuringTheFirstApply(string calls, bool missingFactory)
+    {
+        var result = Generate(calls, "public sealed class ExplicitOnly(IModule module, int value) : FeatureBase(module);", SdkReference());
+        if (missingFactory)
+            await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("ELSAGEN011");
+        else
+            await Assert.That(result.Diagnostics).IsEmpty();
+    }
+
+    [Test]
+    [Arguments("(IServiceCollection)services")]
+    [Arguments("((IServiceCollection)services)")]
+    public async Task SdkEntriesShareThePlanThroughACastAlias(string cast)
+    {
+        var result = Generate($$"""
+            var alias = {{cast}};
+            alias.ConfigureElsa(m => m.Use<Leaf>());
+            services.AddElsa(m => m.Use<Root>());
+            """, sdk: SdkReference());
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(HostSource(result).Split(" : FixedFeatureModule").Length - 1).IsEqualTo(1);
+        await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_appFeature", "_leaf", "_root" })).IsTrue();
+    }
+
+    [Test]
+    [Arguments("public IServiceCollection Services { get; set; } = new ServiceCollection();")]
+    [Arguments("public IServiceCollection Services = new ServiceCollection();")]
+    public async Task SdkEntriesSeparateReplacedCollectionMembers(string member)
+    {
+        var result = Generate("""
+            var holder = new Holder();
+            holder.Services.AddElsa(m => m.Use<Unused>());
+            holder.Services = new ServiceCollection();
+            holder.Services.AddElsa(m => m.Use<Leaf>());
+            """, "public sealed class Holder { " + member + " }", SdkReference());
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Slots(result, "Plan0").Order().SequenceEqual(new[] { "_appFeature", "_unused" })).IsTrue();
+        await Assert.That(Slots(result, "Plan1").Order().SequenceEqual(new[] { "_appFeature", "_leaf" })).IsTrue();
+    }
+
+    [Test]
+    public async Task IncompatibleSdkPlansAreDiagnosedWhenTheCollectionIsForwardedToAHelper()
+    {
+        const string helpers = """
+            public static class Helpers
+            {
+                public static void Setup(IServiceCollection target) => target.ConfigureElsa(m => m.Use<Unused>());
+                public static void Forward(IServiceCollection target) => Setup(target);
+            }
+            """;
+        var sdk = SdkReference();
+        var conflict = Generate("var collection = services; Helpers.Forward(collection); services.AddElsa(m => m.Use<Leaf>());", helpers, sdk);
+        await Assert.That(conflict.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
+        await Assert.That(conflict.Diagnostics.Single().GetMessage()).Contains("Forward");
+        var independent = Generate("Helpers.Forward(other); services.AddElsa(m => m.Use<Leaf>());", helpers, sdk);
+        await Assert.That(independent.Diagnostics).IsEmpty();
+        var shared = Generate("Helpers.Forward(services); services.AddElsa(m => m.Use<Unused>());", helpers, sdk);
+        await Assert.That(shared.Diagnostics).IsEmpty();
+        await Assert.That(HostSource(shared).Split(" : FixedFeatureModule").Length - 1).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task SdkEntriesShareACollectionPlanAndResolveACallbackMethodGroup()
+    {
+        var sdk = SdkReference();
         var host = Generate("""
             services.ConfigureElsa(m => m.Use<Leaf>());
             services.AddElsa(SelectRoot);
             other.AddElsa(m => m.Use<Unused>());
             static void SelectRoot(IModule module) => module.Use<Root>();
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(host.Diagnostics).IsEmpty();
         var source = HostSource(host);
         await Assert.That(source).Contains("ConfigureElsa(configure, CreatePlan0)");
@@ -456,7 +625,7 @@ public class FixedHostPlannerTests
         await Assert.That(source.Split("FixedFeatureSlot _unused;").Length - 1).IsEqualTo(1);
 
         var forwarded = Generate("services.AddElsa(m => m.UseManagement(management => management.UseDatabase()));",
-            sdk: sdkOutput.ToMetadataReference());
+            sdk: sdk);
         await Assert.That(forwarded.Diagnostics).IsEmpty();
         await Assert.That(HostSource(forwarded)).Contains("_database.Apply();");
 
@@ -466,7 +635,7 @@ public class FixedHostPlannerTests
             other.ConfigureElsa().Use<Unused>();
             services.AddElsa();
             other.AddElsa();
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(returned.Diagnostics).IsEmpty();
         var returnedSource = HostSource(returned);
         await Assert.That(returnedSource).Contains("_leaf.Apply();");
@@ -478,7 +647,7 @@ public class FixedHostPlannerTests
             collection.AddElsa(m => m.Use<Leaf>());
             collection = other;
             collection.AddElsa(m => m.Use<Unused>());
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(mutable.Diagnostics).IsEmpty();
         await Assert.That(HostSource(mutable).Split(" : FixedFeatureModule").Length - 1).IsEqualTo(2);
 
@@ -489,38 +658,38 @@ public class FixedHostPlannerTests
                 {
                     public static IServiceCollection Replace(this IServiceCollection services) => new ServiceCollection();
                 }
-                """, sdkOutput.ToMetadataReference());
+                """, sdk);
             var diagnostic = opaque.Diagnostics.Single();
             await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN012");
             await Assert.That(diagnostic.GetMessage()).Contains("Replace");
         }
 
         const string factory = "public static class Factory { public static IServiceCollection GetServices() => new ServiceCollection(); }";
-        var distinct = Generate("other.ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa(); Factory.GetServices().AddElsa();", factory, sdkOutput.ToMetadataReference());
+        var distinct = Generate("other.ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa(); Factory.GetServices().AddElsa();", factory, sdk);
         await Assert.That(distinct.Diagnostics).IsEmpty();
-        var captured = Generate("var saved = Factory.GetServices(); saved.ConfigureElsa(m => m.Use<Leaf>()); saved.AddElsa();", factory, sdkOutput.ToMetadataReference());
+        var captured = Generate("var saved = Factory.GetServices(); saved.ConfigureElsa(m => m.Use<Leaf>()); saved.AddElsa();", factory, sdk);
         await Assert.That(captured.Diagnostics).IsEmpty();
-        var repeated = Generate("Factory.GetServices().ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa();", factory, sdkOutput.ToMetadataReference());
+        var repeated = Generate("Factory.GetServices().ConfigureElsa(m => m.Use<Leaf>()); Factory.GetServices().AddElsa();", factory, sdk);
         await Assert.That(repeated.Diagnostics.Any(d => d.Id == "ELSAGEN012" && d.GetMessage().Contains("GetServices"))).IsTrue();
 
         var branch = Generate("""
             services.ConfigureElsa(m => m.Use<Leaf>());
             if (flag) services.AddElsa(m => m.Use<Unused>());
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(branch.Diagnostics.Single().Id).IsEqualTo("ELSAGEN012");
 
         var conditionalCollection = Generate("""
             var collection = services;
             if (flag) collection = other;
             collection.ConfigureElsa(m => m.Use<Unused>());
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(conditionalCollection.Diagnostics.Single().GetMessage()).Contains("reassigned conditionally");
 
         var reassignedCallback = Generate("""
             System.Action<IModule> configure = m => m.Use<Leaf>();
             if (flag) configure = m => m.Use<Unused>();
             services.AddElsa(configure);
-            """, sdk: sdkOutput.ToMetadataReference());
+            """, sdk: sdk);
         await Assert.That(reassignedCallback.Diagnostics.Single().GetMessage()).Contains("reassigned");
     }
 

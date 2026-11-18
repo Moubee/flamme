@@ -12,15 +12,53 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
 {
     internal List<Request> Features { get; } = [];
     internal List<Request> HostedServices { get; } = [];
+    // ConfigureElsa queues its callback until Apply. Consumers of the returned module
+    // can resolve a slot immediately, before any of the queued factories have run.
+    private readonly List<(SyntaxNode Site, Request? Request, bool Queued)> _resolutions = [];
+    private SyntaxNode? _resolutionSite;
+    private bool _queued;
+
+    internal bool HasFactoryBeforeResolution(INamedTypeSymbol type)
+    {
+        // Declarations in separate methods have no implied execution order. Each
+        // independent entry point must be safe when called first.
+        var scopes = _resolutions.Where(step => step.Request == null || SymbolEqualityComparer.Default.Equals(step.Request.Type, type))
+            .GroupBy(step => step.Site.Ancestors().FirstOrDefault(node => node is BaseMethodDeclarationSyntax or
+                LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax) ?? step.Site.SyntaxTree.GetRoot());
+        return scopes.Any() && scopes.All(scope =>
+        {
+            var pending = new List<Request?>();
+            foreach (var step in scope.OrderBy(step => step.Site.Span.End).ThenByDescending(step => step.Site.SpanStart))
+            {
+                if (step.Queued)
+                    pending.Add(step.Request);
+                else if (step.Request == null)
+                    return SuppliedBy(pending);
+                else if (!step.Request.CustomFactory || !step.Request.Conditional)
+                    return step.Request.CustomFactory;
+            }
+            return SuppliedBy(pending);
+        });
+
+        static bool SuppliedBy(List<Request?> requests)
+        {
+            foreach (var request in requests)
+            {
+                if (request?.CustomFactory != true) return false;
+                if (!request.Conditional) return true;
+            }
+            return false;
+        }
+    }
+
     internal bool Validated { get; private set; }
-    private readonly Dictionary<ILocalSymbol, AssignmentExpressionSyntax[]> _writeCache = new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<ILocalSymbol, LocalWrite[]> _writeCache = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<IParameterSymbol, IOperation> _localArguments = new(SymbolEqualityComparer.Default);
     private Dictionary<ITypeParameterSymbol, ITypeSymbol> _typeArguments = new(SymbolEqualityComparer.Default);
     private readonly FixedProducerModel.FeatureReturnOwners _returnOwners = new(producers);
     private readonly HashSet<InvocationExpressionSyntax> _collectionRoots = [];
     private readonly HashSet<ISymbol> _activeCallbacks = new(SymbolEqualityComparer.Default);
     private readonly INamedTypeSymbol? _module = compilation.GetTypeByMetadataName("Elsa.Features.Services.IModule");
-    private readonly INamedTypeSymbol? _feature = compilation.GetTypeByMetadataName("Elsa.Features.Services.IFeature");
 
     internal sealed class Request(INamedTypeSymbol type, Location location, bool conditional = false, bool customFactory = false, bool immediateFactory = false)
     {
@@ -64,7 +102,14 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             if (executed == false) return;
             var configure = operation.Arguments.FirstOrDefault(a => a.Parameter?.Name == "configure");
             if (configure != null && !configure.IsImplicit && configure.Value.ConstantValue is not { HasValue: true, Value: null })
+            {
+                _resolutionSite = syntax;
+                _queued = true;
                 ReadCallback(configure.Value, semantic, syntax.GetLocation(), new HashSet<ISymbol>(SymbolEqualityComparer.Default), executed == null);
+                _queued = false;
+                _resolutionSite = null;
+            }
+            if (site.Name == "AddElsa") _resolutions.Add((syntax, null, false));
             ReadConsumers(syntax, semantic, executed == null);
             return;
         }
@@ -125,7 +170,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             case IMethodReferenceOperation reference:
                 if (reference.Method.Parameters.Length != 1)
                     break;
-                var declaration = reference.Method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken);
+                var callbackMethod = reference.Method.PartialImplementationPart ?? reference.Method;
+                var declaration = callbackMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken);
                 if (declaration != null)
                 {
                     if (!_activeCallbacks.Add(reference.Method))
@@ -133,7 +179,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                         Error(callSite, $"A feature configurator recursively calls '{reference.Method}'.");
                         return;
                     }
-                    ReadMethodBody(reference.Method, declaration, semantic, reference.Method.OriginalDefinition.Parameters[0], null, conditional);
+                    ReadMethodBody(reference.Method, declaration, semantic, callbackMethod.OriginalDefinition.Parameters[0], null, conditional);
                     _activeCallbacks.Remove(reference.Method);
                 }
                 else if (producers.GetSelector(BindMethod(reference.Method)) is { } selector)
@@ -142,7 +188,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     break;
                 return;
             case ILocalReferenceOperation local when visited.Add(local.Local):
-                if (Writes(local.Local, semantic).Any(write => callSite.SourceTree != write.SyntaxTree || write.SpanStart < callSite.SourceSpan.Start))
+                if (Writes(local.Local, semantic).Any(write => callSite.SourceTree != write.Site.SyntaxTree || write.Site.Span.End <= callSite.SourceSpan.Start))
                 {
                     Error(callSite, $"The feature configurator '{local.Local.Name}' is reassigned. Use a single fixed callback at this composition site.");
                     return;
@@ -160,42 +206,31 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
 
     private void ReadBody(SyntaxNode body, SemanticModel semantic, ISymbol? owner, InvocationExpressionSyntax? creation, SyntaxNode boundary, bool ambientCondition = false, HashSet<ISymbol>? helperOwners = null)
     {
-        foreach (var assignment in body.DescendantNodesAndSelf().OfType<AssignmentExpressionSyntax>())
+        var outerSite = _resolutionSite;
+        var handledCallbacks = new HashSet<SyntaxNode>();
+        foreach (var expression in Expressions(body, null))
         {
-            if (!InvokedByComposition(assignment, body, semantic, out var inConditionalCallback) ||
-                semantic.GetOperation(assignment.Left) is not IPropertyReferenceOperation { Property.SetMethod: { } setter } property ||
-                producers.GetSelector(setter) is not { } selector || !AffectsComposition(selector))
-                continue;
-            var runs = Execution(assignment, boundary, creation, semantic);
-            if (runs == false) continue;
-            var inputs = new List<(ISymbol Parameter, IOperation Value)>();
-            if (property.Instance is { } receiver && IsModuleOrFeature(receiver.Type))
-                inputs.Add((setter.ContainingType, receiver));
-            foreach (var index in property.Arguments)
-                if (index.Parameter != null && IsModuleOrFeature(index.Value.Type))
-                    inputs.Add((setter.Parameters[index.Parameter.Ordinal], index.Value));
-            if (semantic.GetOperation(assignment.Right) is { } value && IsModuleOrFeature(value.Type))
-                inputs.Add((setter.Parameters.Last(), value));
-            var bound = new HashSet<ISymbol>(inputs.Where(input => Owned(input.Value)).Select(input => input.Parameter), SymbolEqualityComparer.Default);
-            if (inputs.Count == 0 ? !IsOwned(property.Instance, new HashSet<ISymbol>(SymbolEqualityComparer.Default)) : bound.Count == 0)
-                continue;
-            var conditional = runs == null || ambientCondition || inConditionalCallback;
-            if (bound.Count == inputs.Count)
-                AddSelector(selector, setter, assignment.GetLocation(), conditional);
-            else if (SymbolEqualityComparer.Default.Equals(setter.ContainingAssembly, compilation.Assembly) && selector.Error == null &&
-                     (!setter.IsVirtual && !setter.IsOverride || setter.IsSealed || setter.ContainingType.IsSealed) &&
-                     setter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken) is AccessorDeclarationSyntax accessor &&
-                     _activeCallbacks.Add(setter))
+            _resolutionSite = outerSite ?? (SyntaxNode?)expression.Ancestors().TakeWhile(node => node != body)
+                .OfType<AnonymousFunctionExpressionSyntax>().LastOrDefault()?.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault() ?? expression;
+            if (expression is not InvocationExpressionSyntax call)
             {
-                ReadBody(accessor, compilation.GetSemanticModel(accessor.SyntaxTree), null, null, accessor, conditional, bound);
-                _activeCallbacks.Remove(setter);
+                if (expression.Parent is MemberAccessExpressionSyntax member && member.Name == expression || expression.Parent is MemberBindingExpressionSyntax)
+                    continue;
+                switch (semantic.GetOperation(expression))
+                {
+                    case IPropertyReferenceOperation property when property.Property.ReturnsByRef ||
+                        property.Parent is not ISimpleAssignmentOperation simple || simple.Target != property:
+                        ReadAccessor(expression, property, property.Property.GetMethod);
+                        break;
+                    case IAssignmentOperation { Target: IPropertyReferenceOperation target } assignment:
+                        ReadAccessor(expression, target, target.Property.SetMethod, assignment.Value, assignment is ICoalesceAssignmentOperation);
+                        break;
+                    case IIncrementOrDecrementOperation { Target: IPropertyReferenceOperation target }:
+                        ReadAccessor(expression, target, target.Property.SetMethod);
+                        break;
+                }
+                continue;
             }
-            else if (reportedOwnershipErrors.Add(assignment))
-                Error(assignment.GetLocation(), $"Cannot assign the effects of '{property.Property}' to independent feature modules. Use a separate helper call per module.");
-        }
-        foreach (var call in body.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
-                     .OrderBy(call => call.Span.End).ThenByDescending(call => call.SpanStart))
-        {
             if (call == creation || !InvokedByComposition(call, body, semantic, out var inConditionalCallback) || semantic.GetOperation(call) is not IInvocationOperation invocation)
                 continue;
             var method = invocation.TargetMethod.ReducedFrom ?? invocation.TargetMethod;
@@ -232,12 +267,15 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 !IsOwned(receiver, new HashSet<ISymbol>(SymbolEqualityComparer.Default)) &&
                 !invocation.Arguments.Any(arg => !arg.IsImplicit && IsModuleOrFeature(arg.Value.Type) && Owned(arg.Value)))
                 continue;
-            if (method.Name == "Apply" && SymbolEqualityComparer.Default.Equals(method.ContainingType, _module))
-                continue;
             var executed = Execution(call, boundary, creation, semantic);
             if (executed == false)
                 continue;
             var conditional = executed == null || ambientCondition || inConditionalCallback;
+            if (method.Name == "Apply" && SymbolEqualityComparer.Default.Equals(method.ContainingType, _module))
+            {
+                RecordApply();
+                continue;
+            }
             if (api && method.Name is "Configure" or "Use")
             {
                 if (BindType(invocation.TargetMethod.TypeArguments.FirstOrDefault()) is not INamedTypeSymbol feature || !FeatureBinding.IsClosed(feature))
@@ -247,7 +285,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 }
                 var custom = method.Name == "Configure" && method.Parameters.Any(parameter => parameter.Name == "factory");
                 var immediate = custom && CheckFactory(invocation, feature, semantic, creation);
-                Features.Add(new Request(feature, call.GetLocation(), conditional, custom, immediate));
+                Record(new Request(feature, call.GetLocation(), conditional, custom, immediate));
                 ReadArguments(invocation, conditional, name => name == "configure");
                 continue;
             }
@@ -268,9 +306,8 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     ReadIndependentInputs(invocation, inputs, selector, conditional);
                     continue;
                 }
-                AddSelector(selector, method, call.GetLocation(), conditional);
-                ReadArguments(invocation, conditional, selector.ConfigurationParameters.Contains);
-                ReadArguments(invocation, true, selector.ConditionalConfigurationParameters.Contains);
+                AddSelector(selector, method, call.GetLocation(), conditional,
+                    (name, guarded) => ReadArguments(invocation, guarded, parameter => parameter == name));
             }
             else if (!api && method.MethodKind != MethodKind.DelegateInvoke && method.ContainingAssembly != null &&
                      !SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly) &&
@@ -278,7 +315,75 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 Error(call.GetLocation(), $"The package method '{method}' needs compiler-visible feature-selection metadata. Rebuild the package with the Elsa generator.");
         }
 
+        _resolutionSite = outerSite;
+
+        // Invocation receivers and arguments evaluate first. An inline configuration
+        // delegate executes inside the call, after Configure has resolved its own slot.
+        IEnumerable<ExpressionSyntax> Expressions(SyntaxNode node, List<SyntaxNode>? deferred)
+        {
+            if (handledCallbacks.Contains(node)) yield break;
+            if (node is AnonymousFunctionExpressionSyntax && deferred != null)
+            {
+                deferred.Add(node);
+                yield break;
+            }
+            var callbacks = node is InvocationExpressionSyntax ? new List<SyntaxNode>() : deferred;
+            foreach (var child in node.ChildNodes())
+                foreach (var expression in Expressions(child, callbacks))
+                    yield return expression;
+            if (node is InvocationExpressionSyntax or MemberAccessExpressionSyntax or MemberBindingExpressionSyntax or
+                ElementAccessExpressionSyntax or ElementBindingExpressionSyntax or AssignmentExpressionSyntax or
+                PrefixUnaryExpressionSyntax or PostfixUnaryExpressionSyntax or IdentifierNameSyntax)
+                yield return (ExpressionSyntax)node;
+            if (node is InvocationExpressionSyntax)
+                foreach (var callback in callbacks!)
+                    foreach (var expression in Expressions(callback, null))
+                        yield return expression;
+        }
+
         bool Owned(IOperation value) => IsOwned(value, new HashSet<ISymbol>(SymbolEqualityComparer.Default));
+
+        void ReadAccessor(ExpressionSyntax site, IPropertyReferenceOperation property, IMethodSymbol? method, IOperation? value = null, bool conditionalWrite = false)
+        {
+            if (method == null || FixedProducerModel.IsFrameworkProperty(property.Property) || !producers.IsCompositionMethod(method)) return;
+            var selector = producers.GetSelector(method);
+            var unresolvedDispatch = method.MethodKind == MethodKind.PropertyGet &&
+                (FixedProducerModel.CallsVirtualGetter(property, method) && property.Instance?.Type?.IsSealed != true ||
+                 selector is { VirtualCalls.Length: > 0 } or { ConditionalVirtualCalls.Length: > 0 });
+            if (!unresolvedDispatch && selector != null && !AffectsComposition(selector)) return;
+            for (IOperation? parent = property.Parent; parent != null; parent = parent.Parent)
+                if (parent is INameOfOperation) return;
+            if (!InvokedByComposition(site, body, semantic, out var inConditionalCallback)) return;
+            var runs = Execution(site, boundary, creation, semantic);
+            if (runs == false) return;
+            var inputs = new List<(ISymbol Parameter, IOperation Value)>();
+            if (property.Instance is { } receiver && IsModuleOrFeature(receiver.Type))
+                inputs.Add((method.ContainingType, receiver));
+            foreach (var index in property.Arguments)
+                if (index.Parameter != null && IsModuleOrFeature(index.Value.Type))
+                    inputs.Add((method.Parameters[index.Parameter.Ordinal], index.Value));
+            if (value != null && IsModuleOrFeature(value.Type))
+                inputs.Add((method.Parameters.Last(), value));
+            var bound = new HashSet<ISymbol>(inputs.Where(input => Owned(input.Value)).Select(input => input.Parameter), SymbolEqualityComparer.Default);
+            if (inputs.Count == 0 ? !IsOwned(property.Instance, new HashSet<ISymbol>(SymbolEqualityComparer.Default)) : bound.Count == 0)
+                return;
+            var conditional = runs == null || ambientCondition || inConditionalCallback || conditionalWrite;
+            if (unresolvedDispatch)
+                Error(site.GetLocation(), $"Cannot bind the virtual feature selection in '{method}' to a concrete receiver.");
+            else if (selector == null)
+                Error(site.GetLocation(), $"The property accessor '{method}' needs compiler-visible feature-selection metadata. Rebuild the package with the Elsa generator.");
+            else if (bound.Count == inputs.Count)
+                AddSelector(selector, method, site.GetLocation(), conditional);
+            else if (SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, compilation.Assembly) && selector.Error == null &&
+                     (!method.IsVirtual && !method.IsOverride || method.IsSealed || method.ContainingType.IsSealed) &&
+                     method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(output.CancellationToken) is { } accessor && _activeCallbacks.Add(method))
+            {
+                ReadBody(accessor, compilation.GetSemanticModel(accessor.SyntaxTree), null, null, accessor, conditional, bound);
+                _activeCallbacks.Remove(method);
+            }
+            else if (reportedOwnershipErrors.Add(site))
+                Error(site.GetLocation(), $"Cannot assign the effects of '{property.Property}' to independent feature modules. Use a separate helper call per module.");
+        }
 
         void ReadIndependentInputs(IInvocationOperation invocation, List<(ISymbol Parameter, IOperation Value)> inputs,
             FixedProducerSelector selector, bool conditional)
@@ -317,20 +422,16 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 var value = argument.Value;
                 while (value is IDelegateCreationOperation or IConversionOperation)
                     value = value is IDelegateCreationOperation d ? d.Target : ((IConversionOperation)value).Operand;
-                // Inline bodies are visited in lexical scope above. Opaque delegates can
-                // configure admitted slots, but cannot add an unplanned slot at runtime.
-                if (value is IMethodReferenceOperation or ILocalReferenceOperation)
+                if (value is IAnonymousFunctionOperation function)
+                {
+                    handledCallbacks.Add(function.Syntax);
+                    var bound = new HashSet<ISymbol>(helperOwners ?? [], SymbolEqualityComparer.Default);
+                    foreach (var parameter in function.Symbol.Parameters) bound.Add(parameter);
+                    ReadBody(function.Syntax, semantic, owner, creation, function.Syntax, conditional, bound);
+                }
+                else if (value is IMethodReferenceOperation or ILocalReferenceOperation)
                     ReadCallback(value, semantic, argument.Syntax.GetLocation(), new HashSet<ISymbol>(SymbolEqualityComparer.Default), conditional);
             }
-        }
-
-        bool Ambiguous(AssignmentExpressionSyntax? write, ILocalReferenceOperation reference)
-        {
-            if (write == null || !IsModuleOrFeature(reference.Type) || !AmbiguousWrite(write, reference.Syntax, semantic))
-                return false;
-            if (reportedOwnershipErrors.Add(write))
-                Error(write.GetLocation(), $"The module or feature alias '{reference.Local.Name}' is reassigned conditionally. Use a distinct local for each fixed composition.");
-            return true;
         }
 
         bool IsOwned(IOperation? value, HashSet<ISymbol> seen)
@@ -346,23 +447,20 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                 case IParenthesizedOperation parentheses:
                     return IsOwned(parentheses.Operand, seen);
                 case ILocalReferenceOperation local:
-                    if (SymbolEqualityComparer.Default.Equals(local.Local, owner))
+                    if (creation == null && SymbolEqualityComparer.Default.Equals(local.Local, owner)) return true;
+                    var write = Writes(local.Local, semantic).LastOrDefault(a => a.Site.Span.End <= value.Syntax.SpanStart);
+                    if (write != null && (write.Value == null || AmbiguousWrite(write.Site, value.Syntax, semantic)))
                     {
-                        if (creation == null) return true;
-                        if (value.Syntax.SpanStart <= creation.SpanStart) return false;
-                        var write = Writes(local.Local, semantic).LastOrDefault(a => a.SpanStart < value.Syntax.SpanStart);
-                        if (Ambiguous(write, local))
-                            return false;
-                        return write == null || write.SpanStart < creation.SpanStart || write.Right == creation;
+                        if (IsModuleOrFeature(local.Type) && reportedOwnershipErrors.Add(write.Site))
+                            Error(write.Site.GetLocation(), $"The module or feature alias '{local.Local.Name}' is reassigned conditionally or through unknown storage. Use a distinct local for each fixed composition.");
+                        return false;
                     }
-                    if (!seen.Add(local.Local))
-                        return false;
                     var initializer = (local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as VariableDeclaratorSyntax)?.Initializer?.Value;
-                    var assigned = Writes(local.Local, semantic).LastOrDefault(a => a.Span.End <= value.Syntax.SpanStart);
-                    var source = assigned?.Right ?? initializer;
-                    if (source == null || source.SyntaxTree != semantic.SyntaxTree || Ambiguous(assigned, local))
-                        return false;
-                    return IsOwned(semantic.GetOperation(source), seen);
+                    var source = write?.Value ?? initializer;
+                    // Each definition precedes the read. Following its RHS also handles fluent
+                    // self-assignment and simultaneous deconstruction without reading the new values early.
+                    return source != null && source.SyntaxTree == semantic.SyntaxTree && source.Span.End <= value.Syntax.SpanStart &&
+                        IsOwned(ExpressionOperation(semantic, source), seen);
                 case IInstanceReferenceOperation instance:
                     return instance.Type != null && helperOwners?.Contains(instance.Type) == true;
                 case IParameterReferenceOperation parameter:
@@ -377,9 +475,22 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     var lambda = parameter.Syntax.Ancestors().OfType<AnonymousFunctionExpressionSyntax>().FirstOrDefault(l =>
                         semantic.GetOperation(l) is IAnonymousFunctionOperation f && SymbolEqualityComparer.Default.Equals(f.Symbol, parameter.Parameter.ContainingSymbol));
                     var outer = lambda?.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-                    return outer != null && body.Span.Contains(outer.Span) && IsOwned(Receiver(semantic, outer), seen);
+                    if (outer == null || !body.Span.Contains(outer.Span) || semantic.GetOperation(outer) is not IInvocationOperation invocation)
+                        return false;
+                    var inputs = CompositionInputs(invocation);
+                    return inputs.Count > 0 && inputs.All(input => IsOwned(input.Value, new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default)));
+                case IPropertyReferenceOperation member when IsModuleOrFeature(member.Type):
+                    var origin = _returnOwners.ReturnedInput(member);
+                    if (origin != null) return IsOwned(origin, seen);
+                    if ((IsOwned(member.Instance, seen) || member.Arguments.Any(argument => Owned(argument.Value))) && reportedOwnershipErrors.Add(member.Syntax))
+                        Error(member.Syntax.GetLocation(), $"Cannot establish which module '{member.Property}' returns. Configure the intended module directly.");
+                    return false;
                 case IPropertyReferenceOperation member:
                     return IsOwned(member.Instance, seen);
+                case IFieldReferenceOperation field when IsModuleOrFeature(field.Type):
+                    if (IsOwned(field.Instance, seen) && reportedOwnershipErrors.Add(field.Syntax))
+                        Error(field.Syntax.GetLocation(), $"Cannot establish which module '{field.Field}' contains. Configure the intended module directly.");
+                    return false;
                 case IFieldReferenceOperation field:
                     return IsOwned(field.Instance, seen);
                 case IInvocationOperation call when call.Syntax is InvocationExpressionSyntax syntax:
@@ -492,17 +603,29 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
     }
 
     private static bool AffectsComposition(FixedProducerSelector selector) =>
-        selector.Error != null || selector.Features.Length != 0 || selector.ConditionalFeatures.Length != 0 ||
+        selector.Error != null || selector.Resolutions.Length != 0 || selector.Features.Length != 0 || selector.ConditionalFeatures.Length != 0 ||
         selector.Hosted.Length != 0 || selector.ConfigurationParameters.Length != 0 ||
         selector.ConditionalConfigurationParameters.Length != 0 || selector.VirtualCalls.Length != 0 || selector.ConditionalVirtualCalls.Length != 0;
 
-    private void AddSelector(FixedProducerSelector selector, IMethodSymbol method, Location location, bool conditional)
+    private void RecordApply() => _resolutions.Add((_resolutionSite!, null, _queued));
+
+    private void Record(Request request)
+    {
+        Features.Add(request);
+        _resolutions.Add((_resolutionSite!, request, _queued));
+    }
+
+    private void AddSelector(FixedProducerSelector selector, IMethodSymbol method, Location location, bool conditional, Action<string, bool>? invoke = null)
     {
         if (selector.Error != null)
             Error(location, $"Cannot resolve fixed selection in '{method}': {selector.Error}.");
-        Features.AddRange(selector.Features.Select(type => new Request(type, location, conditional,
-            customFactory: selector.FactoryFeatures.Contains(type, SymbolEqualityComparer.Default))));
-        Features.AddRange(selector.ConditionalFeatures.Select(type => new Request(type, location, conditional: true)));
+        foreach (var step in selector.OrderedResolutions())
+        {
+            if (step.Callback != null) invoke?.Invoke(step.Callback, conditional || step.Conditional);
+            else if (step.Type == null) RecordApply();
+            else if (step.Type.Value.Concrete is { } type)
+                Record(new Request(type, location, conditional || step.Conditional, step.Factory));
+        }
         HostedServices.AddRange(selector.Hosted.Select(type => new Request(type, location)));
     }
 
@@ -543,9 +666,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         return true;
     }
 
-    private bool IsModuleOrFeature(ITypeSymbol? type) => type != null && (SymbolEqualityComparer.Default.Equals(type, _module) ||
-        SymbolEqualityComparer.Default.Equals(type, _feature) || type.AllInterfaces.Any(candidate =>
-            SymbolEqualityComparer.Default.Equals(candidate, _feature) || SymbolEqualityComparer.Default.Equals(candidate, _module)));
+    private bool IsModuleOrFeature(ITypeSymbol? type) => producers.CompositionType(type);
 
     // true = unconditional, false = unreachable, null = selected by runtime control flow.
     private static bool? Execution(SyntaxNode call, SyntaxNode boundary, SyntaxNode? creation, SemanticModel semantic, int after = 0)
@@ -576,6 +697,7 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
                     break;
                 case ConditionalAccessExpressionSyntax access when access.WhenNotNull.Span.Contains(call.Span):
                 case BinaryExpressionSyntax coalesce when coalesce.IsKind(SyntaxKind.CoalesceExpression) && coalesce.Right.Span.Contains(call.Span):
+                case AssignmentExpressionSyntax assignment when assignment.IsKind(SyntaxKind.CoalesceAssignmentExpression) && assignment.Right.Span.Contains(call.Span):
                     conditional = true;
                     break;
                 case IfStatementSyntax statement when !statement.Condition.Span.Contains(call.Span):
@@ -613,14 +735,14 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
             .Any(node => node is ReturnStatementSyntax or GotoStatementSyntax or BreakStatementSyntax or ContinueStatementSyntax or YieldStatementSyntax);
     }
 
-    private AssignmentExpressionSyntax[] Writes(ILocalSymbol local, SemanticModel semantic)
+    private LocalWrite[] Writes(ILocalSymbol local, SemanticModel semantic)
     {
         if (!_writeCache.TryGetValue(local, out var writes))
             _writeCache[local] = writes = FindWrites(local, semantic).ToArray();
         return writes;
     }
 
-    internal static bool AmbiguousWrite(AssignmentExpressionSyntax write, SyntaxNode read, SemanticModel model)
+    internal static bool AmbiguousWrite(SyntaxNode write, SyntaxNode read, SemanticModel model)
     {
         var function = write.Ancestors().FirstOrDefault(node => node is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax or BaseMethodDeclarationSyntax);
         if (function != null && !function.Span.Contains(read.Span))
@@ -631,10 +753,50 @@ internal sealed class HostSelections(Compilation compilation, FixedProducerModel
         return Execution(write, common, null, model) != true;
     }
 
-    internal static IEnumerable<AssignmentExpressionSyntax> FindWrites(ILocalSymbol local, SemanticModel semantic) =>
-        semantic.SyntaxTree.GetRoot().DescendantNodes().OfType<AssignmentExpressionSyntax>()
-            .Where(assignment => assignment.Left is IdentifierNameSyntax id && id.Identifier.ValueText == local.Name &&
-                SymbolEqualityComparer.Default.Equals(semantic.GetSymbolInfo(id).Symbol, local));
+    internal sealed class LocalWrite(SyntaxNode site, ExpressionSyntax? value)
+    {
+        internal SyntaxNode Site => site;
+        internal ExpressionSyntax? Value => value;
+    }
+
+    internal static IEnumerable<LocalWrite> FindWrites(ILocalSymbol local, SemanticModel semantic)
+    {
+        var writes = new List<LocalWrite>();
+        var scope = local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().Ancestors().FirstOrDefault(
+            node => node is BaseMethodDeclarationSyntax or LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax) ?? semantic.SyntaxTree.GetRoot();
+        foreach (var node in scope.DescendantNodes())
+        {
+            if (node is AssignmentExpressionSyntax assignment)
+                Visit(assignment.Left, assignment.IsKind(SyntaxKind.SimpleAssignmentExpression) ? assignment.Right : null, assignment);
+            else if (node is ArgumentSyntax { Parent.Parent: { } call } arg && arg.RefKindKeyword.ValueText is "ref" or "out")
+                Visit(arg.Expression, null, call);
+            else if (node is RefExpressionSyntax reference)
+                Visit(reference.Expression, null, reference);
+        }
+        return writes.OrderBy(write => write.Site.Span.End);
+
+        void Visit(ExpressionSyntax target, ExpressionSyntax? value, SyntaxNode write)
+        {
+            while (target is ParenthesizedExpressionSyntax paren) target = paren.Expression;
+            while (value is ParenthesizedExpressionSyntax paren) value = paren.Expression;
+            if (target is TupleExpressionSyntax tuple)
+            {
+                var elements = (value as TupleExpressionSyntax)?.Arguments;
+                for (var i = 0; i < tuple.Arguments.Count; i++)
+                    Visit(tuple.Arguments[i].Expression, elements?.Count == tuple.Arguments.Count ? elements.Value[i].Expression : null, write);
+            }
+            else if (target is IdentifierNameSyntax id && id.Identifier.ValueText == local.Name &&
+                     SymbolEqualityComparer.Default.Equals(semantic.GetSymbolInfo(id).Symbol, local))
+                writes.Add(new LocalWrite(write, value));
+        }
+    }
+
+    internal static IOperation? ExpressionOperation(SemanticModel semantic, ExpressionSyntax expression)
+    {
+        while (expression is ParenthesizedExpressionSyntax parentheses)
+            expression = parentheses.Expression;
+        return semantic.GetOperation(expression);
+    }
 
     private void Error(Location location, string message) =>
         output.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.RuntimeSelection, location, message));

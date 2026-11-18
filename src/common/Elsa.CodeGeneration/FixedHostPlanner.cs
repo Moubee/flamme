@@ -21,6 +21,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
 
         // ConfigureElsa accumulates requests for the subsequent AddElsa on this service collection.
         // CreateModule always constructs an independent module, even when the receiver is shared.
+        var calls = new Dictionary<IMethodSymbol, IInvocationOperation[]>(SymbolEqualityComparer.Default);
         var groups = new List<List<RootSite>>();
         var collections = new Dictionary<CollectionPath, List<RootSite>>();
         var potentialAliases = new Dictionary<CollectionPath, List<(RootSite Site, IInvocationOperation? Origin)>>();
@@ -29,8 +30,8 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             var invocation = site.Invocation!;
             var semantic = compilation.GetSemanticModel(invocation.SyntaxTree);
             var receiver = HostSelections.Receiver(semantic, invocation);
-            var key = site.Name == "CreateModule" ? null : CollectionPath.For(receiver, semantic, (location, local) => output.ReportDiagnostic(Diagnostic.Create(
-                CompilerDiagnostics.RuntimeSelection, location, $"The service collection '{local}' is reassigned conditionally. Use a distinct collection local for each fixed composition.")), Remember);
+            var key = site.Name == "CreateModule" ? null : CollectionPath.For(receiver, semantic, CallsTo, (location, local) => output.ReportDiagnostic(Diagnostic.Create(
+                CompilerDiagnostics.RuntimeSelection, location, $"The service collection '{local}' is reassigned conditionally or through unknown storage. Use a distinct collection local for each fixed composition.")), Remember);
             if (key != null) Remember(key, null);
             if (key != null && collections.TryGetValue(key, out var existing))
                 existing.Add(site);
@@ -59,10 +60,34 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             foreach (var (_, origin) in uses)
                 if (origin != null && reported.Add(origin.Syntax))
                     output.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.RuntimeSelection, origin.Syntax.GetLocation(),
-                        $"The compiler cannot determine whether '{origin.TargetMethod.Name}' returns the same service collection for these different feature plans. " +
-                        "Use one collection variable for all Elsa calls on the same collection, and call fluent registration helpers separately."));
+                        $"The call to '{origin.TargetMethod.Name}' can share a service collection across different fixed feature plans. " +
+                        "Place related Elsa calls on the same collection variable in one method."));
         }
         return _plans;
+
+        IInvocationOperation[] CallsTo(IMethodSymbol method)
+        {
+            if (calls.TryGetValue(method, out var known)) return known;
+            var result = new List<IInvocationOperation>();
+            foreach (var tree in compilation.SyntaxTrees)
+            {
+                var model = compilation.GetSemanticModel(tree);
+                foreach (var invocation in tree.GetRoot(output.CancellationToken).DescendantNodes().OfType<InvocationExpressionSyntax>())
+                {
+                    var name = invocation.Expression switch
+                    {
+                        MemberAccessExpressionSyntax member => member.Name,
+                        MemberBindingExpressionSyntax binding => binding.Name,
+                        SimpleNameSyntax simple => simple,
+                        _ => null
+                    };
+                    if (name?.Identifier.ValueText == method.Name && model.GetOperation(invocation, output.CancellationToken) is IInvocationOperation call &&
+                        SymbolEqualityComparer.Default.Equals((call.TargetMethod.ReducedFrom ?? call.TargetMethod).OriginalDefinition, method))
+                        result.Add(call);
+                }
+            }
+            return calls[method] = result.ToArray();
+        }
     }
 
     // Keep the owning object as part of the key: first.Services and second.Services
@@ -77,31 +102,40 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
         public override bool Equals(object? other) => other is CollectionPath path && Equals(path);
         public override int GetHashCode() => unchecked(SymbolEqualityComparer.Default.GetHashCode(symbol) * 31 + (owner?.GetHashCode() ?? 0) + version);
 
-        internal static CollectionPath? For(IOperation? operation, SemanticModel model, Action<Location, string> ambiguous,
+        internal static CollectionPath? For(IOperation? operation, SemanticModel model, Func<IMethodSymbol, IInvocationOperation[]> callsTo, Action<Location, string> ambiguous,
             Action<CollectionPath, IInvocationOperation?> possible, HashSet<ISymbol>? seen = null)
         {
             switch (operation)
             {
                 case ILocalReferenceOperation local:
-                    seen ??= new HashSet<ISymbol>(SymbolEqualityComparer.Default);
-                    if (!seen.Add(local.Local)) return null;
                     var declaration = local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as VariableDeclaratorSyntax;
-                    var write = HostSelections.FindWrites(local.Local, model).LastOrDefault(a => a.SpanStart < local.Syntax.SpanStart);
-                    if (write != null && HostSelections.AmbiguousWrite(write, local.Syntax, model))
+                    var write = HostSelections.FindWrites(local.Local, model).LastOrDefault(a => a.Site.Span.End <= local.Syntax.SpanStart);
+                    if (write != null && (write.Value == null || HostSelections.AmbiguousWrite(write.Site, local.Syntax, model)))
                     {
-                        ambiguous(write.GetLocation(), local.Local.Name);
+                        ambiguous(write.Site.GetLocation(), local.Local.Name);
                         return null;
                     }
-                    var value = write?.Right ?? declaration?.Initializer?.Value;
-                    if (value != null && value.SyntaxTree == model.SyntaxTree && model.GetOperation(value) is { } alias)
-                    {
-                        if (alias is IParameterReferenceOperation or ILocalReferenceOperation or IPropertyReferenceOperation or IFieldReferenceOperation)
-                            return For(alias, model, ambiguous, possible, seen);
-                        if (IsCollection(alias.Type) && For(alias, model, ambiguous, possible, seen) is { } collection)
-                            return collection;
-                    }
-                    return new CollectionPath(local.Local, version: write?.SpanStart ?? -1);
+                    var value = write?.Value ?? declaration?.Initializer?.Value;
+                    if (value != null && value.SyntaxTree == model.SyntaxTree && value.Span.End <= local.Syntax.SpanStart &&
+                        InputPath(HostSelections.ExpressionOperation(model, value)) is { } alias)
+                        return alias;
+                    return new CollectionPath(local.Local, version: write?.Site.SpanStart ?? -1);
                 case IParameterReferenceOperation parameter:
+                    // The same helper site may have several callers. Keep its own fixed
+                    // plan and diagnose incompatible plans on a collection passed to it.
+                    if (IsCollection(parameter.Type) && parameter.Parameter.ContainingSymbol is IMethodSymbol enclosing)
+                    {
+                        seen ??= new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+                        if (seen.Add(parameter.Parameter))
+                            foreach (var call in callsTo(enclosing.OriginalDefinition))
+                            {
+                                var arg = call.Arguments.FirstOrDefault(a => a.Parameter?.Name == parameter.Parameter.Name)?.Value;
+                                if (arg == null && call.TargetMethod.ReducedFrom != null && parameter.Parameter.Ordinal == 0) arg = call.Instance;
+                                if (arg != null && For(arg, arg.SemanticModel!, callsTo, ambiguous, possible,
+                                    new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default)) is { } path)
+                                    possible(path, call);
+                            }
+                    }
                     return new CollectionPath(parameter.Parameter);
                 case IInstanceReferenceOperation instance:
                     return instance.Type == null ? null : new CollectionPath(instance.Type);
@@ -110,16 +144,16 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
                 case IFieldReferenceOperation field:
                     return Member(field.Field, field.Instance);
                 case IConversionOperation conversion when conversion.OperatorMethod == null:
-                    return For(conversion.Operand, model, ambiguous, possible, seen);
+                    return InputPath(conversion.Operand);
                 case IParenthesizedOperation parentheses:
-                    return For(parentheses.Operand, model, ambiguous, possible, seen);
+                    return InputPath(parentheses.Operand);
                 case IInvocationOperation call when IsCollection(call.Type):
                     var method = call.TargetMethod.ReducedFrom ?? call.TargetMethod;
                     var receiver = call.Instance ?? (method.IsExtensionMethod ? call.Arguments.FirstOrDefault(a => a.Parameter?.Ordinal == 0)?.Value : null);
                     if (method.ContainingAssembly.Name == "Microsoft.Extensions.Logging" && method.GetDocumentationCommentId() is
                         "M:Microsoft.Extensions.DependencyInjection.LoggingServiceCollectionExtensions.AddLogging(Microsoft.Extensions.DependencyInjection.IServiceCollection)" or
                         "M:Microsoft.Extensions.DependencyInjection.LoggingServiceCollectionExtensions.AddLogging(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.Extensions.Logging.ILoggingBuilder})")
-                        return For(receiver, model, ambiguous, possible, seen);
+                        return InputPath(receiver);
 
                     // An opaque factory may return an input, a cached collection or a fresh one.
                     // These paths can diagnose incompatible plans. They never merge them.
@@ -133,7 +167,7 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
                 default:
                     return null;
             }
-            CollectionPath? InputPath(IOperation? value) => For(value, model, ambiguous, possible,
+            CollectionPath? InputPath(IOperation? value) => For(value, model, callsTo, ambiguous, possible,
                 seen == null ? null : new HashSet<ISymbol>(seen, SymbolEqualityComparer.Default));
 
             static bool IsCollection(ITypeSymbol? type) => type != null && (IsCollectionContract(type) || type.AllInterfaces.Any(IsCollectionContract));
@@ -143,10 +177,35 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
 
             CollectionPath? Member(ISymbol member, IOperation? instance)
             {
-                if (instance == null) return new CollectionPath(member);
-                var parent = For(instance, model, ambiguous, possible, seen);
-                return parent == null ? null : new CollectionPath(member, parent);
+                var parent = InputPath(instance);
+                if (parent == null && instance != null) return null;
+                var path = new CollectionPath(member, parent);
+                if (!IsCollection(operation!.Type)) return path;
+
+                var scope = operation.Syntax.Ancestors().FirstOrDefault(node => node is BaseMethodDeclarationSyntax or LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax)
+                    ?? model.SyntaxTree.GetRoot();
+                foreach (var write in scope.DescendantNodes().OfType<AssignmentExpressionSyntax>()
+                             .Where(a => a.Span.End <= operation.Syntax.SpanStart).OrderByDescending(a => a.Span.End))
+                {
+                    var target = model.GetOperation(write.Left) as IMemberReferenceOperation;
+                    if (target == null || !SymbolEqualityComparer.Default.Equals(member, target.Member) ||
+                        !Equals(parent, InputPath(target.Instance))) continue;
+                    if (HostSelections.AmbiguousWrite(write, operation.Syntax, model) ||
+                        model.GetOperation(write) is not ISimpleAssignmentOperation ||
+                        member is IPropertySymbol property && !IsAutoProperty(property))
+                    {
+                        ambiguous(write.GetLocation(), member.Name);
+                        return null;
+                    }
+                    return InputPath(HostSelections.ExpressionOperation(model, write.Right)) ?? new CollectionPath(member, parent, write.SpanStart);
+                }
+                return path;
             }
+
+            static bool IsAutoProperty(IPropertySymbol property) =>
+                !property.IsAbstract && (!property.IsVirtual && !property.IsOverride || property.IsSealed || property.ContainingType.IsSealed) &&
+                property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is PropertyDeclarationSyntax { AccessorList: { } list } &&
+                list.Accessors.All(a => a.Body == null && a.ExpressionBody == null);
         }
     }
 
@@ -203,8 +262,8 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             if (selection.Validated)
                 foreach (var dependency in item.Strong.Where(type => !present.Contains(type)))
                     Error($"Feature '{item.Type}' requires '{dependency}', which was excluded by its presence condition.");
-            if (!item.HasDefaultFactory && !selection.Features.Any(root => root.CustomFactory && !root.Conditional && SymbolEqualityComparer.Default.Equals(root.Type, item.Type)))
-                Error($"Feature '{item.Type}' requires an explicit factory. Select it with Configure<T>(factory, configure).");
+            if (!item.HasDefaultFactory && !selection.HasFactoryBeforeResolution(item.Type))
+                Error($"Feature '{item.Type}' requires an explicit factory before its first resolution. Call Configure<T>(factory, configure) before Use, default Configure, or Apply.");
         }
         var features = graph.Where(item => present.Contains(item.Type)).ToList();
         var hosted = new List<string>();

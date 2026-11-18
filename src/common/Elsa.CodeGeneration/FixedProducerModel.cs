@@ -28,13 +28,12 @@ internal sealed class FixedProducerFeature(INamedTypeSymbol type, string bridge,
 internal sealed partial class FixedProducerSelector
 {
     public INamedTypeSymbol[] Features { get => ConcreteTypes(SelectedTypes); set => SelectedTypes = ConcreteTerms(value); }
-    public INamedTypeSymbol[] FactoryFeatures { get => ConcreteTypes(FactoryTypes); set => FactoryTypes = ConcreteTerms(value); }
     public INamedTypeSymbol[] ConditionalFeatures { get => ConcreteTypes(ConditionalTypes); set => ConditionalTypes = ConcreteTerms(value); }
     public string[] ConfigurationParameters { get; internal set; } = [];
     public string[] ConditionalConfigurationParameters { get; internal set; } = [];
     internal string? ReturnOwner { get; set; }
-    internal string[] VirtualCalls { get; set; } = [];
-    internal string[] ConditionalVirtualCalls { get; set; } = [];
+    internal VirtualCall[] VirtualCalls { get; set; } = [];
+    internal VirtualCall[] ConditionalVirtualCalls { get; set; } = [];
     public string? Error { get; internal set; }
     internal INamedTypeSymbol[] Hosted { get => ConcreteTypes(HostedTypes); set => HostedTypes = ConcreteTerms(value); }
 }
@@ -104,15 +103,17 @@ internal sealed partial class FixedProducerModel
                 if (node is TypeDeclarationSyntax { BaseList: not null } decl &&
                     semantic.GetDeclaredSymbol(decl, token) is INamedTypeSymbol { IsAbstract: false } type && _binding.IsFeature(type) && FeatureBinding.IsClosed(type))
                     localTypes.Add(type);
-                if (node is TypeDeclarationSyntax typeDecl && semantic.GetDeclaredSymbol(typeDecl, token) is INamedTypeSymbol constructorOwner &&
-                    _binding.IsFeature(constructorOwner))
-                    methods.AddRange(constructorOwner.InstanceConstructors);
+                if (node is TypeDeclarationSyntax typeDecl && semantic.GetDeclaredSymbol(typeDecl, token) is INamedTypeSymbol constructorOwner)
+                    methods.AddRange(constructorOwner.InstanceConstructors.Where(IsCompositionMethod));
                 if (node is MethodDeclarationSyntax declaration &&
                     semantic.GetDeclaredSymbol(declaration, token) is IMethodSymbol method && IsCompositionMethod(method))
                     methods.Add(method);
-                if (node is AccessorDeclarationSyntax accessor && semantic.GetDeclaredSymbol(accessor, token) is
-                    IMethodSymbol { MethodKind: MethodKind.PropertySet } setter && CompositionType(setter.ContainingType))
-                    methods.Add(setter);
+                if (node is BasePropertyDeclarationSyntax property && semantic.GetDeclaredSymbol(property, token) is IPropertySymbol declaredProperty &&
+                    CompositionType(declaredProperty.ContainingType))
+                {
+                    if (declaredProperty.GetMethod is { } getter) methods.Add(getter);
+                    if (declaredProperty.SetMethod is { } setter) methods.Add(setter);
+                }
                 // A closed generic feature or hosted service may only appear as a type
                 // argument to a selector in a package. Produce bindings here, where the
                 // specialization is visible. The bound selector determines membership.
@@ -167,12 +168,11 @@ internal sealed partial class FixedProducerModel
             {
                 var key = assembly.Identity.Name + "|" + (string)attr.ConstructorArguments[0].Value!;
                 var effects = ReadEffects(attr.ConstructorArguments, 1, 6, selector: true);
-                var factoryKeys = new HashSet<string>(NamedStrings(attr, "Factories"), StringComparer.Ordinal);
-                effects.FactoryTypes = effects.SelectedTypes.Where(type => factoryKeys.Contains(SelectorKey(type))).ToArray();
+                effects.Resolutions = ReadResolutions(attr, effects);
                 effects.ConfigurationParameters = attr.ConstructorArguments[4].Values.Select(a => (string)a.Value!).ToArray();
                 effects.ReturnOwner = attr.NamedArguments.FirstOrDefault(arg => arg.Key == "ReturnOwner").Value.Value as string;
-                effects.VirtualCalls = Strings(attr, 5);
-                effects.ConditionalVirtualCalls = Strings(attr, 7);
+                effects.VirtualCalls = ReadVirtualCalls(Strings(attr, 5), effects);
+                effects.ConditionalVirtualCalls = ReadVirtualCalls(Strings(attr, 7), effects);
                 effects.ConditionalConfigurationParameters = Strings(attr, 8);
                 _selectors[key] = effects;
             }
@@ -216,6 +216,8 @@ internal sealed partial class FixedProducerModel
             item.ConditionalIntroduced = Types(lifecycle.SelectMany(s => s.ConditionalFeatures));
             item.Hosted = Types(lifecycle.SelectMany(s => s.Hosted));
             item.Error = lifecycle.Select(s => s.Error).FirstOrDefault(e => e != null);
+            if (item.Hosted.FirstOrDefault(service => !_services.ContainsKey(service)) is {} missing)
+                item.Error ??= $"No generated hosted-service binding is available for '{missing}'";
         }
         // Rendering formats alias-qualified type names. Finish it before sharing the model
         // across the producer and host generators, so their source output can run concurrently.
@@ -250,6 +252,61 @@ internal sealed partial class FixedProducerModel
         }
     }
 
+    private SlotResolution[] ReadResolutions(AttributeData attribute, FixedProducerSelector selector)
+    {
+        var steps = new List<SlotResolution>();
+        foreach (var entry in NamedStrings(attribute, "ResolutionOrder"))
+        {
+            if (entry == "*")
+            {
+                steps.Add(new SlotResolution(null));
+                continue;
+            }
+            if (entry.Length > 2 && (entry[0] is '?' or '!') && entry[1] == '@')
+            {
+                steps.Add(new SlotResolution(null, entry[0] == '?', callback: entry.Substring(2)));
+                continue;
+            }
+            if (entry.Length > 2 && (entry[0] is '?' or '!') && (entry[1] is '+' or '-'))
+            {
+                var key = entry.Substring(2);
+                SelectorType? term = _types.TryGetValue(key, out var type) ? new SelectorType(type) :
+                    SelectorType.TryReadParameter(key, out var parameter) ? parameter : null;
+                if (term is { } resolved)
+                {
+                    steps.Add(new SlotResolution(resolved, entry[0] == '?', entry[1] == '+'));
+                    continue;
+                }
+            }
+            selector.Error ??= $"invalid slot resolution '{entry}' in the producer metadata";
+        }
+        return steps.ToArray();
+    }
+
+    private VirtualCall[] ReadVirtualCalls(string[] records, FixedProducerSelector selector)
+    {
+        var calls = new List<VirtualCall>();
+        foreach (var record in records)
+        {
+            var parts = record.Split('\n');
+            var arguments = new List<SelectorType>();
+            foreach (var key in parts.Skip(1))
+            {
+                if (SelectorType.TryReadParameter(key, out var parameter)) arguments.Add(parameter);
+                else
+                {
+                    var separator = key.IndexOf('|');
+                    var type = separator < 1 ? null : DocumentationCommentId.GetSymbolsForReferenceId(key.Substring(separator + 1), _compilation)
+                        .OfType<INamedTypeSymbol>().FirstOrDefault(t => t.ContainingAssembly.Identity.Name == key.Substring(0, separator));
+                    if (type == null) selector.Error ??= $"cannot bind type argument '{key}' of virtual feature callback '{parts[0]}'";
+                    else arguments.Add(new SelectorType(type));
+                }
+            }
+            if (arguments.Count == parts.Length - 1) calls.Add(new VirtualCall(parts[0], arguments.ToArray()));
+        }
+        return calls.ToArray();
+    }
+
     internal enum ArgumentKind { TypeArgument, BooleanArgument, Text, TextArray }
     private static readonly ArgumentKind[] SelectorArguments = [Text, TextArray, TextArray, Text, TextArray, TextArray, TextArray, TextArray, TextArray];
     private static readonly ArgumentKind[] SlotArguments = [TypeArgument, BooleanArgument, TextArray, TextArray, Text, TextArray, Text];
@@ -261,7 +318,7 @@ internal sealed partial class FixedProducerModel
     {
         if (bridge.GetMembers("SchemaVersion").OfType<IFieldSymbol>().FirstOrDefault()?.ConstantValue is not 1) return false;
         foreach (var attr in bridge.GetAttributes().Where(a => IsAttribute(a, bridge, "SelectorAttribute")))
-            if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "Factories" && !IsStringArray(pair.Value) ||
+            if (!Matches(attr, SelectorArguments) || attr.NamedArguments.Any(pair => pair.Key == "ResolutionOrder" && !IsStringArray(pair.Value) ||
                 pair.Key == "ReturnOwner" && (pair.Value.Kind != TypedConstantKind.Primitive || pair.Value.Value is not string))) return false;
         foreach (var method in bridge.GetMembers().OfType<IMethodSymbol>())
         foreach (var attr in method.GetAttributes())
@@ -388,7 +445,7 @@ internal sealed partial class FixedProducerModel
             {
                 public SelectorAttribute(string method, string[] features, string[] hosted, string? error, string[] configurationParameters, string[] virtualCalls, string[] conditional, string[] conditionalVirtualCalls, string[] conditionalConfigurationParameters) { }
                 public string? ReturnOwner { get; set; }
-                public string[]? Factories { get; set; }
+                public string[]? ResolutionOrder { get; set; }
             }
             """).Append(body);
         return source.ToString();
@@ -396,10 +453,15 @@ internal sealed partial class FixedProducerModel
 
     private static string SelectorAttributeSource(string key, FixedProducerSelector selector)
     {
-        var factories = selector.FactoryTypes.Length == 0 ? "" : ", Factories = " + Keys(selector.FactoryTypes);
+        var order = selector.Resolutions.Length == 0 ? "" : ", ResolutionOrder = " + StringArray(selector.Resolutions.Select(step =>
+            step.Callback is { } callback ? (step.Conditional ? "?@" : "!@") + callback :
+            step.Type is { } type ? (step.Conditional ? "?" : "!") + (step.Factory ? "+" : "-") + SelectorKey(type) : "*"));
         var owner = selector.ReturnOwner == null ? "" : ", ReturnOwner = " + Literal(selector.ReturnOwner);
-        return $"[Selector({Literal(key)}, {Keys(selector.SelectedTypes)}, {Keys(selector.HostedTypes)}, {Literal(selector.Error)}, {StringArray(selector.ConfigurationParameters)}, {StringArray(selector.VirtualCalls)}, {Keys(selector.ConditionalTypes)}, {StringArray(selector.ConditionalVirtualCalls)}, {StringArray(selector.ConditionalConfigurationParameters)}{factories}{owner})]";
+        return $"[Selector({Literal(key)}, {Keys(selector.SelectedTypes)}, {Keys(selector.HostedTypes)}, {Literal(selector.Error)}, {StringArray(selector.ConfigurationParameters)}, {Calls(selector.VirtualCalls)}, {Keys(selector.ConditionalTypes)}, {Calls(selector.ConditionalVirtualCalls)}, {StringArray(selector.ConditionalConfigurationParameters)}{order}{owner})]";
     }
+
+    private static string Calls(IEnumerable<VirtualCall> calls) =>
+        StringArray(calls.Select(call => call.Encode()).Distinct(StringComparer.Ordinal).OrderBy(key => key, StringComparer.Ordinal));
 
     private static string SelectorKey(SelectorType type) => type.Concrete is {} symbol ? TypeKey(symbol) : type.ParameterKey;
     private static string Keys(IEnumerable<SelectorType> types) => StringArray(types.Select(SelectorKey).Distinct(StringComparer.Ordinal));

@@ -17,6 +17,13 @@ internal readonly struct SelectorType
     internal SelectorType(ITypeParameterSymbol parameter) : this(null, parameter, parameter.Ordinal) { }
     internal string ParameterKey => "!!" + Ordinal.ToString(CultureInfo.InvariantCulture);
 
+    internal static SelectorType? From(ITypeSymbol? type) => type switch
+    {
+        INamedTypeSymbol named when FeatureBinding.IsClosed(named) => new SelectorType(named),
+        ITypeParameterSymbol { TypeParameterKind: TypeParameterKind.Method } parameter => new SelectorType(parameter),
+        _ => null
+    };
+
     internal static bool TryReadParameter(string key, out SelectorType parameter)
     {
         parameter = default;
@@ -49,16 +56,51 @@ internal readonly struct SelectorType
     }
 }
 
+// A selector resolves one slot, invokes a host callback, or applies every slot.
+internal readonly struct SlotResolution(SelectorType? type, bool conditional = false, bool factory = false, string? callback = null)
+{
+    internal SelectorType? Type { get; } = type;
+    internal bool Conditional { get; } = conditional;
+    internal bool Factory { get; } = factory;
+    internal string? Callback { get; } = callback;
+}
+
+/// <summary>Virtual dispatch is resolved on the admitted feature type, using the arguments from the original call.</summary>
+internal sealed class VirtualCall(string methodKey, SelectorType[] arguments)
+{
+    internal string MethodKey => methodKey;
+    internal SelectorType[] Arguments => arguments;
+    internal VirtualCall Bind(IMethodSymbol method, bool allowOpen, ref string? error)
+    {
+        if (arguments.All(argument => argument.Concrete != null)) return this;
+        var bound = new SelectorType[arguments.Length];
+        for (var i = 0; i < bound.Length; i++)
+            bound[i] = arguments[i].Bind(method, allowOpen, ref error);
+        return new VirtualCall(methodKey, bound);
+    }
+
+    // Documentation IDs contain no newlines. Non-generic calls retain their original metadata.
+    internal string Encode() => string.Join("\n", new[] { methodKey }.Concat(arguments.Select(argument =>
+        argument.Concrete is {} type ? type.ContainingAssembly.Identity.Name + "|" + DocumentationCommentId.CreateReferenceId(type) : argument.ParameterKey)));
+}
+
 internal sealed partial class FixedProducerSelector
 {
     internal SelectorType[] SelectedTypes { get; set; } = [];
     internal SelectorType[] ConditionalTypes { get; set; } = [];
     internal SelectorType[] HostedTypes { get; set; } = [];
-    internal SelectorType[] FactoryTypes { get; set; } = [];
+    internal SlotResolution[] Resolutions { get; set; } = [];
+
+    internal IEnumerable<SlotResolution> OrderedResolutions() => Resolutions.Length > 0 ? Resolutions :
+        SelectedTypes.Select(type => new SlotResolution(type))
+            .Concat(ConditionalTypes.Select(type => new SlotResolution(type, conditional: true)))
+            .Concat(ConfigurationParameters.Select(name => new SlotResolution(null, callback: name)))
+            .Concat(ConditionalConfigurationParameters.Select(name => new SlotResolution(null, conditional: true, callback: name)));
 
     internal FixedProducerSelector Bind(IMethodSymbol method, bool allowOpen)
     {
-        if (!HasParameters(SelectedTypes) && !HasParameters(ConditionalTypes) && !HasParameters(HostedTypes) && !HasParameters(FactoryTypes))
+        if (!HasParameters(SelectedTypes) && !HasParameters(ConditionalTypes) && !HasParameters(HostedTypes) &&
+            !VirtualCalls.Any(call => HasParameters(call.Arguments)) && !ConditionalVirtualCalls.Any(call => HasParameters(call.Arguments)))
             return this;
 
         // Keep definition summaries immutable. Two calls to Select<T> can belong to
@@ -68,7 +110,10 @@ internal sealed partial class FixedProducerSelector
         bound.SelectedTypes = Map(SelectedTypes);
         bound.ConditionalTypes = Map(ConditionalTypes);
         bound.HostedTypes = Map(HostedTypes);
-        bound.FactoryTypes = Map(FactoryTypes);
+        bound.Resolutions = Resolutions.Select(step =>
+            new SlotResolution(step.Type?.Bind(method, allowOpen, ref error), step.Conditional, step.Factory, step.Callback)).ToArray();
+        bound.VirtualCalls = VirtualCalls.Select(call => call.Bind(method, allowOpen, ref error)).ToArray();
+        bound.ConditionalVirtualCalls = ConditionalVirtualCalls.Select(call => call.Bind(method, allowOpen, ref error)).ToArray();
         bound.Error = error;
         return bound;
 

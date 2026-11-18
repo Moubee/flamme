@@ -92,8 +92,14 @@ Calls inside
 requests an absent type, the fixed module throws before invoking the factory
 or configuration action. A custom factory receives the actual host module.
 A package helper can select a feature without a default constructor by calling
-`module.Configure(m => new CustomFeature(m, value))` unconditionally.
+`module.Configure(m => new CustomFeature(m, value))` unconditionally before
+the first `Use<CustomFeature>()`, default `Configure<CustomFeature>()`, or
+`Apply()`. This order also applies inside package helpers and their callbacks.
+A `ConfigureElsa` callback runs when the module is first applied. Code that
+uses the returned module before that point must supply its own factory first.
 
+Pass the host callback to `AddElsa` or `ConfigureElsa`. Assigning
+`AppFeature.Configurator` directly in a generated host reports `ELSAGEN012`.
 The host callback runs before the selected features' `Configure()` methods.
 An optional provider can assign its own service factory during that later
 phase. For example, the EF Core runtime provider assigns `TriggerStore`.
@@ -113,6 +119,9 @@ their result is assigned to a local. When an opaque helper might return a
 collection used by another Elsa call with a different plan, the compiler reports
 `ELSAGEN012`. Capture a factory result once and use that variable for both Elsa
 calls, or call a registration helper separately on the original collection.
+The same diagnostic applies when a source helper receives the collection and its
+Elsa calls would use a different plan from the caller. Keep those Elsa calls
+together or move their feature selections into one shared configurator.
 Application code can pass a configured module into a previously compiled helper.
 Module creation inside a precompiled helper must itself use a generated plan.
 
