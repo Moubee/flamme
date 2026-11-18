@@ -1,0 +1,104 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [":approveMajorUpdates"],
+  "dependencyDashboard": { "enabled": true },
+  "enabledManagers": ["nuget", "npm", "github-actions", "dockerfile"],
+  "timezone": "Europe/Minsk",
+  "schedule": ["* * * * 1"],
+  "minimumReleaseAge": "7 days",
+  "prConcurrentLimit": 2,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "automerge": false,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "minimumReleaseAge": "0 days",
+    "dependencyDashboardApproval": false,
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "description": "Raise the declared minimum for bare versions in NuGet manifests.",
+      "matchManagers": ["nuget"],
+      "matchDatasources": ["nuget"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Keep runtime packages on the major supported by their target framework, including the shared EF Core 10 provider and tooling.",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": [
+        "Microsoft.AspNetCore.*", "Microsoft.Extensions.*",
+        "Microsoft.EntityFrameworkCore", "Microsoft.EntityFrameworkCore.*",
+        "Npgsql.EntityFrameworkCore.PostgreSQL", "dotnet-ef",
+        "System.Formats.Asn1", "System.Text.Json"
+      ],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Service both supported target frameworks together while retaining each entry's major version.",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Microsoft.AspNetCore.*", "Microsoft.Extensions.*", "System.Formats.Asn1", "System.Text.Json"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": ".NET runtime servicing"
+    },
+    {
+      "description": "The test matrix installs the .NET 10 runtime alongside the SDK selected by global.json.",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["dotnet-sdk"],
+      "matchCurrentValue": "/^10\\./",
+      "allowedVersions": "<11"
+    },
+    {
+      "description": "Both server Dockerfiles use this image tag as the publish target framework as well.",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["mcr.microsoft.com/dotnet/aspnet"],
+      "allowedVersions": "/^11\\.0$/"
+    },
+    {
+      "description": "Build the containers with the SDK used by the repository.",
+      "matchManagers": ["nuget", "dockerfile"],
+      "matchPackageNames": ["dotnet-sdk", "mcr.microsoft.com/dotnet/sdk"],
+      "groupName": ".NET build SDK"
+    },
+    {
+      "matchPackageNames": ["TUnit", "TUnit.*"],
+      "groupName": "TUnit"
+    },
+    {
+      "matchPackageNames": ["Aspire.AppHost.Sdk", "Aspire.Hosting.*"],
+      "groupName": "Aspire hosting"
+    },
+    {
+      "matchPackageNames": ["Microsoft.EntityFrameworkCore", "Microsoft.EntityFrameworkCore.*", "dotnet-ef"],
+      "groupName": "EF Core"
+    },
+    {
+      "matchPackageNames": ["Testcontainers", "Testcontainers.*"],
+      "groupName": "Testcontainers"
+    },
+    {
+      "description": "The instrumented server image installs the release archive separately for each architecture.",
+      "matchPackageNames": ["OpenTelemetry.AutoInstrumentation"],
+      "prBodyNotes": ["Update OTEL_VERSION in docker/ElsaServer-Datadog.Dockerfile and verify both Linux archive SHA-256 values against the matching upstream release."]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm non-major dependencies"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["actions/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "GitHub-maintained actions"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["docker/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Docker-maintained actions"
+    }
+  ]
+}

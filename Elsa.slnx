@@ -11,7 +11,6 @@
   </Folder>
   <Folder Name="/github/">
     <File Path=".github/copilot-instructions.md" />
-    <File Path=".github/dependabot.yml" />
   </Folder>
   <Folder Name="/github/issue_templates/">
     <File Path=".github/ISSUE_TEMPLATE/bug_report.md" />
@@ -45,6 +44,7 @@
     <File Path="icon.png" />
     <File Path="NuGet.Config" />
     <File Path="README.md" />
+    <File Path="renovate.json" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />

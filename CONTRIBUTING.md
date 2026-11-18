@@ -96,31 +96,38 @@ See the [CI guide](doc/ci.md) for workflow policy, dependency locks, and artifac
 
 ### Dependency updates
 
-[Dependabot](.github/dependabot.yml) checks GitHub Actions and the production JavaScript
-ClientLib npm project every Monday at 06:00 UTC (09:00 in Minsk). Update pull requests use
-Conventional Commits with the `chore` prefix and a dependency scope. Add any new
-npm manifest directory to the existing `directories` list so it receives updates.
+[Renovate](renovate.json) manages NuGet packages, the .NET SDK and tools, npm
+manifests, GitHub Actions (including composite actions), and Docker base images.
+The hosted app discovers manifests automatically. Routine updates can open on
+Mondays in Minsk after a seven-day release delay, with up to two open update
+PRs. Use the Dependency Dashboard to approve proposed major updates. Merging
+updates to the Microsoft runtime packages across target-framework majors
+requires an intentional framework migration.
 
-Minor and patch version updates are grouped by provider or package family, such
-as webpack and the `actions` and `docker` action owners. Major upgrades and
-unmatched packages receive individual pull requests.
+Review dependency PRs against the upstream release notes and the existing
+required CI checks. Renovate groups related packages and leaves merging to
+maintainers. Agents investigating a failed update should identify the failing
+dependency, check its supported frameworks, and report the commands and
+results in the PR. Keep fixes on the update PR where possible. Renovate
+documents how [maintainer edits affect rebases](https://docs.renovatebot.com/updating-rebasing/).
 
-Routine NuGet version scans remain disabled. The retired Loom and manifest
-generator integrations no longer require Feedz; `NuGet.Config` now uses only
-nuget.org. Update NuGet packages and regenerate complete lockfiles manually as
-described above. Re-enabling scheduled NuGet scans is a separate CI policy change.
-Repository security-alert and security-update settings are managed separately.
+- For NuGet or SDK changes, check the complete lockfile diff and run
+  `dotnet restore Elsa.slnx --locked-mode`. If locks need regeneration, run
+  `dotnet restore Elsa.slnx --force-evaluate` for all targets first. Both .NET
+  lanes in the PR workflow must pass.
+- For npm changes, run `npm ci` and the package's build script in the affected
+  directory. Review and commit any changes to bundled assets shipped from Git.
+- When updating OpenTelemetry auto-instrumentation, update the release version
+  and both upstream SHA-256 values in the Datadog Dockerfile together. Build
+  for both supported Linux architectures when validating an archive change.
 
-The GitHub Actions `directories` list includes the NuGet cache composite action,
-which is outside the default workflow scan. Add other composite action directories
-when they introduce external `uses:` dependencies.
-
-Routine version updates have an explicit seven-day release cooldown for every
-ecosystem, including major upgrades. A release becomes eligible after seven
-days, then waits for the next weekly scan; the cooldown does not trigger a scan
-itself. Dependabot security updates bypass the cooldown and weekly version-update
-schedule, provided security updates are enabled in the repository settings. See
-the [Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown).
+To activate the [free hosted app](https://github.com/apps/renovate), grant it
+access to `Moubee/flamme`. Keep the GitHub dependency graph and Dependabot
+alerts enabled so Renovate can open vulnerability-fix PRs. Those PRs can open
+immediately, outside the routine schedule and PR limit. After Renovate is
+active and can read alerts, disable **Dependabot security updates** in the
+repository settings to complete the handoff. This setting is independent of
+the removed Dependabot version-update configuration.
 
 ### Architecture Decision Records
 

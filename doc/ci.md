@@ -58,7 +58,7 @@ downloads using OS, architecture, workload, framework, and restore inputs.
 A cache hit never skips restore. Tool caches have separate fallbacks; compiled
 `bin` and `obj` outputs are not cached.
 
-Dependabot policy and manual package-update instructions live in
+Renovate policy and dependency PR verification instructions live in
 [CONTRIBUTING.md](../CONTRIBUTING.md#dependency-updates). The configured
 [`NuGet.Config`](../NuGet.Config) uses nuget.org; historical Feedz access notes
 and CI timing reports are available in Git history.
