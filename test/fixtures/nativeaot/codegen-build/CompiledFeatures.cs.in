@@ -5,6 +5,7 @@ using Elsa.Extensions;
 using Elsa.Features.Abstractions;
 using Elsa.Features.Attributes;
 using Elsa.Features.Contracts;
+using Elsa.Features.Implementations;
 using Elsa.Features.Services;
 using Elsa.NativeAot.Modules.Producer;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,16 +33,7 @@ try
         installed.Find("Elsa.Consumer") is null || installed.Find("Elsa.Unselected") is not null)
         throw new InvalidOperationException($"Unexpected feature lifecycle: {string.Join(", ", state.Events)}");
 
-    // An opaque hosted-service request exposes which provider actually reached this fresh module.
-    var observed = "Dynamic";
-    try
-    {
-        services.CreateModule().ConfigureHostedService(GetOpaqueService());
-    }
-    catch (InvalidOperationException exception) when (exception.Message.Contains(nameof(UnlistedHostedService), StringComparison.Ordinal))
-    {
-        observed = "Generated";
-    }
+    var observed = ((Module)module).Catalog is null ? "Dynamic" : "Generated";
     if (args.Length != 4 || args[0] != "--expect-provider" || args[1] != observed || args[2] != "--expect-native" ||
         bool.Parse(args[3]) == RuntimeFeature.IsDynamicCodeSupported || JsonSerializer.IsReflectionEnabledByDefault)
         throw new InvalidOperationException($"Unexpected provider or publication settings: {observed}.");
@@ -58,18 +50,10 @@ catch (Exception exception)
     return 1;
 }
 
-static Type GetOpaqueService() => typeof(UnlistedHostedService);
-
 [DependsOn(typeof(FoundationFeature))]
 internal sealed class ConsumerFeature(IModule module, string source) : FeatureBase(module)
 {
     private ProducerState State => (ProducerState)Module.Properties[ProducerState.StatePropertyKey];
     public override void Configure() => State.Events.Add(source + ".configure");
     public override void Apply() => State.Events.Add(source + ".apply");
-}
-
-internal sealed class UnlistedHostedService : IHostedService
-{
-    public Task StartAsync(CancellationToken token) => Task.CompletedTask;
-    public Task StopAsync(CancellationToken token) => Task.CompletedTask;
 }
