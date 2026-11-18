@@ -90,7 +90,7 @@ public class CodeGenerationTests
     [Arguments(false, "Generated")]
     public async Task SourceLibraryOnlyInheritsTheGlobalMode(bool appLocal, string childProvider)
     {
-        var consumer = await CodeGenerationConsumer.Create($"source-library-{childProvider}", sourceLibrary: true, localMode: appLocal);
+        var consumer = await CodeGenerationConsumer.Create($"source-library-{childProvider}", sourceLibrary: true, localMode: appLocal, compiledFeatures: true);
         await consumer.Verify("Generated", appLocal ? [] : ["-p:ElsaExecutionMode=Generated"]);
         await consumer.VerifyChildMode(childProvider);
     }

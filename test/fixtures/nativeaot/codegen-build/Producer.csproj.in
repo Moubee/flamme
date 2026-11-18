@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == '' And '$(TargetFramework)' == 'net11.0'">true</UseRuntimeAsync>
+    <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == ''">false</UseRuntimeAsync>
+    <Features Condition="'$(UseRuntimeAsync)' == 'true' And '$(TargetFramework)' == 'net11.0'">$(Features);runtime-async=on</Features>
+    <WeaverConfiguration><Weavers><ConfigureAwait ContinueOnCapturedContext="false" /></Weavers></WeaverConfiguration>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa.Features" />
+    <PackageReference Include="ConfigureAwait.Fody" PrivateAssets="All" />
+    <PackageReference Include="Fody" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

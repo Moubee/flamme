@@ -5,9 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Elsa.CodeGeneration.Build" PrivateAssets="All" />
-    <PackageReference Include="Elsa.CodeGeneration" PrivateAssets="All" />
-    <PackageReference Include="Elsa.CodeGeneration.Analyzers" PrivateAssets="All" />
+    <PackageReference Include="Elsa.Features" />
   </ItemGroup>
   <Target Name="RecordFixtureLibrarySettings" AfterTargets="ResolveElsaCodeGenerationSettings">
     <WriteLinesToFile File="$(MSBuildProjectDirectory)/observed-mode.txt"
