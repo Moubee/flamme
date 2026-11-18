@@ -1,0 +1,17 @@
+<Project>
+  <Import Project="../tools/roslyn/Elsa.CodeGeneration.Build.targets" Condition="'$(_ElsaCodeGenerationTargetsImported)' != 'true'" />
+
+  <!-- NuGet normally keeps analyzer assets private across a module dependency. Adding
+       these build-only assets here also gives transitive consumers and IDEs the compiler. -->
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true'">
+    <Analyzer Include="$(MSBuildThisFileDirectory)../tools/roslyn/*.dll" />
+  </ItemGroup>
+
+  <!-- Hosts migrating from the standalone packages must run each compiler component once. -->
+  <Target Name="RemoveStandaloneElsaCompilerAssets" AfterTargets="ResolveLockFileAnalyzers"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'Elsa.CodeGeneration' Or '%(Analyzer.NuGetPackageId)' == 'Elsa.CodeGeneration.Analyzers'" />
+    </ItemGroup>
+  </Target>
+</Project>

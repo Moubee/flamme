@@ -5,9 +5,15 @@
             Provides utilities to turn your class library into a module that provides features.
         </Description>
         <PackageTags>elsa common</PackageTags>
+        <_FeatureCompilerPackTfm>$(TargetFrameworks.Split(';')[0])</_FeatureCompilerPackTfm>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackFeatureCompiler</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
 
     <ItemGroup>
+        <_FeatureCompilerProject Include="../Elsa.CodeGeneration/Elsa.CodeGeneration.csproj;
+                                         ../Elsa.CodeGeneration.Analyzers/Elsa.CodeGeneration.Analyzers.csproj;
+                                         ../RegistrationCompiler/RegistrationCompiler.csproj" />
+        <ProjectReference Include="@(_FeatureCompilerProject)" ReferenceOutputAssembly="false" PrivateAssets="all" />
         <ProjectReference Include="../Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj" />
     </ItemGroup>
 
@@ -16,4 +22,22 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="../Elsa.CodeGeneration.Build/buildTransitive/Elsa.CodeGeneration.Build.props"
+              Pack="true" PackagePath="buildTransitive/Elsa.Features.props" />
+        <None Include="../Elsa.CodeGeneration.Build/buildTransitive/Elsa.CodeGeneration.Build.targets"
+              Pack="true" PackagePath="tools/roslyn/Elsa.CodeGeneration.Build.targets" />
+        <None Include="buildTransitive/Elsa.Features.targets" Pack="true" PackagePath="buildTransitive/" />
+    </ItemGroup>
+
+    <!-- Compiler tools have a single netstandard2.0 asset for all runtime targets.
+         GetTargetPath also works for packing without a build and SDK artifacts output layouts. -->
+    <Target Name="PackFeatureCompiler" Condition="'$(TargetFrameworks)' == '' Or '$(TargetFramework)' == '$(_FeatureCompilerPackTfm)'">
+        <MSBuild Projects="@(_FeatureCompilerProject)" Targets="GetTargetPath" Properties="TargetFramework=netstandard2.0">
+            <Output TaskParameter="TargetOutputs" ItemName="_FeatureCompilerAssembly" />
+        </MSBuild>
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="@(_FeatureCompilerAssembly)" PackagePath="tools/roslyn/" />
+        </ItemGroup>
+    </Target>
 </Project>
