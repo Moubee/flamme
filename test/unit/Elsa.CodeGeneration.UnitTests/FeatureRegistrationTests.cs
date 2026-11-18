@@ -57,13 +57,18 @@ public class FeatureRegistrationTests
             public override void Apply() => Module.Properties["steps"] += "plugin;";
         }
 
-        internal sealed class CustomFeature(IModule module, string value) : FeatureBase(module)
+        internal sealed class CustomFeature(IModule module) : FeatureBase(module)
         {
-            public override void Apply() => Module.Properties["custom"] = value;
+            public required string Value { get; init; }
+            public override void Apply() => Module.Properties["custom"] = Value;
         }
-        internal sealed class UnselectedFeature : FeatureBase
+        internal sealed class UnselectedFeature : IFeature
         {
-            public UnselectedFeature(IModule module) : base(module) => throw new Exception("unselected");
+            public UnselectedFeature(IModule module) => throw new Exception("unselected");
+            public IModule Module => throw new NotSupportedException();
+            public void Configure() { }
+            public void ConfigureHostedServices() { }
+            public void Apply() { }
         }
         internal sealed class GenericFeature<T>(IModule module) : FeatureBase(module);
         [DependencyOf(typeof(UnselectedFeature))]
@@ -82,10 +87,12 @@ public class FeatureRegistrationTests
         {
             public static string Run(ExplicitFeatureCatalog catalog)
             {
+                if (!catalog.FeatureTypes.Contains(typeof(UnselectedFeature)))
+                    throw new Exception("missing available direct IFeature implementation");
                 var services = new ServiceCollection();
                 var module = services.CreateModule(catalog);
                 module.Configure<PluginFeature>(p => p.Priority = 42);
-                module.Configure(m => new CustomFeature(m, "caller"));
+                module.Configure(m => new CustomFeature(m) { Value = "caller" });
                 module.Use<GenericFeature<int>>();
                 module.Configure<ExcludedFeature>();
                 module.Apply();
@@ -157,10 +164,17 @@ public class FeatureRegistrationTests
         const string source = """
             using Elsa.Features.Abstractions;
             using Elsa.Features.Services;
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
             public class Host
             {
                 private sealed class HiddenFeature(IModule module) : FeatureBase(module);
-                public static void Start(IModule module) => module.Configure<HiddenFeature>();
+                public static void Start(IServiceCollection services, ExplicitFeatureCatalog explicitCatalog)
+                {
+                    services.CreateModule(explicitCatalog).Configure<HiddenFeature>();
+                    var module = services.CreateModule();
+                    module.Configure<HiddenFeature>();
+                }
             }
             """;
         var input = Create("Host", ("Request.cs", source));
@@ -176,14 +190,55 @@ public class FeatureRegistrationTests
     }
 
     [Test]
+    [Arguments("[CustomDependency]", "derived attribute")]
+    [Arguments("[DependsOn(typeof(HiddenFeature))]", "accessible, closed feature type")]
+    public async Task UnsupportedMetadataIdentifiesTheRequestedFeature(string attribute, string reason)
+    {
+        const string call = "module.Configure<PluginFeature>()";
+        var source = $$"""
+            using Elsa.Features.Abstractions;
+            using Elsa.Features.Attributes;
+            using Elsa.Features.Services;
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
+            public static class Host
+            {
+                private sealed class HiddenFeature(IModule module) : FeatureBase(module);
+                private sealed class CustomDependencyAttribute() : DependsOnAttribute(typeof(HiddenFeature));
+                {{attribute}}
+                public sealed class PluginFeature(IModule module) : FeatureBase(module);
+                public static void Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    module.Configure<PluginFeature>();
+                }
+            }
+            """;
+        var input = Create("Host", ("Request.cs", source));
+        var diagnostic = CompilerTest.CreateDriver(true, new ElsaFeatureGenerator()).Run(input, out var output)
+            .GetRunResult().Diagnostics.Single();
+        await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN010");
+        await Assert.That(diagnostic.Location.SourceSpan).IsEqualTo(new TextSpan(source.IndexOf(call, StringComparison.Ordinal), call.Length));
+        await Assert.That(diagnostic.GetMessage()).Contains(reason);
+        await Assert.That(diagnostic.GetMessage()).Contains("PluginFeature");
+        await output.AssertEmits();
+    }
+
+    [Test]
     public async Task RebuildingAReferencedFeatureWithCompilerToolingClearsItsRequestDiagnostic()
     {
         const string call = "module.Configure<Infrastructure.DatabaseFeature>()";
         const string source = """
             using Elsa.Features.Services;
+            using Elsa.Extensions;
+            using Microsoft.Extensions.DependencyInjection;
             public static class Host
             {
-                public static void Start(IModule module) => module.Configure<Infrastructure.DatabaseFeature>();
+                public static void Start(IServiceCollection services)
+                {
+                    var module = services.CreateModule();
+                    module.Configure<Infrastructure.DatabaseFeature>();
+                }
             }
             """;
         var library = Create("Infrastructure", ("Dependency.cs", Dependency));

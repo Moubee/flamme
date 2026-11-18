@@ -50,12 +50,12 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
         return name?.Identifier.ValueText is "ConfigureHostedService" or "Configure" or "Use";
     }
 
-    private sealed class Request(INamedTypeSymbol type, bool hostedService, string requester, Location location)
+    private sealed class Request(INamedTypeSymbol type, bool hostedService, string requester, InvocationExpressionSyntax syntax)
     {
         public INamedTypeSymbol Type { get; } = type;
         public bool HostedService { get; } = hostedService;
         public string Requester { get; } = requester;
-        public Location Location { get; } = location;
+        public InvocationExpressionSyntax Syntax { get; } = syntax;
     }
 
     private static Request? GetRequest(GeneratorSyntaxContext context, CancellationToken cancellation)
@@ -85,7 +85,46 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
             return null;
 
         var requester = context.SemanticModel.GetEnclosingSymbol(context.Node.SpanStart, cancellation);
-        return new Request(type, hosted, requester?.ToDisplayString() ?? "<module>", context.Node.GetLocation());
+        return new Request(type, hosted, requester?.ToDisplayString() ?? "<module>", (InvocationExpressionSyntax)context.Node);
+    }
+
+    // An explicit catalog or injected module may have bindings unknown to the compiler.
+    // Diagnose only when the receiver comes from an ordinary, interceptable source root.
+    private static bool IsCompiledRoot(Request request, Compilation compilation, CancellationToken cancellation)
+    {
+        var model = compilation.GetSemanticModel(request.Syntax.SyntaxTree);
+        if (model.GetOperation(request.Syntax, cancellation) is not IInvocationOperation invocation)
+            return false;
+        var receiver = invocation.Instance ?? invocation.Arguments.FirstOrDefault(a => a.Parameter?.Ordinal == 0)?.Value;
+        if (receiver is ILocalReferenceOperation local)
+        {
+            // Recognize the immediately following call only. Assignments, aliases and
+            // arbitrary intervening code can change which provider a local refers to.
+            var declaration = local.Local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(cancellation) as VariableDeclaratorSyntax;
+            if (declaration?.Initializer is null || declaration.Parent is not VariableDeclarationSyntax { Variables.Count: 1 } ||
+                declaration.Parent.Parent is not LocalDeclarationStatementSyntax statement ||
+                request.Syntax.Parent is not ExpressionStatementSyntax use || use.GetFirstToken().GetPreviousToken() != statement.SemicolonToken)
+                return false;
+            receiver = model.GetOperation(declaration.Initializer.Value, cancellation);
+        }
+        if (receiver is IParameterReferenceOperation parameter && parameter.Parameter.ContainingSymbol is IMethodSymbol { MethodKind: MethodKind.AnonymousFunction } lambda)
+        {
+            var source = receiver.Syntax.Ancestors().OfType<AnonymousFunctionExpressionSyntax>().FirstOrDefault();
+            if (source is null || !(source.Body == request.Syntax || source.Body is BlockSyntax body && body.Statements.FirstOrDefault() is ExpressionStatementSyntax first && first.Expression == request.Syntax) ||
+                model.GetOperation(source, cancellation) is not IAnonymousFunctionOperation function ||
+                !SymbolEqualityComparer.Default.Equals(function.Symbol, lambda) || function.Parent?.Parent?.Parent is not IInvocationOperation configure)
+                return false;
+            receiver = configure;
+        }
+        if (receiver is not IInvocationOperation root)
+            return false;
+        var method = root.TargetMethod.ReducedFrom ?? root.TargetMethod;
+        var owner = method.ContainingType;
+        return method.Name == "CreateModule" && owner.ContainingAssembly.Name == "Elsa.Features" &&
+               owner.ToDisplayString() == "Elsa.Extensions.DependencyInjectionExtensions" &&
+               (method.Parameters.Length == 1 || method.Parameters.Length == 2 && method.Parameters[1].Type.ToDisplayString() == "Elsa.Features.Models.CompositionPolicy")
+               || method.Name is "AddElsa" or "ConfigureElsa" && owner.ContainingAssembly.Name == "Elsa" &&
+               owner.ToDisplayString() == "Elsa.Extensions.ModuleExtensions" && method.Parameters.Length == 2;
     }
 
     private static void Emit(SourceProductionContext context, Compilation compilation, CompilerSettings settings,
@@ -103,7 +142,7 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
             if (type is not null && binding.IsFeature(type) && FeatureBinding.IsClosed(type))
                 pending.Enqueue(type);
 
-        var diagnose = settings.IsHost && settings.IsGenerated && settings.IsCompiler && !CompilerContract.HasAuthoredHost(compilation);
+        var generatedHost = settings.IsHost && settings.IsGenerated && settings.IsCompiler;
         foreach (var request in requests)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -114,17 +153,21 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
             // Its helper may legitimately refer to internal dependency types hidden from us.
             if (!request.HostedService && !type.IsGenericType && !SymbolEqualityComparer.Default.Equals(type.ContainingAssembly, compilation.Assembly))
             {
-                if (diagnose && !RegistrationSource.HasProducer(type.ContainingAssembly, AdapterId))
-                    context.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InaccessibleRequest, request.Location,
-                        request.Requester, type, $"compile '{type.ContainingAssembly.Name}' with the Elsa feature generator"));
+                if (generatedHost)
+                {
+                    var issue = RegistrationSource.HasProducer(type.ContainingAssembly, AdapterId)
+                        ? binding.FeatureError(type, type.ContainingAssembly)
+                        : $"compile '{type.ContainingAssembly.Name}' with the Elsa feature generator";
+                    if (issue is not null)
+                        ReportIfCompiled(request, issue);
+                }
                 continue;
             }
 
-            var reason = request.HostedService ? binding.HostedServiceError(type) : binding.FeatureError(type);
+            var reason = request.HostedService ? binding.HostedServiceError(type) : binding.FeatureError(type, compilation.Assembly);
             if (reason is not null)
             {
-                if (diagnose)
-                    context.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InaccessibleRequest, request.Location, request.Requester, type, reason));
+                ReportIfCompiled(request, reason);
                 continue;
             }
             if (request.HostedService)
@@ -137,7 +180,7 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             var type = pending.Dequeue();
-            if (!processed.Add(type) || binding.FeatureError(type) is not null)
+            if (!processed.Add(type) || binding.FeatureError(type, compilation.Assembly) is not null)
                 continue;
             var (strong, conditional) = binding.Dependencies(type);
             statements.Add(binding.Registration(type, strong, conditional));
@@ -152,5 +195,12 @@ public sealed class ElsaFeatureGenerator : IIncrementalGenerator
             return;
         var source = RegistrationSource.EmitProducer(compilation.AssemblyName!, AdapterId, BuilderType, statements);
         context.AddSource("ElsaFeatureRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
+
+        void ReportIfCompiled(Request request, string reason)
+        {
+            if (generatedHost && IsCompiledRoot(request, compilation, context.CancellationToken))
+                context.ReportDiagnostic(Diagnostic.Create(CompilerDiagnostics.InaccessibleRequest, request.Syntax.GetLocation(),
+                    request.Requester, request.Type, reason));
+        }
     }
 }

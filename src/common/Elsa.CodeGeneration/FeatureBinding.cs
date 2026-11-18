@@ -26,28 +26,35 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
     };
 
     // File-local types (including type arguments) cannot be named from a generated file.
-    private bool CanName(ITypeSymbol type) => compilation.IsSymbolAccessibleWithin(type, compilation.Assembly) && type switch
+    private bool CanName(ITypeSymbol type, IAssemblySymbol within) => compilation.IsSymbolAccessibleWithin(type, within) && type switch
     {
-        INamedTypeSymbol named => !named.IsFileLocal && named.TypeArguments.All(CanName) &&
-                                 (named.ContainingType is null || CanName(named.ContainingType)),
-        IArrayTypeSymbol array => CanName(array.ElementType),
+        INamedTypeSymbol named => !named.IsFileLocal && named.TypeArguments.All(arg => CanName(arg, within)) &&
+                                 (named.ContainingType is null || CanName(named.ContainingType, within)),
+        IArrayTypeSymbol array => CanName(array.ElementType, within),
         _ => true
     };
 
     internal string? HostedServiceError(INamedTypeSymbol type) =>
-        type.TypeKind == TypeKind.Class && !type.IsAbstract && _hostedService is not null && type.AllInterfaces.Contains(_hostedService, SymbolEqualityComparer.Default) && CanName(type)
+        type.TypeKind == TypeKind.Class && !type.IsAbstract && _hostedService is not null && type.AllInterfaces.Contains(_hostedService, SymbolEqualityComparer.Default) && CanName(type, compilation.Assembly)
             ? null : "use an accessible, closed, concrete hosted-service implementation";
 
-    internal string? FeatureError(INamedTypeSymbol type)
+    internal string? FeatureError(INamedTypeSymbol type, IAssemblySymbol within)
     {
-        if (type.TypeKind != TypeKind.Class || type.IsAbstract || !IsFeature(type) || !CanName(type))
+        if (type.TypeKind != TypeKind.Class || type.IsAbstract || !IsFeature(type) || !CanName(type, within))
             return "use an accessible, closed, concrete feature implementation";
 
-        var (strong, conditional) = Dependencies(type);
-        foreach (var dependency in strong.Concat(conditional))
+        foreach (var attribute in InheritedAttributes(type))
         {
-            if (!CanName(dependency) || !IsClosed(dependency))
-                return $"dependency '{dependency}' must be accessible and closed";
+            // Derived attributes can execute arbitrary code to compute their Type or
+            // display text. Compiling their constructor arguments as literals changes it.
+            for (var parent = attribute.AttributeClass?.BaseType; parent is not null; parent = parent.BaseType)
+                if (Same(parent, _dependsOn) || Same(parent, _dependencyOf) || Same(parent, _displayName) || Same(parent, _description))
+                    return $"metadata from derived attribute '{attribute.AttributeClass}' cannot be evaluated at build time";
+
+            if (!Same(attribute.AttributeClass, _dependsOn) && !Same(attribute.AttributeClass, _dependencyOf))
+                continue;
+            if (DependencyType(attribute) is not INamedTypeSymbol dependency || !CanName(dependency, within) || !IsClosed(dependency))
+                return $"dependency in '{attribute}' must be an accessible, closed feature type";
         }
         return null;
     }
@@ -63,12 +70,17 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
             if (list is null)
                 continue;
 
-            var argument = attribute.NamedArguments.FirstOrDefault(pair => pair.Key == "Type");
-            var value = argument.Key is null ? attribute.ConstructorArguments.FirstOrDefault() : argument.Value;
-            if (value.Value is INamedTypeSymbol dependency)
+            if (DependencyType(attribute) is INamedTypeSymbol dependency)
                 list.Add(dependency);
         }
         return (strong.ToArray(), conditional.ToArray());
+    }
+
+    private static ITypeSymbol? DependencyType(AttributeData attribute)
+    {
+        var argument = attribute.NamedArguments.FirstOrDefault(pair => pair.Key == "Type");
+        var value = argument.Key is null ? attribute.ConstructorArguments.FirstOrDefault() : argument.Value;
+        return value.Value as ITypeSymbol;
     }
 
     internal string Registration(INamedTypeSymbol type, INamedTypeSymbol[] strong, INamedTypeSymbol[] conditional)
@@ -87,14 +99,24 @@ internal sealed class FeatureBinding(Compilation compilation, INamedTypeSymbol f
         // supply a feature with no usable default constructor.
         if (_module is null)
             return "null";
-        var parameters = type.InstanceConstructors
+        var constructors = type.InstanceConstructors
             .Where(ctor => ctor.DeclaredAccessibility == Accessibility.Public && ctor.Parameters.Length == 1 &&
                            ctor.Parameters[0].RefKind == RefKind.None && Assignable(_module, ctor.Parameters[0].Type))
-            .Select(ctor => ctor.Parameters[0].Type).ToArray();
-        var best = parameters.FirstOrDefault(parameter => parameters.All(other => Assignable(parameter, other)));
-        if (best is null)
+            .ToArray();
+        var best = constructors.FirstOrDefault(ctor => constructors.All(other => Assignable(ctor.Parameters[0].Type, other.Parameters[0].Type)));
+        if (best is null || HasUnsatisfiedRequiredMembers(best))
             return "null";
-        return $"static module => new {TypeName(type)}(({TypeName(best)})module)";
+        return $"static module => new {TypeName(type)}(({TypeName(best.Parameters[0].Type)})module)";
+    }
+
+    private static bool HasUnsatisfiedRequiredMembers(IMethodSymbol ctor)
+    {
+        if (ctor.GetAttributes().Any(attribute => attribute.AttributeClass?.ToDisplayString() == "System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute"))
+            return false;
+        for (var type = ctor.ContainingType; type is not null; type = type.BaseType)
+            if (type.GetMembers().Any(member => member is IPropertySymbol { IsRequired: true } or IFieldSymbol { IsRequired: true }))
+                return true;
+        return false;
     }
 
     private bool Assignable(ITypeSymbol from, ITypeSymbol to)
