@@ -296,6 +296,42 @@ public class FixedHostPlannerTests
     }
 
     [Test]
+    [Arguments("LegacyV1")]
+    [Arguments("ValidatedV1")]
+    public async Task AnExecutedRegistrationRequiresItsPresenceConditions(string policy)
+    {
+        const string declarations = """
+            [DependencyOf(typeof(Unused))] public sealed class Gated(IModule m) : FeatureBase(m);
+            public static class Extensions
+            {
+                public static IModule UseGated(this IModule module) => module.Use<Gated>();
+            }
+            public sealed class Contributor(IModule m) : FeatureBase(m)
+            {
+                public override void Apply() => Module.Configure<Gated>();
+            }
+            """;
+        var module = $"var module = services.CreateModule(Elsa.Features.Models.CompositionPolicy.{policy}); ";
+        foreach (var call in new[] { "module.Configure<Gated>();", "module.UseGated();", "module.Use<Contributor>();" })
+        {
+            var absent = Generate(module + call, declarations);
+            var diagnostic = absent.Diagnostics.Single();
+            await Assert.That(diagnostic.Id).IsEqualTo("ELSAGEN011");
+            await Assert.That(diagnostic.GetMessage()).Contains("Gated");
+            await Assert.That(diagnostic.GetMessage()).Contains("DependencyOf");
+            await Assert.That(diagnostic.GetMessage()).Contains("Unused");
+            if (call.Contains("Contributor", StringComparison.Ordinal))
+                await Assert.That(diagnostic.GetMessage()).Contains("Contributor");
+            else
+                await Assert.That(diagnostic.Location.SourceTree!.GetText().ToString(diagnostic.Location.SourceSpan)).IsEqualTo(call.TrimEnd(';'));
+
+            var admitted = Generate(module + call + " module.Use<Unused>();", declarations);
+            await Assert.That(admitted.Diagnostics).IsEmpty();
+            await Assert.That(HostSource(admitted)).Contains("_gated.Configure();");
+        }
+    }
+
+    [Test]
     public async Task SdkEntriesShareACollectionPlanAndResolveACallbackMethodGroup()
     {
         const string sdk = """

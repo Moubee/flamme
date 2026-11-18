@@ -130,9 +130,12 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
                     Visit(extra, sites[0].Invocation!.GetLocation());
         } while (previousCount != graph.Count);
 
-        foreach (var request in selection.Features.Where(item => item.Conditional && !present.Contains(item.Type)))
-            Report(CompilerDiagnostics.RuntimeSelection, request.Location,
-                $"The runtime condition selects '{request.Type}'. Declare the feature unconditionally and configure its options at runtime.");
+        foreach (var request in selection.Features.Where(item => !present.Contains(item.Type)))
+            if (request.Conditional)
+                Report(CompilerDiagnostics.RuntimeSelection, request.Location,
+                    $"The runtime condition selects '{request.Type}'. Declare the feature unconditionally and configure its options at runtime.");
+            else
+                ReportExcludedRegistration(request.Type, request.Location, "This call");
 
         foreach (var item in graph.Where(item => present.Contains(item.Type)))
         {
@@ -140,6 +143,8 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
                 Error($"Cannot construct '{item.Type}' in a fixed graph: {item.ConstructorError}.");
             if (item.Error != null)
                 Error($"Cannot plan '{item.Type}': {item.Error}.");
+            foreach (var requested in item.Introduced.Where(type => !present.Contains(type)))
+                ReportExcludedRegistration(requested, sites[0].Invocation!.GetLocation(), $"Feature '{item.Type}'");
             foreach (var conditional in item.ConditionalIntroduced.Where(type => !present.Contains(type)))
                 Report(CompilerDiagnostics.RuntimeSelection, sites[0].Invocation!.GetLocation(),
                     $"Feature '{item.Type}' conditionally selects '{conditional}'. Declare '{conditional}' at build time.");
@@ -167,6 +172,16 @@ internal sealed class FixedHostPlanner(Compilation compilation, FixedProducerMod
             _plans.Add(plan);
         }
         plan.Sites.AddRange(sites);
+
+        // A conditional dependency can be omitted by the policy, but an actual
+        // Configure/Use call needs a slot even when its configuration action is empty.
+        void ReportExcludedRegistration(INamedTypeSymbol type, Location location, string caller)
+        {
+            if (!_available.TryGetValue(type, out var feature)) return; // Visit already diagnosed the missing binding.
+            var missing = feature.Conditional.Where(gate => !present.Contains(gate));
+            Report(CompilerDiagnostics.InvalidPlan, location,
+                $"{caller} configures '{type}', whose DependencyOf condition requires {string.Join(", ", missing.Select(gate => $"'{gate}'"))}. Select the required features or remove the call.");
+        }
 
         void Visit(INamedTypeSymbol type, Location location)
         {

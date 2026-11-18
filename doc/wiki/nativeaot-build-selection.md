@@ -84,7 +84,10 @@ services.AddElsa(elsa => elsa.UseCSharp(csharp =>
 A runtime flag that changes feature membership must move to a build-time choice
 such as `#if`, or the application must choose between separately compiled host
 entry points. The generator reports `ELSAGEN012` for unsupported runtime
-selection, and `ELSAGEN011` for an invalid fixed graph. Calls inside
+selection, and `ELSAGEN011` for an invalid fixed graph. For example,
+`UseTenantHttpRouting()` requires both `HttpFeature` and `TenantsFeature`
+to be present. An explicit call missing either prerequisite fails the build.
+Calls inside
 `Configure` and `Apply` can configure a selected feature. When opaque code
 requests an absent type, the fixed module throws before invoking the factory
 or configuration action. A custom factory receives the actual host module.
