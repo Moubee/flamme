@@ -1,4 +1,3 @@
-#if EXPLICIT_FEATURE_CATALOG
 using Elsa.Features.Abstractions;
 using Elsa.Features.Contracts;
 using Elsa.Features.Implementations;
@@ -63,9 +62,9 @@ internal static class ExplicitCompositionScenarios
             module.Configure<RootFeature>();
             module.Apply();
 
-            ProbeRunner.Require(ReferenceEquals(custom, repeated) && factoryCalls == 1 && custom.Value == "runtime override",
+            ScenarioAssert.Require(ReferenceEquals(custom, repeated) && factoryCalls == 1 && custom.Value == "runtime override",
                 "Catalog metadata must preserve the runtime factory override and instance.");
-            ProbeRunner.Require(custom.Actions.SequenceEqual(["first", "second"]), "Every Configure action must run once in call order.");
+            ScenarioAssert.Require(custom.Actions.SequenceEqual(["first", "second"]), "Every Configure action must run once in call order.");
             RequireCounts(state, configurations: 1, applications: 1);
             Before(state, "shared.apply", "left.apply");
             Before(state, "shared.apply", "right.apply");
@@ -76,14 +75,14 @@ internal static class ExplicitCompositionScenarios
             Before(state, "late-first.apply", "late-second.apply");
             var registry = (IInstalledFeatureRegistry)services.Last(x => x.ServiceType == typeof(IInstalledFeatureRegistry)).ImplementationInstance!;
             var metadata = registry.Find("Probe.Root");
-            ProbeRunner.Require(metadata is { DisplayName: "Manifest root", Description: "Manifest description" },
+            ScenarioAssert.Require(metadata is { DisplayName: "Manifest root", Description: "Manifest description" },
                 "Installed feature metadata must come from the catalog snapshot.");
             metadata!.DisplayName = "host registry mutation";
 
             module.Configure<FactoryFeature>(f => f.Actions.Add("third"));
             module.Apply();
             RequireCounts(state, configurations: 1, applications: 2);
-            ProbeRunner.Require(custom.Actions.SequenceEqual(["first", "second", "third"]), "Repeated Apply must retain runtime configuration values.");
+            ScenarioAssert.Require(custom.Actions.SequenceEqual(["first", "second", "third"]), "Repeated Apply must retain runtime configuration values.");
         }
     }
 
@@ -95,23 +94,23 @@ internal static class ExplicitCompositionScenarios
         module.Configure<ConditionalAFeature>();
         module.Configure<ConditionalBFeature>();
         module.Apply();
-        ProbeRunner.Require(module.HasFeature<ConditionalAFeature>() == (policy == CompositionPolicy.LegacyV1),
+        ScenarioAssert.Require(module.HasFeature<ConditionalAFeature>() == (policy == CompositionPolicy.LegacyV1),
             $"The selected {policy} must control single-pass versus fixed-point filtering.");
-        ProbeRunner.Require(!module.HasFeature<ConditionalBFeature>() && !module.HasFeature<ConditionalCFeature>(),
+        ScenarioAssert.Require(!module.HasFeature<ConditionalBFeature>() && !module.HasFeature<ConditionalCFeature>(),
             "Conditional presence must never install its absent target.");
-        ProbeRunner.Require(state.Events.Count(x => x == "conditional-a.configure") == 1 && state.Events.Count(x => x == "conditional-b.configure") == 1,
+        ScenarioAssert.Require(state.Events.Count(x => x == "conditional-a.configure") == 1 && state.Events.Count(x => x == "conditional-b.configure") == 1,
             "Legacy and validated policies configure candidates before conditional filtering.");
-        ProbeRunner.Require(!state.Events.Any(x => x.StartsWith("conditional-c.", StringComparison.Ordinal)),
+        ScenarioAssert.Require(!state.Events.Any(x => x.StartsWith("conditional-c.", StringComparison.Ordinal)),
             "An unselected conditional target must not be configured or applied.");
         module.Apply();
-        ProbeRunner.Require(!module.HasFeature<ConditionalAFeature>(), "Repeated legacy filtering must remove A after B disappears.");
+        ScenarioAssert.Require(!module.HasFeature<ConditionalAFeature>(), "Repeated legacy filtering must remove A after B disappears.");
 
         if (policy == CompositionPolicy.LegacyV1)
         {
             var legacy = CreateModule(ConditionalBuilder().Add(m => new StrongRootFeature(m), Metadata("StrongRoot"), [typeof(ConditionalBFeature)]).Build(), policy, new());
             legacy.Configure<StrongRootFeature>();
             legacy.Apply();
-            ProbeRunner.Require(legacy.HasFeature<StrongRootFeature>() && !legacy.HasFeature<ConditionalBFeature>(),
+            ScenarioAssert.Require(legacy.HasFeature<StrongRootFeature>() && !legacy.HasFeature<ConditionalBFeature>(),
                 "Legacy policy must retain its characterized strong-dependent behavior.");
         }
     }
@@ -159,7 +158,7 @@ internal static class ExplicitCompositionScenarios
             .Add(m => new StrongRootFeature(m), Metadata("StrongRoot"), [typeof(ConditionalBFeature)]).Build(), CompositionPolicy.ValidatedV1, strongState);
         strong.Configure<StrongRootFeature>();
         ExpectInvalid(strong.Apply, nameof(StrongRootFeature), nameof(ConditionalBFeature));
-        ProbeRunner.Require(!strongState.Events.Any(x => x.EndsWith(".apply", StringComparison.Ordinal)),
+        ScenarioAssert.Require(!strongState.Events.Any(x => x.EndsWith(".apply", StringComparison.Ordinal)),
             "Invalid initial admission must reject the whole batch before Apply callbacks.");
         ExpectInvalid(strong.Apply, "fault");
 
@@ -169,7 +168,7 @@ internal static class ExplicitCompositionScenarios
             .Add(m => new StrongRootFeature(m), Metadata("StrongRoot"), [typeof(ConditionalBFeature)]).Build(), CompositionPolicy.ValidatedV1, lateState);
         late.Configure<InvalidIntroducingFeature>();
         ExpectInvalid(late.Apply, nameof(StrongRootFeature), nameof(ConditionalBFeature));
-        ProbeRunner.Require(!lateState.Events.Contains("strong-root.apply") && !lateState.Events.Contains("conditional-b.apply"),
+        ScenarioAssert.Require(!lateState.Events.Contains("strong-root.apply") && !lateState.Events.Contains("conditional-b.apply"),
             "An invalid late dependency must never be applied after its admission fails.");
         ExpectInvalid(late.Apply, "fault");
     }
@@ -192,14 +191,14 @@ internal static class ExplicitCompositionScenarios
     {
         foreach (var name in new[] { "root", "left", "right", "shared", "factory", "late-first", "late-second" })
         {
-            ProbeRunner.Require(state.Events.Count(x => x == $"{name}.configure") == configurations && state.Events.Count(x => x == $"{name}.hosted") == configurations,
+            ScenarioAssert.Require(state.Events.Count(x => x == $"{name}.configure") == configurations && state.Events.Count(x => x == $"{name}.hosted") == configurations,
                 $"{name} must configure its lifecycle exactly {configurations} time(s).");
-            ProbeRunner.Require(state.Events.Count(x => x == $"{name}.apply") == applications,
+            ScenarioAssert.Require(state.Events.Count(x => x == $"{name}.apply") == applications,
                 $"{name} must apply exactly {applications} time(s), including repeated Apply.");
         }
     }
 
-    private static void Before(ScenarioState state, string first, string second) => ProbeRunner.Require(
+    private static void Before(ScenarioState state, string first, string second) => ScenarioAssert.Require(
         state.Events.IndexOf(first) >= 0 && state.Events.IndexOf(first) < state.Events.IndexOf(second), $"Expected {first} before {second}.");
 
     private static void ExpectInvalid(Action action, params string[] fragments)
@@ -211,7 +210,7 @@ internal static class ExplicitCompositionScenarios
         catch (InvalidOperationException exception)
         {
             foreach (var fragment in fragments)
-                ProbeRunner.Require(exception.Message.Contains(fragment, StringComparison.OrdinalIgnoreCase),
+                ScenarioAssert.Require(exception.Message.Contains(fragment, StringComparison.OrdinalIgnoreCase),
                     $"Expected diagnostic containing '{fragment}', received '{exception.Message}'.");
             return;
         }
@@ -274,4 +273,3 @@ internal static class ExplicitCompositionScenarios
     private sealed class CycleAFeature(IModule module) : RecordingFeature(module, "cycle-a");
     private sealed class CycleBFeature(IModule module) : RecordingFeature(module, "cycle-b");
 }
-#endif

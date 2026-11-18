@@ -1,18 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../NativeAot/Probe.props" />
   <PropertyGroup>
-    <NativeAotFeatureProvider Condition="'$(NativeAotFeatureProvider)' == ''">legacy</NativeAotFeatureProvider>
-    <DefineConstants Condition="'$(NativeAotFeatureProvider)' == 'explicit'">$(DefineConstants);EXPLICIT_FEATURE_CATALOG</DefineConstants>
+    <!-- Exercise the independently authored catalog in both managed and native publication. -->
+    <UseElsaSourceTooling>false</UseElsaSourceTooling>
+    <OutputType>Exe</OutputType>
+    <NativeAotMode Condition="'$(NativeAotMode)' == ''">managed</NativeAotMode>
+    <PublishAot Condition="'$(NativeAotMode)' == 'native'">true</PublishAot>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <NuGetLockFilePath Condition="'$(RuntimeIdentifier)' != ''">$(MSBuildProjectDirectory)/locks/$(NativeAotMode)/$(RuntimeIdentifier)/packages.lock.json</NuGetLockFilePath>
   </PropertyGroup>
-  <Target Name="ValidateNativeAotFeatureProvider" BeforeTargets="CollectPackageReferences;PrepareForBuild">
-    <Error Condition="'$(NativeAotFeatureProvider)' != 'legacy' And '$(NativeAotFeatureProvider)' != 'explicit'"
-           Code="ELSAOT005" Text="NativeAotFeatureProvider must be legacy or explicit." />
-  </Target>
   <ItemGroup>
     <ProjectReference Include="../../common/Elsa.Features/Elsa.Features.csproj" />
     <ProjectReference Include="../../../test/fixtures/Elsa.NativeAot.Modules.Producer/Elsa.NativeAot.Modules.Producer.csproj" />
-    <Compile Include="../../../test/fixtures/nativeaot/module-consumer/ModuleConsumerScenarios.cs"
-             Link="ModuleConsumerScenarios.cs" Condition="'$(NativeAotFeatureProvider)' == 'explicit'" />
+    <Compile Include="../../../test/fixtures/nativeaot/module-consumer/ModuleConsumerScenarios.cs" Link="ModuleConsumerScenarios.cs" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
+  <Target Name="ValidateNativeAotMode" BeforeTargets="CollectPackageReferences;PrepareForBuild">
+    <Error Condition="'$(NativeAotMode)' != 'managed' And '$(NativeAotMode)' != 'native'"
+           Code="ELSAOT001" Text="NativeAotMode must be managed or native." />
+    <Error Condition="'$(NativeAotMode)' == 'managed' And '$(PublishAot)' == 'true'"
+           Code="ELSAOT002" Text="Use NativeAotMode=native when PublishAot is enabled." />
+    <Error Condition="'$(NativeAotMode)' == 'native' And '$(PublishAot)' != 'true'"
+           Code="ELSAOT003" Text="NativeAotMode=native requires PublishAot=true." />
+    <Error Condition="'$(JsonSerializerIsReflectionEnabledByDefault)' != 'false'"
+           Code="ELSAOT004" Text="The explicit catalog probe requires reflection JSON to be disabled." />
+  </Target>
 </Project>

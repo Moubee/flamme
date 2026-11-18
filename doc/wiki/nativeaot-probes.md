@@ -1,28 +1,10 @@
-# NativeAOT diagnostic probes
+# NativeAOT Features tests
 
-The four console probes establish a reproducible baseline for the first NativeAOT
-migration step. They call existing production code and keep unresolved failures
-visible. Their `legacy-baseline` provider does not implement generated composition
-or establish NativeAOT support for the libraries, server, persistence, or scripting.
-
-| Probe | Production path |
-| --- | --- |
-| `features` | `Elsa.Features` default activation, declared dependency ordering, lifecycle, and installed-feature registry. No Workflow Core reference. |
-| `execution` | Explicit factories for the stock core features, the real workflow runner, and a sequence containing an awaited activity. |
-| `payloads` | Standalone `JsonPayloadSerializer`, registered DTO/list aliases, nested bodies, and scalar contracts. An authored System.Text.Json context supplies an independent positive control. |
-| `integrated` | Default `WorkflowsFeature` activation, the real workflow runner, and production payload serialization. |
-
-The Features probe also supports the `explicit-catalog` provider. It compiles
-an independent catalog caller covering dependency graphs, policies, runtime
-configuration, metadata isolation, typed hosted-service identities, and deterministic negative cases. The default
-`legacy-baseline` keeps the original reflection-based observation. Provider
-selection is a compiler input, so the explicit executable does not root the
-legacy bootstrap. Both providers use the same module lifecycle and explicitly
-select their admission policy; see [module composition](module-system.md#explicit-feature-composition).
-
-Each executable also runs an independent asynchronous/generated-JSON control.
-JSON reflection is disabled in managed and native publication. The default baseline
-fixtures retain managed discovery; the explicit catalog is a runtime oracle. The packaged compiler consumer below exercises generated composition separately.
+A packed consumer exercises generated feature factories through `services.CreateModule()`.
+The standalone `Elsa.NativeAot.Features.Smoke` executable uses a handwritten
+catalog to test dependency ordering, admission policies, configuration, hosted
+service lifetimes and failure cases under managed .NET and NativeAOT.
+See [explicit feature composition](module-system.md#explicit-feature-composition).
 
 ## Run the tests
 
@@ -48,28 +30,20 @@ dotnet test --project "$project" -c Release -f net11.0 -- --treenode-filter '/*/
 dotnet test --project "$project" -c Release -- --treenode-filter '/*/*/CodeGenerationTests/UnselectedDynamicCodeProducerExposesItsNativeRequirement'
 ```
 
-## Diagnose a legacy provider
+The tests record build logs, evaluated MSBuild properties and process output in
+`artifacts/nativeaot/<framework>/`. Set `ELSA_NATIVEAOT_STRICT=true` to make
+IL diagnostics fail the standalone catalog publish.
 
-The four legacy probes exercise capabilities at different stages of migration. Select their diagnostic tests when investigating a specific runtime or framework. An unresolved failure produces a failed test and preserves the child process output.
+## Maintain the Features probe locks
 
-```bash
-dotnet test --project "$project" -c Release -f net11.0 --no-restore -- --treenode-filter '/*/*/*/*[Category=NativeAotDiagnostic]'
-```
-
-To select one row, replace the category with its name, for example `legacy-baseline-payloads-native-default` or `explicit-catalog-features-native-disabled`. The runtime-async opt-out rows target .NET 11.
-
-Set `ELSA_NATIVEAOT_STRICT=true` to treat IL diagnostics as failures when investigating a probe. The diagnostic publish records source and native compiler output even when the exercised runtime path succeeds. The explicit catalog can still report source warnings for unused legacy reflection paths.
-
-Each test uses a fresh directory under `artifacts/nativeaot/<framework>/`. Inspect the restore and publish logs, evaluated MSBuild properties, publish binlog, IL diagnostics, and execution output for the failing case. A probe must report the expected framework, RID, dynamic-code and reflection-JSON settings, run the control and production scenario in order, and finish with the expected provider and scope. Evidence from a macOS publish describes macOS execution. Run on Linux for Linux evidence.
-
-## Maintain probe locks
-
-Solution restores use each executable's portable `packages.lock.json`. RID-specific restores use its `locks/<mode>/<rid>/packages.lock.json`. After a dependency change, regenerate and review each affected two-framework lock. For example, run this command for the Linux native Features lock. Lock generation works across operating systems and does not require a native compiler.
+Solution restores use the portable `packages.lock.json`. When the probe's
+dependencies change, regenerate its two-framework locks for each supported RID
+(`linux-x64` and `osx-arm64`) and publication mode (`managed` and `native`).
+For example, update the Linux native lock with the same analyzer settings used
+by the publication test.
 
 ```bash
 dotnet restore src/apps/Elsa.NativeAot.Features.Smoke/Elsa.NativeAot.Features.Smoke.csproj --force-evaluate \
   -p:NativeAotMode=native -p:RuntimeIdentifier=linux-x64 \
   -p:EnableTrimAnalyzer=true -p:EnableAotAnalyzer=true
 ```
-
-Use the same analyzer settings for managed and native restores. Omit the target framework during restore to include both frameworks. The catalog providers share the same dependencies and lock. The test runner uses locked restore before publishing a single framework with the same graph settings.

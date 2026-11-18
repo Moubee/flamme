@@ -66,7 +66,7 @@ clean outputs for the selected configuration.
 See [Build, Run, And Operate](doc/wiki/build-run-operate.md) for targeted commands,
 server startup, and operational guidance.
 
-NativeAOT validation uses the same test runner. The [NativeAOT test guide](doc/wiki/nativeaot-probes.md#run-the-tests) covers package-consumer tests, published native executables, and opt-in legacy diagnostics.
+NativeAOT validation uses the same test runner. The [NativeAOT test guide](doc/wiki/nativeaot-probes.md#run-the-tests) covers package consumers and the published Features executables.
 
 ### Local development with Aspire
 

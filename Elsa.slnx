@@ -51,9 +51,6 @@
   </Folder>
   <Folder Name="/src/apps/">
     <Project Path="src/apps/Elsa.NativeAot.Features.Smoke/Elsa.NativeAot.Features.Smoke.csproj" />
-    <Project Path="src/apps/Elsa.NativeAot.Execution.Smoke/Elsa.NativeAot.Execution.Smoke.csproj" />
-    <Project Path="src/apps/Elsa.NativeAot.Payloads.Smoke/Elsa.NativeAot.Payloads.Smoke.csproj" />
-    <Project Path="src/apps/Elsa.NativeAot.Smoke/Elsa.NativeAot.Smoke.csproj" />
     <File Path="src/apps/Directory.Build.props" />
     <Project Path="src/apps/Elsa.AppHost/Elsa.AppHost.csproj" />
     <Project Path="src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
