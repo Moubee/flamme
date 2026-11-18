@@ -1,106 +1,102 @@
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text.Json;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using Elsa.Extensions;
-using Elsa.Features.Contracts;
 using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.CommitStates;
+using Elsa.Server.Web;
+using Elsa.ServiceDefaults;
 using Elsa.Workflows.Features;
-using Elsa.Workflows.Middleware.Activities;
-using Elsa.Workflows.Middleware.Workflows;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Perfolizer.Horology;
 
-internal static class CompositionProbe
+namespace Elsa.FeatureComposition.Benchmarks;
+
+public enum FeatureGraph { Small, Web }
+
+public abstract class CompositionBenchmark
 {
-    public static async Task RunSmall()
+    [Params(FeatureGraph.Small, FeatureGraph.Web)]
+    public FeatureGraph Graph { get; set; }
+
+    protected Func<IModule> Prepare()
     {
-        var builder = WebApplication.CreateBuilder();
-        var services = builder.Services;
-        var start = Start();
-        var module = services.CreateModule();
-        module.Use<WorkflowsFeature>();
-        module.Apply();
-        var startup = Stop(start);
-        await Measure(module, startup);
-    }
-
-    public static (long Bytes, long Timestamp) Start() =>
-        (GC.GetTotalAllocatedBytes(precise: true), Stopwatch.GetTimestamp());
-
-    public static (double Milliseconds, long Bytes) Stop((long Bytes, long Timestamp) start) =>
-        (Stopwatch.GetElapsedTime(start.Timestamp).TotalMilliseconds, GC.GetTotalAllocatedBytes(precise: true) - start.Bytes);
-
-    public static async Task Measure(IModule module, (double Milliseconds, long Bytes) startup)
-    {
-        const int lookups = 16_000_000;
-        const int warmupWorkflows = 1_024;
-        const int workflows = 4_096;
-        Lookup(module, 100_000);
-        var lookupStart = Stopwatch.GetTimestamp();
-        Lookup(module, lookups);
-        var lookupTime = Stopwatch.GetElapsedTime(lookupStart);
-
-        // Keep the workflow in-process on both graphs. These overrides happen after startup timing.
-        var services = module.Services;
-        services.AddScoped<ICommitStateHandler, NoopCommitStateHandler>();
-        services.AddScoped<IWorkflowExecutionPipeline>(sp => new WorkflowExecutionPipeline(sp,
-            pipeline => pipeline.UseExceptionHandling().UseDefaultActivityScheduler()));
-        services.AddScoped<IActivityExecutionPipeline>(sp => new ActivityExecutionPipeline(sp,
-            pipeline => pipeline.UseExceptionHandling().UseDefaultActivityInvoker()));
-
-        await using var provider = services.BuildServiceProvider();
-        await using var scope = provider.CreateAsyncScope();
-        var scoped = scope.ServiceProvider;
-        var features = scoped.GetRequiredService<IInstalledFeatureRegistry>().List().Select(f => f.FullName).Order().ToArray();
-        var registry = scoped.GetRequiredService<IActivityRegistry>();
-        await registry.RegisterAsync<Workflow>();
-        await registry.RegisterAsync<Inline>();
-
-        var executed = 0;
-        var workflow = Workflow.FromActivity(Inline.From(() => { executed++; }));
-        var graph = await scoped.GetRequiredService<IWorkflowGraphBuilder>().BuildAsync(workflow);
-        var runner = scoped.GetRequiredService<IWorkflowRunner>();
-        await Run(warmupWorkflows);
-        var workflowStart = Stopwatch.GetTimestamp();
-        await Run(workflows);
-        var workflowTime = Stopwatch.GetElapsedTime(workflowStart);
-        if (executed != warmupWorkflows + workflows)
-            throw new InvalidOperationException($"Expected {warmupWorkflows + workflows} activity executions, observed {executed}.");
-
-        Console.WriteLine(JsonSerializer.Serialize(new
+        Elsa.Expressions.Helpers.ObjectConverter.StrictMode = true;
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
-            provider = module is FixedFeatureModule ? "Generated" : "Dynamic",
-            runtime = RuntimeInformation.FrameworkDescription,
-            architecture = RuntimeInformation.ProcessArchitecture.ToString(),
-            serverGc = System.Runtime.GCSettings.IsServerGC,
-            features,
-            startupMs = startup.Milliseconds,
-            startupBytes = startup.Bytes,
-            lookupNs = lookupTime.TotalNanoseconds / lookups,
-            workflowsPerSecond = workflows / workflowTime.TotalSeconds
-        }));
-
-        async Task Run(int count)
+            ContentRootPath = AppContext.BaseDirectory,
+            EnvironmentName = Environments.Development,
+            ApplicationName = typeof(ReferenceServerComposition).Assembly.GetName().Name
+        });
+        if (Graph == FeatureGraph.Web)
         {
-            for (var i = 0; i < count; i++)
-            {
-                var result = await runner.RunAsync(graph);
-                if (result.WorkflowState.SubStatus != WorkflowSubStatus.Finished)
-                    throw new InvalidOperationException($"Workflow ended in {result.WorkflowState.SubStatus}.");
-            }
+            builder.AddServiceDefaults();
+            return new ReferenceServerComposition(builder).Apply;
         }
+
+        var services = builder.Services;
+        return () =>
+        {
+            var module = services.CreateModule();
+            module.Use<WorkflowsFeature>();
+            module.Apply();
+            return module;
+        };
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void Lookup(IModule module, int count)
+    protected static string CheckModule(IModule module)
     {
-        var hits = 0;
-        for (var i = 0; i < count; i++)
-            if (module.HasFeature<WorkflowsFeature>()) hits++;
-        if (hits != count) throw new InvalidOperationException("Missing WorkflowsFeature.");
+        var mode = module switch
+        {
+            FixedFeatureModule => "Generated",
+            Features.Implementations.Module => "Dynamic",
+            _ => throw new InvalidOperationException($"Unexpected module {module.GetType()}.")
+        };
+        if (mode != Environment.GetEnvironmentVariable("ELSA_BENCHMARK_MODE") || !module.HasFeature<WorkflowsFeature>())
+            throw new InvalidOperationException($"Unexpected {mode} composition or missing WorkflowsFeature.");
+        return mode;
+    }
+}
+
+public class ColdCompositionConfig : CompositionConfig
+{
+    public ColdCompositionConfig() : base(Job.Default.WithStrategy(RunStrategy.ColdStart)
+        .WithLaunchCount(10).WithWarmupCount(0).WithIterationCount(1).WithInvocationCount(1).WithUnrollFactor(1)) { }
+}
+
+public class WarmCompositionConfig : CompositionConfig
+{
+    public WarmCompositionConfig() : base(Job.ShortRun.WithLaunchCount(3).WithIterationCount(8).WithIterationTime(TimeInterval.FromMilliseconds(150))) { }
+}
+
+public abstract class CompositionConfig : ManualConfig
+{
+    private static readonly IToolchain Net11 = CreateToolchain();
+
+    private static IToolchain CreateToolchain()
+    {
+        // 0.15.8's SDK validator throws for .NET 11. Use the stock project generator,
+        // builder and executor with the target framework selected by the repo SDK.
+        var sdk = CsProjCoreToolchain.From(new NetCoreAppSettings("net11.0", null, ".NET 11"));
+        return new Toolchain(sdk.Name, sdk.Generator, sdk.Builder, sdk.Executor);
+    }
+
+    protected CompositionConfig(Job job)
+    {
+        Options |= ConfigOptions.DisableParallelBuild;
+        BuildTimeout = TimeSpan.FromMinutes(10);
+        foreach (var mode in new[] { "Dynamic", "Generated" })
+        {
+            var variant = job.WithToolchain(Net11).WithId(mode).WithGcServer(true)
+                .WithEnvironmentVariable("ELSA_BENCHMARK_MODE", mode)
+                .WithEnvironmentVariable("DOTNET_TieredCompilation", "0")
+                .WithEnvironmentVariable("Logging__LogLevel__Default", "None")
+                .WithArguments([new MsBuildArgument($"/p:ElsaExecutionMode={mode}"), new MsBuildArgument("/p:RunAnalyzers=true")]);
+            AddJob(mode == "Dynamic" ? variant.AsBaseline() : variant);
+        }
     }
 }

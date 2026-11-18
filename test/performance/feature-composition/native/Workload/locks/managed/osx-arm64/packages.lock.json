@@ -1,0 +1,147 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net11.0": {
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[11.0.0, )",
+        "resolved": "11.0.0",
+        "contentHash": "gK2aq4XvChj5kvozpPHrkfKkr7zc5Z4xoTrJb4GPZzDEPMlCk0TX632bwY3LsWcX2UVcVRQBBGzsBGC2lq6YhA=="
+      },
+      "Json.More.Net": {
+        "type": "Transitive",
+        "resolved": "3.1.0",
+        "contentHash": "7qGdCuzlojAC0u1a3aPoVyZTEmwnQaEThsTpeeMfMVjj3OmSzXwfY4mHvx8tDJbqr4xB1pMqh9PkjV/Dl7kHzA=="
+      },
+      "JsonPointer.Net": {
+        "type": "Transitive",
+        "resolved": "7.1.0",
+        "contentHash": "wht0EXfuazcdA0CuTaCuzk7Mpv7jOyj+BEdTDMX/FfyGVuoeB/ecnIqPA+IOr9GCcQpdvNt5NmRQ8KJzPBWgQQ==",
+        "dependencies": {
+          "Humanizer.Core": "3.0.10",
+          "Json.More.Net": "3.1.0"
+        }
+      },
+      "ZstdSharp.Port": {
+        "type": "Transitive",
+        "resolved": "0.8.6",
+        "contentHash": "iP4jVLQoQmUjMU88g1WObiNr6YKZGvh4aOXn3yOJsHqZsflwRsxZPcIBvNXgjXO3vQKSLctXGLTpcBPLnWPS8A=="
+      },
+      "elsa.codegeneration.abstractions": {
+        "type": "Project"
+      },
+      "elsa.common": {
+        "type": "Project",
+        "dependencies": {
+          "Cronos": "[0.11.1, )",
+          "DistributedLock.Core": "[1.0.9, )",
+          "Elsa.Features": "[1.0.0, )",
+          "Elsa.Mediator": "[1.0.0, )",
+          "IronCompress": "[1.7.0, )",
+          "LinqKit.Core": "[1.3.2, )",
+          "Snappier": "[1.3.1, )"
+        }
+      },
+      "elsa.expressions": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.Common": "[1.0.0, )",
+          "Elsa.Features": "[1.0.0, )"
+        }
+      },
+      "elsa.features": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.CodeGeneration.Abstractions": "[1.0.0, )"
+        }
+      },
+      "elsa.mediator": {
+        "type": "Project"
+      },
+      "elsa.workflows.core": {
+        "type": "Project",
+        "dependencies": {
+          "Elsa.Common": "[1.0.0, )",
+          "Elsa.Expressions": "[1.0.0, )",
+          "Humanizer.Core": "[3.0.10, )",
+          "JsonSchema.Net": "[9.7.0, )",
+          "Newtonsoft.Json": "[13.0.4, )",
+          "ShortGuid": "[2.0.1, )"
+        }
+      },
+      "Cronos": {
+        "type": "CentralTransitive",
+        "requested": "[0.11.1, )",
+        "resolved": "0.11.1",
+        "contentHash": "5Ug+giPQITSAdTp/METAsofRSSUi3I5p7t4dlcXnzUgUzwZb4HkOBcYfpHuPwAHrnKJjmyW8amVzLD6mfLpaBg=="
+      },
+      "DistributedLock.Core": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.9, )",
+        "resolved": "1.0.9",
+        "contentHash": "y72z/Ta4xX3qKc+bsAJDsAZ+LuXz4xbCiAYgJwvOP2Xup63tdonTXmlKXU45Ds3GfEuMEHGrnVinhxyBZjRc2Q=="
+      },
+      "Humanizer.Core": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.10, )",
+        "resolved": "3.0.10",
+        "contentHash": "yZIhtw8sYuvsONzQbZxWpR60tMWYHXoo0DL6nyOqSFiU5POjBTSEyWFpTQtJEZuy+oqiYTXKXY/Mjx7KnqIQFw=="
+      },
+      "IronCompress": {
+        "type": "CentralTransitive",
+        "requested": "[1.7.0, )",
+        "resolved": "1.7.0",
+        "contentHash": "soOOMriKl0J/p3V2fKuJ7R6n+SBtvpB+mRxmWU3tNeowmtBs32CyEyxHaBPralorsInVRWPFZDDJ46Eg6A9nqQ==",
+        "dependencies": {
+          "Snappier": "1.2.0",
+          "ZstdSharp.Port": "0.8.6"
+        }
+      },
+      "JsonSchema.Net": {
+        "type": "CentralTransitive",
+        "requested": "[9.7.0, )",
+        "resolved": "9.7.0",
+        "contentHash": "uzAiT0JPDQcco/+HUxDvAHfq6rnAGgfWvoPKJxwe9M+OBa22lh2AEA/ni0DSVDWy/38cDhFUd7Ea3EQd2NO+fw==",
+        "dependencies": {
+          "JsonPointer.Net": "7.1.0"
+        }
+      },
+      "LinqKit.Core": {
+        "type": "CentralTransitive",
+        "requested": "[1.3.2, )",
+        "resolved": "1.3.2",
+        "contentHash": "i96eW+ZpyThNhu/6XkW4St64yEvTV2q2jzG57JJ46oQ1Zhlr9RVFpykcBAq8sDE3Zt3HmYEuOv9g9+du5aP27g=="
+      },
+      "Newtonsoft.Json": {
+        "type": "CentralTransitive",
+        "requested": "[13.0.4, )",
+        "resolved": "13.0.4",
+        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
+      },
+      "ShortGuid": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "I/bXxaY4BDC0mUCJvF9ZlUfWsq3nRswv53gyNrxqg5SmOObDkggNl7v21tHHMQaPC3PW6xdMS1IHeGzFi2GuAQ=="
+      },
+      "Snappier": {
+        "type": "CentralTransitive",
+        "requested": "[1.3.1, )",
+        "resolved": "1.3.1",
+        "contentHash": "DOdDQiO8YZ5rBtVLY+6CmR1yp9WYoJRgEEktPBrR0tEj9QO2djA/zv0O3DX0OZpEAfosbY8pytQ9tQUogwQsEA=="
+      }
+    },
+    "net11.0/osx-arm64": {
+      "IronCompress": {
+        "type": "CentralTransitive",
+        "requested": "[1.7.0, )",
+        "resolved": "1.7.0",
+        "contentHash": "soOOMriKl0J/p3V2fKuJ7R6n+SBtvpB+mRxmWU3tNeowmtBs32CyEyxHaBPralorsInVRWPFZDDJ46Eg6A9nqQ==",
+        "dependencies": {
+          "Snappier": "1.2.0",
+          "ZstdSharp.Port": "0.8.6"
+        }
+      }
+    }
+  }
+}

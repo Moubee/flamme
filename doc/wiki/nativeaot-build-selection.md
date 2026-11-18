@@ -167,7 +167,14 @@ referenced while the application publishes. Selecting that feature exposes
 the constructor's native compilation requirement.
 [Run the packed consumer](nativeaot-probes.md#run-the-tests)
 
-The managed benchmark compares startup time, allocations, feature lookups and workflow throughput on a small graph and the reference web server graph. [Results and reproduction steps](../../test/performance/feature-composition/README.md)
+The managed BenchmarkDotNet suite compares Dynamic and Generated composition
+on the small workflow graph and the reference web server graph. It measures
+the first Apply, allocations, feature lookups and workflow throughput.
+[Managed results and reproduction steps](../../test/performance/feature-composition/README.md)
+
+A separate benchmark publishes the same generated workflow as self-contained
+managed and NativeAOT executables. It also records whether the native reference
+web server starts. [Published benchmark results](../../test/performance/feature-composition/native/README.md)
 
 ## Inspect a generated factory in Rider
 

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseElsaSourceTooling>true</UseElsaSourceTooling>
+    <ElsaExecutionMode>Generated</ElsaExecutionMode>
+    <NativeAotMode Condition="'$(NativeAotMode)' == ''">managed</NativeAotMode>
+    <PublishAot Condition="'$(NativeAotMode)' == 'native'">true</PublishAot>
+    <NuGetLockFilePath Condition="'$(RuntimeIdentifier)' != ''">$(MSBuildProjectDirectory)/locks/$(NativeAotMode)/$(RuntimeIdentifier)/packages.lock.json</NuGetLockFilePath>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../../src/modules/Elsa.Workflows.Core/Elsa.Workflows.Core.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>

@@ -1,29 +1,17 @@
-using System.Text.Encodings.Web;
 using System.Threading.RateLimiting;
 using Elsa.Caching.Options;
 using Elsa.Common.RecurringTasks;
 using Elsa.Expressions.Helpers;
 using Elsa.Extensions;
 using Elsa.Http.Options;
-using Elsa.Identity.Multitenancy;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Server.Web.Activities;
-using Elsa.Server.Web.ActivityHosts;
+using Elsa.Server.Web;
 using Elsa.Server.Web.Filters;
 using Elsa.ServiceDefaults;
-using Elsa.Tenants;
 using Elsa.Tenants.AspNetCore;
-using Elsa.Tenants.Extensions;
 using Elsa.Workflows;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Api;
-using Elsa.Workflows.CommitStates.Strategies;
 using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.LogPersistence;
 using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Distributed.Extensions;
 using Elsa.Workflows.Runtime.Options;
 using Elsa.Workflows.Runtime.Tasks;
 using JetBrains.Annotations;
@@ -32,10 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable RedundantAssignment
-const bool useReadOnlyMode = false;
 const bool useSignalR = false; // Disabled until Elsa Studio sends authenticated requests.
-const bool useMultitenancy = true;
-const bool disableVariableWrappers = false;
 const string elsaApiRateLimitingPolicy = "elsa-api";
 const string httpWorkflowRateLimitingPolicy = "elsa-http-workflows";
 
@@ -45,109 +30,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 var services = builder.Services;
 var configuration = builder.Configuration;
-var identitySection = configuration.GetSection("Identity");
-var identityTokenSection = identitySection.GetSection("Tokens");
 var ingressRateLimitingSection = configuration.GetSection("IngressRateLimiting");
 var useIngressRateLimiting = ingressRateLimitingSection.GetValue("Enabled", false);
 var registerIngressRateLimitingPolicies = ingressRateLimitingSection.GetValue("RegisterReferencePolicies", useIngressRateLimiting);
-var configuredAllowLocalDistributedRuntimeLockProvider = configuration.GetValue<bool?>("DistributedRuntime:AllowLocalLockProviderInDistributedRuntime");
-var allowLocalDistributedRuntimeLockProvider =
-    configuredAllowLocalDistributedRuntimeLockProvider ?? builder.Environment.IsDevelopment();
 
-services
-    .AddElsa(elsa =>
-    {
-        elsa
-            .AddActivitiesFrom<Program>()
-            .AddActivityHost<Penguin>()
-            .AddWorkflowsFrom<Program>()
-            .UseIdentity(identity =>
-            {
-                identity.TokenOptions += options => identityTokenSection.Bind(options);
-                identity.UseConfigurationBasedUserProvider(options => identitySection.Bind(options));
-                identity.UseConfigurationBasedApplicationProvider(options => identitySection.Bind(options));
-                identity.UseConfigurationBasedRoleProvider(options => identitySection.Bind(options));
-            })
-            .UseDefaultAuthentication()
-            .UseWorkflows(workflows =>
-            {
-                workflows.UseCommitStrategies(strategies =>
-                {
-                    strategies.AddStandardStrategies();
-                    strategies.Add("Every 10 seconds", new PeriodicWorkflowStrategy(TimeSpan.FromSeconds(10)));
-                });
-            })
-            .UseFlowchart(flowchart => flowchart.UseTokenBasedExecution())
-            .UseWorkflowManagement(management =>
-            {
-                management.UseEntityFrameworkCore(ef => ef.UsePostgreSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("PostgreSql")
-                    ?? throw new InvalidOperationException("ConnectionStrings:PostgreSql is required.")));
-                management.SetDefaultLogPersistenceMode(LogPersistenceMode.Inherit);
-                management.UseCache();
-                management.UseReadOnlyMode(useReadOnlyMode);
-            })
-            .UseWorkflowRuntime(runtime =>
-            {
-                runtime.UseEntityFrameworkCore(ef => ef.UsePostgreSql(sp => sp.GetRequiredService<IConfiguration>().GetConnectionString("PostgreSql")
-                    ?? throw new InvalidOperationException("ConnectionStrings:PostgreSql is required.")));
-                runtime.UseCache();
-                runtime.UseDistributedRuntime();
-                // This sample host acknowledges single-host file-system locks in development or explicit single-host opt-in.
-                runtime.DistributedLockingOptions = options => options.AllowLocalLockProviderInDistributedRuntime = allowLocalDistributedRuntimeLockProvider;
-            })
-            .UseWorkflowsApi()
-            .UseDashboardApi()
-            .UseWorkflowRuntimeDashboard()
-            .UseFluentStorageProvider()
-            .UseScheduling()
-            .UseCSharp(options =>
-            {
-                configuration.GetSection("Scripting:CSharp").Bind(options);
-                options.DisableWrappers = disableVariableWrappers;
-                options.AppendScript("string Greet(string name) => $\"Hello {name}!\";");
-                options.AppendScript("string SayHelloWorld() => Greet(\"World\");");
-            })
-            .UseJavaScript(options =>
-            {
-                options.AllowClrAccess = true;
-                options.ConfigureEngine(engine =>
-                {
-                    engine.Execute("function greet(name) { return `Hello ${name}!`; }");
-                    engine.Execute("function sayHelloWorld() { return greet('World'); }");
-                });
-            })
-            .UsePython(python =>
-            {
-                python.PythonOptions += options =>
-                {
-                    // Make sure to configure the path to the python DLL. E.g. /opt/homebrew/Cellar/python@3.11/3.11.6_1/Frameworks/Python.framework/Versions/3.11/bin/python3.11
-                    // alternatively, you can set the PYTHONNET_PYDLL environment variable.
-                    configuration.GetSection("Scripting:Python").Bind(options);
-
-                    options.AddScript(sb =>
-                    {
-                        sb.AppendLine("def greet():");
-                        sb.AppendLine("    return \"Hello, welcome to Python!\"");
-                    });
-                };
-            })
-            .UseLiquid(liquid => liquid.FluidOptions = options => options.Encoder = HtmlEncoder.Default)
-            .UseHttp(http =>
-            {
-                http.ConfigureHttpOptions = options => configuration.GetSection("Http").Bind(options);
-                http.UseCache();
-            });
-        
-        if(useMultitenancy)
-        {
-            elsa.UseTenants(tenants =>
-            {
-                tenants.UseConfigurationBasedTenantsProvider(options => configuration.GetSection("Multitenancy").Bind(options));
-                tenants.ConfigureMultitenancy(options => options.TenantResolverPipelineBuilder = new TenantResolverPipelineBuilder()
-                    .Append<CurrentUserTenantResolver>());
-            });
-        }
-    });
+new ReferenceServerComposition(builder).Apply();
 
 // Obfuscate HTTP request headers.
 services.AddActivityStateFilter<HttpRequestAuthenticationHeaderFilter>();
@@ -259,7 +146,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Multitenancy.
-if (useMultitenancy)
+if (ReferenceServerComposition.UseMultitenancy)
     app.UseTenants();
 
 // Captures unhandled exceptions and returns a JSON response.

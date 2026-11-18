@@ -184,6 +184,11 @@
   <Folder Name="/test/performance/">
     <File Path="test/performance/Directory.Build.props" />
     <Project Path="test/performance/Elsa.Workflows.PerformanceTests/Elsa.Workflows.PerformanceTests.csproj" />
+    <Project Path="test/performance/feature-composition/Elsa.FeatureComposition.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/test/performance/feature-composition/native/">
+    <Project Path="test/performance/feature-composition/native/Launcher/Launcher.csproj" />
+    <Project Path="test/performance/feature-composition/native/Workload/Workload.csproj" />
   </Folder>
   <Folder Name="/test/fixtures/">
     <File Path="test/fixtures/Directory.Build.props" />

@@ -20,7 +20,8 @@ Pull requests target `main`. Keep each change focused so its behavior and verifi
 Install the SDK selected by [global.json](global.json) (.NET SDK 11.0.100 with
 patch roll-forward), plus the .NET 10 runtime to run both supported targets.
 Libraries, app hosts, and correctness tests target .NET 10 and .NET 11; performance
-benchmarks target .NET 10. .NET 8 and .NET 9 are no longer supported.
+benchmarks target .NET 10. The feature composition benchmarks use the reference
+web server’s .NET 11 target. .NET 8 and .NET 9 are no longer supported.
 
 .NET 11 server builds enable [runtime async](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime)
 centrally through the compiler's `runtime-async=on` feature. .NET 10 keeps the

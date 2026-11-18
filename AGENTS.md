@@ -38,7 +38,7 @@ Use the [ranked documentation index](doc/README.md) to find guidance for a task.
 - Centralize package versions in `Directory.Packages.props` and library targets
   in `src/Directory.Build.props`. Libraries, server apps, and correctness tests
   target .NET 10 and .NET 11; the Aspire AppHost targets .NET 11, and benchmarks
-  target .NET 10.
+  target .NET 10 except when benchmarking the .NET 11 reference web server.
 - .NET 11 enables runtime async through `Directory.Build.targets`; retain the
   ConfigureAwait.Fody policy for both supported frameworks. Rebuild with
   `-p:UseRuntimeAsync=false` when verifying the opt-out; see

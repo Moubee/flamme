@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <DefaultItemExcludes>$(DefaultItemExcludes);native/**</DefaultItemExcludes>
+    <UseElsaSourceTooling>true</UseElsaSourceTooling>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj" />
+  </ItemGroup>
+</Project>
