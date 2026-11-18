@@ -30,7 +30,6 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(ElsaIsHost)' == 'true'">
-      <InterceptorsNamespaces Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated' And '$(ElsaHostBootstrap)' == 'Compiler'">$(InterceptorsNamespaces);Elsa.CodeGeneration.Interceptors</InterceptorsNamespaces>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated'">$(DefineConstants);ELSA_GENERATED</DefineConstants>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Dynamic'">$(DefineConstants);ELSA_DYNAMIC</DefineConstants>
     </PropertyGroup>
@@ -49,6 +48,14 @@
            Text="Compiler bootstrap requires ElsaGenerateMetadata=true. Provide a manual bootstrap and set ElsaHostBootstrap=Manual to disable generation." />
     <Error Code="ELSACG010" Condition="'$(GenerateMSBuildEditorConfigFile)' == 'false' And ('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true')"
            Text="Elsa compiler assets require the SDK-generated MSBuild editorconfig file." />
+  </Target>
+
+  <!-- Older standalone build packages can also supply ResolveElsaCodeGenerationSettings. -->
+  <Target Name="EnableElsaFeatureInterceptors" AfterTargets="ResolveElsaCodeGenerationSettings"
+          Condition="'$(ElsaIsHost)' == 'true' And '$(ElsaEffectiveExecutionMode)' == 'Generated' And '$(ElsaHostBootstrap)' == 'Compiler'">
+    <PropertyGroup>
+      <InterceptorsNamespaces>$(InterceptorsNamespaces);Elsa.CodeGeneration.Interceptors</InterceptorsNamespaces>
+    </PropertyGroup>
   </Target>
 
   <Target Name="ValidateElsaCodeGenerationAssets" BeforeTargets="CoreCompile" DependsOnTargets="ResolveElsaCodeGenerationSettings;_ComputeSkipAnalyzers"

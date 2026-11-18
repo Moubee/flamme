@@ -33,7 +33,8 @@
     <!-- Compiler tools have a single netstandard2.0 asset for all runtime targets.
          GetTargetPath also works for packing without a build and SDK artifacts output layouts. -->
     <Target Name="PackFeatureCompiler" Condition="'$(TargetFrameworks)' == '' Or '$(TargetFramework)' == '$(_FeatureCompilerPackTfm)'">
-        <MSBuild Projects="@(_FeatureCompilerProject)" Targets="GetTargetPath" Properties="TargetFramework=netstandard2.0">
+        <MSBuild Projects="@(_FeatureCompilerProject)" Targets="GetTargetPath" Properties="TargetFramework=netstandard2.0"
+                 RemoveProperties="RuntimeIdentifier;SelfContained">
             <Output TaskParameter="TargetOutputs" ItemName="_FeatureCompilerAssembly" />
         </MSBuild>
         <ItemGroup>
