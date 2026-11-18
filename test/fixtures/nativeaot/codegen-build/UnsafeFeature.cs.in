@@ -1,0 +1,13 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Elsa.Features.Abstractions;
+using Elsa.Features.Services;
+
+namespace OptionalPlugin;
+
+internal sealed class DynamicFeature : FeatureBase
+{
+    [RequiresDynamicCode("This optional plugin requires runtime code generation.")]
+    public DynamicFeature(IModule module) : base(module) =>
+        throw new InvalidOperationException("An unselected plugin constructor ran.");
+}

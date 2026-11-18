@@ -46,9 +46,19 @@ internal sealed class PackageFeed
         {
             var project = Path.Combine(BuildTest.Root, id == Producer ? "test/fixtures" : "src/common", id, id + ".csproj");
             var result = await BuildTest.Run(BuildTest.Root, Path.Combine(packages.Artifacts, $"pack-{id}.log"), "dotnet",
-                ["pack", project, .. packages.PackProperties, $"-bl:{packages.Artifacts}/pack-{id}.binlog"]);
+                ["pack", project, .. packages.PackProperties, "-p:EmitCompilerGeneratedFiles=true", $"-bl:{packages.Artifacts}/pack-{id}.binlog"]);
             result.EnsureSuccess();
             packages.VerifyLayout(id);
+        }
+        var intermediate = Path.Combine(packages.Artifacts, "build", "obj", Producer);
+        var helpers = Directory.GetFiles(intermediate, "ElsaFeatureRegistrations.g.cs", SearchOption.AllDirectories);
+        Require(helpers.Length == 2, "Expected producer bindings for both target frameworks.");
+        foreach (var helper in helpers)
+        {
+            var source = File.ReadAllText(helper);
+            Require(source.Contains(".UnselectedFeature>(", StringComparison.Ordinal) &&
+                    source.Contains(".FoundationFeature>(", StringComparison.Ordinal),
+                $"Missing selected or unselected feature in {helper}.");
         }
         return packages;
     }

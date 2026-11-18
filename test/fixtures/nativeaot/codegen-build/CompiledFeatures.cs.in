@@ -1,0 +1,59 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+using Elsa.Extensions;
+using Elsa.Features.Abstractions;
+using Elsa.Features.Attributes;
+using Elsa.Features.Contracts;
+using Elsa.Features.Implementations;
+using Elsa.Features.Services;
+using Elsa.NativeAot.Modules.Producer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+try
+{
+    var services = new ServiceCollection();
+    var module = services.CreateModule();
+    var state = new ProducerState();
+    module.Properties[ProducerState.StatePropertyKey] = state;
+    var root = module.Configure(m => new ConsumerFeature(m, "caller"));
+    module.Apply();
+    module.Apply();
+
+    await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+    var hosted = provider.GetServices<IHostedService>().Single();
+    await hosted.StartAsync(CancellationToken.None);
+    await hosted.StopAsync(CancellationToken.None);
+    string[] expectedEvents = ["foundation.configure", "caller.configure", "foundation.apply", "caller.apply",
+        "foundation.apply", "caller.apply", "foundation.start", "foundation.stop"];
+    var installed = provider.GetRequiredService<IInstalledFeatureRegistry>();
+    if (!state.Events.SequenceEqual(expectedEvents) || state.Constructors != 1 || state.HostedConstructors != 1 ||
+        !ReferenceEquals(module.Configure<ConsumerFeature>(), root) || installed.Find("Elsa.Foundation") is null ||
+        installed.Find("Elsa.Consumer") is null || installed.Find("Elsa.Unselected") is not null)
+        throw new InvalidOperationException($"Unexpected feature lifecycle: {string.Join(", ", state.Events)}");
+
+    var observed = ((Module)module).Catalog is null ? "Dynamic" : "Generated";
+    if (args.Length != 4 || args[0] != "--expect-provider" || args[1] != observed || args[2] != "--expect-native" ||
+        bool.Parse(args[3]) == RuntimeFeature.IsDynamicCodeSupported || JsonSerializer.IsReflectionEnabledByDefault)
+        throw new InvalidOperationException($"Unexpected provider or publication settings: {observed}.");
+
+    Console.WriteLine($"probe=codegen-build provider={observed} dynamic-code={RuntimeFeature.IsDynamicCodeSupported} reflection-json={JsonSerializer.IsReflectionEnabledByDefault}");
+    Console.WriteLine($"framework={RuntimeInformation.FrameworkDescription} rid={RuntimeInformation.RuntimeIdentifier}");
+    Console.WriteLine("scenario=producer-lifecycle result=passed");
+    Console.WriteLine("probe=codegen-build result=passed");
+    return 0;
+}
+catch (Exception exception)
+{
+    Console.Error.WriteLine($"probe=codegen-build result=failed {exception}");
+    return 1;
+}
+
+[DependsOn(typeof(FoundationFeature))]
+internal sealed class ConsumerFeature(IModule module, string source) : FeatureBase(module)
+{
+    private ProducerState State => (ProducerState)Module.Properties[ProducerState.StatePropertyKey];
+    public override void Configure() => State.Events.Add(source + ".configure");
+    public override void Apply() => State.Events.Add(source + ".apply");
+}
