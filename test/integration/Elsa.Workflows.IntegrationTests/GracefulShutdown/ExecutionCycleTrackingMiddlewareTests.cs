@@ -1,6 +1,8 @@
 using Elsa.Extensions;
 using Elsa.Testing.Shared;
 using Elsa.Workflows.Activities;
+using Elsa.Workflows.CommitStates.Strategies;
+using Elsa.Workflows.IntegrationTests.SharedHelpers;
 using Elsa.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -66,6 +68,46 @@ public class ExecutionCycleTrackingMiddlewareTests : IAsyncDisposable
         {
             observed.Add(registry.ActiveCount);
             return ValueTask.CompletedTask;
+        }
+    }
+
+    [Test]
+    public async Task InFlightActivityKeepsItsCycleAfterACheckpointWithACustomCommitHandler()
+    {
+        var commits = new CommitTracker();
+        await using var services = (ServiceProvider)new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
+            .ConfigureElsa(elsa => elsa.UseWorkflows(workflows =>
+            {
+                workflows.WithDefaultActivityCommitStrategy(new ExecutingActivityStrategy());
+                workflows.CommitStateHandler = _ => commits;
+            }))
+            .Build();
+        await services.PopulateRegistriesAsync();
+        var registry = services.GetRequiredService<IExecutionCycleRegistry>();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var workflow = new TestWorkflow(builder => builder.Root = new BlockedActivity(entered, release.Task));
+        var run = services.GetRequiredService<IWorkflowRunner>().RunAsync(workflow);
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            await Assert.That(commits.CommitCount).IsGreaterThan(0);
+            await Assert.That(registry.ActiveCount).IsEqualTo(1);
+        }
+        finally
+        {
+            release.TrySetResult();
+            await run.WaitAsync(TimeSpan.FromSeconds(10));
+        }
+        await Assert.That(registry.ActiveCount).IsEqualTo(0);
+    }
+
+    private sealed class BlockedActivity(TaskCompletionSource entered, Task release) : CodeActivity
+    {
+        protected override ValueTask ExecuteAsync(ActivityExecutionContext context)
+        {
+            entered.TrySetResult();
+            return new ValueTask(release);
         }
     }
 

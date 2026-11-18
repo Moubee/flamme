@@ -142,7 +142,7 @@ Commit strategies determine persistence boundaries. Related files:
 - [CommitStrategies](../../src/modules/Elsa.Workflows.Core/CommitStates)
 - workflow sample configuration in [Elsa.Server.Web/Program.cs](../../src/apps/Elsa.Server.Web/Program.cs)
 
-The runtime uses `DefaultCommitStateHandler` to persist workflow state. To supply a custom implementation, set `WorkflowsFeature.CommitStateHandler`. The runtime wraps the selected handler so a commit releases its execution-cycle handle on success or failure.
+The runtime uses `DefaultCommitStateHandler` to persist workflow state. To supply a custom implementation, set `WorkflowsFeature.CommitStateHandler`. The execution cycle stays active through activity and workflow checkpoints. The runtime releases the handle after the runner's terminal commit succeeds or fails.
 
 ## Serialization
 

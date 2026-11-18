@@ -23,16 +23,17 @@ public sealed class ExecutionCycleAwareCommitStateHandler : ICommitStateHandler
     internal ExecutionCycleAwareCommitStateHandler(ICommitStateHandler inner) => _inner = inner;
 
     /// <inheritdoc />
-    public async Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, CancellationToken cancellationToken = default)
-    {
-        try { await _inner.CommitAsync(workflowExecutionContext, cancellationToken); }
-        finally { DisposeCycleHandleIfPresent(workflowExecutionContext); }
-    }
+    public Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, CancellationToken cancellationToken = default) =>
+        _inner.CommitAsync(workflowExecutionContext, cancellationToken);
 
     /// <inheritdoc />
-    public async Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, WorkflowState workflowState, CancellationToken cancellationToken = default)
+    public Task CommitAsync(WorkflowExecutionContext workflowExecutionContext, WorkflowState workflowState, CancellationToken cancellationToken = default) =>
+        _inner.CommitAsync(workflowExecutionContext, workflowState, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task CommitFinalAsync(WorkflowExecutionContext workflowExecutionContext, WorkflowState workflowState, CancellationToken cancellationToken = default)
     {
-        try { await _inner.CommitAsync(workflowExecutionContext, workflowState, cancellationToken); }
+        try { await _inner.CommitFinalAsync(workflowExecutionContext, workflowState, cancellationToken); }
         finally { DisposeCycleHandleIfPresent(workflowExecutionContext); }
     }
 

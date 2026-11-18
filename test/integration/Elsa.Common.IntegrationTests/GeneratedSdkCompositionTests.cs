@@ -44,7 +44,7 @@ public class GeneratedSdkCompositionTests
     [Arguments(false, true)]
     [Arguments(true, false)]
     [Arguments(true, true)]
-    public async Task RuntimeReleasesTheCycleAfterTheHostCommit(bool withState, bool fail)
+    public async Task RuntimeReleasesTheCycleOnlyAfterTheHostTerminalCommit(bool withState, bool fail)
     {
         var services = new ServiceCollection();
         var custom = new RecordingCommitHandler(fail);
@@ -59,7 +59,7 @@ public class GeneratedSdkCompositionTests
         var registry = scoped.GetRequiredService<IExecutionCycleRegistry>();
         var graph = await scoped.GetRequiredService<IWorkflowGraphBuilder>().BuildAsync(new Workflow(new WriteLine("test")));
         var context = await WorkflowExecutionContext.CreateAsync(scoped, graph, "custom-commit");
-        var handle = registry.BeginCycle(context.Id, null, default);
+        using var handle = registry.BeginCycle(context.Id, null, default);
         context.TransientProperties[ExecutionCycleTrackingMiddleware.ExecutionCycleHandleKey] = handle;
 
         Task Commit() => withState ? handler.CommitAsync(context, new WorkflowState()) : handler.CommitAsync(context);
@@ -70,6 +70,15 @@ public class GeneratedSdkCompositionTests
 
         await Assert.That(custom.WithState).IsEqualTo(withState);
         await Assert.That(custom.ActiveDuringCommit).IsEqualTo(1);
+        await Assert.That(registry.ActiveCount).IsEqualTo(1);
+        await Assert.That(handle.Disposed.IsCompleted).IsFalse();
+
+        Task CommitFinal() => handler.CommitFinalAsync(context, new WorkflowState());
+        if (fail)
+            await Assert.That(CommitFinal).Throws<InvalidOperationException>().WithMessage("host commit failed");
+        else
+            await CommitFinal();
+
         await Assert.That(registry.ActiveCount).IsEqualTo(0);
         await Assert.That(handle.Disposed.IsCompletedSuccessfully).IsTrue();
     }

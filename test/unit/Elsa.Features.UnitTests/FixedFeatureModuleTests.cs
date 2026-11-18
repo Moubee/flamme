@@ -68,6 +68,39 @@ public class FixedFeatureModuleTests
     }
 
     [Test]
+    public async Task InPlaceServiceReplacementStaysAheadOfQueuedHostedServices()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddHostedService<HostService>();
+        var replacement = ServiceDescriptor.Singleton<IHostedService>(_ => new HostService());
+        var module = new TestPlan(services);
+        module.Configure<ChildFeature>(child => child.WhenApplied = () => services[0] = replacement);
+        module.Apply();
+
+        await Assert.That(services[0]).IsSameReferenceAs(replacement);
+        await Assert.That(services[1].ImplementationType).IsEqualTo(typeof(LowService));
+    }
+
+    [Test]
+    public async Task LaterHostedRequestsHonorPriorityAndPreserveHostOwnedDuplicates()
+    {
+        var services = new ServiceCollection();
+        services.AddHostedService<LowService>();
+        var original = services[0];
+        var module = new TestPlan(services);
+        module.Apply();
+        services.AddHostedService<HostService>();
+        module.ConfigureHostedService<LateService>(0);
+        module.Apply();
+        module.Apply();
+
+        var hosted = services.Where(d => d.ServiceType == typeof(IHostedService)).ToArray();
+        await Assert.That(hosted[0]).IsSameReferenceAs(original);
+        await Assert.That(hosted.Select(d => d.ImplementationType).SequenceEqual(
+            [typeof(LowService), typeof(LateService), typeof(HighService), typeof(HostService)])).IsTrue();
+    }
+
+    [Test]
     public async Task SelectedFeatureWithoutDefaultConstructorAcceptsHostFactory()
     {
         var module = new TestPlan(new ServiceCollection(), hasDefaultFactory: false);
@@ -124,6 +157,7 @@ public class FixedFeatureModuleTests
             _child = Declare<ChildFeature>(hasDefaultFactory ? m => new(m, "default") : null, new("Child", "Test", "Child"));
             DeclareHostedService<LowService>();
             DeclareHostedService<HighService>();
+            DeclareHostedService<LateService>();
             SealDeclarations();
         }
 
@@ -172,4 +206,6 @@ public class FixedFeatureModuleTests
     }
 
     private sealed class HighService : LowService;
+    private sealed class LateService : LowService;
+    private sealed class HostService : LowService;
 }

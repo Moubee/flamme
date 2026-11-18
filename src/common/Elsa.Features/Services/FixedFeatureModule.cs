@@ -155,10 +155,11 @@ public abstract class FixedFeatureModule : IModule
                 EnsureUsable();
                 ConfigureFeatures();
             }
-            var beforeApply = new HashSet<ServiceDescriptor>(Services, ReferenceEqualityComparer.Instance);
+            var beforeApply = Services.ToArray();
             ApplyFeatures();
             EnsureUsable();
-            FeatureServiceRegistration.RegisterHostedServices(Services, beforeApply, _requestedServices.OrderBy(entry => entry.Priority).Select(entry => entry.Descriptor));
+            var requested = _requestedServices.OrderBy(entry => entry.Priority).Select(entry => entry.Descriptor).Distinct();
+            FeatureServiceRegistration.RegisterHostedServices(Services, beforeApply, requested, orderExisting: true);
             FeatureServiceRegistration.PublishInstalledFeatures(Services, _slots.Values.Select(slot => slot.GetDescriptor()));
         }
         catch (Exception exception)

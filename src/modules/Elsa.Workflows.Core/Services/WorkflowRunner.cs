@@ -253,7 +253,7 @@ public class WorkflowRunner(
         var activityExecutionContexts = workflowExecutionContext.ActivityExecutionContexts.ToList();
         var journal = new Journal(workflowExecutionLogEntries, activityExecutionContexts);
         await notificationSender.SendAsync(new WorkflowExecuted(workflow, workflowState, workflowExecutionContext), cancellationToken);
-        await commitStateHandler.CommitAsync(workflowExecutionContext, workflowState, cancellationToken);
+        await commitStateHandler.CommitFinalAsync(workflowExecutionContext, workflowState, cancellationToken);
         return new(workflowExecutionContext, workflowState, workflowExecutionContext.Workflow, result, journal);
     }
 }

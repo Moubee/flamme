@@ -208,7 +208,7 @@ public class Module : IModule
 
         // Hosted services are registered after the features have been applied, because applying a feature can contribute more of them. They still belong
         // at this position in the service collection though, ahead of whatever the features register from their Apply method, so remember where that is.
-        var beforeApply = new HashSet<ServiceDescriptor>(Services, ReferenceEqualityComparer.Instance);
+        var beforeApply = Services.ToArray();
 
         // Make sure to use the complete list of features when applying them. Applying a feature can introduce additional features (a feature calling
         // Module.Configure<T>() from its Apply method, directly or through a helper such as AddActivity<T>()), so keep going until nothing new shows up.
@@ -238,7 +238,7 @@ public class Module : IModule
             select feature;
     }
 
-    private void RegisterHostedServices(HashSet<ServiceDescriptor> beforeApply) =>
+    private void RegisterHostedServices(ServiceDescriptor[] beforeApply) =>
         FeatureServiceRegistration.RegisterHostedServices(Services, beforeApply,
             _hostedServiceDescriptors.OrderBy(entry => entry.Order).Select(entry => _provider.CreateHostedServiceDescriptor(entry.Type)));
 
@@ -377,7 +377,7 @@ public class Module : IModule
         _isApplying = true;
         ConfigureValidatedFeatures();
         AdmitValidatedFeatures();
-        var beforeApply = new HashSet<ServiceDescriptor>(Services, ReferenceEqualityComparer.Instance);
+        var beforeApply = Services.ToArray();
         var applied = new HashSet<IFeature>();
         while (true)
         {
