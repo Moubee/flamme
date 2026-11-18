@@ -4,7 +4,6 @@ using Elsa.Caching.Options;
 using Elsa.Common.RecurringTasks;
 using Elsa.Expressions.Helpers;
 using Elsa.Extensions;
-using Elsa.Features.Services;
 using Elsa.Http.Options;
 using Elsa.Identity.Multitenancy;
 using Elsa.Persistence.EFCore.Extensions;
@@ -148,8 +147,6 @@ services
                     .Append<CurrentUserTenantResolver>());
             });
         }
-
-        ConfigureForTest?.Invoke(elsa);
     });
 
 // Obfuscate HTTP request headers.
@@ -288,13 +285,7 @@ if (useSignalR)
 await app.RunAsync();
 
 /// <summary>
-/// The main entry point for the application made public for end to end testing.
+/// The entry point for the reference server.
 /// </summary>
 [UsedImplicitly]
-public partial class Program
-{
-    /// <summary>
-    /// Set by the test runner to configure the module for testing.
-    /// </summary>
-    public static Action<IModule>? ConfigureForTest { get; set; }
-}
+public partial class Program;

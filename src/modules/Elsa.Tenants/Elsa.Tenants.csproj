@@ -13,5 +13,4 @@
         <ProjectReference Include="..\Elsa.Common\Elsa.Common.csproj"/>
     </ItemGroup>
 
-  <Import Project="../../common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>

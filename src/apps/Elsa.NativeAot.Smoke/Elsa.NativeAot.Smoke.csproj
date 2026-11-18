@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../NativeAot/Probe.props" />
-  <ItemGroup>
-    <ProjectReference Include="../../modules/Elsa.Workflows.Core/Elsa.Workflows.Core.csproj" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-  </ItemGroup>
-</Project>

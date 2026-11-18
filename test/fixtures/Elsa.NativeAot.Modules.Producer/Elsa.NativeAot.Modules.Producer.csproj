@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <UseElsaSourceTooling>true</UseElsaSourceTooling>
     <Description>Compiled producer fixture for NativeAOT module export validation.</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/common/Elsa.Features/Elsa.Features.csproj" />
   </ItemGroup>
-  <Import Project="../../../src/common/Elsa.CodeGeneration.Build/SourceTooling.targets" />
 </Project>

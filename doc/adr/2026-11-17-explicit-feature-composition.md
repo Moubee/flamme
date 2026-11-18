@@ -60,7 +60,7 @@ component success does not establish generator or complete workflow support.
 Generators, versioned cross-module exports, source diagnostics, payload codecs,
 workflow execution, and worker/server capability migration remain separate work.
 
-The Features probe compiles explicit and legacy bootstraps separately. It tests
+The standalone Features probe uses a handwritten catalog. It tests
 both policies, lifecycle, failures, hosted-service identities and owned scopes
 under managed execution and NativeAOT. Broader source diagnostics in the legacy
 reflection provider remain visible; no package-wide compatibility flag or blanket

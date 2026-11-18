@@ -139,10 +139,9 @@ exports, build the combined catalog, then create/configure the module as before.
 Keep feature factories and state host-local. Export revisions are not inferred
 from assembly or package versions.
 
-Existing workflow and payload data keep their formats. Later plan steps cover
-generation of feature declarations and richer authoring diagnostics.
-
-The compiler asset packages can select the host bootstrap at build time.
+A feature library can also publish compiler-generated registrations from its
+existing feature declarations. Its dependency on `Elsa.Features` supplies the
+compiler settings to the consuming host.
 [Build selection and compiler assets](nativeaot-build-selection.md)
 
 ## Validate producer/consumer boundaries

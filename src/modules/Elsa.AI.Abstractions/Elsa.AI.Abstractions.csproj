@@ -4,6 +4,7 @@
         <Description>
             Provides provider-neutral abstractions for Flamme AI capabilities.
         </Description>
+        <UseElsaSourceTooling>false</UseElsaSourceTooling>
         <PackageTags>elsa module ai abstractions</PackageTags>
     </PropertyGroup>
 

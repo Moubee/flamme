@@ -9,7 +9,6 @@ namespace Elsa.NativeAot.IntegrationTests;
 [NotInParallel("NativeAotBuild")]
 public class ModulePackageTests
 {
-    private const string Producer = "Elsa.NativeAot.Modules.Producer";
     private const string ConsumerProject = "Consumer.csproj";
 
     [Test]
@@ -33,12 +32,17 @@ public class ModulePackageTests
     {
         var feed = await PackageFeed.Get(disableRuntimeAsync);
         string[] frameworks = BuildTest.Framework == "net11.0" ? ["net10.0", "net11.0"] : [BuildTest.Framework];
-        foreach (var project in new[] { "src/common/Elsa.CodeGeneration.Abstractions", "src/common/Elsa.Features", $"test/fixtures/{Producer}" })
+        foreach (var project in new[]
         {
-            var name = Path.GetFileName(project);
+            Path.Combine(BuildTest.Root, "src/common/Elsa.CodeGeneration.Abstractions/Elsa.CodeGeneration.Abstractions.csproj"),
+            Path.Combine(BuildTest.Root, "src/common/Elsa.Features/Elsa.Features.csproj"),
+            feed.ProducerProject
+        })
+        {
+            var name = Path.GetFileNameWithoutExtension(project);
             foreach (var framework in frameworks)
             {
-                var properties = await ReadBuildProperties(BuildTest.Root, Path.Combine(project, name + ".csproj"),
+                var properties = await ReadBuildProperties(Path.GetDirectoryName(project)!, project,
                     Path.Combine(feed.Artifacts, $"{name}-{framework}"), framework, feed.PackProperties);
                 await VerifyCompilerSettings(properties, framework, disableRuntimeAsync);
                 await Assert.That(properties.GetProperty("IsPackable").GetString()).IsEqualTo("true");
@@ -64,7 +68,7 @@ public class ModulePackageTests
                 .Save(Path.Combine(consumer, "Directory.Packages.props"));
             new XElement("Project", new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                 new XElement("PropertyGroup", new XElement("TargetFramework", BuildTest.Framework)),
-                new XElement("ItemGroup", new XElement("PackageReference", new XAttribute("Include", Producer), new XAttribute("Version", $"[{version}]"))))
+                new XElement("ItemGroup", new XElement("PackageReference", new XAttribute("Include", PackageFeed.Producer), new XAttribute("Version", $"[{version}]"))))
                 .Save(Path.Combine(consumer, ConsumerProject));
             new XElement("configuration", new XElement("packageSources", new XElement("clear"),
                 new XElement("add", new XAttribute("key", "empty-fixture"), new XAttribute("value", emptyFeed))))
@@ -73,7 +77,7 @@ public class ModulePackageTests
             var failure = await BuildTest.Run(consumer, Path.Combine(evidence, "restore.log"), "dotnet", "restore", ConsumerProject,
                 "--configfile", "NuGet.Config", "--packages", Path.Combine(consumer, "packages"), "-p:RestoreFallbackFolders=", "-p:NuGetAudit=false");
             await Assert.That(failure.ExitCode).IsNotEqualTo(0);
-            await Assert.That(failure.Output).Matches($@"error NU110[12]:[^\r\n]*{Regex.Escape(Producer)}");
+            await Assert.That(failure.Output).Matches($@"error NU110[12]:[^\r\n]*{Regex.Escape(PackageFeed.Producer)}");
         }
         finally
         {
@@ -110,8 +114,7 @@ public class ModulePackageTests
         PackageFeed.VerifyLock(lockFile);
         File.Copy(lockFile, Path.Combine(evidence, "packages.lock.json"));
         (await Run("locked-restore", "dotnet", ["restore", ConsumerProject, "--locked-mode", "--artifacts-path", build, .. options])).EnsureSuccess();
-        feed.VerifyAssets(Path.Combine(build, "obj", "Consumer", "project.assets.json"), false,
-            "Elsa.CodeGeneration", "Elsa.CodeGeneration.Analyzers", "Elsa.CodeGeneration.Build");
+        feed.VerifyAssets(Path.Combine(build, "obj", "Consumer", "project.assets.json"), false, PackageFeed.CompilerPackages, [PackageFeed.Producer]);
 
         // Publish both assets from the same two-target restore to catch intermediate or lock overwrites.
         string[] frameworks = BuildTest.Framework == "net11.0" && !disableRuntimeAsync ? ["net10.0", "net11.0"] : [BuildTest.Framework];

@@ -1,4 +1,3 @@
-#if EXPLICIT_FEATURE_CATALOG
 using Elsa.Features.Abstractions;
 using Elsa.Features.Implementations;
 using Elsa.Features.Models;
@@ -54,24 +53,24 @@ internal static class ExplicitHostedServiceScenarios
             module.Apply();
 
             var descriptors = services.Where(descriptor => descriptor.ServiceType == typeof(IHostedService)).ToArray();
-            ProbeRunner.Require(descriptors.Length == expected.Length && descriptors.All(descriptor => descriptor.Lifetime == ServiceLifetime.Singleton),
+            ScenarioAssert.Require(descriptors.Length == expected.Length && descriptors.All(descriptor => descriptor.Lifetime == ServiceLifetime.Singleton),
                 "Repeated Apply must retain exactly five singleton hosted-service descriptors.");
-            ProbeRunner.Require(descriptors.Select(descriptor => descriptor.ImplementationType).SequenceEqual([
+            ScenarioAssert.Require(descriptors.Select(descriptor => descriptor.ImplementationType).SequenceEqual([
                 typeof(PreExistingHostedService), typeof(LateHostedService), typeof(FirstHostedService), typeof(SecondHostedService), typeof(DirectHostedService)
             ]), "Priority ties, duplicate direct registration, and late queued registration must preserve their implementation identities and placement.");
-            ProbeRunner.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
+            ScenarioAssert.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
                 "Composition must not instantiate hosted services or their scoped work.");
 
             await using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
-            ProbeRunner.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
+            ScenarioAssert.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
                 "Container validation must not execute hosted-service constructors.");
             var hostedServices = provider.GetServices<IHostedService>().ToArray();
             var resolvedAgain = provider.GetServices<IHostedService>().ToArray();
-            ProbeRunner.Require(hostedServices.Zip(resolvedAgain).All(pair => ReferenceEquals(pair.First, pair.Second)),
+            ScenarioAssert.Require(hostedServices.Zip(resolvedAgain).All(pair => ReferenceEquals(pair.First, pair.Second)),
                 "Each hosted-service registration must resolve the same singleton instance.");
-            ProbeRunner.Require(state.Constructors.SequenceEqual(expected),
+            ScenarioAssert.Require(state.Constructors.SequenceEqual(expected),
                 "Hosted-service construction must occur only when resolving the ordered registrations.");
-            ProbeRunner.Require(state.ScopedCreations == 0, "A singleton may acquire its work scope only during StartAsync.");
+            ScenarioAssert.Require(state.ScopedCreations == 0, "A singleton may acquire its work scope only during StartAsync.");
 
             var started = new List<IHostedService>();
             try
@@ -81,9 +80,9 @@ internal static class ExplicitHostedServiceScenarios
                     await service.StartAsync(CancellationToken.None);
                     started.Add(service);
                 }
-                ProbeRunner.Require(state.Events.Where(value => value.StartsWith("start:", StringComparison.Ordinal)).SequenceEqual(expected.Select(name => $"start:{name}")),
+                ScenarioAssert.Require(state.Events.Where(value => value.StartsWith("start:", StringComparison.Ordinal)).SequenceEqual(expected.Select(name => $"start:{name}")),
                     "Real StartAsync calls must complete in registration order.");
-                ProbeRunner.Require(state.Active.SetEquals(expected) && state.ScopedCreations == 1 && state.ScopedDisposals == 0,
+                ScenarioAssert.Require(state.Active.SetEquals(expected) && state.ScopedCreations == 1 && state.ScopedDisposals == 0,
                     "The owning singleton must create one live scoped dependency during its awaited start.");
             }
             finally
@@ -92,9 +91,9 @@ internal static class ExplicitHostedServiceScenarios
                     await service.StopAsync(CancellationToken.None);
             }
 
-            ProbeRunner.Require(state.Events.Where(value => value.StartsWith("stop:", StringComparison.Ordinal)).SequenceEqual(expected.Reverse().Select(name => $"stop:{name}")),
+            ScenarioAssert.Require(state.Events.Where(value => value.StartsWith("stop:", StringComparison.Ordinal)).SequenceEqual(expected.Reverse().Select(name => $"stop:{name}")),
                 "Real StopAsync calls must complete in reverse registration order.");
-            ProbeRunner.Require(state.Active.Count == 0 && state.ScopedCreations == 1 && state.ScopedDisposals == 1,
+            ScenarioAssert.Require(state.Active.Count == 0 && state.ScopedCreations == 1 && state.ScopedDisposals == 1,
                 "Stopping the owning singleton must dispose its own scope exactly once.");
         }
     }
@@ -105,7 +104,7 @@ internal static class ExplicitHostedServiceScenarios
         var module = new Module(CreateServices(state), new ExplicitFeatureCatalogBuilder().Build(), policy);
         ExpectInvalid(() => module.ConfigureHostedService(typeof(UnknownHostedService)), nameof(UnknownHostedService));
         ExpectInvalid(module.Apply, "fault");
-        ProbeRunner.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
+        ScenarioAssert.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
             "An undeclared hosted-service Type must fail admission before any construction.");
     }
 
@@ -124,7 +123,7 @@ internal static class ExplicitHostedServiceScenarios
         }
         catch (AggregateException exception)
         {
-            ProbeRunner.Require(exception.Flatten().InnerExceptions.All(inner => inner is InvalidOperationException),
+            ScenarioAssert.Require(exception.Flatten().InnerExceptions.All(inner => inner is InvalidOperationException),
                 "The captive-scope failure must come from DI validation.");
             RequireCaptiveDiagnostic(exception);
             rejected = true;
@@ -134,8 +133,8 @@ internal static class ExplicitHostedServiceScenarios
             RequireCaptiveDiagnostic(exception);
             rejected = true;
         }
-        ProbeRunner.Require(rejected, "A singleton hosted service must not capture a scoped constructor dependency.");
-        ProbeRunner.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
+        ScenarioAssert.Require(rejected, "A singleton hosted service must not capture a scoped constructor dependency.");
+        ScenarioAssert.Require(state.Constructors.Count == 0 && state.ScopedCreations == 0,
             "Invalid captive scopes must be rejected before running constructors.");
     }
 
@@ -151,7 +150,7 @@ internal static class ExplicitHostedServiceScenarios
     {
         var diagnostic = exception.ToString();
         foreach (var fragment in new[] { nameof(CaptiveScopedHostedService), nameof(ScopedWork), "scoped", "singleton" })
-            ProbeRunner.Require(diagnostic.Contains(fragment, StringComparison.OrdinalIgnoreCase),
+            ScenarioAssert.Require(diagnostic.Contains(fragment, StringComparison.OrdinalIgnoreCase),
                 $"Captive-scope validation must identify '{fragment}': {diagnostic}");
     }
 
@@ -164,7 +163,7 @@ internal static class ExplicitHostedServiceScenarios
         catch (InvalidOperationException exception)
         {
             foreach (var fragment in fragments)
-                ProbeRunner.Require(exception.Message.Contains(fragment, StringComparison.OrdinalIgnoreCase),
+                ScenarioAssert.Require(exception.Message.Contains(fragment, StringComparison.OrdinalIgnoreCase),
                     $"Expected hosted-service diagnostic containing '{fragment}', received '{exception.Message}'.");
             return;
         }
@@ -222,7 +221,7 @@ internal static class ExplicitHostedServiceScenarios
             await Task.Yield();
             cancellationToken.ThrowIfCancellationRequested();
             State.Events.Add($"start:{_name}");
-            ProbeRunner.Require(State.Active.Add(_name), $"Hosted service {_name} started twice.");
+            ScenarioAssert.Require(State.Active.Add(_name), $"Hosted service {_name} started twice.");
         }
 
         public virtual async Task StopAsync(CancellationToken cancellationToken)
@@ -230,7 +229,7 @@ internal static class ExplicitHostedServiceScenarios
             await Task.Yield();
             cancellationToken.ThrowIfCancellationRequested();
             State.Events.Add($"stop:{_name}");
-            ProbeRunner.Require(State.Active.Remove(_name), $"Hosted service {_name} stopped without a matching start.");
+            ScenarioAssert.Require(State.Active.Remove(_name), $"Hosted service {_name} stopped without a matching start.");
         }
     }
 
@@ -289,4 +288,3 @@ internal static class ExplicitHostedServiceScenarios
         public CaptiveScopedHostedService(HostedState state, ScopedWork scopedWork) : base(state, "captive") => _ = scopedWork;
     }
 }
-#endif

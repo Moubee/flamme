@@ -8,6 +8,8 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-        <ProjectReference Include="../Elsa.Server.Web/Elsa.Server.Web.csproj" />
+        <!-- Let IDE builds resolve the server's net11.0 output from the AppHost's target framework. -->
+        <ProjectReference Include="../Elsa.Server.Web/Elsa.Server.Web.csproj"
+                          SkipGetTargetFrameworkProperties="false" />
     </ItemGroup>
 </Project>

@@ -1,20 +1,14 @@
-using Aspire.Hosting.ApplicationModel;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Match the reference quickstart's PostgreSQL major and data-directory layout.
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("17-alpine")
-    .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent);
+    .WithDataVolume();
+
 var database = postgres.AddDatabase("elsa");
 
 // Ignore the standalone launch profile's fixed ports; Aspire allocates both endpoints.
-var server = builder.AddProject<Projects.Elsa_Server_Web>("server", options => options.ExcludeLaunchProfile = true)
-    // With no launch profile, these select the framework for Aspire's `dotnet run` launcher.
-    .WithArgs("--framework", "net11.0")
-    .WithHttpEndpoint()
-    .WithHttpsEndpoint()
+var server = builder.AddProject<Projects.Elsa_Server_Web>("server")
     .WithReference(database, "PostgreSql")
     .WaitFor(database)
     .WithHttpHealthCheck("/health/ready")

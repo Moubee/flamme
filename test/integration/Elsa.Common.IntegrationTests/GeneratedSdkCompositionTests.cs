@@ -3,8 +3,11 @@ using Elsa.CodeGeneration.Interceptors;
 #endif
 using Elsa.Common.Features;
 using Elsa.Extensions;
+using Elsa.Expressions.CSharp.Features;
+using Elsa.Expressions.Liquid.Features;
 using Elsa.Features;
 using Elsa.Features.Contracts;
+using Elsa.Features.Implementations;
 using Elsa.Features.Services;
 using Elsa.Workflows.Features;
 using Elsa.Workflows.Management.Features;
@@ -15,6 +18,25 @@ namespace Elsa.Common.IntegrationTests;
 
 public class GeneratedSdkCompositionTests
 {
+    [Test]
+    public async Task TransitiveExpressionModulesSupplyFactoriesBeforeSelection()
+    {
+        var services = new ServiceCollection();
+        var module = services.CreateModule();
+#if ELSA_GENERATED
+        var catalog = ((Module)module).Catalog!;
+        await Assert.That(catalog.FeatureTypes).Contains(typeof(CSharpFeature));
+        await Assert.That(catalog.FeatureTypes).Contains(typeof(LiquidFeature));
+#endif
+        await Assert.That(module.HasFeature<CSharpFeature>()).IsFalse();
+        module.UseCSharp();
+        module.Apply();
+
+        await Assert.That(module.HasFeature<CSharpFeature>()).IsTrue();
+        await Assert.That(module.HasFeature<MediatorFeature>()).IsTrue();
+        await Assert.That(module.HasFeature<LiquidFeature>()).IsFalse();
+    }
+
     [Test]
     public async Task ConfigureBeforeAddUsesTheCompiledCatalogAndRunsTheApplicationCallbackOnce()
     {
@@ -27,8 +49,10 @@ public class GeneratedSdkCompositionTests
         // An ordinary call and an explicit provider call must share the first module.
 #if ELSA_GENERATED
         var explicitModule = services.ConfigureElsa(null, ElsaFeatureInterceptors.Catalog);
-#else
+#elif ELSA_DYNAMIC
         var explicitModule = services.ConfigureElsa();
+#else
+#error The SDK composition tests require the feature tooling to select an execution mode.
 #endif
 
         await Assert.That(ReferenceEquals(first, applied) && ReferenceEquals(applied, repeated) &&

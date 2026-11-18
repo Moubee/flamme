@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <Description>Provides shared dashboard contracts and contribution abstractions for Flamme modules.</Description>
+        <UseElsaSourceTooling>false</UseElsaSourceTooling>
         <PackageTags>elsa dashboard abstractions contributors operations</PackageTags>
     </PropertyGroup>
 

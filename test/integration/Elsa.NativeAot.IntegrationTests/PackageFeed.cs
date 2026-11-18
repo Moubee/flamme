@@ -9,11 +9,11 @@ namespace Elsa.NativeAot.IntegrationTests;
 
 internal sealed class PackageFeed
 {
-    private const string Producer = "Elsa.NativeAot.Modules.Producer";
+    internal const string Producer = "Elsa.NativeAot.Modules.Producer";
     private const string Abstractions = "Elsa.CodeGeneration.Abstractions";
     private const string BuildPackage = "Elsa.CodeGeneration.Build";
     private static readonly string[] RuntimePackages = [Abstractions, "Elsa.Features", Producer];
-    private static readonly string[] CompilerPackages = ["Elsa.CodeGeneration", "Elsa.CodeGeneration.Analyzers", BuildPackage];
+    internal static readonly string[] CompilerPackages = ["Elsa.CodeGeneration", "Elsa.CodeGeneration.Analyzers", BuildPackage];
     private static readonly Lazy<DirectoryInfo> Consumers = new(() => Directory.CreateTempSubdirectory("flamme-consumers-"));
     private static readonly Lazy<Task<PackageFeed>> Default = new(() => Pack(false));
     private static readonly Lazy<Task<PackageFeed>> AsyncDisabled = new(() => Pack(true));
@@ -33,6 +33,7 @@ internal sealed class PackageFeed
     public string[] PackProperties { get; }
     public string Version { get; } = $"0.0.0-test.{Guid.NewGuid():N}";
     public string Artifacts { get; }
+    public string ProducerProject { get; private set; } = null!;
     public string Feed => Path.Combine(Artifacts, "feed");
 
     public static Task<PackageFeed> Get(bool disableRuntimeAsync = false) =>
@@ -42,15 +43,20 @@ internal sealed class PackageFeed
     {
         var packages = new PackageFeed(disableRuntimeAsync);
         Directory.CreateDirectory(packages.Feed);
-        foreach (var id in RuntimePackages.Concat(CompilerPackages))
+        foreach (var id in RuntimePackages.Except([Producer]).Concat(CompilerPackages))
         {
-            var project = Path.Combine(BuildTest.Root, id == Producer ? "test/fixtures" : "src/common", id, id + ".csproj");
-            var result = await BuildTest.Run(BuildTest.Root, Path.Combine(packages.Artifacts, $"pack-{id}.log"), "dotnet",
-                ["pack", project, .. packages.PackProperties, "-p:EmitCompilerGeneratedFiles=true", $"-bl:{packages.Artifacts}/pack-{id}.binlog"]);
-            result.EnsureSuccess();
-            packages.VerifyLayout(id);
+            var project = Path.Combine(BuildTest.Root, "src/common", id, id + ".csproj");
+            await packages.PackProject(id, project);
         }
+
+        // Build a third-party feature library against the staged public package, outside the repository.
+        var producer = packages.PrepareConsumer("producer");
+        packages.ProducerProject = Path.Combine(producer, Producer + ".csproj");
+        File.Copy(Path.Combine(BuildTest.Root, "test/fixtures/nativeaot/codegen-build/Producer.csproj.in"), packages.ProducerProject);
+        File.Copy(Path.Combine(BuildTest.Root, "test/fixtures", Producer, "ProducerExports.cs"), Path.Combine(producer, "ProducerExports.cs"));
+        await packages.PackProject(Producer, packages.ProducerProject);
         var intermediate = Path.Combine(packages.Artifacts, "build", "obj", Producer);
+        packages.VerifyAssets(Path.Combine(intermediate, "project.assets.json"), false, [Producer, .. CompilerPackages], ["Elsa.Features"]);
         var helpers = Directory.GetFiles(intermediate, "ElsaFeatureRegistrations.g.cs", SearchOption.AllDirectories);
         Require(helpers.Length == 2, "Expected producer bindings for both target frameworks.");
         foreach (var helper in helpers)
@@ -63,14 +69,22 @@ internal sealed class PackageFeed
         return packages;
     }
 
+    private async Task PackProject(string id, string project)
+    {
+        var result = await BuildTest.Run(Path.GetDirectoryName(project)!, Path.Combine(Artifacts, $"pack-{id}.log"), "dotnet",
+            ["pack", project, .. PackProperties, "-p:EmitCompilerGeneratedFiles=true", $"-bl:{Artifacts}/pack-{id}.binlog"]);
+        result.EnsureSuccess();
+        VerifyLayout(id);
+    }
+
     // An external project can consume only the public NuGet assets. Give every test its own SDK inputs.
     public string PrepareConsumer(string name)
     {
         var directory = Consumers.Value.CreateSubdirectory($"{name}-{Guid.NewGuid():N}").FullName;
         File.Copy(Path.Combine(BuildTest.Root, "global.json"), Path.Combine(directory, "global.json"));
         // Reuse installed SDK dependencies while keeping freshly staged packages out of the user's cache.
-        using var producer = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(Artifacts, "build", "obj", Producer, "project.assets.json")));
-        var caches = producer.RootElement.GetProperty("packageFolders").EnumerateObject().Select(p => p.Name);
+        using var features = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(Artifacts, "build", "obj", "Elsa.Features", "project.assets.json")));
+        var caches = features.RootElement.GetProperty("packageFolders").EnumerateObject().Select(p => p.Name);
         new XElement("Project", new XElement("PropertyGroup",
             new XElement("RestorePackagesPath", Path.Combine(Artifacts, "consumer-packages")),
             new XElement("RestoreAdditionalProjectFallbackFolders", string.Join(';', caches))))
@@ -114,6 +128,15 @@ internal sealed class PackageFeed
         }
         if (RuntimePackages.Contains(id))
         {
+            if (id == "Elsa.Features")
+            {
+                foreach (var toolName in new[] { "Elsa.CodeGeneration", "Elsa.CodeGeneration.Analyzers", "RegistrationCompiler" })
+                    Require(archive.GetEntry($"tools/roslyn/{toolName}.dll") != null, $"Missing bundled {toolName}.");
+                foreach (var suffix in new[] { "props", "targets" })
+                    Require(archive.GetEntry($"buildTransitive/{id}.{suffix}") != null, $"Missing bundled {suffix}.");
+            }
+            Require(!archive.Entries.Any(e => e.FullName.StartsWith("lib/", StringComparison.Ordinal) &&
+                e.Name.EndsWith(".dll", StringComparison.Ordinal) && e.Name != id + ".dll"), $"{id} ships extra runtime assemblies.");
             foreach (var tfm in new[] { "net10.0", "net11.0" })
                 Require(archive.GetEntry($"lib/{tfm}/{id}.dll") != null, $"{id} lacks the {tfm} assembly.");
             return;
@@ -157,10 +180,19 @@ internal sealed class PackageFeed
             Require(groups.TryGetProperty(tfm, out _), $"Missing {tfm} in {path}.");
     }
 
-    public void VerifyAssets(string assetsFile, bool allowSourceLibrary = false, params string[] omitted)
+    public void VerifyAssets(string assetsFile, bool allowSourceLibrary, string[] omitted, string[]? directElsaPackages = null)
     {
         using var file = JsonDocument.Parse(File.ReadAllBytes(assetsFile));
         var assets = file.RootElement;
+        if (directElsaPackages != null)
+        {
+            foreach (var framework in assets.GetProperty("project").GetProperty("frameworks").EnumerateObject())
+            {
+                var references = framework.Value.GetProperty("dependencies").EnumerateObject().Select(p => p.Name)
+                    .Where(id => id.StartsWith("Elsa.", StringComparison.OrdinalIgnoreCase)).ToArray();
+                Require(references.SequenceEqual(directElsaPackages), $"Unexpected direct Elsa references for {framework.Name}: {string.Join(", ", references)}.");
+            }
+        }
         var libraries = assets.GetProperty("libraries");
         foreach (var library in libraries.EnumerateObject())
         {

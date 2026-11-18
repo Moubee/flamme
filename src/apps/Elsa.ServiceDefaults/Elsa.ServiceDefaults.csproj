@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <UseElsaSourceTooling>false</UseElsaSourceTooling>
         <IsAspireSharedProject>true</IsAspireSharedProject>
     </PropertyGroup>
 

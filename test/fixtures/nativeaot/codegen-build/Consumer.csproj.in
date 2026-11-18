@@ -8,9 +8,6 @@
     <DefineConstants>$(DefineConstants);$(FixtureHostCase)</DefineConstants>
     <IsPackable>false</IsPackable>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <FixtureIncludeGenerator Condition="'$(FixtureIncludeGenerator)' == ''">true</FixtureIncludeGenerator>
-    <FixtureIncludeAnalyzer Condition="'$(FixtureIncludeAnalyzer)' == ''">true</FixtureIncludeAnalyzer>
-    <FixtureIncludeBuild Condition="'$(FixtureIncludeBuild)' == ''">true</FixtureIncludeBuild>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == '' And '$(TargetFramework)' == 'net11.0'">true</UseRuntimeAsync>
     <UseRuntimeAsync Condition="'$(UseRuntimeAsync)' == ''">false</UseRuntimeAsync>
@@ -18,11 +15,6 @@
     <WeaverConfiguration><Weavers><ConfigureAwait ContinueOnCapturedContext="false" /></Weavers></WeaverConfiguration>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Elsa.CodeGeneration.Build" PrivateAssets="All" Condition="'$(FixtureIncludeBuild)' == 'true'" />
-    <PackageReference Include="Elsa.CodeGeneration" PrivateAssets="All" Condition="'$(FixtureIncludeGenerator)' == 'true'" />
-    <PackageReference Include="Elsa.CodeGeneration.Analyzers" PrivateAssets="All" Condition="'$(FixtureIncludeAnalyzer)' == 'true'" />
-    <PackageReference Include="Elsa.CodeGeneration.Abstractions" />
-    <PackageReference Include="Elsa.Features" />
     <PackageReference Include="Elsa.NativeAot.Modules.Producer" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="ConfigureAwait.Fody" PrivateAssets="All" />

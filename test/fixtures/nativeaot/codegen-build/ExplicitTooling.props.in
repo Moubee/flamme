@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <FixtureIncludeGenerator Condition="'$(FixtureIncludeGenerator)' == ''">true</FixtureIncludeGenerator>
+    <FixtureIncludeAnalyzer Condition="'$(FixtureIncludeAnalyzer)' == ''">true</FixtureIncludeAnalyzer>
+    <FixtureIncludeBuild Condition="'$(FixtureIncludeBuild)' == ''">true</FixtureIncludeBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa.CodeGeneration.Build" PrivateAssets="All" Condition="'$(FixtureIncludeBuild)' == 'true'" />
+    <PackageReference Include="Elsa.CodeGeneration" PrivateAssets="All" Condition="'$(FixtureIncludeGenerator)' == 'true'" />
+    <PackageReference Include="Elsa.CodeGeneration.Analyzers" PrivateAssets="All" Condition="'$(FixtureIncludeAnalyzer)' == 'true'" />
+    <PackageReference Include="Elsa.CodeGeneration.Abstractions" />
+    <PackageReference Include="Elsa.Features">
+      <!-- Remove bundled tooling when the test simulates an incomplete standalone installation. -->
+      <ExcludeAssets Condition="'$(FixtureIncludeBuild)' != 'true' Or '$(FixtureIncludeGenerator)' != 'true' Or '$(FixtureIncludeAnalyzer)' != 'true'">buildTransitive</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

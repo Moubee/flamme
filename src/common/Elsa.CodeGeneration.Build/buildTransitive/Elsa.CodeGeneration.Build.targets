@@ -1,6 +1,11 @@
 <Project TreatAsLocalProperty="ElsaEffectiveExecutionMode">
+  <PropertyGroup>
+    <_ElsaCodeGenerationTargetsImported>true</_ElsaCodeGenerationTargetsImported>
+    <_ElsaCompilerVisibleProperties>ElsaExecutionMode;ElsaEffectiveExecutionMode;ElsaGenerateMetadata;ElsaIsHost;ElsaHostBootstrap;ElsaModuleExportSchemaVersion;RuntimeIdentifier</_ElsaCompilerVisibleProperties>
+  </PropertyGroup>
   <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true'">
-    <CompilerVisibleProperty Include="ElsaExecutionMode;ElsaEffectiveExecutionMode;ElsaGenerateMetadata;ElsaIsHost;ElsaHostBootstrap;ElsaModuleExportSchemaVersion;RuntimeIdentifier" />
+    <CompilerVisibleProperty Remove="$(_ElsaCompilerVisibleProperties)" />
+    <CompilerVisibleProperty Include="$(_ElsaCompilerVisibleProperties)" />
   </ItemGroup>
 
   <Target Name="ResolveElsaCodeGenerationSettings" BeforeTargets="PrepareForBuild;CollectPackageReferences;GenerateMSBuildEditorConfigFileShouldRun"
@@ -25,7 +30,6 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(ElsaIsHost)' == 'true'">
-      <InterceptorsNamespaces Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated' And '$(ElsaHostBootstrap)' == 'Compiler'">$(InterceptorsNamespaces);Elsa.CodeGeneration.Interceptors</InterceptorsNamespaces>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Generated'">$(DefineConstants);ELSA_GENERATED</DefineConstants>
       <DefineConstants Condition="'$(ElsaEffectiveExecutionMode)' == 'Dynamic'">$(DefineConstants);ELSA_DYNAMIC</DefineConstants>
     </PropertyGroup>
@@ -46,6 +50,14 @@
            Text="Elsa compiler assets require the SDK-generated MSBuild editorconfig file." />
   </Target>
 
+  <!-- Older standalone build packages can also supply ResolveElsaCodeGenerationSettings. -->
+  <Target Name="EnableElsaFeatureInterceptors" AfterTargets="ResolveElsaCodeGenerationSettings"
+          Condition="'$(ElsaIsHost)' == 'true' And '$(ElsaEffectiveExecutionMode)' == 'Generated' And '$(ElsaHostBootstrap)' == 'Compiler'">
+    <PropertyGroup>
+      <InterceptorsNamespaces>$(InterceptorsNamespaces);Elsa.CodeGeneration.Interceptors</InterceptorsNamespaces>
+    </PropertyGroup>
+  </Target>
+
   <Target Name="ValidateElsaCodeGenerationAssets" BeforeTargets="CoreCompile" DependsOnTargets="ResolveElsaCodeGenerationSettings;_ComputeSkipAnalyzers"
           Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsCrossTargetingBuild)' != 'true' And '$(DesignTimeBuild)' != 'true'">
     <ItemGroup>
@@ -53,9 +65,9 @@
       <_ElsaAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'Elsa.CodeGeneration.Analyzers'" />
     </ItemGroup>
     <Error Code="ELSACG007" Condition="'$(ElsaGenerateMetadata)' == 'true' And '@(_ElsaGenerator)' == ''"
-           Text="Elsa generation is enabled. Add Elsa.CodeGeneration with its analyzer assets enabled." />
+           Text="Elsa generation requires the generator from the Elsa.Features buildTransitive assets or the standalone Elsa.CodeGeneration analyzer assets." />
     <Error Code="ELSACG008" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And '@(_ElsaAnalyzer)' == ''"
-           Text="Elsa build validation requires Elsa.CodeGeneration.Analyzers with its analyzer assets enabled." />
+           Text="Elsa build validation requires the analyzer from the Elsa.Features buildTransitive assets or the standalone Elsa.CodeGeneration.Analyzers analyzer assets." />
     <Error Code="ELSACG009" Condition="('$(ElsaIsHost)' == 'true' Or '$(ElsaGenerateMetadata)' == 'true') And
         '$(_SkipAnalyzers)' == 'true'"
            Text="Elsa build validation requires compiler analyzers to run." />
