@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace Elsa.CodeGeneration.Generators;
 
 /// <summary>
-/// Emits only the selected compiler bootstrap; feature bindings remain in authored typed exports.
+/// Emits build information and implements a legacy bootstrap when the application declares one.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class ElsaHostGenerator : IIncrementalGenerator
@@ -25,7 +25,8 @@ public sealed class ElsaHostGenerator : IIncrementalGenerator
         });
         var bootstrap = context.CompilationProvider.Combine(settings).Select(static (input, cancellationToken) =>
         {
-            if (!input.Right.IsHost || !input.Right.GenerateMetadata || input.Right.IsManual)
+            if (!input.Right.IsHost || !input.Right.GenerateMetadata || input.Right.IsManual
+                || !CompilerContract.HasAuthoredHost(input.Left))
                 return HostGenerationOutput.Empty;
             var contract = CompilerContract.Validate(input.Left, input.Right, cancellationToken);
             return contract.Success

@@ -1,0 +1,11 @@
+<Project>
+  <!-- Source builds consume the same compiler assets and build settings as installed packages. -->
+  <Import Project="buildTransitive/Elsa.CodeGeneration.Build.props" />
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../RegistrationCompiler/RegistrationCompiler.csproj;
+                               $(MSBuildThisFileDirectory)../Elsa.CodeGeneration/Elsa.CodeGeneration.csproj;
+                               $(MSBuildThisFileDirectory)../Elsa.CodeGeneration.Analyzers/Elsa.CodeGeneration.Analyzers.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
+  <Import Project="buildTransitive/Elsa.CodeGeneration.Build.targets" />
+</Project>
