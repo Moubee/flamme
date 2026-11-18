@@ -57,7 +57,7 @@ public class MigrationGuideTests
     /// <summary>The resources and verbs every retained module shipped alongside these tests contributes.</summary>
     /// <remarks>
     /// Loads every <c>Elsa.*.dll</c> in the output directory. The project explicitly references retained
-    /// modules whose permission descriptors are documented even when the reference server does not enable them.
+    /// modules whose permissions the guide documents, including modules outside the configured test host.
     /// This keeps the catalog deterministic without depending on which assemblies earlier tests touched.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2070",
