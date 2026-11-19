@@ -119,29 +119,22 @@ public partial class Flowchart : Container
     }
 
     private static ValueTask ExecuteBasedOnMode(ActivityExecutionContext context, Func<ValueTask> tokenBasedAction, Func<ValueTask> counterBasedAction)
-    {
-        var mode = GetEffectiveExecutionMode(context);
-
-        return mode switch
-        {
-            FlowchartExecutionMode.TokenBased => tokenBasedAction(),
-            FlowchartExecutionMode.CounterBased or FlowchartExecutionMode.Default or _ => counterBasedAction()
-        };
-    }
+        => UsesTokenFlow(context) ? tokenBasedAction() : counterBasedAction();
 
     /// <summary>
-    /// Gets the effective execution mode for this flowchart execution.
+    /// Determines whether the flowchart uses token-based execution.
     /// Priority: WorkflowExecutionContext.Properties > FlowchartOptions (DI) > Static UseTokenFlow flag
     /// </summary>
-    internal static FlowchartExecutionMode GetEffectiveExecutionMode(ActivityExecutionContext context)
+    internal static bool UsesTokenFlow(ActivityExecutionContext context)
     {
-        var workflowExecutionContext = context.WorkflowExecutionContext;
+        var mode = context.WorkflowExecutionContext.Properties.TryGetValue(ExecutionModePropertyKey, out var modeValue)
+            ? ParseExecutionMode(modeValue)
+            : FlowchartExecutionMode.Default;
 
-        if (!workflowExecutionContext.Properties.TryGetValue(ExecutionModePropertyKey, out var modeValue))
-            return GetDefaultModeFromOptions(context);
+        if (mode == FlowchartExecutionMode.Default)
+            mode = GetDefaultModeFromOptions(context);
 
-        var mode = ParseExecutionMode(modeValue);
-        return mode != FlowchartExecutionMode.Default ? mode : GetDefaultModeFromOptions(context);
+        return mode == FlowchartExecutionMode.TokenBased;
     }
 
     private static FlowchartExecutionMode ParseExecutionMode(object modeValue)

@@ -1,7 +1,10 @@
 using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Activities.Flowchart.Activities;
 using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Runtime.Activities;
+using Microsoft.Extensions.DependencyInjection;
 using static Flamme.Activities.IntegrationTests.Flow.FlowchartTestHelpers;
 
 namespace Flamme.Activities.IntegrationTests.Branching;
@@ -24,6 +27,34 @@ public class FlowJoinTests : IAsyncDisposable
     {
         await DisposeServiceProviderAsync(_services);
         _output.Dispose();
+    }
+
+    [Test]
+    public async Task WaitAnyCancelsAnEventScheduledAlongsideTheJoinWhenTheModeIsUnknown()
+    {
+        var fork = new FlowFork { Branches = new(["Wait", "Continue"]) };
+        var wait = new Event("pending");
+        var join = new FlowJoin { Mode = new(FlowJoinMode.WaitAny) };
+        var flowchart = new Flowchart
+        {
+            Start = fork,
+            Activities = { fork, wait, join },
+            Connections =
+            {
+                CreateConnection(fork, wait, "Wait"),
+                CreateConnection(fork, join, "Continue"),
+                CreateConnection(wait, join)
+            }
+        };
+
+        await _services.PopulateRegistriesAsync();
+        var result = await _services.GetRequiredService<IWorkflowRunner>().RunAsync(flowchart, new()
+        {
+            Properties = new Dictionary<string, object> { [Flowchart.ExecutionModePropertyKey] = "42" }
+        });
+
+        await Assert.That(result.WorkflowState.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
+        await Assert.That(result.WorkflowState.Bookmarks).IsEmpty();
     }
 
     [Test]
