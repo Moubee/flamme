@@ -8,8 +8,16 @@ namespace Flamme.Workflows.Management;
 /// <summary>
 /// Represents a store of <see cref="WorkflowDefinition"/>s.
 /// </summary>
+/// <remarks>
+/// Built-in stores claim a native activity’s tenant, canonical type name, and version atomically
+/// with persistence. A conflicting owner raises
+/// <see cref="Exceptions.WorkflowDefinitionValidationException"/> before any changes are committed.
+/// </remarks>
 public interface IWorkflowDefinitionStore
 {
+    /// <summary>Whether writes atomically reject another workflow's claim on the same tenant, activity name and version.</summary>
+    bool EnforcesActivityBindingOwnership => false;
+
     /// <summary>
     /// Finds a workflow definition using the specified filter.
     /// </summary>
@@ -173,6 +181,18 @@ public interface IWorkflowDefinitionStore
     Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Saves a draft against its observed latest revision and invokes per-entity saving hooks.
+    /// </summary>
+    Task SaveDraftVersionAsync(WorkflowDefinition? previous, WorkflowDefinition draft, CancellationToken cancellationToken = default)
+    {
+        if (previous is null || previous.Id == draft.Id)
+            return SaveAsync(draft, cancellationToken);
+        var demoted = previous.ShallowClone();
+        demoted.IsLatest = false;
+        return SaveManyAsync([demoted, draft], cancellationToken);
+    }
+
+    /// <summary>
     /// Inserts a new workflow revision. Returns false on a revision ID or logical version conflict.
     /// Stores accepting imports with caller-supplied revision IDs must enforce uniqueness at write time.
     /// </summary>
@@ -181,7 +201,7 @@ public interface IWorkflowDefinitionStore
 
     /// <summary>
     /// Saves the demoted revisions and new publication, in order. Built-in stores commit these
-    /// changes atomically. The default preserves the save hooks of third-party stores.
+    /// changes atomically and reject a stale set of predecessors. The default preserves the save hooks of third-party stores.
     /// </summary>
     async Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
     {

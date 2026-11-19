@@ -2,6 +2,7 @@ using Flamme.Caching;
 using Flamme.Common.Models;
 using Flamme.Common.Multitenancy;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,6 +14,9 @@ namespace Flamme.Workflows.Management.Stores;
 /// </summary>
 public class CachingWorkflowDefinitionStore(IWorkflowDefinitionStore decoratedStore, ICacheManager cacheManager, IHasher hasher, ITenantAccessor tenantAccessor) : IWorkflowDefinitionStore
 {
+    /// <inheritdoc />
+    public bool EnforcesActivityBindingOwnership => decoratedStore.EnforcesActivityBindingOwnership;
+
     private static readonly string CacheInvalidationTokenKey = typeof(CachingWorkflowDefinitionStore).FullName!;
 
     /// <inheritdoc />
@@ -125,9 +129,25 @@ public class CachingWorkflowDefinitionStore(IWorkflowDefinitionStore decoratedSt
     }
 
     /// <inheritdoc />
-    public async Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
+    public Task SaveDraftVersionAsync(WorkflowDefinition? previous, WorkflowDefinition draft, CancellationToken cancellationToken = default) =>
+        SaveHeadAsync(() => decoratedStore.SaveDraftVersionAsync(previous, draft, cancellationToken), cancellationToken);
+
+    /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        SaveHeadAsync(() => decoratedStore.SavePublicationAsync(definitions, cancellationToken), cancellationToken);
+
+    private async Task SaveHeadAsync(Func<Task> save, CancellationToken cancellationToken)
     {
-        await decoratedStore.SavePublicationAsync(definitions, cancellationToken);
+        try
+        {
+            await save();
+        }
+        catch (WorkflowDefinitionValidationException)
+        {
+            // A different host may have replaced our cached predecessor. Let a retry read its committed head.
+            await cacheManager.TriggerTokenAsync(CacheInvalidationTokenKey, cancellationToken);
+            throw;
+        }
         await cacheManager.TriggerTokenAsync(CacheInvalidationTokenKey, cancellationToken);
     }
 

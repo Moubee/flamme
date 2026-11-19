@@ -39,6 +39,11 @@ public class ValidateWorkflowActivityBinding(IWorkflowDefinitionStore store, ITe
         if (staticBinding != null)
             throw new WorkflowDefinitionValidationException($"'{name}' version {version} is already registered in tenant '{scope}'.");
 
+        // These stores check the canonical owner during the write under the store lock.
+        // Other providers retain the pre-save ownership check.
+        if (store.EnforcesActivityBindingOwnership)
+            return;
+
         var summaries = await store.FindSummariesAsync(new() { UsableAsActivity = true, VersionOptions = VersionOptions.SpecificVersion(version) }, cancellationToken);
         var potentialConflicts = summaries
             .Where(x => x.DefinitionId != definition.DefinitionId && !string.IsNullOrWhiteSpace(x.Name))

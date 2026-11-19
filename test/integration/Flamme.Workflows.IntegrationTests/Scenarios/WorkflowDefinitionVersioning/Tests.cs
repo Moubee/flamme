@@ -79,6 +79,30 @@ public class Tests : IAsyncDisposable
     }
 
     [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task SavingWithoutDefinitionIdAllocatesAnIndependentHead(bool publish)
+    {
+        await _services.PopulateRegistriesAsync();
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
+        var previous = await publisher.NewAsync();
+        await publisher.SaveDraftAsync(previous);
+        var next = await publisher.NewAsync();
+        next.Id = null!;
+        next.DefinitionId = null!;
+
+        if (publish)
+            await Assert.That((await publisher.PublishAsync(next)).Succeeded).IsTrue();
+        else
+            await publisher.SaveDraftAsync(next);
+
+        await Assert.That(next.DefinitionId).IsNotEqualTo(previous.DefinitionId);
+        await Assert.That((await store.FindAsync(new() { Id = previous.Id }))!.IsLatest).IsTrue();
+        await Assert.That((await store.FindAsync(new() { Id = next.Id }))!.IsLatest).IsTrue();
+    }
+
+    [Test]
     public async Task SaveDraftAsync_ShouldClearLatestFlagFromPreviousUnpublishedDraft()
     {
         const string definitionId = "test-definition";
@@ -391,13 +415,14 @@ public class Tests : IAsyncDisposable
                 )
             );
 
-        Mock.Get(store).SaveManyAsync(
-                Arg.Any<IEnumerable<WorkflowDefinition>>(),
+        Mock.Get(store).SaveDraftVersionAsync(
+                Arg.Any<WorkflowDefinition>(),
+                Arg.Any<WorkflowDefinition>(),
                 Arg.Any<CancellationToken>()
             )
-            .Returns((IEnumerable<WorkflowDefinition> records, CancellationToken cancellationToken) =>
+            .Returns((WorkflowDefinition previous, WorkflowDefinition draft, CancellationToken cancellationToken) =>
             {
-                var definitions = records.ToList();
+                var definitions = new[] { previous, draft };
 
                 var snapshot = persisted.ToDictionary(
                     x => x.Key,

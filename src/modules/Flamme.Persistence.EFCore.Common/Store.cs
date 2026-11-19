@@ -198,37 +198,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             if (entityList.Count == 0)
                 return;
 
-            var tenantId = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId;
-            var tenancyEnabled = serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
-
-            await ExecuteWriteAsync(async (dbContext, ct) =>
-            {
-                if (onSaving != null)
-                {
-                    var savingTasks = entityList.Select(entity => onSaving(dbContext, entity, ct).AsTask()).ToList();
-                    await Task.WhenAll(savingTasks);
-                }
-
-                // When doing a custom SQL query (Bulk Upsert), none of the installed query filters will be applied. Hence, we are assigning the current tenant ID explicitly.
-                foreach (var entity in entityList)
-                {
-                    if (entity is Entity entityWithTenant)
-                    {
-                        // Don't touch tenant-agnostic entities (marked with "*")
-                        if (entityWithTenant.TenantId == Tenant.AgnosticTenantId)
-                            continue;
-
-                        // Apply current tenant ID to entities without one
-                        if (entityWithTenant.TenantId == null)
-                            entityWithTenant.TenantId = tenantId;
-                    }
-                }
-
-                if (tenancyEnabled)
-                    await EnsureTenantOwnershipAsync(dbContext, entityList, keySelector, tenantId, ct);
-
-                await dbContext.BulkUpsertAsync(entityList, keySelector, ct);
-            }, cancellationToken);
+            await ExecuteWriteAsync((db, ct) => BulkSaveInContextAsync(db, entityList, keySelector, onSaving, ct), cancellationToken);
         }
         catch (Exception ex)
         {
@@ -239,6 +209,39 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         {
             Semaphore.Release();
         }
+    }
+
+    internal async Task BulkSaveInContextAsync(TDbContext dbContext, IList<TEntity> entities,
+        Expression<Func<TEntity, string>> keySelector, Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken)
+    {
+        var tenantId = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId;
+        var tenancyEnabled = serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
+
+        if (onSaving != null)
+        {
+            var savingTasks = entities.Select(entity => onSaving(dbContext, entity, cancellationToken).AsTask()).ToList();
+            await Task.WhenAll(savingTasks);
+        }
+
+        // When doing a custom SQL query (Bulk Upsert), none of the installed query filters will be applied. Hence, we are assigning the current tenant ID explicitly.
+        foreach (var entity in entities)
+        {
+            if (entity is Entity entityWithTenant)
+            {
+                // Don't touch tenant-agnostic entities (marked with "*")
+                if (entityWithTenant.TenantId == Tenant.AgnosticTenantId)
+                    continue;
+
+                // Apply current tenant ID to entities without one
+                if (entityWithTenant.TenantId == null)
+                    entityWithTenant.TenantId = tenantId;
+            }
+        }
+
+        if (tenancyEnabled)
+            await EnsureTenantOwnershipAsync(dbContext, entities, keySelector, tenantId, cancellationToken);
+
+        await dbContext.BulkUpsertAsync(entities, keySelector, cancellationToken);
     }
 
     /// <summary>
