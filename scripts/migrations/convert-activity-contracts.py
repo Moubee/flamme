@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Copy a portable Elsa JSON definition to Flamme, using the checked-in catalog."""
+"""Copy a portable Elsa JSON definition to Flamme, using the checked-in catalog.
+
+Closed generic activities such as ForEach<Int32> require a host-specific mapping
+to the concrete activity descriptor registered by the Flamme host.
+"""
 import argparse
 import csv
 import json
@@ -62,9 +66,13 @@ def convert_declarations(owner, path):
     custom = owner.get("customProperties") or {}
     if custom.get("Elsa:WorkflowContextProviderTypes"):
         raise ValueError(f"{path}: map the workflow context providers for this installation")
-    for name, item in (custom.get("logPersistenceConfig") or {}).items():
-        if isinstance(item, dict):
-            convert_clr_field(item, "strategyType", f"{path}.customProperties.logPersistenceConfig.{name}")
+    config = custom.get("logPersistenceConfig") or {}
+    config_path = f"{path}.customProperties.logPersistenceConfig"
+    for section in ("default", "internalState"):
+        convert_clr_field(config.get(section) or {}, "strategyType", f"{config_path}.{section}")
+    for section in ("inputs", "outputs"):
+        for prop, item in (config.get(section) or {}).items():
+            convert_clr_field(item or {}, "strategyType", f"{config_path}.{section}.{prop}")
 
 
 def child_objects(owner, selector, path):
@@ -119,7 +127,7 @@ def convert(definition):
         raise ValueError("expected one exported JSON workflow definition containing a root object")
     with CATALOG.open(encoding="utf-8") as source:
         contracts = {row["Legacy activity type"]: (row["Published activity type"], int(row["Version"]))
-                     for row in csv.DictReader(source) if "<" not in row["Legacy activity type"]}
+                     for row in csv.DictReader(source)}
     convert_declarations(definition, "$")
     convert_activity(definition["root"], "$.root", contracts)
     return definition

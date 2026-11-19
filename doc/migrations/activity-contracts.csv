@@ -16,7 +16,6 @@ Flamme.Workflows.Activities.Finish,Elsa.Finish,ControlFlow.Finish,1
 Flamme.Workflows.Activities.Flowchart.Activities.Flowchart,Elsa.Flowchart,ControlFlow.Flowchart,1
 Flamme.Workflows.Activities.For,Elsa.For,ControlFlow.For,1
 Flamme.Workflows.Activities.ForEach,Elsa.ForEach,ControlFlow.ForEach,1
-Flamme.Workflows.Activities.ForEach<T>,Elsa.Workflows.Activities.ForEach<T>,ControlFlow.ForEach<T>,1
 Flamme.Workflows.Activities.Flowchart.Activities.FlowFork,Elsa.FlowFork,ControlFlow.Fork,1
 Flamme.Workflows.Activities.Fork,Elsa.Fork,ControlFlow.ForkBranches,1
 Flamme.Workflows.Activities.If,Elsa.If,ControlFlow.If,1
@@ -24,7 +23,6 @@ Flamme.Workflows.Activities.Flowchart.Activities.FlowJoin,Elsa.FlowJoin,ControlF
 Flamme.Workflows.Activities.Flowchart.Activities.FlowNode,Elsa.FlowNode,ControlFlow.Node,1
 Flamme.Workflows.Activities.Parallel,Elsa.Parallel,ControlFlow.Parallel,1
 Flamme.Workflows.Activities.ParallelForEach,Elsa.ParallelForEach,ControlFlow.ParallelForEach,1
-Flamme.Workflows.Activities.ParallelForEach<T>,Elsa.ParallelForEach<T>,ControlFlow.ParallelForEach<T>,1
 Flamme.Workflows.Activities.Sequence,Elsa.Sequence,ControlFlow.Sequence,1
 Flamme.Workflows.Activities.Start,Elsa.Start,ControlFlow.Start,1
 Flamme.Workflows.Activities.StateMachine.Activities.StateMachine,Elsa.StateMachine,ControlFlow.StateMachine,1
@@ -33,7 +31,6 @@ Flamme.Workflows.Activities.Flowchart.Activities.FlowSwitch,Elsa.FlowSwitch,Cont
 Flamme.Workflows.Activities.While,Elsa.While,ControlFlow.While,1
 Flamme.Workflows.Management.Activities.SetOutput.SetOutput,Elsa.SetOutput,Data.SetOutput,1
 Flamme.Workflows.Activities.SetVariable,Elsa.SetVariable,Data.SetVariable,1
-Flamme.Workflows.Activities.SetVariable<T>,Elsa.SetVariable<T>,Data.SetVariable<T>,1
 Flamme.Http.DownloadHttpFile,Elsa.DownloadHttpFile,Http.DownloadFile,1
 Flamme.Http.HttpEndpoint,Elsa.HttpEndpoint,Http.Endpoint,1
 Flamme.Http.FlowSendHttpRequest,Elsa.FlowSendHttpRequest,Http.FlowSendRequest,1
@@ -41,7 +38,6 @@ Flamme.Http.SendHttpRequest,Elsa.SendHttpRequest,Http.SendRequest,1
 Flamme.Http.WriteFileHttpResponse,Elsa.WriteFileHttpResponse,Http.WriteFileResponse,1
 Flamme.Http.WriteHttpResponse,Elsa.WriteHttpResponse,Http.WriteResponse,1
 Flamme.Workflows.Activities.Inline,Elsa.Inline,Scripting.Inline,1
-Flamme.Workflows.Activities.Inline<T>,Elsa.Workflows.Activities.Inline<T>,Scripting.Inline<T>,1
 Flamme.Expressions.CSharp.Activities.RunCSharp,Elsa.RunCSharp,Scripting.RunCSharp,1
 Flamme.Expressions.JavaScript.Activities.RunJavaScript,Elsa.RunJavaScript,Scripting.RunJavaScript,1
 Flamme.Expressions.Python.Activities.RunPython,Elsa.RunPython,Scripting.RunPython,1
