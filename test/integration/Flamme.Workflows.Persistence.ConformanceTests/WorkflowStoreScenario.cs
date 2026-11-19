@@ -90,7 +90,7 @@ public sealed class WorkflowStoreScenario(
     public static Task<WorkflowStoreScenario> CreatePostgreSqlAsync() => CreatePostgreSqlAsync("tenant-a");
 
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
-    public static async Task<WorkflowStoreScenario> CreatePostgreSqlAsync(string tenantId, bool tenantsEnabled = true)
+    public static async Task<WorkflowStoreScenario> CreatePostgreSqlAsync(string tenantId, bool tenantsEnabled = true, IEntitySavingHandler? savingHandler = null)
     {
         var managementDatabase = new PostgreSqlTestDatabase();
         var runtimeDatabase = new PostgreSqlTestDatabase();
@@ -101,7 +101,7 @@ public sealed class WorkflowStoreScenario(
         try
         {
             var migrationsAssembly = typeof(ManagementDbContextFactory).Assembly;
-            services = new ServiceCollection()
+            var registrations = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ITenantAccessor>(tenantAccessor)
                 .AddSingleton<IPayloadSerializer, ConformancePayloadSerializer>()
@@ -132,8 +132,10 @@ public sealed class WorkflowStoreScenario(
                 .AddScoped<EFCoreBookmarkStore>()
                 .AddScoped<EFBookmarkQueueDeadLetterStore>()
                 .AddScoped<EFCoreActivityExecutionStore>()
-                .AddScoped<EFCoreWorkflowExecutionLogStore>()
-                .BuildServiceProvider();
+                .AddScoped<EFCoreWorkflowExecutionLogStore>();
+            if (savingHandler != null)
+                registrations.AddSingleton(savingHandler);
+            services = registrations.BuildServiceProvider();
 
             await using (var management = await services.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync())
                 await management.Database.EnsureCreatedAsync();

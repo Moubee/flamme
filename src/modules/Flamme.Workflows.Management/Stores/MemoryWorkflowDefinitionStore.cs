@@ -4,6 +4,7 @@ using Flamme.Common.Services;
 using Flamme.Extensions;
 using Flamme.Workflows.Management.Entities;
 using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Models;
 
 namespace Flamme.Workflows.Management.Stores;
@@ -11,7 +12,7 @@ namespace Flamme.Workflows.Management.Stores;
 /// <summary>
 /// A memory implementation of <see cref="IWorkflowDefinitionStore"/>.
 /// </summary>
-public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store, ITenantAccessor? tenantAccessor = null) : IWorkflowDefinitionStore
+public partial class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store, ITenantAccessor? tenantAccessor = null) : IWorkflowDefinitionStore
 {
     /// <inheritdoc />
     public Task<WorkflowDefinition?> FindAsync(WorkflowDefinitionFilter filter, CancellationToken cancellationToken = default)
@@ -95,11 +96,27 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
     }
 
     /// <inheritdoc />
+    public Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
+    {
+        lock (store.Sync)
+        {
+            var key = GetVersionKey(definition);
+            if (store.Any(x => x.Id == definition.Id || GetVersionKey(x) == key))
+                return Task.FromResult(false);
+
+            ValidateActivityBindings([definition]);
+            store.Save(definition, GetId);
+            return Task.FromResult(true);
+        }
+    }
+
+    /// <inheritdoc />
     public Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
         lock (store.Sync)
         {
             EnsureVersionKeyAvailable(definition);
+            ValidateActivityBindings([definition]);
             store.Save(definition, GetId);
         }
 
@@ -117,10 +134,47 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
             foreach (var definition in definitionList)
                 EnsureVersionKeyAvailable(definition);
 
+            ValidateActivityBindings(definitionList);
             store.SaveMany(definitionList, GetId);
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        SaveHeadAsync(definitions.ToList(), publish: true, cancellationToken);
+
+    /// <inheritdoc />
+    public Task SaveDraftVersionAsync(WorkflowDefinition? previous, WorkflowDefinition draft, CancellationToken cancellationToken = default) =>
+        SaveHeadAsync(previous is null ? [draft] : [previous, draft], publish: false, cancellationToken);
+
+    private Task SaveHeadAsync(List<WorkflowDefinition> changes, bool publish, CancellationToken cancellationToken)
+    {
+        if (changes.Count == 0)
+            return Task.CompletedTask;
+        lock (store.Sync)
+        {
+            var revision = changes[^1];
+            var predecessors = store.Query(q => Filter(q, new() { DefinitionId = revision.DefinitionId }))
+                .Where(x => (!publish || x.Id != revision.Id) && (x.IsLatest || (publish && x.IsPublished))).ToList();
+            if (!predecessors.Select(x => x.Id).ToHashSet().SetEquals(changes.SkipLast(1).Select(x => x.Id)) ||
+                (!publish && predecessors.Count == 1 && predecessors[0].IsPublished != changes[0].IsPublished))
+                throw new WorkflowDefinitionValidationException("The workflow head changed before saving. Reload the definition and try again.");
+
+            if (!publish && !revision.IsPublished && predecessors.Any(x => x.Id == revision.Id && x.IsPublished))
+                throw new WorkflowDefinitionValidationException("This draft has already been published. Reload it before saving a new draft.");
+
+            var batch = predecessors.Where(x => x.Id != revision.Id).Select(current =>
+            {
+                var previous = current.ShallowClone();
+                previous.IsLatest = false;
+                if (publish)
+                    previous.IsPublished = false;
+                return previous;
+            }).Append(revision);
+            return SaveManyAsync(batch, cancellationToken);
+        }
     }
 
     /// <inheritdoc />
@@ -140,7 +194,10 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
             if (!current.IsLatest || !matchesExpected(current))
                 return Task.FromResult(WorkflowDefinitionUpdateResult.Conflict());
 
-            var next = update(current);
+            var editable = current.ShallowClone();
+            editable.Options = current.Options.ShallowClone();
+            var next = update(editable);
+            ValidateActivityBindings([next]);
 
             if (next.Id != current.Id)
             {
@@ -236,7 +293,7 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
         new($"A workflow definition already exists for definition '{definition.DefinitionId}' version {definition.Version} tenant '{definition.TenantId}'.");
 
     private static DefinitionVersionKey GetVersionKey(WorkflowDefinition definition) =>
-        new(definition.DefinitionId, definition.Version, definition.TenantId);
+        new(definition.DefinitionId, definition.Version, definition.TenantId.NormalizeTenantId());
 
     private string GetId(WorkflowDefinition workflowDefinition) => workflowDefinition.Id;
 

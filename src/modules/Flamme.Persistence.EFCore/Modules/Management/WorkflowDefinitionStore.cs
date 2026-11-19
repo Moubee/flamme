@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
@@ -8,6 +9,7 @@ using Flamme.Workflows;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Entities;
 using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Models;
 using Flamme.Workflows.Memory;
 using Flamme.Workflows.Models;
@@ -20,7 +22,7 @@ namespace Flamme.Persistence.EFCore.Modules.Management;
 
 /// <inheritdoc />
 [UsedImplicitly]
-public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext, WorkflowDefinition> store, IPayloadSerializer payloadSerializer, ILogger<EFCoreWorkflowDefinitionStore> logger)
+public partial class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext, WorkflowDefinition> store, IPayloadSerializer payloadSerializer, ILogger<EFCoreWorkflowDefinitionStore> logger)
     : IWorkflowDefinitionStore
 {
     /// <inheritdoc />
@@ -118,15 +120,98 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
     }
 
     /// <inheritdoc />
-    public async Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
+    public async Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
-        await store.SaveAsync(definition, OnSaveAsync, cancellationToken);
+        try
+        {
+            await WriteDefinitionsAsync([definition], DefinitionWrite.Insert, cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException ex) when (DbExceptionClassifier.IsDuplicateKey(ex))
+        {
+            return false;
+        }
     }
 
     /// <inheritdoc />
-    public async Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
+    public Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default) =>
+        WriteDefinitionsAsync([definition], DefinitionWrite.Save, cancellationToken);
+
+    /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        WriteDefinitionsAsync(definitions.ToList(), DefinitionWrite.Publish, cancellationToken);
+
+    /// <inheritdoc />
+    public Task SaveDraftVersionAsync(WorkflowDefinition? previous, WorkflowDefinition draft, CancellationToken cancellationToken = default) =>
+        WriteDefinitionsAsync(previous is null ? [draft] : [previous, draft], DefinitionWrite.Draft, cancellationToken);
+
+    /// <inheritdoc />
+    public Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        WriteDefinitionsAsync(definitions.ToList(), DefinitionWrite.Bulk, cancellationToken);
+
+    private enum DefinitionWrite { Insert, Save, Publish, Draft, Bulk }
+
+    private async Task WriteDefinitionsAsync(List<WorkflowDefinition> definitions, DefinitionWrite kind, CancellationToken cancellationToken)
     {
-        await store.SaveManyAsync(definitions, OnSaveAsync, cancellationToken);
+        if (definitions.Count == 0)
+            return;
+
+        await store.ExecuteWithDbExceptionHandlingAsync(async () =>
+        {
+            await using var db = await store.CreateDbContextAsync(cancellationToken);
+            await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+            await LockDefinitionsAsync(db, definitions, cancellationToken);
+            if (kind == DefinitionWrite.Bulk)
+                await store.BulkSaveInContextAsync(db, definitions, x => x.Id, OnSaveAsync, cancellationToken);
+            else
+            {
+                var revision = definitions[^1];
+                if (kind is DefinitionWrite.Publish or DefinitionWrite.Draft)
+                {
+                    // Reload and demote the actual rows, so a stale publisher cannot overwrite a newer head or its metadata.
+                    var predecessors = await db.WorkflowDefinitions
+                        .Where(x => x.DefinitionId == revision.DefinitionId && (kind == DefinitionWrite.Draft || x.Id != revision.Id) &&
+                            (x.IsLatest || (kind == DefinitionWrite.Publish && x.IsPublished)))
+                        .ToListAsync(cancellationToken);
+                    if (!predecessors.Select(x => x.Id).ToHashSet().SetEquals(definitions.SkipLast(1).Select(x => x.Id)) ||
+                        (kind == DefinitionWrite.Draft && predecessors.Count == 1 && predecessors[0].IsPublished != definitions[0].IsPublished))
+                        throw new WorkflowDefinitionValidationException("The workflow head changed before saving. Reload the definition and try again.");
+                    foreach (var predecessor in predecessors)
+                    {
+                        if (predecessor.Id == revision.Id)
+                        {
+                            if (predecessor.IsPublished && !revision.IsPublished)
+                                throw new WorkflowDefinitionValidationException("This draft has already been published. Reload it before saving a new draft.");
+                            db.Entry(predecessor).State = EntityState.Detached;
+                            continue;
+                        }
+                        await OnLoadAsync(db, predecessor, cancellationToken);
+                        predecessor.IsLatest = false;
+                        if (kind == DefinitionWrite.Publish)
+                            predecessor.IsPublished = false;
+                    }
+                }
+
+                await OnSaveAsync(db, revision, cancellationToken);
+                var exists = kind != DefinitionWrite.Insert && await db.WorkflowDefinitions.AnyAsync(x => x.Id == revision.Id, cancellationToken);
+                db.Entry(revision).State = exists ? EntityState.Modified : EntityState.Added;
+                await db.SaveChangesAsync(cancellationToken);
+            }
+
+            await ValidateActivityBindingsAsync(db, definitions, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return true;
+        }, cancellationToken, ex => ex is not WorkflowDefinitionValidationException);
+    }
+
+    private static async Task LockDefinitionsAsync(ManagementFlammeDbContext db, IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken)
+    {
+        // The PostgreSQL transaction owns these locks even when the definition has no rows yet.
+        foreach (var id in definitions.Select(x => x.DefinitionId).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
+        {
+            var resource = $"workflow-definition:{db.Schema}:{id}";
+            await db.Database.ExecuteSqlInterpolatedAsync($"SELECT pg_advisory_xact_lock(hashtextextended({resource}, 0))", cancellationToken);
+        }
     }
 
     /// <inheritdoc />
@@ -137,9 +222,9 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
         CancellationToken cancellationToken = default)
     {
         await using var dbContext = await store.CreateDbContextAsync(cancellationToken);
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
-        var queryable = Filter(dbContext.WorkflowDefinitions.AsNoTracking(), filter);
+        var queryable = Filter(dbContext.WorkflowDefinitions, filter);
 
         if (filter.TenantAgnostic)
             queryable = queryable.IgnoreQueryFilters();
@@ -161,7 +246,10 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
         var expectedDescription = current.Description;
         var expectedData = (string?)dbContext.Entry(current).Property("Data").CurrentValue;
 
+        // Materialize the shadow Data column before detaching the compare-and-swap snapshot.
+        dbContext.Entry(current).State = EntityState.Detached;
         var next = update(current);
+        await LockDefinitionsAsync(dbContext, [next], cancellationToken);
         var nextData = SerializeState(next);
         var nextUsableAsActivity = next.Options.UsableAsActivity;
 
@@ -178,6 +266,7 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
             dbContext.Entry(next).Property("Data").CurrentValue = nextData;
             dbContext.Entry(next).Property("UsableAsActivity").CurrentValue = nextUsableAsActivity;
             await dbContext.SaveChangesAsync(cancellationToken);
+            await ValidateActivityBindingsAsync(dbContext, [next], cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return WorkflowDefinitionUpdateResult.Updated(next);
         }
@@ -194,6 +283,7 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
         if (updated == 0)
             return WorkflowDefinitionUpdateResult.Conflict();
 
+        await ValidateActivityBindingsAsync(dbContext, [next], cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return WorkflowDefinitionUpdateResult.Updated(next);
     }

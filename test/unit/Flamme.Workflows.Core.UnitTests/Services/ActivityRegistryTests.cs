@@ -1,4 +1,11 @@
 using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Services;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
@@ -14,19 +21,20 @@ public class ActivityRegistryTests
     private const string TestActivityType = "TestActivity";
     private const string CurrentTenant = "tenant1";
 
+    private readonly ITenantAccessor _tenantAccessor;
     private readonly IActivityDescriber _activityDescriber;
     private readonly ILogger<ActivityRegistry> _logger;
     private readonly ActivityRegistry _registry;
 
     public ActivityRegistryTests()
     {
-        var tenantAccessor = ITenantAccessor.Mock().Object;
+        _tenantAccessor = ITenantAccessor.Mock().Object;
         _activityDescriber = IActivityDescriber.Mock().Object;
         _logger = ILogger<ActivityRegistry>.Mock().Object;
-        _registry = new(_activityDescriber, [], tenantAccessor, _logger);
+        _registry = new(_activityDescriber, [], _tenantAccessor, _logger);
 
         // Set default tenant for all tests
-        Mock.Get(tenantAccessor).TenantId.Returns(CurrentTenant);
+        Mock.Get(_tenantAccessor).TenantId.Returns(CurrentTenant);
     }
 
     [Test]
@@ -328,39 +336,89 @@ public class ActivityRegistryTests
     }
 
     [Test]
-    public async Task RefreshDescriptorsAsync_LogsWarning_WhenDifferentProvidersRegisterSameActivity()
+    public async Task RefreshRejectsDifferentProvidersClaimingTheSameContract()
     {
-        // Arrange
-        // Create two different providers with the same activity
-        var descriptor1 = new ActivityDescriptor
-        {
-            TypeName = "DuplicateActivity",
-            Version = 1,
-            Kind = ActivityKind.Task,
-            Category = "Test",
-            Description = "From Provider 1",
-            IsBrowsable = true
-        };
+        var owner = CreateDescriptor("Duplicate", 1, CurrentTenant);
+        var one = new Provider1([owner]);
+        var two = new Provider2([CreateDescriptor("Duplicate", 1, CurrentTenant)]);
 
-        var descriptor2 = new ActivityDescriptor
-        {
-            TypeName = "DuplicateActivity",
-            Version = 1,
-            Kind = ActivityKind.Task,
-            Category = "Test",
-            Description = "From Provider 2",
-            IsBrowsable = true
-        };
+        await _registry.RefreshDescriptorsAsync(one);
+        await Assert.That(() => _registry.RefreshDescriptorsAsync(two)).Throws<InvalidOperationException>();
 
-        var provider1 = new Provider1([descriptor1]);
-        var provider2 = new Provider2([descriptor2]);
-        var providers = new IActivityProvider[] { provider1, provider2 };
+        await Assert.That(_registry.Find("Duplicate", 1)).IsSameReferenceAs(owner);
+    }
 
-        // Act
-        await _registry.RefreshDescriptorsAsync(providers);
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task RegisterAsyncChecksTheModifiedScopeWhenTheAmbientTenantAlreadyHasABinding(bool sameClrType)
+    {
+        var name = ActivityTypeNameHelper.GenerateTypeName<WriteLine>();
+        var local = CreateDescriptor(name, 1, CurrentTenant);
+        local.ClrType = sameClrType ? typeof(WriteLine) : typeof(ReadLine);
+        var incoming = CreateDescriptor(name, 1, "before-modifiers");
+        incoming.ClrType = typeof(WriteLine);
+        Mock.Get(_activityDescriber).DescribeActivityAsync(typeof(WriteLine), Arg.Any<CancellationToken>()).Returns(incoming);
+        var registry = new ActivityRegistry(_activityDescriber, [new SetSharedScope()], _tenantAccessor, _logger);
+        registry.Register(local);
 
-        // Assert - Should log a warning for the duplicate
-        await Assert.That(Mock.Get(_logger).Invocations.Count(call => call.MemberName == "Log" && Equals(call.Arguments[0], LogLevel.Warning) && call.Arguments[2]!.ToString()!.Contains("DuplicateActivity") && call.Arguments[2]!.ToString()!.Contains("was already registered"))).IsEqualTo(1);
+        await registry.RegisterAsync(typeof(WriteLine), default);
+
+        await Assert.That(registry.FindMany(d => d.TypeName == name && d.TenantId == Tenant.AgnosticTenantId).Single()).IsSameReferenceAs(incoming);
+        await Assert.That(registry.Find(name, 1)).IsSameReferenceAs(local);
+    }
+
+    [Test]
+    public async Task PublishedUpdateReconcilesOwnershipAfterADraftRenameAndRejectsSimultaneousClaims()
+    {
+        var first = new WorkflowDefinition { DefinitionId = "first", Id = "first-revision", TenantId = CurrentTenant, Name = "Send", Version = 1 };
+        var second = new WorkflowDefinition { DefinitionId = "second", Id = "second-revision", TenantId = CurrentTenant, Name = "Send", Version = 1 };
+        var definitions = new List<WorkflowDefinition> { first };
+        var store = IWorkflowDefinitionStore.Mock().Object;
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definitions);
+        var provider = new WorkflowDefinitionActivityProvider(store, new WorkflowDefinitionActivityDescriptorFactory());
+        var updater = new WorkflowDefinitionActivityRegistryUpdater(provider, _registry);
+
+        await updater.AddToRegistry(first.Id, default);
+        definitions.Add(second);
+        await Assert.That(() => updater.AddToRegistry(second.Id, default)).Throws<InvalidOperationException>();
+        await Assert.That(_registry.Find("Send", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(first.DefinitionId);
+
+        first.Name = "Renamed";
+        await updater.AddToRegistry(second.Id, default);
+
+        await Assert.That(_registry.Find("Send", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(second.DefinitionId);
+        await Assert.That(_registry.Find("Renamed", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(first.DefinitionId);
+    }
+
+    [Test]
+    public async Task AnOlderProviderReadCannotRemoveANewerBinding()
+    {
+        var added = CreateDescriptor("New", 1, CurrentTenant);
+        var provider = new DelayedSnapshotProvider();
+        var first = _registry.RefreshDescriptorsAsync(provider);
+        await provider.FirstRead.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        provider.Descriptors = [added];
+
+        var second = _registry.RefreshDescriptorsAsync(provider);
+        provider.ReleaseFirstRead.SetResult();
+        await Task.WhenAll(first, second);
+
+        await Assert.That(_registry.Find("New", 1)).IsSameReferenceAs(added);
+    }
+
+    [Test]
+    public async Task AmbiguousProviderRefreshLeavesPreviousCatalogIntact()
+    {
+        var existing = CreateDescriptor("Valid", 1, CurrentTenant);
+        var provider = new MutableProvider([existing]);
+        await _registry.RefreshDescriptorsAsync(provider);
+        provider.Descriptors = [CreateDescriptor("Conflict", 2, CurrentTenant), CreateDescriptor("Conflict", 2, CurrentTenant)];
+
+        await Assert.That(() => _registry.RefreshDescriptorsAsync(provider)).Throws<InvalidOperationException>();
+
+        await Assert.That(_registry.Find("Valid", 1)).IsSameReferenceAs(existing);
+        await Assert.That(_registry.Find("Conflict", 2)).IsNull();
     }
 
     [Test]
@@ -389,7 +447,7 @@ public class ActivityRegistryTests
     }
 
     [Test]
-    public async Task RefreshDescriptorsAsync_PreservesExistingDescriptors_WhenProviderReturnsNoTenantGroups()
+    public async Task RefreshDescriptorsAsync_RetiresExistingDescriptors_WhenProviderReturnsNoTenantGroups()
     {
         // Arrange
         var provider = new MutableProvider(
@@ -406,7 +464,7 @@ public class ActivityRegistryTests
         var result = _registry.Find(TestActivityType);
 
         // Assert
-        await AssertDescriptor(result, CurrentTenant, 2);
+        await Assert.That(result).IsNull();
     }
 
     [Test]
@@ -545,6 +603,30 @@ public class ActivityRegistryTests
     private sealed class Provider2(IEnumerable<ActivityDescriptor> descriptors) : IActivityProvider
     {
         public ValueTask<IEnumerable<ActivityDescriptor>> GetDescriptorsAsync(CancellationToken cancellationToken = default) => new(descriptors);
+    }
+
+    private sealed class SetSharedScope : IActivityDescriptorModifier
+    {
+        public void Modify(ActivityDescriptor descriptor)
+        {
+            if (descriptor.TenantId == "before-modifiers")
+                descriptor.TenantId = Tenant.AgnosticTenantId;
+        }
+    }
+
+    private sealed class DelayedSnapshotProvider : IActivityProvider
+    {
+        public IEnumerable<ActivityDescriptor> Descriptors { get; set; } = [];
+        public TaskCompletionSource FirstRead { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource ReleaseFirstRead { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public async ValueTask<IEnumerable<ActivityDescriptor>> GetDescriptorsAsync(CancellationToken cancellationToken = default)
+        {
+            var snapshot = Descriptors;
+            if (FirstRead.TrySetResult())
+                await ReleaseFirstRead.Task.WaitAsync(cancellationToken);
+            return snapshot;
+        }
     }
 
     private sealed class MutableProvider(IEnumerable<ActivityDescriptor> descriptors) : IActivityProvider

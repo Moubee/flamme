@@ -35,7 +35,9 @@ public class WorkflowDefinitionActivityProvider : IActivityProvider
             VersionOptions = VersionOptions.All
         };
 
-        var definitions = (await _store.FindManyAsync(filter, cancellationToken)).ToList();
+        var definitions = (await _store.FindManyAsync(filter, cancellationToken))
+            .Where(x => !string.IsNullOrWhiteSpace(x.Name))
+            .ToList();
 
         if (_tenantAccessor != null)
         {

@@ -120,6 +120,83 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task StaleUnversionedChildNameCannotSelectAnArbitraryRevision()
+    {
+        var descriptors = new[] { 1, 2 }.Select(version => new ActivityDescriptor
+        {
+            TypeName = "RenamedChild",
+            Version = version,
+            CustomProperties = { ["WorkflowDefinitionId"] = "child" },
+            Constructor = _ => new(new WorkflowDefinitionActivity { Version = version })
+        }).ToArray();
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => descriptors.Where(predicate));
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+        var sut = CreateSut(registry);
+
+        var ambiguous = Execute(sut, """{"type":"OldName","workflowDefinitionId":"child"}""");
+        var exact = Execute(sut, """{"type":"OldName","workflowDefinitionId":"child","version":2}""");
+
+        await Assert.That(ambiguous).IsTypeOf<NotFoundActivity>();
+        var selected = await Assert.That(exact).IsTypeOf<WorkflowDefinitionActivity>();
+        await Assert.That(selected!.Version).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task StaleChildRevisionWithoutAnExplicitVersionCannotSelectTheLatestMatchingOwner()
+    {
+        var descriptor = new ActivityDescriptor
+        {
+            TypeName = "Send",
+            Version = 2,
+            CustomProperties = { ["WorkflowDefinitionId"] = "child", ["WorkflowDefinitionVersionId"] = "current" },
+            Constructor = _ => new(new WorkflowDefinitionActivity { WorkflowDefinitionId = "child", WorkflowDefinitionVersionId = "current", Version = 2 })
+        };
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).Find("Send").Returns(descriptor);
+        Mock.Get(registry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => new[] { descriptor }.Where(predicate));
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+        var sut = CreateSut(registry);
+
+        var unversioned = Execute(sut, """{"type":"Send","workflowDefinitionId":"child","workflowDefinitionVersionId":"stale"}""");
+        var versioned = Execute(sut, """{"type":"Send","version":2,"workflowDefinitionId":"child","workflowDefinitionVersionId":"stale"}""");
+
+        await Assert.That(unversioned).IsTypeOf<NotFoundActivity>();
+        var selected = await Assert.That(versioned).IsTypeOf<WorkflowDefinitionActivity>();
+        await Assert.That(selected!.WorkflowDefinitionVersionId).IsEqualTo("current");
+    }
+
+    [Test]
+    [Arguments("absent-revision")]
+    [Arguments("another-owners-revision")]
+    public async Task WorkflowReferenceCannotSelectAnotherDefinitionWithTheSameName(string revisionId)
+    {
+        var descriptor = new ActivityDescriptor
+        {
+            TypeName = "Send",
+            Version = 1,
+            Constructor = _ => new(WorkflowAsActivity),
+            CustomProperties =
+            {
+                ["WorkflowDefinitionId"] = "other-owner",
+                ["WorkflowDefinitionVersionId"] = "another-owners-revision"
+            }
+        };
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).Find("Send", 1).Returns(descriptor);
+        Mock.Get(registry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => predicate(descriptor) ? descriptor : null);
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+
+        var json = $$"""{"type":"Send","version":1,"workflowDefinitionId":"requested-owner","workflowDefinitionVersionId":"{{revisionId}}"}""";
+        var missing = await Assert.That(Execute(CreateSut(registry), json)).IsTypeOf<NotFoundActivity>();
+        await Assert.That(missing!.MissingTypeName).IsEqualTo("Send");
+        await Assert.That(missing.MissingTypeVersion).IsEqualTo(1);
+    }
+
+    [Test]
     public async Task When_DeserializeWorkflowAsActivity_And_TypeNameSpecified_Then_FindsAndInstantiatesActivity()
     {
         // Arrange
@@ -176,6 +253,8 @@ public sealed class ActivityJsonConverterTests
         Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns((ActivityDescriptor?)null);
         Mock.Get(activityRegistry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
                     .Returns((global::System.Func<global::Flamme.Workflows.Models.ActivityDescriptor, bool> __arg0) => __arg0(descriptor) ? descriptor : null);
+        Mock.Get(activityRegistry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => new[] { descriptor }.Where(predicate));
 
         return activityRegistry;
     }

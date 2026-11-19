@@ -1,5 +1,6 @@
 using Flamme.Common;
 using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management.Entities;
@@ -67,5 +68,6 @@ public class WorkflowTimestampTests
         IActivitySerializer.Mock().Object,
         IMediator.Mock().Object,
         time,
-        Microsoft.Extensions.Options.Options.Create(new ManagementOptions()));
+        Microsoft.Extensions.Options.Options.Create(new ManagementOptions()),
+        new DefaultTenantAccessor());
 }

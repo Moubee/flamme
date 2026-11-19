@@ -12,16 +12,10 @@ public class WorkflowDefinitionActivityRegistryUpdater(WorkflowDefinitionActivit
     private readonly Type _providerType = typeof(WorkflowDefinitionActivityProvider);
     
     /// <inheritdoc />
-    public async Task AddToRegistry(string workflowDefinitionVersionId, CancellationToken cancellationToken)
+    public Task AddToRegistry(string workflowDefinitionVersionId, CancellationToken cancellationToken)
     {
-        var descriptors = await provider.GetDescriptorsAsync(cancellationToken);
-        var descriptorToAdd = descriptors
-            .FirstOrDefault(d =>
-                d.CustomProperties.TryGetValue("WorkflowDefinitionVersionId", out var val) &&
-                val.ToString() == workflowDefinitionVersionId);
-        
-        if (descriptorToAdd is not null)
-            registry.Add(_providerType, descriptorToAdd);
+        // A draft rename can release a binding for a different definition. Reconcile the provider's current owners together.
+        return registry.RefreshDescriptorsAsync(provider, cancellationToken);
     }
 
     /// <inheritdoc />
