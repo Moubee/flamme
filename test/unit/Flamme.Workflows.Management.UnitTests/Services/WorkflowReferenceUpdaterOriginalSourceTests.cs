@@ -19,11 +19,13 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
     private const string CustomSource = "custom workflow source";
 
     [Test]
-    public async Task UpdateWorkflowReferencesAsync_SkipsSourceOnlyConsumerAndUpdatesJsonConsumer()
+    [Arguments("Json Consumer")]
+    [Arguments(" ")]
+    public async Task UpdateWorkflowReferencesAsync_SkipsSourceOnlyConsumerAndUpdatesJsonConsumer(string consumerName)
     {
         var target = CreateTargetDefinition();
         var sourceOnlyConsumer = CreateSourceOnlyConsumer();
-        var jsonConsumer = CreateJsonConsumer();
+        var jsonConsumer = CreateJsonConsumer(consumerName);
         var sourceOnlyGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var jsonGraph = CreateConsumerGraph(jsonConsumer, target, "json-consumer-workflow");
         var logger = new CollectingLogger();
@@ -180,13 +182,13 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         };
     }
 
-    private static WorkflowDefinition CreateJsonConsumer()
+    private static WorkflowDefinition CreateJsonConsumer(string name)
     {
         return new()
         {
             Id = "consumer-json-v1",
             DefinitionId = "consumer-json",
-            Name = "Json Consumer",
+            Name = name,
             Version = 1,
             IsPublished = false,
             IsLatest = true,

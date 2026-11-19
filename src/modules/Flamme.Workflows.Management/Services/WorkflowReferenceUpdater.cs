@@ -209,6 +209,8 @@ public class WorkflowReferenceUpdater(
 
         // Store the draft in the cache for potential future use
         draftCache[definitionId] = draft;
+        if (string.IsNullOrWhiteSpace(draft.Name))
+            return draft;
 
         // Get the current published version of the workflow definition.
         var publishedVersion = await workflowDefinitionStore.FindAsync(
