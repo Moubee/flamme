@@ -27,9 +27,10 @@ Identity supports store-based providers, configuration-based providers, and admi
 [DefaultAuthenticationFeature](../../src/modules/Flamme.Identity/Features/DefaultAuthenticationFeature.cs) wires default authentication. The reference server calls:
 
 ```csharp
-elsa
-    .UseIdentity(...)
-    .UseDefaultAuthentication();
+services.AddFlamme(flamme => flamme
+    .UseIdentity(identity => identity.TokenOptions += options =>
+        builder.Configuration.GetRequiredSection("Identity:Tokens").Bind(options))
+    .UseDefaultAuthentication());
 ```
 
 See [src/apps/Flamme.Server.Web/Program.cs](../../src/apps/Flamme.Server.Web/Program.cs).

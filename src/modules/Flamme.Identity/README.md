@@ -23,7 +23,7 @@ shell configuration paths have been removed.
 ```csharp
 services.AddFlamme(flamme =>
 {
-    elsa
+    flamme
         .UseIdentity(identity =>
         {
             identity.TokenOptions += options =>

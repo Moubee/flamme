@@ -32,7 +32,7 @@ The common public path is:
 ```csharp
 services.AddFlamme(flamme =>
 {
-    elsa
+    flamme
         .UseWorkflowManagement()
         .UseWorkflowRuntime()
         .UseWorkflowsApi();
