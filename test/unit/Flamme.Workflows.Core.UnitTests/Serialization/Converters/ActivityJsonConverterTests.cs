@@ -46,6 +46,19 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task ExplicitUnknownMajorPreservesTheMissingContract()
+    {
+        var registry = CreateActivityRegistry(WriteLineActivityTypeName, WriteLineActivity);
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+
+        var result = Execute(CreateSut(registry), """{ "type": "Console.WriteLine", "version": 42 }""");
+
+        var missing = await Assert.That(result).IsTypeOf<NotFoundActivity>();
+        await Assert.That(missing!.MissingTypeName).IsEqualTo("Console.WriteLine");
+        await Assert.That(missing.MissingTypeVersion).IsEqualTo(42);
+    }
+
+    [Test]
     public async Task When_DeserializeUnknownActivity_Then_ReturnsNotFoundActivity()
     {
         // Arrange
@@ -117,6 +130,18 @@ public sealed class ActivityJsonConverterTests
         var result = Execute(sut, WorkflowAsActivityJson_WithTypeNameOnly);
 
         // Assert
+        await Assert.That(result).IsSameReferenceAs(WorkflowAsActivity);
+    }
+
+    [Test]
+    public async Task ExactChildRevisionTakesPrecedenceOverItsCachedVersion()
+    {
+        var registry = CreateActivityRegistry_FindByCustomProperty(
+            WorkflowDefinitionVersionIdCustomPropertyName, WorkflowAsActivityDefinitionVersionId);
+        var json = $$"""{ "type": "Test-SubWorkflow", "version": 42, "workflowDefinitionVersionId": "{{WorkflowAsActivityDefinitionVersionId}}" }""";
+
+        var result = Execute(CreateSut(registry), json);
+
         await Assert.That(result).IsSameReferenceAs(WorkflowAsActivity);
     }
 
