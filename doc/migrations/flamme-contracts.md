@@ -21,7 +21,7 @@ A definition-file conversion does not migrate database rows. Existing state may 
 
 For native workflow-as-activity imports, export the child and its caller together. The child's exact revision ID takes precedence over its cached display name and numeric version. Its logical definition ID must agree when present. A stale revision ID can bind only when the effective descriptor independently matches the logical owner and requested numeric version. If only a logical ID survives a display-name change, imports require one matching revision in the effective tenant scope. Supply the exact version to disambiguate an older export. Verify all references against the target tenant.
 
-Native drafts marked usable as activities also reserve a descriptor when the registry refreshes. Saving or publishing checks the proposed name and version against stored workflow owners in its tenant scope. Concurrent authors creating different native definitions under the same activity name can pass this check before either writes. Serialize those native edits in the authoring host. The registry rejects a conflicting binding if it encounters one during registration.
+Saving a native workflow marked usable as an activity claims its activity name and version within the publishing tenant. The PostgreSQL and in-memory stores commit that claim with the revision. If two definitions in the same tenant claim the same name and version, one succeeds and the other receives a validation error. A tenant can still override a shared activity. A stored child reference carrying the shared owner can still resolve to that shared revision.
 
 ## Producer-authored workflows
 
