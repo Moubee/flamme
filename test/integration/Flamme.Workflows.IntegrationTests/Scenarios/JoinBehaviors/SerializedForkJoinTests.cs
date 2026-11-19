@@ -7,6 +7,7 @@ using Flamme.Workflows.Models;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Models;
 using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
@@ -55,7 +56,14 @@ public class SerializedForkJoinTests
         var model = serializer.Deserialize<WorkflowDefinitionModel>(Encoding.UTF8.GetString(export.Data));
         var importer = consumer.Services.GetRequiredService<IWorkflowDefinitionImporter>();
         var imported = await importer.ImportAsync(new() { Model = model, Publish = true });
-        var state = await consumer.RunWorkflowAsync(imported.WorkflowDefinition.DefinitionId, options: new RunWorkflowOptions().WithTokenBasedFlowchart());
+        var runtime = consumer.Services.GetRequiredService<IWorkflowRuntime>();
+        var client = await runtime.CreateClientAsync();
+        await client.CreateAndRunInstanceAsync(new()
+        {
+            WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionVersionId(imported.WorkflowDefinition.Id),
+            Properties = new RunWorkflowOptions().WithTokenBasedFlowchart().Properties
+        });
+        var state = await client.ExportStateAsync();
 
         await Assert.That(state.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
         await Assert.That(state.Incidents).IsEmpty();

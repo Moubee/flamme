@@ -36,9 +36,9 @@ public class FlowJoin : Activity, IJoinNode
     /// <inheritdoc />
     protected override async ValueTask ExecuteAsync(ActivityExecutionContext context)
     {
-        if(!Flowchart.UseTokenFlow)
-            if (context.ParentActivityExecutionContext != null)
-                await context.ParentActivityExecutionContext.CancelInboundAncestorsAsync(this);
+        var parent = context.ParentActivityExecutionContext;
+        if (parent != null && Flowchart.GetEffectiveExecutionMode(parent) == FlowchartExecutionMode.CounterBased)
+            await parent.CancelInboundAncestorsAsync(this);
 
         // The join behavior is handled by Flowchart, so we can simply complete the activity here.
         await context.CompleteActivityAsync();

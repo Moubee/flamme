@@ -133,7 +133,7 @@ public partial class Flowchart : Container
     /// Gets the effective execution mode for this flowchart execution.
     /// Priority: WorkflowExecutionContext.Properties > FlowchartOptions (DI) > Static UseTokenFlow flag
     /// </summary>
-    private static FlowchartExecutionMode GetEffectiveExecutionMode(ActivityExecutionContext context)
+    internal static FlowchartExecutionMode GetEffectiveExecutionMode(ActivityExecutionContext context)
     {
         var workflowExecutionContext = context.WorkflowExecutionContext;
 
