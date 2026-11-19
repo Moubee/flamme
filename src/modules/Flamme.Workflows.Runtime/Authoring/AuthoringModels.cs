@@ -1,7 +1,9 @@
+using System.Security.Claims;
+
 namespace Flamme.Workflows.Runtime.Authoring;
 
 /// <summary>An administrator's assignment of a catalog namespace to an authenticated subject.</summary>
-public sealed record NamespaceGrant(string Publisher, string Namespace);
+public sealed record NamespaceGrant(string Publisher, string Namespace, string Issuer = ClaimsIdentity.DefaultIssuer);
 
 /// <summary>A local name for one catalog namespace in a workflow source document.</summary>
 public sealed record NamespaceImport(string Alias, string Namespace);

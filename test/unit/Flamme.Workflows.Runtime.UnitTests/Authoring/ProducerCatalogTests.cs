@@ -22,6 +22,16 @@ public class ProducerCatalogTests
     }
 
     [Test]
+    public async Task SameSubjectFromADifferentIssuerCannotClaimANamespace()
+    {
+        var catalog = new ProducerCatalog([new("north", "north.mail", "identity.example/one")]);
+        Assert.ThrowsExactly<UnauthorizedAccessException>(() => catalog.Admit(Principal("north", "identity.example/two"), North));
+        catalog.Admit(Principal("north", "identity.example/one"), North);
+        var (_, manifest) = CuratedWorkflowPublisher.Compile(catalog, new("notices", [Imports[0]], [new("first", "north:Send", 1)]));
+        await Assert.That(manifest.GetProperty("releases")[0].GetProperty("issuer").GetString()).IsEqualTo("identity.example/one");
+    }
+
+    [Test]
     public void RejectsDuplicateOverlappingAndReservedGrants()
     {
         Assert.ThrowsExactly<ArgumentException>(() => new ProducerCatalog([new("north", "north.mail"), new("south", "north.mail")]));
@@ -84,5 +94,6 @@ public class ProducerCatalogTests
     }
 
     private static ProducerCatalog CreateCatalog() => new([new("north", "north.mail"), new("south", "south.mail")]);
-    private static ClaimsPrincipal Principal(string subject) => new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, subject)], "test"));
+    private static ClaimsPrincipal Principal(string subject, string issuer = ClaimsIdentity.DefaultIssuer) =>
+        new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, subject, ClaimValueTypes.String, issuer)], "test"));
 }

@@ -18,7 +18,7 @@ public sealed partial class ProducerCatalog
         "Scripting", "System", "Tasks", "Time", "Workflows"
     };
 
-    private readonly Dictionary<string, string> _grants = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, NamespaceGrant> _grants = new(StringComparer.Ordinal);
     private readonly Dictionary<(string Key, int Major), AdmittedRecipe> _recipes = new();
     private readonly Lock _sync = new();
 
@@ -28,6 +28,7 @@ public sealed partial class ProducerCatalog
         foreach (var grant in grants)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(grant.Publisher);
+            ArgumentException.ThrowIfNullOrWhiteSpace(grant.Issuer);
             ArgumentException.ThrowIfNullOrWhiteSpace(grant.Namespace);
             var segments = grant.Namespace.Split('.');
             if (segments.Length < 2 || segments.Any(segment => !ScopeSegment().IsMatch(segment)) || ReservedRoots.Contains(segments[0]))
@@ -36,7 +37,7 @@ public sealed partial class ProducerCatalog
             if (_grants.Keys.Any(existing => existing == grant.Namespace ||
                 existing.StartsWith(grant.Namespace + ".", StringComparison.Ordinal) || grant.Namespace.StartsWith(existing + ".", StringComparison.Ordinal)))
                 throw new ArgumentException($"Duplicate or overlapping namespace grant '{grant.Namespace}'.", nameof(grants));
-            _grants.Add(grant.Namespace, grant.Publisher);
+            _grants.Add(grant.Namespace, grant);
         }
     }
 
@@ -46,8 +47,8 @@ public sealed partial class ProducerCatalog
         ArgumentNullException.ThrowIfNull(principal);
         ArgumentNullException.ThrowIfNull(recipe);
         var subjects = principal.Identities.Where(x => x.IsAuthenticated)
-            .SelectMany(x => x.FindAll(ClaimTypes.NameIdentifier)).Select(x => x.Value).Distinct(StringComparer.Ordinal).ToArray();
-        if (subjects.Length != 1 || !_grants.TryGetValue(recipe.Namespace, out var publisher) || subjects[0] != publisher)
+            .SelectMany(x => x.FindAll(ClaimTypes.NameIdentifier)).Select(x => (x.Issuer, x.Value)).Distinct().ToArray();
+        if (subjects.Length != 1 || !_grants.TryGetValue(recipe.Namespace, out var grant) || subjects[0] != (grant.Issuer, grant.Publisher))
             throw new UnauthorizedAccessException($"The authenticated publisher has no grant for '{recipe.Namespace}'.");
 
         if (!IsIdentifier(recipe.Name) || recipe.Major < 1 || string.IsNullOrWhiteSpace(recipe.Release))
@@ -68,7 +69,7 @@ public sealed partial class ProducerCatalog
         }
 
         var key = $"{recipe.Namespace}.{recipe.Name}";
-        var release = new AdmittedRecipe(publisher, key, recipe.Major, recipe.Release, steps);
+        var release = new AdmittedRecipe(grant.Issuer, grant.Publisher, key, recipe.Major, recipe.Release, steps);
         lock (_sync)
         {
             if (!_recipes.TryAdd((key, recipe.Major), release))
@@ -93,9 +94,9 @@ public sealed partial class ProducerCatalog
     [GeneratedRegex(@"\A[A-Za-z][A-Za-z0-9_-]*\z", RegexOptions.CultureInvariant)]
     private static partial Regex Identifier();
 
-    internal sealed record AdmittedRecipe(string Publisher, string Key, int Major, string Release, ImmutableArray<RecipeStep> Steps)
+    internal sealed record AdmittedRecipe(string Issuer, string Publisher, string Key, int Major, string Release, ImmutableArray<RecipeStep> Steps)
     {
         public string Digest { get; } = Convert.ToHexStringLower(SHA256.HashData(
-            JsonSerializer.SerializeToUtf8Bytes(new { Publisher, Key, Major, Release, Steps })));
+            JsonSerializer.SerializeToUtf8Bytes(new { Issuer, Publisher, Key, Major, Release, Steps })));
     }
 }
