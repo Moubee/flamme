@@ -1,4 +1,9 @@
 using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Services;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
@@ -338,6 +343,27 @@ public class ActivityRegistryTests
         await Assert.That(() => _registry.RefreshDescriptorsAsync(two)).Throws<InvalidOperationException>();
 
         await Assert.That(_registry.Find("Duplicate", 1)).IsSameReferenceAs(owner);
+    }
+
+    [Test]
+    public async Task IncrementalWorkflowDescriptorUpdatesPreserveTheLogicalOwner()
+    {
+        var definitions = new[] { "first", "second" }.Select(owner => new WorkflowDefinition
+        {
+            DefinitionId = owner, Id = owner + "-revision", TenantId = CurrentTenant, Name = "Send", Version = 1
+        }).ToArray();
+        var store = IWorkflowDefinitionStore.Mock().Object;
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+            .Returns(definitions);
+        var provider = new WorkflowDefinitionActivityProvider(store, new WorkflowDefinitionActivityDescriptorFactory());
+        var updater = new WorkflowDefinitionActivityRegistryUpdater(provider, _registry);
+
+        await updater.AddToRegistry("first-revision", default);
+        await updater.AddToRegistry("first-revision", default);
+        await Assert.That(() => updater.AddToRegistry("second-revision", default)).Throws<InvalidOperationException>();
+
+        var selected = _registry.Find("Send", 1);
+        await Assert.That(selected!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo("first");
     }
 
     [Test]

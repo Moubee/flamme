@@ -19,7 +19,7 @@ An activity occurrence keeps its own ID. Its `type` selects a capability such as
 
 A definition-file conversion does not migrate database rows. Existing state may contain serialized CLR payloads, callbacks, protected values, scheduled messages and bookmark hashes computed using earlier route names. Pointing a renamed host at the same PostgreSQL schema cannot establish compatibility for those records. Recovery of existing Elsa instances, an in-place upgrade and a mixed-version cluster each need a separate deployment-specific migration and rehearsal.
 
-For native workflow-as-activity imports, export the child and its caller together. The child's exact revision ID takes precedence over its cached display name and numeric version. Its logical definition ID must agree when present. A stale revision ID can bind only when the effective descriptor independently matches the logical owner and requested numeric version. Verify all references against the target tenant.
+For native workflow-as-activity imports, export the child and its caller together. The child's exact revision ID takes precedence over its cached display name and numeric version. Its logical definition ID must agree when present. A stale revision ID can bind only when the effective descriptor independently matches the logical owner and requested numeric version. If only a logical ID survives a display-name change, imports require one matching revision in the effective tenant scope. Supply the exact version to disambiguate an older export. Verify all references against the target tenant.
 
 ## Producer-authored workflows
 

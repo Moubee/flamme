@@ -120,6 +120,30 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task StaleUnversionedChildNameCannotSelectAnArbitraryRevision()
+    {
+        var descriptors = new[] { 1, 2 }.Select(version => new ActivityDescriptor
+        {
+            TypeName = "RenamedChild",
+            Version = version,
+            CustomProperties = { ["WorkflowDefinitionId"] = "child" },
+            Constructor = _ => new(new WorkflowDefinitionActivity { Version = version })
+        }).ToArray();
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => descriptors.Where(predicate));
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+        var sut = CreateSut(registry);
+
+        var ambiguous = Execute(sut, """{"type":"OldName","workflowDefinitionId":"child"}""");
+        var exact = Execute(sut, """{"type":"OldName","workflowDefinitionId":"child","version":2}""");
+
+        await Assert.That(ambiguous).IsTypeOf<NotFoundActivity>();
+        var selected = await Assert.That(exact).IsTypeOf<WorkflowDefinitionActivity>();
+        await Assert.That(selected!.Version).IsEqualTo(2);
+    }
+
+    [Test]
     [Arguments("absent-revision")]
     [Arguments("another-owners-revision")]
     public async Task WorkflowReferenceCannotSelectAnotherDefinitionWithTheSameName(string revisionId)
@@ -192,6 +216,8 @@ public sealed class ActivityJsonConverterTests
         Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns((ActivityDescriptor?)null);
         Mock.Get(activityRegistry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
                     .Returns((global::System.Func<global::Flamme.Workflows.Models.ActivityDescriptor, bool> __arg0) => __arg0(descriptor) ? descriptor : null);
+        Mock.Get(activityRegistry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => new[] { descriptor }.Where(predicate));
 
         return activityRegistry;
     }

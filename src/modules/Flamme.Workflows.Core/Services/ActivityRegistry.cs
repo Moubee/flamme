@@ -292,8 +292,11 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
         if (!registry.ActivityDescriptors.TryGetValue((descriptor.TypeName, descriptor.Version), out var existing))
             return;
 
-        // The same typed descriptor may have been discovered first while building a CLR workflow.
-        if (existing.ClrType != descriptor.ClrType || (owned?.Contains(existing) != true && !_manualActivityDescriptors.Contains(existing)))
+        // Workflow-as-activity descriptors share a CLR implementation across logical definitions.
+        existing.CustomProperties.TryGetValue("WorkflowDefinitionId", out var existingOwner);
+        descriptor.CustomProperties.TryGetValue("WorkflowDefinitionId", out var incomingOwner);
+        if (existing.ClrType != descriptor.ClrType || !Equals(existingOwner, incomingOwner) ||
+            (owned?.Contains(existing) != true && !_manualActivityDescriptors.Contains(existing)))
             throw ConflictingBinding(descriptor);
     }
 

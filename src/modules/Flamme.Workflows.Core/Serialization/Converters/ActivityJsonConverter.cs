@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Flamme.Common.Multitenancy;
 using Flamme.Expressions.Contracts;
 using Flamme.Extensions;
 using Flamme.Workflows.Activities;
@@ -130,7 +131,8 @@ public class ActivityJsonConverter(
             : null;
         if (activityRoot.TryGetProperty("workflowDefinitionVersionId", out var revisionElement) && revisionElement.ValueKind == JsonValueKind.String)
         {
-            var revision = FindActivityDescriptorByCustomProperty("WorkflowDefinitionVersionId", revisionElement);
+            var revisionId = revisionElement.GetString();
+            var revision = activityRegistry.Find(x => x.CustomProperties.TryGetValue("WorkflowDefinitionVersionId", out var id) && Equals(id, revisionId));
             // An immutable revision takes precedence over the designer's cached display name and version.
             // Legacy imports can carry a stale revision ID. Accept the tenant-scoped (name, version)
             // descriptor only when the serialized logical owner independently identifies the same workflow.
@@ -142,7 +144,7 @@ public class ActivityJsonConverter(
         else if (owner != null && (activityDescriptor == null || activityDescriptor.CustomProperties.ContainsKey("WorkflowDefinitionId")) && !HasOwner(activityDescriptor, owner))
         {
             int? requestedVersion = activityVersionElement.ValueKind == JsonValueKind.Undefined ? null : activityTypeVersion;
-            activityDescriptor = FindActivityDescriptorByCustomProperty("WorkflowDefinitionId", ownerElement, requestedVersion);
+            activityDescriptor = FindUniqueOwnerBinding(owner, requestedVersion);
         }
 
         activityTypeVersion = activityDescriptor?.Version ?? activityTypeVersion;
@@ -152,13 +154,14 @@ public class ActivityJsonConverter(
     private static bool HasOwner(ActivityDescriptor? descriptor, string owner) =>
         descriptor != null && descriptor.CustomProperties.TryGetValue("WorkflowDefinitionId", out var id) && Equals(id, owner);
 
-    private ActivityDescriptor? FindActivityDescriptorByCustomProperty(string customPropertyName, JsonElement valueElement, int? version = null)
+    private ActivityDescriptor? FindUniqueOwnerBinding(string owner, int? version)
     {
-        if (valueElement.ValueKind != JsonValueKind.String)
-            return null;
-
-        var searchValue = valueElement.GetString();
-        return activityRegistry.Find(x => (version == null || x.Version == version) && x.CustomProperties.TryGetValue(customPropertyName, out var value) && (string?)value == searchValue);
+        var matches = activityRegistry.FindMany(x => HasOwner(x, owner) && (version == null || x.Version == version))
+            .ToLookup(x => x.TenantId is not (null or Tenant.AgnosticTenantId));
+        // An obsolete display name can be recovered only from an unambiguous owner binding.
+        // Preserve the registry's tenant-specific precedence over shared descriptors.
+        var effectiveScope = matches.Contains(true) ? matches[true] : matches[false];
+        return effectiveScope.Take(2).ToArray() is [var only] ? only : null;
     }
 
     private JsonSerializerOptions GetClonedOptions(JsonSerializerOptions options)
