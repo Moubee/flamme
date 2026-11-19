@@ -717,12 +717,12 @@ public sealed class ExternalAuthenticationStoreScenario(
         };
 
         public bool MatchesMutation(string commandText) => Point == ConformanceRacePoint.RegistryVersionAdvance &&
-            commandText.Contains("UPDATE \"Flamme\".\"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
+            commandText.Contains("UPDATE \"Elsa\".\"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
 
         private static bool IsSelectFrom(string commandText, string tableName) =>
             commandText.Contains("SELECT", StringComparison.Ordinal) &&
             (commandText.Contains($"FROM \"{tableName}\"", StringComparison.Ordinal) ||
-             commandText.Contains($"FROM \"Flamme\".\"{tableName}\"", StringComparison.Ordinal));
+             commandText.Contains($"FROM \"Elsa\".\"{tableName}\"", StringComparison.Ordinal));
     }
 
     private static async Task<(MemoryUserStore Users, StoreBasedUserProvider Provider)> CreateUsersAsync()
