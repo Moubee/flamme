@@ -15,6 +15,7 @@ using Flamme.Workflows.Management.Contracts;
 using Flamme.Workflows.Management.Services;
 using Flamme.Workflows.Options;
 using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Runtime.Authoring;
 using Flamme.Workflows.Runtime.Bookmarks;
 using Flamme.Workflows.Runtime.Discovery;
 using Flamme.Workflows.Runtime.Entities;
@@ -346,6 +347,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
             .AddScoped<StoreActivityExecutionLogSink>()
             .AddScoped<StoreWorkflowExecutionLogSink>()
             .AddScoped<DispatchWorkflowCommandHandler>()
+            .AddScoped<CuratedWorkflowPublisher>()
             .AddScoped<IEventPublisher, EventPublisher>()
             .AddScoped<IBookmarkUpdater, BookmarkUpdater>()
             .AddScoped<IBookmarksPersister, BookmarksPersister>()
