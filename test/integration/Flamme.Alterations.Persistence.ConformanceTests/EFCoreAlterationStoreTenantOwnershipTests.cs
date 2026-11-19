@@ -255,7 +255,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Flamme\".\"AlterationPlans\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationPlans\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Plans.SaveAsync(Plan(
@@ -274,7 +274,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"Flamme\".\"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"Elsa\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveAsync(Job(
@@ -293,7 +293,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Flamme\".\"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveManyAsync([
@@ -619,7 +619,7 @@ public sealed class GateFirstAlterationUpdates(
     }
 
     private bool IsArmedAlterationUpdate(DbCommand command) =>
-        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"Flamme\".\"{tableName}\"", StringComparison.OrdinalIgnoreCase);
+        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"Elsa\".\"{tableName}\"", StringComparison.OrdinalIgnoreCase);
 
     private async Task CoordinateAsync(CancellationToken cancellationToken)
     {

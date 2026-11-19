@@ -122,9 +122,9 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
 
         await Assert.That(await dbContext.Database.GetAppliedMigrationsAsync()).HasSingleItem();
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'Flamme' AND table_name = 'ExternalAuthenticationSessionRefreshTokens'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessionRefreshTokens'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(1L);
-        command.CommandText = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'Flamme' AND table_name = 'ExternalAuthenticationSessions' AND column_name = 'CurrentRefreshTokenHash'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessions' AND column_name = 'CurrentRefreshTokenHash'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(0L);
     }
 
