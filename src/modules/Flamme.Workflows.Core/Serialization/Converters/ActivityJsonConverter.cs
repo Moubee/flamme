@@ -138,8 +138,10 @@ public class ActivityJsonConverter(
             // descriptor only when the serialized logical owner independently identifies the same workflow.
             if (revision != null)
                 activityDescriptor = owner == null || HasOwner(revision, owner) ? revision : null;
-            else if (owner == null || activityVersionElement.ValueKind == JsonValueKind.Undefined || !HasOwner(activityDescriptor, owner))
-                activityDescriptor = null;
+            else
+                activityDescriptor = owner != null && activityVersionElement.ValueKind != JsonValueKind.Undefined
+                    ? FindUniqueOwnerBinding(owner, activityTypeVersion, activityTypeName)
+                    : null;
         }
         else if (owner != null && (activityDescriptor == null || activityDescriptor.CustomProperties.ContainsKey("WorkflowDefinitionId")) && !HasOwner(activityDescriptor, owner))
         {
@@ -154,9 +156,10 @@ public class ActivityJsonConverter(
     private static bool HasOwner(ActivityDescriptor? descriptor, string owner) =>
         descriptor != null && descriptor.CustomProperties.TryGetValue("WorkflowDefinitionId", out var id) && Equals(id, owner);
 
-    private ActivityDescriptor? FindUniqueOwnerBinding(string owner, int? version)
+    private ActivityDescriptor? FindUniqueOwnerBinding(string owner, int? version, string? typeName = null)
     {
-        var matches = activityRegistry.FindMany(x => HasOwner(x, owner) && (version == null || x.Version == version))
+        var matches = activityRegistry.FindMany(x => HasOwner(x, owner) &&
+                (version == null || x.Version == version) && (typeName == null || x.TypeName == typeName))
             .ToLookup(x => x.TenantId is not (null or Tenant.AgnosticTenantId));
         // An obsolete display name can be recovered only from an unambiguous owner binding.
         // Preserve the registry's tenant-specific precedence over shared descriptors.

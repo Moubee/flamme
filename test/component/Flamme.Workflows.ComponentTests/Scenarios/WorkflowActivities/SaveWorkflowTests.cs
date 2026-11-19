@@ -25,16 +25,25 @@ public class SaveWorkflowTests(App app) : AppComponentTest(app)
         shared.Name = $"Notice{Guid.NewGuid():N}";
         shared.TenantId = Tenant.AgnosticTenantId;
         shared.Options.UsableAsActivity = true;
-        await publisher.PublishAsync(shared);
+        var sharedResult = await publisher.PublishAsync(shared);
+        await Assert.That(sharedResult.Succeeded).IsTrue();
+        var registry = Scope.ServiceProvider.GetRequiredService<IActivityRegistry>();
+        var sharedBinding = registry.Find(shared.Name, shared.Version);
+        await Assert.That(sharedBinding?.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(shared.DefinitionId);
 
         var local = await publisher.NewAsync();
         local.Name = shared.Name;
         local.Options.UsableAsActivity = true;
-        await publisher.PublishAsync(local);
+        var localResult = await publisher.PublishAsync(local);
+        await Assert.That(localResult.Succeeded).IsTrue();
 
-        var registry = Scope.ServiceProvider.GetRequiredService<IActivityRegistry>();
         var selected = registry.Find(local.Name, local.Version);
         await Assert.That(selected!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(local.DefinitionId);
+
+        var serializer = Scope.ServiceProvider.GetRequiredService<IActivitySerializer>();
+        var json = $$"""{ "type": "{{shared.Name}}", "version": {{shared.Version}}, "workflowDefinitionId": "{{shared.DefinitionId}}", "workflowDefinitionVersionId": "obsolete-revision" }""";
+        var child = await Assert.That(serializer.Deserialize<IActivity>(json)).IsTypeOf<WorkflowDefinitionActivity>();
+        await Assert.That(child!.WorkflowDefinitionVersionId).IsEqualTo(shared.Id);
     }
 
     [Test]
