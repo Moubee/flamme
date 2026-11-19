@@ -1,13 +1,13 @@
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
 
-namespace Elsa.Features.Services;
+namespace Flamme.Features.Services;
 
 /// <summary>
 /// Implementation of <see cref="IInstalledFeatureProvider"/> that delegates to <see cref="IInstalledFeatureRegistry"/>.
 /// </summary>
 /// <remarks>
-/// Features registered through an Elsa module are published in the installed feature registry.
+/// Features registered through an Flamme module are published in the installed feature registry.
 /// </remarks>
 public class InstalledFeatureProvider : IInstalledFeatureProvider
 {

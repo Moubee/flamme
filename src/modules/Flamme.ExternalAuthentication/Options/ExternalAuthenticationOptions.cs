@@ -1,9 +1,9 @@
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Permissions;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.ExternalAuthentication.Options;
+namespace Flamme.ExternalAuthentication.Options;
 
 /// <summary>
 /// Configures deployment-owned External Authentication behavior.
@@ -14,7 +14,7 @@ public class ExternalAuthenticationOptions
     [ConfigurationKeyName("AuthenticationClients")]
     public ICollection<AuthenticationClient> Clients { get; set; } = new List<AuthenticationClient>();
 
-    /// <summary>Controls brokered Elsa username/password login as a normal login method.</summary>
+    /// <summary>Controls brokered Flamme username/password login as a normal login method.</summary>
     public LocalLoginMethodOptions LocalLogin { get; set; } = new();
 
     /// <summary>Immutable configuration-owned connections. Configuration key: <c>Connections</c>.</summary>
@@ -42,7 +42,7 @@ public class ExternalAuthenticationOptions
     /// <summary>Controls the deployment default and database override boundary for unlinked identities.</summary>
     public UnlinkedIdentityPolicyOptions UnlinkedIdentityPolicy { get; set; } = new();
 
-    /// <summary>Defines deployment-wide Elsa permission allow and deny boundaries.</summary>
+    /// <summary>Defines deployment-wide Flamme permission allow and deny boundaries.</summary>
     public PermissionGrantOptions PermissionGrants { get; set; } = new();
 
     /// <summary>Configures transaction, code, preview, and session lifetimes.</summary>
@@ -82,7 +82,7 @@ public class LocalLoginMethodOptions
     /// <summary>Whether brokered local credentials appear as a normal login method.</summary>
     public bool IsEnabled { get; set; } = true;
     /// <summary>Text shown by login method discovery.</summary>
-    public string DisplayName { get; set; } = "Elsa account";
+    public string DisplayName { get; set; } = "Flamme account";
     /// <summary>Trusted server-hosted icon identifier.</summary>
     public string IconId { get; set; } = "elsa";
     /// <summary>Deterministic chooser order.</summary>

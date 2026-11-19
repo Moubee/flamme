@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.Helpers;
+namespace Flamme.Workflows.Helpers;
 
 public static class ActivityTypeNameHelper
 {

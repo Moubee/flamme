@@ -6,7 +6,7 @@ using System.Text;
 using IronCompress;
 #endif
 
-namespace Elsa.Common.Codecs;
+namespace Flamme.Common.Codecs;
 
 /// <summary>
 /// Represents a ZSTD compression strategy.

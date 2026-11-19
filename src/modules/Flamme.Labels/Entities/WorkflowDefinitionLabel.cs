@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Labels.Entities;
+namespace Flamme.Labels.Entities;
 
 /// <summary>
 /// Represents a lookup between a label and a workflow definition.

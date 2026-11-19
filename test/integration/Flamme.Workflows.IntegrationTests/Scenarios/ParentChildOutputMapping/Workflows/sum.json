@@ -9,7 +9,7 @@
   "inputs": [
     {
       "uiHint": "singleline",
-      "storageDriverType": "Elsa.Workflows.Services.WorkflowStorageDriver, Elsa.Workflows.Core",
+      "storageDriverType": "Flamme.Workflows.Services.WorkflowStorageDriver, Flamme.Workflows.Core",
       "type": "Int32",
       "name": "A",
       "displayName": "A",
@@ -18,7 +18,7 @@
     },
     {
       "uiHint": "singleline",
-      "storageDriverType": "Elsa.Workflows.Services.WorkflowStorageDriver, Elsa.Workflows.Core",
+      "storageDriverType": "Flamme.Workflows.Services.WorkflowStorageDriver, Flamme.Workflows.Core",
       "type": "Int32",
       "name": "B",
       "displayName": "B",

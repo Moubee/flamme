@@ -1,6 +1,6 @@
-using Elsa.Hosting.Management.Contracts;
+using Flamme.Hosting.Management.Contracts;
 
-namespace Elsa.Hosting.Management.Services;
+namespace Flamme.Hosting.Management.Services;
 
 /// <summary>
 /// Returns a randomly generated instance name.

@@ -1,12 +1,12 @@
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <inheritdoc />
 public class HttpWorkflowLookupService(ITriggerStore triggerStore, IWorkflowDefinitionService workflowDefinitionService) : IHttpWorkflowLookupService

@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.Persistence.EFCore.Converters;
-using Elsa.Extensions;
+using Flamme.Persistence.EFCore.Converters;
+using Flamme.Extensions;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 internal static class JsonValueConverterHelper
 {

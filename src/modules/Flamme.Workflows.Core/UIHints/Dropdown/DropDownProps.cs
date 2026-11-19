@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.UIHints.Dropdown;
+namespace Flamme.Workflows.UIHints.Dropdown;
 
 /// <summary>
 /// Provides properties for the <see cref="InputUIHints.DropDown"/> UI hint.

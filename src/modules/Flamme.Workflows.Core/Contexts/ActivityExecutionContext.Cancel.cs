@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Signals;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public partial class ActivityExecutionContext
 {

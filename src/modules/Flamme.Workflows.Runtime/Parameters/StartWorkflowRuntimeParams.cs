@@ -1,6 +1,6 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 
-namespace Elsa.Workflows.Runtime.Parameters;
+namespace Flamme.Workflows.Runtime.Parameters;
 
 /// <summary>
 /// Represents parameters for starting a workflow.

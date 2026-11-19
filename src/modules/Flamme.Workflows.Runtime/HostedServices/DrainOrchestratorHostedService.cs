@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime.Services;
+using Flamme.Workflows.Runtime.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime.HostedServices;
+namespace Flamme.Workflows.Runtime.HostedServices;
 
 /// <summary>
 /// Subscribes to <see cref="IHostApplicationLifetime.ApplicationStopping"/> and runs the drain orchestrator on

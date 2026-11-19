@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.UIHints.SingleLine;
+namespace Flamme.Api.Client.Shared.UIHints.SingleLine;
 
 /// <summary>
 /// Provides additional options for the SingleLine input field.

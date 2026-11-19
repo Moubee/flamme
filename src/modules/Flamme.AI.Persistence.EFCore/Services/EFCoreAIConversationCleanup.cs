@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.AI.Persistence.EFCore.Services;
+namespace Flamme.AI.Persistence.EFCore.Services;
 
 public static class EFCoreAIConversationCleanup
 {

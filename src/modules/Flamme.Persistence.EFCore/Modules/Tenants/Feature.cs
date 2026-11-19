@@ -1,16 +1,16 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Tenants.Features;
+using Flamme.Common.Multitenancy;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Tenants.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 /// <summary>
 /// Configures the <see cref="TenantManagementFeature"/> feature with an Entity Framework Core persistence provider.
 /// </summary>
 [DependsOn(typeof(TenantManagementFeature))]
-public class EFCoreTenantManagementFeature(IModule module) : PersistenceFeatureBase<EFCoreTenantManagementFeature, TenantsElsaDbContext>(module)
+public class EFCoreTenantManagementFeature(IModule module) : PersistenceFeatureBase<EFCoreTenantManagementFeature, TenantsFlammeDbContext>(module)
 {
     /// <inheritdoc />
     public override void Configure()
@@ -30,6 +30,6 @@ public class EFCoreTenantManagementFeature(IModule module) : PersistenceFeatureB
 
     protected override void ConfigureMigrations()
     {
-        Module.ConfigureHostedService<RunMigrationsHostedService<TenantsElsaDbContext>>(-100);
+        Module.ConfigureHostedService<RunMigrationsHostedService<TenantsFlammeDbContext>>(-100);
     }
 }

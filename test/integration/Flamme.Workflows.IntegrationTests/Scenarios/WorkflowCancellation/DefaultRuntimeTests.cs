@@ -1,15 +1,15 @@
-using Elsa.Common.Models;
-using Elsa.Mediator.HostedServices;
-using Elsa.Mediator.Options;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Scenarios.WorkflowCancellation.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common.Models;
+using Flamme.Mediator.HostedServices;
+using Flamme.Mediator.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Scenarios.WorkflowCancellation.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowCancellation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowCancellation;
 
 /// <summary>
 /// Represents a class containing unit tests for the DefaultRuntime class.

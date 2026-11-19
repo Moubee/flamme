@@ -1,6 +1,6 @@
-using Elsa.Mediator.Middleware.Request.Contracts;
+using Flamme.Mediator.Middleware.Request.Contracts;
 
-namespace Elsa.Mediator.Middleware.Request;
+namespace Flamme.Mediator.Middleware.Request;
 
 /// <inheritdoc />
 public class RequestPipelineBuilder : IRequestPipelineBuilder

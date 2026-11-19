@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// Represents a serializable workflow definition.

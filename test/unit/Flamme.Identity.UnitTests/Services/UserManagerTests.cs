@@ -1,11 +1,11 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Services;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Services;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class UserManagerTests
 {

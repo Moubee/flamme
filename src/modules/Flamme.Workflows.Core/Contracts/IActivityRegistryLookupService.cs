@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Represents a service for looking up activity descriptors.

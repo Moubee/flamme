@@ -1,11 +1,11 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Workflows.Management.Handlers.Notifications;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Management.Stores;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Workflows.Management.Handlers.Notifications;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Management.Stores;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Features;
+namespace Flamme.Workflows.Management.Features;
 
 /// <summary>
 /// Configures workflow definition caching.

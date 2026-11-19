@@ -1,30 +1,30 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Data.Common;
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Persistence.EFCore;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Persistence.EFCore;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows;
+using Flamme.Testing.Shared.Databases;
 using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Persistence;
 
 public abstract class ExternalAuthenticationStoreConformanceTests
 {
@@ -525,15 +525,15 @@ public sealed class ExternalAuthenticationStoreScenario(
         try
         {
             await database.OpenAsync();
-            var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
-            optionsBuilder.UseElsaDbContextOptions(null);
-            optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+            var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>();
+            optionsBuilder.UseFlammeDbContextOptions(null);
+            optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
             optionsBuilder.AddInterceptors(races);
             var options = optionsBuilder.Options;
             services = new ServiceCollection()
-                .AddSingleton<IDbContextFactory<ExternalAuthenticationElsaDbContext>>(serviceProvider => new TestDbContextFactory(options, serviceProvider))
+                .AddSingleton<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>(serviceProvider => new TestDbContextFactory(options, serviceProvider))
                 .BuildServiceProvider();
-            var dbContextFactory = services.GetRequiredService<IDbContextFactory<ExternalAuthenticationElsaDbContext>>();
+            var dbContextFactory = services.GetRequiredService<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>();
             var leaseFactory = new ExternalAuthenticationDbContextLeaseFactory(services.GetRequiredService<IServiceScopeFactory>());
             await using (var dbContext = await dbContextFactory.CreateDbContextAsync())
                 await dbContext.Database.EnsureCreatedAsync();
@@ -717,12 +717,12 @@ public sealed class ExternalAuthenticationStoreScenario(
         };
 
         public bool MatchesMutation(string commandText) => Point == ConformanceRacePoint.RegistryVersionAdvance &&
-            commandText.Contains("UPDATE \"Elsa\".\"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
+            commandText.Contains("UPDATE \"Flamme\".\"ExternalAuthenticationRegistryVersions\"", StringComparison.Ordinal);
 
         private static bool IsSelectFrom(string commandText, string tableName) =>
             commandText.Contains("SELECT", StringComparison.Ordinal) &&
             (commandText.Contains($"FROM \"{tableName}\"", StringComparison.Ordinal) ||
-             commandText.Contains($"FROM \"Elsa\".\"{tableName}\"", StringComparison.Ordinal));
+             commandText.Contains($"FROM \"Flamme\".\"{tableName}\"", StringComparison.Ordinal));
     }
 
     private static async Task<(MemoryUserStore Users, StoreBasedUserProvider Provider)> CreateUsersAsync()
@@ -733,9 +733,9 @@ public sealed class ExternalAuthenticationStoreScenario(
         return (users, new StoreBasedUserProvider(users));
     }
 
-    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationElsaDbContext> options, IServiceProvider serviceProvider) : IDbContextFactory<ExternalAuthenticationElsaDbContext>
+    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationFlammeDbContext> options, IServiceProvider serviceProvider) : IDbContextFactory<ExternalAuthenticationFlammeDbContext>
     {
-        public ExternalAuthenticationElsaDbContext CreateDbContext() => new(options, serviceProvider);
-        public Task<ExternalAuthenticationElsaDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
+        public ExternalAuthenticationFlammeDbContext CreateDbContext() => new(options, serviceProvider);
+        public Task<ExternalAuthenticationFlammeDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
     }
 }

@@ -1,7 +1,7 @@
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay.Workflows;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay.Workflows;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay;
 
 public class DelayTests(App app) : TimerActivityTestBase(app)
 {

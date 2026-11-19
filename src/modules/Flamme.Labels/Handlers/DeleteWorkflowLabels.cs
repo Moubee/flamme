@@ -1,8 +1,8 @@
-using Elsa.Labels.Contracts;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Labels.Contracts;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Notifications;
 
-namespace Elsa.Labels.Handlers;
+namespace Flamme.Labels.Handlers;
 
 // ReSharper disable once UnusedType.Global
 /// <summary>

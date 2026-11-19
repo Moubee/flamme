@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 [UsedImplicitly]
 internal class IndexTriggers(ITriggerIndexer triggerIndexer) :

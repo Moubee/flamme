@@ -1,9 +1,9 @@
 using System.Text;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class SecretHasherDefaultOverloadTests
 {

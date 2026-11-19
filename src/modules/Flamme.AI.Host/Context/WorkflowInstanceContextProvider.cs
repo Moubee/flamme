@@ -1,10 +1,10 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.AI.Host.Context;
+namespace Flamme.AI.Host.Context;
 
 public class WorkflowInstanceContextProvider(IServiceProvider serviceProvider, RuntimeGroundingMapper mapper) : IAIContextProvider, IPlaceholderAIContextProvider
 {

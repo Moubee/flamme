@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.OpenIdConnect.Models;
+namespace Flamme.ExternalAuthentication.OpenIdConnect.Models;
 
 /// <summary>Selects discovery-based or explicitly pinned OpenID Connect trust metadata.</summary>
 public enum OpenIdConnectTrustMode

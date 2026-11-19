@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Cancel;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Cancel;
 
 internal class Request
 {

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using AspNetCore.Authentication.ApiKey;
 
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
 /// Represents a validated API key.

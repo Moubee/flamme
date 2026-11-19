@@ -1,4 +1,4 @@
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// Decides whether a held permission satisfies a required one. One matching rule shape on both axes:

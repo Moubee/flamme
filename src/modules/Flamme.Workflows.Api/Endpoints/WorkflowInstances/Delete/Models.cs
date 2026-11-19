@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Delete;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Delete;
 
 internal class Request
 {

@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// General extension methods for ActivityTestFixture.

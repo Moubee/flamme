@@ -1,7 +1,7 @@
-using Elsa.Common;
+using Flamme.Common;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 
 /// <summary>

@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Workflows;
 
 public class FlowchartWorkflow : WorkflowBase
 {

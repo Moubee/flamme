@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management.Stores;
+namespace Flamme.Workflows.Management.Stores;
 
 /// <summary>
 /// A non-persistent memory store for saving and loading <see cref="WorkflowInstance"/> entities.
@@ -214,7 +214,7 @@ public class MemoryWorkflowInstanceStore : IWorkflowInstanceStore
 
     private string CurrentTenantId => _tenantAccessor?.TenantId ?? Tenant.DefaultTenantId;
 
-    [RequiresUnreferencedCode("Calls Elsa.Workflows.Management.Filters.WorkflowInstanceFilter.Apply(IQueryable<WorkflowInstance>)")]
+    [RequiresUnreferencedCode("Calls Flamme.Workflows.Management.Filters.WorkflowInstanceFilter.Apply(IQueryable<WorkflowInstance>)")]
     private IQueryable<WorkflowInstance> Filter(IQueryable<WorkflowInstance> query, WorkflowInstanceFilter filter) =>
         filter.Apply(query.WhereVisibleToTenant(CurrentTenantId));
 

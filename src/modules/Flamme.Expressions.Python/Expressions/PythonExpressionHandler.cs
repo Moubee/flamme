@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.Python.Contracts;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.Python.Contracts;
 
-namespace Elsa.Expressions.Python.Expressions;
+namespace Flamme.Expressions.Python.Expressions;
 
 /// <summary>
 /// Evaluates C# expressions.

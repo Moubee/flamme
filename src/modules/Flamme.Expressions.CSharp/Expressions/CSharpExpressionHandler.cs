@@ -1,9 +1,9 @@
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.CSharp.Expressions;
+namespace Flamme.Expressions.CSharp.Expressions;
 
 /// <summary>
 /// Evaluates C# expressions.

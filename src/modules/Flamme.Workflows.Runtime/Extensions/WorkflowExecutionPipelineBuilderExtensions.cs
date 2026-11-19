@@ -1,10 +1,10 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Middleware.Workflows;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
-using Elsa.Workflows.Runtime.Middleware.Workflows;
+using Flamme.Workflows;
+using Flamme.Workflows.Middleware.Workflows;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.Runtime.Middleware.Workflows;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IWorkflowExecutionPipelineBuilder"/> that add various middleware components.
@@ -33,7 +33,7 @@ public static class WorkflowExecutionPipelineBuilderExtensions
     public static IWorkflowExecutionPipelineBuilder UseWorkflowHeartbeat(this IWorkflowExecutionPipelineBuilder pipelineBuilder) => pipelineBuilder.UseMiddleware<WorkflowHeartbeatMiddleware>();
 
     /// <summary>
-    /// Installs middleware that registers an <see cref="Elsa.Workflows.Runtime.ExecutionCycleHandle"/> for the duration of
+    /// Installs middleware that registers an <see cref="Flamme.Workflows.Runtime.ExecutionCycleHandle"/> for the duration of
     /// each workflow execution cycle, so the drain orchestrator can count active executions and force-cancel them on
     /// deadline breach.
     /// </summary>

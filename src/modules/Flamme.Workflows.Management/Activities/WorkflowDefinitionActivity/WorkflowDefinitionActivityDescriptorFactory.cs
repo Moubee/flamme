@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
 using Humanizer;
 
-namespace Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
+namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 
 public class WorkflowDefinitionActivityDescriptorFactory
 {

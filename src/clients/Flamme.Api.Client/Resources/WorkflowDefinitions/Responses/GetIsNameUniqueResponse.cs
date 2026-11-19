@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
 
 /// <summary>
 /// A response containing a value indicating whether a workflow definition name is unique.

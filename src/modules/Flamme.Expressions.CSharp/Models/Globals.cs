@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.CSharp.Models;
+namespace Flamme.Expressions.CSharp.Models;
 
 /// <summary>
 /// Provides access to global objects, such as the workflow execution context.

@@ -1,10 +1,10 @@
 using System.Reflection;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Secrets.Persistence.EFCore.Features;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Secrets.Persistence.EFCore.Features;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
-namespace Elsa.Secrets.Persistence.EFCore.PostgreSql.Extensions;
+namespace Flamme.Secrets.Persistence.EFCore.PostgreSql.Extensions;
 
 public static class PostgreSqlSecretsPersistenceFeatureExtensions
 {
@@ -13,7 +13,7 @@ public static class PostgreSqlSecretsPersistenceFeatureExtensions
     public static EFCoreSecretsPersistenceFeature UsePostgreSql(
         this EFCoreSecretsPersistenceFeature feature,
         string connectionString,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
     {
         return feature.UsePostgreSql(_ => connectionString, options, configure);
@@ -22,7 +22,7 @@ public static class PostgreSqlSecretsPersistenceFeatureExtensions
     public static EFCoreSecretsPersistenceFeature UsePostgreSql(
         this EFCoreSecretsPersistenceFeature feature,
         Func<IServiceProvider, string> connectionStringFunc,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
     {
         return feature.UsePostgreSql(Assembly, connectionStringFunc, options, configure);

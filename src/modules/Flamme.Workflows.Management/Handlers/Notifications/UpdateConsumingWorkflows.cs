@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Notifications;
 
-namespace Elsa.Workflows.Management.Handlers.Notifications;
+namespace Flamme.Workflows.Management.Handlers.Notifications;
 
 /// <summary>
 /// Updates consuming workflows when a workflow definition is published.

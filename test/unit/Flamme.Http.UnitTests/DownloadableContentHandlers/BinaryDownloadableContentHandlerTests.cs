@@ -1,8 +1,8 @@
-using Elsa.Http.DownloadableContentHandlers;
-using Elsa.Http.Services;
+using Flamme.Http.DownloadableContentHandlers;
+using Flamme.Http.Services;
 using TUnit.Assertions.Enums;
 
-namespace Elsa.Http.UnitTests.DownloadableContentHandlers;
+namespace Flamme.Http.UnitTests.DownloadableContentHandlers;
 
 public class BinaryDownloadableContentHandlerTests
 {

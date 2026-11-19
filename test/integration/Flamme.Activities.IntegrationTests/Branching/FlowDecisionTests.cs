@@ -1,11 +1,11 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Activities.IntegrationTests.Branching;
+namespace Flamme.Activities.IntegrationTests.Branching;
 
 /// <summary>
 /// Integration tests for FlowDecision activity in flowchart scenarios.

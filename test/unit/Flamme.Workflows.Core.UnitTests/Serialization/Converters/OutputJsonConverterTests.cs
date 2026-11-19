@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
+namespace Flamme.Workflows.Core.UnitTests.Serialization.Converters;
 
 public sealed class OutputJsonConverterTests
 {

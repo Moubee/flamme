@@ -1,19 +1,19 @@
 using System.Text.Json;
 using BenchmarkDotNet.Attributes;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.PerformanceTests.ExternalAuthentication;
+namespace Flamme.Workflows.PerformanceTests.ExternalAuthentication;
 
 /// <summary>
 /// Bounded scenarios for the performance goals in the External Authentication feature plan:
@@ -156,7 +156,7 @@ public class ExternalAuthenticationBenchmarks
         IUserCredentialsValidator,
         IUserProvider,
         IRoleProvider,
-        IElsaTokenService,
+        IFlammeTokenService,
         IIdentityRefreshTokenService
     {
         public ValueTask<ExternalIdentityResolution> ResolveAsync(ExternalIdentityResolutionContext context, CancellationToken cancellationToken = default) => throw new NotSupportedException();

@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants;
+namespace Flamme.Tenants;
 
 /// <inheritdoc />
 public class TenantResolverPipelineBuilder : ITenantResolverPipelineBuilder

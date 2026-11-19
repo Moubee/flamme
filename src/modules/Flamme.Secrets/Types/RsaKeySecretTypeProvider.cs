@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Types;
+namespace Flamme.Secrets.Types;
 
 public class RsaKeySecretTypeProvider : ISecretTypeProvider
 {

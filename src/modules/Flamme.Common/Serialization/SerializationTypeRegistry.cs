@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 /// <inheritdoc />
 public class SerializationTypeRegistry : ISerializationTypeRegistry

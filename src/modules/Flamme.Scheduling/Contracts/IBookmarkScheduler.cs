@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 /// <summary>
 /// Creates timer schedules for the specified bookmarks.

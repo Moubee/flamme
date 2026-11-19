@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.Runtime.Activities;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
 
 [UsedImplicitly]
 public class DispatchInvalidDefinitionWorkflow : WorkflowBase

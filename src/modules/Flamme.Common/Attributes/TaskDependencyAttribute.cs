@@ -1,4 +1,4 @@
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Specifies dependencies for a task implementation. Tasks with dependencies will be executed after their dependencies have completed.

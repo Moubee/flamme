@@ -1,18 +1,18 @@
-﻿using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+﻿using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Reload;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Reload;
 
 [PublicAPI]
-internal class Reload(IWorkflowDefinitionsReloader workflowDefinitionsReloader) : ElsaEndpointWithoutRequest
+internal class Reload(IWorkflowDefinitionsReloader workflowDefinitionsReloader) : FlammeEndpointWithoutRequest
 {
     private const int BatchSize = 10;
 
     public override void Configure()
     {
         Post("/actions/workflow-definitions/reload");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "reload");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "reload");
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

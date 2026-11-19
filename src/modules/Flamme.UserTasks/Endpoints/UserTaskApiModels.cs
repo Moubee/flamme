@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.UserTasks.Endpoints;
+namespace Flamme.UserTasks.Endpoints;
 
 public sealed class ListUserTasksRequest
 {

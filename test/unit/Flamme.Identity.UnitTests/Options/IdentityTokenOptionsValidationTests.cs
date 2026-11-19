@@ -1,11 +1,11 @@
-using Elsa.Identity.Options;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Options;
+namespace Flamme.Identity.UnitTests.Options;
 
 public class IdentityTokenOptionsValidationTests
 {

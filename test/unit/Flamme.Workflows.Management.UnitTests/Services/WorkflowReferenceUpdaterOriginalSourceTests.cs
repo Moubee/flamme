@@ -1,18 +1,18 @@
-using Elsa.Common.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Materializers;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Materializers;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Management.UnitTests.Services;
+namespace Flamme.Workflows.Management.UnitTests.Services;
 
 public class WorkflowReferenceUpdaterOriginalSourceTests
 {
@@ -123,7 +123,7 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
                     .Returns([target]);
         Mock.Get(store).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowDefinitionFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Workflows.Management.Filters.WorkflowDefinitionFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var filter = __arg0;
                         return filter.DefinitionId != null && consumersById.TryGetValue(filter.DefinitionId, out var consumer)
@@ -131,7 +131,7 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
                             : consumers.First();
                     });
         Mock.Get(publisher).SaveDraftAsync(Arg.Any<WorkflowDefinition>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowDefinition __arg0, global::System.Threading.CancellationToken __arg1) => __arg0);
+                    .Returns((global::Flamme.Workflows.Management.Entities.WorkflowDefinition __arg0, global::System.Threading.CancellationToken __arg1) => __arg0);
         Mock.Get(serializer).Serialize(Arg.Any<object>()).Returns("serialized-root");
 
         return new(

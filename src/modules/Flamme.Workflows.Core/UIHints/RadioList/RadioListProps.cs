@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.UIHints.RadioList;
+namespace Flamme.Workflows.UIHints.RadioList;
 
 /// <summary>
 /// Provides properties for the <see cref="InputUIHints.RadioList"/> UI hint.

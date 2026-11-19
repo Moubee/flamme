@@ -1,15 +1,15 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Extensions;
+using Flamme.Abstractions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.Api.Endpoints.StorageDrivers.List;
+namespace Flamme.Workflows.Api.Endpoints.StorageDrivers.List;
 
 /// <summary>
 /// Returns a list of registered <see cref="IStorageDriver"/> implementations.
 /// </summary>
-public class List : ElsaEndpointWithoutRequest<Response>
+public class List : FlammeEndpointWithoutRequest<Response>
 {
     private readonly IStorageDriverManager _registry;
 

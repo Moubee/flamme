@@ -1,16 +1,16 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.State;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Composition;
+namespace Flamme.Activities.UnitTests.Composition;
 
 public class ExecuteWorkflowTests
 {

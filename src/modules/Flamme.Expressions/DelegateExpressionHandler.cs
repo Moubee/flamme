@@ -1,7 +1,7 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions;
+namespace Flamme.Expressions;
 
 /// <summary>
 /// An expression handler for Delegate expressions.

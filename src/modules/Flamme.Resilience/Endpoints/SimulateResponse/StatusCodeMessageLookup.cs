@@ -1,4 +1,4 @@
-namespace Elsa.Resilience.Endpoints.SimulateResponse;
+namespace Flamme.Resilience.Endpoints.SimulateResponse;
 
 public static class StatusCodeMessageLookup
 {

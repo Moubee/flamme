@@ -1,5 +1,5 @@
 // ReSharper disable once CheckNamespace
-namespace Elsa.Workflows.UIHints;
+namespace Flamme.Workflows.UIHints;
 
 /// <summary>
 /// Provides a set of well-known UI hints.

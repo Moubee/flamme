@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.ActivityDescriptors.Enums;
+using Flamme.Api.Client.Resources.ActivityDescriptors.Enums;
 
-namespace Elsa.Api.Client.Resources.ActivityDescriptors.Models;
+namespace Flamme.Api.Client.Resources.ActivityDescriptors.Models;
 
 /// <summary>
 /// A descriptor of an activity type.

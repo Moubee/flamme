@@ -1,8 +1,8 @@
 using System.Reflection;
-using Elsa.Workflows.UIHints.CodeEditor;
+using Flamme.Workflows.UIHints.CodeEditor;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Workflows.UIHints.JsonEditor;
+namespace Flamme.Workflows.UIHints.JsonEditor;
 
 internal class JsonCodeOptionsProvider : CodeEditorOptionsProviderBase
 {

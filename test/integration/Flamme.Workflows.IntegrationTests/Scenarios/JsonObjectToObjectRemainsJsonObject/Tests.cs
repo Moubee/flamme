@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject;
 
 public class JsonObjectJintTests : IAsyncDisposable
 {

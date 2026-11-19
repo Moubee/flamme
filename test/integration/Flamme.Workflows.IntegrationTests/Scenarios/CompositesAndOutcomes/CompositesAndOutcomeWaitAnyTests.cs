@@ -1,6 +1,6 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CompositesAndOutcomes;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CompositesAndOutcomes;
 
 public class ExplicitJoinWaitAnyTests : IAsyncDisposable
 {

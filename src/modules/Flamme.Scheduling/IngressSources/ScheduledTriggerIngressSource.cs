@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.IngressSources;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.IngressSources;
 
-namespace Elsa.Scheduling.IngressSources;
+namespace Flamme.Scheduling.IngressSources;
 
 /// <summary>
 /// Surfaces scheduled-trigger ingress (Cron, Timer, StartAt, Delay) as an <see cref="IIngressSource"/> in the runtime's

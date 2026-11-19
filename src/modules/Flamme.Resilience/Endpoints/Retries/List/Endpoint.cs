@@ -1,17 +1,17 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Models;
-using Elsa.Resilience.Entities;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Models;
+using Flamme.Resilience.Entities;
 
-namespace Elsa.Resilience.Endpoints.Retries.List;
+namespace Flamme.Resilience.Endpoints.Retries.List;
 
-public class Endpoint(IRetryAttemptReader reader) : ElsaEndpointWithoutRequest
+public class Endpoint(IRetryAttemptReader reader) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
         Get("/resilience/retries/{activityInstanceId}");
-        RequirePermission(Elsa.Resilience.Permissions.ResiliencePermissions.Retries, CoreVerbs.View);
+        RequirePermission(Flamme.Resilience.Permissions.ResiliencePermissions.Retries, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

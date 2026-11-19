@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using static Elsa.Activities.IntegrationTests.Flow.FlowchartTestHelpers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using static Flamme.Activities.IntegrationTests.Flow.FlowchartTestHelpers;
 
-namespace Elsa.Activities.IntegrationTests.Branching;
+namespace Flamme.Activities.IntegrationTests.Branching;
 
 /// <summary>
 /// Integration tests for FlowJoin activity in complex flowchart scenarios.

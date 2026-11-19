@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.UIHints.Dropdown;
+namespace Flamme.Workflows.UIHints.Dropdown;
 
 /// <summary>
 /// A base class for providing options to populate a dropdown UI component. This class is intended to be inherited to implement

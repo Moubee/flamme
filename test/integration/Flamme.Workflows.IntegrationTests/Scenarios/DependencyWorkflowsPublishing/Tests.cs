@@ -1,12 +1,12 @@
-﻿using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Entities;
+﻿using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.DependencyWorkflowsPublishing;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.DependencyWorkflowsPublishing;
 
 /// <summary>
 /// Contains tests for the "DependencyWorkflowsPublishing" scenario.

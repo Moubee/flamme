@@ -1,6 +1,6 @@
-using Elsa.Workflows.Api.Models;
+using Flamme.Workflows.Api.Models;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Publish;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Publish;
 
 internal class Request
 {

@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Entities;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Notifications;
+namespace Flamme.Workflows.Management.Notifications;
 
 /// <summary>
 /// A notification that is sent when specific workflow definition versions are about to be updated.

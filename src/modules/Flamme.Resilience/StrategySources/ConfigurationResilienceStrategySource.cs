@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Resilience.Serialization;
+using Flamme.Extensions;
+using Flamme.Resilience.Serialization;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Resilience.StrategySources;
+namespace Flamme.Resilience.StrategySources;
 
 public class ConfigurationResilienceStrategySource(IConfiguration configuration, ResilienceStrategySerializer serializer) : IResilienceStrategySource
 {

@@ -1,25 +1,25 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Data.Common;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Identity;
-using Elsa.Persistence.EFCore.PostgreSql;
-using Elsa.Testing.Shared.Databases;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Identity;
+using Flamme.Persistence.EFCore.PostgreSql;
+using Flamme.Testing.Shared.Databases;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Identity;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Identity;
 
 /// <summary>
 /// The revoked-session contract, held by the in-memory store and by the migrated EF Core store with multitenancy on.
@@ -166,15 +166,15 @@ public sealed class PostgreSqlRevokedSessionStoreTests : RevokedSessionStoreTest
             .AddScoped<IEntitySavingHandler, ApplyTenantId>()
             .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
             .AddPostgreSqlEntityModelCreatingHandlers()
-            .AddDbContextFactory<IdentityElsaDbContext>((_, builder) =>
-                builder.UseElsaPostgreSql(typeof(IdentityDbContextFactory).Assembly, _database.ConnectionString).AddInterceptors(_inserts))
-            .Decorate<IDbContextFactory<IdentityElsaDbContext>, TenantAwareDbContextFactory<IdentityElsaDbContext>>()
-            .AddScoped<EntityStore<IdentityElsaDbContext, RevokedSession>>()
+            .AddDbContextFactory<IdentityFlammeDbContext>((_, builder) =>
+                builder.UseFlammePostgreSql(typeof(IdentityDbContextFactory).Assembly, _database.ConnectionString).AddInterceptors(_inserts))
+            .Decorate<IDbContextFactory<IdentityFlammeDbContext>, TenantAwareDbContextFactory<IdentityFlammeDbContext>>()
+            .AddScoped<EntityStore<IdentityFlammeDbContext, RevokedSession>>()
             .AddScoped<EFCoreRevokedSessionStore>()
             .BuildServiceProvider();
 
         // Migrated rather than created, so the RevokedSessions migration is what these assertions run against.
-        await using (var dbContext = await _services.GetRequiredService<IDbContextFactory<IdentityElsaDbContext>>().CreateDbContextAsync())
+        await using (var dbContext = await _services.GetRequiredService<IDbContextFactory<IdentityFlammeDbContext>>().CreateDbContextAsync())
             await dbContext.Database.MigrateAsync();
 
         _scope = _services.CreateScope();

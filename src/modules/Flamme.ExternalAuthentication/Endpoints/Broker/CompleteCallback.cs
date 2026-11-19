@@ -1,11 +1,11 @@
-using Elsa.Abstractions;
-using Elsa.ExternalAuthentication.Constants;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.ExternalAuthentication.Constants;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Builder;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Broker;
+namespace Flamme.ExternalAuthentication.Endpoints.Broker;
 
-internal sealed class CompleteCallback(IExternalAuthenticationBroker broker) : ElsaEndpoint<CompleteCallbackRequest>
+internal sealed class CompleteCallback(IExternalAuthenticationBroker broker) : FlammeEndpoint<CompleteCallbackRequest>
 {
     public override void Configure()
     {

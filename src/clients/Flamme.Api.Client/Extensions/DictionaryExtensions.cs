@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="JsonElement"/>.

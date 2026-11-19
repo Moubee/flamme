@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Permissions;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Test;
+namespace Flamme.Secrets.Endpoints.Secrets.Test;
 
-internal class Endpoint(ISecretManager manager) : ElsaEndpointWithoutRequest<SecretTestResponse>
+internal class Endpoint(ISecretManager manager) : FlammeEndpointWithoutRequest<SecretTestResponse>
 {
     public override void Configure()
     {
         Post("/secrets/{name}/test");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, "test");
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, "test");
     }
 
     public override Task<SecretTestResponse> ExecuteAsync(CancellationToken cancellationToken)

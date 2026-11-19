@@ -1,6 +1,6 @@
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
+namespace Flamme.Workflows.Runtime.UnitTests.Quiescence;
 
 public class DrainOrchestratorPauseTests : DrainOrchestratorTestsBase
 {

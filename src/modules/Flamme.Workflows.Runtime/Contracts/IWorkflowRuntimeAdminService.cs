@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Domain service that backs the runtime's administrative pause / resume / force-drain / status surface. Endpoints

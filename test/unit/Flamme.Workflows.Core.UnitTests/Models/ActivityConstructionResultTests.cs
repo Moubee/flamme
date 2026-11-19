@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Models;
+namespace Flamme.Workflows.Core.UnitTests.Models;
 
 public class ActivityConstructionResultTests
 {

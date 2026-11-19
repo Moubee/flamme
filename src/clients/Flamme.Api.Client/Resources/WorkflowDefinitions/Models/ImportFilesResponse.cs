@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
 /// <summary>
 /// The response of a file import operation.

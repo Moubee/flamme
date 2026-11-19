@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Tracks every in-flight execution cycle of the workflow runtime — the atomic unit of work the drain orchestrator

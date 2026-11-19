@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public class ActivityExecutedLogUpdatedEventArgs(WorkflowExecutionContext workflowExecutionContext, ICollection<ActivityExecutionRecord> records) : EventArgs
 {

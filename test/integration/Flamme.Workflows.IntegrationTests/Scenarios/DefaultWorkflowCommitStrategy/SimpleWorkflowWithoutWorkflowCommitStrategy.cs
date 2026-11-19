@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.DefaultWorkflowCommitStrategy;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.DefaultWorkflowCommitStrategy;
 
 /// <summary>
 /// A simple workflow that does not specify an explicit commit strategy.

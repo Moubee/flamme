@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Represents a shape of a variable that can be serialized.

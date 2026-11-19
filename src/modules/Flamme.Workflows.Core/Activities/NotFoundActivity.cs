@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Exceptions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Exceptions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// This activity is instantiated in case a workflow references an activity type that could not be found.

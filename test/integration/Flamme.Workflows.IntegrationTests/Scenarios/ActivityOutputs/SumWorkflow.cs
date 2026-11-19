@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
 
 public class SumWorkflow : WorkflowBase
 {

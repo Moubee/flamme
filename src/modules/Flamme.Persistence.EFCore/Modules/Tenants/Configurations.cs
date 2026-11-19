@@ -1,8 +1,8 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 /// <summary>
 /// EF Core configuration for <see cref="Tenant"/>. 

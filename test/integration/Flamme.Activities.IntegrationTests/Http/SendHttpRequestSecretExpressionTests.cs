@@ -1,19 +1,19 @@
 using System.Net;
-using Elsa.Activities.IntegrationTests.Http.Helpers;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Expressions;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Providers;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
+using Flamme.Activities.IntegrationTests.Http.Helpers;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Expressions;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Providers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Activities.IntegrationTests.Http;
+namespace Flamme.Activities.IntegrationTests.Http;
 
 public class SendHttpRequestSecretExpressionTests
 {
@@ -69,7 +69,7 @@ public class SendHttpRequestSecretExpressionTests
                 services.AddSingleton<ISecretResolver>(new TestSecretResolver());
                 services.AddSingleton<IExpressionDescriptorProvider, SecretExpressionDescriptorProvider>();
             })
-            .ConfigureElsa(elsa => elsa.UseHttp(http =>
+            .ConfigureFlamme(elsa => elsa.UseHttp(http =>
             {
                 http.HttpClientBuilder = builder => builder.ConfigurePrimaryHttpMessageHandler(() => handler);
             }));

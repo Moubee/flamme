@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Secrets.Models;
+using Flamme.Secrets.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Secrets.Persistence.EFCore;
+namespace Flamme.Secrets.Persistence.EFCore;
 
 internal static class SecretSerialization
 {

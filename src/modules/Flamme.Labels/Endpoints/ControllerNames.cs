@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints;
+namespace Flamme.Labels.Endpoints;
 
 public class ControllerNames
 {

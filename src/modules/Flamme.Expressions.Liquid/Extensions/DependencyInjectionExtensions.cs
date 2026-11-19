@@ -1,6 +1,6 @@
-using Elsa.Expressions.Liquid.Contracts;
-using Elsa.Expressions.Liquid.Options;
-using Elsa.Expressions.Liquid.Services;
+using Flamme.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Liquid.Options;
+using Flamme.Expressions.Liquid.Services;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;

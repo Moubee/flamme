@@ -1,13 +1,13 @@
-using Elsa.Extensions;
-using Elsa.Http.Resilience;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Builders;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Extensions;
+using Flamme.Http.Resilience;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Builders;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Http.Scripting.JavaScript;
+namespace Flamme.Http.Scripting.JavaScript;
 
 /// <summary>
 /// Configures the JavaScript engine with additional .NET types that can be instantiated.

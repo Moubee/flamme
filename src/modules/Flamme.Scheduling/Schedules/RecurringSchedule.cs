@@ -1,8 +1,8 @@
-using Elsa.Scheduling.ScheduledTasks;
+using Flamme.Scheduling.ScheduledTasks;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Scheduling.Schedules;
+namespace Flamme.Scheduling.Schedules;
 
 /// <summary>
 /// A recurring schedule.

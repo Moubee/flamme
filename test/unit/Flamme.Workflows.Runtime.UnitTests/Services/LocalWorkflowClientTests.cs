@@ -1,20 +1,20 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Exceptions;
-using Elsa.Workflows.Management.Mappers;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Exceptions;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
+using Flamme.Workflows.Management.Mappers;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.Exceptions;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class LocalWorkflowClientTests
 {
@@ -170,7 +170,7 @@ public class LocalWorkflowClientTests
                     .Returns(() => Task.FromResult(new WorkflowActivationLease(true, lockHandle, handleLostSource.Token)));
         var saveStarted = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
         Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var cancellationToken = __arg1;
                         saveStarted.SetResult(cancellationToken);
@@ -202,7 +202,7 @@ public class LocalWorkflowClientTests
                     .Returns(new WorkflowActivationLease(true, null));
         var saveStarted = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
         Mock.Get(_workflowInstanceManager).SaveAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Workflows.Management.Entities.WorkflowInstance __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var cancellationToken = __arg1;
                         saveStarted.SetResult(cancellationToken);
@@ -299,7 +299,7 @@ public class LocalWorkflowClientTests
         Mock.Get(_workflowInstanceManager).CreateWorkflowInstance(Arg.Any<Workflow>(), Arg.Any<WorkflowInstanceOptions?>())
                     .Returns(CreateRunningInstance());
         Mock.Get(_workflowRunner).RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Models.WorkflowGraph __arg0, global::Elsa.Workflows.State.WorkflowState __arg1, global::Elsa.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) => Task.FromCanceled<RunWorkflowResult>(__arg3));
+                    .Returns((global::Flamme.Workflows.Models.WorkflowGraph __arg0, global::Flamme.Workflows.State.WorkflowState __arg1, global::Flamme.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) => Task.FromCanceled<RunWorkflowResult>(__arg3));
         var request = new CreateAndRunWorkflowInstanceRequest
         {
             WorkflowDefinitionHandle = WorkflowDefinitionHandle.ByDefinitionId("test-definition"),
@@ -327,7 +327,7 @@ public class LocalWorkflowClientTests
         var runnerCompletion = new TaskCompletionSource<RunWorkflowResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         CancellationToken runnerToken = default;
         Mock.Get(_workflowRunner).RunAsync(Arg.Any<WorkflowGraph>(), Arg.Any<WorkflowState>(), Arg.Any<RunWorkflowOptions?>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Models.WorkflowGraph __arg0, global::Elsa.Workflows.State.WorkflowState __arg1, global::Elsa.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) =>
+                    .Returns((global::Flamme.Workflows.Models.WorkflowGraph __arg0, global::Flamme.Workflows.State.WorkflowState __arg1, global::Flamme.Workflows.Options.RunWorkflowOptions? __arg2, global::System.Threading.CancellationToken __arg3) =>
                     {
                         runnerToken = __arg3;
                         runnerToken.Register(() => runnerCompletion.TrySetCanceled(runnerToken));
@@ -385,7 +385,7 @@ public class LocalWorkflowClientTests
     private LocalWorkflowClient CreateClient(bool canStart = true, ILogger<LocalWorkflowClient>? logger = null)
     {
         Mock.Get(_workflowActivationGate).EvaluateAsync(Arg.Any<Workflow>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Activities.Workflow __arg0, string? __arg1, global::System.Threading.CancellationToken __arg2) => canStart
+                    .Returns((global::Flamme.Workflows.Activities.Workflow __arg0, string? __arg1, global::System.Threading.CancellationToken __arg2) => canStart
                         ? new WorkflowActivationLease(true, null, __arg2)
                         : WorkflowActivationLease.Denied);
 

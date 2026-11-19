@@ -1,11 +1,11 @@
-﻿using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Models;
+﻿using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.ClusteredHosting;
+namespace Flamme.Workflows.ComponentTests.Scenarios.ClusteredHosting;
 
 public class ActivityRegistrySyncTests(App app) : AppComponentTest(app)
 {

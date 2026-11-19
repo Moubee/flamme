@@ -1,6 +1,6 @@
-using Elsa.Expressions.JavaScript.Models;
+using Flamme.Expressions.JavaScript.Models;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
 
 public class BulkDispatchWithCorrelationIdWorkflow : WorkflowBase
 {

@@ -1,15 +1,15 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Contracts;
-using Elsa.Common.Models;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
+using Flamme.Api.Client.Resources.WorkflowInstances.Contracts;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion;
 
 /// <summary>
 /// Tests that workflow instances can be deleted reliably, even when they are running or being persisted.

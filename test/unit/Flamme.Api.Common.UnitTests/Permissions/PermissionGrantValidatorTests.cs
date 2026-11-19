@@ -1,7 +1,7 @@
-using Elsa.Permissions;
+using Flamme.Permissions;
 using System.Threading.Tasks;
 
-namespace Elsa.Api.Common.UnitTests.Permissions;
+namespace Flamme.Api.Common.UnitTests.Permissions;
 
 public class PermissionGrantValidatorTests
 {

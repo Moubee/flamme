@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Processes pending workflow dispatch outbox items.

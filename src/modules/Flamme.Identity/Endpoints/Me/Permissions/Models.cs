@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Me.Permissions;
+namespace Flamme.Identity.Endpoints.Me.Permissions;
 
 /// <summary>The calling principal's effective grants for the current tenant context.</summary>
 /// <param name="Grants">

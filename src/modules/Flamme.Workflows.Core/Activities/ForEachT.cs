@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Behaviors;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Behaviors;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// A strongly-typed for-each construct where <typeparamref name="T"/> is the item type.

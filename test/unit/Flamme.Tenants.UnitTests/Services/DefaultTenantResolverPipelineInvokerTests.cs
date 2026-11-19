@@ -1,8 +1,8 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Tenants.UnitTests.Services;
+namespace Flamme.Tenants.UnitTests.Services;
 
 public class DefaultTenantResolverPipelineInvokerTests
 {

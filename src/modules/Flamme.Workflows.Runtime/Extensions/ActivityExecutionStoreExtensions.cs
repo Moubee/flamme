@@ -1,7 +1,7 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Provides extension methods for <see cref="IActivityExecutionStore"/>.

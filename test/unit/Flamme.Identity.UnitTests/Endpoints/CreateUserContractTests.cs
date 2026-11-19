@@ -1,14 +1,14 @@
 using System.Reflection;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Endpoints.Users.Create;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.UnitTests.Shared;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Endpoints.Users.Create;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.UnitTests.Shared;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Endpoints;
+namespace Flamme.Identity.UnitTests.Endpoints;
 
 /// <summary>
 /// Pins the <c>POST /identity/users</c> response contract: no hashes or salts, no echo of a supplied password,

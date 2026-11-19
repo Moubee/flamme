@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Extensions;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Scheduling.Services;
+namespace Flamme.Scheduling.Services;
 
 /// <summary>
 /// A default implementation of <see cref="ITriggerScheduler"/> that schedules bookmarks using <see cref="IWorkflowScheduler"/>.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptors.List;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptors.List;
 
 [PublicAPI]
 internal class Response(ICollection<ActivityDescriptor> items)

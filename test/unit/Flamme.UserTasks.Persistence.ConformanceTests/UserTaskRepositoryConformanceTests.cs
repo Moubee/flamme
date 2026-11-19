@@ -1,10 +1,10 @@
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
-using Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 using System.Threading.Tasks;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests;
+namespace Flamme.UserTasks.Persistence.ConformanceTests;
 
 /// <summary>
 /// The behaviour every <see cref="IUserTaskRepository"/> owes its callers, run unchanged against each

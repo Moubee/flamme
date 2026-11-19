@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.Core.UnitTests.Contexts;
+namespace Flamme.Workflows.Core.UnitTests.Contexts;
 
 public class ScheduledVariableIsolationTests
 {

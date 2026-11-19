@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.LogPersistence;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.LogPersistence;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.JavaScript.Handlers;
+namespace Flamme.Expressions.JavaScript.Handlers;
 
 /// <summary>
 /// A handler that configures the Jint engine with common types.

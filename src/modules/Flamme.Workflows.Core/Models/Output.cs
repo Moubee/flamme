@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 public class Output : Argument
 {

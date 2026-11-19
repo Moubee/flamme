@@ -1,8 +1,8 @@
-using Elsa.AI.Host.Services;
-using Elsa.Workflows.Management.Entities;
+using Flamme.AI.Host.Services;
+using Flamme.Workflows.Management.Entities;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Grounding;
+namespace Flamme.AI.Host.UnitTests.Grounding;
 
 public class WorkflowGroundingMapperTests
 {

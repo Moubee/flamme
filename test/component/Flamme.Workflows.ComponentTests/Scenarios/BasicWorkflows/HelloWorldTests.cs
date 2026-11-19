@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
-using Elsa.Testing.Shared.Extensions;
-using Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Execute;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
+using Flamme.Testing.Shared.Extensions;
+using Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Execute;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.BasicWorkflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.BasicWorkflows;
 
 public class HelloWorldTests(App app) : AppComponentTest(app)
 {

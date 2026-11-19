@@ -1,14 +1,14 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Stimuli;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// Resumes any blocking <see cref="BulkDispatchWorkflows"/> activities when its child workflows complete.

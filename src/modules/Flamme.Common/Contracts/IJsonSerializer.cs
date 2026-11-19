@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Provides JSON serialization services.

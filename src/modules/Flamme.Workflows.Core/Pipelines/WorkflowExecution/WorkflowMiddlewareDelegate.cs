@@ -1,3 +1,3 @@
-namespace Elsa.Workflows.Pipelines.WorkflowExecution;
+namespace Flamme.Workflows.Pipelines.WorkflowExecution;
 
 public delegate ValueTask WorkflowMiddlewareDelegate(WorkflowExecutionContext context);

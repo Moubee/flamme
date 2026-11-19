@@ -1,8 +1,8 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Options;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Services;
+namespace Flamme.Expressions.Services;
 
 /// <inheritdoc />
 public class WellKnownTypeRegistry : IWellKnownTypeRegistry

@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.UIHints.CheckList;
+namespace Flamme.Api.Client.Shared.UIHints.CheckList;
 
 /// <summary>
 /// Represents an item in a <see cref="CheckList"/>.

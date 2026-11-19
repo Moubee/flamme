@@ -1,16 +1,16 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.Python.Contracts;
-using Elsa.Expressions.Python.Options;
-using Elsa.Expressions.Python.Services;
-using Elsa.Features.Services;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Services;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.Python.Contracts;
+using Flamme.Expressions.Python.Options;
+using Flamme.Expressions.Python.Services;
+using Flamme.Features.Services;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Services;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Expressions.UnitTests.Python;
+namespace Flamme.Expressions.UnitTests.Python;
 
 public class PythonHostCodeExecutionTests
 {
@@ -18,7 +18,7 @@ public class PythonHostCodeExecutionTests
     public async Task Evaluator_BlocksExecution_WhenHostHasNotOptedIn()
     {
         var evaluator = new PythonNetPythonEvaluator(
-            Elsa.Mediator.Contracts.INotificationSender.Mock().Object,
+            Flamme.Mediator.Contracts.INotificationSender.Mock().Object,
             Microsoft.Extensions.Options.Options.Create(new PythonOptions()));
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();
 
@@ -37,7 +37,7 @@ public class PythonHostCodeExecutionTests
         services.AddOptions();
         var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
-        new Elsa.Expressions.Python.Features.PythonFeature(module)
+        new Flamme.Expressions.Python.Features.PythonFeature(module)
         {
             PythonOptions = options => options.AllowHostCodeExecution = allowHostCodeExecution
         }.Apply();

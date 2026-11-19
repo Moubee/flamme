@@ -1,6 +1,6 @@
-using Elsa.AI.Host.Streaming;
+using Flamme.AI.Host.Streaming;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIChatReconnectTests
 {

@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.StorageDrivers.Models;
+using Flamme.Api.Client.Resources.StorageDrivers.Models;
 
-namespace Elsa.Api.Client.Resources.StorageDrivers.Responses;
+namespace Flamme.Api.Client.Resources.StorageDrivers.Responses;
 
 /// <summary>
 /// The response containing the storage drivers.

@@ -1,16 +1,16 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Workflows.Signals;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FaultSignals;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FaultSignals;
 
 /// <summary>
 /// Integration tests for <see cref="FaultSignal"/>: a container's opportunity to claim a child's fault before it

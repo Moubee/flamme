@@ -1,7 +1,7 @@
-namespace Elsa.Api.Client.Shared;
+namespace Flamme.Api.Client.Shared;
 
 /// <summary>
-/// Contains header names used by the Elsa API.
+/// Contains header names used by the Flamme API.
 /// </summary>
 public static class HeaderNames
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptors.Get;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptors.Get;
 
 internal class Request
 {

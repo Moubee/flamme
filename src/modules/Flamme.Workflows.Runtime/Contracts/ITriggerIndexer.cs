@@ -1,10 +1,10 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Extracts triggers from workflow definitions.

@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
 /// <summary>
 /// Stable resource names for External Authentication. Endpoints reference these constants rather than string
@@ -24,7 +24,7 @@ public static class ExternalAuthenticationResourcePermissions
     public const string PolicyDefaultRoles = "external-authentication/policies/default-roles";
     /// <summary>Confirm an unsafe provider trust setting or a final-login-path recovery override.</summary>
     public const string ProviderTrust = "external-authentication/provider-trust";
-    /// <summary>Configure which Elsa permissions an external claim mapping may confer. The unrestricted verb lifts the requirement that the actor already holds them.</summary>
+    /// <summary>Configure which Flamme permissions an external claim mapping may confer. The unrestricted verb lifts the requirement that the actor already holds them.</summary>
     public const string PermissionGrants = "external-authentication/permission-grants";
 }
 
@@ -71,6 +71,6 @@ public sealed class ExternalAuthenticationResourcePermissionsDescriptorProvider 
         new(ExternalAuthenticationResourcePermissions.Policies, [CoreVerbs.View, CoreVerbs.Update], "Unlinked identity policies", "Configure how unknown external identities are admitted.", "External Authentication"),
         new(ExternalAuthenticationResourcePermissions.PolicyDefaultRoles, [CoreVerbs.Update], "Policy default roles", "Choose the roles granted to a user created for an unknown external identity.", "External Authentication"),
         new(ExternalAuthenticationResourcePermissions.ProviderTrust, [ExternalAuthenticationVerbs.Override], "Provider trust overrides", "Confirm an unsafe provider trust setting or a final-login-path recovery override.", "External Authentication"),
-        new(ExternalAuthenticationResourcePermissions.PermissionGrants, [ExternalAuthenticationVerbs.Delegate, ExternalAuthenticationVerbs.DelegateUnrestricted], "External permission grants", "Configure which Elsa permissions an external claim mapping may confer. The unrestricted verb lifts the requirement that the actor already holds them.", "External Authentication"),
+        new(ExternalAuthenticationResourcePermissions.PermissionGrants, [ExternalAuthenticationVerbs.Delegate, ExternalAuthenticationVerbs.DelegateUnrestricted], "External permission grants", "Configure which Flamme permissions an external claim mapping may confer. The unrestricted verb lifts the requirement that the actor already holds them.", "External Authentication"),
     ];
 }

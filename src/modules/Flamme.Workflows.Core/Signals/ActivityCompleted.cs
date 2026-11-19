@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Signals;
+namespace Flamme.Workflows.Signals;
 
 /// <summary>
 /// Signaled when an activity has completed.

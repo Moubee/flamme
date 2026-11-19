@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Core.UnitTests.OutputConverters.Fixtures;
+namespace Flamme.Workflows.Core.UnitTests.OutputConverters.Fixtures;
 
 public sealed class ReferenceOutputConverter : IOutputConverter
 {

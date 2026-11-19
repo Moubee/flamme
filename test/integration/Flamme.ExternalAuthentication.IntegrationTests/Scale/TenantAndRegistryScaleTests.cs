@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Scale;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Scale;
 
 public sealed class TenantAndRegistryScaleTests
 {

@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows;
+using Flamme.Workflows;
 using FastEndpoints;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
@@ -12,10 +12,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
-/// Provides extension methods to add FastEndpoints configured for use with Elsa API endpoints.
+/// Provides extension methods to add FastEndpoints configured for use with Flamme API endpoints.
 /// </summary>
 [PublicAPI]
 public static class WebApplicationExtensions
@@ -27,10 +27,10 @@ public static class WebApplicationExtensions
     };
 
     /// <summary>
-    /// Registers the FastEndpoints middleware configured for use with Elsa API endpoints.
+    /// Registers the FastEndpoints middleware configured for use with Flamme API endpoints.
     /// </summary>
     /// <param name="app"></param>
-    /// <param name="routePrefix">The route prefix to apply to Elsa API endpoints.</param>
+    /// <param name="routePrefix">The route prefix to apply to Flamme API endpoints.</param>
     /// <example>E.g. "elsa/api" will expose endpoints like this: "/elsa/api/workflow-definitions"</example>
     public static IApplicationBuilder UseWorkflowsApi(this IApplicationBuilder app, string routePrefix = "elsa/api")
     {
@@ -38,10 +38,10 @@ public static class WebApplicationExtensions
     }
 
     /// <summary>
-    /// Applies an ASP.NET Core rate limiting policy to requests targeting the Elsa API route prefix.
+    /// Applies an ASP.NET Core rate limiting policy to requests targeting the Flamme API route prefix.
     /// </summary>
     /// <param name="app">The application builder.</param>
-    /// <param name="routePrefix">The route prefix used by Elsa API endpoints.</param>
+    /// <param name="routePrefix">The route prefix used by Flamme API endpoints.</param>
     /// <param name="policyName">The registered ASP.NET Core rate limiting policy name. Leave empty to skip rate limiting.</param>
     public static IApplicationBuilder UseWorkflowsApiRateLimiting(this IApplicationBuilder app, string routePrefix = "elsa/api", string? policyName = null)
     {
@@ -49,14 +49,14 @@ public static class WebApplicationExtensions
             return app;
 
         var pathPrefix = NormalizeRoutePrefixPath(routePrefix);
-        return app.UseRateLimitingPolicyForPath(pathPrefix, policyName, "Elsa API rate limiting endpoint", requireMatchedEndpoint: true);
+        return app.UseRateLimitingPolicyForPath(pathPrefix, policyName, "Flamme API rate limiting endpoint", requireMatchedEndpoint: true);
     }
 
     /// <summary>
-    /// Maps FastEndpoints endpoint routes configured for use with Elsa API endpoints.
+    /// Maps FastEndpoints endpoint routes configured for use with Flamme API endpoints.
     /// </summary>
     /// <param name="routes">The <see cref="IEndpointRouteBuilder"/> to register the endpoints with.</param>
-    /// <param name="routePrefix">The route prefix to apply to Elsa API endpoints.</param>
+    /// <param name="routePrefix">The route prefix to apply to Flamme API endpoints.</param>
     /// <example>E.g. "elsa/api" will expose endpoints like this: "/elsa/api/workflow-definitions"</example>
     public static IEndpointRouteBuilder MapWorkflowsApi(this IEndpointRouteBuilder routes, string routePrefix = "elsa/api") =>
         routes.MapFastEndpoints(config => ConfigureWorkflowsApi(config, routePrefix));

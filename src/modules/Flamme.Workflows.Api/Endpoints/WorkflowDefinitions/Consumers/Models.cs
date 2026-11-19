@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Consumers;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Consumers;
 
 internal record Request
 {

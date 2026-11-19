@@ -1,7 +1,7 @@
-using Elsa.Scheduling.Activities;
-using Elsa.Workflows.Activities;
+using Flamme.Scheduling.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowActivities.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowActivities.Workflows;
 
 public class DeleteWorkflowClustered : WorkflowBase
 {

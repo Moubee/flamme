@@ -1,19 +1,19 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Net.Mime;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Serialization;
-using Elsa.Models;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Serialization;
+using Flamme.Models;
 
-namespace Elsa.Tenants.Endpoints.Tenants.List;
+namespace Flamme.Tenants.Endpoints.Tenants.List;
 
-public class Endpoint(ITenantService tenantService) : ElsaEndpointWithoutRequest<ListResponse<Tenant>>
+public class Endpoint(ITenantService tenantService) : FlammeEndpointWithoutRequest<ListResponse<Tenant>>
 {
     public override void Configure()
     {
         Get("/tenants");
-        RequirePermission(Elsa.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.View);
+        RequirePermission(Flamme.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extension methods to perform bulk upsert operations for entities

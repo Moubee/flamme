@@ -1,13 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Security;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Security;
 
 /// <summary>
 /// Contract tests for values that must never cross the broker boundary.  The marker values are deliberately

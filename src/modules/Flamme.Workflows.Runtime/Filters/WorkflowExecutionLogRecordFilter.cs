@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Filters;
+namespace Flamme.Workflows.Runtime.Filters;
 
 /// <summary>
 /// A specification to use when finding workflow execution log records. Only non-null fields will be included in the conditional expression.

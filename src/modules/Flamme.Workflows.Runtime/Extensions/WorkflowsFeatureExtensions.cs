@@ -2,12 +2,12 @@
 
 
 
-using Elsa.Workflows.Middleware.Activities;
+using Flamme.Workflows.Middleware.Activities;
 // ReSharper disable once CheckNamespace
-using Elsa.Workflows.Features;
+using Flamme.Workflows.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds an extension method to the <see cref="WorkflowsFeature"/> that installs a default workflow runtime execution pipeline.

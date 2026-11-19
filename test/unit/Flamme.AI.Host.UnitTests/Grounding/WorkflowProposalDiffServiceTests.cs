@@ -1,8 +1,8 @@
 using System.Text.Json.Nodes;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Host.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Grounding;
+namespace Flamme.AI.Host.UnitTests.Grounding;
 
 public class WorkflowProposalDiffServiceTests
 {

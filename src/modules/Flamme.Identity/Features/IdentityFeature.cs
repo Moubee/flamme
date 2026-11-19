@@ -1,22 +1,22 @@
 using AspNetCore.Authentication.ApiKey;
-using Elsa.Common.Features;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Multitenancy;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Options;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
+using Flamme.Common.Features;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Multitenancy;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Options;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.Identity.Features;
+namespace Flamme.Identity.Features;
 
 /// <summary>
 /// Provides identity feature to authenticate &amp; authorize API requests.
@@ -40,7 +40,7 @@ public class IdentityFeature : FeatureBase
     /// </summary>
     public Action<ApiKeyOptions> ApiKeyOptions { get; set; } = options =>
     {
-        options.Realm = "Elsa Workflows";
+        options.Realm = "Flamme Workflows";
         options.KeyName = "ApiKey";
     };
 
@@ -234,7 +234,7 @@ public class IdentityFeature : FeatureBase
             .AddScoped<IRoleDeletionCoordinator, RoleDeletionCoordinator>()
             .AddScoped<IUserDeletionCoordinator, UserDeletionCoordinator>()
             .AddScoped<ISecretHasher, DefaultSecretHasher>()
-            .AddScoped<IElsaTokenService, DefaultElsaTokenService>()
+            .AddScoped<IFlammeTokenService, DefaultFlammeTokenService>()
             .AddScoped<IAccessTokenIssuer>(sp => ActivatorUtilities.CreateInstance<DefaultAccessTokenIssuer>(sp))
             .AddScoped<IIdentityRefreshTokenService, DefaultIdentityRefreshTokenService>()
             .AddScoped<SessionRevoker>()

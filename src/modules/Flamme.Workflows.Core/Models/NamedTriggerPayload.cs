@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// A trigger payload that carries its own stimulus name.

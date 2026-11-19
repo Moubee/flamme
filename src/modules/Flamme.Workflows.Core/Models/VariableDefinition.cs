@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Stores information about a workflow variable.

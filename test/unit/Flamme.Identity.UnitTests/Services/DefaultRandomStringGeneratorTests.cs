@@ -1,7 +1,7 @@
-using Elsa.Identity.Services;
+using Flamme.Identity.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class DefaultRandomStringGeneratorTests
 {

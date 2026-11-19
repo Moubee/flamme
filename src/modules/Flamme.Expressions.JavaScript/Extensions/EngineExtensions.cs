@@ -1,11 +1,11 @@
-using Elsa.Expressions.JavaScript.Helpers;
-using Elsa.Expressions.JavaScript.Options;
+using Flamme.Expressions.JavaScript.Helpers;
+using Flamme.Expressions.JavaScript.Options;
 using Jint;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="Engine"/>.

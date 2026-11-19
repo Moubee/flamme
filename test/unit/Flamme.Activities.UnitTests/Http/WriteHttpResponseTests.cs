@@ -1,17 +1,17 @@
 using System.Net;
-using Elsa.Http;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.Options;
-using Elsa.Http.Parsers;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Exceptions;
+using Flamme.Http;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.Options;
+using Flamme.Http.Parsers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class WriteHttpResponseTests
 {

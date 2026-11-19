@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.List;
+namespace Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.List;
 
 [UsedImplicitly]
-internal class Endpoint(IBookmarkQueueDeadLetterStore store) : ElsaEndpoint<ListRequest, ListResponse>
+internal class Endpoint(IBookmarkQueueDeadLetterStore store) : FlammeEndpoint<ListRequest, ListResponse>
 {
     public override void Configure()
     {
         Verbs(FastEndpoints.Http.GET, FastEndpoints.Http.POST);
         Routes("/bookmark-queue/dead-letters");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(ListRequest request, CancellationToken cancellationToken)

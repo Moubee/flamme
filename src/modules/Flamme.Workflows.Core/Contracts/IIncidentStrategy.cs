@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A strategy for handling workflow incidents

@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
-using Elsa.Scheduling.Commands;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
+using Flamme.Scheduling.Commands;
 
-namespace Elsa.Scheduling.Handlers;
+namespace Flamme.Scheduling.Handlers;
 
 /// <summary>
 /// A command handler for <see cref="RunScheduledTask"/>.

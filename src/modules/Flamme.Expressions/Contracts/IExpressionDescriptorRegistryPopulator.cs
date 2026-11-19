@@ -1,4 +1,4 @@
-// namespace Elsa.Expressions.Contracts;
+// namespace Flamme.Expressions.Contracts;
 //
 // /// <summary>
 // /// Populates the expression descriptor registry.

@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Signals;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Signals;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Break out of a loop.

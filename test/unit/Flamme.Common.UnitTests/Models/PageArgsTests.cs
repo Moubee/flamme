@@ -1,7 +1,7 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Common.UnitTests.Models;
+namespace Flamme.Common.UnitTests.Models;
 
 public class PageArgsTests
 {

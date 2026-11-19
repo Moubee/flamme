@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.Extensions;
+namespace Flamme.Http.Extensions;
 
 /// <summary>
 /// Provides extension methods for the <see cref="HttpContext"/> class.

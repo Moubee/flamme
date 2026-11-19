@@ -1,10 +1,10 @@
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
 
 public sealed class EFCoreExternalAuthenticationSessionStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory, TimeProvider timeProvider) : IExternalAuthenticationSessionStore
 {

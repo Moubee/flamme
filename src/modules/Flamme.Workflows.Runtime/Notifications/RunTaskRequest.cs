@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// A domain event that applications can subscribe to in order to handle tasks requested by a workflow.

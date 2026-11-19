@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.Services;
+namespace Flamme.Secrets.Services;
 
 public class DefaultSecretValueProtector(IOptions<SecretsOptions> options) : ISecretValueProtector
 {
@@ -42,10 +42,10 @@ public class DefaultSecretValueProtector(IOptions<SecretsOptions> options) : ISe
     {
         var key = options.Value.EncryptionKey;
         if (key == null || key.Length == 0)
-            throw new InvalidOperationException("Elsa Secrets encryption key is not configured. Configure SecretsOptions.EncryptionKey before using the encrypted secrets store.");
+            throw new InvalidOperationException("Flamme Secrets encryption key is not configured. Configure SecretsOptions.EncryptionKey before using the encrypted secrets store.");
 
         if (key.Length is not (16 or 24 or 32))
-            throw new InvalidOperationException("Elsa Secrets encryption key must be exactly 16, 24, or 32 bytes.");
+            throw new InvalidOperationException("Flamme Secrets encryption key must be exactly 16, 24, or 32 bytes.");
 
         return key;
     }

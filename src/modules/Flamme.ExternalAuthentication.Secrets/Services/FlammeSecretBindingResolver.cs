@@ -1,22 +1,22 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
 
-namespace Elsa.ExternalAuthentication.Secrets.Services;
+namespace Flamme.ExternalAuthentication.Secrets.Services;
 
 /// <summary>
-/// Resolves External Authentication secret references through Elsa Secrets
+/// Resolves External Authentication secret references through Flamme Secrets
 /// without exposing secret values or generation metadata to management models.
 /// </summary>
-public sealed class ElsaSecretBindingResolver(
+public sealed class FlammeSecretBindingResolver(
     ISecretManager secretManager,
     IExternalAuthenticationHandleHasher handleHasher) : ISecretBindingResolver, IManagedSecretBindingWriter
 {
     public const string ResolverType = "elsa-secrets";
     public string Type => ResolverType;
     string IManagedSecretBindingWriter.ResolverType => ResolverType;
-    string IManagedSecretBindingWriter.DisplayName => "Elsa Secrets";
+    string IManagedSecretBindingWriter.DisplayName => "Flamme Secrets";
 
     public async ValueTask<SecretBinding> StageAsync(ManagedSecretBindingWriteRequest request, CancellationToken cancellationToken = default)
     {

@@ -1,18 +1,18 @@
 using System.Dynamic;
 using System.Text.RegularExpressions;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Extensions;
-using Elsa.Expressions.JavaScript.Helpers;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Extensions;
+using Flamme.Expressions.JavaScript.Helpers;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
 using JetBrains.Annotations;
 using Jint.Native;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.JavaScript.Handlers;
+namespace Flamme.Expressions.JavaScript.Handlers;
 
 /// <summary>
 /// A handler that configures the Jint engine with workflow variables.

@@ -1,8 +1,8 @@
 
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Abstractions.UnitTests;
+namespace Flamme.AI.Abstractions.UnitTests;
 
 public class AIToolDefinitionTests
 {

@@ -1,13 +1,13 @@
-using Elsa.Common;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
+using Flamme.Common;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.HostedServices;
+namespace Flamme.UserTasks.HostedServices;
 
 /// <summary>
 /// Shared plumbing for the User Tasks background workers: a periodic loop that never lets one failed pass

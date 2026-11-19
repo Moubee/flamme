@@ -1,4 +1,4 @@
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
 using System;

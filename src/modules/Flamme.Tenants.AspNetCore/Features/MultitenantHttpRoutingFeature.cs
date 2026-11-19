@@ -1,14 +1,14 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Http.Features;
-using Elsa.Tenants.AspNetCore.Options;
-using Elsa.Tenants.AspNetCore.Services;
-using Elsa.Tenants.Features;
+using Flamme.Common.Multitenancy;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Http.Features;
+using Flamme.Tenants.AspNetCore.Options;
+using Flamme.Tenants.AspNetCore.Services;
+using Flamme.Tenants.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants.AspNetCore.Features;
+namespace Flamme.Tenants.AspNetCore.Features;
 
 [DependencyOf(typeof(HttpFeature))]
 [DependencyOf(typeof(TenantsFeature))]

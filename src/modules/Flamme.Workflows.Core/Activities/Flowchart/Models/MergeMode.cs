@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Activities.Flowchart.Models;
+namespace Flamme.Workflows.Activities.Flowchart.Models;
 
 /// <summary>
 /// Specifies the strategy for handling multiple inbound execution paths in a workflow.

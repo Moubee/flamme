@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Applications.Create;
+namespace Flamme.Identity.Endpoints.Applications.Create;
 
 internal class Request
 {

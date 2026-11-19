@@ -3,18 +3,18 @@ using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
-using Elsa.Common;
-using Elsa.Common.Services;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Features;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
-using Elsa.UnitTests.Shared;
+using Flamme.Common;
+using Flamme.Common.Services;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Features;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
+using Flamme.UnitTests.Shared;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
@@ -22,7 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.UnitTests.Endpoints;
+namespace Flamme.Identity.UnitTests.Endpoints;
 
 /// <summary>
 /// Signs in, refreshes and signs out through the real endpoints, authentication schemes, token services and the
@@ -60,7 +60,7 @@ public sealed class LogoutEndpointTests
             .AddFastEndpoints(options =>
             {
                 options.Assemblies = [typeof(IdentityFeature).Assembly];
-                options.Filter = x => x.Namespace is "Elsa.Identity.Endpoints.Login" or "Elsa.Identity.Endpoints.RefreshToken" or "Elsa.Identity.Endpoints.Logout";
+                options.Filter = x => x.Namespace is "Flamme.Identity.Endpoints.Login" or "Flamme.Identity.Endpoints.RefreshToken" or "Flamme.Identity.Endpoints.Logout";
             });
 
         _app = builder.Build();

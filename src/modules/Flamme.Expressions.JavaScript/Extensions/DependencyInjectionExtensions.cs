@@ -1,7 +1,7 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.JavaScript.Extensions;
+namespace Flamme.Expressions.JavaScript.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="IServiceCollection"/>.

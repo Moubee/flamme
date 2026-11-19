@@ -1,11 +1,11 @@
-using Elsa.Alterations.Core.Contexts;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Alterations.Core.Contexts;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
 
-namespace Elsa.Alterations.Middleware.Workflows;
+namespace Flamme.Alterations.Middleware.Workflows;
 
 /// <summary>
 /// Middleware that runs alterations.

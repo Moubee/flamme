@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Enums;
+namespace Flamme.Alterations.Core.Enums;
 
 /// <summary>
 /// The status of an alteration plan.

@@ -1,8 +1,8 @@
-using Elsa.Activities.IntegrationTests.Composition.Activities;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Activities.IntegrationTests.Composition.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Composition.Workflows;
+namespace Flamme.Activities.IntegrationTests.Composition.Workflows;
 
 /// <summary>
 /// Workflow demonstrating that Complete terminates composite execution immediately.

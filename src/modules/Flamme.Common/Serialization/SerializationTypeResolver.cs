@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text.Json;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 /// <summary>
 /// Resolves serialization type aliases without loading arbitrary CLR type names.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
 
 public class Spy
 {

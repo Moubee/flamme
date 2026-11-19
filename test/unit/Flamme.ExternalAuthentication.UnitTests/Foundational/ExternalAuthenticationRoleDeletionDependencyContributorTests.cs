@@ -1,29 +1,29 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Authorization;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Authorization;
+using Flamme.Testing.Shared.Multitenancy;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Mediator.Contracts;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ExternalAuthenticationRoleDeletionDependencyContributorTests
 {

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Holds information about an activity incident.

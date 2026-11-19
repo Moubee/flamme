@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Expressions.JavaScript.Notifications;
+namespace Flamme.Expressions.JavaScript.Notifications;
 
 /// <summary>
 /// This notification is published when a JavaScript engine is being created.

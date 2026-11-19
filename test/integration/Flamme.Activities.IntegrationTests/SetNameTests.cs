@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Activities.IntegrationTests;
+namespace Flamme.Activities.IntegrationTests;
 
 public class SetNameTests : IAsyncDisposable
 {

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 public class ScheduleNewWorkflowInstanceRequest
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkPublish;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkPublish;
 
 internal class Request
 {

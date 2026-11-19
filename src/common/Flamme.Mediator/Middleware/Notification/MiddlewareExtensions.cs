@@ -1,7 +1,7 @@
-using Elsa.Mediator.Middleware.Notification.Contracts;
+using Flamme.Mediator.Middleware.Notification.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.Middleware.Notification;
+namespace Flamme.Mediator.Middleware.Notification;
 
 /// <summary>
 /// Contains extension methods for <see cref="INotificationPipelineBuilder"/>.

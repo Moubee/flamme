@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 public static class WorkflowDefinitionHandleExtensions
 {

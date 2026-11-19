@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ActivityDescriptorOptions.Requests;
+namespace Flamme.Api.Client.Resources.ActivityDescriptorOptions.Requests;
 
 /// <summary>
 /// Represents a request to Get Activity Descriptor Options.

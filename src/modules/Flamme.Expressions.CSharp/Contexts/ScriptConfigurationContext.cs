@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace Elsa.Expressions.CSharp.Contexts;
+namespace Flamme.Expressions.CSharp.Contexts;
 
 /// <summary>
 /// Context for configuring the <see cref="ScriptOptions"/>.

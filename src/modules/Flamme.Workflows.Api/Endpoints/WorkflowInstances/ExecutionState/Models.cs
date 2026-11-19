@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.ExecutionState;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.ExecutionState;
 
 /// <summary>
 /// The request to check the execution state of the workflow instance.

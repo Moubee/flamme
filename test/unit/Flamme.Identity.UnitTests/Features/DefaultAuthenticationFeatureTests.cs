@@ -1,9 +1,9 @@
-using Elsa.Features.Services;
-using Elsa.Identity.Features;
+using Flamme.Features.Services;
+using Flamme.Identity.Features;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Features;
+namespace Flamme.Identity.UnitTests.Features;
 
 /// <summary>
 /// These tests previously asserted the shape of the SecurityRoot policy. That policy has been retired in

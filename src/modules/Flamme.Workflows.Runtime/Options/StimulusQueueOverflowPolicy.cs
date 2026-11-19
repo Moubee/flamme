@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Controls how the durable stimulus queue behaves when its configured maximum depth is exceeded while the runtime is paused.

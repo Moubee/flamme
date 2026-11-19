@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Common;
+using Flamme.Common;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A base class for <see cref="ISerializationOptionsConfigurator"/> implementations.

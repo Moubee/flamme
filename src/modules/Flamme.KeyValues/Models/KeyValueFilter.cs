@@ -1,6 +1,6 @@
-using Elsa.KeyValues.Entities;
+using Flamme.KeyValues.Entities;
 
-namespace Elsa.KeyValues.Models;
+namespace Flamme.KeyValues.Models;
 
 public class KeyValueFilter
 {

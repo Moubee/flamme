@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Elsa.WorkflowServer.Web": {
+    "Flamme.WorkflowServer.Web": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

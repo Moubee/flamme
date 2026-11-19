@@ -1,8 +1,8 @@
 using System.Diagnostics;
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Middleware.Activities;
+namespace Flamme.Workflows.Middleware.Activities;
 
 /// <summary>
 /// An activity execution middleware component that logs information about the activity being executed.

@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class BookmarksPersister(IBookmarkUpdater bookmarkUpdater, INotificationSender notificationSender) : IBookmarksPersister

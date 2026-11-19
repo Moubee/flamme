@@ -1,4 +1,4 @@
-namespace Elsa.Resilience.Options;
+namespace Flamme.Resilience.Options;
 
 public class SimulateResponseOptions
 {

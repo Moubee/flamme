@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
 
 /// <summary>
 /// A container that schedules a child the ordinary way — by activity, so the child has no execution context yet — and

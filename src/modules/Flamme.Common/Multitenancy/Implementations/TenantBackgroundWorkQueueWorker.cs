@@ -1,7 +1,7 @@
-using Elsa.Common.Helpers;
+using Flamme.Common.Helpers;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class TenantBackgroundWorkQueueWorker(
     ITenantBackgroundWorkQueue workQueue,

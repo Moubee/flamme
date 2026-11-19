@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
+namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 
 /// <summary>
 /// Returns the root activity for a given <see cref="WorkflowDefinitionActivity"/>.

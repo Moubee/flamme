@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// Published when the bookmarks of a workflow instance have been persisted.

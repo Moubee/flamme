@@ -1,7 +1,7 @@
 using System.Collections;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides extension methods for the ActivityExecutionContext class.

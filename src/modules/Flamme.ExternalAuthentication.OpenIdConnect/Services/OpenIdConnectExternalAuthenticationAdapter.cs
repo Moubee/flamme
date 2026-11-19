@@ -1,20 +1,20 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Validation;
-using Elsa.ExternalAuthentication.OpenIdConnect.Models;
-using Elsa.ExternalAuthentication.OpenIdConnect.Validation;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.OpenIdConnect.Models;
+using Flamme.ExternalAuthentication.OpenIdConnect.Validation;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Options;
 
-namespace Elsa.ExternalAuthentication.OpenIdConnect.Services;
+namespace Flamme.ExternalAuthentication.OpenIdConnect.Services;
 
-/// <summary>Implements hardened OpenID Connect authorization-code authentication for the protocol-neutral Elsa broker.</summary>
+/// <summary>Implements hardened OpenID Connect authorization-code authentication for the protocol-neutral Flamme broker.</summary>
 public sealed class OpenIdConnectExternalAuthenticationAdapter(IProviderHttpClient providerHttpClient, OpenIdConnectSettingsParser settingsParser, IOptions<ExternalAuthenticationOptions> options) : IExternalAuthenticationAdapter
 {
     public const string AdapterType = "openid-connect";
@@ -29,7 +29,7 @@ public sealed class OpenIdConnectExternalAuthenticationAdapter(IProviderHttpClie
             new("discoveryUrl", "Discovery URL", "Exact OpenID Connect discovery document URL.", "uri", true, "uri", null, [], new(1, 2048), false, false, new("mode", "discovery"), null, false),
             new("clientId", "Client ID", "Provider client registration identifier.", "string", true, "text", null, [], new(1, 512), false, false, null, null, false),
             new("clientSecret", "Client secret", "Required Secret Binding for the confidential upstream client.", "secret", true, "secret", null, [], new(), true, false, null, null, true),
-            new("clientAuthenticationMethod", "Client authentication", "How Elsa authenticates its confidential client to the provider token endpoint.", "string", true, "select", null, ["client_secret_basic", "client_secret_post"], new(), false, false, null, null, false),
+            new("clientAuthenticationMethod", "Client authentication", "How Flamme authenticates its confidential client to the provider token endpoint.", "string", true, "select", null, ["client_secret_basic", "client_secret_post"], new(), false, false, null, null, false),
             new("mode", "Trust mode", "Discovery is the default. Manual trust requires explicit endpoints and signing keys.", "string", true, "select", null, ["discovery", "manual"], new(), false, false, null, null, false),
             new("scopes", "Scopes", "OpenID Connect scopes requested from the provider. The openid scope is always included.", "string-array", false, "tags", null, [], new(), false, false, null, null, false),
             new("issuer", "Issuer", "Expected issuer for manually configured provider trust.", "uri", true, "uri", null, [], new(), false, false, new("mode", "manual"), null, false),

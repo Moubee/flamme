@@ -1,4 +1,4 @@
-namespace Elsa.AI.Copilot.Options;
+namespace Flamme.AI.Copilot.Options;
 
 public class CopilotOptions
 {

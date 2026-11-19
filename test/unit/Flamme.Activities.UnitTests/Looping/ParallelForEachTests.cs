@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Looping;
+namespace Flamme.Activities.UnitTests.Looping;
 
 public class ParallelForEachTests
 {

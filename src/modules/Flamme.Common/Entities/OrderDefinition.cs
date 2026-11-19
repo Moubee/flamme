@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Common.Entities;
+namespace Flamme.Common.Entities;
 
 /// <summary>
 /// Represents the order by which to order the results of a query.

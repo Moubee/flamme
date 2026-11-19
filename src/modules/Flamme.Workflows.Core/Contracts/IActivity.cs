@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Represents an activity, which is an atomic unit of operation within a workflow.

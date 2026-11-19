@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides registered output converter descriptors and registrations.

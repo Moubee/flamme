@@ -1,8 +1,8 @@
-using Elsa.Workflows.Exceptions;
+using Flamme.Workflows.Exceptions;
 using JetBrains.Annotations;
 using Npgsql;
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Handlers;
+namespace Flamme.Persistence.EFCore.PostgreSql.Handlers;
 
 /// <summary>
 /// Transforms database exceptions encountered when using a postgreSQL database into more generic exceptions.

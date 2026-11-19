@@ -1,9 +1,9 @@
 using System.Net;
-using Elsa.Resilience.Options;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.AspNetCore;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public class SimulateResponseEndpointTests : WebApplicationTest<ResilienceWebApplicationFactory, ResilienceTestEntryPoint>
 {

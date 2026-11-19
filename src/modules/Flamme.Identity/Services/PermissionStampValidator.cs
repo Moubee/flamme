@@ -1,13 +1,13 @@
 using System.Security.Claims;
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>Rejects a token whose permission stamp no longer matches the user's current grants.</summary>
 [UsedImplicitly]

@@ -1,6 +1,6 @@
-using Elsa.Mediator.Middleware.Notification.Contracts;
+using Flamme.Mediator.Middleware.Notification.Contracts;
 
-namespace Elsa.Mediator.Middleware.Notification;
+namespace Flamme.Mediator.Middleware.Notification;
 
 /// <inheritdoc />
 public class NotificationPipeline : INotificationPipeline

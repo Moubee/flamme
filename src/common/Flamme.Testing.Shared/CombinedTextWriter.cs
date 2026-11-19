@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Forwards text to the specified list of writers.

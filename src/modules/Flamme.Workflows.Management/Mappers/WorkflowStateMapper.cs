@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.State;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Management.Mappers;
+namespace Flamme.Workflows.Management.Mappers;
 
 /// <summary>
 /// Maps a workflow state to a workflow instance.

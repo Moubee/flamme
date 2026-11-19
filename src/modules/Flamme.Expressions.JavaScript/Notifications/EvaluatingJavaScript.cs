@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
 using Jint;
 
-namespace Elsa.Expressions.JavaScript.Notifications;
+namespace Flamme.Expressions.JavaScript.Notifications;
 
 /// <summary>
 /// This notification is published every time a JavaScript expression is about to be evaluated.

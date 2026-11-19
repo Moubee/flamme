@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Notification.Contracts;
+namespace Flamme.Mediator.Middleware.Notification.Contracts;
 
 /// <summary>
 /// Represents a notification middleware component.

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class AIToolEnablementConfigurationHostedService(
     AIToolEnablementService enablementService,

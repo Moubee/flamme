@@ -1,9 +1,9 @@
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Identity.Contracts;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Identity.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Secrets.Hash;
+namespace Flamme.Identity.Endpoints.Secrets.Hash;
 
 /// <summary>
 /// Hash a user password, returning the encoded hash and salt the user store would otherwise have written.
@@ -22,13 +22,13 @@ namespace Elsa.Identity.Endpoints.Secrets.Hash;
 /// sufficient to create an application end to end. See ADR 0010.
 /// </remarks>
 [PublicAPI]
-internal class Hash(ISecretHasher secretHasher) : ElsaEndpoint<Request, Response>
+internal class Hash(ISecretHasher secretHasher) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Post("/identity/secrets/hash");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Create);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Create);
     }
 
     /// <inheritdoc />

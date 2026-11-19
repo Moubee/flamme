@@ -1,13 +1,13 @@
 using System.Net;
-using Elsa.Activities.IntegrationTests.Http.Helpers;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Activities.IntegrationTests.Http.Helpers;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Activities.IntegrationTests.Http;
+namespace Flamme.Activities.IntegrationTests.Http;
 
 public class DownloadHttpFileTests
 {
@@ -191,7 +191,7 @@ public class DownloadHttpFileTests
 
     private WorkflowTestFixture CreateFixture(HttpMessageHandler handler) =>
         new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseHttp(http =>
+            .ConfigureFlamme(elsa => elsa.UseHttp(http =>
             {
                 http.HttpClientBuilder = builder => builder.ConfigurePrimaryHttpMessageHandler(() => handler);
             }));

@@ -1,12 +1,12 @@
-using Elsa.Abstractions;
-using Elsa.ExternalAuthentication.Constants;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.ExternalAuthentication.Constants;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Builder;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Broker;
+namespace Flamme.ExternalAuthentication.Endpoints.Broker;
 
-internal sealed class ExchangeToken(IExternalAuthenticationBroker broker) : ElsaEndpoint<ExchangeTokenRequest>
+internal sealed class ExchangeToken(IExternalAuthenticationBroker broker) : FlammeEndpoint<ExchangeTokenRequest>
 {
     public override void Configure()
     {

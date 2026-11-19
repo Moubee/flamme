@@ -1,13 +1,13 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
 using Jint;
 using Jint.Native;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// Verifies which .NET types are exposed to JavaScript and under which names.

@@ -1,6 +1,6 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Evaluation;
+namespace Flamme.Workflows.IntegrationTests.Evaluation;
 
 /// <summary>
 /// Owns the activity fixtures created for a single test instance.

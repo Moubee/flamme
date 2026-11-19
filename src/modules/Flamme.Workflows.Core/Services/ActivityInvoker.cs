@@ -1,8 +1,8 @@
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Telemetry;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Telemetry;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class ActivityInvoker(

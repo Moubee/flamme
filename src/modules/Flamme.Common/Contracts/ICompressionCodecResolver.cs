@@ -1,4 +1,4 @@
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Resolves a <see cref="ICompressionCodec"/> from its name.

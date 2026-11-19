@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.Contracts;
+namespace Flamme.Expressions.Contracts;
 
 /// <summary>
 /// Evaluates an expression.

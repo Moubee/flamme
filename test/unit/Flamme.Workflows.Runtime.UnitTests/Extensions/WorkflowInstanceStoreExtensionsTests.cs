@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Extensions;
+namespace Flamme.Workflows.Runtime.UnitTests.Extensions;
 
 public class WorkflowInstanceStoreExtensionsTests
 {
@@ -26,7 +26,7 @@ public class WorkflowInstanceStoreExtensionsTests
             CreateSummary("workflow-4")
         };
         Mock.Get(store).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    .Returns((global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Flamme.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
                     {
                         var pageArgs = __arg1;
                         requestedPages.Add(pageArgs with { });

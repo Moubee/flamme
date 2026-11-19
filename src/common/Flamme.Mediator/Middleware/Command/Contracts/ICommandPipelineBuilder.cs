@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Command.Contracts;
+namespace Flamme.Mediator.Middleware.Command.Contracts;
 
 /// <summary>
 /// Represents a command pipeline builder.

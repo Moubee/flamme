@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Requests;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class DefaultWorkflowRestarter(IWorkflowDispatcher workflowDispatcher, ILogger<DefaultWorkflowRestarter> logger) : IWorkflowRestarter

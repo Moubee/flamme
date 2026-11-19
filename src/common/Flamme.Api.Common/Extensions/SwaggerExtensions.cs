@@ -1,8 +1,8 @@
-﻿using Elsa.Features.Services;
+﻿using Flamme.Features.Services;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
 
-namespace Elsa.Extensions
+namespace Flamme.Extensions
 {
     /// <summary>
     /// Extensions to enable the generation of Swagger API Documentation and associated Swagger UI.
@@ -23,7 +23,7 @@ namespace Elsa.Extensions
                 o.DocumentSettings = s =>
                 {
                     s.DocumentName = $"v{ver.Major}";
-                    s.Title = "Elsa API";
+                    s.Title = "Flamme API";
                     s.Version = $"v{ver.Major}.{ver.Minor}";
                     s.AddAuth("ApiKey", new()
                     {

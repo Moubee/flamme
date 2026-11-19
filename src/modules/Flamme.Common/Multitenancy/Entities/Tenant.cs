@@ -1,8 +1,8 @@
-﻿using Elsa.Common.Entities;
+﻿using Flamme.Common.Entities;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Represents a tenant.

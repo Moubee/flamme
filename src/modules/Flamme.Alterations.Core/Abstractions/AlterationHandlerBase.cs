@@ -1,7 +1,7 @@
-﻿using Elsa.Alterations.Core.Contexts;
-using Elsa.Alterations.Core.Contracts;
+﻿using Flamme.Alterations.Core.Contexts;
+using Flamme.Alterations.Core.Contracts;
 
-namespace Elsa.Alterations.Core.Abstractions;
+namespace Flamme.Alterations.Core.Abstractions;
 
 /// <summary>
 /// A base class for alterations.

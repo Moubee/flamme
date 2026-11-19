@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
 /// <summary>
 /// Represents a handle to a workflow definition.

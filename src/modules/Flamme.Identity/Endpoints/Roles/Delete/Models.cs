@@ -1,6 +1,6 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Endpoints.Roles.Delete;
+namespace Flamme.Identity.Endpoints.Roles.Delete;
 
 internal sealed class RemediateRoleDeletionRequest
 {

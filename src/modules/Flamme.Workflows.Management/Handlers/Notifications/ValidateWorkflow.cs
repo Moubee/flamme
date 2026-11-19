@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Handlers.Notifications;
+namespace Flamme.Workflows.Management.Handlers.Notifications;
 
 public class ValidateWorkflow : INotificationHandler<WorkflowDefinitionValidating>
 {

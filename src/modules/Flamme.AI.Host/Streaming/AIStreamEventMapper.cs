@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 using System.Text.Json.Nodes;
 
-namespace Elsa.AI.Host.Streaming;
+namespace Flamme.AI.Host.Streaming;
 
 public class AIStreamEventMapper
 {

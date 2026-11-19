@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ExternalAuthenticationConfigurationExtensions
 {

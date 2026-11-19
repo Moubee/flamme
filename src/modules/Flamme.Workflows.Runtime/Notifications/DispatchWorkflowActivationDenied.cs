@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// Signals that a queued child-workflow dispatch was accepted but activation was denied.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Messages;
+namespace Flamme.Workflows.Runtime.Messages;
 
 /// <summary>
 /// A request to create and run a new workflow instance.

@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
+using Flamme.Extensions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 [PublicAPI]

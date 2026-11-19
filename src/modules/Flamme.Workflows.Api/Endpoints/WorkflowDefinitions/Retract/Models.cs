@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Retract;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Retract;
 
 public class Request
 {

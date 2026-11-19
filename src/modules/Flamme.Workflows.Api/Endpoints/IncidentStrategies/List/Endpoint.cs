@@ -1,18 +1,18 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Workflows;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Workflows;
 using Humanizer;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Api.Endpoints.IncidentStrategies.List;
+namespace Flamme.Workflows.Api.Endpoints.IncidentStrategies.List;
 
 /// <summary>
 /// Returns list of available <see cref="IIncidentStrategy" /> implementations.
 /// </summary>
-internal class List(IEnumerable<IIncidentStrategy> strategies, ISerializationTypeRegistry workflowJsonTypeRegistry) : ElsaEndpointWithoutRequest<ListResponse<IncidentStrategyDescriptor>>
+internal class List(IEnumerable<IIncidentStrategy> strategies, ISerializationTypeRegistry workflowJsonTypeRegistry) : FlammeEndpointWithoutRequest<ListResponse<IncidentStrategyDescriptor>>
 {
     public override void Configure()
     {

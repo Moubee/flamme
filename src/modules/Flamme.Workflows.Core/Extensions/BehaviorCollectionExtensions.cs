@@ -1,7 +1,7 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class BehaviorCollectionExtensions
 {

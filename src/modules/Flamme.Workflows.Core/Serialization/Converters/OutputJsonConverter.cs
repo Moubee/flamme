@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Serializes <see cref="Input"/> objects.

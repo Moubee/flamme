@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 public record WorkflowIdentity(string DefinitionId, int Version, string Id, string? TenantId = null)
 {

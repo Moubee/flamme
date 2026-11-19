@@ -1,16 +1,16 @@
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.PublishingStrategies;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.PublishingStrategies;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// Verifies the pause/resume idempotency invariants and the SC-007 audit-entry-count rule against the real DI graph.
-/// The HTTP layer is exercised separately by component tests (Elsa.Workflows.ComponentTests); these tests focus on the
+/// The HTTP layer is exercised separately by component tests (Flamme.Workflows.ComponentTests); these tests focus on the
 /// audit-publishing logic that lives inside the endpoint handlers.
 /// </summary>
 public class AdminPauseResumeIntegrationTests : IAsyncDisposable
@@ -22,7 +22,7 @@ public class AdminPauseResumeIntegrationTests : IAsyncDisposable
     {
         _recorder = new RecordingNotificationSender();
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
             .ConfigureServices(s => s.AddSingleton<INotificationSender>(_recorder))
             .Build();
     }

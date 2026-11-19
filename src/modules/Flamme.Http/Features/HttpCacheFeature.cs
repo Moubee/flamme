@@ -1,12 +1,12 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Http.Handlers;
-using Elsa.Http.Services;
-using Elsa.Workflows.Management.Features;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Http.Handlers;
+using Flamme.Http.Services;
+using Flamme.Workflows.Management.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Http.Features;
+namespace Flamme.Http.Features;
 
 /// <summary>
 /// Installs services related to HTTP caching.

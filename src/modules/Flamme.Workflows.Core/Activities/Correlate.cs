@@ -1,12 +1,12 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Set the CorrelationId of the workflow to a given value.

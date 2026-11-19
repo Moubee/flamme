@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.PortResolvers;
+namespace Flamme.Workflows.PortResolvers;
 
 /// <summary>
 /// Returns a list of outbound activities for a given <see cref="Switch"/> activity's branches.

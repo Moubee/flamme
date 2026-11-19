@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Represents a store of <see cref="WorkflowDefinition"/>s.

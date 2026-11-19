@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A delegate that executes an activity.

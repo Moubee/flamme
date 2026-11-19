@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Serialization;
+namespace Flamme.Api.Client.Serialization;
 
 /// <summary>
 /// Provides options for serializing and deserializing objects.

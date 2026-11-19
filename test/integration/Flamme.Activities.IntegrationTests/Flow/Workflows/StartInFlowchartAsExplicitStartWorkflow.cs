@@ -1,9 +1,9 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Activities.IntegrationTests.Flow.Workflows;
+namespace Flamme.Activities.IntegrationTests.Flow.Workflows;
 
 /// <summary>
 /// Workflow demonstrating that an explicit Start activity in a flowchart is used as the starting point.

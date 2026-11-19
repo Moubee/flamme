@@ -1,4 +1,4 @@
-namespace Elsa.Hosting.Management.Contracts;
+namespace Flamme.Hosting.Management.Contracts;
 
 /// <summary>
 /// Provides a name of the current application instance.

@@ -1,16 +1,16 @@
 using System.Text.Json;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Resilience.Entities;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Models;
-using Elsa.Resilience.Serialization;
-using Elsa.Workflows;
-using Elsa.Workflows.State;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Resilience.Entities;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Models;
+using Flamme.Resilience.Serialization;
+using Flamme.Workflows;
+using Flamme.Workflows.State;
 using Polly;
 using Polly.Telemetry;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public class ResilientActivityInvoker(
     IResilienceStrategyConfigEvaluator resilienceStrategyConfigEvaluator,

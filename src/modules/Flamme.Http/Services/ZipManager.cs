@@ -1,12 +1,12 @@
 using System.Buffers;
 using System.IO.Compression;
-using Elsa.Common;
-using Elsa.Http.Options;
+using Flamme.Common;
+using Flamme.Http.Options;
 using FluentStorage.Blobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <summary>
 /// Provides a helper service for zipping downloadable content.

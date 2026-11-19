@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowReferenceGraph;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowReferenceGraph;
 
 /// <summary>
 /// Tests for the Consumers endpoint and Export endpoint with consumer inclusion.

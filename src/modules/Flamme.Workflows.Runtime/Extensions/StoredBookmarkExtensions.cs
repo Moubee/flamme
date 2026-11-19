@@ -1,9 +1,9 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime.Entities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="StoredBookmark"/>.

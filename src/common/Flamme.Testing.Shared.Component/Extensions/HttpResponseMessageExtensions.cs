@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Api.Client;
+using Flamme.Api.Client;
 
-namespace Elsa.Testing.Shared.Extensions;
+namespace Flamme.Testing.Shared.Extensions;
 
 public static class HttpResponseMessageExtensions
 {

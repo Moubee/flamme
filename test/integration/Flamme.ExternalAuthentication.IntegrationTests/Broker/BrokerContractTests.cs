@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Broker;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Broker;
 
 /// <summary>Contract-level assertions for the anonymous OAuth-shaped broker surface.</summary>
 public class BrokerContractTests
@@ -81,8 +81,8 @@ public class BrokerDiscoveryEndpointContractTests : WebApplicationTest<BrokerDis
 
     public BrokerDiscoveryEndpointContractTests()
     {
-        _authentication.SetClaims(new Claim(Elsa.Identity.Constants.CustomClaimTypes.ExternalAuthenticationSessionId, "session-a"));
-        Mock.Get(_broker).DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IReadOnlyCollection<LoginMethod>>([new("local", "local", LoginMethodKind.Local, "Elsa account", "elsa", 0, false, new Uri("/external-authentication/local/authorize", UriKind.Relative))]));
+        _authentication.SetClaims(new Claim(Flamme.Identity.Constants.CustomClaimTypes.ExternalAuthenticationSessionId, "session-a"));
+        Mock.Get(_broker).DiscoverAsync("tenant-a", "studio", Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IReadOnlyCollection<LoginMethod>>([new("local", "local", LoginMethodKind.Local, "Flamme account", "elsa", 0, false, new Uri("/external-authentication/local/authorize", UriKind.Relative))]));
         Mock.Get(_tenant).TenantId.Returns("tenant-a");
     }
 

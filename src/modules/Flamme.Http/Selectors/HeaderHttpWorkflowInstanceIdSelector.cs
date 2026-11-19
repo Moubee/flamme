@@ -1,7 +1,7 @@
-using Elsa.Http.Abstractions;
+using Flamme.Http.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.Selectors;
+namespace Flamme.Http.Selectors;
 
 /// <summary>
 /// Returns the workflow instance ID from the <c>X-Workflow-Instance-ID</c> header, if any.

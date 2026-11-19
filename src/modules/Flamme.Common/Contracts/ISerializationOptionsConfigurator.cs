@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Configures <see cref="JsonSerializerOptions"/> objects.

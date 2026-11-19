@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Options;
+namespace Flamme.ExternalAuthentication.Options;
 
 /// <summary>
 /// Identifies a deployment-installed External Authentication extension without
@@ -15,10 +15,10 @@ public enum ExternalAuthenticationExtensionKind
     Adapter,
     /// <summary>An unlinked external identity admission policy.</summary>
     UnlinkedIdentityPolicy,
-    /// <summary>An Elsa permission grant source.</summary>
+    /// <summary>An Flamme permission grant source.</summary>
     PermissionGrantSource
     ,
-    /// <summary>A trusted deployed external-to-Elsa user matcher.</summary>
+    /// <summary>A trusted deployed external-to-Flamme user matcher.</summary>
     ExternalUserMatcher
 }
 

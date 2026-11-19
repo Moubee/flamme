@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Management.Notifications;
+namespace Flamme.Workflows.Management.Notifications;
 
 /// <summary>
 /// A notification that is sent when workflow instances are about to be deleted.

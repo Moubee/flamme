@@ -1,12 +1,12 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Endpoints.AI.Capabilities;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Endpoints.AI.Capabilities;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AICapabilitiesEndpointTests
 {

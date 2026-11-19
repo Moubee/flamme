@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Captures lines of text.

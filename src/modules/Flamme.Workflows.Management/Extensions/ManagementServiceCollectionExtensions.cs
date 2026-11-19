@@ -1,16 +1,16 @@
 using System.Reflection;
-using Elsa.Expressions.Extensions;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Options;
+using Flamme.Expressions.Extensions;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Workflows.Management.Extensions;
+namespace Flamme.Workflows.Management.Extensions;
 
 /// <summary>
-/// <see cref="IServiceCollection"/> extension methods for registering Elsa activity types
+/// <see cref="IServiceCollection"/> extension methods for registering Flamme activity types
 /// and variable descriptors via <see cref="ManagementOptions"/>.
 /// </summary>
 /// <remarks>

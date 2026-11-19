@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.IntegrationTests.Scenarios.Incidents.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.IntegrationTests.Scenarios.Incidents.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.Incidents;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.Incidents;
 
 public class IncidentStrategyTests
 {

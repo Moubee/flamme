@@ -1,7 +1,7 @@
 ﻿using Fluid;
 using Fluid.Values;
 
-namespace Elsa.Expressions.Liquid.Contracts;
+namespace Flamme.Expressions.Liquid.Contracts;
 
 /// <summary>
 /// Represents a Liquid filter.

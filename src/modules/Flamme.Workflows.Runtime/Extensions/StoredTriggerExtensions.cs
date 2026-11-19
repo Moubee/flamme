@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="StoredTrigger"/>.

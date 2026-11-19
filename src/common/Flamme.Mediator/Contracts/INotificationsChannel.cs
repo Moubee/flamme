@@ -1,7 +1,7 @@
 using System.Threading.Channels;
-using Elsa.Mediator.Middleware.Notification;
+using Flamme.Mediator.Middleware.Notification;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// A channel that can be used to enqueue notifications.

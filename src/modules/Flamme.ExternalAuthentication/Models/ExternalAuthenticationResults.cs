@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Models;
+namespace Flamme.ExternalAuthentication.Models;
 
 public sealed record ConnectionValidationResult(bool IsValid, IReadOnlyCollection<ConnectionValidationError> Errors, IReadOnlyCollection<string> Warnings);
 public sealed record ConnectionValidationError(string Field, string Code, string Message);

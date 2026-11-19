@@ -1,32 +1,32 @@
 using System.Text.Encodings.Web;
 using System.Threading.RateLimiting;
-using Elsa.Caching.Options;
-using Elsa.Common.RecurringTasks;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Http.Options;
-using Elsa.Identity.Multitenancy;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Server.Web.Activities;
-using Elsa.Server.Web.ActivityHosts;
-using Elsa.Server.Web.Filters;
-using Elsa.ServiceDefaults;
-using Elsa.Tenants;
-using Elsa.Tenants.AspNetCore;
-using Elsa.Tenants.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Api;
-using Elsa.Workflows.CommitStates.Strategies;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Distributed.Extensions;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Tasks;
+using Flamme.Caching.Options;
+using Flamme.Common.RecurringTasks;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Http.Options;
+using Flamme.Identity.Multitenancy;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Persistence.EFCore.Modules.Runtime;
+using Flamme.Server.Web.Activities;
+using Flamme.Server.Web.ActivityHosts;
+using Flamme.Server.Web.Filters;
+using Flamme.ServiceDefaults;
+using Flamme.Tenants;
+using Flamme.Tenants.AspNetCore;
+using Flamme.Tenants.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Api;
+using Flamme.Workflows.CommitStates.Strategies;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.Distributed.Extensions;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -37,7 +37,7 @@ const bool useReadOnlyMode = false;
 const bool useSignalR = false; // Disabled until Elsa Studio sends authenticated requests.
 const bool useMultitenancy = true;
 const bool disableVariableWrappers = false;
-const string elsaApiRateLimitingPolicy = "elsa-api";
+const string flammeApiRateLimitingPolicy = "elsa-api";
 const string httpWorkflowRateLimitingPolicy = "elsa-http-workflows";
 
 ObjectConverter.StrictMode = true;
@@ -56,7 +56,7 @@ var allowLocalDistributedRuntimeLockProvider =
     configuredAllowLocalDistributedRuntimeLockProvider ?? builder.Environment.IsDevelopment();
 
 services
-    .AddElsa(elsa =>
+    .AddFlamme(elsa =>
     {
         elsa
             .AddActivitiesFrom<Program>()
@@ -172,7 +172,7 @@ if (useIngressRateLimiting)
     services.PostConfigure<ApiEndpointOptions>(options =>
     {
         if (options.RateLimitingPolicyName == null)
-            options.RateLimitingPolicyName = elsaApiRateLimitingPolicy;
+            options.RateLimitingPolicyName = flammeApiRateLimitingPolicy;
     });
     services.PostConfigure<HttpActivityOptions>(options =>
     {
@@ -187,7 +187,7 @@ services.AddRateLimiter(options =>
 
     if (registerIngressRateLimitingPolicies)
     {
-        options.AddFixedWindowLimiter(elsaApiRateLimitingPolicy, limiterOptions =>
+        options.AddFixedWindowLimiter(flammeApiRateLimitingPolicy, limiterOptions =>
         {
             limiterOptions.PermitLimit = ingressRateLimitingSection.GetValue("ApiPermitLimit", 120);
             limiterOptions.Window = TimeSpan.FromSeconds(ingressRateLimitingSection.GetValue("ApiWindowSeconds", 60));
@@ -205,7 +205,7 @@ services.AddRateLimiter(options =>
 });
 services
     .AddHealthChecks()
-    .AddElsaReadinessChecks(includeDistributedLocks: true);
+    .AddFlammeReadinessChecks(includeDistributedLocks: true);
 services.AddControllers();
 services.AddCors(cors => cors.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().WithExposedHeaders("*")));
 
@@ -227,7 +227,7 @@ app.MapHealthChecks("/health/live", new()
 });
 app.MapHealthChecks("/health/ready", new()
 {
-    Predicate = check => check.Tags.Contains(HealthCheckExtensions.ElsaTag) && check.Tags.Contains(HealthCheckExtensions.ReadinessTag),
+    Predicate = check => check.Tags.Contains(HealthCheckExtensions.FlammeTag) && check.Tags.Contains(HealthCheckExtensions.ReadinessTag),
     ResultStatusCodes =
     {
         [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable,
@@ -239,7 +239,7 @@ app.MapHealthChecks("/", new()
     Predicate = _ => false
 });
 
-// Elsa API endpoints for designer.
+// Flamme API endpoints for designer.
 var apiEndpointOptions = app.Services.GetRequiredService<IOptions<ApiEndpointOptions>>().Value;
 var routePrefix = apiEndpointOptions.RoutePrefix;
 app.MapWorkflowsApi(routePrefix);
@@ -249,7 +249,7 @@ app.UseRouting();
 
 app.UseWorkflowsApiRateLimiting(routePrefix, apiEndpointOptions.RateLimitingPolicyName);
 
-// Elsa HTTP Endpoint activities.
+// Flamme HTTP Endpoint activities.
 var httpActivityOptions = app.Services.GetRequiredService<IOptions<HttpActivityOptions>>().Value;
 app.UseWorkflowsRateLimiting(httpActivityOptions.BasePath, httpActivityOptions.RateLimitingPolicyName);
 if (useIngressRateLimiting ||

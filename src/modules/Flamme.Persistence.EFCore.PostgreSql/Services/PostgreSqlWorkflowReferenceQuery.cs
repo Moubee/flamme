@@ -1,16 +1,16 @@
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Persistence.EFCore.PostgreSql.Helpers;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Persistence.EFCore.PostgreSql.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Services;
+namespace Flamme.Persistence.EFCore.PostgreSql.Services;
 
 /// <summary>
 /// Provides an implementation of <see cref="IWorkflowReferenceQuery"/> for querying PostgreSQL databases
 /// to find all latest workflow definitions that reference a specific workflow definition.
 /// </summary>
-public class PostgreSqlWorkflowReferenceQuery(IDbContextFactory<ManagementElsaDbContext> dbContextFactory) : IWorkflowReferenceQuery
+public class PostgreSqlWorkflowReferenceQuery(IDbContextFactory<ManagementFlammeDbContext> dbContextFactory) : IWorkflowReferenceQuery
 {
     public async Task<IEnumerable<string>> ExecuteAsync(string workflowDefinitionId, CancellationToken cancellationToken = default)
     {

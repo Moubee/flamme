@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Options;
+using Flamme.Extensions;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Options;
+namespace Flamme.Identity.UnitTests.Options;
 
 public class ConfigureJwtBearerOptionsTests
 {
@@ -27,7 +27,7 @@ public class ConfigureJwtBearerOptionsTests
     }
 
     [Test]
-    public async Task Configure_SkipsNonElsaManagedSchemes()
+    public async Task Configure_SkipsNonFlammeManagedSchemes()
     {
         var configureOptions = CreateConfigureOptions();
         var options = new JwtBearerOptions();

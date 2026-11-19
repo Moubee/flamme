@@ -1,8 +1,8 @@
-using Elsa.Caching;
-using Elsa.Http.Bookmarks;
-using Elsa.Workflows;
+using Flamme.Caching;
+using Flamme.Http.Bookmarks;
+using Flamme.Workflows;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <inheritdoc />
 public class HttpWorkflowsCacheManager(ICacheManager cache, IHasher bookmarkHasher) : IHttpWorkflowsCacheManager

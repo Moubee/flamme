@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
+using Flamme.Common.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class DictionaryExtensions
 {

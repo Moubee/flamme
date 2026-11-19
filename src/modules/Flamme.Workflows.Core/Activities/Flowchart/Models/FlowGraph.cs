@@ -1,7 +1,7 @@
-﻿using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
+﻿using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
 
-namespace Elsa.Workflows.Activities.Flowchart.Models;
+namespace Flamme.Workflows.Activities.Flowchart.Models;
 
 /// <summary>
 /// Represents a directed graph structure for managing workflow connections.

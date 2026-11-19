@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Notifications;
+namespace Flamme.ExternalAuthentication.UnitTests.Notifications;
 
 public class SecurityNotificationTests
 {

@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Tenants.AspNetCore;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Api;
-using Elsa.Workflows.CommitStates.Strategies;
-using Elsa.Workflows.ComponentTests.Host;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.Runtime.Distributed.Extensions;
+using Flamme.Extensions;
+using Flamme.Tenants.AspNetCore;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Api;
+using Flamme.Workflows.CommitStates.Strategies;
+using Flamme.Workflows.ComponentTests.Host;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.Runtime.Distributed.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -15,7 +15,7 @@ var services = builder.Services;
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
 // The component factory appends invocation-specific providers and applies this module once.
-services.ConfigureElsa(elsa => elsa
+services.ConfigureFlamme(elsa => elsa
     .UseWorkflows(workflows => workflows.UseCommitStrategies(strategies =>
     {
         strategies.AddStandardStrategies();

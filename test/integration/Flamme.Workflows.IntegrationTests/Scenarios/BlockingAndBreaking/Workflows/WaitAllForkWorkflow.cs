@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking.Workflows;
 
 public class WaitAllForkWorkflow : WorkflowBase
 {

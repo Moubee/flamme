@@ -1,6 +1,6 @@
-using Elsa.Workflows.Options;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Invokes activities.

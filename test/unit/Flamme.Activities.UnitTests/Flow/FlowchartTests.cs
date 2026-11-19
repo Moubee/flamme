@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using static Elsa.Activities.UnitTests.Flow.FlowchartTestHelpers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using static Flamme.Activities.UnitTests.Flow.FlowchartTestHelpers;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Flow;
+namespace Flamme.Activities.UnitTests.Flow;
 
 /// <summary>
 /// Tests for common Flowchart behavior (both counter and token-based strategies).

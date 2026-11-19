@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.OutputConverters.Requests;
-using Elsa.Api.Client.Resources.OutputConverters.Responses;
+using Flamme.Api.Client.Resources.OutputConverters.Requests;
+using Flamme.Api.Client.Resources.OutputConverters.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.OutputConverters.Contracts;
+namespace Flamme.Api.Client.Resources.OutputConverters.Contracts;
 
 /// <summary>
 /// Represents a client for output converter descriptor discovery.

@@ -1,4 +1,4 @@
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// A handler that is invoked when authorizing an inbound HTTP request.

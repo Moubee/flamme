@@ -1,6 +1,6 @@
-using Elsa.Workflows.CommitStates;
+using Flamme.Workflows.CommitStates;
 
-namespace Elsa.Workflows.Api.Endpoints.CommitStrategies;
+namespace Flamme.Workflows.Api.Endpoints.CommitStrategies;
 
 internal record CommitStrategyDescriptor(string Name, string DisplayName, string Description)
 {

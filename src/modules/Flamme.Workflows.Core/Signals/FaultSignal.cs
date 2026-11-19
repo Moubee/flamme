@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Signals;
+namespace Flamme.Workflows.Signals;
 
 /// <summary>
 /// Sent up the ancestor chain when an activity faulted, giving an enclosing container the chance to handle the failure

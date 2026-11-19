@@ -1,13 +1,13 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
 
-namespace Elsa.Features;
+namespace Flamme.Features;
 
 /// <summary>
 /// A wrapper for invoking application-specific configuration, ensuring it is invoked lastly.
 /// </summary>
-[DependsOn(typeof(ElsaFeature))]
+[DependsOn(typeof(FlammeFeature))]
 public class AppFeature(IModule module) : FeatureBase(module)
 {
     /// <summary>

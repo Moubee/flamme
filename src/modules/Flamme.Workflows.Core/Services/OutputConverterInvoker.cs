@@ -1,8 +1,8 @@
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class OutputConverterInvoker(

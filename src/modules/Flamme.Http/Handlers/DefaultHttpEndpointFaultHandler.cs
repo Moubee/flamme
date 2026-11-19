@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Elsa.Http.Exceptions;
+using Flamme.Http.Exceptions;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// A default fault handler that writes information about the fault to the <see cref="HttpResponse"/>.

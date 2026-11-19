@@ -1,23 +1,23 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Api.Security;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Mappers;
-using Elsa.Workflows.Management.Materializers;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Models;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Api.Security;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Mappers;
+using Flamme.Workflows.Management.Materializers;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 using Medallion.Threading;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Post;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Post;
 
 [PublicAPI]
 internal class Post(
@@ -28,12 +28,12 @@ internal class Post(
     IWorkflowDefinitionLinker linker,
     IAuthorizationService authorizationService,
     WorkflowDefinitionScriptAuthorizationService scriptAuthorizationService)
-    : ElsaEndpoint<SaveWorkflowDefinitionRequest, LinkedWorkflowDefinitionModel>
+    : FlammeEndpoint<SaveWorkflowDefinitionRequest, LinkedWorkflowDefinitionModel>
 {
     public override void Configure()
     {
         Post("/workflow-definitions");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Write);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Write);
     }
 
     public override async Task HandleAsync(SaveWorkflowDefinitionRequest request, CancellationToken cancellationToken)

@@ -1,6 +1,6 @@
 // ReSharper disable once CheckNamespace
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for strings that represent a route.

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class DefaultTenantFinder(IServiceScopeFactory scopeFactory) : ITenantFinder
 {

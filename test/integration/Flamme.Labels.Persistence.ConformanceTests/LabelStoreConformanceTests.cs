@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Labels.Entities;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Persistence.ConformanceTests;
+namespace Flamme.Labels.Persistence.ConformanceTests;
 
 /// <summary>
 /// Shared InMemory / EF Core store-contract assertions for Labels ports.

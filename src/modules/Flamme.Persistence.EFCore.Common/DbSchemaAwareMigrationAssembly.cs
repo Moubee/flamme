@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// Class That enable Schema change for Migration
@@ -26,9 +26,9 @@ public class DbSchemaAwareMigrationAssembly(
         if (activeProvider == null)
             throw new ArgumentNullException(nameof(activeProvider));
 
-        var hasCtorWithSchema = migrationClass.GetConstructor([typeof(IElsaDbContextSchema)]) != null;
+        var hasCtorWithSchema = migrationClass.GetConstructor([typeof(IFlammeDbContextSchema)]) != null;
 
-        if (hasCtorWithSchema && _context is IElsaDbContextSchema schema)
+        if (hasCtorWithSchema && _context is IFlammeDbContextSchema schema)
         {
             var instance = (Migration)Activator.CreateInstance(migrationClass.AsType(), schema)!;
             instance.ActiveProvider = activeProvider;

@@ -1,7 +1,7 @@
-using Elsa.Http;
-using Elsa.Workflows;
+using Flamme.Http;
+using Flamme.Workflows;
 
-namespace Elsa.Workflows.ComponentTests.Host;
+namespace Flamme.Workflows.ComponentTests.Host;
 
 /// <summary>
 /// Masks authorization input persisted by Send HTTP Request activities.

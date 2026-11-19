@@ -1,4 +1,4 @@
-namespace Elsa.Scheduling.Options;
+namespace Flamme.Scheduling.Options;
 
 /// <summary>
 /// Configures local scheduling behavior.

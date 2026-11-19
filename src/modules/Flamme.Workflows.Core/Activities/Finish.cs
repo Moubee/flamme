@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Mark the workflow as finished.

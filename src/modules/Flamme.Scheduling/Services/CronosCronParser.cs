@@ -1,7 +1,7 @@
 using Cronos;
-using Elsa.Common;
+using Flamme.Common;
 
-namespace Elsa.Scheduling.Services;
+namespace Flamme.Scheduling.Services;
 
 /// <summary>
 /// A cron parser that uses Cronos.

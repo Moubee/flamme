@@ -1,11 +1,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<IActivityDescriptorModifier> modifiers, ITenantAccessor tenantAccessor, ILogger<ActivityRegistry> logger) : IActivityRegistry

@@ -1,10 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Sets a property on the workflow execution context with the specified name value.

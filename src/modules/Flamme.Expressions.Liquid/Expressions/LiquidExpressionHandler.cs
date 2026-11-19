@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.Liquid.Contracts;
 
-namespace Elsa.Expressions.Liquid.Expressions;
+namespace Flamme.Expressions.Liquid.Expressions;
 
 /// <summary>
 /// Evaluates a Liquid expression.

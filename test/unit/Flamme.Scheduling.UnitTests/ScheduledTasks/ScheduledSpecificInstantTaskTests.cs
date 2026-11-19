@@ -1,14 +1,14 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.Options;
-using Elsa.Scheduling.ScheduledTasks;
-using Elsa.Scheduling.Services;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.Options;
+using Flamme.Scheduling.ScheduledTasks;
+using Flamme.Scheduling.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
-namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
+namespace Flamme.Scheduling.UnitTests.ScheduledTasks;
 
 /// <summary>
 /// Tests for ScheduledSpecificInstantTask to ensure specific instant tasks handle edge cases correctly.

@@ -1,11 +1,11 @@
 using System.ComponentModel;
 using System.Collections.Concurrent;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.HostMethodActivities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.HostMethodActivities;
 
 /// <summary>
 /// A test host class for HostMethod activity testing.

@@ -1,11 +1,11 @@
-﻿using Elsa.Labels.Entities;
+﻿using Flamme.Labels.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
-public class LabelsElsaDbContext : ElsaDbContextBase
+public class LabelsFlammeDbContext : FlammeDbContextBase
 {
-    public LabelsElsaDbContext(DbContextOptions<LabelsElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public LabelsFlammeDbContext(DbContextOptions<LabelsFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

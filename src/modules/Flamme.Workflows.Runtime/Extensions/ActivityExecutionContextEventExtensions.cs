@@ -1,11 +1,11 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Stimuli;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ActivityExecutionContextEventExtensions
 {

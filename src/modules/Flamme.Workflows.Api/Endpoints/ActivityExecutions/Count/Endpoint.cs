@@ -1,17 +1,17 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.Count;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.Count;
 
 /// <summary>
 /// Counts the number of executions for a given activity.
 /// </summary>
 [PublicAPI]
-internal class Count : ElsaEndpoint<Request, CountResponse>
+internal class Count : FlammeEndpoint<Request, CountResponse>
 {
     private readonly IActivityExecutionStore _store;
 
@@ -25,7 +25,7 @@ internal class Count : ElsaEndpoint<Request, CountResponse>
     public override void Configure()
     {
         Get("/activity-executions/count");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

@@ -1,5 +1,5 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 public record AffectedWorkflows(ICollection<WorkflowDefinition> WorkflowDefinitions);

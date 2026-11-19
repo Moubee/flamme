@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Orchestrates adapter-owned, forward-only settings migrations while preserving

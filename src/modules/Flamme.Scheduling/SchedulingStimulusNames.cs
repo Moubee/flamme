@@ -1,4 +1,4 @@
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 public static class SchedulingStimulusNames
 {

@@ -1,9 +1,9 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Models;
+using Flamme.AI.Abstractions.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class RuntimeGroundingMapper(AIGroundingResultFormatter formatter)
 {

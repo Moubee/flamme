@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Responses;
+namespace Flamme.Workflows.Runtime.Responses;
 
 public record DispatchStimulusResponse
 {

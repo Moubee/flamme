@@ -1,11 +1,11 @@
-using Elsa.Abstractions;
-using Elsa.Workflows.Models;
+using Flamme.Abstractions;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptors.Get;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptors.Get;
 
 [PublicAPI]
-internal class Get : ElsaEndpoint<Request, ActivityDescriptor>
+internal class Get : FlammeEndpoint<Request, ActivityDescriptor>
 {
     private readonly IActivityRegistryLookupService _registryLookup;
 

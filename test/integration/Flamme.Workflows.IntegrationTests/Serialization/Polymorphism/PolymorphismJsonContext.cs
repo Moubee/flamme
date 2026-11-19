@@ -2,7 +2,7 @@ using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.Polymorphism;
+namespace Flamme.Workflows.IntegrationTests.Serialization.Polymorphism;
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(Model))]

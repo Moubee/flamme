@@ -1,10 +1,10 @@
 ﻿using System.Dynamic;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// These tests ensure that we did not replace any JS types with .NET types. 

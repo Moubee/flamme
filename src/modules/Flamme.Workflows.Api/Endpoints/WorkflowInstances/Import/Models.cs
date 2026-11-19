@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Import;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Import;
 
 internal class Response
 {

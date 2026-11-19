@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Activities;
 
 public class CustomActivity : CodeActivity
 {

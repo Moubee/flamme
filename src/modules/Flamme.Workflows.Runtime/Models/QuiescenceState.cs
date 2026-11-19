@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Composite signal describing whether the runtime is accepting new work and, if not, why not.

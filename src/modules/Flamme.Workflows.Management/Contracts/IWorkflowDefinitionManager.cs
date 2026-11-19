@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Provides operations for managing workflow definitions.

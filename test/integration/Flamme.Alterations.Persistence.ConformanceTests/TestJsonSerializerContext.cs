@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Alterations.Persistence.ConformanceTests;
+namespace Flamme.Alterations.Persistence.ConformanceTests;
 
 [JsonSerializable(typeof(TestAlteration))]
 [JsonSerializable(typeof(TestAlteration[]))]

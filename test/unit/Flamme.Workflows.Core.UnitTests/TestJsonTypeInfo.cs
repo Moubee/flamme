@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Workflows.Core.UnitTests.ObjectConversion;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Core.UnitTests.ObjectConversion;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Core.UnitTests;
+namespace Flamme.Workflows.Core.UnitTests;
 
 internal static class TestJsonTypeInfo
 {
@@ -34,11 +34,11 @@ internal static class TestJsonTypeInfo
 [JsonSerializable(typeof(IDictionary<string, object>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(HashSet<string>))]
-[JsonSerializable(typeof(global::Elsa.Expressions.Models.Expression))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Models.Input<bool>))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Models.Input<string>))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Models.Output<string>))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.RegisteredPayload))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.UnregisteredPayload))]
-[JsonSerializable(typeof(global::Elsa.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.AbstractPayload))]
+[JsonSerializable(typeof(global::Flamme.Expressions.Models.Expression))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Models.Input<bool>))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Models.Input<string>))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Models.Output<string>))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.RegisteredPayload))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.UnregisteredPayload))]
+[JsonSerializable(typeof(global::Flamme.Workflows.Core.UnitTests.Serialization.Converters.SerializationTypeResolverTests.AbstractPayload))]
 internal partial class TestJsonSerializerContext : JsonSerializerContext;

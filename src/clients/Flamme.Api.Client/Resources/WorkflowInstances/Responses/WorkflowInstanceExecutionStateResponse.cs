@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Enums;
+using Flamme.Api.Client.Resources.WorkflowInstances.Enums;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Responses;
 
 /// <summary>
 /// Represents the response containing the last updated timestamp of a workflow instance.

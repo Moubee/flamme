@@ -1,7 +1,7 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.Services;
+namespace Flamme.Expressions.Services;
 
 /// <inheritdoc />
 public class ExpressionEvaluator(IExpressionDescriptorRegistry registry, IServiceProvider serviceProvider) : IExpressionEvaluator

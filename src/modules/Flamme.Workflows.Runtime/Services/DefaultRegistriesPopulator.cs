@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class DefaultRegistriesPopulator(

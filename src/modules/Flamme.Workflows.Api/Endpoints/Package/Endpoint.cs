@@ -2,7 +2,7 @@ using System.Reflection;
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Package;
+namespace Flamme.Workflows.Api.Endpoints.Package;
 
 /// <summary>
 /// Returns the package informational version.

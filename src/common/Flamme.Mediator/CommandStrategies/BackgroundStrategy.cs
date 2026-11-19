@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.CommandStrategies;
+namespace Flamme.Mediator.CommandStrategies;
 
 /// <summary>
 /// Invokes command handlers in the background and does not wait for the result.

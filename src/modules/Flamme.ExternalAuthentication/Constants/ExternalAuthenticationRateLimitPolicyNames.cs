@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Constants;
+namespace Flamme.ExternalAuthentication.Constants;
 
 public static class ExternalAuthenticationRateLimitPolicyNames
 {

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.Api.Endpoints.RuntimeAdmin;
+namespace Flamme.Workflows.Api.Endpoints.RuntimeAdmin;
 
 /// <summary>Body for the pause endpoint. The reason is a free-form human-readable string captured on the audit event.</summary>
 public class PauseRequest

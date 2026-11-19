@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Workflows.Api.Features;
+using Flamme.Features.Services;
+using Flamme.Workflows.Api.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IModule"/>.

@@ -1,14 +1,14 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Resilience.Core.UnitTests.TestHelpers;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Models;
-using Elsa.Resilience.Options;
-using Elsa.Resilience.Serialization;
-using Elsa.Workflows;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Resilience.Core.UnitTests.TestHelpers;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Models;
+using Flamme.Resilience.Options;
+using Flamme.Resilience.Serialization;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ResilientActivityInvokerTests
 {

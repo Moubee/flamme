@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows.Activities.Flowchart.Extensions;
+namespace Flamme.Workflows.Activities.Flowchart.Extensions;
 
 public static class ActivityExecutionContextExtensions
 {

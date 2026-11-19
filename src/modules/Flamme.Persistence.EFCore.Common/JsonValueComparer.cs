@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// Compares two objects.

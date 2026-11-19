@@ -1,23 +1,23 @@
-using Elsa.Common;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.DistributedHosting.DistributedLocks;
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.Commands;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.DistributedHosting.DistributedLocks;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.State;
 using Medallion.Threading;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class WorkflowDispatchOutboxProcessorTests
 {
@@ -133,7 +133,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
         Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
@@ -149,7 +149,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
         Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
@@ -169,7 +169,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
         Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
         Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
@@ -200,7 +200,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
         Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
@@ -220,7 +220,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
         Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchWorkflowDefinitionCommand), Any(), Any(), Any()).WasNeverCalled();
     }
 
     [Test]
@@ -234,7 +234,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(
             item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
         Mock.Get(_store).DeleteAsync(item.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         Mock.Get(_workflowInstanceStore).SaveAsync(
@@ -311,7 +311,7 @@ public class WorkflowDispatchOutboxProcessorTests
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(
             item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
         await Assert.That(item.DeliveryAttempts).IsEqualTo(0);
         Mock.Get(_store).SaveAsync(item, Arg.Any<CancellationToken>()).WasNeverCalled();
@@ -325,8 +325,8 @@ public class WorkflowDispatchOutboxProcessorTests
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Flamme.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
 
         await _processor.ProcessAsync();
 
@@ -343,14 +343,14 @@ public class WorkflowDispatchOutboxProcessorTests
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .ReturnsSequentially(
         CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]));
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Flamme.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
         Mock.Get(_store).SaveAsync(failedItem, Arg.Any<CancellationToken>())
                     .Returns(() => Task.FromException(new InvalidOperationException("Save failed.")));
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(
             nextItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
         Mock.Get(_store).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
@@ -363,8 +363,8 @@ public class WorkflowDispatchOutboxProcessorTests
         Mock.Get(_store).FindManyAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns([item]);
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(CreateOwnerWorkflowInstance(includeOutboxMarker: true));
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(item.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Flamme.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
 
         await _processor.ProcessAsync();
 
@@ -381,14 +381,14 @@ public class WorkflowDispatchOutboxProcessorTests
         Mock.Get(_workflowInstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .ReturnsSequentially(
         CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [failedItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]), CreateOwnerWorkflowInstance(includeOutboxMarker: true, itemIds: [nextItem.Id]));
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
-                    .Returns(() => Task.FromException<Elsa.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(failedItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None)
+                    .Returns(() => Task.FromException<Flamme.Mediator.Models.Unit>(new InvalidOperationException("Queue unavailable.")));
         Mock.Get(_store).DeleteAsync(failedItem.Id, Arg.Any<CancellationToken>())
                     .Returns(() => Task.FromException(new InvalidOperationException("Delete failed.")));
 
         await _processor.ProcessAsync();
 
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(
             nextItem.WorkflowDefinitionCommand!, CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
         Mock.Get(_store).SaveAsync(Arg.Is<WorkflowDispatchOutboxItem>(x => x.Id == failedItem.Id && x.DeliveryAttempts == _options.MaxOutboxDeliveryAttempts), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         Mock.Get(_store).DeleteAsync(nextItem.Id, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));

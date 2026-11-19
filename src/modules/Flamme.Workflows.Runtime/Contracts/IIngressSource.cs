@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// An adapter through which external events enter the workflow engine. Every component that initiates execution cycles

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Provides a way to select the correlation ID for a request.

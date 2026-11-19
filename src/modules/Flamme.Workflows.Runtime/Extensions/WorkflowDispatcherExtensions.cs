@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Workflows.Runtime.Contracts;
+namespace Flamme.Workflows.Runtime.Contracts;
 
 /// <summary>
 /// Provides a set of extension methods for <see cref="IWorkflowDispatcher"/>.

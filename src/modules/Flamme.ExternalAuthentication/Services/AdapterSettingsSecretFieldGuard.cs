@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Prevents adapter setting fields that are declared as secret bindings from being persisted or returned as ordinary settings.

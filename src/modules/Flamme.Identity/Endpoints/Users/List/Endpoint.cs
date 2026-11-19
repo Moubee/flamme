@@ -1,23 +1,23 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Users.List;
+namespace Flamme.Identity.Endpoints.Users.List;
 
 /// <summary>
 /// An endpoint that lists all users.
 /// </summary>
 [PublicAPI]
-internal class List(IUserStore userStore, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest<Response>
+internal class List(IUserStore userStore, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest<Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/identity/users");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.View);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.View);
     }
 
     /// <inheritdoc />

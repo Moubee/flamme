@@ -1,13 +1,13 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Services;
+namespace Flamme.Workflows.Runtime.Services;
 
 /// <summary>
 /// Default thread-safe implementation of <see cref="IQuiescenceSignal"/>. Uses a single lock for transitions

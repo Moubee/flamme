@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.UserTasks.Permissions;
+namespace Flamme.UserTasks.Permissions;
 
 /// <summary>
 /// Stable resource names for User Tasks. Endpoints reference these constants rather than string

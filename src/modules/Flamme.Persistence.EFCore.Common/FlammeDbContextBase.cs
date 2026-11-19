@@ -1,16 +1,16 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// An optional base class to implement with some opinions on certain converters to install for certain DB providers.
 /// </summary>
-public abstract class ElsaDbContextBase : DbContext, IElsaDbContextSchema
+public abstract class FlammeDbContextBase : DbContext, IFlammeDbContextSchema
 {
     private static readonly ISet<EntityState> ModifiedEntityStates = new HashSet<EntityState>
     {
@@ -19,13 +19,13 @@ public abstract class ElsaDbContextBase : DbContext, IElsaDbContextSchema
     };
 
     protected IServiceProvider ServiceProvider { get; }
-    private readonly ElsaDbContextOptions? _elsaDbContextOptions;
+    private readonly FlammeDbContextOptions? _flammeDbContextOptions;
     public string? TenantId { get; set; }
 
     /// <summary>
-    /// The default schema used by Elsa.
+    /// The default schema used by Flamme.
     /// </summary>
-    public static string ElsaSchema { get; set; } = "Elsa";
+    public static string FlammeSchema { get; set; } = "Elsa";
 
     /// <inheritdoc/>
     public string Schema { get; }
@@ -36,15 +36,15 @@ public abstract class ElsaDbContextBase : DbContext, IElsaDbContextSchema
     public static string MigrationsHistoryTable { get; set; } = "__EFMigrationsHistory";
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ElsaDbContextBase"/> class.
+    /// Initializes a new instance of the <see cref="FlammeDbContextBase"/> class.
     /// </summary>
-    protected ElsaDbContextBase(DbContextOptions options, IServiceProvider serviceProvider) : base(options)
+    protected FlammeDbContextBase(DbContextOptions options, IServiceProvider serviceProvider) : base(options)
     {
         ServiceProvider = serviceProvider;
-        _elsaDbContextOptions = options.FindExtension<ElsaDbContextOptionsExtension>()?.Options;
+        _flammeDbContextOptions = options.FindExtension<FlammeDbContextOptionsExtension>()?.Options;
 
         // ReSharper disable once VirtualMemberCallInConstructor
-        Schema = !string.IsNullOrWhiteSpace(_elsaDbContextOptions?.SchemaName) ? _elsaDbContextOptions.SchemaName : ElsaSchema;
+        Schema = !string.IsNullOrWhiteSpace(_flammeDbContextOptions?.SchemaName) ? _flammeDbContextOptions.SchemaName : FlammeSchema;
 
         var tenantAccessor = serviceProvider.GetService<ITenantAccessor>();
         var tenantId = (tenantAccessor?.TenantId).NormalizeTenantId();
@@ -64,7 +64,7 @@ public abstract class ElsaDbContextBase : DbContext, IElsaDbContextSchema
         if (!string.IsNullOrWhiteSpace(Schema))
             modelBuilder.HasDefaultSchema(Schema);
 
-        var additionalConfigurations = _elsaDbContextOptions?.GetModelConfigurations(this);
+        var additionalConfigurations = _flammeDbContextOptions?.GetModelConfigurations(this);
 
         additionalConfigurations?.Invoke(modelBuilder);
 

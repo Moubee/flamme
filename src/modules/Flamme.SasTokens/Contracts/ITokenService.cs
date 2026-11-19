@@ -1,4 +1,4 @@
-﻿namespace Elsa.SasTokens.Contracts;
+﻿namespace Flamme.SasTokens.Contracts;
 
 /// <summary>
 /// A service that can create and decrypt SAS (Shared Access Signature) tokens.

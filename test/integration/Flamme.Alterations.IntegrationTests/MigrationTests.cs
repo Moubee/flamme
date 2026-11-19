@@ -1,13 +1,13 @@
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Extensions;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Extensions;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 /// <summary>
 /// Contains tests for migration.
@@ -26,7 +26,7 @@ public class MigrationTests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureElsa(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(elsa => elsa.UseAlterations())
             .Build();
         _alterationRunner = _services.GetRequiredService<IAlterationRunner>();
         _workflowInstanceStore = _services.GetRequiredService<IWorkflowInstanceStore>();

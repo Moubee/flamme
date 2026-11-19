@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Results;
+namespace Flamme.Workflows.Runtime.Results;
 
 /// <summary>
 /// Contains workflow execution results

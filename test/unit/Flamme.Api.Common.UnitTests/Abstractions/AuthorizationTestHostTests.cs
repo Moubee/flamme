@@ -1,7 +1,7 @@
-using Elsa.Authorization;
-using Elsa.Testing.Shared.Authorization;
+using Flamme.Authorization;
+using Flamme.Testing.Shared.Authorization;
 
-namespace Elsa.Api.Common.UnitTests.Abstractions;
+namespace Flamme.Api.Common.UnitTests.Abstractions;
 
 [NotInParallel(nameof(EndpointSecurityCollection))]
 public class AuthorizationTestHostTests

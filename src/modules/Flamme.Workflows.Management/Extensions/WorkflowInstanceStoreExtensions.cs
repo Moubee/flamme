@@ -1,8 +1,8 @@
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides a set of extension methods for <see cref="IWorkflowInstanceStore"/>.

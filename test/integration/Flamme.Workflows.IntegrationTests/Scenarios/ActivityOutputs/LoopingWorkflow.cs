@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
 
 public class LoopingWorkflow : WorkflowBase
 {

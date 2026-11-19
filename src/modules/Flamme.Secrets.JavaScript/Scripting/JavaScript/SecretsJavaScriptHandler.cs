@@ -1,11 +1,11 @@
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Abstractions;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Mediator.Contracts;
-using Elsa.Secrets.Contracts;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Abstractions;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Secrets.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Secrets.JavaScript.Scripting.JavaScript;
+namespace Flamme.Secrets.JavaScript.Scripting.JavaScript;
 
 [UsedImplicitly]
 public class SecretsJavaScriptHandler(ISecretResolver secretResolver) : FunctionDefinitionProvider, INotificationHandler<EvaluatingJavaScript>

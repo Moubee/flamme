@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="JsonObject"/>.

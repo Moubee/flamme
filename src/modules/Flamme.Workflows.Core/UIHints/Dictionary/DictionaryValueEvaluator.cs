@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.UIHints.Dictionary;
+namespace Flamme.Workflows.UIHints.Dictionary;
 
 /// <summary>
 /// A class that evaluates activity inputs configured to be dictionaries. It resolves expressions and modifies the input dictionary accordingly.

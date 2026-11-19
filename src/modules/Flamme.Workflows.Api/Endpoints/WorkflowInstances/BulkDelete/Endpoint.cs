@@ -1,14 +1,14 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.BulkDelete;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.BulkDelete;
 
 [PublicAPI]
-internal class BulkDelete(IWorkflowInstanceStore workflowInstanceStore, IWorkflowInstanceManager workflowInstanceManager, IWorkflowRuntime workflowRuntime) : ElsaEndpoint<Request, Response>
+internal class BulkDelete(IWorkflowInstanceStore workflowInstanceStore, IWorkflowInstanceManager workflowInstanceManager, IWorkflowRuntime workflowRuntime) : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
@@ -16,7 +16,7 @@ internal class BulkDelete(IWorkflowInstanceStore workflowInstanceStore, IWorkflo
             "/bulk-actions/delete/workflow-instances",
             "/bulk-actions/delete/workflow-instances/by-id" // Deprecated route.
         );
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Delete);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Delete);
     }
 
     public override async Task<Response> ExecuteAsync(Request request, CancellationToken cancellationToken)

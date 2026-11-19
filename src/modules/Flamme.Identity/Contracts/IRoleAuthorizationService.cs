@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Authorizes role assignment and role permission changes.

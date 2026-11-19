@@ -1,16 +1,16 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Identity.Contracts;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.Identity.Models;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Identity.Contracts;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 public sealed class DefaultExternalAuthenticationTokenIssuer(
     IExternalAuthenticationSessionStore sessionStore,
@@ -18,7 +18,7 @@ public sealed class DefaultExternalAuthenticationTokenIssuer(
     IEnumerable<ISecretBindingResolver> secretBindingResolvers,
     IUserProvider userProvider,
     IRoleProvider roleProvider,
-    IElsaTokenService tokenService,
+    IFlammeTokenService tokenService,
     ITenantAccessor tenantAccessor,
     TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options) : IExternalAuthenticationTokenIssuer
@@ -67,7 +67,7 @@ public sealed class DefaultExternalAuthenticationTokenIssuer(
         // Role permissions go through the same deployment boundary as the external grants beside them. They
         // used to be concatenated raw, which let a permission the boundary had just excluded during grant
         // resolution reappear here from the same roles -- making the deny list unenforceable for anything a
-        // role happened to carry, and ElsaRolePermissionGrantSource's own filtering pointless. Re-applying it
+        // role happened to carry, and FlammeRolePermissionGrantSource's own filtering pointless. Re-applying it
         // at issuance also picks up a boundary that changed since sign-in, because refreshing reissues.
         // With no boundary configured, which is the default, every well-formed permission passes and nothing
         // about this changes.

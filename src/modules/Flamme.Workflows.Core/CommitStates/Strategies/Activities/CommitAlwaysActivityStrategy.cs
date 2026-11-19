@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Elsa.Workflows.CommitStates.Strategies;
+namespace Flamme.Workflows.CommitStates.Strategies;
 
 /// <summary>
 /// Represents a strategy that always commits the workflow whenever the associated activity is about to execute or has executed.

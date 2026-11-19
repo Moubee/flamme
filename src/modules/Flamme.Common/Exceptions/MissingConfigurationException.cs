@@ -1,4 +1,4 @@
-namespace Elsa.Common.Exceptions;
+namespace Flamme.Common.Exceptions;
 
 /// <summary>
 /// Configuration is missing.

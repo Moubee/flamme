@@ -1,6 +1,6 @@
-using Elsa.Secrets.Models;
+using Flamme.Secrets.Models;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretResolverTests
 {

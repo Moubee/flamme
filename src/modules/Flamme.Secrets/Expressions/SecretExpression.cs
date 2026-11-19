@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Secrets.Expressions;
+namespace Flamme.Secrets.Expressions;
 
 /// <summary>
 /// Creates Secret expressions that store references to named secrets.

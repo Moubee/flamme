@@ -1,4 +1,4 @@
-namespace Elsa.Http.Options;
+namespace Flamme.Http.Options;
 
 /// <summary>
 /// Provides options for the HTTP file cache.

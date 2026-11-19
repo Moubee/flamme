@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.IngressSources;
+namespace Flamme.Workflows.Runtime.IngressSources;
 
 /// <summary>
 /// Surfaces the in-process bookmark-queue processor as an <see cref="IIngressSource"/> in the runtime's diagnostic

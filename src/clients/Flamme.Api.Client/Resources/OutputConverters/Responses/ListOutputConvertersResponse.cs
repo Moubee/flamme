@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.OutputConverters.Models;
+using Flamme.Api.Client.Resources.OutputConverters.Models;
 
-namespace Elsa.Api.Client.Resources.OutputConverters.Responses;
+namespace Flamme.Api.Client.Resources.OutputConverters.Responses;
 
 /// <summary>
 /// Represents a response containing compatible output converter descriptors.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Represents the switch mode.

@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptorOptions.Get;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptorOptions.Get;
 
 [PublicAPI]
-internal class Get : ElsaEndpoint<Request, Response>
+internal class Get : FlammeEndpoint<Request, Response>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IActivityRegistryLookupService _registryLookup;
@@ -23,7 +23,7 @@ internal class Get : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Post("/descriptors/activities/{activityTypeName}/options/{propertyName}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.DescriptorsActivities, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.DescriptorsActivities, CoreVerbs.View);
     }
 
     /// <inheritdoc />

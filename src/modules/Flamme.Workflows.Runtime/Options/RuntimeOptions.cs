@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Provides options to the workflow runtime.

@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Services;
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Services;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowDefinitionRefresh;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowDefinitionRefresh;
 
 public class DynamicEndpointTests : AppComponentTest
 {

@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Composition.Activities;
+namespace Flamme.Activities.IntegrationTests.Composition.Activities;
 
 /// <summary>
 /// Inner composite activity that uses Complete.

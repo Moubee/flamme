@@ -1,11 +1,11 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// Tests for JintJavaScriptEvaluator to ensure all custom functions remain available.
@@ -185,7 +185,7 @@ public class JintJavaScriptEvaluatorTests : IAsyncDisposable
     {
         await _fixture.BuildAsync();
 
-        var workflow = new Elsa.Workflows.Activities.Workflow();
+        var workflow = new Flamme.Workflows.Activities.Workflow();
 
         if (variables != null)
         {

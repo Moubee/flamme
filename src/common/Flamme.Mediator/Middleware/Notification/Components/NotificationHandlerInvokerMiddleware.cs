@@ -1,11 +1,11 @@
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification.Contracts;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification.Contracts;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.Middleware.Notification.Components;
+namespace Flamme.Mediator.Middleware.Notification.Components;
 
 /// <inheritdoc />
 [UsedImplicitly]

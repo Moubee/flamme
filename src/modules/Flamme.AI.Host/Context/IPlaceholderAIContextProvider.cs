@@ -1,5 +1,5 @@
-using Elsa.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Contracts;
 
-namespace Elsa.AI.Host.Context;
+namespace Flamme.AI.Host.Context;
 
 public interface IPlaceholderAIContextProvider : IAIContextProvider;

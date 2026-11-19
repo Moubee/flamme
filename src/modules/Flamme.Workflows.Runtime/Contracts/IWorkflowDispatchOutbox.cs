@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Models;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Stores workflow dispatch commands for at-least-once delivery after their owner workflow state commits.

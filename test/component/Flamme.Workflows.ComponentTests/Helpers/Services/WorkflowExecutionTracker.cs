@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.ComponentTests.Services;
+namespace Flamme.Workflows.ComponentTests.Services;
 
 /// <summary>
 /// Tracks actual in-flight workflow-runner calls across the session-shared test cluster.

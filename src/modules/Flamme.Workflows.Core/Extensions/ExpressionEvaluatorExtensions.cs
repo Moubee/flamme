@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Contains extension methods for <see cref="IExpressionEvaluator"/>.

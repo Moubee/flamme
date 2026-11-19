@@ -1,10 +1,10 @@
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 using JetBrains.Annotations;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime.Distributed;
+namespace Flamme.Workflows.Runtime.Distributed;
 
 /// <summary>
 /// Decorator class that adds distributed locking to the Workflow Definitions Refresher.

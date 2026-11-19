@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ActivityExecutions.Models;
+namespace Flamme.Api.Client.Resources.ActivityExecutions.Models;
 
 /// <summary>
 /// Represents statistics about the execution of an activity.

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Adds extension methods to <see cref="Type"/>.

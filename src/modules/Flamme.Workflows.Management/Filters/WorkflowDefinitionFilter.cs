@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Filters;
+namespace Flamme.Workflows.Management.Filters;
 
 /// <summary>
 /// A specification to use when finding workflow definitions. Only non-null fields will be included in the conditional expression.

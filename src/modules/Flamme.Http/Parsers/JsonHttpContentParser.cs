@@ -1,11 +1,11 @@
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Helpers;
-using Elsa.Http.Contexts;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Expressions.Helpers;
+using Flamme.Http.Contexts;
+using Flamme.Workflows.Serialization.Converters;
 
-namespace Elsa.Http.Parsers;
+namespace Flamme.Http.Parsers;
 
 /// <summary>
 /// Reads application/json and text/json content type streams.

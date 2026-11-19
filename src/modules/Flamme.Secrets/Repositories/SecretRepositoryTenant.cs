@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Secrets.Contracts;
+using Flamme.Common.Multitenancy;
+using Flamme.Secrets.Contracts;
 
-namespace Elsa.Secrets.Repositories;
+namespace Flamme.Secrets.Repositories;
 
 /// <summary>
 /// Applies the same ambient-tenant visibility and write rules used by EF Core persistence to the

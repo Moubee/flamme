@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.RealTime.Messages;
+namespace Flamme.Workflows.Api.RealTime.Messages;
 
 /// <summary>
 /// A message representing that a workflow instance was updated. 

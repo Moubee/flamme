@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkRetract;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkRetract;
 
 internal class Request
 {

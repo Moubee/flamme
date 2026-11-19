@@ -1,15 +1,15 @@
-using Elsa.Persistence.EFCore;
+using Flamme.Persistence.EFCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.UserTasks.Persistence.EFCore;
+namespace Flamme.UserTasks.Persistence.EFCore;
 
 /// <summary>
 /// Persistence-side User Tasks context. Aggregate-safe JSON stays alongside normalized relationships so
 /// every relational provider can share the same tenant-scoped schema.
 /// </summary>
-public class UserTasksElsaDbContext : ElsaDbContextBase
+public class UserTasksFlammeDbContext : FlammeDbContextBase
 {
-    public UserTasksElsaDbContext(DbContextOptions<UserTasksElsaDbContext> options, IServiceProvider serviceProvider)
+    public UserTasksFlammeDbContext(DbContextOptions<UserTasksFlammeDbContext> options, IServiceProvider serviceProvider)
         : base(options, serviceProvider)
     {
     }

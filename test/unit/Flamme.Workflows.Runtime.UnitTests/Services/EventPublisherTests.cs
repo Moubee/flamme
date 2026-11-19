@@ -1,11 +1,11 @@
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Stimuli;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class EventPublisherTests
 {
@@ -25,7 +25,7 @@ public class EventPublisherTests
         await publisher.PublishAsync(eventName, correlationId, workflowInstanceId, activityInstanceId, payload, asynchronous: true);
 
         Mock.Get(_workflowDispatcher).DispatchAsync(
-            Arg.Is<DispatchTriggerWorkflowsRequest>(request => IsMatchingTriggerRequest(request, eventName, correlationId, workflowInstanceId, activityInstanceId, payload)), Arg.Any<global::Elsa.Workflows.Runtime.DispatchWorkflowOptions?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+            Arg.Is<DispatchTriggerWorkflowsRequest>(request => IsMatchingTriggerRequest(request, eventName, correlationId, workflowInstanceId, activityInstanceId, payload)), Arg.Any<global::Flamme.Workflows.Runtime.DispatchWorkflowOptions?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         Mock.Get(_stimulusSender).SendAsync(Any(), Any(), Any(), Any()).WasNeverCalled();
     }
 

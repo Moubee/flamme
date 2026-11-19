@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Expressions.Contracts;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Workflows.Models;
 using Humanizer;
 
-namespace Elsa.Workflows.Serialization.Helpers;
+namespace Flamme.Workflows.Serialization.Helpers;
 
 /// <summary>
 /// Helper class for writing synthetic properties of an activity to a JSON writer.

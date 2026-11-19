@@ -1,15 +1,15 @@
-using Elsa.Common.Features;
-using Elsa.Extensions;
-using Elsa.Features.Implementations;
-using Elsa.Resilience.Endpoints.SimulateResponse;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Features;
-using Elsa.Resilience.Options;
+using Flamme.Common.Features;
+using Flamme.Extensions;
+using Flamme.Features.Implementations;
+using Flamme.Resilience.Endpoints.SimulateResponse;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Features;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public class TimeProviderCompositionTests
 {
@@ -44,12 +44,12 @@ public class TimeProviderCompositionTests
     [Test]
     [Arguments(true)]
     [Arguments(false)]
-    public async Task AddElsaAndResilience_PreserveTheHostProvider(bool registerBefore)
+    public async Task AddFlammeAndResilience_PreserveTheHostProvider(bool registerBefore)
     {
         var services = new ServiceCollection();
         var fake = new FakeTimeProvider(DateTimeOffset.UnixEpoch.AddTicks(1_234_567));
         if (registerBefore) services.AddSingleton<TimeProvider>(fake);
-        services.AddElsa(module => module.UseResilience());
+        services.AddFlamme(module => module.UseResilience());
         if (!registerBefore) services.AddSingleton<TimeProvider>(fake);
         await using var container = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 

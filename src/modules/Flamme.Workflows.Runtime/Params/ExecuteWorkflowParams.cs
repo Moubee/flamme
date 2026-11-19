@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Params;
+namespace Flamme.Workflows.Runtime.Params;
 
 [Obsolete("This type is obsolete.")]
 public class ExecuteWorkflowParams

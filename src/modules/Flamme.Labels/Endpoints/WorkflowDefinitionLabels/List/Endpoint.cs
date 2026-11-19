@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Labels.Contracts;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Labels.Contracts;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Labels.Endpoints.WorkflowDefinitionLabels.List;
+namespace Flamme.Labels.Endpoints.WorkflowDefinitionLabels.List;
 
 [PublicAPI]
-internal class List : ElsaEndpoint<Request, Response>
+internal class List : FlammeEndpoint<Request, Response>
 {
     private readonly IWorkflowDefinitionStore _workflowDefinitionStore;
     private readonly IWorkflowDefinitionLabelStore _workflowDefinitionLabelStore;
@@ -25,7 +25,7 @@ internal class List : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Get("/workflow-definitions/{id}/labels");
-        RequirePermission(Elsa.Labels.Permissions.LabelPermissions.WorkflowDefinitionLabels, CoreVerbs.View);
+        RequirePermission(Flamme.Labels.Permissions.LabelPermissions.WorkflowDefinitionLabels, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

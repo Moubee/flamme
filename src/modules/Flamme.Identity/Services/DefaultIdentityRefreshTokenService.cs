@@ -1,16 +1,16 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
-/// Validates and exchanges Elsa identity refresh tokens.
+/// Validates and exchanges Flamme identity refresh tokens.
 /// </summary>
 public sealed class DefaultIdentityRefreshTokenService(
     IUserProvider userProvider,

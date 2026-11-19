@@ -1,7 +1,7 @@
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.Runtime.Stimuli;
+namespace Flamme.Workflows.Runtime.Stimuli;
 
 /// <summary>
 /// Bookmark payload for the <see cref="BulkDispatchWorkflows"/> activity.

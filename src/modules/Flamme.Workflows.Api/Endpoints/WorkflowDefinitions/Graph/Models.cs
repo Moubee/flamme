@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Graph;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Graph;
 
 internal class Request
 {

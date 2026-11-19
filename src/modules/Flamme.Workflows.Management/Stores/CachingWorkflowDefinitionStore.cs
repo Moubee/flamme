@@ -1,12 +1,12 @@
-using Elsa.Caching;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Caching;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Elsa.Workflows.Management.Stores;
+namespace Flamme.Workflows.Management.Stores;
 
 /// <summary>
 /// A decorator for <see cref="IWorkflowDefinitionStore"/> that caches workflow definitions.

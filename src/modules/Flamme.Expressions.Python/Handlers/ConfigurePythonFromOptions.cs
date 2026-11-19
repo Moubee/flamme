@@ -1,10 +1,10 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Expressions.Python.Notifications;
-using Elsa.Expressions.Python.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Expressions.Python.Notifications;
+using Flamme.Expressions.Python.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Python.Handlers;
+namespace Flamme.Expressions.Python.Handlers;
 
 /// <summary>
 /// This handler configures the Python engine based on the <see cref="PythonOptions"/>.

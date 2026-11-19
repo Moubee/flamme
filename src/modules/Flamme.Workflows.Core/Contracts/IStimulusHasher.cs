@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Computes a hash for a given activity type name and bookmark payload.

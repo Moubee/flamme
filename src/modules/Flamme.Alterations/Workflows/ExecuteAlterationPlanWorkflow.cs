@@ -1,10 +1,10 @@
-using Elsa.Alterations.Activities;
-using Elsa.Alterations.Core.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Alterations.Activities;
+using Flamme.Alterations.Core.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Alterations.Workflows;
+namespace Flamme.Alterations.Workflows;
 
 /// <summary>
 /// Executes an alteration plan.

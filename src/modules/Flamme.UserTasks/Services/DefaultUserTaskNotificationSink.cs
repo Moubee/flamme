@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 public sealed class DefaultUserTaskNotificationSink(IServiceProvider services) : IUserTaskNotificationSink
 {

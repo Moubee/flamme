@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides serializer options and services for model serialization suitable for APIs.

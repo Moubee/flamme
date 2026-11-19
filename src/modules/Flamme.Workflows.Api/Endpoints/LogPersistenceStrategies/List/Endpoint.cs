@@ -1,18 +1,18 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Extensions;
-using Elsa.Models;
-using Elsa.Workflows.LogPersistence;
+using Flamme.Abstractions;
+using Flamme.Extensions;
+using Flamme.Models;
+using Flamme.Workflows.LogPersistence;
 using Humanizer;
 
-namespace Elsa.Workflows.Api.Endpoints.LogPersistenceStrategies.List;
+namespace Flamme.Workflows.Api.Endpoints.LogPersistenceStrategies.List;
 
 /// <summary>
 /// Returns list of available <see cref="ILogPersistenceStrategy" /> implementations.
 /// </summary>
-internal class Endpoint(ILogPersistenceStrategyService logPersistenceStrategyService) : ElsaEndpointWithoutRequest<ListResponse<LogPersistenceStrategyDescriptor>>
+internal class Endpoint(ILogPersistenceStrategyService logPersistenceStrategyService) : FlammeEndpointWithoutRequest<ListResponse<LogPersistenceStrategyDescriptor>>
 {
     public override void Configure()
     {

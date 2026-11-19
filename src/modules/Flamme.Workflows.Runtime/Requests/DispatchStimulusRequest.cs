@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Requests;
+namespace Flamme.Workflows.Runtime.Requests;
 
 public class DispatchStimulusRequest
 {

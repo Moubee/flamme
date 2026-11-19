@@ -1,4 +1,4 @@
-namespace Elsa.Tenants.Mediator;
+namespace Flamme.Tenants.Mediator;
 
 public static class TenantHeaders
 {

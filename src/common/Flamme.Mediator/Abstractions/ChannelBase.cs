@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace Elsa.Mediator.Abstractions;
+namespace Flamme.Mediator.Abstractions;
 
 /// <summary>
 /// A base class for channels.

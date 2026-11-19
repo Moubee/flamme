@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// An optional capability, implemented alongside <see cref="IRoleStore"/>, that deletes roles atomically and

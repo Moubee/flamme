@@ -1,12 +1,12 @@
 using System.Threading.Channels;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification;
-using Elsa.Mediator.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification;
+using Flamme.Mediator.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Mediator.Services;
+namespace Flamme.Mediator.Services;
 
 /// <summary>
 /// Continuously reads from a channel to which notifications can be sent, publishing each received notification.

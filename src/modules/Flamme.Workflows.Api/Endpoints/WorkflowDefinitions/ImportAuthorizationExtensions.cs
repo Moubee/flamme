@@ -1,14 +1,14 @@
 using System.Security.Claims;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions;
 
 internal static class ImportAuthorizationExtensions
 {

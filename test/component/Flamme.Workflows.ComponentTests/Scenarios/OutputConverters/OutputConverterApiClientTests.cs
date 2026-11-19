@@ -1,13 +1,13 @@
 using System.Net;
 using System.Text;
-using Elsa.Api.Client;
-using Elsa.Api.Client.Extensions;
-using Elsa.Api.Client.Resources.OutputConverters.Contracts;
-using Elsa.Api.Client.Resources.OutputConverters.Requests;
+using Flamme.Api.Client;
+using Flamme.Api.Client.Extensions;
+using Flamme.Api.Client.Resources.OutputConverters.Contracts;
+using Flamme.Api.Client.Resources.OutputConverters.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.OutputConverters;
+namespace Flamme.Workflows.ComponentTests.Scenarios.OutputConverters;
 
 public class OutputConverterApiClientTests
 {

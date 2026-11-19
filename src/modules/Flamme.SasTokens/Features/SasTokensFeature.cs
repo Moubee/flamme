@@ -1,10 +1,10 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.SasTokens.Contracts;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.SasTokens.Contracts;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.SasTokens.Features;
+namespace Flamme.SasTokens.Features;
 
 /// <summary>
 /// Adds the SAS tokens feature to the workflow runtime.
@@ -14,9 +14,9 @@ public class SasTokensFeature(IModule module) : FeatureBase(module)
 {
     /// <summary>
     /// Configures the <see cref="IDataProtectionBuilder"/> used for setting up data protection.
-    /// Defaults to setting the application name to "Elsa Workflows".
+    /// Defaults to setting the application name to "Flamme Workflows".
     /// </summary>
-    public Action<IDataProtectionBuilder> ConfigureDataProtectionBuilder { get; set; } = b => { b.SetApplicationName("Elsa Workflows"); };
+    public Action<IDataProtectionBuilder> ConfigureDataProtectionBuilder { get; set; } = b => { b.SetApplicationName("Flamme Workflows"); };
 
     /// <summary>
     /// Factory method to create an instance of <see cref="ITokenService"/>.

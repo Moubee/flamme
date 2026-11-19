@@ -1,6 +1,6 @@
-﻿using Elsa.Alterations.Core.Contexts;
+﻿using Flamme.Alterations.Core.Contexts;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Represents a change to a given type <c>T</c>.

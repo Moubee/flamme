@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.ComponentTests.WorkflowProviders;
+namespace Flamme.Workflows.ComponentTests.WorkflowProviders;
 
 public class TestWorkflowProvider : IWorkflowsProvider
 {

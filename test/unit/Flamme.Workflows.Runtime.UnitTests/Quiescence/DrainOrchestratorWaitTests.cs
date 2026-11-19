@@ -1,11 +1,11 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.HostedServices;
-using Elsa.Workflows.Runtime.Services;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.HostedServices;
+using Flamme.Workflows.Runtime.Services;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
+namespace Flamme.Workflows.Runtime.UnitTests.Quiescence;
 
 public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
 {
@@ -120,7 +120,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var maxInFlight = 0;
         var maxLock = new Lock();
         Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var id = __arg0.Id!;
                         lock (seenLock)
@@ -352,7 +352,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
             Mock.Get(ExecutionCycleRegistry).ActiveCount.Returns(2);
             Mock.Get(ExecutionCycleRegistry).ListActiveCycles().Returns(new[] { target, blocker });
             Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-                            .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) => new ValueTask<WorkflowInstance?>(RunningInstance(__arg0.Id!)));
+                            .Returns((global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) => new ValueTask<WorkflowInstance?>(RunningInstance(__arg0.Id!)));
 
             var sut = BuildSut();
             drainTask = Task.Run(async () => await sut.DrainAsync(DrainTrigger.OperatorForce));
@@ -419,7 +419,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         Mock.Get(ExecutionCycleRegistry).ActiveCount.Returns(2);
         Mock.Get(ExecutionCycleRegistry).ListActiveCycles().Returns(new[] { handle, blocker });
         Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) => new ValueTask<WorkflowInstance?>(RunningInstance(__arg0.Id!)));
+                    .Returns((global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) => new ValueTask<WorkflowInstance?>(RunningInstance(__arg0.Id!)));
 
         Task<DrainOutcome>? drainTask = null;
         try
@@ -551,7 +551,7 @@ public class DrainOrchestratorWaitTests : DrainOrchestratorTestsBase
         var promotedIdsLock = new Lock();
         var snapshotFinds = 0;
         Mock.Get(InstanceStore).FindAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         var id = __arg0.Id!;
                         lock (seenLock)

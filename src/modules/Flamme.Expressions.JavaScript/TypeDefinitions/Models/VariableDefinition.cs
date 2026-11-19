@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
 /// <summary>
 /// Represents a variable definition.

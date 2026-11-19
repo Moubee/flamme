@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Services;
-using Elsa.Common.Serialization;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Services;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Runtime.Comparers;
+namespace Flamme.Workflows.Runtime.Comparers;
 
 /// <summary>
 /// Compares two <see cref="StoredTrigger"/> instances for equality.

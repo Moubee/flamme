@@ -1,4 +1,4 @@
-namespace Elsa.Tenants.AspNetCore.Options;
+namespace Flamme.Tenants.AspNetCore.Options;
 
 public class MultitenancyHttpOptions
 {

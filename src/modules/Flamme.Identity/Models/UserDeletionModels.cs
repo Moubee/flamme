@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>Describes a module-owned reference that prevents deleting a user.</summary>
 public sealed record UserDeletionDependency(string Source, string Description);

@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="Expression"/> objects.

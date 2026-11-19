@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Messages;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Provides extension methods for the <see cref="IWorkflowClient"/> interface.

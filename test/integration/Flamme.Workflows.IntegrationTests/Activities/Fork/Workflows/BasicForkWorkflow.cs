@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Activities.Workflows;
 
 public class BasicForkWorkflow : WorkflowBase
 {

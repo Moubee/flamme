@@ -1,6 +1,6 @@
-using Elsa.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Contracts;
 
-namespace Elsa.ExternalAuthentication.Stores.InMemory;
+namespace Flamme.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryConnectionRegistryVersionStore : IConnectionRegistryVersionStore
 {

@@ -1,14 +1,14 @@
-using Elsa.Common.Models;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Dashboard;
-using static Elsa.Dashboard.Api.UnitTests.TestContributor;
+using Flamme.Common.Models;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Dashboard;
+using static Flamme.Dashboard.Api.UnitTests.TestContributor;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 /// <summary>
 /// Each module guards the dashboard data it adds with the permission of that data. A contribution that declared nothing

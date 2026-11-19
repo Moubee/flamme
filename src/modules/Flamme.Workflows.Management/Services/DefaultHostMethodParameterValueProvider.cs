@@ -1,10 +1,10 @@
 using System.Reflection;
-using Elsa.Expressions.Helpers;
-using Elsa.Workflows.Management.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Workflows.Management.Attributes;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <summary>
 /// Default parameter binding implementation for host method activities.

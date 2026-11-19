@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Reflection;
 using Humanizer;
 
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 public static class ObjectMetadataDescriber
 {

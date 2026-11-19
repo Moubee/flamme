@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// HTTP content based on a string that preserves the provided media type as-is (no automatic charset parameter).

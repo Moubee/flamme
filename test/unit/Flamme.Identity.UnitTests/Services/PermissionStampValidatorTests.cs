@@ -1,17 +1,17 @@
 using System.Security.Claims;
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using MsOptions = Microsoft.Extensions.Options.Options;
-using Elsa.Identity.Services;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Identity.Services;
+using Flamme.Testing.Shared.Multitenancy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class PermissionStampValidatorTests : IDisposable
 {

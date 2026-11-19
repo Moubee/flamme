@@ -1,6 +1,6 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 
-namespace Elsa.Http.Contexts;
+namespace Flamme.Http.Contexts;
 
 /// <summary>
 /// Provides context for downloadable providers.

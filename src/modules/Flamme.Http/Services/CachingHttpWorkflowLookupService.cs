@@ -1,8 +1,8 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <summary>
 /// Represents a caching implementation of the IHttpWorkflowLookupService that retrieves workflows using HTTP workflow lookup service and caches the results.

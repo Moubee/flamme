@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
-using ActivityCompleted = Elsa.Workflows.Signals.ActivityCompleted;
+using ActivityCompleted = Flamme.Workflows.Signals.ActivityCompleted;
 
-namespace Elsa.Workflows.Behaviors;
+namespace Flamme.Workflows.Behaviors;
 
 /// <summary>
 /// Implements a behavior that invokes "child completed" callbacks on parent activities.

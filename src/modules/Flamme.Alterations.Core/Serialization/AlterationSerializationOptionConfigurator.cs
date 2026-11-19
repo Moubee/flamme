@@ -1,12 +1,12 @@
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Options;
-using Elsa.Workflows;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Options;
+using Flamme.Workflows;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Alterations.Core.Serialization;
+namespace Flamme.Alterations.Core.Serialization;
 
 /// <summary>
 /// Add additional <see cref="JsonConverter"/> objects.

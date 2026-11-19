@@ -1,6 +1,6 @@
-using Elsa.Features.Models;
+using Flamme.Features.Models;
 
-namespace Elsa.Features.Contracts;
+namespace Flamme.Features.Contracts;
 
 /// <summary>
 /// Represents a registry of installed features.

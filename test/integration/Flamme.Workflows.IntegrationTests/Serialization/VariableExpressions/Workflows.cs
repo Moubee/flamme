@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableExpressions;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableExpressions;
 
 class SampleWorkflow : WorkflowBase
 {

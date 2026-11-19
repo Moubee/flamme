@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Common.UnitTests.Serialization;
+namespace Flamme.Common.UnitTests.Serialization;
 
 public class ConfigurationJsonConverterTests
 {

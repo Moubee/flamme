@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Invokes a workflow in a transactional manner (i.e., runs the workflow in the current context and not via the <see cref="IWorkflowRuntime"/>).

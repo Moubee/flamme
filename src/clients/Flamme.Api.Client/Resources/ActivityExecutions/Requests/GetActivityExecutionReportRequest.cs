@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ActivityExecutions.Requests;
+namespace Flamme.Api.Client.Resources.ActivityExecutions.Requests;
 
 /// <summary>
 /// Represents a request for a list of activity execution records for a given activity in a workflow instance.

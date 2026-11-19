@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Params;
+namespace Flamme.Workflows.Runtime.Params;
 
 /// <summary>
 /// Options for delivering a workflow inbox message.

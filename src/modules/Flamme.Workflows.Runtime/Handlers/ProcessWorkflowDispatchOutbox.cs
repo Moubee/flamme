@@ -1,11 +1,11 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// Processes the workflow dispatch outbox after a workflow state commit.

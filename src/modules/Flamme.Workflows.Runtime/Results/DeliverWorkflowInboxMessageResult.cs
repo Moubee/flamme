@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Results;
+namespace Flamme.Workflows.Runtime.Results;
 
 /// <summary>
 /// Result of delivering a workflow inbox message.

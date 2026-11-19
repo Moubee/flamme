@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.OpenIdConnect.Features;
-using Elsa.Features.Services;
+using Flamme.ExternalAuthentication.OpenIdConnect.Features;
+using Flamme.Features.Services;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ModuleExtensions
 {

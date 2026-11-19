@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Enums;
+using Flamme.Api.Client.Resources.WorkflowInstances.Enums;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// Represents a summary view of a <see cref="WorkflowInstance"/>.

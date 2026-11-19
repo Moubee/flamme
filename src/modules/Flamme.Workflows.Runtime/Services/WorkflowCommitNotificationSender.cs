@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Buffers notifications emitted during workflow commit persistence and delegates all other notifications to the mediator.

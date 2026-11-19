@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Testing.Shared.Authorization;
+namespace Flamme.Testing.Shared.Authorization;
 
 /// <summary>
 /// Authenticates a caller that names itself in a header, holding the permissions named in another header (none when

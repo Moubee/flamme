@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Options;
+namespace Flamme.Workflows.Management.Options;
 
 /// <summary>
 /// Represents parameters for creating a workflow instance.

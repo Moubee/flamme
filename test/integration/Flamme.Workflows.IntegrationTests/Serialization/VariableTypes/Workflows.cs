@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableTypes;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableTypes;
 
 class SampleWorkflow : WorkflowBase
 {

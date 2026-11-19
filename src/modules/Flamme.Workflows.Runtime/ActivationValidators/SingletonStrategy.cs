@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.Workflows.Runtime.ActivationValidators;
+namespace Flamme.Workflows.Runtime.ActivationValidators;
 
 /// <summary>
 /// Only allow new workflow instances if a running one of the same workflow definition doesn't already exist.

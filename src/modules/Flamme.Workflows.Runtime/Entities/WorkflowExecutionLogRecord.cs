@@ -1,7 +1,7 @@
-using Elsa.Common;
-using Elsa.Common.Entities;
+using Flamme.Common;
+using Flamme.Common.Entities;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// Represents a workflow execution log entry.

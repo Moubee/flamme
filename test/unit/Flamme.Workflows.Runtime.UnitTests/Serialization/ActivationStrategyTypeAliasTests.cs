@@ -1,13 +1,13 @@
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Services;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Services;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Serialization;
+namespace Flamme.Workflows.Runtime.UnitTests.Serialization;
 
 public class ActivationStrategyTypeAliasTests
 {

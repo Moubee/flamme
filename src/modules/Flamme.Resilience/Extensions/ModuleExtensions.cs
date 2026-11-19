@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Resilience.Features;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Resilience.Features;
 
-namespace Elsa.Resilience.Extensions;
+namespace Flamme.Resilience.Extensions;
 
 public static class ModuleExtensions
 {

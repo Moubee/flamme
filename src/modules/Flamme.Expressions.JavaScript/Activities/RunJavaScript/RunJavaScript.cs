@@ -1,15 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 using Jint;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.JavaScript.Activities;
+namespace Flamme.Expressions.JavaScript.Activities;
 
 /// <summary>
 /// Executes JavaScript code.

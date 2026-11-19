@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 using Jint;
 
-namespace Elsa.Expressions.JavaScript.Options;
+namespace Flamme.Expressions.JavaScript.Options;
 
 /// <summary>
 /// Options for the Jint JavaScript engine.

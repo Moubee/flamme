@@ -1,10 +1,10 @@
 using System.Reflection;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.RecurringTasks;
 using Medallion.Threading;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class TaskExecutor(IDistributedLockProvider distributedLockProvider, IOptions<DistributedLockingOptions> options) : ITaskExecutor, IBackgroundTaskStarter
 {

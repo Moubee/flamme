@@ -1,4 +1,4 @@
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// A permission: a hierarchical resource path paired with a verb, written <c>{resource}:{verb}</c>.

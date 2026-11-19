@@ -1,25 +1,25 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Journal.GetLastEntry;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Journal.GetLastEntry;
 
 /// <summary>
 /// Return the last log entry for the specified workflow instance and activity ID.
 /// </summary>
 [PublicAPI]
-public class Get(IWorkflowExecutionLogStore store) : ElsaEndpoint<Request, WorkflowExecutionLogRecord>
+public class Get(IWorkflowExecutionLogStore store) : FlammeEndpoint<Request, WorkflowExecutionLogRecord>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/workflow-instances/{workflowInstanceId}/journal/{activityId}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
     }
 
     /// <inheritdoc />

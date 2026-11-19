@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Represents a tenant scope, which sets the current tenant for the duration of the scope.

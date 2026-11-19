@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Messages;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Results;
+namespace Flamme.Workflows.Runtime.Results;
 
 /// <summary>
 /// Represents the result of sending a stimulus the engine.

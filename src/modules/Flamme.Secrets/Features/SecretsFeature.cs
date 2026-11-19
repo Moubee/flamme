@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Secrets.Extensions;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Secrets.Extensions;
 
-namespace Elsa.Secrets.Features;
+namespace Flamme.Secrets.Features;
 
 public class SecretsFeature(IModule module) : FeatureBase(module)
 {

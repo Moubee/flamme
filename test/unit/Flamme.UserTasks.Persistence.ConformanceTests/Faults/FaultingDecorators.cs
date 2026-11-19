@@ -1,7 +1,7 @@
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Faults;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Faults;
 
 /// <summary>
 /// Thrown by the fault decorators. A distinct type so a test can tell an injected failure apart from a

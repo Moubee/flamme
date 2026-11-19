@@ -1,20 +1,20 @@
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Features;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Persistence.EFCore.Repositories;
-using Elsa.Secrets.Services;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Features;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Persistence.EFCore.Repositories;
+using Flamme.Secrets.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Secrets.Persistence.EFCore.Features;
+namespace Flamme.Secrets.Persistence.EFCore.Features;
 
 /// <summary>
 /// Configures the <see cref="SecretsFeature"/> feature with Entity Framework Core persistence.
 /// </summary>
 [DependsOn(typeof(SecretsFeature))]
-public class EFCoreSecretsPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreSecretsPersistenceFeature, SecretsElsaDbContext>(module)
+public class EFCoreSecretsPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreSecretsPersistenceFeature, SecretsFlammeDbContext>(module)
 {
     /// <inheritdoc />
     public override void Apply()

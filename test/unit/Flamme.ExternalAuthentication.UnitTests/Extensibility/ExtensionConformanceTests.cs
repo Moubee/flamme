@@ -1,13 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Extensibility;
+namespace Flamme.ExternalAuthentication.UnitTests.Extensibility;
 
 public class ExtensionConformanceTests
 {

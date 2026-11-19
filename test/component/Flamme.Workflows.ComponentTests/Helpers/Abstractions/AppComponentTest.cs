@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Abstractions;
+namespace Flamme.Workflows.ComponentTests.Abstractions;
 
 /// <summary>
 /// Supplies the session-shared component application while keeping each test's scope and tenant context isolated.

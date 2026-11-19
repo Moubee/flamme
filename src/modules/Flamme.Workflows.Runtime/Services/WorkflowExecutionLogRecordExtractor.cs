@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class WorkflowExecutionLogRecordExtractor(IIdentityGenerator identityGenerator) : ILogRecordExtractor<WorkflowExecutionLogRecord>

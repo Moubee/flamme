@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Security.Claims;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Operations;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Operations;
 
 public class RecoveryAndRevocationTests
 {
@@ -23,7 +23,7 @@ public class RecoveryAndRevocationTests
         var disabled = Connection(enabled: false);
 
         await Assert.That(await guard.AuthorizeAsync(existing, disabled, "tenant-a", new ClaimsPrincipal(new ClaimsIdentity()), false)).IsEqualTo(FinalLoginPathGuardResult.Denied);
-        var privileged = new ClaimsPrincipal(new ClaimsIdentity([new Claim(Elsa.PermissionNames.ClaimType, options.Value.FinalLoginPathGuard.PrivilegedOverridePermission)]));
+        var privileged = new ClaimsPrincipal(new ClaimsIdentity([new Claim(Flamme.PermissionNames.ClaimType, options.Value.FinalLoginPathGuard.PrivilegedOverridePermission)]));
         await Assert.That(await guard.AuthorizeAsync(existing, disabled, "tenant-a", privileged, true)).IsEqualTo(FinalLoginPathGuardResult.Allowed);
         options.Value.FinalLoginPathGuard.HasBreakGlassAuthentication = true;
         await Assert.That(await guard.AuthorizeAsync(existing, disabled, "tenant-a", new ClaimsPrincipal(), false)).IsEqualTo(FinalLoginPathGuardResult.Allowed);

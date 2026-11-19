@@ -1,4 +1,4 @@
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// An implementation of <see cref="ITenantResolver"/> that always returns the default tenant.

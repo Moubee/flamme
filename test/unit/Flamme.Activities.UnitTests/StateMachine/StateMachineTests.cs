@@ -1,14 +1,14 @@
-using Elsa.Testing.Shared;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities.StateMachine.Models;
-using Elsa.Workflows.Options;
+using Flamme.Testing.Shared;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities.StateMachine.Models;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using StateMachineActivity = Elsa.Workflows.Activities.StateMachine.Activities.StateMachine;
+using StateMachineActivity = Flamme.Workflows.Activities.StateMachine.Activities.StateMachine;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.StateMachine;
+namespace Flamme.Activities.UnitTests.StateMachine;
 
 public class StateMachineTests
 {

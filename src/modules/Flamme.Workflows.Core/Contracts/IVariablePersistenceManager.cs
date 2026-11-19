@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Helps managing the persistence of variables.

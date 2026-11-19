@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
-using Elsa.Permissions;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
+using Flamme.Permissions;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Compatibility;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Compatibility;
 
 /// <summary>
 /// Pins the permission descriptor the API serves to the one its client deserializes.

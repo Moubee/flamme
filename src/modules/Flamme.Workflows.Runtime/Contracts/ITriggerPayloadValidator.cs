@@ -1,8 +1,8 @@
-﻿using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Runtime.Entities;
+﻿using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Contracts;
+namespace Flamme.Workflows.Runtime.Contracts;
 
 /// <summary>
 /// Validator that validate a given trigger payload.

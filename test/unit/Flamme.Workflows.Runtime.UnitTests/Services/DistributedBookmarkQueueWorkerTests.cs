@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Runtime.Distributed;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Runtime.Distributed;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class DistributedBookmarkQueueWorkerTests
 {
@@ -52,11 +52,11 @@ public class DistributedBookmarkQueueWorkerTests
         var signaler = new BookmarkQueueSignaler(accessor);
         var lockProvider = new RecordingLockProvider { Succeeds = true };
         var processor = new CountingProcessor();
-        var worker = CreateWorker(signaler, accessor, Elsa.Common.Multitenancy.Tenant.Default, lockProvider, processor);
+        var worker = CreateWorker(signaler, accessor, Flamme.Common.Multitenancy.Tenant.Default, lockProvider, processor);
 
         try
         {
-            using (accessor.PushContext(Elsa.Common.Multitenancy.Tenant.Default))
+            using (accessor.PushContext(Flamme.Common.Multitenancy.Tenant.Default))
                 worker.Start();
 
             await signaler.TriggerAsync();

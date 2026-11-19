@@ -5,7 +5,7 @@ using Jint;
 using Jint.Native;
 using Jint.Runtime.Interop;
 
-namespace Elsa.Expressions.JavaScript.ObjectConverters;
+namespace Flamme.Expressions.JavaScript.ObjectConverters;
 
 internal class JsonElementConverter : IObjectConverter
 {

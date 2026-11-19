@@ -1,12 +1,12 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a host of a workflow instance to interact with.

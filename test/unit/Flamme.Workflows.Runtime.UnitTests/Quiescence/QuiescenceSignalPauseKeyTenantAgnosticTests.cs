@@ -1,15 +1,15 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
-using Elsa.KeyValues.Stores;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Services;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
+using Flamme.KeyValues.Stores;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Services;
 using Microsoft.Extensions.Time.Testing;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
+namespace Flamme.Workflows.Runtime.UnitTests.Quiescence;
 
 /// <summary>
 /// The host-wide pause key must be written as * under an agnostic tenant scope so Memory isolation

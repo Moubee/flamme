@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities.Flowchart.Models;
+namespace Flamme.Workflows.Activities.Flowchart.Models;
 
 [UsedImplicitly]
 public class Position

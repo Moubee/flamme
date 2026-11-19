@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 internal class Configurations : IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Application>, IEntityTypeConfiguration<Role>, IEntityTypeConfiguration<RevokedSession>
 {

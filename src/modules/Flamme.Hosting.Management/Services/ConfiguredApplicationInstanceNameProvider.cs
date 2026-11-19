@@ -1,10 +1,10 @@
-using Elsa.Hosting.Management.Contracts;
-using Elsa.Hosting.Management.Options;
+using Flamme.Hosting.Management.Contracts;
+using Flamme.Hosting.Management.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 
-namespace Elsa.Hosting.Management.Services;
+namespace Flamme.Hosting.Management.Services;
 
 /// <summary>
 /// Resolves the application instance name from <see cref="ApplicationInstanceOptions"/>, allowing a

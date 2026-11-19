@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Text;
 using System.IO.Compression;
-using Elsa.Common;
-using Elsa.Http;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.Parsers;
-using Elsa.Http.Options;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.Http;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.Parsers;
+using Flamme.Http.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Elsa.Workflows.Exceptions;
+using Flamme.Workflows.Exceptions;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class WriteFileHttpResponseTests
 {
@@ -477,7 +477,7 @@ public class WriteFileHttpResponseTests
 
     private static void RegisterZipManager(IServiceCollection services)
     {
-        var zipManagerType = Type.GetType("Elsa.Http.Services.ZipManager, Elsa.Http");
+        var zipManagerType = Type.GetType("Flamme.Http.Services.ZipManager, Flamme.Http");
         if (zipManagerType != null)
         {
             services.AddSingleton(zipManagerType, zipManagerType);

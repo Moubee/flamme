@@ -1,7 +1,7 @@
-using Elsa.Http.Contexts;
-using Elsa.Http.Options;
+using Flamme.Http.Contexts;
+using Flamme.Http.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <inheritdoc />
 public class DefaultDownloadableManager : IDownloadableManager

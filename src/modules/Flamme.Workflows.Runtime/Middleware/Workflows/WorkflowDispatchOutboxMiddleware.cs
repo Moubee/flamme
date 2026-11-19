@@ -1,8 +1,8 @@
-using Elsa.Workflows.Pipelines.WorkflowExecution;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Middleware.Workflows;
+namespace Flamme.Workflows.Runtime.Middleware.Workflows;
 
 /// <summary>
 /// Makes the current workflow execution context available to the workflow dispatch outbox.

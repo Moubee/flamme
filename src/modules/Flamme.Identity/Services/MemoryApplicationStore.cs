@@ -1,11 +1,11 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Represents an in-memory application store.

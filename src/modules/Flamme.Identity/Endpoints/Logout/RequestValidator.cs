@@ -2,7 +2,7 @@ using FastEndpoints;
 using FluentValidation;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Logout;
+namespace Flamme.Identity.Endpoints.Logout;
 
 [PublicAPI]
 internal class RequestValidator : Validator<Request>

@@ -1,12 +1,12 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Features;
-using Elsa.Expressions.Options;
-using Elsa.Features.Services;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Features;
+using Flamme.Expressions.Options;
+using Flamme.Features.Services;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="IModule"/>.

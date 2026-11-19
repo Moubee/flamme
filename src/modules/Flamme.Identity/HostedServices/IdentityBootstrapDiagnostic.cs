@@ -1,19 +1,19 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Options;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.HostedServices;
+namespace Flamme.Identity.HostedServices;
 
 /// <summary>
 /// Reports, at startup, an instance nobody can sign in to: an empty user store with no bootstrap configured.
 /// </summary>
 /// <remarks>
 /// Bootstrapping the first identity is a chicken-and-egg problem — every management endpoint requires a
-/// permission, which requires a role, which requires a user. Elsa answers it declaratively: configure
+/// permission, which requires a role, which requires a user. Flamme answers it declaratively: configure
 /// <see cref="DefaultAdminUserOptions"/> to seed an admin, or <see cref="AdminApiKeyOptions"/> to accept an
 /// out-of-band key. Both work in a deployed environment, and both attach an identity to whatever the caller
 /// then does.

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using Elsa.Common;
+using Flamme.Common;
 
-namespace Elsa.Workflows.Runtime.Services;
+namespace Flamme.Workflows.Runtime.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IIngressSourceRegistry"/>. Backed by a <see cref="ConcurrentDictionary{TKey,TValue}"/>

@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.Composites;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.Composites;
 
 public class Tests : IAsyncDisposable
 {
@@ -15,7 +15,7 @@ public class Tests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureElsa(elsa => elsa.UseJavaScript())
+            .ConfigureFlamme(elsa => elsa.UseJavaScript())
             .Build();
         _workflowBuilderFactory = _services.GetRequiredService<IWorkflowBuilderFactory>();
         _workflowRunner = _services.GetRequiredService<IWorkflowRunner>();

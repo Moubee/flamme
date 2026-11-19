@@ -1,18 +1,18 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Security.Cryptography;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.IntegrationTests.Broker;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.IntegrationTests.Broker;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Sessions;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Sessions;
 
 public class ExternalRefreshPermissionTests
 {
@@ -71,7 +71,7 @@ public class ExternalRefreshPermissionTests
     }
 
     [Test]
-    public async Task RefreshRetainsBoundedExternalSnapshotAndReevaluatesCurrentElsaRoles()
+    public async Task RefreshRetainsBoundedExternalSnapshotAndReevaluatesCurrentFlammeRoles()
     {
         var clock = new FakeTimeProvider(DateTimeOffset.Parse("2026-07-24T12:00:00Z"));
         var sessionStore = new InMemoryExternalAuthenticationSessionStore(clock);
@@ -105,7 +105,7 @@ public class ExternalRefreshPermissionTests
         Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>())
             .Returns(() => ValueTask.FromResult<IEnumerable<Role>>(tenantAccessor.TenantId == "tenant-a" ? [role] : []));
         var issuanceContexts = new List<TokenIssuanceContext>();
-        var tokenService = IElsaTokenService.Mock().Object;
+        var tokenService = IFlammeTokenService.Mock().Object;
         Mock.Get(tokenService).IssueAccessTokenAsync(
                 Arg.Any<TokenIssuanceContext>(),
                 Arg.Any<CancellationToken>())
@@ -205,7 +205,7 @@ public class ExternalRefreshPermissionTests
         var roles = IRoleProvider.Mock().Object;
         Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).Returns(() => ValueTask.FromResult<IEnumerable<Role>>([role]));
         var contexts = new List<TokenIssuanceContext>();
-        var tokenService = IElsaTokenService.Mock().Object;
+        var tokenService = IFlammeTokenService.Mock().Object;
         Mock.Get(tokenService).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>())
             .Returns((TokenIssuanceContext context, CancellationToken cancellationToken) =>
             {

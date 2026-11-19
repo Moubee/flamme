@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Posts a message to a topic to cancel a specified set of workflows.

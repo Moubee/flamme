@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.ActivityDescriptorOptions.Requests;
-using Elsa.Api.Client.Resources.ActivityDescriptorOptions.Responses;
+using Flamme.Api.Client.Resources.ActivityDescriptorOptions.Requests;
+using Flamme.Api.Client.Resources.ActivityDescriptorOptions.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ActivityDescriptorOptions.Contracts;
+namespace Flamme.Api.Client.Resources.ActivityDescriptorOptions.Contracts;
 
 /// <summary>
 /// Represents a client for the workflow definitions API.

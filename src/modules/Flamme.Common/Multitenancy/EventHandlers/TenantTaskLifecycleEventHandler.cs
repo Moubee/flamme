@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Common.Multitenancy.EventHandlers;
+namespace Flamme.Common.Multitenancy.EventHandlers;
 
 /// <summary>
 /// Adapts tenant lifecycle events to the tenant task lifecycle coordinator.

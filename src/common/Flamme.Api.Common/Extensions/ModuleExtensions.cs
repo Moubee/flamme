@@ -1,11 +1,11 @@
 using System.Reflection;
-using Elsa.Features.Services;
-using Elsa.Permissions;
+using Flamme.Features.Services;
+using Flamme.Permissions;
 using FastEndpoints;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IModule"/>.
@@ -26,7 +26,7 @@ public static class ModuleExtensions
         // that assembly's descriptors are registered here rather than in AddFastEndpointsFromModule. A host
         // that wires FastEndpoints itself never calls that helper, and without the authorization handler
         // every RequirePermission endpoint would answer 403 -- fail-closed, but broken.
-        module.Services.AddElsaAuthorization();
+        module.Services.AddFlammeAuthorization();
         module.Services.AddPermissionDescriptorsFromAssembly(assembly);
 
         return module;

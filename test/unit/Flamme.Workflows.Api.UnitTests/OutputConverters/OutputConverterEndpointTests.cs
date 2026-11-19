@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Models;
-using Elsa.Workflows.Api.Endpoints.OutputConverters.List;
-using Elsa.Workflows.Models;
+using Flamme.Common.Serialization;
+using Flamme.Models;
+using Flamme.Workflows.Api.Endpoints.OutputConverters.List;
+using Flamme.Workflows.Models;
 using FastEndpoints;
 
-namespace Elsa.Workflows.Api.UnitTests.OutputConverters;
+namespace Flamme.Workflows.Api.UnitTests.OutputConverters;
 
 public class OutputConverterEndpointTests
 {
@@ -20,7 +20,7 @@ public class OutputConverterEndpointTests
 
         await Assert.That(definition.Routes).Contains("/descriptors/output-converters");
 
-        await Assert.That(Elsa.Authorization.EndpointPermissionRegistry.FindRequirement(typeof(List))).IsNull();
+        await Assert.That(Flamme.Authorization.EndpointPermissionRegistry.FindRequirement(typeof(List))).IsNull();
     }
 
     [Test]

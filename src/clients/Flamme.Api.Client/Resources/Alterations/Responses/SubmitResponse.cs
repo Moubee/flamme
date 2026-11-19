@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Alterations.Responses;
+namespace Flamme.Api.Client.Resources.Alterations.Responses;
 
 /// <summary>
 /// The response to the "Submit" endpoint

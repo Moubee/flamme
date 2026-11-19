@@ -1,27 +1,27 @@
-using Elsa.Testing.Shared.Databases;
+using Flamme.Testing.Shared.Databases;
 using System.Collections.Concurrent;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.HostedServices;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.HostedServices;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Runtime.Requests;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CorrelatedActivation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CorrelatedActivation;
 
 public class Tests
 {
@@ -154,7 +154,7 @@ public class Tests
             await Assert.That(nodeA.GetRequiredService<IDistributedLockProvider>()).IsSameReferenceAs(lockProvider);
             await Assert.That(nodeB.GetRequiredService<IDistributedLockProvider>()).IsSameReferenceAs(lockProvider);
 
-            await using (var dbContext = await nodeA.GetRequiredService<IDbContextFactory<ManagementElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await nodeA.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.EnsureCreatedAsync();
 
             await Task.WhenAll(nodeA.PopulateRegistriesAsync(), nodeB.PopulateRegistriesAsync());
@@ -483,7 +483,7 @@ public class Tests
     private ServiceProvider CreatePostgreSqlServices(string connectionString, IDistributedLockProvider lockProvider)
     {
         var builder = new TestApplicationBuilder(_testOutputHelper)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflowManagement(management => management.UseWorkflowInstances(instances =>
                     instances.UseEntityFrameworkCore(persistence => persistence.UsePostgreSql(connectionString))))
                 .UseWorkflowRuntime(runtime => runtime.DistributedLockProvider = _ => lockProvider));

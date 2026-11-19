@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.JsonSerialization;
+namespace Flamme.Workflows.IntegrationTests.Serialization.JsonSerialization;
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(IDictionary<string, object>), TypeInfoPropertyName = "ObjectMap")]

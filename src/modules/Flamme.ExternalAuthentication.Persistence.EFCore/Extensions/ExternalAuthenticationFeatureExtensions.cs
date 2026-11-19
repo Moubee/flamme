@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Features;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Features;
+using Flamme.ExternalAuthentication.Features;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Features;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.Extensions;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extensions to the <see cref="ExternalAuthenticationFeature"/> feature.

@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.State;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.ExecuteWorkflow;
+namespace Flamme.Workflows.IntegrationTests.Activities.ExecuteWorkflow;
 
 public class ExecuteWorkflowTests : IAsyncDisposable
 {

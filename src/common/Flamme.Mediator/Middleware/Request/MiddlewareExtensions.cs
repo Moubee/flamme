@@ -1,7 +1,7 @@
-using Elsa.Mediator.Middleware.Request.Contracts;
+using Flamme.Mediator.Middleware.Request.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.Middleware.Request;
+namespace Flamme.Mediator.Middleware.Request;
 
 /// <summary>
 /// Provides a set of static methods for building a request pipeline.

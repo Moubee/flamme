@@ -1,8 +1,8 @@
-using Elsa.Common.Entities;
-using Elsa.Workflows.Api.Models;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Api.Models;
 using FastEndpoints;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.List;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.List;
 
 internal class Request
 {

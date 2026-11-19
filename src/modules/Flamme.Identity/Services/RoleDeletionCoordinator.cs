@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Authorization;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 public sealed class RoleDeletionCoordinator(

@@ -1,14 +1,14 @@
 using System.Text.Json;
-using Elsa.Expressions;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Expressions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Expressions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Providers;
+namespace Flamme.Workflows.Management.Providers;
 
 /// <inheritdoc />
 public class DefaultExpressionDescriptorProvider : IExpressionDescriptorProvider

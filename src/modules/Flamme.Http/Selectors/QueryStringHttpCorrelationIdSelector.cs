@@ -1,7 +1,7 @@
-using Elsa.Http.Abstractions;
+using Flamme.Http.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.Selectors;
+namespace Flamme.Http.Selectors;
 
 /// <summary>
 /// Returns the correlation ID from the <c>correlationId</c> query string parameter.

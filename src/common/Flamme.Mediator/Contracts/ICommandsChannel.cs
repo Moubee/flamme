@@ -1,7 +1,7 @@
 using System.Threading.Channels;
-using Elsa.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Command;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// A channel that can be used to enqueue commands.

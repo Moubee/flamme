@@ -1,6 +1,6 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Provides extension methods for <see cref="ActivityExecutionContext"/> to enhance its functionality.

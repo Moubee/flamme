@@ -1,6 +1,6 @@
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Contributes middleware to the activity execution pipeline.

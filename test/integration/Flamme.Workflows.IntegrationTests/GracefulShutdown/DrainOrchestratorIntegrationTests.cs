@@ -1,13 +1,13 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Runtime;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// End-to-end DI integration tests: prove the orchestrator + signal + registries are correctly wired through
-/// the full Elsa runtime registration. Drain-deadline-breach and workflow-cancellation scenarios are covered
+/// the full Flamme runtime registration. Drain-deadline-breach and workflow-cancellation scenarios are covered
 /// by the unit tests in <c>DrainOrchestratorWaitTests</c>; here we only verify the production wiring resolves
 /// correctly and a no-op drain returns the expected outcome.
 /// </summary>
@@ -18,7 +18,7 @@ public class DrainOrchestratorIntegrationTests : IAsyncDisposable
     public DrainOrchestratorIntegrationTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflowRuntime(runtime => runtime
                     .ConfigureGracefulShutdown(options =>
                     {

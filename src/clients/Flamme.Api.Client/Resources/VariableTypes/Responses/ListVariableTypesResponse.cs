@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.VariableTypes.Models;
+using Flamme.Api.Client.Resources.VariableTypes.Models;
 
-namespace Elsa.Api.Client.Resources.VariableTypes.Responses;
+namespace Flamme.Api.Client.Resources.VariableTypes.Responses;
 
 /// <summary>
 /// A response containing a list of variable types.

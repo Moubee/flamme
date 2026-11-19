@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Management.Models
+﻿namespace Flamme.Workflows.Management.Models
 {
     /// <summary>
     /// Represents a request to save a workflow definition.

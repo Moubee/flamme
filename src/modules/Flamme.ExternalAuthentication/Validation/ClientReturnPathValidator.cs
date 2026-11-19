@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Validation;
+namespace Flamme.ExternalAuthentication.Validation;
 
 /// <summary>
 /// Validates a browser return path supplied to the authentication broker.

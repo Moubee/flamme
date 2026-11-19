@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Login;
+namespace Flamme.Identity.Endpoints.Login;
 
 public class Request
 {

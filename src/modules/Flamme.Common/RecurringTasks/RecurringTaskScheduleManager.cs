@@ -1,7 +1,7 @@
 using Cronos;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Common.RecurringTasks;
+namespace Flamme.Common.RecurringTasks;
 
 public class RecurringTaskScheduleManager(IOptions<RecurringTaskOptions> options, TimeProvider timeProvider)
 {

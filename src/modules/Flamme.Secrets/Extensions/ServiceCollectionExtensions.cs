@@ -1,14 +1,14 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Secrets.Providers;
-using Elsa.Secrets.Repositories;
-using Elsa.Secrets.Services;
-using Elsa.Secrets.Stores;
-using Elsa.Secrets.Types;
-using Elsa.Tenants.Options;
+using Flamme.Expressions.Contracts;
+using Flamme.Secrets.Providers;
+using Flamme.Secrets.Repositories;
+using Flamme.Secrets.Services;
+using Flamme.Secrets.Stores;
+using Flamme.Secrets.Types;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.Secrets.Extensions;
+namespace Flamme.Secrets.Extensions;
 
 public static class ServiceCollectionExtensions
 {

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.Timer.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.Timer.Workflows;
 
 public class TimerWorkflow : WorkflowBase
 {
@@ -14,7 +14,7 @@ public class TimerWorkflow : WorkflowBase
             Activities =
             {
                 new WriteLine("Starting...") { Id = "WriteLine1" },
-                Elsa.Scheduling.Activities.Timer.FromSeconds(1),
+                Flamme.Scheduling.Activities.Timer.FromSeconds(1),
                 new WriteLine("End") { Id = "WriteLine2" }
             }
         };

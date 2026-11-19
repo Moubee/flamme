@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="Type"/> with additional methods.

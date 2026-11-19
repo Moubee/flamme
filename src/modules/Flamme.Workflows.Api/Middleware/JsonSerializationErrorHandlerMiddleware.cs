@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Middleware;
+namespace Flamme.Workflows.Api.Middleware;
 
 /// <summary>
 /// Catches JSON serialization errors during POST requests and returns Bad Request responses.

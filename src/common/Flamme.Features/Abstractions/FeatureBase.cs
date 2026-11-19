@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Features.Abstractions;
+namespace Flamme.Features.Abstractions;
 
 /// <summary>
 /// Base type for classes that represent a feature. 

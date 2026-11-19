@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public class WorkflowIndexingContext
 {

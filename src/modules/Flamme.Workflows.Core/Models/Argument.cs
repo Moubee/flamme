@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// A base type for the <see cref="Input{T}"/> type.

@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Workflows.Api.Permissions;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Enums;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Authorization;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Workflows.Api.Permissions;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Enums;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Runtime.Dashboard;
+namespace Flamme.Workflows.Runtime.Dashboard;
 
 public class WorkflowDashboardContributor(
     IWorkflowInstanceStore workflowInstanceStore,

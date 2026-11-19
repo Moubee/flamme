@@ -3,13 +3,13 @@ using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Serialization.ReferenceHandlers;
-using Elsa.Workflows.Services;
-using Elsa.Common.Serialization;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.ReferenceHandlers;
+using Flamme.Workflows.Services;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.Polymorphism;
+namespace Flamme.Workflows.IntegrationTests.Serialization.Polymorphism;
 
 public class Tests
 {

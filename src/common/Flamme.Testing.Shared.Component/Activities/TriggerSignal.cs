@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Testing.Shared.Activities;
+namespace Flamme.Testing.Shared.Activities;
 
 public class TriggerSignal(string signal) : CodeActivity
 {

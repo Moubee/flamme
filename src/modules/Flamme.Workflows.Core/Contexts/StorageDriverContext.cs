@@ -1,6 +1,6 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides context for storage drivers.

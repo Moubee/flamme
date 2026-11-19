@@ -1,10 +1,10 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Services;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Features;
+namespace Flamme.Expressions.Features;
 
 /// <summary>
 /// Installs and configures the expressions feature.

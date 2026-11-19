@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Requests;
+namespace Flamme.Workflows.Runtime.Requests;
 
 /// <summary>
 /// Contains arguments to use for counting the number of workflow instances.

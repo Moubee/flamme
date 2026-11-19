@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.CommitStrategies.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.CommitStrategies.Models;
+using Flamme.Api.Client.Shared.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.CommitStrategies.Contracts;
+namespace Flamme.Api.Client.Resources.CommitStrategies.Contracts;
 
 /// <summary>
 /// Represents a client for the commit strategies API.

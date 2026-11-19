@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class TenantEventsManager(
     IEnumerable<ITenantActivatedEvent> tenantActivatedEvents, 

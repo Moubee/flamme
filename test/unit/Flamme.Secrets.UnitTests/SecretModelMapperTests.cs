@@ -1,7 +1,7 @@
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Services;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Services;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretModelMapperTests
 {

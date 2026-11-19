@@ -1,13 +1,13 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IRevokedSessionStore"/>.
 /// </summary>
-public class EFCoreRevokedSessionStore(EntityStore<IdentityElsaDbContext, RevokedSession> store) : IRevokedSessionStore
+public class EFCoreRevokedSessionStore(EntityStore<IdentityFlammeDbContext, RevokedSession> store) : IRevokedSessionStore
 {
     /// <inheritdoc />
     public async Task AddOrExtendAsync(RevokedSession revokedSession, CancellationToken cancellationToken = default)

@@ -1,20 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Acornima.Ast;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.ObjectConverters;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.ObjectConverters;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Mediator.Contracts;
 using Jint;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable ConvertClosureToMethodGroup
-namespace Elsa.Expressions.JavaScript.Services;
+namespace Flamme.Expressions.JavaScript.Services;
 
 /// <summary>
 /// Provides a JavaScript evaluator using Jint.

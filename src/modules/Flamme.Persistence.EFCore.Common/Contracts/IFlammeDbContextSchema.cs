@@ -1,9 +1,9 @@
-﻿namespace Elsa.Persistence.EFCore;
+﻿namespace Flamme.Persistence.EFCore;
 
 /// <summary>
-/// Interface to provide custom Elsa Db Context Schema in Migration
+/// Interface to provide custom Flamme Db Context Schema in Migration
 /// </summary>
-public interface IElsaDbContextSchema
+public interface IFlammeDbContextSchema
 {
     /// <summary>
     /// Name of the Schema

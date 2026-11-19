@@ -1,11 +1,11 @@
 using System.Text;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JavaScriptFunctions;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JavaScriptFunctions;
 
 public class BytesAndStringEncodingTests : IAsyncDisposable
 {

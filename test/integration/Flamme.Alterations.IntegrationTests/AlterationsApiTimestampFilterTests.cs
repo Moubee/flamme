@@ -2,17 +2,17 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Net;
 using System.Net.Http.Json;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Common;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Enums;
-using Elsa.Workflows.Runtime;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Common;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Enums;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TUnit.AspNetCore;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 public class AlterationsApiTimestampFilterTests : WebApplicationTest<AlterationsWebApplicationFactory, AlterationsTestEntryPoint>
 {

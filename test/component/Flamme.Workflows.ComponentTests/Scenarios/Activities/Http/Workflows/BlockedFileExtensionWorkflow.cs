@@ -1,11 +1,11 @@
 using System.Net;
-using Elsa.Http;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Http;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
 using Microsoft.AspNetCore.Http;
-using Endpoint = Elsa.Workflows.Activities.Flowchart.Models.Endpoint;
+using Endpoint = Flamme.Workflows.Activities.Flowchart.Models.Endpoint;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Http.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Http.Workflows;
 
 public class BlockedFileExtensionWorkflow : WorkflowBase
 {

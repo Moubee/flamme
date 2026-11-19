@@ -1,15 +1,15 @@
 using System.ComponentModel;
 using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
-using Elsa.Features.Services;
+using Flamme.Extensions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Features.Implementations;
+namespace Flamme.Features.Implementations;
 
 /// <inheritdoc />
 public class Module : IModule
@@ -130,7 +130,7 @@ public class Module : IModule
         {
             var type = feature.GetType();
             var name = type.Name.Replace("Feature", string.Empty);
-            var ns = "Elsa";
+            var ns = "Flamme";
             var displayName = type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? name;
             var description = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
             registry.Add(new(name, ns, displayName, description));

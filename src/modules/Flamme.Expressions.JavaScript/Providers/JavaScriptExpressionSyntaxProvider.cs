@@ -1,11 +1,11 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Expressions;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Expressions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.JavaScript.Providers;
+namespace Flamme.Expressions.JavaScript.Providers;
 
 [UsedImplicitly]
 internal class JavaScriptExpressionDescriptorProvider : IExpressionDescriptorProvider

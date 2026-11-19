@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public class DefaultWorkflowInstanceVariableWriter(IVariablePersistenceManager variablePersistenceManager) : IWorkflowInstanceVariableWriter
 {

@@ -1,12 +1,12 @@
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Abstractions;
-using Elsa.Alterations.Core.Contexts;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Signals;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Abstractions;
+using Flamme.Alterations.Core.Contexts;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Signals;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.AlterationHandlers;
+namespace Flamme.Alterations.AlterationHandlers;
 
 /// <summary>
 /// Schedules an activity for execution.

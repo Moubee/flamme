@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Serializes and deserializes <see cref="IAlteration"/> objects.

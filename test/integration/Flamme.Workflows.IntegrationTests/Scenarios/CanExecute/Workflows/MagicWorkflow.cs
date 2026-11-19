@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CanExecute.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CanExecute.Workflows;
 
 public class MagicWorkflow : WorkflowBase
 {

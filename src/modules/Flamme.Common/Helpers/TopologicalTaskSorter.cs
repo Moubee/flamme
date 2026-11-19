@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Common.Helpers;
+namespace Flamme.Common.Helpers;
 
 /// <summary>
 /// Sorts tasks based on their dependencies using topological ordering.

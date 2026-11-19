@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Activities.Flowchart.Contracts;
+namespace Flamme.Workflows.Activities.Flowchart.Contracts;
 
 /// <summary>
 /// Gives implementing activities a chance to customize certain flowchart execution behaviors.

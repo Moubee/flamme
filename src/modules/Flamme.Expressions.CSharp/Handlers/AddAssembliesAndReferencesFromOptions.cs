@@ -1,11 +1,11 @@
-using Elsa.Expressions.CSharp.Notifications;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.CSharp.Notifications;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.CSharp.Handlers;
+namespace Flamme.Expressions.CSharp.Handlers;
 
 /// <summary>
 /// This handler adds assemblies and namespaces from the <see cref="CSharpOptions"/> to the <see cref="ScriptOptions"/>.

@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Services;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 public class DashboardRangeResolverTests
 {

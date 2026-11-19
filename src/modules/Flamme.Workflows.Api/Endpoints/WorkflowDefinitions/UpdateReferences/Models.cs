@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.UpdateReferences;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.UpdateReferences;
 
 internal record Request
 {

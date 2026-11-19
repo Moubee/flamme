@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Contracts;
+namespace Flamme.ExternalAuthentication.Contracts;
 
 public interface IExternalAuthenticationAdapter
 {
@@ -123,7 +123,7 @@ public interface IUnlinkedIdentityPolicy
     ValueTask<UnlinkedIdentityDecision> EvaluateAsync(UnlinkedIdentityContext context, CancellationToken cancellationToken = default);
 }
 
-/// <summary>Trusted deployed extension that may identify one Elsa user for an unlinked external identity.</summary>
+/// <summary>Trusted deployed extension that may identify one Flamme user for an unlinked external identity.</summary>
 public interface IExternalUserMatcher
 {
     string Type { get; }

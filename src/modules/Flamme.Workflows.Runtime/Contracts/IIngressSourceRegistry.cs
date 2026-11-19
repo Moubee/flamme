@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Central inventory of ingress sources discovered via DI and surfaced to the drain orchestrator,

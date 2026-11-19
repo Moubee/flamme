@@ -1,7 +1,7 @@
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime.Results;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime.Results;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Contains extension methods for the <see cref="IStimulusSender"/> interface.

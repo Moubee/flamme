@@ -1,9 +1,9 @@
-using Elsa.Api.Client.Resources.Scripting.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.Scripting.Models;
+using Flamme.Api.Client.Shared.Models;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Scripting.Contracts;
+namespace Flamme.Api.Client.Resources.Scripting.Contracts;
 
 /// <summary>
 /// Represents a client for the expression descriptors API.

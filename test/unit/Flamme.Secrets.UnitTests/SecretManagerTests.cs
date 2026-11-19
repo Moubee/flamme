@@ -1,6 +1,6 @@
-using Elsa.Secrets.Models;
+using Flamme.Secrets.Models;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretManagerTests
 {
@@ -26,7 +26,7 @@ public class SecretManagerTests
             Value = "p@ssword"
         });
 
-        var model = Elsa.Secrets.Services.SecretModelMapper.ToModel(secret);
+        var model = Flamme.Secrets.Services.SecretModelMapper.ToModel(secret);
 
         await Assert.That(secret.Name).IsEqualTo("smtp:password");
         await Assert.That(model.DisplayName).IsEqualTo("SMTP password");

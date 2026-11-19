@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 public abstract class StoreSaveManyTenantOwnershipTests
 {

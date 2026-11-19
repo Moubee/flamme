@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using JetBrains.Annotations;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 [PublicAPI]
 public class TypeTypeConverter : TypeConverter

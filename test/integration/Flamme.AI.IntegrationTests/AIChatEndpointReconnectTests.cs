@@ -1,14 +1,14 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Streaming;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Streaming;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using ChatEndpoint = Elsa.AI.Host.Endpoints.AI.Chat.Endpoint;
+using ChatEndpoint = Flamme.AI.Host.Endpoints.AI.Chat.Endpoint;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIChatEndpointReconnectTests
 {

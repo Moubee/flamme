@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.Tasks.Requests;
+using Flamme.Api.Client.Resources.Tasks.Requests;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Tasks.Contracts;
+namespace Flamme.Api.Client.Resources.Tasks.Contracts;
 
 /// <summary>
 /// Represents a client for the tasks API.

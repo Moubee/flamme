@@ -1,7 +1,7 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class DefaultTenantService(IServiceScopeFactory scopeFactory, ITenantScopeFactory tenantScopeFactory, TenantEventsManager tenantEvents, ITenantAccessor tenantAccessor) : ITenantService, IAsyncDisposable
 {

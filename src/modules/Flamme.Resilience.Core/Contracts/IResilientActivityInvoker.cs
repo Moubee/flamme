@@ -1,6 +1,6 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 /// <summary>
 /// Provides functionality to execute an activity's logic with a specified resilience strategy, or execute the action directly if no resilience configuration is applicable.

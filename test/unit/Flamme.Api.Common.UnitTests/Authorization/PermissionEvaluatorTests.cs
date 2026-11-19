@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Threading.Tasks;
 
-namespace Elsa.Api.Common.UnitTests.Authorization;
+namespace Flamme.Api.Common.UnitTests.Authorization;
 
 public class PermissionEvaluatorTests
 {
@@ -59,7 +59,7 @@ public class PermissionEvaluatorTests
     [Test]
     public async Task TheEmptySetSentinelIsNotAGrant()
     {
-        // Elsa writes "none" when it knows the caller has zero grants. It must never authorize anything.
+        // Flamme writes "none" when it knows the caller has zero grants. It must never authorize anything.
         var principal = PrincipalWith(PermissionNames.None);
 
         await Assert.That(_evaluator.GetGrants(principal)).IsEmpty();

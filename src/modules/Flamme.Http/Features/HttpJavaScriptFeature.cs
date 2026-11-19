@@ -1,11 +1,11 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Http.Scripting.JavaScript;
-using Elsa.Expressions.JavaScript.Features;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Http.Scripting.JavaScript;
+using Flamme.Expressions.JavaScript.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Http.Features;
+namespace Flamme.Http.Features;
 
 /// <summary>
 /// Enabled when both <see cref="HttpFeature"/> and <see cref="JavaScriptFeature"/> are enabled.

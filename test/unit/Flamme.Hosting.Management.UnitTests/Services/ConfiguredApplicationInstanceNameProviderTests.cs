@@ -1,9 +1,9 @@
-using Elsa.Hosting.Management.Options;
-using Elsa.Hosting.Management.Services;
+using Flamme.Hosting.Management.Options;
+using Flamme.Hosting.Management.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 
-namespace Elsa.Hosting.Management.UnitTests.Services;
+namespace Flamme.Hosting.Management.UnitTests.Services;
 
 public class ConfiguredApplicationInstanceNameProviderTests
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Models;
+namespace Flamme.Workflows.Runtime.Models;
 
 /// <summary>
 /// The supported workflow dispatch outbox command kinds.

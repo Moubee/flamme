@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 /// <summary>
 /// Projects the internal aggregate onto the wire contract. Every protected value passes through an explicit

@@ -1,14 +1,14 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Security;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Security;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Requests;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkDispatch;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkDispatch;
 
 [PublicAPI]
 internal class Endpoint(
@@ -16,12 +16,12 @@ internal class Endpoint(
     IWorkflowDispatcher workflowDispatcher,
     IIdentityGenerator identityGenerator,
     WorkflowDefinitionScriptAuthorizationService scriptAuthorizationService)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
         Post("/workflow-definitions/{definitionId}/bulk-dispatch");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Execute);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Execute);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

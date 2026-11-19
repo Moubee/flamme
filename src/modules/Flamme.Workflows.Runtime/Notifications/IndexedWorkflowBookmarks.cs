@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// Contains the bookmarks that were added, removed, or unchanged.

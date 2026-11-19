@@ -1,6 +1,6 @@
-﻿using Elsa.Expressions.Models;
+﻿using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.Liquid.Contracts;
+namespace Flamme.Expressions.Liquid.Contracts;
 
 /// <summary>
 /// Provides services to render Liquid templates.

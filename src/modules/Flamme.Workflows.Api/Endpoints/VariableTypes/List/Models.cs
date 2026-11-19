@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.VariableTypes.List;
+namespace Flamme.Workflows.Api.Endpoints.VariableTypes.List;
 
 internal class Response(ICollection<VariableTypeDescriptor> items)
 {

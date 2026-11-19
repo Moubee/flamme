@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Serializes <see cref="Type"/> objects to a simple alias representing said type.

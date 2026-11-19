@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.AspNetCore.Middleware;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.AspNetCore.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants.UnitTests.Middleware;
+namespace Flamme.Tenants.UnitTests.Middleware;
 
 public class TenantResolutionMiddlewareTests
 {

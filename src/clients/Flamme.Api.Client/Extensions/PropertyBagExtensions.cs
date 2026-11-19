@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Provides extension methods for the PropertyBag class.

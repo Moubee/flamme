@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// A factory class that wraps and extends the functionality of an existing <see cref="IDbContextFactory{TDbContext}"/>
@@ -31,7 +31,7 @@ public class TenantAwareDbContextFactory<TDbContext>(
 
     private void SetTenantId(TDbContext context)
     {
-        if (context is ElsaDbContextBase elsaContext) 
-            elsaContext.TenantId = tenantAccessor.TenantId;
+        if (context is FlammeDbContextBase flammeContext) 
+            flammeContext.TenantId = tenantAccessor.TenantId;
     }
 }

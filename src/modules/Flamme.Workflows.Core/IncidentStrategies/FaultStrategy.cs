@@ -2,7 +2,7 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Workflows.IncidentStrategies;
+namespace Flamme.Workflows.IncidentStrategies;
 
 /// <summary>
 /// An incident strategy that puts the entire workflow in the <c>Faulted</c> state.

@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Net;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Workflows;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Links;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Links;
 
 public class IdentityLinkAuthorizationTests : WebApplicationTest<IdentityLinkAuthorizationWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {

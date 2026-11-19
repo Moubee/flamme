@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
 
-namespace Elsa.Activities.IntegrationTests;
+namespace Flamme.Activities.IntegrationTests;
 
 public class SetOutputTests : IAsyncDisposable
 {

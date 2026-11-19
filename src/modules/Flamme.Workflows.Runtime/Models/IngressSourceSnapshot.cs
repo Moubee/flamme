@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Point-in-time view of a registered ingress source, surfaced via <c>IIngressSourceRegistry.Snapshot()</c>

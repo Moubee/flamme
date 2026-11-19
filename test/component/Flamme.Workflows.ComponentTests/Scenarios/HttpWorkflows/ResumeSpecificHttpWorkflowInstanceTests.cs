@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.HttpWorkflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.HttpWorkflows;
 
 public class ResumeSpecificHttpWorkflowInstanceTests(App app) : AppComponentTest(app)
 {

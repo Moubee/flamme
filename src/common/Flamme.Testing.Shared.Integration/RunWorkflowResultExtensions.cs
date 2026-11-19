@@ -1,8 +1,8 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Provides extension methods for <see cref="RunWorkflowResult"/> to facilitate testing with Journal-based assertions.

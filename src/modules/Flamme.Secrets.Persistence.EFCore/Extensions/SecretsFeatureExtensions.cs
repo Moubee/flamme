@@ -1,7 +1,7 @@
-using Elsa.Secrets.Features;
-using Elsa.Secrets.Persistence.EFCore.Features;
+using Flamme.Secrets.Features;
+using Flamme.Secrets.Persistence.EFCore.Features;
 
-namespace Elsa.Secrets.Persistence.EFCore.Extensions;
+namespace Flamme.Secrets.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extensions to the <see cref="SecretsFeature"/> feature.

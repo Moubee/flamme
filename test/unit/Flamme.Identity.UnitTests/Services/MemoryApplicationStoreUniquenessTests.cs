@@ -1,11 +1,11 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Services;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Services;
+using Flamme.Testing.Shared.Multitenancy;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 /// <summary>
 /// Memory must enforce the same per-tenant application uniqueness that EF Core

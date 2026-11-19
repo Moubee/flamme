@@ -1,8 +1,8 @@
 using System.Net.Mime;
-using Elsa.Workflows;
+using Flamme.Workflows;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// A fault handler that writes detailed information about the fault to the <see cref="HttpResponse"/>.

@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
 
 /// <summary>
 /// A response containing the IDs of workflow definitions that consume a specified workflow definition.

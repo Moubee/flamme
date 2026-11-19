@@ -1,22 +1,22 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Extensions;
-using Elsa.Alterations.Core.Models;
-using Elsa.Alterations.Core.Stores;
-using Elsa.Alterations.Extensions;
-using Elsa.Alterations.Services;
-using Elsa.Alterations.Workflows;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Workflows.Options;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Extensions;
+using Flamme.Alterations.Core.Models;
+using Flamme.Alterations.Core.Stores;
+using Flamme.Alterations.Extensions;
+using Flamme.Alterations.Services;
+using Flamme.Alterations.Workflows;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Alterations.Features;
+namespace Flamme.Alterations.Features;
 
 /// <summary>
-/// Adds the Elsa alterations services.
+/// Adds the Flamme alterations services.
 /// </summary>
 public class AlterationsFeature : FeatureBase
 {

@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Elsa.Expressions.JavaScript.Helpers;
+namespace Flamme.Expressions.JavaScript.Helpers;
 
 /// <summary>
 /// Contains helper methods for working with object arrays.

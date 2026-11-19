@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 using FluentStorage.Blobs;
 
-namespace Elsa.WorkflowProviders.BlobStorage.Contracts;
+namespace Flamme.WorkflowProviders.BlobStorage.Contracts;
 
 /// <summary>
 /// Handles parsing of workflow definitions from blob storage in a specific format.

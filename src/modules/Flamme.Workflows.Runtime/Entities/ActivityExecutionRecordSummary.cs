@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// Represents a summarized view of a single activity execution of an activity instance.

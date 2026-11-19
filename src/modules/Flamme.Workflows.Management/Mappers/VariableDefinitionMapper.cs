@@ -1,13 +1,13 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Services;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Management.Mappers;
+namespace Flamme.Workflows.Management.Mappers;
 
 /// <summary>
 /// Maps <see cref="Variable"/>s to <see cref="VariableDefinition"/>s and vice versa.

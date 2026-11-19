@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.SharedHelpers;
+namespace Flamme.Workflows.IntegrationTests.SharedHelpers;
 
 internal static class TestResourceDisposal
 {

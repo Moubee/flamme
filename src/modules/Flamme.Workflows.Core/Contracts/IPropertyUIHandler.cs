@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Resolves UI options for a property.

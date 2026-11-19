@@ -1,7 +1,7 @@
-﻿using Elsa.Workflows.Activities.Flowchart.Models;
+﻿using Flamme.Workflows.Activities.Flowchart.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Flowchart;
+namespace Flamme.Workflows.Core.UnitTests.Flowchart;
 
 public static class FlowGraphExtensions
 {

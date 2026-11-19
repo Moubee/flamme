@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared;
+using Flamme.Api.Client.Shared;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Contains extension methods for the <see cref="HttpResponseMessage"/> class.

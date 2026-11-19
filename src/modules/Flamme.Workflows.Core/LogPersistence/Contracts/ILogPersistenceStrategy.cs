@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.LogPersistence;
+namespace Flamme.Workflows.LogPersistence;
 
 public interface ILogPersistenceStrategy
 {

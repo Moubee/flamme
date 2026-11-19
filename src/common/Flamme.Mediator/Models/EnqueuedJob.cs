@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Models;
+namespace Flamme.Mediator.Models;
 
 /// <summary>
 /// Represents an item in the job queue.

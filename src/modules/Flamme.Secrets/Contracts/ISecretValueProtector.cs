@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Contracts;
+namespace Flamme.Secrets.Contracts;
 
 public interface ISecretValueProtector
 {

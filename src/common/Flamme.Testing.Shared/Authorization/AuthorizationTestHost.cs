@@ -1,11 +1,11 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Testing.Shared.Authorization;
+namespace Flamme.Testing.Shared.Authorization;
 
 /// <summary>
 /// A FastEndpoints host exercising real endpoint authorization: callers name themselves and their permissions in headers

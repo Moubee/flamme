@@ -1,10 +1,10 @@
-using Elsa.Mediator.Abstractions;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification;
+using Flamme.Mediator.Abstractions;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification;
 
-namespace Elsa.Mediator.Channels;
+namespace Flamme.Mediator.Channels;
 
-/// <inheritdoc cref="Elsa.Mediator.Contracts.INotificationsChannel" />
+/// <inheritdoc cref="Flamme.Mediator.Contracts.INotificationsChannel" />
 public class NotificationsChannel : ChannelBase<NotificationContext>, INotificationsChannel
 {
 }

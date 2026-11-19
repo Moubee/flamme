@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Options;
+namespace Flamme.Identity.Options;
 
 /// <summary>
 /// Options for the built-in admin user provider.

@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures.ConformanceExtensions;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures.ConformanceExtensions;
 
 internal sealed class ConformanceExternalAuthenticationAdapter : IExternalAuthenticationAdapter
 {

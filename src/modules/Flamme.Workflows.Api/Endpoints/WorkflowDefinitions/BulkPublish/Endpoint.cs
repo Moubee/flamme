@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Api.Security;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Api.Security;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkPublish;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkPublish;
 
 [PublicAPI]
 internal class BulkPublish(
@@ -19,12 +19,12 @@ internal class BulkPublish(
     IAuthorizationService authorizationService,
     IWorkflowDefinitionService workflowDefinitionService,
     WorkflowDefinitionScriptAuthorizationService scriptAuthorizationService)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
         Post("/bulk-actions/publish/workflow-definitions/by-definition-ids");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "publish");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "publish");
     }
 
     public override async Task<Response> ExecuteAsync(Request request, CancellationToken cancellationToken)

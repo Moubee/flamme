@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// An <see cref="IHttpEndpointAuthorizationHandler"/> that uses the <see cref="IAuthorizationService"/> to authorize an inbound HTTP request.

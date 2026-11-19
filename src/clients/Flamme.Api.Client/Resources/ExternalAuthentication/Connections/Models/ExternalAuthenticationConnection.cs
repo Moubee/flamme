@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Models;
 
 /// <summary>
 /// An external authentication connection exposed by the management API.

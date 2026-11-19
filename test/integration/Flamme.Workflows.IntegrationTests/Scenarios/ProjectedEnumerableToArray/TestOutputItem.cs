@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
 
 public class TestOutputItem
 {

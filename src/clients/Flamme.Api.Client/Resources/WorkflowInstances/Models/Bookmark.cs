@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// A bookmark represents a location in a workflow where the workflow can be resumed at a later time.

@@ -1,16 +1,16 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Models;
-using Elsa.Alterations.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Enums;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.State;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Models;
+using Flamme.Alterations.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Enums;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 public class WorkflowInstanceFinderTimestampFilterTests : IAsyncDisposable
 {
@@ -21,7 +21,7 @@ public class WorkflowInstanceFinderTimestampFilterTests : IAsyncDisposable
     public WorkflowInstanceFinderTimestampFilterTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(elsa => elsa.UseAlterations())
             .Build();
         
         _workflowInstanceFinder = _services.GetRequiredService<IWorkflowInstanceFinder>();

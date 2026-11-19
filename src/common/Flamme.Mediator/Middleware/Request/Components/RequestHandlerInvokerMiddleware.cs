@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Request.Contracts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Request.Contracts;
 
-namespace Elsa.Mediator.Middleware.Request.Components;
+namespace Flamme.Mediator.Middleware.Request.Components;
 
 /// <summary>
 /// A middleware component that invokes request handlers.

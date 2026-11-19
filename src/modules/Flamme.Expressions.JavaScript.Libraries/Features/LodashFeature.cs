@@ -1,5 +1,5 @@
-﻿using Elsa.Features.Services;
+﻿using Flamme.Features.Services;
 
-namespace Elsa.Expressions.JavaScript.Libraries;
+namespace Flamme.Expressions.JavaScript.Libraries;
 
 public class LodashFeature(IModule module) : ScriptModuleFeatureBase("lodash", module);

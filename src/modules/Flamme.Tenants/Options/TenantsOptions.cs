@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Providers;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Providers;
 
-namespace Elsa.Tenants.Options;
+namespace Flamme.Tenants.Options;
 
 /// <summary>
 /// Options for configuring the Tenants.

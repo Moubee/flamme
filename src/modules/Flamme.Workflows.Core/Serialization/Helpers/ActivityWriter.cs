@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Serialization.Helpers;
+namespace Flamme.Workflows.Serialization.Helpers;
 
 /// <summary>
 /// The ActivityWriter class is responsible for writing an activity to a JSON writer using the provided options.

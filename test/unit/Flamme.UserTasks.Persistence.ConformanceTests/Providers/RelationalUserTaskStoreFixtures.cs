@@ -1,11 +1,11 @@
 using System.Reflection;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Testing.Shared.Databases;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Testing.Shared.Databases;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 
 /// <summary>
 /// PostgreSQL runs by default in an isolated test database. ELSA_USERTASKS_TEST_POSTGRES can select
@@ -53,5 +53,5 @@ public sealed class PostgreSqlUserTaskStoreFixture : EFCoreUserTaskStoreFixture
     }
 
     protected override void ConfigureServices(IServiceCollection services) => services.AddPostgreSqlEntityModelCreatingHandlers();
-    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseElsaPostgreSql(MigrationsAssembly, connectionString);
+    protected override void ConfigureProvider(DbContextOptionsBuilder builder, string connectionString) => builder.UseFlammePostgreSql(MigrationsAssembly, connectionString);
 }

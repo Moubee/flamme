@@ -1,13 +1,13 @@
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.Attributes;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Activities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Activities;
 
 /// <summary>
 /// A custom activity that simulates a long-running operation to test workflow deletion during execution.
 /// This activity sends a signal when it starts, then delays for a specified duration.
 /// </summary>
-[Activity("Elsa.Workflows.ComponentTests", "LongRunningActivity", "A long-running activity for testing")]
+[Activity("Flamme.Workflows.ComponentTests", "LongRunningActivity", "A long-running activity for testing")]
 public class LongRunningActivity : CodeActivity
 {
     /// <summary>

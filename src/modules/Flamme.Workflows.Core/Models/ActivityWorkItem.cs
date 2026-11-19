@@ -1,6 +1,6 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Represents a work item that can be scheduled for execution.

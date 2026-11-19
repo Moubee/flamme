@@ -1,9 +1,9 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Providers;
+namespace Flamme.ExternalAuthentication.Providers;
 
 /// <summary>
 /// Projects optional database-owned rows into the effective registry. The backing store is deliberately replaceable.

@@ -1,12 +1,12 @@
 using System.Reflection;
 using Acornima;
-using Elsa.Expressions.Options;
-using Elsa.Workflows.Options;
+using Flamme.Expressions.Options;
+using Flamme.Workflows.Options;
 using Jint;
 using Jint.Runtime;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Expressions.JavaScript;
+namespace Flamme.Expressions.JavaScript;
 
 internal static class JavaScriptExceptionTypeAliasRegistrar
 {

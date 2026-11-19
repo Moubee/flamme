@@ -1,7 +1,7 @@
-using Elsa.Common;
-using Elsa.Workflows.Runtime.Models;
+using Flamme.Common;
+using Flamme.Workflows.Runtime.Models;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class WorkflowDispatchOutbox(

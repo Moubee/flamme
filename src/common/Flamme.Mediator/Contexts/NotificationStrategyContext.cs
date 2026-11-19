@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.Contexts;
+namespace Flamme.Mediator.Contexts;
 
 /// <summary>
 /// Represents a context for publishing events.

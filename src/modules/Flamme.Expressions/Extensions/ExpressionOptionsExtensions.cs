@@ -1,8 +1,8 @@
-using Elsa.Expressions.Options;
+using Flamme.Expressions.Options;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="ExpressionOptions"/>.

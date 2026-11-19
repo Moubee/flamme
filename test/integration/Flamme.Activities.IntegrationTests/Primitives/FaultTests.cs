@@ -1,12 +1,12 @@
-using Elsa.Activities.IntegrationTests.Primitives.Workflows;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.State;
+using Flamme.Activities.IntegrationTests.Primitives.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.State;
 
-namespace Elsa.Activities.IntegrationTests.Primitives;
+namespace Flamme.Activities.IntegrationTests.Primitives;
 
 /// <summary>
 /// Integration tests for the <see cref="Fault"/> activity.

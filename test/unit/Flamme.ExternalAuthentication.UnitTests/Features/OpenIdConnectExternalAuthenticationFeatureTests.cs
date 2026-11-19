@@ -1,11 +1,11 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.OpenIdConnect.Features;
-using Elsa.ExternalAuthentication.OpenIdConnect.Services;
-using Elsa.Features.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.OpenIdConnect.Features;
+using Flamme.ExternalAuthentication.OpenIdConnect.Services;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Features;
+namespace Flamme.ExternalAuthentication.UnitTests.Features;
 
 public class OpenIdConnectExternalAuthenticationFeatureTests
 {

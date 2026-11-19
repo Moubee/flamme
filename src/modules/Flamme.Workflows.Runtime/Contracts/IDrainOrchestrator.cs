@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Owns the drain protocol end-to-end: parallel pause of every <see cref="IIngressSource"/>, wait for active execution cycles to

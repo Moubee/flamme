@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
 
 class HelloWorldWorkflow : WorkflowBase
 {

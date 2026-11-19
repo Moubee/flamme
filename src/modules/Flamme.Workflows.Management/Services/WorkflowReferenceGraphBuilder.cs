@@ -1,8 +1,8 @@
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Options;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IWorkflowReferenceGraphBuilder"/> that uses <see cref="IWorkflowReferenceQuery"/>

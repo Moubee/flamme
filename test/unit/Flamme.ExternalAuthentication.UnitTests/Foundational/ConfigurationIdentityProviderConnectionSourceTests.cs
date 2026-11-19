@@ -1,11 +1,11 @@
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Providers;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Providers;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ConfigurationIdentityProviderConnectionSourceTests
 {

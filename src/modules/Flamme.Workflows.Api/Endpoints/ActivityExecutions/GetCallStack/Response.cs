@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
 
 /// <summary>
 /// Response containing the call stack for an activity execution with pagination support.

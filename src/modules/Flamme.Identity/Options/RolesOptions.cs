@@ -1,6 +1,6 @@
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Options;
+namespace Flamme.Identity.Options;
 
 /// <summary>
 /// Represents options that stores available roles. 

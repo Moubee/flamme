@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
 
 /// <summary>
 /// Represents a response to a request to update consuming workflow references.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
 
 /// <summary>
 /// Fluent builder for constructing test data with workflows and triggers.

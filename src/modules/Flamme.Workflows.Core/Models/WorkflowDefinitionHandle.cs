@@ -1,6 +1,6 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Represents a handle to a workflow definition.

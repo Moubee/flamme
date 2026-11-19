@@ -1,15 +1,15 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.State;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.JavaScriptVariables;
+namespace Flamme.Workflows.ComponentTests.Scenarios.JavaScriptVariables;
 
 public class JavaScriptVariablesWorkflowTests(App app) : AppComponentTest(app)
 {

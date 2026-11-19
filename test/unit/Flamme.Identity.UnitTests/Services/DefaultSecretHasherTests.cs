@@ -1,16 +1,16 @@
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Testing.Shared.Multitenancy;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class DefaultSecretHasherTests
 {

@@ -1,11 +1,11 @@
 using System.ComponentModel;
-using Elsa.Common.Serialization;
-using Elsa.Common.Services;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Common.Serialization;
+using Flamme.Common.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Features;
+namespace Flamme.Common.Features;
 
 public class DefaultFormattersFeature(IModule module) : FeatureBase(module)
 {

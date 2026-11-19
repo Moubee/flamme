@@ -1,10 +1,10 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Materializers;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Materializers;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Mappers;
+namespace Flamme.Workflows.Management.Mappers;
 
 /// <summary>
 /// Maps <see cref="WorkflowDefinition"/> to and from <see cref="Workflow"/> and <see cref="WorkflowDefinitionModel"/>.

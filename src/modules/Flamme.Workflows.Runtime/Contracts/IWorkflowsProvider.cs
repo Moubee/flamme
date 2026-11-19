@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Runtime;
+﻿namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a source of workflow definitions.

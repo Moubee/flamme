@@ -1,12 +1,12 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
-/// Resolves normalized external identities to Elsa users and delegates tuple uniqueness to the atomic provisioner.
+/// Resolves normalized external identities to Flamme users and delegates tuple uniqueness to the atomic provisioner.
 /// </summary>
 public sealed class DefaultExternalIdentityResolver(
     IExternalIdentityProvisioner provisioner,
@@ -85,7 +85,7 @@ public sealed class DefaultExternalIdentityResolver(
 }
 
 /// <summary>
-/// Signals that a successfully authenticated external identity has no permitted Elsa user link.
+/// Signals that a successfully authenticated external identity has no permitted Flamme user link.
 /// Endpoint code must translate this exception to the safe <c>identity_unlinked</c> broker category.
 /// </summary>
 public sealed class ExternalIdentityUnlinkedException(string safeReason) : InvalidOperationException

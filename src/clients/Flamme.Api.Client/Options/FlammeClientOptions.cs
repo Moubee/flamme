@@ -1,17 +1,17 @@
-namespace Elsa.Api.Client.Options;
+namespace Flamme.Api.Client.Options;
 
 /// <summary>
-/// Represents options for the Elsa client.
+/// Represents options for the Flamme client.
 /// </summary>
-public class ElsaClientOptions
+public class FlammeClientOptions
 {
     /// <summary>
-    /// Gets or sets the base address of the Elsa server.
+    /// Gets or sets the base address of the Flamme server.
     /// </summary>
     public Uri BaseAddress { get; set; } = default!;
 
     /// <summary>
-    /// Gets or sets the API key function to use when authenticating with the Elsa server.
+    /// Gets or sets the API key function to use when authenticating with the Flamme server.
     /// </summary>
     public string? ApiKey { get; set; }
     

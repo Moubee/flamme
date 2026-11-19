@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Builds a complete graph of workflow references by recursively discovering all workflows

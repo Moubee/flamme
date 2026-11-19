@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints.Labels.Update;
+namespace Flamme.Labels.Endpoints.Labels.Update;
 
 public class Request
 {

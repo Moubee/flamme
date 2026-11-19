@@ -1,16 +1,16 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class DefaultIdentityRefreshTokenServiceTests
 {
@@ -25,7 +25,7 @@ public class DefaultIdentityRefreshTokenServiceTests
     };
     private readonly IAccessTokenIssuer _accessTokenIssuer = IAccessTokenIssuer.Mock().Object;
     private readonly IUserProvider _userProvider = IUserProvider.Mock().Object;
-    private readonly DefaultElsaTokenService _tokenService;
+    private readonly DefaultFlammeTokenService _tokenService;
     private readonly SessionRevoker _sessionRevoker;
     private readonly DefaultIdentityRefreshTokenService _service;
 

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Graph.Segments;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Graph.Segments;
 
 internal class Request
 {

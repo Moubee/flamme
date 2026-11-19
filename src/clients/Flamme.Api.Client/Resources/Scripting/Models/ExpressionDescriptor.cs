@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Resources.Scripting.Models;
+namespace Flamme.Api.Client.Resources.Scripting.Models;
 
 /// <summary>
 /// Represents a descriptor for an expression.

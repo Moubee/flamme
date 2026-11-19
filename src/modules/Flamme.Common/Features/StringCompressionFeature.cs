@@ -1,11 +1,11 @@
-using Elsa.Common.Codecs;
-using Elsa.Common.Services;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Common.Codecs;
+using Flamme.Common.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Features;
+namespace Flamme.Common.Features;
 
 [UsedImplicitly]
 public class StringCompressionFeature(IModule module) : FeatureBase(module)

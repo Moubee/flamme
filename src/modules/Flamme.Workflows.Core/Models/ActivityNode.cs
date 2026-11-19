@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Represents an activity in the context of an hierarchical tree structure, providing access to its siblings, parents and children.

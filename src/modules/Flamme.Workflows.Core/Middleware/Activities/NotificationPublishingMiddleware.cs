@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 
-namespace Elsa.Workflows.Middleware.Activities;
+namespace Flamme.Workflows.Middleware.Activities;
 
 /// <summary>
 /// An activity execution middleware component that publishes activity notifications:

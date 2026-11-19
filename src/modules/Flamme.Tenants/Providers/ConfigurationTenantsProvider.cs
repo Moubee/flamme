@@ -1,11 +1,11 @@
-﻿using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Options;
+﻿using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Tenants.Providers;
+namespace Flamme.Tenants.Providers;
 
 /// <summary>
 /// Provides the implementation to retrieve tenant information from a configuration.

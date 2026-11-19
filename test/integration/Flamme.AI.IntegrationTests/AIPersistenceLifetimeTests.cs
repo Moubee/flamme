@@ -1,10 +1,10 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Persistence.EFCore;
-using Elsa.Extensions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Persistence.EFCore;
+using Flamme.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIPersistenceLifetimeTests
 {

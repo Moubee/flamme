@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// A summary of a workflow definition.

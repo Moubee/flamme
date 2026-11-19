@@ -1,22 +1,22 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Common;
-using Elsa.Common.Codecs;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Options;
+using Flamme.Common;
+using Flamme.Common.Codecs;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Options;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Management;
+namespace Flamme.Persistence.EFCore.Modules.Management;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IWorkflowInstanceStore"/>.
@@ -24,7 +24,7 @@ namespace Elsa.Persistence.EFCore.Modules.Management;
 [UsedImplicitly]
 public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
 {
-    private readonly EntityStore<ManagementElsaDbContext, WorkflowInstance> _store;
+    private readonly EntityStore<ManagementFlammeDbContext, WorkflowInstance> _store;
     private readonly IWorkflowStateSerializer _workflowStateSerializer;
     private readonly ICompressionCodecResolver _compressionCodecResolver;
     private readonly IOptions<ManagementOptions> _options;
@@ -34,7 +34,7 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
     /// Constructor.
     /// </summary>
     public EFCoreWorkflowInstanceStore(
-        EntityStore<ManagementElsaDbContext, WorkflowInstance> store,
+        EntityStore<ManagementFlammeDbContext, WorkflowInstance> store,
         IWorkflowStateSerializer workflowStateSerializer,
         ICompressionCodecResolver compressionCodecResolver,
         IOptions<ManagementOptions> options,
@@ -82,7 +82,7 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
     }
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("Calls Elsa.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
+    [RequiresUnreferencedCode("Calls Flamme.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
     public async ValueTask<long> CountAsync(WorkflowInstanceFilter filter, CancellationToken cancellationToken = default)
     {
         return await _store.CountAsync(filter.Apply, cancellationToken);
@@ -217,7 +217,7 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
     }
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("Calls Elsa.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
+    [RequiresUnreferencedCode("Calls Flamme.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
     public async ValueTask SaveAsync(WorkflowInstance instance, CancellationToken cancellationToken = default)
     {
         await _store.SaveAsync(instance, OnSaveAsync, cancellationToken);
@@ -241,8 +241,8 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
         await _store.SaveManyAsync(instances, OnSaveAsync, cancellationToken);
     }
 
-    [RequiresUnreferencedCode("Calls Elsa.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
-    private async ValueTask OnSaveAsync(ManagementElsaDbContext managementElsaDbContext, WorkflowInstance entity, CancellationToken cancellationToken)
+    [RequiresUnreferencedCode("Calls Flamme.Workflows.Contracts.IWorkflowStateSerializer.SerializeAsync(WorkflowState, CancellationToken)")]
+    private async ValueTask OnSaveAsync(ManagementFlammeDbContext managementFlammeDbContext, WorkflowInstance entity, CancellationToken cancellationToken)
     {
         var data = entity.WorkflowState;
         var json = _workflowStateSerializer.Serialize(data);
@@ -250,18 +250,18 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
         var compressionCodec = _compressionCodecResolver.Resolve(compressionAlgorithm);
         var compressedJson = await compressionCodec.CompressAsync(json, cancellationToken);
 
-        managementElsaDbContext.Entry(entity).Property("Data").CurrentValue = compressedJson;
-        managementElsaDbContext.Entry(entity).Property("DataCompressionAlgorithm").CurrentValue = compressionAlgorithm;
+        managementFlammeDbContext.Entry(entity).Property("Data").CurrentValue = compressedJson;
+        managementFlammeDbContext.Entry(entity).Property("DataCompressionAlgorithm").CurrentValue = compressionAlgorithm;
     }
 
-    private async ValueTask OnLoadAsync(ManagementElsaDbContext managementElsaDbContext, WorkflowInstance? entity, CancellationToken cancellationToken)
+    private async ValueTask OnLoadAsync(ManagementFlammeDbContext managementFlammeDbContext, WorkflowInstance? entity, CancellationToken cancellationToken)
     {
         if (entity == null)
             return;
 
         var data = entity.WorkflowState;
-        var json = (string?)managementElsaDbContext.Entry(entity).Property("Data").CurrentValue;
-        var compressionAlgorithm = (string?)managementElsaDbContext.Entry(entity).Property("DataCompressionAlgorithm").CurrentValue ?? nameof(None);
+        var json = (string?)managementFlammeDbContext.Entry(entity).Property("Data").CurrentValue;
+        var compressionAlgorithm = (string?)managementFlammeDbContext.Entry(entity).Property("DataCompressionAlgorithm").CurrentValue ?? nameof(None);
         var compressionStrategy = _compressionCodecResolver.Resolve(compressionAlgorithm);
 
         try

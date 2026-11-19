@@ -1,18 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.Permissions;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
-using Elsa.UserTasks.Services;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.Permissions;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
+using Flamme.UserTasks.Services;
 using FastEndpoints;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using System.Threading.Tasks;
 
-namespace Elsa.UserTasks.UnitTests.Authorization;
+namespace Flamme.UserTasks.UnitTests.Authorization;
 
 /// <summary>
 /// Pins what each User Tasks endpoint requires, and checks that what they require is something the catalog
@@ -102,9 +102,9 @@ public class EndpointPermissionTests
         await Assert.That(unused.Length == 0).IsTrue().Because($"The catalog advertises {unused.Length} permission(s) no endpoint requires: {string.Join(", ", unused)}.");
     }
 
-    /// <summary>The Elsa endpoints this module declares, by simple name.</summary>
+    /// <summary>The Flamme endpoints this module declares, by simple name.</summary>
     private static IEnumerable<string> EndpointNames() =>
-        Elsa.Testing.Shared.Authorization.EndpointCoverage.FindEndpoints(Module).Select(x => x.Name);
+        Flamme.Testing.Shared.Authorization.EndpointCoverage.FindEndpoints(Module).Select(x => x.Name);
 
     /// <summary>
     /// Runs one endpoint's <c>Configure()</c> and returns what it recorded. The requirement is attached as an
@@ -115,23 +115,23 @@ public class EndpointPermissionTests
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     private static Type ResolveEndpointType(string name) => name switch
     {
-        "FeatureCapabilitiesEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.FeatureCapabilitiesEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ListEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "GetEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.GetEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "CapabilitiesEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CapabilitiesEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ListEventsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListEventsEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "RevealFieldEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RevealFieldEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ClaimEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ClaimEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ReleaseEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ReleaseEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "AssignEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.AssignEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ScheduleEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ScheduleEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "CompleteEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CompleteEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "CancelEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.CancelEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "RetryResolutionEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RetryResolutionEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "IssueInvitationEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.IssueInvitationEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ListInvitationsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListInvitationsEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "RevokeInvitationEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.RevokeInvitationEndpoint, Elsa.UserTasks", throwOnError: true)!,
-        "ListParticipantsEndpoint" => Type.GetType("Elsa.UserTasks.Endpoints.ListParticipantsEndpoint, Elsa.UserTasks", throwOnError: true)!,
+        "FeatureCapabilitiesEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.FeatureCapabilitiesEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ListEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ListEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "GetEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.GetEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "CapabilitiesEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.CapabilitiesEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ListEventsEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ListEventsEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "RevealFieldEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.RevealFieldEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ClaimEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ClaimEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ReleaseEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ReleaseEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "AssignEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.AssignEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ScheduleEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ScheduleEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "CompleteEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.CompleteEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "CancelEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.CancelEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "RetryResolutionEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.RetryResolutionEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "IssueInvitationEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.IssueInvitationEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ListInvitationsEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ListInvitationsEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "RevokeInvitationEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.RevokeInvitationEndpoint, Flamme.UserTasks", throwOnError: true)!,
+        "ListParticipantsEndpoint" => Type.GetType("Flamme.UserTasks.Endpoints.ListParticipantsEndpoint, Flamme.UserTasks", throwOnError: true)!,
         _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
     };
 
@@ -178,11 +178,11 @@ public class EndpointPermissionTests
             var definition = type.GetGenericTypeDefinition();
             var arguments = type.GetGenericArguments();
 
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpoint<,>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpoint<,>))
                 return (arguments[0], arguments[1]);
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpointWithoutRequest<>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpointWithoutRequest<>))
                 return (typeof(EmptyRequest), arguments[0]);
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpoint<>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpoint<>))
                 return (arguments[0], typeof(object));
         }
 

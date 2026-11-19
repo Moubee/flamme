@@ -1,7 +1,7 @@
-using Elsa.Scheduling.Schedules;
-using Elsa.Scheduling.Tasks;
+using Flamme.Scheduling.Schedules;
+using Flamme.Scheduling.Tasks;
 
-namespace Elsa.Scheduling.Services;
+namespace Flamme.Scheduling.Services;
 
 /// <summary>
 /// A default implementation of <see cref="IWorkflowScheduler"/> that uses the <see cref="LocalScheduler"/>.

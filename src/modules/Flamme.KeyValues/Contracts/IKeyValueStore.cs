@@ -1,7 +1,7 @@
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
 
-namespace Elsa.KeyValues.Contracts;
+namespace Flamme.KeyValues.Contracts;
 
 /// <summary>
 /// Store that holds key value entities that can be used to store application data. 

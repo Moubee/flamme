@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.UIHints.CheckList;
+namespace Flamme.Workflows.UIHints.CheckList;
 
 /// <summary>
 /// Provides properties for the <see cref="InputUIHints.CheckList"/> UI hint.

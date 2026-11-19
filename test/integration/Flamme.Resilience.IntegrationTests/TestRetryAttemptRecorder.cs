@@ -1,7 +1,7 @@
-using Elsa.Resilience.Entities;
-using Elsa.Resilience.Models;
+using Flamme.Resilience.Entities;
+using Flamme.Resilience.Models;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public class TestRetryAttemptRecorder : IRetryAttemptRecorder
 {

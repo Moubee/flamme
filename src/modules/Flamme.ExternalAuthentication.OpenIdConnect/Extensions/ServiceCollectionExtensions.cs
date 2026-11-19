@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.OpenIdConnect.Services;
-using Elsa.ExternalAuthentication.OpenIdConnect.Validation;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.OpenIdConnect.Services;
+using Flamme.ExternalAuthentication.OpenIdConnect.Validation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;

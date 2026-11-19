@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Options;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class AIGroundingResultFormatter(IOptions<AIHostOptions> options)
 {
@@ -51,7 +51,7 @@ public class AIGroundingResultFormatter(IOptions<AIHostOptions> options)
         new()
         {
             Status = AIToolInvocationStatus.Failed,
-            Summary = $"{sourceName} is not available in this Elsa host.",
+            Summary = $"{sourceName} is not available in this Flamme host.",
             Error = $"{sourceName} is not available.",
             Data = new JsonObject
             {

@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Attributes;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Represents an inline code activity that can be used to execute arbitrary .NET code from a workflow.

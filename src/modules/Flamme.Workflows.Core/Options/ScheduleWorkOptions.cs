@@ -1,6 +1,6 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.Options;
+namespace Flamme.Workflows.Options;
 
 /// <summary>
 /// Represents options for scheduling a work item.

@@ -1,8 +1,8 @@
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// An in-memory <see cref="IRevokedSessionStore"/>. Revocations are lost on restart and not shared between nodes.

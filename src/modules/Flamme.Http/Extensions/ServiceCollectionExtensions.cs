@@ -1,9 +1,9 @@
-using Elsa.Http;
+using Flamme.Http;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Contains extension methods for the <see cref="IServiceCollection"/> interface.

@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Results;
+using Flamme.Alterations.Core.Results;
 
-namespace Elsa.Alterations.Endpoints.Alterations.Run;
+namespace Flamme.Alterations.Endpoints.Alterations.Run;
 
 /// <summary>
 /// The response from the <see cref="Run"/> endpoint.

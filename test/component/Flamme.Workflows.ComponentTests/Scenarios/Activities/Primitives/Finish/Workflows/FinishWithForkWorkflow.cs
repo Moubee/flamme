@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
 
 /// <summary>
 /// A workflow that publishes an event locally, then forks execution into two paths with Event activities,
@@ -37,7 +37,7 @@ public class FinishWithForkWorkflow : WorkflowBase
                     }
                 },
                 // Finish clears remaining completion callbacks
-                new Elsa.Workflows.Activities.Finish()
+                new Flamme.Workflows.Activities.Finish()
             }
         };
     }

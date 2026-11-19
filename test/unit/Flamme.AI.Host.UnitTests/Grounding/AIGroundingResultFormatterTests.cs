@@ -1,10 +1,10 @@
 using System.Text.Json.Nodes;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Services;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Grounding;
+namespace Flamme.AI.Host.UnitTests.Grounding;
 
 public class AIGroundingResultFormatterTests
 {

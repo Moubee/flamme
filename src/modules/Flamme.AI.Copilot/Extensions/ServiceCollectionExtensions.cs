@@ -1,11 +1,11 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Copilot.Adapters;
-using Elsa.AI.Copilot.Options;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Copilot.Adapters;
+using Flamme.AI.Copilot.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ServiceCollectionExtensions
 {

@@ -1,6 +1,6 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionActivities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionActivities;
 
 public class Tests : IAsyncDisposable
 {

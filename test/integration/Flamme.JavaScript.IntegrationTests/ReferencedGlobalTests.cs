@@ -1,11 +1,11 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Memory;
 using Jint;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// The generated variable, input and activity output accessors are registered only when the expression names
@@ -111,7 +111,7 @@ public class ReferencedGlobalTests : IAsyncDisposable
     {
         Engine? engine = null;
         await using var fixture = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
-        fixture.ConfigureElsa(elsa => elsa.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
+        fixture.ConfigureFlamme(elsa => elsa.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
 
         var context = await fixture.CreateExpressionExecutionContextAsync([new Variable<int>("MyVariable", 42)]);
         var evaluator = fixture.Services.GetRequiredService<IJavaScriptEvaluator>();

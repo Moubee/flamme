@@ -1,7 +1,7 @@
-using Elsa.Mediator.Middleware.Command.Contracts;
-using Elsa.Mediator.Middleware.Command.Components;
+using Flamme.Mediator.Middleware.Command.Contracts;
+using Flamme.Mediator.Middleware.Command.Components;
 
-namespace Elsa.Mediator.Middleware.Command;
+namespace Flamme.Mediator.Middleware.Command;
 
 /// <summary>
 /// Provides extension methods for <see cref="ICommandPipelineBuilder"/>.

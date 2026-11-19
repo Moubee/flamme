@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Validates converter settings against descriptor and converter-owned rules.

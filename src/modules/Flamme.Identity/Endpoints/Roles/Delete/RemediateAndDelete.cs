@@ -1,20 +1,20 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Identity.Endpoints.Roles.Delete;
+namespace Flamme.Identity.Endpoints.Roles.Delete;
 
 /// <summary>Removes a role from all editable dependency policies and deletes it only after reinspection succeeds.</summary>
 [PublicAPI]
-internal sealed class RemediateAndDelete(IRoleDeletionCoordinator coordinator) : ElsaEndpoint<RemediateRoleDeletionRequest>
+internal sealed class RemediateAndDelete(IRoleDeletionCoordinator coordinator) : FlammeEndpoint<RemediateRoleDeletionRequest>
 {
     public override void Configure()
     {
         Post("/identity/roles/{id}/remove-from-jit-policies-and-delete");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Delete);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(RemediateRoleDeletionRequest request, CancellationToken cancellationToken)

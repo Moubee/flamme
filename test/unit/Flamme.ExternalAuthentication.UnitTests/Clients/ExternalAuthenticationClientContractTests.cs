@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Clients;
+namespace Flamme.ExternalAuthentication.UnitTests.Clients;
 
 public class ExternalAuthenticationClientContractTests
 {

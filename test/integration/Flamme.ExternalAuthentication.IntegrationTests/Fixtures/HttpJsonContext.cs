@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.ExternalAuthentication.IntegrationTests.Connections;
-using Elsa.ExternalAuthentication.IntegrationTests.Links;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.IntegrationTests.Connections;
+using Flamme.ExternalAuthentication.IntegrationTests.Links;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 
 [JsonSourceGenerationOptions(JsonSerializerDefaults.Web, GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(PolicySelection))]

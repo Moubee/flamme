@@ -1,10 +1,10 @@
-using Elsa.Common;
+using Flamme.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Elsa.Common.UnitTests;
+namespace Flamme.Common.UnitTests;
 
 public class ExceptionExtensionsTests
 {

@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.Container;
+namespace Flamme.Workflows.IntegrationTests.Activities.Container;
 
 /// <summary>
 /// Simple workflow with a container that executes activities sequentially.

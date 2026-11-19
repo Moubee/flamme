@@ -1,20 +1,20 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <inheritdoc />
 [UsedImplicitly]
 public class EFCoreTriggerStore(
-    EntityStore<RuntimeElsaDbContext, StoredTrigger> store,
+    EntityStore<RuntimeFlammeDbContext, StoredTrigger> store,
     ITenantAccessor tenantAccessor,
     IPayloadSerializer serializer) : ITriggerStore
 {
@@ -100,13 +100,13 @@ public class EFCoreTriggerStore(
         return await store.DeleteWhereAsync(filter.Apply, cancellationToken);
     }
 
-    private ValueTask OnSaveAsync(RuntimeElsaDbContext dbContext, StoredTrigger entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(RuntimeFlammeDbContext dbContext, StoredTrigger entity, CancellationToken cancellationToken)
     {
         dbContext.Entry(entity).Property("SerializedPayload").CurrentValue = entity.Payload != null ? serializer.Serialize(entity.Payload) : null;
         return default;
     }
 
-    private ValueTask OnLoadAsync(RuntimeElsaDbContext dbContext, StoredTrigger? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(RuntimeFlammeDbContext dbContext, StoredTrigger? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return ValueTask.CompletedTask;

@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.ExternalAuthentication.Notifications;
+namespace Flamme.ExternalAuthentication.Notifications;
 
 public enum SecurityEventOutcome
 {

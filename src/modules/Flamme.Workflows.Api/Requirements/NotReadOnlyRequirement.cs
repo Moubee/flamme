@@ -1,10 +1,10 @@
-﻿using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Options;
+﻿using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Options;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Api.Requirements;
+namespace Flamme.Workflows.Api.Requirements;
 
 public record NotReadOnlyResource(WorkflowDefinition? WorkflowDefinition = default);
 

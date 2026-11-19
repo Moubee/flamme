@@ -1,11 +1,11 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Commands;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Requests;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundStimulusDispatcherTests
 {
@@ -24,8 +24,8 @@ public class BackgroundStimulusDispatcherTests
         await dispatcher.SendAsync(request, callerCts.Token);
 
         // Assert - background commands run independently of caller's lifecycle
-        Mock.Get(_commandSender).SendAsync<global::Elsa.Mediator.Models.Unit>(
-            Arg.Is<global::Elsa.Mediator.Contracts.ICommand<global::Elsa.Mediator.Models.Unit>>(__value => __value is DispatchStimulusCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
+        Mock.Get(_commandSender).SendAsync<global::Flamme.Mediator.Models.Unit>(
+            Arg.Is<global::Flamme.Mediator.Contracts.ICommand<global::Flamme.Mediator.Models.Unit>>(__value => __value is DispatchStimulusCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     private BackgroundStimulusDispatcher CreateDispatcher()

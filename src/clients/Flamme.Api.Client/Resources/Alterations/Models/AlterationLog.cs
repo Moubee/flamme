@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Alterations.Models;
+namespace Flamme.Api.Client.Resources.Alterations.Models;
 
 /// <summary>
 /// Represents a log of alterations.

@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using Elsa.AI.Host.Options;
-using Elsa.Authorization;
-using Elsa.Common.Multitenancy;
+using Flamme.AI.Host.Options;
+using Flamme.Authorization;
+using Flamme.Common.Multitenancy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.Host.Endpoints.AI;
+namespace Flamme.AI.Host.Endpoints.AI;
 
 internal static class AIHttpContextIdentity
 {

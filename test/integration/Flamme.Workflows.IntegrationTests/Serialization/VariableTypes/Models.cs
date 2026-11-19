@@ -1,5 +1,5 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableTypes;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableTypes;
 
 internal record VariablesContainer(ICollection<Variable> Variables);

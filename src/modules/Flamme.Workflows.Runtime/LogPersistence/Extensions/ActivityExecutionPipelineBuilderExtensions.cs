@@ -1,10 +1,10 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Runtime.Middleware;
-using Elsa.Workflows.Runtime.Middleware.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Runtime.Middleware;
+using Flamme.Workflows.Runtime.Middleware.Activities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="IActivityExecutionPipelineBuilder"/>.

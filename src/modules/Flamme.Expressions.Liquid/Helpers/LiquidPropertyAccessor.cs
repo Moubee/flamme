@@ -1,6 +1,6 @@
 ﻿using Fluid.Values;
 
-namespace Elsa.Expressions.Liquid.Helpers;
+namespace Flamme.Expressions.Liquid.Helpers;
 
 /// <summary>
 /// Can be used to provide a factory to return a value based on a property name 

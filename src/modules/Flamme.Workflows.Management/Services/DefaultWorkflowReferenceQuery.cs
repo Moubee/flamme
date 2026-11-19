@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <summary>
 /// Represents the default implementation of <see cref="IWorkflowReferenceQuery"/> that queries workflows

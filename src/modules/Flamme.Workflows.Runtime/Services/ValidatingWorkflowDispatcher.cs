@@ -1,9 +1,9 @@
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Validates the workflow request before dispatching it to the workflow dispatcher.

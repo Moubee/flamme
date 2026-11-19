@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Request.Contracts;
+namespace Flamme.Mediator.Middleware.Request.Contracts;
 
 /// <summary>
 /// Represents a request pipeline. A request pipeline is a chain of middleware that can be used to process a request.

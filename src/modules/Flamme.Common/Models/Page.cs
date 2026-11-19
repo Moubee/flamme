@@ -1,4 +1,4 @@
-namespace Elsa.Common.Models;
+namespace Flamme.Common.Models;
 
 /// <summary>
 /// Represents a page of items.

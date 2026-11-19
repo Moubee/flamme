@@ -2,12 +2,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Extensions;
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Extensions;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Api.Serialization;
+namespace Flamme.Workflows.Api.Serialization;
 
 /// <summary>
 /// Converts <see cref="ArgumentDefinition"/> derivatives from and to JSON

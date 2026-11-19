@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Workflows;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Workflows;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IUserManager"/>.

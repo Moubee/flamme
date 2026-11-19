@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Mappers;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Mappers;
 
-namespace Elsa.Workflows.Management.Materializers;
+namespace Flamme.Workflows.Management.Materializers;
 
 /// <summary>
 /// A workflow materializer that deserializes workflows created in C# code.

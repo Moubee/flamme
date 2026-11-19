@@ -1,22 +1,22 @@
 using System.Text.Json;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Stores;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Alterations;
-using Elsa.Persistence.EFCore.PostgreSql;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Stores;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Alterations;
+using Flamme.Persistence.EFCore.PostgreSql;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.Persistence.ConformanceTests;
+namespace Flamme.Alterations.Persistence.ConformanceTests;
 
 /// <summary>
 /// Holds one Memory or EF/PostgreSQL pair of Alterations stores and the ambient tenant they read.
@@ -134,24 +134,24 @@ public sealed class AlterationStoreScenario(
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
                 .AddPostgreSqlEntityModelCreatingHandlers()
-                .AddDbContextFactory<AlterationsElsaDbContext>((_, builder) =>
+                .AddDbContextFactory<AlterationsFlammeDbContext>((_, builder) =>
                 {
-                    builder.UseElsaPostgreSql(migrationsAssembly, connectionString);
+                    builder.UseFlammePostgreSql(migrationsAssembly, connectionString);
                     builder.EnableServiceProviderCaching(false);
                     if (commandInterceptor is not null)
                         builder.AddInterceptors(commandInterceptor);
                     if (transactionInterceptor is not null)
                         builder.AddInterceptors(transactionInterceptor);
                 })
-                .Decorate<IDbContextFactory<AlterationsElsaDbContext>, TenantAwareDbContextFactory<AlterationsElsaDbContext>>()
-                .AddScoped<EntityStore<AlterationsElsaDbContext, AlterationPlan>>()
-                .AddScoped<EntityStore<AlterationsElsaDbContext, AlterationJob>>()
+                .Decorate<IDbContextFactory<AlterationsFlammeDbContext>, TenantAwareDbContextFactory<AlterationsFlammeDbContext>>()
+                .AddScoped<EntityStore<AlterationsFlammeDbContext, AlterationPlan>>()
+                .AddScoped<EntityStore<AlterationsFlammeDbContext, AlterationJob>>()
                 .AddScoped<EFCoreAlterationPlanStore>()
                 .AddScoped<EFCoreAlterationJobStore>();
             if (dbExceptionHandler is not null)
                 serviceCollection.AddSingleton(dbExceptionHandler);
             services = serviceCollection.BuildServiceProvider();
-            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<AlterationsElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<AlterationsFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.EnsureCreatedAsync();
             scope = services.CreateScope();
             return new(tenantAccessor,

@@ -1,13 +1,13 @@
-using Elsa.Common;
+using Flamme.Common;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime.HealthChecks;
+namespace Flamme.Workflows.Runtime.HealthChecks;
 
 /// <summary>
 /// Reports whether the workflow runtime can create clients and is currently accepting new work.
 /// </summary>
-public class ElsaRuntimeHealthCheck(IWorkflowRuntime workflowRuntime, IQuiescenceSignal quiescenceSignal, ILogger<ElsaRuntimeHealthCheck> logger) : IHealthCheck
+public class FlammeRuntimeHealthCheck(IWorkflowRuntime workflowRuntime, IQuiescenceSignal quiescenceSignal, ILogger<FlammeRuntimeHealthCheck> logger) : IHealthCheck
 {
     /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
@@ -26,8 +26,8 @@ public class ElsaRuntimeHealthCheck(IWorkflowRuntime workflowRuntime, IQuiescenc
             };
 
             return state.IsAcceptingNewWork
-                ? HealthCheckResult.Healthy("Elsa workflow runtime is ready.", data)
-                : HealthCheckResult.Degraded("Elsa workflow runtime is paused or draining.", data: data);
+                ? HealthCheckResult.Healthy("Flamme workflow runtime is ready.", data)
+                : HealthCheckResult.Degraded("Flamme workflow runtime is paused or draining.", data: data);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -35,8 +35,8 @@ public class ElsaRuntimeHealthCheck(IWorkflowRuntime workflowRuntime, IQuiescenc
         }
         catch (Exception e) when (!e.IsFatal())
         {
-            logger.LogWarning(e, "Elsa workflow runtime could not create a workflow client.");
-            return HealthCheckResult.Unhealthy("Elsa workflow runtime could not create a workflow client.", data: new Dictionary<string, object>
+            logger.LogWarning(e, "Flamme workflow runtime could not create a workflow client.");
+            return HealthCheckResult.Unhealthy("Flamme workflow runtime could not create a workflow client.", data: new Dictionary<string, object>
             {
                 ["category"] = "runtime"
             });

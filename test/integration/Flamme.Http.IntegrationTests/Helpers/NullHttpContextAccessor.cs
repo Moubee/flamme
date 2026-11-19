@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.IntegrationTests.Helpers;
+namespace Flamme.Http.IntegrationTests.Helpers;
 
 /// <summary>
 /// A null HTTP context accessor that always returns null.

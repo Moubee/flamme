@@ -1,7 +1,7 @@
-using Elsa.Scheduling.Activities;
-using Elsa.Workflows.Activities;
+using Flamme.Scheduling.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
 
 /// <summary>
 /// A workflow that generates related records: execution logs, activity execution records, and bookmarks.

@@ -1,8 +1,8 @@
-using Elsa.Identity.Constants;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 public class DefaultClientIdGenerator : IClientIdGenerator

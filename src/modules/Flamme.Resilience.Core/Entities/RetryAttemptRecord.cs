@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Resilience.Entities;
+namespace Flamme.Resilience.Entities;
 
 public class RetryAttemptRecord : Entity
 {

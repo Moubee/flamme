@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Testing.Shared.Models;
+namespace Flamme.Testing.Shared.Models;
 
 /// <summary>
 /// Represents the result of a test workflow execution, including the workflow execution context and activity execution records.

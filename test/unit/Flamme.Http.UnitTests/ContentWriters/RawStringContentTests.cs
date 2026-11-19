@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
 using System.Text;
-using Elsa.Http.ContentWriters;
+using Flamme.Http.ContentWriters;
 
-namespace Elsa.Http.UnitTests.ContentWriters;
+namespace Flamme.Http.UnitTests.ContentWriters;
 
 /// <summary>
 /// Tests for the <see cref="RawStringContent"/> class.

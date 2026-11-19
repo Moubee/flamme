@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contexts;
+using Flamme.Mediator.Contexts;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// Represents a strategy for publishing events.

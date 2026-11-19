@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Notifications;
-using Elsa.Mediator.Contracts;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Notifications;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>Publishes role and assignment changes for audit subscribers.</summary>
 /// <remarks>

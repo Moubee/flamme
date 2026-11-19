@@ -1,5 +1,5 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Notifications;
+namespace Flamme.Workflows.Notifications;
 
 public record InvokingActivityCallback(ActivityExecutionContext Parent, ActivityExecutionContext Child) : INotification;

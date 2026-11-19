@@ -1,28 +1,28 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Authorization;
-using Elsa.Extensions;
+using Flamme.Authorization;
+using Flamme.Extensions;
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Mediator.Contracts;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Connections;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Connections;
 
 public class ConnectionManagementTests : WebApplicationTest<ConnectionManagementWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {
@@ -70,7 +70,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddSingleton(_authentication);
-        services.AddElsaAuthorization();
+        services.AddFlammeAuthorization();
         services.Configure<ExternalAuthenticationOptions>(options =>
         {
             options.EnableDatabaseConnections = true;
@@ -465,7 +465,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         var secret = new HttpRequestMessage(HttpMethod.Put, $"/external-authentication/connections/{connection.Id}/secret-bindings/clientSecret/managed") { Content = TestJson.Content(new JsonObject { ["resolverType"] = "test-managed", ["value"] = "secret" }) };
         secret.Headers.TryAddWithoutValidation("If-Match", "\"2\"");
         await Assert.That((await client.SendAsync(secret)).StatusCode).IsEqualTo(HttpStatusCode.OK);
-        Mock.Get(_notifications).SendAsync(Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is IdentityProviderConnectionSecretBindingChanged x && x.FieldName == "clientSecret" && x.ResolverType == "test-managed" && !x.IsConfigured), Arg.Any<CancellationToken>()).WasCalled();
+        Mock.Get(_notifications).SendAsync(Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is IdentityProviderConnectionSecretBindingChanged x && x.FieldName == "clientSecret" && x.ResolverType == "test-managed" && !x.IsConfigured), Arg.Any<CancellationToken>()).WasCalled();
     }
 
     [Test]
@@ -547,7 +547,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         allowed.Headers.TryAddWithoutValidation("If-Match", "\"1\"");
         await Assert.That((await Client.SendAsync(allowed)).StatusCode).IsEqualTo(HttpStatusCode.OK);
         Mock.Get(_notifications).SendAsync(
-            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationConnectionSessionsRevoked x && x.SessionCount == 2 && x.Reason == "connection_disabled"),
+            Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationConnectionSessionsRevoked x && x.SessionCount == 2 && x.Reason == "connection_disabled"),
             Arg.Any<CancellationToken>()).WasCalled();
     }
 
@@ -1105,7 +1105,7 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         }
 
         public bool CanCreateRoleWithPermissions(ClaimsPrincipal user, IEnumerable<string>? permissions) => true;
-        public bool CanMutateRole(ClaimsPrincipal user, Elsa.Identity.Entities.Role role, IEnumerable<string>? replacementPermissions = null) => true;
+        public bool CanMutateRole(ClaimsPrincipal user, Flamme.Identity.Entities.Role role, IEnumerable<string>? replacementPermissions = null) => true;
     }
 
     private sealed class TestManagedSecretBindingWriter : IManagedSecretBindingWriter

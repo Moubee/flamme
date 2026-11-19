@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Converts a native activity output into a value suitable for one output binding.

@@ -1,17 +1,17 @@
-using Elsa.Common.Entities;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Persistence.EFCore.EntityHandlers;
+using Flamme.Common.Entities;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Persistence.EFCore.EntityHandlers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 public abstract class PersistenceFeatureBase<TFeature, TDbContext>(IModule module) : FeatureBase(module)
-    where TDbContext : ElsaDbContextBase
+    where TDbContext : FlammeDbContextBase
 {
     /// <summary>
     /// Gets or sets a value indicating whether to use context pooling.

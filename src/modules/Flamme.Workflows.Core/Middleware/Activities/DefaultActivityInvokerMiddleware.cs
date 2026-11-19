@@ -1,13 +1,13 @@
 using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Middleware.Activities;
+namespace Flamme.Workflows.Middleware.Activities;
 
 /// <summary>
 /// Provides extension methods to <see cref="IActivityExecutionPipelineBuilder"/>.

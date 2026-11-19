@@ -1,6 +1,6 @@
 using FluentStorage.Blobs;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class BlobExtensions
 {

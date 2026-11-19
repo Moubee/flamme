@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime.Distributed;
+namespace Flamme.Workflows.Runtime.Distributed;
 
 public class DistributedBookmarkQueueWorker : BookmarkQueueWorker
 {

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Elsa.Common;
-using Elsa.Common.Entities;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Common.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// Represents a single activity execution of an activity instance.

@@ -2,10 +2,10 @@ using System.Buffers;
 using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 public class DefaultSecretHasher : ISecretHasher

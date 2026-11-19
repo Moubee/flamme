@@ -1,10 +1,10 @@
-﻿using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
+﻿using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.InputOutput;
+namespace Flamme.Workflows.ComponentTests.Scenarios.InputOutput;
 
 public class InputOutputTests(App app) : AppComponentTest(app)
 {

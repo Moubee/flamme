@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Services;
+using Flamme.Common;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Services;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Quiescence;
+namespace Flamme.Workflows.Runtime.UnitTests.Quiescence;
 
 public class QuiescenceSignalTests
 {

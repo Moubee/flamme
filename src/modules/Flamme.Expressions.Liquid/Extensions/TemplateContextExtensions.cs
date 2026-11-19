@@ -1,10 +1,10 @@
-﻿using Elsa.Expressions.Liquid.Contracts;
-using Elsa.Expressions.Liquid.Options;
+﻿using Flamme.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Liquid.Options;
 using Fluid;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 internal static class TemplateContextExtensions
 {

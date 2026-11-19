@@ -1,10 +1,10 @@
 using System.Text.Json.Nodes;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.JavaScript.Models;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.JavaScript.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Workflows;
 
 public class TestWorkflow : WorkflowBase
 {

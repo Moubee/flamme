@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents a path segment in a workflow. For example, the following is a list of segments: ForEach:Body -> Container:Body -> MyCustomActivity:Root 

@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Activities.Flowchart.Options;
-using Elsa.Workflows.Features;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Options;
+using Flamme.Workflows.Features;
 
-namespace Elsa.Workflows.Activities.Flowchart.Extensions;
+namespace Flamme.Workflows.Activities.Flowchart.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="FlowchartFeature"/>.

@@ -1,6 +1,6 @@
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Models;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// Represents a command handler.

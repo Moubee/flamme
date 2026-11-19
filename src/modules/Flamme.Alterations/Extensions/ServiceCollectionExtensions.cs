@@ -1,10 +1,10 @@
-using Elsa.Alterations.AlterationHandlers;
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Extensions;
-using Elsa.Alterations.Features;
+using Flamme.Alterations.AlterationHandlers;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Extensions;
+using Flamme.Alterations.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.Extensions;
+namespace Flamme.Alterations.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.

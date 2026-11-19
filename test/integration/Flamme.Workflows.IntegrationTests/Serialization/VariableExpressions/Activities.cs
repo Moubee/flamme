@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableExpressions;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableExpressions;
 
 /// <inheritdoc />
 public class NumberActivity : CodeActivity

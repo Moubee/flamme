@@ -1,15 +1,15 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// A user cancellation that still has its original execution cycle live when drain snapshots
@@ -26,7 +26,7 @@ public class UserCancelDuringDrainTests : IAsyncDisposable
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .AddActivitiesFrom<UserCancelDuringDrainTests>()
             .AddWorkflow<LongRunningObservableWorkflow>()
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     o.DrainDeadline = TimeSpan.FromMilliseconds(50);
@@ -84,7 +84,7 @@ public class UserCancelDuringDrainTests : IAsyncDisposable
             await Assert.That(instance.SubStatus).IsEqualTo(WorkflowSubStatus.Cancelled);
 
             var restarter = new RecordingRestarter();
-            var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, restarter);
+            var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, restarter);
             var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
 
             await Assert.That(requeued).IsEqualTo(0);

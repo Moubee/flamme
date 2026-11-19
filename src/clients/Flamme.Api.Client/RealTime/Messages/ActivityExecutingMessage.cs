@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.ActivityExecutions.Models;
+using Flamme.Api.Client.Resources.ActivityExecutions.Models;
 
-namespace Elsa.Api.Client.RealTime.Messages;
+namespace Flamme.Api.Client.RealTime.Messages;
 
 /// <summary>
 /// Contains information about the activity executing event.

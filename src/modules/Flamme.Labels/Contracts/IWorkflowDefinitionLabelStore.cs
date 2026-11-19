@@ -1,6 +1,6 @@
-using Elsa.Labels.Entities;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Contracts;
+namespace Flamme.Labels.Contracts;
 
 public interface IWorkflowDefinitionLabelStore
 {

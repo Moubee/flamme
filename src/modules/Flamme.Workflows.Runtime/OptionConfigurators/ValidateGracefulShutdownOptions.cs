@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Validates <see cref="GracefulShutdownOptions"/>.

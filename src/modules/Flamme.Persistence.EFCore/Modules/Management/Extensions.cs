@@ -1,6 +1,6 @@
-﻿using Elsa.Workflows.Management.Features;
+﻿using Flamme.Workflows.Management.Features;
 
-namespace Elsa.Persistence.EFCore.Modules.Management;
+namespace Flamme.Persistence.EFCore.Modules.Management;
 
 /// <summary>
 /// Provides extensions to various management related features.

@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
-using Elsa.Workflows.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Commands;
+namespace Flamme.Workflows.Runtime.Commands;
 
 /// <summary>
 /// A command to dispatch a workflow instance.

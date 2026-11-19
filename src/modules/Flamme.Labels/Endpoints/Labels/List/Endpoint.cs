@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Labels.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Labels.Contracts;
 using FastEndpoints;
 
-namespace Elsa.Labels.Endpoints.Labels.List;
+namespace Flamme.Labels.Endpoints.Labels.List;
 
-public class List : ElsaEndpoint<Request, Response, PageMapper>
+public class List : FlammeEndpoint<Request, Response, PageMapper>
 {
     private readonly ILabelStore _store;
 
@@ -17,7 +17,7 @@ public class List : ElsaEndpoint<Request, Response, PageMapper>
     public override void Configure()
     {
         Get("/labels");
-        RequirePermission(Elsa.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.View);
+        RequirePermission(Flamme.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.View);
     }
 
     public override async Task<Response> ExecuteAsync(Request request, CancellationToken cancellationToken)

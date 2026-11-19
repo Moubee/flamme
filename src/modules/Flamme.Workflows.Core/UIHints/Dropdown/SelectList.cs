@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.UIHints.Dropdown;
+namespace Flamme.Workflows.UIHints.Dropdown;
 
 /// <summary>
 /// Represents a list of select list items.

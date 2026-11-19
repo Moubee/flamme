@@ -1,14 +1,14 @@
 using System.Collections.Concurrent;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.ActivationValidators;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.ActivationValidators;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class WorkflowActivationGateTests
 {
@@ -85,7 +85,7 @@ public class WorkflowActivationGateTests
         CancellationToken strategyToken = default;
         var evaluator = IWorkflowActivationStrategyEvaluator.Mock().Object;
         Mock.Get(evaluator).CanStartWorkflowAsync(Arg.Any<WorkflowActivationStrategyEvaluationContext>())
-                    .Returns((global::Elsa.Workflows.Runtime.WorkflowActivationStrategyEvaluationContext __arg0) =>
+                    .Returns((global::Flamme.Workflows.Runtime.WorkflowActivationStrategyEvaluationContext __arg0) =>
                     {
                         strategyToken = __arg0.CancellationToken;
                         evaluatorStarted.SetResult();

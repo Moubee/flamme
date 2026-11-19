@@ -1,22 +1,22 @@
-using Elsa.Common.Models;
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Entities;
-using Elsa.Persistence.EFCore.Extensions;
+using Flamme.Common.Models;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Entities;
+using Flamme.Persistence.EFCore.Extensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
 /// <summary>
 /// An Entity Framework Core implementation of <see cref="ILabelStore"/>.
 /// </summary>
 public class EFCoreLabelStore : ILabelStore
 {
-    private readonly EntityStore<LabelsElsaDbContext, Label> _labelStore;
-    private readonly EntityStore<LabelsElsaDbContext, WorkflowDefinitionLabel> _workflowDefinitionLabelStore;
+    private readonly EntityStore<LabelsFlammeDbContext, Label> _labelStore;
+    private readonly EntityStore<LabelsFlammeDbContext, WorkflowDefinitionLabel> _workflowDefinitionLabelStore;
 
     /// <summary>
     /// Initializes a new instance of <see cref="EFCoreLabelStore"/>.
     /// </summary>
-    public EFCoreLabelStore(EntityStore<LabelsElsaDbContext, Label> labelStore, EntityStore<LabelsElsaDbContext, WorkflowDefinitionLabel> workflowDefinitionLabelStore)
+    public EFCoreLabelStore(EntityStore<LabelsFlammeDbContext, Label> labelStore, EntityStore<LabelsFlammeDbContext, WorkflowDefinitionLabel> workflowDefinitionLabelStore)
     {
         _labelStore = labelStore;
         _workflowDefinitionLabelStore = workflowDefinitionLabelStore;

@@ -1,18 +1,18 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IBookmarkStore"/>.
 /// </summary>
 [UsedImplicitly]
-public class EFCoreBookmarkStore(Store<RuntimeElsaDbContext, StoredBookmark> store, IPayloadSerializer serializer) : IBookmarkStore
+public class EFCoreBookmarkStore(Store<RuntimeFlammeDbContext, StoredBookmark> store, IPayloadSerializer serializer) : IBookmarkStore
 {
     /// <inheritdoc />
     public async ValueTask SaveAsync(StoredBookmark record, CancellationToken cancellationToken = default)
@@ -52,14 +52,14 @@ public class EFCoreBookmarkStore(Store<RuntimeElsaDbContext, StoredBookmark> sto
         return await store.DeleteWhereAsync(filter.Apply, cancellationToken);
     }
 
-    private ValueTask OnSaveAsync(RuntimeElsaDbContext dbContext, StoredBookmark entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(RuntimeFlammeDbContext dbContext, StoredBookmark entity, CancellationToken cancellationToken)
     {
         dbContext.Entry(entity).Property("SerializedPayload").CurrentValue = entity.Payload != null ? serializer.Serialize(entity.Payload) : null;
         dbContext.Entry(entity).Property("SerializedMetadata").CurrentValue = entity.Metadata != null ? serializer.Serialize(entity.Metadata) : null;
         return default;
     }
 
-    private ValueTask OnLoadAsync(RuntimeElsaDbContext dbContext, StoredBookmark? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(RuntimeFlammeDbContext dbContext, StoredBookmark? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return default;

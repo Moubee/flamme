@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityOutputs;
 
 public class SumActivity : CodeActivity<int>
 {

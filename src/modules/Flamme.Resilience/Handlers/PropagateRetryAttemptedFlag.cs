@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Resilience.Extensions;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Resilience.Extensions;
+using Flamme.Workflows.Runtime.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Resilience.Handlers;
+namespace Flamme.Resilience.Handlers;
 
 [UsedImplicitly]
 public class PropagateRetryAttemptedFlag : INotificationHandler<BackgroundActivityExecutionCompleted>

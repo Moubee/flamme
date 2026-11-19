@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
 /// <summary>
 /// Grants only provider claim values explicitly bounded by configured literal permission names.

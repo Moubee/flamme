@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 /// <summary>
 /// Thrown when a NotFoundActivity is executed.

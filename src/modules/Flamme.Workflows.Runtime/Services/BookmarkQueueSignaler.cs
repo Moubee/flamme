@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Threading.Channels;
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class BookmarkQueueSignaler : IBookmarkQueueSignaler
 {

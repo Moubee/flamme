@@ -1,9 +1,9 @@
-using Elsa.Identity.Options;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Validates the <see cref="IdentityTokenOptions"/>.

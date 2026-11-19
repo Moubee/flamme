@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.State;
+using Flamme.Extensions;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Extension methods for workflow dispatch outbox state stored on workflow state.

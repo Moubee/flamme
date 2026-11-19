@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
 
 public class TriggerEventWorkflow : WorkflowBase
 {

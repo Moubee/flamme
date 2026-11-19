@@ -1,7 +1,7 @@
-using Elsa.Common.Models;
-using Elsa.Labels.Entities;
+using Flamme.Common.Models;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Contracts;
+namespace Flamme.Labels.Contracts;
 
 public interface ILabelStore
 {

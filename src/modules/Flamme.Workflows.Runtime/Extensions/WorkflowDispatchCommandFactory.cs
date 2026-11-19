@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Commands;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 internal static class WorkflowDispatchCommandFactory
 {

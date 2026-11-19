@@ -1,6 +1,6 @@
-using Elsa.Workflows.Helpers;
+using Flamme.Workflows.Helpers;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// A message that can be delivered to a workflow instance.

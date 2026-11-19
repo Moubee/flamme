@@ -1,6 +1,6 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Service wrapper for cancelling multiple workflow instances.

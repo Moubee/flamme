@@ -1,20 +1,20 @@
-using Elsa.Caching.Features;
-using Elsa.Common.Features;
-using Elsa.Expressions.CSharp.ActivityDescriptorModifiers;
-using Elsa.Expressions.CSharp.Activities;
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.CSharp.Providers;
-using Elsa.Expressions.CSharp.Services;
-using Elsa.Expressions.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows;
+using Flamme.Caching.Features;
+using Flamme.Common.Features;
+using Flamme.Expressions.CSharp.ActivityDescriptorModifiers;
+using Flamme.Expressions.CSharp.Activities;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.CSharp.Providers;
+using Flamme.Expressions.CSharp.Services;
+using Flamme.Expressions.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.CSharp.Features;
+namespace Flamme.Expressions.CSharp.Features;
 
 /// <summary>
 /// Installs C# integration.

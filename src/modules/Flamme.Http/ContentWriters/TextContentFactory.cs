@@ -1,7 +1,7 @@
 using System.Net.Mime;
 using System.Text;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// Creates a <see cref="StringContent"/> object for text/plain, text/richtext and text/html content types.

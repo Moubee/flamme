@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.Mediator.Contracts;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>Publishes redacted security events after the caller has committed its state change.</summary>
 public sealed class ExternalAuthenticationSecurityNotifier(IServiceProvider services)

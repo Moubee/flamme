@@ -1,11 +1,11 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 [UsedImplicitly]
-public class EFCoreTenantStore(EntityStore<TenantsElsaDbContext, Tenant> store) : ITenantStore
+public class EFCoreTenantStore(EntityStore<TenantsFlammeDbContext, Tenant> store) : ITenantStore
 {
     public async Task<Tenant?> FindAsync(TenantFilter filter, CancellationToken cancellationToken = default)
     {

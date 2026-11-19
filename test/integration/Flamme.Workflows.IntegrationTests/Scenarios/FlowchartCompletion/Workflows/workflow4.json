@@ -206,7 +206,7 @@
           }
         },
         "strategy": {
-          "typeName": "Elsa.Scheduling.Models.DelayBlockingStrategy, Elsa.Scheduling",
+          "typeName": "Flamme.Scheduling.Models.DelayBlockingStrategy, Flamme.Scheduling",
           "expression": {
             "type": "Literal",
             "value": "NonBlocking"
@@ -283,7 +283,7 @@
           }
         },
         "strategy": {
-          "typeName": "Elsa.Scheduling.Models.DelayBlockingStrategy, Elsa.Scheduling",
+          "typeName": "Flamme.Scheduling.Models.DelayBlockingStrategy, Flamme.Scheduling",
           "expression": {
             "type": "Literal",
             "value": "NonBlocking"

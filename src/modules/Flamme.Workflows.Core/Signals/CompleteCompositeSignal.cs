@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Signals;
+namespace Flamme.Workflows.Signals;
 
 /// <summary>
 /// Sent by child activities to notify their composite container that it should complete.

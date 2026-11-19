@@ -1,4 +1,4 @@
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Helps to forward types to new types when deserializing JSON containing types that have been renamed and or moved to a different namespace.

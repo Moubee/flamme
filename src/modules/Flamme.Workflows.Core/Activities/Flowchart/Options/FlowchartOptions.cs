@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows.Activities.Flowchart.Options;
+namespace Flamme.Workflows.Activities.Flowchart.Options;
 
 /// <summary>
 /// Options for configuring flowchart execution behavior.

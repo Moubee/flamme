@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Signals;
+using Flamme.Extensions;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Signals;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Middleware.Activities;
+namespace Flamme.Workflows.Middleware.Activities;
 
 /// <summary>
 /// Adds extension methods to <see cref="ExceptionHandlingMiddleware"/>.

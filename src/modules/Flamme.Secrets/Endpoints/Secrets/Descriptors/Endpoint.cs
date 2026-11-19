@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Permissions;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Descriptors;
+namespace Flamme.Secrets.Endpoints.Secrets.Descriptors;
 
-internal class Endpoint(ISecretTypeRegistry typeRegistry, ISecretStoreRegistry storeRegistry) : ElsaEndpointWithoutRequest<SecretDescriptorsResponse>
+internal class Endpoint(ISecretTypeRegistry typeRegistry, ISecretStoreRegistry storeRegistry) : FlammeEndpointWithoutRequest<SecretDescriptorsResponse>
 {
     public override void Configure()
     {
         Get("/secrets/descriptors");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.View);
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.View);
     }
 
     public override Task<SecretDescriptorsResponse> ExecuteAsync(CancellationToken cancellationToken)

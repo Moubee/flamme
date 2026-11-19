@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Routing;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Matches a given request path against the specified route template.

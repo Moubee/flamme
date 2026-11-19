@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Persistence.EFCore;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Persistence.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.Persistence.EFCore.Features;
+namespace Flamme.AI.Persistence.EFCore.Features;
 
 public class AIPersistenceFeature(IModule module) : PersistenceFeatureBase<AIPersistenceFeature, AIDbContext>(module)
 {

@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Memory;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableExpressions;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableExpressions;
 
 /// <summary>
 /// Contains tests for variable expressions serialization.

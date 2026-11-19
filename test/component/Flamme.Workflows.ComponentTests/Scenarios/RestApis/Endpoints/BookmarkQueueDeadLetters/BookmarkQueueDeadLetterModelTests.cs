@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.RestApis.Endpoints.BookmarkQueueDeadLetters;
+namespace Flamme.Workflows.ComponentTests.Scenarios.RestApis.Endpoints.BookmarkQueueDeadLetters;
 
 public class BookmarkQueueDeadLetterModelTests
 {

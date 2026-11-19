@@ -1,4 +1,4 @@
-namespace Elsa.AI.Persistence.EFCore.Helpers;
+namespace Flamme.AI.Persistence.EFCore.Helpers;
 
 internal static class ExceptionFilters
 {

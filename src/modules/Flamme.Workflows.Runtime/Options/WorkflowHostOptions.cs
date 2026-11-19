@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Represents the options for creating a workflow host.

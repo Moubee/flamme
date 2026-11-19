@@ -1,9 +1,9 @@
-using Elsa.Http.Middleware;
+using Flamme.Http.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extension methods to <see cref="IApplicationBuilder"/> related to workflow middleware components.
@@ -40,7 +40,7 @@ public static class ApplicationBuilderExtensions
 
         var pathPrefix = NormalizeBasePath(basePath);
         return pathPrefix.HasValue
-            ? app.UseRateLimitingPolicyForPath(pathPrefix, policyName, "Elsa HTTP workflow trigger rate limiting endpoint", requireMatchedEndpoint: false)
+            ? app.UseRateLimitingPolicyForPath(pathPrefix, policyName, "Flamme HTTP workflow trigger rate limiting endpoint", requireMatchedEndpoint: false)
             : app;
     }
 

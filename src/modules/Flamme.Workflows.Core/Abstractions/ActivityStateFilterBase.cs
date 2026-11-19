@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 [UsedImplicitly]
 public abstract class ActivityStateFilterBase : IActivityStateFilter

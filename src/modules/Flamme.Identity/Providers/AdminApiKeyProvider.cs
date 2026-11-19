@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using AspNetCore.Authentication.ApiKey;
-using Elsa;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.Providers;
+namespace Flamme.Identity.Providers;
 
 /// <summary>
 /// Provides an <see cref="IApiKey"/> with admin privileges for an explicitly configured admin API key.

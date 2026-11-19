@@ -1,7 +1,7 @@
-using Elsa.Labels.Entities;
+using Flamme.Labels.Entities;
 using FastEndpoints;
 
-namespace Elsa.Labels.Endpoints.Labels.Get;
+namespace Flamme.Labels.Endpoints.Labels.Get;
 
 internal class LabelMapper : Mapper<Request, Response, Label>
 {

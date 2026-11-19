@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace Elsa.Identity.Constants;
+namespace Flamme.Identity.Constants;
 
 /// <summary>
-/// Authentication scheme names used by Elsa identity.
+/// Authentication scheme names used by Flamme identity.
 /// </summary>
 public static class IdentityAuthenticationSchemes
 {

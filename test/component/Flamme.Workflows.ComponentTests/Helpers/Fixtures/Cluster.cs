@@ -1,6 +1,6 @@
-using Elsa.Workflows.ComponentTests.Services;
+using Flamme.Workflows.ComponentTests.Services;
 
-namespace Elsa.Workflows.ComponentTests.Fixtures;
+namespace Flamme.Workflows.ComponentTests.Fixtures;
 
 /// <summary>
 /// Lazily creates the in-memory hosts shared by the serialized component-test suite.

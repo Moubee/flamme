@@ -1,20 +1,20 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.List;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.List;
 
 /// <summary>
 /// Lists the executions for a given activity.
 /// </summary>
 [PublicAPI]
-internal class List : ElsaEndpoint<Request, ListResponse<ActivityExecutionRecord>>
+internal class List : FlammeEndpoint<Request, ListResponse<ActivityExecutionRecord>>
 {
     private readonly IActivityExecutionStore _store;
 
@@ -28,7 +28,7 @@ internal class List : ElsaEndpoint<Request, ListResponse<ActivityExecutionRecord
     public override void Configure()
     {
         Get("/activity-executions/list");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

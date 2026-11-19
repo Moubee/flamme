@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Elsa.Secrets.Persistence.EFCore.PostgreSql.Migrations.Secrets
+namespace Flamme.Secrets.Persistence.EFCore.PostgreSql.Migrations.Secrets
 {
     /// <inheritdoc />
     public partial class SecretTenancy : Migration

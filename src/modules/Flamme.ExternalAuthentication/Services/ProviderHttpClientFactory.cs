@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Validation;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Creates the protocol-neutral HTTP client used for all provider traffic.

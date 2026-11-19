@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 // ReSharper disable MethodHasAsyncOverload
 
-namespace Elsa.Activities.UnitTests.Console;
+namespace Flamme.Activities.UnitTests.Console;
 
 public class WriteLineTests
 {

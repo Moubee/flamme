@@ -1,20 +1,20 @@
 using System.Diagnostics;
-using Elsa.Common.Models;
-using Elsa.Testing.Shared.Models;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.State;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared.Models;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Assertions.Enums;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows;
 
 public class BulkDispatchWorkflowsTests : AppComponentTest
 {
@@ -22,7 +22,7 @@ public class BulkDispatchWorkflowsTests : AppComponentTest
     private const int InitialChildWorkflowPollingIntervalMilliseconds = 250;
     private const int MaxChildWorkflowPollingIntervalMilliseconds = 1000;
     // The runtime persists this marker under the activity property name; resume handlers read the same key from WorkflowState.Properties.
-    private const string WaitForCompletionPropertyName = nameof(Elsa.Workflows.Runtime.Activities.BulkDispatchWorkflows.WaitForCompletion);
+    private const string WaitForCompletionPropertyName = nameof(Flamme.Workflows.Runtime.Activities.BulkDispatchWorkflows.WaitForCompletion);
     private AsyncWorkflowRunner _workflowRunner = null!;
     private IWorkflowInstanceStore _workflowInstanceStore = null!;
 

@@ -1,10 +1,10 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Models;
+namespace Flamme.Workflows.Core.UnitTests.Models;
 
 public sealed class JsonActivityConstructorContextHelperTests
 {

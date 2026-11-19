@@ -1,6 +1,6 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Endpoints.Users.Create;
+namespace Flamme.Identity.Endpoints.Users.Create;
 
 internal class Request
 {

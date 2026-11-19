@@ -1,15 +1,15 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.ExternalAuthentication.Endpoints.IdentityLinks;
+namespace Flamme.ExternalAuthentication.Endpoints.IdentityLinks;
 
-internal sealed class GetIdentityLinks(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpoint<IdentityLinkListRequest, IdentityLinkListResponse>
+internal sealed class GetIdentityLinks(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpoint<IdentityLinkListRequest, IdentityLinkListResponse>
 {
     public override void Configure()
     {
@@ -39,7 +39,7 @@ internal sealed class GetIdentityLinks(ExternalIdentityLinkManagementService man
     }
 }
 
-internal sealed class FindUsers(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpoint<FindIdentityLinkUsersRequest, FindIdentityLinkUsersResponse>
+internal sealed class FindUsers(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpoint<FindIdentityLinkUsersRequest, FindIdentityLinkUsersResponse>
 {
     public override void Configure()
     {
@@ -66,7 +66,7 @@ internal sealed class FindUsers(ExternalIdentityLinkManagementService management
     }
 }
 
-internal sealed class PrelinkIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpoint<PrelinkIdentityLinkRequest>
+internal sealed class PrelinkIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpoint<PrelinkIdentityLinkRequest>
 {
     public override void Configure()
     {
@@ -104,7 +104,7 @@ internal sealed class PrelinkIdentityLink(ExternalIdentityLinkManagementService 
     }
 }
 
-internal sealed class ReplaceIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpoint<ReplaceIdentityLinkRequest>
+internal sealed class ReplaceIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpoint<ReplaceIdentityLinkRequest>
 {
     public override void Configure()
     {
@@ -149,7 +149,7 @@ internal sealed class ReplaceIdentityLink(ExternalIdentityLinkManagementService 
     }
 }
 
-internal sealed class DeleteIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class DeleteIdentityLink(ExternalIdentityLinkManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {

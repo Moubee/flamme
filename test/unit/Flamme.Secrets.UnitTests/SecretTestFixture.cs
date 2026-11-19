@@ -1,14 +1,14 @@
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Options;
-using Elsa.Secrets.Repositories;
-using Elsa.Secrets.Services;
-using Elsa.Secrets.Stores;
-using Elsa.Secrets.Types;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Options;
+using Flamme.Secrets.Repositories;
+using Flamme.Secrets.Services;
+using Flamme.Secrets.Stores;
+using Flamme.Secrets.Types;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretTestFixture
 {

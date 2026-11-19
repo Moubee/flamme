@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Workflows;
 
 /// <summary>
 /// A simple workflow for testing distributed lock resilience.

@@ -1,14 +1,14 @@
 using System.Text;
 using System.Text.Json;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Context;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Streaming;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Context;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Streaming;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class AIOrchestrator(
     IEnumerable<IAIProvider> providers,

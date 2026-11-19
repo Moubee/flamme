@@ -1,8 +1,8 @@
-using Elsa.Http;
-using Elsa.Workflows.Activities;
+using Flamme.Http;
+using Flamme.Workflows.Activities;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.HttpWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.HttpWorkflows.Workflows;
 
 public class SimpleHttpApiWorkflow : WorkflowBase
 {

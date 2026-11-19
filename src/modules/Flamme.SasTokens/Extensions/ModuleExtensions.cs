@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.SasTokens.Features;
+using Flamme.Features.Services;
+using Flamme.SasTokens.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to install the <see cref="SasTokens"/> feature.

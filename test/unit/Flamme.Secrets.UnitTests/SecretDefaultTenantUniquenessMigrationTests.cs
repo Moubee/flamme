@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 /// <summary>
 /// SecretDefaultTenantUniqueness must stamp null TenantId to "" and must not
@@ -11,7 +11,7 @@ namespace Elsa.Secrets.UnitTests;
 public class SecretDefaultTenantUniquenessMigrationTests
 {
     [Test]
-    [Arguments("Elsa.Secrets.Persistence.EFCore.PostgreSql")]
+    [Arguments("Flamme.Secrets.Persistence.EFCore.PostgreSql")]
     public async Task SecretDefaultTenantUniqueness_StampsNullTenantIdAndDoesNotDeleteDuplicates(string providerProject)
     {
         var migration = FindMigration(providerProject);
@@ -24,7 +24,7 @@ public class SecretDefaultTenantUniquenessMigrationTests
     }
 
     [Test]
-    [Arguments("Elsa.Secrets.Persistence.EFCore.PostgreSql", "RAISE EXCEPTION")]
+    [Arguments("Flamme.Secrets.Persistence.EFCore.PostgreSql", "RAISE EXCEPTION")]
     public async Task SecretDefaultTenantUniqueness_PreflightsDuplicateKeys(string providerProject, string abortKeyword)
     {
         var migration = FindMigration(providerProject);
@@ -52,12 +52,12 @@ public class SecretDefaultTenantUniquenessMigrationTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Join(directory.FullName, "Elsa.slnx")))
+            if (File.Exists(Path.Join(directory.FullName, "Flamme.slnx")))
                 return directory.FullName;
 
             directory = directory.Parent;
         }
 
-        throw new InvalidOperationException("Could not find Elsa.slnx from the test output directory.");
+        throw new InvalidOperationException("Could not find Flamme.slnx from the test output directory.");
     }
 }

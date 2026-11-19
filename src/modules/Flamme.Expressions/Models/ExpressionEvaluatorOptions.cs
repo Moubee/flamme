@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// Contains additional options for the expression evaluator.

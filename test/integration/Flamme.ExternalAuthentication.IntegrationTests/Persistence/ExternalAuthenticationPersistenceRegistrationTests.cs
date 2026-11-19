@@ -1,15 +1,15 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Features;
-using Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.Extensions;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Features.Services;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Identity;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Features;
+using Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.Extensions;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Features.Services;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Persistence;
 
 public class ExternalAuthenticationPersistenceRegistrationTests
 {

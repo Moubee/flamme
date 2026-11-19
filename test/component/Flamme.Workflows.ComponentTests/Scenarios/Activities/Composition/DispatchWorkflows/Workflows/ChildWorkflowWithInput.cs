@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
 
 [UsedImplicitly]
 public class ChildWorkflowWithInput : WorkflowBase

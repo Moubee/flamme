@@ -1,6 +1,6 @@
-using Elsa.Expressions.JavaScript.Helpers;
+using Flamme.Expressions.JavaScript.Helpers;
 
-namespace Elsa.Expressions.JavaScript.Extensions;
+namespace Flamme.Expressions.JavaScript.Extensions;
 
 public static class VariableNameExtensions
 {

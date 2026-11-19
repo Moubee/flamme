@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
 
-namespace Elsa.Workflows.Runtime.Commands;
+namespace Flamme.Workflows.Runtime.Commands;
 
 /// <summary>
 /// Dispatches a workflow definition.

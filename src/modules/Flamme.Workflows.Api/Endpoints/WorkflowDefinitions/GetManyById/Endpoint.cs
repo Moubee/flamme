@@ -1,20 +1,20 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.GetManyById;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.GetManyById;
 
 [PublicAPI]
-internal class GetManyById(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker) : ElsaEndpoint<Request>
+internal class GetManyById(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker) : FlammeEndpoint<Request>
 {
     public override void Configure()
     {
         Get("/workflow-definitions/many-by-id");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

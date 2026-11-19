@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Medallion.Threading;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
+namespace Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
 
 /// <summary>
 /// Test implementation of IDistributedLockProvider that allows simulating transient failures.

@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.Resilience.Models;
+namespace Flamme.Api.Client.Resources.Resilience.Models;
 
 public class RetryAttemptRecord : Entity
 {

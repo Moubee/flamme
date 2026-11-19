@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
+namespace Flamme.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
 
 /// <summary>
 ///  Write a line of text to the console.

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Contributes middleware to the workflow execution pipeline.

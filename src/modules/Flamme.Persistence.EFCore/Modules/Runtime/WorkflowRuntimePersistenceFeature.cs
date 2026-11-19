@@ -1,19 +1,19 @@
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Features;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Features;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Features;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// Configures the default workflow runtime to use EF Core persistence providers.
 /// </summary>
 [DependsOn(typeof(WorkflowRuntimeFeature))]
-public class EFCoreWorkflowRuntimePersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreWorkflowRuntimePersistenceFeature, RuntimeElsaDbContext>(module)
+public class EFCoreWorkflowRuntimePersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreWorkflowRuntimePersistenceFeature, RuntimeFlammeDbContext>(module)
 {
     /// <summary>
     /// Gets or sets whether to wrap workflow commit persistence in an EF Core transaction.

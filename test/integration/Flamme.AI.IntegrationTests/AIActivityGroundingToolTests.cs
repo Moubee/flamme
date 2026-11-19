@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIActivityGroundingToolTests
 {

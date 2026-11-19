@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http.Abstractions;
+namespace Flamme.Http.Abstractions;
 
 /// <summary>
 /// Provides a base class for implementing <see cref="IHttpCorrelationIdSelector"/>.

@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime.Middleware.Workflows;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime.Middleware.Workflows;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class WorkflowHeartbeatGeneratorFactory(IOptions<RuntimeOptions> options, TimeProvider timeProvider, ILogger<WorkflowHeartbeatMiddleware> logger, ILoggerFactory loggerFactory)
 {

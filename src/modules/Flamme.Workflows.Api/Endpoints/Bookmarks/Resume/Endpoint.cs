@@ -1,20 +1,20 @@
 using System.Text;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.SasTokens.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
+using Flamme.Abstractions;
+using Flamme.SasTokens.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
 using FastEndpoints;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.Bookmarks.Resume;
+namespace Flamme.Workflows.Api.Endpoints.Bookmarks.Resume;
 
 /// <summary>
 /// Resumes a bookmarked workflow instance with the bookmark ID specified in the provided SAS token.
 /// </summary>
 [PublicAPI]
-internal class Resume(ITokenService tokenService, IWorkflowResumer workflowResumer, IBookmarkQueue bookmarkQueue, IPayloadSerializer payloadSerializer, IApiSerializer apiSerializer) : ElsaEndpointWithoutRequest
+internal class Resume(ITokenService tokenService, IWorkflowResumer workflowResumer, IBookmarkQueue bookmarkQueue, IPayloadSerializer payloadSerializer, IApiSerializer apiSerializer) : FlammeEndpointWithoutRequest
 {
     private const long MaxBookmarkResumeBodySize = 1024 * 1024;
 

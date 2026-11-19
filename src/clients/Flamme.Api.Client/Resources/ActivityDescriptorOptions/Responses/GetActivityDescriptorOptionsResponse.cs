@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ActivityDescriptorOptions.Responses;
+namespace Flamme.Api.Client.Resources.ActivityDescriptorOptions.Responses;
 /// <summary>
 /// Represents a response from get activity descriptors Options.
 /// </summary>

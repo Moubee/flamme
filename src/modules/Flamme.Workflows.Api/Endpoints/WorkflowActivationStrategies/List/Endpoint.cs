@@ -1,19 +1,19 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Extensions;
-using Elsa.Models;
-using Elsa.Workflows;
+using Flamme.Abstractions;
+using Flamme.Extensions;
+using Flamme.Models;
+using Flamme.Workflows;
 using Humanizer;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowActivationStrategies.List;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowActivationStrategies.List;
 
 /// <summary>
 /// Returns list of available <see cref="IWorkflowActivationStrategy" /> implementations.
 /// </summary>
-internal class List(IEnumerable<IWorkflowActivationStrategy> strategies, ISerializationTypeRegistry workflowJsonTypeRegistry) : ElsaEndpointWithoutRequest<ListResponse<WorkflowActivationStrategyDescriptor>>
+internal class List(IEnumerable<IWorkflowActivationStrategy> strategies, ISerializationTypeRegistry workflowJsonTypeRegistry) : FlammeEndpointWithoutRequest<ListResponse<WorkflowActivationStrategyDescriptor>>
 {
     public override void Configure()
     {

@@ -1,16 +1,16 @@
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
-/// Provides options for configuring Elsa's Entity Framework Core integration.
+/// Provides options for configuring Flamme's Entity Framework Core integration.
 /// </summary>
 [PublicAPI]
-public class ElsaDbContextOptions
+public class FlammeDbContextOptions
 {
     /// <summary>
-    /// The schema used by Elsa.
+    /// The schema used by Flamme.
     /// </summary>
     public string? SchemaName { get; set; }
 

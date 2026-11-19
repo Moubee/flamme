@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.UIHints.RadioList;
+namespace Flamme.Workflows.UIHints.RadioList;
 
 /// <summary>
 /// Provides static drop-down options for a given property.

@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public class DefaultActivityInputEvaluator : IActivityInputEvaluator
 {

@@ -1,6 +1,6 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Provides downloadables from the specified content, if supported.

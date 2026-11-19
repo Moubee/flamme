@@ -1,11 +1,11 @@
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Activities.SetOutput;
+namespace Flamme.Workflows.Management.Activities.SetOutput;
 
 /// <summary>
 /// Assigns a given value to a workflow definition's output.

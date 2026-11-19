@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Common.DistributedHosting;
+namespace Flamme.Common.DistributedHosting;
 
 /// <summary>
 /// Provides options related to distributed locking, which is used by the workflow runtime.

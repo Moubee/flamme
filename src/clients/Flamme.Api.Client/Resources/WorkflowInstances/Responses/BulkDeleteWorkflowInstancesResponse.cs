@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Responses;
 
 internal sealed class BulkDeleteWorkflowInstancesResponse
 {

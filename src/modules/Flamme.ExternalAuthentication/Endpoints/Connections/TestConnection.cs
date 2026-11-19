@@ -1,13 +1,13 @@
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Connections;
+namespace Flamme.ExternalAuthentication.Endpoints.Connections;
 
-internal sealed class TestConnection(IServiceProvider services, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class TestConnection(IServiceProvider services, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {

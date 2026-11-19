@@ -1,9 +1,9 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Workflows.Api.RealTime.Handlers;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Workflows.Api.RealTime.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Api.Features;
+namespace Flamme.Workflows.Api.Features;
 
 /// <summary>
 /// Sets up a SignalR hub for receiving workflow events on the client.

@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Tenants.Permissions;
+namespace Flamme.Tenants.Permissions;
 
 /// <summary>
 /// Stable resource names for Tenants. Endpoints reference these constants rather than string

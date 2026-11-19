@@ -1,6 +1,6 @@
-﻿using Elsa.Testing.Shared;
+﻿using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ParentChildCompletion;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ParentChildCompletion;
 
 /// <summary>
 /// Tests for mapping an activity's output directly to the workflow's output definition.

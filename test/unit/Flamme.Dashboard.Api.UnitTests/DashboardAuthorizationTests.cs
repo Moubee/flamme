@@ -2,19 +2,19 @@ using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Elsa.Authorization;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Authorization;
-using Elsa.Dashboard.Api.Permissions;
-using Elsa.Dashboard.Api.Services;
-using Elsa.Testing.Shared.Authorization;
-using Elsa.Workflows.Api.Permissions;
+using Flamme.Authorization;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Authorization;
+using Flamme.Dashboard.Api.Permissions;
+using Flamme.Dashboard.Api.Services;
+using Flamme.Testing.Shared.Authorization;
+using Flamme.Workflows.Api.Permissions;
 using Microsoft.Extensions.DependencyInjection;
-using DashboardApiFeature = Elsa.Dashboard.Api.Features.DashboardApiFeature;
-using static Elsa.Dashboard.Api.UnitTests.TestContributor;
+using DashboardApiFeature = Flamme.Dashboard.Api.Features.DashboardApiFeature;
+using static Flamme.Dashboard.Api.UnitTests.TestContributor;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 /// <summary>
 /// Elsa Studio shows the dashboard to every signed-in user and gates each widget by the permission of the data it shows,
@@ -74,7 +74,7 @@ public class DashboardAuthorizationTests
 
     [Before(Test)]
     public async Task InitializeAsync() => _host = await AuthorizationTestHost.StartAsync<DashboardApiFeature>(
-        endpoint => endpoint.Namespace?.StartsWith("Elsa.Dashboard.Api.Endpoints", StringComparison.Ordinal) == true,
+        endpoint => endpoint.Namespace?.StartsWith("Flamme.Dashboard.Api.Endpoints", StringComparison.Ordinal) == true,
         services => services.AddSingleton<IDashboardProvider>(new DefaultDashboardProvider([Declared()], new(new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero))), new TestHostEnvironment())));
 
     [After(Test)]

@@ -1,4 +1,4 @@
-namespace Elsa;
+namespace Flamme;
 
 public static class EndpointSecurityOptions
 {

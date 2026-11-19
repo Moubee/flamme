@@ -1,6 +1,6 @@
-using Elsa.Workflows.Signals;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
 
 /// <summary>
 /// An activity that throws and also claims its own <see cref="FaultSignal"/>, used to pin the channel's self-receipt

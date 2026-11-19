@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class WorkflowCommitNotificationBuffer(IMediator mediator, ILogger<WorkflowCommitNotificationBuffer> logger) : IWorkflowCommitNotificationBuffer

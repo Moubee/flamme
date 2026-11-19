@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Workflows.Runtime.Commands;
+namespace Flamme.Workflows.Runtime.Commands;
 
 public record DispatchStimulusCommand(DispatchStimulusRequest Request) : ICommand<Unit>;

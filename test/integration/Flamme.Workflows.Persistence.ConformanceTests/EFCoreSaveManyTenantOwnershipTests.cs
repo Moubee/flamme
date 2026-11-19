@@ -1,19 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Common.Multitenancy;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows;
-using Elsa.Workflows.Api.Endpoints.WorkflowInstances.Import;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.State;
+using Flamme.Common.Multitenancy;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows;
+using Flamme.Workflows.Api.Endpoints.WorkflowInstances.Import;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Persistence.ConformanceTests;
+namespace Flamme.Workflows.Persistence.ConformanceTests;
 
 /// <summary>
 /// EF <c>Store.SaveManyAsync</c> must refuse a cross-tenant key collision before any row is written.
@@ -148,7 +148,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             var activity = (await Assert.That(await scenario.ActivityExecutions.FindManyAsync(new ActivityExecutionRecordFilter { Id = "ae-forged" })).HasSingleItem());
             await Assert.That(activity.TenantId).IsEqualTo("tenant-b");
 
-            var log = (await Assert.That((await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter { Id = "el-forged" }, Elsa.Common.Models.PageArgs.All)).Items).HasSingleItem());
+            var log = (await Assert.That((await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter { Id = "el-forged" }, Flamme.Common.Models.PageArgs.All)).Items).HasSingleItem());
             await Assert.That(log.TenantId).IsEqualTo("tenant-b");
 
             await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>

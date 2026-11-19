@@ -1,16 +1,16 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.StateMachine.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.StateMachine.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities.StateMachine.Activities;
+namespace Flamme.Workflows.Activities.StateMachine.Activities;
 
 /// <summary>
 /// Executes a state machine made of named states and trigger-driven transitions.
@@ -323,7 +323,7 @@ public class StateMachine : Activity
             var duplicatesId = !string.IsNullOrWhiteSpace(trigger.Id) && !seenIds.Add(trigger.Id);
 
             if (sharesInstance || duplicatesId)
-                throw new InvalidOperationException("StateMachine transitions cannot share a Trigger activity in Elsa 3.8. Give each transition its own trigger activity with a unique ID.");
+                throw new InvalidOperationException("StateMachine transitions cannot share a Trigger activity in Flamme 3.8. Give each transition its own trigger activity with a unique ID.");
         }
     }
 

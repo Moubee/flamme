@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.Models;
+namespace Flamme.ExternalAuthentication.Models;
 
 public sealed record SettingFieldDescriptor(
     string Name,

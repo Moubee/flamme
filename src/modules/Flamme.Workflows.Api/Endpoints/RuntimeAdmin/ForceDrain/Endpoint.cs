@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using FastEndpoints;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain;
+namespace Flamme.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain;
 
 /// <summary>
 /// <c>POST /admin/workflow-runtime/force-drain</c> — operator-escalation drain with zero deadline. Cancels every
@@ -15,12 +15,12 @@ namespace Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain;
 /// in <see cref="QuiescenceReason.Drain"/> until the next runtime generation.
 /// </summary>
 [PublicAPI]
-internal sealed class ForceDrainEndpoint(IWorkflowRuntimeAdminService admin) : ElsaEndpoint<ForceDrainRequest, ForceDrainResponse>
+internal sealed class ForceDrainEndpoint(IWorkflowRuntimeAdminService admin) : FlammeEndpoint<ForceDrainRequest, ForceDrainResponse>
 {
     public override void Configure()
     {
         Post("/admin/workflow-runtime/force-drain");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Runtime, "control");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Runtime, "control");
     }
 
     public override async Task HandleAsync(ForceDrainRequest req, CancellationToken ct)

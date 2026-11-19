@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.Incidents.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.Incidents.Workflows;
 
 public sealed record FaultyWorkflowOptions(Type IncidentStrategyType);
 

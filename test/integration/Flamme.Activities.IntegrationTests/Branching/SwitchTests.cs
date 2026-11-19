@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Branching;
+namespace Flamme.Activities.IntegrationTests.Branching;
 
 /// <summary>
 /// Integration tests for Switch activity.

@@ -1,15 +1,15 @@
-using Elsa.Expressions.CSharp.Handlers;
-using Elsa.Expressions.CSharp.Notifications;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.CSharp.Services;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.CSharp.Handlers;
+using Flamme.Expressions.CSharp.Notifications;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.CSharp.Services;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.UnitTests.CSharp;
+namespace Flamme.Expressions.UnitTests.CSharp;
 
 public class GenerateWorkflowVariableAccessorsTests
 {

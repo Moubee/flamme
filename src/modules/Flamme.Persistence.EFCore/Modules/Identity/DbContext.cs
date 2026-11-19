@@ -1,15 +1,15 @@
-﻿using Elsa.Identity.Entities;
+﻿using Flamme.Identity.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// The database context for the Identity module.
 /// </summary>
-public class IdentityElsaDbContext : ElsaDbContextBase
+public class IdentityFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public IdentityElsaDbContext(DbContextOptions<IdentityElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public IdentityFlammeDbContext(DbContextOptions<IdentityFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

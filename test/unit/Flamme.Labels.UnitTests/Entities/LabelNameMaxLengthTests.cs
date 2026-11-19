@@ -1,6 +1,6 @@
-using Elsa.Labels.Entities;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.UnitTests.Entities;
+namespace Flamme.Labels.UnitTests.Entities;
 
 public class LabelNameMaxLengthTests
 {

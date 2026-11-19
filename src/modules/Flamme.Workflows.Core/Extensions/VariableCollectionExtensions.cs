@@ -1,7 +1,7 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extension methods to <see cref="ICollection{Variable}"/>.

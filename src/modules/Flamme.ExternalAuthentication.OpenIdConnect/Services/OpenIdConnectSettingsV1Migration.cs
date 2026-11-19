@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Contracts;
 
-namespace Elsa.ExternalAuthentication.OpenIdConnect.Services;
+namespace Flamme.ExternalAuthentication.OpenIdConnect.Services;
 
 /// <summary>Migrates the unreleased v1 authority/callback settings to the v2 deployment-derived callback model.</summary>
 public sealed class OpenIdConnectSettingsV1Migration : IAdapterSettingsMigration

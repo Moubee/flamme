@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Alterations.Requests;
+namespace Flamme.Api.Client.Resources.Alterations.Requests;
 
 /// <summary>
 /// Represents a request to bulk retry workflow instances.

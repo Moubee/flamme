@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Http;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants.AspNetCore;
+namespace Flamme.Tenants.AspNetCore;
 
 /// <summary>
 /// Resolves the tenant based on the route prefix in the request URL. The tenant ID is expected to be part of the route.

@@ -1,6 +1,6 @@
 using FluentStorage.Blobs;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Represents a provider of a file cache storage.

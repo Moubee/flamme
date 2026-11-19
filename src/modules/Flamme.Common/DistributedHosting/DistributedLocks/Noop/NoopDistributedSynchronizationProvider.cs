@@ -1,6 +1,6 @@
 using Medallion.Threading;
 
-namespace Elsa.Common.DistributedHosting.DistributedLocks;
+namespace Flamme.Common.DistributedHosting.DistributedLocks;
 
 /// <summary>
 /// Represents a no-op implementation of the IDistributedLockProvider interface.

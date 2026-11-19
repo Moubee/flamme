@@ -1,13 +1,13 @@
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Options;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Identity.Features;
+namespace Flamme.Identity.Features;
 
 /// <summary>
 /// Feature that initializes an admin user from configuration if provided.

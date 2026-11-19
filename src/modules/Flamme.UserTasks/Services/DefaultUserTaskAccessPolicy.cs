@@ -1,9 +1,9 @@
-using Elsa.Authorization;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Permissions;
+using Flamme.Authorization;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Permissions;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 public sealed class DefaultUserTaskAccessPolicy : IUserTaskAccessPolicy
 {
@@ -135,7 +135,7 @@ public sealed class DefaultUserTaskAccessPolicy : IUserTaskAccessPolicy
 
 /// <summary>
 /// A safe default for hosts that do not expose a participant directory. It keeps lookup optional and
-/// avoids coupling User Tasks to Elsa.Identity.
+/// avoids coupling User Tasks to Flamme.Identity.
 /// </summary>
 public sealed class EmptyUserTaskParticipantDirectory : IUserTaskParticipantDirectory
 {

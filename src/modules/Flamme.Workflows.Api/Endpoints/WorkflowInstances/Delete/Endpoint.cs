@@ -1,17 +1,17 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Delete;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Delete;
 
 [PublicAPI]
-internal class Delete(IWorkflowRuntime workflowRuntime) : ElsaEndpoint<Request>
+internal class Delete(IWorkflowRuntime workflowRuntime) : FlammeEndpoint<Request>
 {
     public override void Configure()
     {
         Delete("/workflow-instances/{id}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Delete);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

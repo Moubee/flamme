@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// Represents a single execution log record.

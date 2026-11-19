@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Elsa.Api.Client.Resources.Alterations.Models;
+namespace Flamme.Api.Client.Resources.Alterations.Models;
 
 /// <summary>
 /// Represents the execution of an alteration plan against a set of workflow instances defined by the given filter

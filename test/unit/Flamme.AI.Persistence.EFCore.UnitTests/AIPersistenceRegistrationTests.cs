@@ -1,12 +1,12 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.Extensions;
-using Elsa.AI.Persistence.EFCore.Stores;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.Extensions;
+using Flamme.AI.Persistence.EFCore.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Persistence.EFCore.UnitTests;
+namespace Flamme.AI.Persistence.EFCore.UnitTests;
 
 public class AIPersistenceRegistrationTests
 {

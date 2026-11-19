@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Elsa.Testing.Shared.Services;
+namespace Flamme.Testing.Shared.Services;
 
 public class SignalManager
 {

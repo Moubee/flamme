@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator.Middleware.Command;
-using Elsa.Mediator.Middleware.Command.Contracts;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Command.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Tenants.Mediator.Middleware;
+namespace Flamme.Tenants.Mediator.Middleware;
 
 /// <summary>
 /// Middleware that ensures tenant context is propagated through the request pipeline.

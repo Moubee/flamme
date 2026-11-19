@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows.Signals;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FaultSignals.Activities;
 
 /// <summary>
 /// A sequential container that delegates <see cref="FaultSignal"/> handling to a caller-supplied strategy, so that a

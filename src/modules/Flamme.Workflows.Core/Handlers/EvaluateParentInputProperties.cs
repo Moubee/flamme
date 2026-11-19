@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Notifications;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Notifications;
 
-namespace Elsa.Workflows.Handlers;
+namespace Flamme.Workflows.Handlers;
 
 public class EvaluateParentInputProperties : INotificationHandler<InvokingActivityCallback>
 {

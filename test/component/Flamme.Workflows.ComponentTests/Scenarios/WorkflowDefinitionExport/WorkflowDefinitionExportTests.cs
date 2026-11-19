@@ -1,12 +1,12 @@
 using System.IO.Compression;
 using System.Text.Json;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 using Refit;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowDefinitionExport;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowDefinitionExport;
 
 /// <summary>
 /// Tests for the Export endpoint variations using a simple Parent → Child → Grandchild hierarchy.

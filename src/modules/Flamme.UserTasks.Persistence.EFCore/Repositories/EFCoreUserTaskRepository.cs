@@ -1,22 +1,22 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Persistence.EFCore;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Persistence.EFCore.Contracts;
+using Flamme.Persistence.EFCore;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Persistence.EFCore.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Elsa.UserTasks.Persistence.EFCore.Repositories;
+namespace Flamme.UserTasks.Persistence.EFCore.Repositories;
 
 /// <summary>
 /// EF Core implementation of the public User Tasks repository and the low-level projection adapter.
 /// Participant identities are flattened into provider/type/id columns; no identity or foreign-key
 /// dependency is introduced by this package.
 /// </summary>
-public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserTaskRecord> store)
+public sealed class EFCoreUserTaskRepository(Store<UserTasksFlammeDbContext, UserTaskRecord> store)
     : IUserTaskRepository, IUserTaskPersistenceAdapter
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
@@ -239,7 +239,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
         }
     }
 
-    private static IQueryable<UserTaskRecord> BuildQuery(UserTasksElsaDbContext dbContext, UserTaskQuery query)
+    private static IQueryable<UserTaskRecord> BuildQuery(UserTasksFlammeDbContext dbContext, UserTaskQuery query)
     {
         var records = dbContext.UserTasks.AsNoTracking();
         records = records.Where(x => x.TenantId == query.TenantId);
@@ -348,7 +348,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
     /// matched individually and case-insensitively — the same semantics as InMemory, with no
     /// tag table and no JSON-syntax false positives.
     /// </summary>
-    private static IQueryable<UserTaskRecord> ApplySafeSearch(UserTasksElsaDbContext dbContext, IQueryable<UserTaskRecord> records, string tenantId, string? search)
+    private static IQueryable<UserTaskRecord> ApplySafeSearch(UserTasksFlammeDbContext dbContext, IQueryable<UserTaskRecord> records, string tenantId, string? search)
     {
         if (string.IsNullOrWhiteSpace(search))
             return records;
@@ -466,12 +466,12 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
         }
     }
 
-    private static async Task<UserTask> LoadAggregateAsync(UserTasksElsaDbContext dbContext, UserTaskRecord record, CancellationToken cancellationToken)
+    private static async Task<UserTask> LoadAggregateAsync(UserTasksFlammeDbContext dbContext, UserTaskRecord record, CancellationToken cancellationToken)
     {
         return (await LoadAggregatesAsync(dbContext, [record], cancellationToken))[0];
     }
 
-    private static async Task<List<UserTask>> LoadAggregatesAsync(UserTasksElsaDbContext dbContext, IReadOnlyCollection<UserTaskRecord> records, CancellationToken cancellationToken)
+    private static async Task<List<UserTask>> LoadAggregatesAsync(UserTasksFlammeDbContext dbContext, IReadOnlyCollection<UserTaskRecord> records, CancellationToken cancellationToken)
     {
         var tasks = records.Select(ToModel).ToList();
         if (tasks.Count == 0)
@@ -682,7 +682,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
         target.CreatedFromBookmarkRevision = source.CreatedFromBookmarkRevision;
     }
 
-    private static async Task ReplaceChildrenAsync(UserTasksElsaDbContext dbContext, UserTask task, CancellationToken cancellationToken)
+    private static async Task ReplaceChildrenAsync(UserTasksFlammeDbContext dbContext, UserTask task, CancellationToken cancellationToken)
     {
         dbContext.UserTaskCandidates.RemoveRange(await dbContext.UserTaskCandidates.Where(x => x.TenantId == task.TenantId && x.TaskId == task.Id).ToListAsync(cancellationToken));
         dbContext.UserTaskSnapshotMembers.RemoveRange(await dbContext.UserTaskSnapshotMembers.Where(x => x.TenantId == task.TenantId && x.TaskId == task.Id).ToListAsync(cancellationToken));
@@ -824,7 +824,7 @@ public sealed class EFCoreUserTaskRepository(Store<UserTasksElsaDbContext, UserT
         AllowedActionsJson = Serialize(value.AllowedActions)
     };
 
-    private static async Task<bool> ExistsByMaterializationKeyAsync(UserTasksElsaDbContext dbContext, string tenantId, string key, CancellationToken cancellationToken) => await dbContext.UserTasks.AsNoTracking().AnyAsync(x => x.TenantId == tenantId && x.MaterializationKey == key, cancellationToken);
+    private static async Task<bool> ExistsByMaterializationKeyAsync(UserTasksFlammeDbContext dbContext, string tenantId, string key, CancellationToken cancellationToken) => await dbContext.UserTasks.AsNoTracking().AnyAsync(x => x.TenantId == tenantId && x.MaterializationKey == key, cancellationToken);
 
     private static void EnsureExpectedRevision(UserTaskRecord? existing, string taskId, int expectedRevision)
     {

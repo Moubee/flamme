@@ -1,18 +1,18 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Mediator.HostedServices;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Mediator.HostedServices;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// End-to-end drain recovery using the production <see cref="IWorkflowRestarter"/> (not a recording fake).
@@ -36,7 +36,7 @@ public class DrainRecoveryEndToEndTests : IAsyncDisposable
             .ConfigureServices(services => services.AddSingleton(_resumeGate))
             .AddActivitiesFrom<DrainRecoveryEndToEndTests>()
             .AddWorkflow<RecoverableResumeWorkflow>()
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     o.DrainDeadline = TimeSpan.FromMilliseconds(50);

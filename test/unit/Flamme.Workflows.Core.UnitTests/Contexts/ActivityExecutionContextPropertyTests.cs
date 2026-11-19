@@ -1,6 +1,6 @@
-using Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+using Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
 
-namespace Elsa.Workflows.Core.UnitTests.Contexts;
+namespace Flamme.Workflows.Core.UnitTests.Contexts;
 
 public class ActivityExecutionContextPropertyTests
 {

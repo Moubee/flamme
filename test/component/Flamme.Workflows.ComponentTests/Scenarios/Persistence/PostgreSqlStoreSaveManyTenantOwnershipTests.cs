@@ -1,8 +1,8 @@
-using Elsa.Persistence.EFCore.UnitTests;
+using Flamme.Persistence.EFCore.UnitTests;
 using Testcontainers.PostgreSql;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Persistence;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Persistence;
 
 [InheritsTests]
 [ClassDataSource<PostgreSqlStoreSaveManyFixture>(Shared = SharedType.PerClass)]

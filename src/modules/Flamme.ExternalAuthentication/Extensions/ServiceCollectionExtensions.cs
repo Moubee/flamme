@@ -1,14 +1,14 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Providers;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.ExternalAuthentication.Validation;
-using Elsa.Identity.Contracts;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Providers;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Validation;
+using Flamme.Identity.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -36,17 +36,17 @@ public static class ServiceCollectionExtensions
         // The module evaluates permissions outside endpoint authorization -- delegation, the grant boundary,
         // and the recovery override -- so it depends on the evaluator whether or not a host wired one up.
         // The call is TryAdd-based and idempotent, so a host that already registered one keeps it.
-        services.AddElsaAuthorization();
+        services.AddFlammeAuthorization();
 
         // Contributed explicitly rather than left to the host's assembly scan, so the module's resources reach
-        // the catalog on any host that registers its services, the same reason AddElsaAuthorization is called
+        // the catalog on any host that registers its services, the same reason AddFlammeAuthorization is called
         // here. Registration is TryAddEnumerable-backed, so a host that also scans this assembly gets one copy.
         services.AddPermissionDescriptors<ExternalAuthenticationResourcePermissionsDescriptorProvider>();
 
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.UnlinkedIdentityPolicy, RejectUnlinkedIdentityPolicy.PolicyType);
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.UnlinkedIdentityPolicy, CreateUserUnlinkedIdentityPolicy.PolicyType);
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.UnlinkedIdentityPolicy, MatchExternalUserUnlinkedIdentityPolicy.PolicyType);
-        services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.PermissionGrantSource, ElsaRolePermissionGrantSource.SourceType);
+        services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.PermissionGrantSource, FlammeRolePermissionGrantSource.SourceType);
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.PermissionGrantSource, ClaimMappingPermissionGrantSource.SourceType);
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.PermissionGrantSource, GroupMappingPermissionGrantSource.SourceType);
         services.AddExternalAuthenticationExtension(ExternalAuthenticationExtensionKind.PermissionGrantSource, ClaimPassThroughPermissionGrantSource.SourceType);
@@ -106,7 +106,7 @@ public static class ServiceCollectionExtensions
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IUnlinkedIdentityPolicy, RejectUnlinkedIdentityPolicy>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IUnlinkedIdentityPolicy, CreateUserUnlinkedIdentityPolicy>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IUnlinkedIdentityPolicy, MatchExternalUserUnlinkedIdentityPolicy>());
-        services.TryAddEnumerable(ServiceDescriptor.Scoped<IPermissionGrantSource, ElsaRolePermissionGrantSource>());
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<IPermissionGrantSource, FlammeRolePermissionGrantSource>());
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IPermissionGrantSource, ClaimMappingPermissionGrantSource>());
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IPermissionGrantSource, GroupMappingPermissionGrantSource>());
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IPermissionGrantSource, ClaimPassThroughPermissionGrantSource>());

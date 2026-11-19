@@ -1,4 +1,4 @@
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 /// <summary>
 /// Service for detecting whether exceptions are transient and may be resolved by retrying.

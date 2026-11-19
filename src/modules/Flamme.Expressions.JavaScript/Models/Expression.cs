@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.JavaScript.Models;
+namespace Flamme.Expressions.JavaScript.Models;
 
 /// <summary>
 /// Represents an expression.

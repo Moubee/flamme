@@ -1,10 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// HMAC-SHA-256 handle hasher. It uses a configured shared key when present and a process-local

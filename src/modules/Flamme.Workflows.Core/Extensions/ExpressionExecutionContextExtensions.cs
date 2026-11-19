@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Common;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Common;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using Humanizer;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions on <see cref="ExpressionExecutionContext"/>

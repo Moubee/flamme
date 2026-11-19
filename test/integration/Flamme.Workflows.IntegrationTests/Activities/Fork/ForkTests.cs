@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Activities.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Activities.Workflows;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Activities;
+namespace Flamme.Workflows.IntegrationTests.Activities;
 
 /// <summary>
 /// Integration tests for the <see cref="Workflows.Activities.Fork"/> activity.

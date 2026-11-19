@@ -2,16 +2,16 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 /// <summary>
 /// In-process guest session store. Only the SHA-256 hash of a credential is retained, so a memory dump or a

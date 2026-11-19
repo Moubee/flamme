@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Extension methods for the DatabaseFacade class.

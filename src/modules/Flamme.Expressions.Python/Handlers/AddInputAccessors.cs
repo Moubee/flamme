@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Expressions.Python.Models;
-using Elsa.Expressions.Python.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Expressions.Python.Models;
+using Flamme.Expressions.Python.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.Python.Handlers;
+namespace Flamme.Expressions.Python.Handlers;
 
 /// <summary>
 /// Adds input accessors to the Python engine.

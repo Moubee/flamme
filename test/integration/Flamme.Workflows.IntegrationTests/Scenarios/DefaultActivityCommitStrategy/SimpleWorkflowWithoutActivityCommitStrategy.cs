@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.DefaultActivityCommitStrategy;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.DefaultActivityCommitStrategy;
 
 public class SimpleWorkflowWithoutActivityCommitStrategy : WorkflowBase
 {

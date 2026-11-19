@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
-/// Reads the user id from an Elsa Identity refresh token.
+/// Reads the user id from an Flamme Identity refresh token.
 /// </summary>
 /// <remarks>
 /// Collects every <c>sub</c> (<see cref="JwtRegisteredClaimNames.Sub"/>) and inbound-mapped

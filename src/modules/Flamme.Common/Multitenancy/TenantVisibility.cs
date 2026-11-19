@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Memory-store counterpart of EF Core <c>SetTenantIdFilter</c>.

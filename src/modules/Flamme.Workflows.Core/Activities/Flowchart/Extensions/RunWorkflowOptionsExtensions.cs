@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Options;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.Activities.Flowchart.Extensions;
+namespace Flamme.Workflows.Activities.Flowchart.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="RunWorkflowOptions"/> to configure flowchart execution mode.

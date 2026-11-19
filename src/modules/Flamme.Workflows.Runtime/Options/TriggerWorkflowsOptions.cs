@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Options for triggering workflows.

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// Represents handler for entity model creation.
@@ -11,5 +11,5 @@ public interface IEntityModelCreatingHandler
     /// <summary>
     /// Handles the entity model being created.
     /// </summary>
-    void Handle(ElsaDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType);
+    void Handle(FlammeDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType);
 }

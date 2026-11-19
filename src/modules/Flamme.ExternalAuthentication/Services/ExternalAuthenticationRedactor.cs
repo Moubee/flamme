@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Centralizes removal of values that must never leave the external-authentication trust boundary.

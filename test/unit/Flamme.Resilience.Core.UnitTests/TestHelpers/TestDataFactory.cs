@@ -1,5 +1,5 @@
 
-namespace Elsa.Resilience.Core.UnitTests.TestHelpers;
+namespace Flamme.Resilience.Core.UnitTests.TestHelpers;
 
 internal static class TestDataFactory
 {

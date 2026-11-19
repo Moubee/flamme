@@ -1,6 +1,6 @@
-using Elsa.Expressions.Contracts;
+using Flamme.Expressions.Contracts;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Updates the workflow store from <see cref="IWorkflowsProvider"/> implementations, creates triggers, updates the <see cref="IActivityRegistry"/> and <see cref="IExpressionDescriptorRegistry"/>.

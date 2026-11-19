@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.IsNameUnique;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.IsNameUnique;
 
 internal class Request
 {

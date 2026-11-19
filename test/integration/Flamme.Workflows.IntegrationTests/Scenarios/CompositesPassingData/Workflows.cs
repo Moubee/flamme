@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CompositesPassingData;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CompositesPassingData;
 
 /// <summary>
 /// A composite activity that adds text to a string

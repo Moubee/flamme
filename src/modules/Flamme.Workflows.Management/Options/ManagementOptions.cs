@@ -1,7 +1,7 @@
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management.Options;
+namespace Flamme.Workflows.Management.Options;
 
 /// <summary>
 /// Options for the management module.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Attributes;
+namespace Flamme.Workflows.Attributes;
 
 /// <summary>
 /// Specifies various metadata about an activity's input property.

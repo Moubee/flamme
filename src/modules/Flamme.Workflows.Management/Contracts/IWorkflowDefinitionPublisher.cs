@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Publishes workflow definitions.

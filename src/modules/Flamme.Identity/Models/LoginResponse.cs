@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 public class LoginResponse(bool isAuthenticated, string? accessToken, string? refreshToken)
 {

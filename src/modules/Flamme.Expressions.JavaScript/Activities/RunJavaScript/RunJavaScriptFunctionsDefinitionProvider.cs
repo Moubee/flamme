@@ -1,10 +1,10 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Abstractions;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Workflows.Helpers;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Abstractions;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Workflows.Helpers;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.JavaScript.Activities;
+namespace Flamme.Expressions.JavaScript.Activities;
 
 /// <summary>
 /// Produces <see cref="FunctionDefinition"/>s for common functions.

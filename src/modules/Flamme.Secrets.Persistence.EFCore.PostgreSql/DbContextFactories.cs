@@ -1,14 +1,14 @@
-using Elsa.Persistence.EFCore.Abstractions;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Secrets.Persistence.EFCore;
+using Flamme.Persistence.EFCore.Abstractions;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Secrets.Persistence.EFCore;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Secrets.Persistence.EFCore.PostgreSql;
+namespace Flamme.Secrets.Persistence.EFCore.PostgreSql;
 
 [UsedImplicitly]
-public class SecretsDbContextFactory : PostgreSqlSecretsDesignTimeDbContextFactory<SecretsElsaDbContext>;
+public class SecretsDbContextFactory : PostgreSqlSecretsDesignTimeDbContextFactory<SecretsFlammeDbContext>;
 
 public class PostgreSqlSecretsDesignTimeDbContextFactory<TDbContext> : DesignTimeDbContextFactoryBase<TDbContext> where TDbContext : DbContext
 {
@@ -19,6 +19,6 @@ public class PostgreSqlSecretsDesignTimeDbContextFactory<TDbContext> : DesignTim
 
     protected override void ConfigureBuilder(DbContextOptionsBuilder<TDbContext> builder, string connectionString)
     {
-        builder.UseElsaPostgreSql(GetType().Assembly, connectionString);
+        builder.UseFlammePostgreSql(GetType().Assembly, connectionString);
     }
 }

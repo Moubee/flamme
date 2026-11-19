@@ -1,16 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Writes workflow dispatch commands to a durable outbox while a workflow execution is in progress.

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests;
+namespace Flamme.UserTasks.Persistence.ConformanceTests;
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(UserTaskGuestSession))]

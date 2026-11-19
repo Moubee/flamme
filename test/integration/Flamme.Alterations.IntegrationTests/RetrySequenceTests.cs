@@ -1,22 +1,22 @@
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Extensions;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Extensions;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 public sealed class RetrySequenceTests : IAsyncInitializer, IAsyncDisposable
 {
@@ -29,7 +29,7 @@ public sealed class RetrySequenceTests : IAsyncInitializer, IAsyncDisposable
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_output)
             .ConfigureServices(services => services.AddSingleton(_probe))
-            .ConfigureElsa(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(elsa => elsa.UseAlterations())
             .AddWorkflow<RetrySequenceWorkflow>()
             .AddWorkflow<RetryStandaloneSequenceWorkflow>()
             .AddActivitiesFrom<RetryBookmarkActivity>()

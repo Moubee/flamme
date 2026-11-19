@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// Represents a trigger associated with a workflow definition.

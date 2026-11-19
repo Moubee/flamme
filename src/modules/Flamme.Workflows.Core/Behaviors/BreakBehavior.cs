@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Signals;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows.Behaviors;
+namespace Flamme.Workflows.Behaviors;
 
 /// <summary>
 /// Implements a "break" behavior that handles the <see cref="BreakSignal"/> signal.

@@ -1,6 +1,6 @@
-using Elsa.Mediator.CommandStrategies;
+using Flamme.Mediator.CommandStrategies;
 
-namespace Elsa.Mediator;
+namespace Flamme.Mediator;
 
 /// <summary>
 /// Provides a set of strategies for publishing events.

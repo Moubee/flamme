@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// Published when an authorised operator effectively transitions the runtime into <see cref="QuiescenceReason.AdministrativePause"/>.

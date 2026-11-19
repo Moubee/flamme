@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.VariablesArray.Activities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.VariablesArray.Activities;
 
 public class RemoveTopElementStep : Activity
 {

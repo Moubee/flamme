@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Represents a store of workflow instances.
@@ -187,7 +187,7 @@ public interface IWorkflowInstanceStore
     /// <param name="workflowInstanceId">The workflow instance to mark.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="allowFinishedCancelled">
-    /// Unused by Elsa Core as of #8419. Kept so the 3.8.4 signature remains binary-compatible with
+    /// Unused by Flamme Core as of #8419. Kept so the 3.8.4 signature remains binary-compatible with
     /// extension-package implementations. Drain no longer passes <c>true</c>: a
     /// <see cref="WorkflowStatus.Finished"/> / <see cref="WorkflowSubStatus.Cancelled"/> row is never
     /// promoted to <see cref="WorkflowStatus.Running"/> + <see cref="WorkflowSubStatus.Interrupted"/>.

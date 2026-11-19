@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ActivityDescriptors.Enums;
+namespace Flamme.Api.Client.Resources.ActivityDescriptors.Enums;
 
 /// <summary>
 /// The type of a port.

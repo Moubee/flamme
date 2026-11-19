@@ -1,7 +1,7 @@
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Manages user operations such as creation and validation.

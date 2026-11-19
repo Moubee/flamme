@@ -1,12 +1,12 @@
-using Elsa.Common;
-using Elsa.Extensions;
-using Elsa.Scheduling.Activities;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common;
+using Flamme.Extensions;
+using Flamme.Scheduling.Activities;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Scheduling.Services;
+namespace Flamme.Scheduling.Services;
 
 /// <summary>
 /// A default implementation of <see cref="ITriggerScheduler"/> that schedules triggers using <see cref="IWorkflowScheduler"/>.

@@ -1,9 +1,9 @@
 using System.Threading.Channels;
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.HostedServices;
+namespace Flamme.Mediator.HostedServices;
 
 /// <summary>
 /// Continuously reads from a channel to which commands can be sent, executing each received command.

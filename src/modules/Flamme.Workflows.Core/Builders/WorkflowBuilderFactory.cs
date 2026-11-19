@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Builders;
+namespace Flamme.Workflows.Builders;
 
 /// <inheritdoc />
 public class WorkflowBuilderFactory : IWorkflowBuilderFactory

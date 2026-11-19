@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents an output binding for an activity.

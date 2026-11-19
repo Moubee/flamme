@@ -1,11 +1,11 @@
-﻿using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Workflows;
+﻿using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Workflows;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Applications.Create;
+namespace Flamme.Identity.Endpoints.Applications.Create;
 
 /// <summary>
 /// An endpoint that creates a new application.
@@ -19,7 +19,7 @@ internal class Create(
     ISecretHasher secretHasher,
     IApplicationStore applicationStore,
     IRoleStore roleStore)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     private readonly IRoleStore _roleStore = roleStore;
 
@@ -27,7 +27,7 @@ internal class Create(
     public override void Configure()
     {
         Post("/identity/applications");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Applications, CoreVerbs.Create);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Applications, CoreVerbs.Create);
     }
 
     /// <inheritdoc />

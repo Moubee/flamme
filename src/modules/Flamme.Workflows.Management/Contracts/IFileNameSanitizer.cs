@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Sanitizes file names by replacing invalid characters with safe alternatives.

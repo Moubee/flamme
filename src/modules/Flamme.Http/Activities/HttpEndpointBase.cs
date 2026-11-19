@@ -1,8 +1,8 @@
-using Elsa.Http.Extensions;
-using Elsa.Workflows;
+using Flamme.Http.Extensions;
+using Flamme.Workflows;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 public abstract class HttpEndpointBase : HttpEndpointBase<object>;
 
@@ -23,7 +23,7 @@ public abstract class HttpEndpointBase<TResult> : Trigger<TResult>
     protected override async ValueTask ExecuteAsync(ActivityExecutionContext context)
     {
     var options = GetOptions();
-    await context.WaitForHttpRequestAsync(options, HttpRequestReceivedAsync, Elsa.Http.HttpStimulusNames.HttpEndpoint);
+    await context.WaitForHttpRequestAsync(options, HttpRequestReceivedAsync, Flamme.Http.HttpStimulusNames.HttpEndpoint);
     }
 
     protected override IEnumerable<object> GetTriggerPayloads(TriggerIndexingContext context)

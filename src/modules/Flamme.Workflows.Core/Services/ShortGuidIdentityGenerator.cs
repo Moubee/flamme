@@ -1,6 +1,6 @@
 using DEDrake;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Generates a unique identifier using <see cref="ShortGuid"/>.

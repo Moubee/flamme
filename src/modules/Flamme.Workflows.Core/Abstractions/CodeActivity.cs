@@ -1,11 +1,11 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Behaviors;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Behaviors;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Base class for custom activities with auto-complete behavior.

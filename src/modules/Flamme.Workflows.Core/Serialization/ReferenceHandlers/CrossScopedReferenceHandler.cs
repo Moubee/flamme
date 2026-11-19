@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.Serialization.ReferenceHandlers;
+namespace Flamme.Workflows.Serialization.ReferenceHandlers;
 
 /// <summary>
 /// A reference handler that can be used to resolve references across scopes.

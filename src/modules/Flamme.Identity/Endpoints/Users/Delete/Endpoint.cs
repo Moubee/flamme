@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Identity.Endpoints.Users.Delete;
+namespace Flamme.Identity.Endpoints.Users.Delete;
 
 /// <summary>
 /// An endpoint that deletes a user by ID.
 /// </summary>
 [PublicAPI]
-internal class Delete(IUserDeletionCoordinator coordinator) : ElsaEndpointWithoutRequest
+internal class Delete(IUserDeletionCoordinator coordinator) : FlammeEndpointWithoutRequest
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Delete("/identity/users/{id}");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Delete);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Delete);
     }
 
     /// <inheritdoc />

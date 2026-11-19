@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.ActivationValidators;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class DefaultWorkflowActivationStrategyEvaluatorTests
 {

@@ -1,16 +1,16 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.UIHints;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.UIHints;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// An activity that downloads a file from a given URL.

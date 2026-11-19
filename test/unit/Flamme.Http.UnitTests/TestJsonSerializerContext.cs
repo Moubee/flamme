@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Http.UnitTests;
+namespace Flamme.Http.UnitTests;
 
-[JsonSerializable(typeof(global::Elsa.Http.Bookmarks.HttpEndpointBookmarkPayload), TypeInfoPropertyName = "HttpEndpointBookmarkPayload")]
+[JsonSerializable(typeof(global::Flamme.Http.Bookmarks.HttpEndpointBookmarkPayload), TypeInfoPropertyName = "HttpEndpointBookmarkPayload")]
 internal partial class TestJsonSerializerContext : JsonSerializerContext;

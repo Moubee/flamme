@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ConnectionRevisionCalculatorTests
 {

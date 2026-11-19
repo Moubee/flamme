@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Export;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Export;
 
 /// <summary>
 /// Exports the specified workflow definition as JSON download.

@@ -2,15 +2,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Elsa.Secrets.Persistence.EFCore.PostgreSql.Migrations.Secrets
+namespace Flamme.Secrets.Persistence.EFCore.PostgreSql.Migrations.Secrets
 {
     /// <inheritdoc />
     public partial class SecretDefaultTenantUniqueness : Migration
     {
-        private readonly Elsa.Persistence.EFCore.IElsaDbContextSchema _schema;
+        private readonly Flamme.Persistence.EFCore.IFlammeDbContextSchema _schema;
 
         /// <inheritdoc />
-        public SecretDefaultTenantUniqueness(Elsa.Persistence.EFCore.IElsaDbContextSchema schema)
+        public SecretDefaultTenantUniqueness(Flamme.Persistence.EFCore.IFlammeDbContextSchema schema)
         {
             _schema = schema;
         }

@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class LogPersistenceConfiguration
 {

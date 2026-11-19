@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.Blocking;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.Blocking;
 
 class BlockingSequentialWorkflow : WorkflowBase
 {

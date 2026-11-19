@@ -2,13 +2,13 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Common.Converters;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
+using Flamme.Common.Converters;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 public class JsonConverterTest : IAsyncDisposable
 {
     private readonly IServiceProvider _serviceProvider = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput).Build();

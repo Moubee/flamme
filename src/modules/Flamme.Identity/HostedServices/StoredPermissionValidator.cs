@@ -1,12 +1,12 @@
-using Elsa.Authorization;
-using Elsa.Identity.Contracts;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Identity.Contracts;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Identity.HostedServices;
+namespace Flamme.Identity.HostedServices;
 
 /// <summary>
 /// Reports stored role permissions that no longer resolve, so an upgrade fails loudly rather than

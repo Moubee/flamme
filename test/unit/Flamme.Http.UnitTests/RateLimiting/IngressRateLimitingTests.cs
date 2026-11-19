@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.RateLimiting;
-using Elsa.Extensions;
+using Flamme.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TUnit.AspNetCore;
 
-namespace Elsa.Http.UnitTests.RateLimiting;
+namespace Flamme.Http.UnitTests.RateLimiting;
 
 public sealed class IngressRateLimitingTestEntryPoint;
 
@@ -254,7 +254,7 @@ public class IngressRateLimitingTests
                 app.UseRateLimiter();
                 app.UseEndpoints(endpoints => endpoints
                     .MapGet("/elsa/api/ping", (RequestDelegate)WritePongAsync)
-                    .WithDisplayName("Elsa API Ping")
+                    .WithDisplayName("Flamme API Ping")
                     .WithMetadata(routeMetadata));
             });
         using var client = factory.CreateClient();

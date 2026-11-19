@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.Alterations.Enums;
+using Flamme.Api.Client.Resources.Alterations.Enums;
 
-namespace Elsa.Api.Client.Resources.Alterations.Models;
+namespace Flamme.Api.Client.Resources.Alterations.Models;
 
 /// <summary>
 /// A filter for activities within a workflow instance

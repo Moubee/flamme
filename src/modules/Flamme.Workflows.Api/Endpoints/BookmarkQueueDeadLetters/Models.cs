@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
+namespace Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
 
 public class ListRequest
 {

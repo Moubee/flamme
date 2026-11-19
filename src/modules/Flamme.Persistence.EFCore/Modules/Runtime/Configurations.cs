@@ -1,9 +1,9 @@
-using Elsa.KeyValues.Entities;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.KeyValues.Entities;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// EF Core configuration for various sets of <see cref="DbContext"/>. 

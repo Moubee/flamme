@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Populates the <see cref="IActivityRegistry"/> with activities.

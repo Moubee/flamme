@@ -1,16 +1,16 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Signals;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Signals;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Represents a composite activity that has a single <see cref="Root"/> activity. Like a workflow, but without workflow-level properties.

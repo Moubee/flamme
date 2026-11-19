@@ -2,25 +2,25 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Links;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Links;
 
 public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIdentityLinkWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {
@@ -111,7 +111,7 @@ public partial class ExternalIdentityLinkTests : WebApplicationTest<ExternalIden
         var resolver = new DefaultExternalIdentityResolver(
             scope.ServiceProvider.GetRequiredService<IExternalIdentityProvisioner>(),
             [new RejectUnlinkedIdentityPolicy()],
-            Microsoft.Extensions.Options.Options.Create(new Elsa.ExternalAuthentication.Options.ExternalAuthenticationOptions()));
+            Microsoft.Extensions.Options.Options.Create(new Flamme.ExternalAuthentication.Options.ExternalAuthenticationOptions()));
         var identity = new ExternalIdentity("https://issuer.example", "subject-a", new Dictionary<string, IReadOnlyCollection<string>>());
         var connection = await _connections.FindByKeyAsync("tenant-a", "contoso");
         await Assert.ThrowsExactlyAsync<ExternalIdentityUnlinkedException>(() => resolver.ResolveAsync(new ExternalIdentityResolutionContext("tenant-a", connection!, identity, identity.Claims)).AsTask());

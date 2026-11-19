@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.Contracts;
+namespace Flamme.Expressions.Contracts;
 
 /// <summary>
 /// A central repository of well known types.

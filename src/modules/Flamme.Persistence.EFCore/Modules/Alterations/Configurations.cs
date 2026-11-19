@@ -1,8 +1,8 @@
-using Elsa.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// EF Core configuration for various entity types. 

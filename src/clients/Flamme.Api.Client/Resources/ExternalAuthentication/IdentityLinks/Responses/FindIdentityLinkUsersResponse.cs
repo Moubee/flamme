@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Responses;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Responses;
 
 /// <summary>
 /// A cursor-paged minimal user picker response.

@@ -1,12 +1,12 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator;
-using Elsa.Mediator.Contracts;
-using Elsa.Tenants.Mediator;
-using Elsa.Workflows.Runtime.Commands;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator;
+using Flamme.Mediator.Contracts;
+using Flamme.Tenants.Mediator;
+using Flamme.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// A simple implementation that queues the specified request for delivering stimuli on a non-durable background worker.

@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Persistence.EFCore.Entities;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Persistence.EFCore.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.AI.Persistence.EFCore.Stores;
+namespace Flamme.AI.Persistence.EFCore.Stores;
 
 public class EFCoreAIProposalStore(AIDbContext dbContext) : IAIProposalStore
 {

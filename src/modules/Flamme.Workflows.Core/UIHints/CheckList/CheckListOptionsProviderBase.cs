@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.UIHints.CheckList;
+namespace Flamme.Workflows.UIHints.CheckList;
 
 /// <summary>
 /// A base class for providing options to populate a checklist UI component. This class is intended to be inherited to implement

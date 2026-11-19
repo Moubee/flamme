@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Elsa.Workflows.IntegrationTests")]
-[assembly: InternalsVisibleTo("Elsa.Workflows.Api.UnitTests")]
-[assembly: InternalsVisibleTo("Elsa.Workflows.Persistence.ConformanceTests")]
+[assembly: InternalsVisibleTo("Flamme.Workflows.IntegrationTests")]
+[assembly: InternalsVisibleTo("Flamme.Workflows.Api.UnitTests")]
+[assembly: InternalsVisibleTo("Flamme.Workflows.Persistence.ConformanceTests")]

@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 using FastEndpoints;
 using FluentValidation;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
 
 /// <summary>
 /// Validates the request for bulk canceling workflow instances.

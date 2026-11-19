@@ -1,39 +1,39 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Elsa.Alterations.Extensions;
-using Elsa.Caching;
-using Elsa.Caching.Options;
-using Elsa.Common.Features;
-using Elsa.Common.RecurringTasks;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Identity.Providers;
-using Elsa.Http.Options;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Alterations;
-using Elsa.Persistence.EFCore.Modules.Identity;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Testing.Shared.Handlers;
-using Elsa.Testing.Shared.Services;
-using Elsa.Tenants;
-using Elsa.Tenants.AspNetCore;
-using Elsa.Tenants.Extensions;
-using Elsa.Workflows.ComponentTests.Host;
-using Elsa.Workflows.ComponentTests.Decorators;
-using Elsa.Workflows.ComponentTests.Materializers;
-using Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
-using Elsa.Workflows.ComponentTests.Scenarios.HostMethodActivities;
-using Elsa.Workflows.ComponentTests.Scenarios.OutputConverters;
-using Elsa.Workflows.ComponentTests.Services;
-using Elsa.Workflows.ComponentTests.WorkflowProviders;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Distributed.Extensions;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Tasks;
+using Flamme.Alterations.Extensions;
+using Flamme.Caching;
+using Flamme.Caching.Options;
+using Flamme.Common.Features;
+using Flamme.Common.RecurringTasks;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Identity.Providers;
+using Flamme.Http.Options;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Alterations;
+using Flamme.Persistence.EFCore.Modules.Identity;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Persistence.EFCore.Modules.Runtime;
+using Flamme.Testing.Shared.Handlers;
+using Flamme.Testing.Shared.Services;
+using Flamme.Tenants;
+using Flamme.Tenants.AspNetCore;
+using Flamme.Tenants.Extensions;
+using Flamme.Workflows.ComponentTests.Host;
+using Flamme.Workflows.ComponentTests.Decorators;
+using Flamme.Workflows.ComponentTests.Materializers;
+using Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
+using Flamme.Workflows.ComponentTests.Scenarios.HostMethodActivities;
+using Flamme.Workflows.ComponentTests.Scenarios.OutputConverters;
+using Flamme.Workflows.ComponentTests.Services;
+using Flamme.Workflows.ComponentTests.WorkflowProviders;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.Distributed.Extensions;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Tasks;
 using FluentStorage;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
@@ -44,9 +44,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Refit;
 using TUnit.AspNetCore;
-using static Elsa.Api.Client.RefitSettingsHelper;
+using static Flamme.Api.Client.RefitSettingsHelper;
 
-namespace Elsa.Workflows.ComponentTests.Fixtures;
+namespace Flamme.Workflows.ComponentTests.Fixtures;
 
 /// <summary>
 /// Session-owned root factory. TUnit creates a derived TestServer host for each pod by
@@ -55,7 +55,7 @@ namespace Elsa.Workflows.ComponentTests.Fixtures;
 public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFactory<ComponentTestHost>
 {
     private const string TestSigningKey = "development-only-secret-signing-key-change-before-production";
-    private readonly ConcurrentBag<ElsaModuleRegistryLease> _moduleRegistryLeases = [];
+    private readonly ConcurrentBag<FlammeModuleRegistryLease> _moduleRegistryLeases = [];
     private int _baseFactoryDisposed;
 
     internal bool BaseFactoryDisposed => Volatile.Read(ref _baseFactoryDisposed) != 0;
@@ -67,7 +67,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
 
     internal void ConfigureComponentHost(IWebHostBuilder builder, ComponentTestHostOptions hostOptions)
     {
-        var moduleRegistryLease = new ElsaModuleRegistryLease();
+        var moduleRegistryLease = new FlammeModuleRegistryLease();
         _moduleRegistryLeases.Add(moduleRegistryLease);
 
         builder
@@ -94,7 +94,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
                     services.Configure<HttpFileCacheOptions>(options =>
                         options.LocalCacheDirectory = hostOptions.HttpFileCacheDirectory);
 
-                    var module = services.ConfigureElsa(ConfigureElsaForTesting);
+                    var module = services.ConfigureFlamme(ConfigureFlammeForTesting);
                     var registryCleanupDescriptor = moduleRegistryLease.CaptureAndRegister(module);
                     module.Apply();
 
@@ -168,7 +168,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
                     catch (Exception cleanupFailure)
                     {
                         throw new AggregateException(
-                            "Component host configuration and Elsa module-registry cleanup both failed.",
+                            "Component host configuration and Flamme module-registry cleanup both failed.",
                             configurationFailure,
                             cleanupFailure);
                     }
@@ -178,7 +178,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
             });
     }
 
-    private static void ConfigureElsaForTesting(IModule elsa)
+    private static void ConfigureFlammeForTesting(IModule elsa)
     {
         elsa
             .AddWorkflowsFrom<WorkflowServer>()
@@ -282,7 +282,7 @@ public sealed class ComponentTestWebApplicationFactory : TestWebApplicationFacto
         }
 
         if (failures is { Count: > 0 })
-            throw new AggregateException("Failed to release one or more Elsa module-registry leases.", failures);
+            throw new AggregateException("Failed to release one or more Flamme module-registry leases.", failures);
     }
 
     private static string GetConnectionString(IServiceProvider serviceProvider) =>
@@ -317,7 +317,7 @@ internal sealed class ComponentDatabaseBootstrapTracker
 }
 
 /// <summary>
-/// Creates the shared app catalog before Elsa's tenant activation and migration hosted services run.
+/// Creates the shared app catalog before Flamme's tenant activation and migration hosted services run.
 /// The host itself is materialized while TUnit.AspNetCore holds its native server-init gate.
 /// </summary>
 internal sealed class ComponentCatalogProvisioningService(ComponentTestCatalog catalog) : IHostedService
@@ -329,7 +329,7 @@ internal sealed class ComponentCatalogProvisioningService(ComponentTestCatalog c
 
 /// <summary>
 /// Applies each distinct component schema once to the session template. The restored app catalog
-/// starts with those schemas, while Elsa's per-tenant migration startup tasks remain disabled.
+/// starts with those schemas, while Flamme's per-tenant migration startup tasks remain disabled.
 /// </summary>
 internal sealed class ComponentDatabaseMigrationService(
     IServiceScopeFactory scopeFactory,
@@ -345,10 +345,10 @@ internal sealed class ComponentDatabaseMigrationService(
         await using var scope = scopeFactory.CreateAsyncScope();
         var services = scope.ServiceProvider;
 
-        await MigrateAsync<IdentityElsaDbContext>(services, cancellationToken);
-        await MigrateAsync<ManagementElsaDbContext>(services, cancellationToken);
-        await MigrateAsync<RuntimeElsaDbContext>(services, cancellationToken);
-        await MigrateAsync<AlterationsElsaDbContext>(services, cancellationToken);
+        await MigrateAsync<IdentityFlammeDbContext>(services, cancellationToken);
+        await MigrateAsync<ManagementFlammeDbContext>(services, cancellationToken);
+        await MigrateAsync<RuntimeFlammeDbContext>(services, cancellationToken);
+        await MigrateAsync<AlterationsFlammeDbContext>(services, cancellationToken);
     }
 
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This JIT-run database test exercises EF schema creation or migrations; production AOT support is tracked separately.")]
@@ -552,9 +552,9 @@ internal sealed class ComponentPodHarness : WebApplicationTest<ComponentTestWebA
 }
 
 /// <summary>
-/// Removes only one disposed host's exact service-collection key from Elsa's process-wide module registry.
+/// Removes only one disposed host's exact service-collection key from Flamme's process-wide module registry.
 /// </summary>
-internal sealed class ElsaModuleRegistryLease
+internal sealed class FlammeModuleRegistryLease
 {
     private readonly Lock _captureLock = new();
     private IServiceCollection? _services;
@@ -584,17 +584,17 @@ internal sealed class ElsaModuleRegistryLease
             if (_module is not null)
                 throw new InvalidOperationException("A module-registry lease cannot capture more than one module.");
             if (!ReferenceEquals(module.Services, services))
-                throw new InvalidOperationException("Elsa returned a module for a different service collection.");
+                throw new InvalidOperationException("Flamme returned a module for a different service collection.");
 
             var modules = GetModules();
             if (!modules.TryGetValue(services, out var registeredModule) || !ReferenceEquals(registeredModule, module))
-                throw new InvalidOperationException("The host's exact service collection and module pair was not registered with Elsa.");
+                throw new InvalidOperationException("The host's exact service collection and module pair was not registered with Flamme.");
 
             _module = module;
         }
 
         var descriptor = ServiceDescriptor.Singleton<IHostedService>(serviceProvider =>
-            new ElsaModuleRegistryCleanupService(
+            new FlammeModuleRegistryCleanupService(
                 this,
                 serviceProvider.GetRequiredService<IHostApplicationLifetime>()));
         services.Insert(0, descriptor);
@@ -648,7 +648,7 @@ internal sealed class ElsaModuleRegistryLease
         if (lifecycleFailure is not null)
             throw new InvalidOperationException("Lifecycle module-registry cleanup failed before the factory fallback succeeded.", lifecycleFailure);
         if (factoryDisposed && hadCapturedModule && !hostStopped)
-            throw new InvalidOperationException("The host never reached ApplicationStopped; its exact Elsa module-registry entry was detached by the factory fallback.");
+            throw new InvalidOperationException("The host never reached ApplicationStopped; its exact Flamme module-registry entry was detached by the factory fallback.");
     }
 
     private void Release(bool requireStoppedHost = true)
@@ -657,7 +657,7 @@ internal sealed class ElsaModuleRegistryLease
         if (priorState == 2)
             return;
         if (priorState == 1)
-            throw new InvalidOperationException("Concurrent Elsa module-registry release is not supported.");
+            throw new InvalidOperationException("Concurrent Flamme module-registry release is not supported.");
 
         try
         {
@@ -680,24 +680,24 @@ internal sealed class ElsaModuleRegistryLease
                 }
 
                 if (!ReferenceEquals(module.Services, services))
-                    throw new InvalidOperationException("Elsa's module registry returned a module for a different service collection.");
+                    throw new InvalidOperationException("Flamme's module registry returned a module for a different service collection.");
                 Volatile.Write(ref _module, module);
             }
 
             if (requireStoppedHost && Volatile.Read(ref _hostStopped) == 0)
-                throw new InvalidOperationException("The component host did not reach its stopped lifecycle phase; its Elsa module-registry entry remains attached.");
+                throw new InvalidOperationException("The component host did not reach its stopped lifecycle phase; its Flamme module-registry entry remains attached.");
 
             var modules = GetModules();
             if (!modules.TryRemove(new KeyValuePair<IServiceCollection, IModule>(services, module)))
             {
                 if (modules.TryGetValue(services, out var registeredModule))
                     throw new InvalidOperationException(ReferenceEquals(registeredModule, module)
-                        ? "Failed to remove the stopped host's exact Elsa module-registry entry."
-                        : "The stopped host's Elsa module-registry entry was replaced unexpectedly.");
+                        ? "Failed to remove the stopped host's exact Flamme module-registry entry."
+                        : "The stopped host's Flamme module-registry entry was replaced unexpectedly.");
             }
 
             if (modules.ContainsKey(services))
-                throw new InvalidOperationException("The stopped host's Elsa module-registry entry is still present.");
+                throw new InvalidOperationException("The stopped host's Flamme module-registry entry is still present.");
 
             Volatile.Write(ref _services, null);
             Volatile.Write(ref _module, null);
@@ -713,24 +713,24 @@ internal sealed class ElsaModuleRegistryLease
     private static ConcurrentDictionary<IServiceCollection, IModule> GetModules()
     {
         const string fieldName = "Modules";
-        var extensionsType = Type.GetType("Elsa.Extensions.ModuleExtensions, Elsa", throwOnError: true)!;
+        var extensionsType = Type.GetType("Flamme.Extensions.ModuleExtensions, Flamme", throwOnError: true)!;
         var field = extensionsType.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
             ?? throw new MissingFieldException(extensionsType.FullName, fieldName);
         var expectedType = typeof(IDictionary<IServiceCollection, IModule>);
         if (field.FieldType != expectedType || !field.IsStatic || !field.IsPrivate || !field.IsInitOnly)
-            throw new InvalidOperationException($"Unexpected Elsa module registry type '{field.FieldType}'.");
+            throw new InvalidOperationException($"Unexpected Flamme module registry type '{field.FieldType}'.");
         if (field.GetValue(null) is not ConcurrentDictionary<IServiceCollection, IModule> modules)
-            throw new InvalidOperationException("Elsa's module registry is unavailable.");
+            throw new InvalidOperationException("Flamme's module registry is unavailable.");
         return modules;
     }
 }
 
 /// <summary>
-/// Releases a host's exact Elsa module-registry key from ApplicationStopped, after every
+/// Releases a host's exact Flamme module-registry key from ApplicationStopped, after every
 /// hosted-service stop phase has completed but before the service provider is disposed.
 /// </summary>
-internal sealed class ElsaModuleRegistryCleanupService(
-    ElsaModuleRegistryLease lease,
+internal sealed class FlammeModuleRegistryCleanupService(
+    FlammeModuleRegistryLease lease,
     IHostApplicationLifetime applicationLifetime) : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)

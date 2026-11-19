@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Hosting.Management.Services;
+namespace Flamme.Hosting.Management.Services;
 
 /// <summary>
 /// Generates a unique identifier using a random short value.

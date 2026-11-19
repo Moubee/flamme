@@ -1,3 +1,3 @@
-global using Elsa.Workflows.Activities;
-global using Elsa.Workflows.Memory;
-global using Elsa.Workflows.Models;
+global using Flamme.Workflows.Activities;
+global using Flamme.Workflows.Memory;
+global using Flamme.Workflows.Models;

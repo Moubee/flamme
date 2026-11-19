@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command;
-using Elsa.Mediator.Middleware.Notification;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Notification;
+using Flamme.Mediator.Models;
 
-namespace Elsa.Mediator.Extensions;
+namespace Flamme.Mediator.Extensions;
 
 /// <summary>
 /// Contains helper methods for invoking notification handlers.

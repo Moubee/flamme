@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// A dictionary of values that is skipped by polymorphic serialization.

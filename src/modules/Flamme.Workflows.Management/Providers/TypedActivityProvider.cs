@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Management.Providers;
+namespace Flamme.Workflows.Management.Providers;
 
 /// <summary>
 /// Provides activity descriptors based on a list of activity types registered in the <see cref="ManagementOptions"/>.

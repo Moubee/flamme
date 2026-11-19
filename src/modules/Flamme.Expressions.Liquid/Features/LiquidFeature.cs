@@ -1,20 +1,20 @@
-using Elsa.Caching.Features;
-using Elsa.Common.Features;
-using Elsa.Expressions.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Expressions.Liquid.Contracts;
-using Elsa.Expressions.Liquid.Filters;
-using Elsa.Expressions.Liquid.Handlers;
-using Elsa.Expressions.Liquid.Options;
-using Elsa.Expressions.Liquid.Providers;
-using Elsa.Expressions.Liquid.Services;
+using Flamme.Caching.Features;
+using Flamme.Common.Features;
+using Flamme.Expressions.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Liquid.Filters;
+using Flamme.Expressions.Liquid.Handlers;
+using Flamme.Expressions.Liquid.Options;
+using Flamme.Expressions.Liquid.Providers;
+using Flamme.Expressions.Liquid.Services;
 using Fluid.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Liquid.Features;
+namespace Flamme.Expressions.Liquid.Features;
 
 /// <summary>
 /// Configures liquid functionality.

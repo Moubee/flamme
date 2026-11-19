@@ -1,13 +1,13 @@
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiKey;
-using Elsa.Features.Services;
-using Elsa.Identity.Features;
-using Elsa.Identity.Options;
-using Elsa.Identity.Providers;
+using Flamme.Features.Services;
+using Flamme.Identity.Features;
+using Flamme.Identity.Options;
+using Flamme.Identity.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.UnitTests.Features;
+namespace Flamme.Identity.UnitTests.Features;
 
 public class DefaultAuthenticationApiKeyTests
 {

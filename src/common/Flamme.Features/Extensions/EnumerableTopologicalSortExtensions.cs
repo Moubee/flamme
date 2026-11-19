@@ -1,5 +1,5 @@
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extension methods to sort collections by their dependencies, also known as a topological sort.

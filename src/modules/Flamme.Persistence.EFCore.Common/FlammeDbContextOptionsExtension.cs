@@ -1,18 +1,18 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
-/// Provides options for configuring Elsa's Entity Framework Core integration.
+/// Provides options for configuring Flamme's Entity Framework Core integration.
 /// </summary>
-public class ElsaDbContextOptionsExtension : IDbContextOptionsExtension
+public class FlammeDbContextOptionsExtension : IDbContextOptionsExtension
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ElsaDbContextOptionsExtension"/> class.
+    /// Initializes a new instance of the <see cref="FlammeDbContextOptionsExtension"/> class.
     /// </summary>
     /// <param name="options">The options.</param>
-    public ElsaDbContextOptionsExtension(ElsaDbContextOptions? options)
+    public FlammeDbContextOptionsExtension(FlammeDbContextOptions? options)
     {
         Options = options;
     }
@@ -20,7 +20,7 @@ public class ElsaDbContextOptionsExtension : IDbContextOptionsExtension
     /// <summary>
     /// Gets the options.
     /// </summary>
-    public ElsaDbContextOptions? Options { get; }
+    public FlammeDbContextOptions? Options { get; }
 
     /// <inheritdoc />
     public DbContextOptionsExtensionInfo Info => new CustomDbContextOptionsExtensionInfo(this);

@@ -1,13 +1,13 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="IActivity"/>.

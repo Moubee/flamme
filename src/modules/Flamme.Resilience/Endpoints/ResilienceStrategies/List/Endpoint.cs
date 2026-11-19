@@ -1,11 +1,11 @@
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Resilience.Serialization;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Resilience.Serialization;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Resilience.Endpoints.ResilienceStrategies.List;
+namespace Flamme.Resilience.Endpoints.ResilienceStrategies.List;
 
-public class Endpoint(IResilienceStrategyCatalog catalog, ResilienceStrategySerializer serializer) : ElsaEndpointWithoutRequest
+public class Endpoint(IResilienceStrategyCatalog catalog, ResilienceStrategySerializer serializer) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A base class for implementing workflow definitions using the pipelineBuilder API.

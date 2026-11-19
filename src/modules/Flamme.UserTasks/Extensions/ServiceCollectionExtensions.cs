@@ -1,12 +1,12 @@
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Repositories;
-using Elsa.UserTasks.Services;
-using Elsa.Mediator.Extensions;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Repositories;
+using Flamme.UserTasks.Services;
+using Flamme.Mediator.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.UserTasks.Extensions;
+namespace Flamme.UserTasks.Extensions;
 
 public static class ServiceCollectionExtensions
 {

@@ -1,13 +1,13 @@
-using Elsa.Scheduling;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Scheduling;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
-using Timer = Elsa.Scheduling.Activities.Timer;
+using Timer = Flamme.Scheduling.Activities.Timer;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Scheduling;
+namespace Flamme.Activities.UnitTests.Scheduling;
 
 public class TimerTests
 {

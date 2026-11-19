@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Common.RecurringTasks;
+namespace Flamme.Common.RecurringTasks;
 
 public class IntervalSchedule(TimeSpan interval) : ISchedule
 {

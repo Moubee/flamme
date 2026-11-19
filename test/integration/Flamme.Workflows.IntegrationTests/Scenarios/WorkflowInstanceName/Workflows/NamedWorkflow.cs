@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName.Workflows;
 
 public class NamedWorkflow : WorkflowBase
 {

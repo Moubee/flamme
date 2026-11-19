@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.Common.Services;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Common.Models;
+using Flamme.Common.Services;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Stores;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Extensions;
+namespace Flamme.Workflows.Runtime.UnitTests.Extensions;
 
 public class ActivityExecutionStoreExtensionsTests
 {

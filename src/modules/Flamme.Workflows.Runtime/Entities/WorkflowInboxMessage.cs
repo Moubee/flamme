@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// A message that can be delivered to a workflow instance.

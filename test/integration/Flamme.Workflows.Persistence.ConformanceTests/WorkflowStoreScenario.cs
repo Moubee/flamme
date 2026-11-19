@@ -1,31 +1,31 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Codecs;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Persistence.EFCore.PostgreSql;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Databases;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Stores;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Common;
+using Flamme.Common.Codecs;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Persistence.EFCore.Modules.Runtime;
+using Flamme.Persistence.EFCore.PostgreSql;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Databases;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Stores;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace Elsa.Workflows.Persistence.ConformanceTests;
+namespace Flamme.Workflows.Persistence.ConformanceTests;
 
 /// <summary>
 /// Holds one Memory or EF/PostgreSQL set of management + runtime stores and the ambient tenant they read.
@@ -40,7 +40,7 @@ public sealed class WorkflowStoreScenario(
     IWorkflowExecutionLogStore executionLogs,
     Func<Func<Task>, Task> assertUniquenessConflictAsync,
     Func<ValueTask> disposeAsync,
-    IDbContextFactory<RuntimeElsaDbContext>? runtimeDbContextFactory = null) : IAsyncDisposable
+    IDbContextFactory<RuntimeFlammeDbContext>? runtimeDbContextFactory = null) : IAsyncDisposable
 {
     public TestTenantAccessor TenantAccessor { get; } = tenantAccessor;
     public IWorkflowDefinitionStore Definitions { get; } = definitions;
@@ -49,7 +49,7 @@ public sealed class WorkflowStoreScenario(
     public IBookmarkQueueDeadLetterStore DeadLetters { get; } = deadLetters;
     public IActivityExecutionStore ActivityExecutions { get; } = activityExecutions;
     public IWorkflowExecutionLogStore ExecutionLogs { get; } = executionLogs;
-    public IDbContextFactory<RuntimeElsaDbContext>? RuntimeDbContextFactory { get; } = runtimeDbContextFactory;
+    public IDbContextFactory<RuntimeFlammeDbContext>? RuntimeDbContextFactory { get; } = runtimeDbContextFactory;
 
     public IDisposable UseTenant(string tenantId) =>
         TenantAccessor.PushContext(tenantId == Tenant.DefaultTenantId
@@ -113,20 +113,20 @@ public sealed class WorkflowStoreScenario(
                 .AddPostgreSqlEntityModelCreatingHandlers()
                 // The disabled-tenancy contract has a different EF model (no tenant query filters).
                 // Keep it out of the shared provider/model cache used by the parallel tenant-aware scenarios.
-                .AddDbContextFactory<ManagementElsaDbContext>((_, builder) =>
-                    builder.UseElsaPostgreSql(migrationsAssembly, managementDatabase.ConnectionString)
+                .AddDbContextFactory<ManagementFlammeDbContext>((_, builder) =>
+                    builder.UseFlammePostgreSql(migrationsAssembly, managementDatabase.ConnectionString)
                         .EnableServiceProviderCaching(tenantsEnabled))
-                .AddDbContextFactory<RuntimeElsaDbContext>((_, builder) =>
-                    builder.UseElsaPostgreSql(migrationsAssembly, runtimeDatabase.ConnectionString)
+                .AddDbContextFactory<RuntimeFlammeDbContext>((_, builder) =>
+                    builder.UseFlammePostgreSql(migrationsAssembly, runtimeDatabase.ConnectionString)
                         .EnableServiceProviderCaching(tenantsEnabled))
-                .Decorate<IDbContextFactory<ManagementElsaDbContext>, TenantAwareDbContextFactory<ManagementElsaDbContext>>()
-                .Decorate<IDbContextFactory<RuntimeElsaDbContext>, TenantAwareDbContextFactory<RuntimeElsaDbContext>>()
-                .AddScoped<EntityStore<ManagementElsaDbContext, WorkflowDefinition>>()
-                .AddScoped<EntityStore<RuntimeElsaDbContext, StoredTrigger>>()
-                .AddScoped<Store<RuntimeElsaDbContext, StoredBookmark>>()
-                .AddScoped<Store<RuntimeElsaDbContext, BookmarkQueueDeadLetterItem>>()
-                .AddScoped<EntityStore<RuntimeElsaDbContext, ActivityExecutionRecord>>()
-                .AddScoped<EntityStore<RuntimeElsaDbContext, WorkflowExecutionLogRecord>>()
+                .Decorate<IDbContextFactory<ManagementFlammeDbContext>, TenantAwareDbContextFactory<ManagementFlammeDbContext>>()
+                .Decorate<IDbContextFactory<RuntimeFlammeDbContext>, TenantAwareDbContextFactory<RuntimeFlammeDbContext>>()
+                .AddScoped<EntityStore<ManagementFlammeDbContext, WorkflowDefinition>>()
+                .AddScoped<EntityStore<RuntimeFlammeDbContext, StoredTrigger>>()
+                .AddScoped<Store<RuntimeFlammeDbContext, StoredBookmark>>()
+                .AddScoped<Store<RuntimeFlammeDbContext, BookmarkQueueDeadLetterItem>>()
+                .AddScoped<EntityStore<RuntimeFlammeDbContext, ActivityExecutionRecord>>()
+                .AddScoped<EntityStore<RuntimeFlammeDbContext, WorkflowExecutionLogRecord>>()
                 .AddScoped<EFCoreWorkflowDefinitionStore>()
                 .AddScoped<EFCoreTriggerStore>()
                 .AddScoped<EFCoreBookmarkStore>()
@@ -135,9 +135,9 @@ public sealed class WorkflowStoreScenario(
                 .AddScoped<EFCoreWorkflowExecutionLogStore>()
                 .BuildServiceProvider();
 
-            await using (var management = await services.GetRequiredService<IDbContextFactory<ManagementElsaDbContext>>().CreateDbContextAsync())
+            await using (var management = await services.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync())
                 await management.Database.EnsureCreatedAsync();
-            await using (var runtime = await services.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>().CreateDbContextAsync())
+            await using (var runtime = await services.GetRequiredService<IDbContextFactory<RuntimeFlammeDbContext>>().CreateDbContextAsync())
                 await runtime.Database.EnsureCreatedAsync();
 
             scope = services.CreateScope();
@@ -159,7 +159,7 @@ public sealed class WorkflowStoreScenario(
                     await managementDatabase.DisposeAsync();
                     await runtimeDatabase.DisposeAsync();
                 },
-                scoped.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>());
+                scoped.GetRequiredService<IDbContextFactory<RuntimeFlammeDbContext>>());
         }
         catch
         {

@@ -1,4 +1,4 @@
-using Elsa.Tenants.AspNetCore.Middleware;
+using Flamme.Tenants.AspNetCore.Middleware;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace

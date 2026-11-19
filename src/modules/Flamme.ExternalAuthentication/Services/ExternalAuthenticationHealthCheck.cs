@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Contracts;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>Opt-in health bridge. It reports the latest redacted test observation and never performs provider traffic.</summary>
 public sealed class ExternalAuthenticationHealthCheck(

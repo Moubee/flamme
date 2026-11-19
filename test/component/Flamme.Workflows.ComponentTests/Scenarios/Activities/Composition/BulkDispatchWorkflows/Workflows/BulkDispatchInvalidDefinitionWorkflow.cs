@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IncidentStrategies;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IncidentStrategies;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
 
 [UsedImplicitly]
 public class BulkDispatchInvalidDefinitionWorkflow : WorkflowBase

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Helpers;
+namespace Flamme.Workflows.Helpers;
 
 public static class TypeNameHelper
 {

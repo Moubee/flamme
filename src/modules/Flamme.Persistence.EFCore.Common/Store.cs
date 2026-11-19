@@ -1,18 +1,18 @@
 using System.Globalization;
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Extensions;
-using Elsa.Tenants.Options;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Extensions;
+using Flamme.Tenants.Options;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// A generic repository class around EF Core for accessing entities.

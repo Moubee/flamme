@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Provides an extensibility hook to resolve values for host method parameters.
@@ -31,7 +31,7 @@ public readonly record struct HostMethodParameterValueProviderResult(bool Handle
 public record HostMethodParameterValueProviderContext(
     IServiceProvider ServiceProvider,
     ActivityExecutionContext ActivityExecutionContext,
-    IReadOnlyCollection<Elsa.Workflows.Models.InputDescriptor> InputDescriptors,
+    IReadOnlyCollection<Flamme.Workflows.Models.InputDescriptor> InputDescriptors,
     IActivity Activity,
     ParameterInfo Parameter,
     CancellationToken CancellationToken)

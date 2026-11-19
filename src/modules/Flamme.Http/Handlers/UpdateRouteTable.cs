@@ -1,8 +1,8 @@
-﻿using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
+﻿using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// A handler that updates the route table when workflow triggers and bookmarks are indexed.

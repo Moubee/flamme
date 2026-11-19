@@ -1,11 +1,11 @@
-using Elsa.Expressions.JavaScript.Models;
-using Elsa.Workflows.ActivationValidators;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Expressions.JavaScript.Models;
+using Flamme.Workflows.ActivationValidators;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CorrelatedActivation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CorrelatedActivation;
 
 public class CorrelatedSingletonConversationWorkflow : WorkflowBase
 {

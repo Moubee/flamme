@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Labels.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Labels.Contracts;
 using FastEndpoints;
 
-namespace Elsa.Labels.Endpoints.Labels.Delete;
+namespace Flamme.Labels.Endpoints.Labels.Delete;
 
-public class Delete : ElsaEndpoint<Request>
+public class Delete : FlammeEndpoint<Request>
 {
     private readonly ILabelStore _store;
 
@@ -14,7 +14,7 @@ public class Delete : ElsaEndpoint<Request>
     public override void Configure()
     {
         Delete("/labels/{id}");
-        RequirePermission(Elsa.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Delete);
+        RequirePermission(Flamme.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

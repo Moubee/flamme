@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// A content writer that writes content in the application/x-www-form-urlencoded format. 

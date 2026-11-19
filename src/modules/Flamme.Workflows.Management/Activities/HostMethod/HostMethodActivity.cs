@@ -2,12 +2,12 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Helpers;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Activities.HostMethod;
+namespace Flamme.Workflows.Management.Activities.HostMethod;
 
 /// <summary>
 /// Executes a public async method on a configured CLR type. Internal activity used by <see cref="HostMethodActivityProvider"/>.

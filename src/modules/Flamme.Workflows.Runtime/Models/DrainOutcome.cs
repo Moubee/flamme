@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Structured result of a completed drain, returned by <c>IDrainOrchestrator.DrainAsync</c>.

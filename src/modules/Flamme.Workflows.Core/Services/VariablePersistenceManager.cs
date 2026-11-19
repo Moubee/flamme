@@ -1,10 +1,10 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class VariablePersistenceManager(IStorageDriverManager storageDriverManager, ILogger<VariablePersistenceManager> logger) : IVariablePersistenceManager

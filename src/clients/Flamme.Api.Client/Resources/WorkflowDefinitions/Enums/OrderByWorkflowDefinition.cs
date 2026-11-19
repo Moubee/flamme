@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Enums;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Enums;
 
 /// <summary>
 /// Defines the order by options for workflow definitions.

@@ -1,6 +1,6 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience.Models;
+namespace Flamme.Resilience.Models;
 
 public record RetryAttempt(ActivityExecutionContext ActivityExecutionContext, int AttemptNumber, TimeSpan RetryDelay, object? Result, Exception? Exception)
 {

@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Text.Json.Serialization;
-using Elsa.Common.Converters;
+using Flamme.Common.Converters;
 using JetBrains.Annotations;
 
-namespace Elsa.Common.Models;
+namespace Flamme.Common.Models;
 
 /// <summary>
 /// Provides parameters for querying a given version of versioned entities.

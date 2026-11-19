@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.SasTokens.Contracts;
+using Flamme.SasTokens.Contracts;
 using Microsoft.AspNetCore.DataProtection;
 
-namespace Elsa.SasTokens.UnitTests.Contracts;
+namespace Flamme.SasTokens.UnitTests.Contracts;
 
 public partial class DataProtectorTokenServiceTests : IDisposable
 {
@@ -59,7 +59,7 @@ public partial class DataProtectorTokenServiceTests : IDisposable
     {
         var payload = new TokenPayload("workflow-instance-1", "bookmark-1");
         var json = JsonSerializer.Serialize(payload, TokenJsonContext.Default.TokenPayload);
-        var token = _dataProtectionProvider.CreateProtector("Elsa Tokens").ToTimeLimitedDataProtector().Protect(json, TimeSpan.FromMinutes(5));
+        var token = _dataProtectionProvider.CreateProtector("Flamme Tokens").ToTimeLimitedDataProtector().Protect(json, TimeSpan.FromMinutes(5));
 
         var result = _service.TryDecryptToken<TokenPayload>(token, out var decryptedPayload);
 
@@ -72,7 +72,7 @@ public partial class DataProtectorTokenServiceTests : IDisposable
     {
         var payload = new TokenPayload("workflow-instance-1", "bookmark-1");
         var json = JsonSerializer.Serialize(payload, TokenJsonContext.Default.TokenPayload);
-        var token = _dataProtectionProvider.CreateProtector("Elsa Tokens").Protect(json);
+        var token = _dataProtectionProvider.CreateProtector("Flamme Tokens").Protect(json);
 
         var result = _service.TryDecryptToken<TokenPayload>(token, out var decryptedPayload);
 

@@ -1,15 +1,15 @@
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Constants;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Constants;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Previews;
+namespace Flamme.ExternalAuthentication.Endpoints.Previews;
 
-internal sealed class InitiatePreview(PreviewSignInService previews, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class InitiatePreview(PreviewSignInService previews, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -54,7 +54,7 @@ internal sealed class InitiatePreview(PreviewSignInService previews, ITenantAcce
     }
 }
 
-internal sealed class AuthorizePreview(PreviewSignInService previews) : ElsaEndpointWithoutRequest
+internal sealed class AuthorizePreview(PreviewSignInService previews) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -75,7 +75,7 @@ internal sealed class AuthorizePreview(PreviewSignInService previews) : ElsaEndp
     }
 }
 
-internal sealed class CompletePreview(PreviewSignInService previews) : ElsaEndpointWithoutRequest
+internal sealed class CompletePreview(PreviewSignInService previews) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -93,7 +93,7 @@ internal sealed class CompletePreview(PreviewSignInService previews) : ElsaEndpo
     }
 }
 
-internal sealed class GetPreviewResult(PreviewSignInService previews, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class GetPreviewResult(PreviewSignInService previews, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {

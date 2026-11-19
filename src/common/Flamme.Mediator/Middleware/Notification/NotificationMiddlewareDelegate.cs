@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Notification;
+namespace Flamme.Mediator.Middleware.Notification;
 
 /// <summary>
 /// Represents a delegate for a notification middleware.

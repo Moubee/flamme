@@ -1,6 +1,6 @@
-using Elsa.Mediator.PublishingStrategies;
+using Flamme.Mediator.PublishingStrategies;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// Publishes notifications.

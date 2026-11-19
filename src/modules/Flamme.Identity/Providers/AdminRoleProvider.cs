@@ -1,8 +1,8 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Providers;
+namespace Flamme.Identity.Providers;
 
 /// <summary>
 /// Represents a role provider that always returns a single admin role. This is useful for development purposes.

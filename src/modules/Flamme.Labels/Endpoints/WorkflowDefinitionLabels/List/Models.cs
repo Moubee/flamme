@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints.WorkflowDefinitionLabels.List;
+namespace Flamme.Labels.Endpoints.WorkflowDefinitionLabels.List;
 
 public class Request
 {

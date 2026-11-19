@@ -1,12 +1,12 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Endpoints.AI.Capabilities;
-using Elsa.AI.Host.Options;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Endpoints.AI.Capabilities;
+using Flamme.AI.Host.Options;
 using Microsoft.Extensions.DependencyInjection;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Grounding;
+namespace Flamme.AI.Host.UnitTests.Grounding;
 
 public class AIGroundingCapabilityTests
 {

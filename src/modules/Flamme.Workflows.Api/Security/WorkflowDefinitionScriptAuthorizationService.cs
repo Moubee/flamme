@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Api.Security;
+namespace Flamme.Workflows.Api.Security;
 
 internal class WorkflowDefinitionScriptAuthorizationService(
     IActivityVisitor activityVisitor,

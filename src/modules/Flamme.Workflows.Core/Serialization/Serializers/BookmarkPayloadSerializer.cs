@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Common.Serialization;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Serialization.Serializers;
+namespace Flamme.Workflows.Serialization.Serializers;
 
 /// <inheritdoc />
 public class BookmarkPayloadSerializer : IBookmarkPayloadSerializer

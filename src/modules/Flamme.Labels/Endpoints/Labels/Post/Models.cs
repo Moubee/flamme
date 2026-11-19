@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints.Labels.Post;
+namespace Flamme.Labels.Endpoints.Labels.Post;
 
 public class Request
 {

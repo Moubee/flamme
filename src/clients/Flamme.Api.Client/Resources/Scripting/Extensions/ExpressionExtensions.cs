@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.Scripting.Models;
+using Flamme.Api.Client.Resources.Scripting.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.Scripting.Extensions;
+namespace Flamme.Api.Client.Resources.Scripting.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="Expression"/>.

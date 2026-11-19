@@ -1,7 +1,7 @@
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Provides context about the faulted workflow.

@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Alterations.Core.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Alterations.Core.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Endpoints.Alterations.Run;
+namespace Flamme.Alterations.Endpoints.Alterations.Run;
 
 /// <summary>
 /// Executes an alteration plan by targeting workflow instances by ID.
 /// </summary>
 [PublicAPI]
-public class Run : ElsaEndpoint<Request, Response>
+public class Run : FlammeEndpoint<Request, Response>
 {
     private readonly IAlterationRunner _alterationRunner;
     private readonly IAlteredWorkflowDispatcher _workflowDispatcher;
@@ -25,7 +25,7 @@ public class Run : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Post("/alterations/run");
-        RequirePermission(Elsa.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
+        RequirePermission(Flamme.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
     }
 
     /// <inheritdoc />

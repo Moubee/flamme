@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>Coordinates guarded role deletion across installed dependency contributors.</summary>
 public interface IRoleDeletionCoordinator

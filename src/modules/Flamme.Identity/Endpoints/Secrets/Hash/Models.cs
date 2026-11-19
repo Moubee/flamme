@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Elsa.Identity.Endpoints.Secrets.Hash;
+namespace Flamme.Identity.Endpoints.Secrets.Hash;
 
 internal class Request
 {

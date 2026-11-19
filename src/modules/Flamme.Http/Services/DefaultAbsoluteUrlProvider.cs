@@ -1,7 +1,7 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <inheritdoc />
 public class DefaultAbsoluteUrlProvider : IAbsoluteUrlProvider
@@ -20,7 +20,7 @@ public class DefaultAbsoluteUrlProvider : IAbsoluteUrlProvider
 
         if (baseUrl == null)
             throw new Exception(
-                "There was no base URL configured, which means no absolute URL can be generated from outside the context of an HTTP request. Please make sure that `HttpActivityOptions` is configured correctly. The configuration key used in most Elsa samples is usually: \"Elsa:Server:BaseUrl\"");
+                "There was no base URL configured, which means no absolute URL can be generated from outside the context of an HTTP request. Please make sure that `HttpActivityOptions` is configured correctly. The configuration key used in most Flamme samples is usually: \"Elsa:Server:BaseUrl\"");
 
         // To not lose any base path information, we need to ensure that:
         // - Base path ends with a slash.

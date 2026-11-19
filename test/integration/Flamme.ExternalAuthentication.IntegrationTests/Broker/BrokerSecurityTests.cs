@@ -1,31 +1,31 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Testing.Shared.Multitenancy;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Broker;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Broker;
 
 public class BrokerSecurityTests
 {
@@ -351,7 +351,7 @@ public class BrokerSecurityTests
         Mock.Get(users).FindAsync(Arg.Any<UserFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<User?>(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" }));
         var roles = IRoleProvider.Mock().Object;
         Mock.Get(roles).FindManyAsync(Arg.Any<RoleFilter>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult<IEnumerable<Role>>([]));
-        var tokens = IElsaTokenService.Mock().Object;
+        var tokens = IFlammeTokenService.Mock().Object;
         Mock.Get(tokens).IssueAccessTokenAsync(Arg.Any<TokenIssuanceContext>(), Arg.Any<CancellationToken>()).ReturnsAsync(ValueTask.FromResult(new IssuedAccessToken("access", clock.GetUtcNow().AddHours(1))));
         var issuer = new DefaultExternalAuthenticationTokenIssuer(store, registry, [], users, roles, tokens, new DefaultTenantAccessor(), clock, Microsoft.Extensions.Options.Options.Create(new ExternalAuthenticationOptions()));
         var session = new ExternalAuthenticationSession { Id = "session-a", AuthenticationClientId = "studio", TenantId = "tenant-a", UserId = "user-a", ConnectionKey = "contoso", ConnectionMaterialRevision = "revision-a", SecretGenerationFingerprint = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData([])), Issuer = "issuer", SubjectHash = "subject", StartedAt = clock.GetUtcNow(), LastRefreshedAt = clock.GetUtcNow(), ExpiresAt = clock.GetUtcNow().AddHours(1), RefreshExpiresAt = clock.GetUtcNow().AddHours(1) };
@@ -433,7 +433,7 @@ public class BrokerSecurityTests
 
         await Assert.That(result.Error?.Error).IsEqualTo("invalid_request");
         Mock.Get(sender).SendAsync(
-            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
+            Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
                 notification.Flow == "external" &&
                 notification.Stage == "initiate" &&
                 notification.Category == "invalid_request" &&
@@ -454,7 +454,7 @@ public class BrokerSecurityTests
 
         await Assert.That(result.Error?.Error).IsEqualTo("temporarily_unavailable");
         Mock.Get(sender).SendAsync(
-            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
+            Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is ExternalAuthenticationOutcomeRecorded notification &&
                 notification.Category == "temporarily_unavailable" &&
                 notification.Context.Outcome == SecurityEventOutcome.Failed),
             Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
@@ -474,7 +474,7 @@ public class BrokerSecurityTests
         IUserCredentialsValidator? credentialsValidator = null,
         IUserProvider? userProvider = null,
         IRoleProvider? roleProvider = null,
-        IElsaTokenService? tokenService = null,
+        IFlammeTokenService? tokenService = null,
         IIdentityRefreshTokenService? identityRefreshTokenService = null,
         ITenantAccessor? tenantAccessor = null,
         ExternalAuthenticationSecurityNotifier? notifier = null,
@@ -509,7 +509,7 @@ public class BrokerSecurityTests
                 new HashSet<Uri> { new("https://studio.example/authentication/external/callback") }, new HashSet<Uri>(), new HashSet<string> { "https://studio.example" }, new HashSet<string> { "/workflows" }, null, true)]
         });
         var brokerClock = clock ?? new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"));
-        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? IExternalIdentityResolver.Mock().Object, permissionGrantResolver ?? IPermissionGrantResolver.Mock().Object, new InMemoryExternalAuthenticationStateStore(brokerClock), grants ?? new InMemoryAuthorizationGrantStore(brokerClock), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(brokerClock), tokenIssuer ?? IExternalAuthenticationTokenIssuer.Mock().Object, credentialsValidator ?? IUserCredentialsValidator.Mock().Object, userProvider ?? IUserProvider.Mock().Object, roleProvider ?? IRoleProvider.Mock().Object, tokenService ?? IElsaTokenService.Mock().Object, identityRefreshTokenService ?? IIdentityRefreshTokenService.Mock().Object, tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
+        return new ExternalAuthenticationBroker(registry, validityAssessor, [adapter], resolvers ?? [], hasher ?? new HmacExternalAuthenticationHandleHasher(), new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider(), identityResolver ?? IExternalIdentityResolver.Mock().Object, permissionGrantResolver ?? IPermissionGrantResolver.Mock().Object, new InMemoryExternalAuthenticationStateStore(brokerClock), grants ?? new InMemoryAuthorizationGrantStore(brokerClock), sessionStore ?? new InMemoryExternalAuthenticationSessionStore(brokerClock), tokenIssuer ?? IExternalAuthenticationTokenIssuer.Mock().Object, credentialsValidator ?? IUserCredentialsValidator.Mock().Object, userProvider ?? IUserProvider.Mock().Object, roleProvider ?? IRoleProvider.Mock().Object, tokenService ?? IFlammeTokenService.Mock().Object, identityRefreshTokenService ?? IIdentityRefreshTokenService.Mock().Object, tenantAccessor ?? new DefaultTenantAccessor(), brokerClock, options, notifier);
     }
 
     private static BrokerAuthorizationRequest Request(string returnPath) => new("studio", new Uri("https://studio.example/authentication/external/callback"), "code", "challenge", "S256", returnPath, "contoso");
@@ -562,14 +562,14 @@ public class BrokerSecurityTests
             Issuer = "https://elsa.test",
             Audience = "elsa-api"
         });
-        var tokens = new DefaultElsaTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options);
+        var tokens = new DefaultFlammeTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options);
         var accessTokenIssuer = new DefaultAccessTokenIssuer(roles, tokens);
         var sessionRevoker = new SessionRevoker(new MemoryRevokedSessionStore(new MemoryStore<RevokedSession>()), new FakeTimeProvider(DateTimeOffset.UtcNow), options);
         return new(tokens, accessTokenIssuer, sessionRevoker, new DefaultIdentityRefreshTokenService(users, accessTokenIssuer, tenantAccessor, sessionRevoker, options));
     }
 
     private sealed record LocalIdentityServices(
-        DefaultElsaTokenService Tokens,
+        DefaultFlammeTokenService Tokens,
         DefaultAccessTokenIssuer AccessTokenIssuer,
         SessionRevoker SessionRevoker,
         DefaultIdentityRefreshTokenService RefreshTokens);

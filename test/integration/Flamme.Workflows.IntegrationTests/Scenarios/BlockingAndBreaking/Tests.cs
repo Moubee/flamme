@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking.Workflows;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.BlockingAndBreaking;
 
 public class Tests : IAsyncDisposable
 {

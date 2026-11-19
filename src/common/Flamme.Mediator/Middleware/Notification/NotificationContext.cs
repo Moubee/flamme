@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Mediator.Middleware.Notification;
+namespace Flamme.Mediator.Middleware.Notification;
 
 /// <summary>
 /// Represents a context for a notification.

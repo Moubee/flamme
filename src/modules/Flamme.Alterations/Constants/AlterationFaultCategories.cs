@@ -1,4 +1,4 @@
-namespace Elsa.Alterations;
+namespace Flamme.Alterations;
 
 public static class AlterationFaultCategories
 {

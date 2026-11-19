@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
+namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 
 internal static class PropertyNameHelper
 {

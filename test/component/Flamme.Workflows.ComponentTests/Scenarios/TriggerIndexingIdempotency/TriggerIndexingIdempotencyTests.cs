@@ -1,14 +1,14 @@
-using Elsa.Http;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Http;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.TriggerIndexingIdempotency;
+namespace Flamme.Workflows.ComponentTests.Scenarios.TriggerIndexingIdempotency;
 
 /// <summary>
 /// Tests that trigger indexing is idempotent: re-indexing an unchanged workflow should

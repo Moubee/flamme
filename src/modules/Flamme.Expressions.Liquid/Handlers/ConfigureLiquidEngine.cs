@@ -1,18 +1,18 @@
 using System.Dynamic;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.Liquid.Helpers;
-using Elsa.Expressions.Liquid.Notifications;
-using Elsa.Expressions.Liquid.Options;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.Liquid.Helpers;
+using Flamme.Expressions.Liquid.Notifications;
+using Flamme.Expressions.Liquid.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Memory;
 using Fluid;
 using Fluid.Values;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Liquid.Handlers;
+namespace Flamme.Expressions.Liquid.Handlers;
 
 /// <summary>
 /// Configures the liquid templating engine before evaluating a liquid expression.

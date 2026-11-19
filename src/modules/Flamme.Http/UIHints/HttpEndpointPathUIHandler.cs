@@ -1,9 +1,9 @@
 using System.Reflection;
-using Elsa.Workflows;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.UIHints.SingleLine;
+using Flamme.Workflows;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.UIHints.SingleLine;
 
-namespace Elsa.Http.UIHints;
+namespace Flamme.Http.UIHints;
 
 /// <summary>
 /// Provides additional options for the Path input field.

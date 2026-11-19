@@ -1,12 +1,12 @@
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Multitenancy;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Multitenancy;
 
 /// <summary>
 /// Tests for multitenancy tenant ID normalization.

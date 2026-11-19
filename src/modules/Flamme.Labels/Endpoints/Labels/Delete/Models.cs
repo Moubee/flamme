@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints.Labels.Delete;
+namespace Flamme.Labels.Endpoints.Labels.Delete;
 
 public class Request
 {

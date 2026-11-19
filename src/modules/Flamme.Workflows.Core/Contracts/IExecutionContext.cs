@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides a common interface to access the current execution context.

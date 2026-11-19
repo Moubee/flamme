@@ -1,5 +1,5 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 public record BackgroundActivityExecutionCompleted(ActivityExecutionContext ActivityExecutionContext) : INotification;

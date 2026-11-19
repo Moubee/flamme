@@ -1,23 +1,23 @@
 using System.Security.Claims;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Sessions;
+namespace Flamme.ExternalAuthentication.Endpoints.Sessions;
 
 internal sealed class ListExternalAuthenticationSessions(
     IExternalAuthenticationSessionStore sessions,
     ITenantAccessor tenantAccessor,
-    IOptions<ExternalAuthenticationOptions> options) : ElsaEndpoint<ExternalAuthenticationSessionListRequest, ExternalAuthenticationSessionListResponse>
+    IOptions<ExternalAuthenticationOptions> options) : FlammeEndpoint<ExternalAuthenticationSessionListRequest, ExternalAuthenticationSessionListResponse>
 {
     public override void Configure()
     {
@@ -70,7 +70,7 @@ internal sealed class RevokeExternalAuthenticationSession(
     IExternalAuthenticationSessionStore sessions,
     ITenantAccessor tenantAccessor,
     IOptions<ExternalAuthenticationOptions> options,
-    ExternalAuthenticationSecurityNotifier notifier) : ElsaEndpoint<RevokeExternalAuthenticationSessionRequest>
+    ExternalAuthenticationSecurityNotifier notifier) : FlammeEndpoint<RevokeExternalAuthenticationSessionRequest>
 {
     public override void Configure()
     {

@@ -1,4 +1,4 @@
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Default implementation of <see cref="ITenantAccessor"/>.

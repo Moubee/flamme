@@ -1,7 +1,7 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Extensions;
+namespace Flamme.Workflows.Runtime.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="ActivityExecutionRecord"/>.

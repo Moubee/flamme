@@ -1,7 +1,7 @@
-﻿using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+﻿using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.HttpWorkflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.HttpWorkflows;
 
 public class RouteDataTests(App app) : AppComponentTest(app)
 {

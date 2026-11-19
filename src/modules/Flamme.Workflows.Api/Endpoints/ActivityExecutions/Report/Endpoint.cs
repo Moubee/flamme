@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.Report;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.Report;
 
 /// <summary>
 /// Gets a report for the specified set of activities that includes number of executions, split by completed and non-completed executions as well as blocking activities.
 /// </summary>
 [PublicAPI]
-internal class Report : ElsaEndpoint<Request, Response>
+internal class Report : FlammeEndpoint<Request, Response>
 {
     private readonly IActivityExecutionStore _store;
     private readonly IActivityExecutionStatsService _activityExecutionStatsService;
@@ -25,7 +25,7 @@ internal class Report : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Post("/activity-executions/report");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

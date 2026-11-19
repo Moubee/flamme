@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="Workflow"/>.

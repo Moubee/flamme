@@ -1,17 +1,17 @@
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Identity.Permissions;
-using Elsa.Permissions;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Identity.Permissions;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Permissions.List;
+namespace Flamme.Identity.Endpoints.Permissions.List;
 
 /// <summary>
 /// Returns the permission catalog. A role editor renders from this rather than hard-coding permission
 /// strings, which is what keeps clients from drifting out of step with the server.
 /// </summary>
 [PublicAPI]
-internal class List(IPermissionDescriptorRegistry registry) : ElsaEndpointWithoutRequest<Response>
+internal class List(IPermissionDescriptorRegistry registry) : FlammeEndpointWithoutRequest<Response>
 {
     /// <inheritdoc />
     public override void Configure()

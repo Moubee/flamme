@@ -1,7 +1,7 @@
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.DispatchWorkflows.Workflows;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.DispatchWorkflows.Workflows;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
 
 public class DispatchFireAndForgetWorkflow : WorkflowBase
 {

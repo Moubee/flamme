@@ -1,11 +1,11 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Contracts;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Contracts;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Handlers.Notifications;
+namespace Flamme.Workflows.Management.Handlers.Notifications;
 
 /// <summary>
 /// Refreshes the <see cref="IActivityRegistry"/> for the <see cref="WorkflowDefinitionActivityProvider"/> provider whenever an <see cref="WorkflowDefinition"/> is published, retracted or deleted.

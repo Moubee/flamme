@@ -1,9 +1,9 @@
-using Elsa.Features.Services;
-using Elsa.Expressions.JavaScript.Features;
-using Elsa.Expressions.JavaScript.Options;
+using Flamme.Features.Services;
+using Flamme.Expressions.JavaScript.Features;
+using Flamme.Expressions.JavaScript.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="IModule"/> that installs the <see cref="JavaScriptFeature"/> feature.

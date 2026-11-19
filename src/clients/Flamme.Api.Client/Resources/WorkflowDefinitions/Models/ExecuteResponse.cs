@@ -1,5 +1,5 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Models;
+using Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
 public record ExecuteResponse(WorkflowState WorkflowState);

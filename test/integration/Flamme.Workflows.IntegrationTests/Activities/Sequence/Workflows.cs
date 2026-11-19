@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Activities;
+namespace Flamme.Workflows.IntegrationTests.Activities;
 
 /// <summary>
 /// Workflow with Sequence that executes all activities.

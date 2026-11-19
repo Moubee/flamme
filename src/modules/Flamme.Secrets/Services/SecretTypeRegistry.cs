@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Services;
+namespace Flamme.Secrets.Services;
 
 public class SecretTypeRegistry(IEnumerable<ISecretTypeProvider> providers) : ISecretTypeRegistry
 {

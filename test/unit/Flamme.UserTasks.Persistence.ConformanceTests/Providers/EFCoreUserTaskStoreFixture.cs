@@ -1,16 +1,16 @@
 using System.Reflection;
-using Elsa.Persistence.EFCore;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Persistence.EFCore;
-using Elsa.UserTasks.Persistence.EFCore.Repositories;
+using Flamme.Persistence.EFCore;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Persistence.EFCore;
+using Flamme.UserTasks.Persistence.EFCore.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 
 /// <summary>
 /// Shared wiring for every relational provider. Only the connection string, the migrations assembly, and
-/// the <c>UseElsa*</c> call differ, so the suite runs against real SQL rather than an in-memory EF
+/// the <c>UseFlamme*</c> call differ, so the suite runs against real SQL rather than an in-memory EF
 /// provider — the revision-conflict defect the suite exists to pin only reproduces against real SQL.
 /// </summary>
 public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
@@ -74,10 +74,10 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
         var services = new ServiceCollection();
         ConfigureServices(services);
         var connectionString = ResolveConnectionString();
-        services.AddDbContextFactory<UserTasksElsaDbContext>(builder => ConfigureProvider(builder, connectionString));
-        services.AddScoped<Store<UserTasksElsaDbContext, UserTaskRecord>>();
-        services.AddScoped<Store<UserTasksElsaDbContext, UserTaskGuestSessionRecord>>();
-        services.AddScoped<Store<UserTasksElsaDbContext, UserTaskInvitationDeliveryRecord>>();
+        services.AddDbContextFactory<UserTasksFlammeDbContext>(builder => ConfigureProvider(builder, connectionString));
+        services.AddScoped<Store<UserTasksFlammeDbContext, UserTaskRecord>>();
+        services.AddScoped<Store<UserTasksFlammeDbContext, UserTaskGuestSessionRecord>>();
+        services.AddScoped<Store<UserTasksFlammeDbContext, UserTaskInvitationDeliveryRecord>>();
         services.AddScoped<EFCoreUserTaskRepository>();
         services.AddScoped<EFCoreUserTaskGuestSessionIssuer>();
         services.AddScoped<EFCoreUserTaskInvitationOutbox>();
@@ -88,7 +88,7 @@ public abstract class EFCoreUserTaskStoreFixture : UserTaskStoreFixture
         _serviceProvider = services.BuildServiceProvider();
         _scope = _serviceProvider.CreateAsyncScope();
 
-        var factory = _scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+        var factory = _scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksFlammeDbContext>>();
         await using var dbContext = await factory.CreateDbContextAsync();
         await dbContext.Database.MigrateAsync();
     }

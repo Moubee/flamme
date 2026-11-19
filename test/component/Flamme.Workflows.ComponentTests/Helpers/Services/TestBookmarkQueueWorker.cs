@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.ComponentTests.Services;
+namespace Flamme.Workflows.ComponentTests.Services;
 
 /// <summary>
 /// A test-specific bookmark queue worker that processes items immediately without throttling.

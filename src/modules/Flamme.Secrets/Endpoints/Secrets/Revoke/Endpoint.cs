@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Permissions;
-using Elsa.Secrets.Services;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Permissions;
+using Flamme.Secrets.Services;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Revoke;
+namespace Flamme.Secrets.Endpoints.Secrets.Revoke;
 
-internal class Endpoint(ISecretManager manager) : ElsaEndpointWithoutRequest<SecretModel>
+internal class Endpoint(ISecretManager manager) : FlammeEndpointWithoutRequest<SecretModel>
 {
     public override void Configure()
     {
         Post("/secrets/{name}/revoke");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Write);
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Write);
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

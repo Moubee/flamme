@@ -1,7 +1,7 @@
-using Elsa.UserTasks.Features;
-using Elsa.UserTasks.Persistence.EFCore.Features;
+using Flamme.UserTasks.Features;
+using Flamme.UserTasks.Persistence.EFCore.Features;
 
-namespace Elsa.UserTasks.Persistence.EFCore.Extensions;
+namespace Flamme.UserTasks.Persistence.EFCore.Extensions;
 
 public static class UserTasksPersistenceFeatureExtensions
 {

@@ -1,6 +1,6 @@
 // using System.Text.Json.Serialization;
 //
-// namespace Elsa.Workflows.State;
+// namespace Flamme.Workflows.State;
 //
 // public class PersistentVariableState
 // {

@@ -1,16 +1,16 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.CSharp.Services;
-using Elsa.Expressions.Models;
-using Elsa.Features.Services;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.CSharp.Services;
+using Flamme.Expressions.Models;
+using Flamme.Features.Services;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Expressions.UnitTests.CSharp;
+namespace Flamme.Expressions.UnitTests.CSharp;
 
 public class CSharpHostCodeExecutionTests
 {
@@ -19,7 +19,7 @@ public class CSharpHostCodeExecutionTests
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var evaluator = new CSharpEvaluator(
-            Elsa.Mediator.Contracts.INotificationSender.Mock().Object,
+            Flamme.Mediator.Contracts.INotificationSender.Mock().Object,
             Microsoft.Extensions.Options.Options.Create(new CSharpOptions()),
             memoryCache);
         var context = await new ActivityTestFixture(new WriteLine("test")).BuildAsync();
@@ -40,11 +40,11 @@ public class CSharpHostCodeExecutionTests
         services.AddMemoryCache();
         var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
-        new Elsa.Expressions.CSharp.Features.CSharpFeature(module)
+        new Flamme.Expressions.CSharp.Features.CSharpFeature(module)
         {
             CSharpOptions = options => options.AllowHostCodeExecution = allowHostCodeExecution
         }.Apply();
-        services.AddSingleton<IExpressionDescriptorRegistry, Elsa.Workflows.Management.Services.ExpressionDescriptorRegistry>();
+        services.AddSingleton<IExpressionDescriptorRegistry, Flamme.Workflows.Management.Services.ExpressionDescriptorRegistry>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registry = serviceProvider.GetRequiredService<IExpressionDescriptorRegistry>();

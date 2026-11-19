@@ -1,4 +1,4 @@
-namespace Elsa.Activities.IntegrationTests.Http.Helpers;
+namespace Flamme.Activities.IntegrationTests.Http.Helpers;
 
 /// <summary>
 /// A project-local HTTP message handler for exercising HTTP activities without depending on another test project.

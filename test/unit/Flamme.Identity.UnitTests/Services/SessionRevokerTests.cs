@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
-using Elsa.Common.Services;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme.Common.Services;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class SessionRevokerTests
 {

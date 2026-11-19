@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Common;
-using Elsa.Scheduling.Services;
+using Flamme.Common;
+using Flamme.Scheduling.Services;
 
-namespace Elsa.Scheduling.UnitTests.Services;
+namespace Flamme.Scheduling.UnitTests.Services;
 
 public class CronosCronParserTests
 {

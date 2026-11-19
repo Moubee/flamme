@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore;
 
 internal static class ExternalAuthenticationPersistenceMapper
 {

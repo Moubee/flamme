@@ -1,9 +1,9 @@
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.HostMethodActivities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.HostMethodActivities;
 
 public class HostMethodActivityTests(App app) : AppComponentTest(app)
 {

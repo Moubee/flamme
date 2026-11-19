@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Models;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Resilience.Models;
+namespace Flamme.Resilience.Models;
 
 public class ResilienceStrategyConfig
 {

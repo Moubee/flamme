@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Terminal state of a single ingress source as recorded in a <see cref="DrainOutcome"/>.

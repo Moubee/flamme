@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.List;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.List;
 
 /// <summary>
 /// Represents a request for list of activity execution log records for a given activity in a workflow instance.

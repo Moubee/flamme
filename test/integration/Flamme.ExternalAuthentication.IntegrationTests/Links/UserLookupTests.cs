@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Links;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Links;
 
 public partial class ExternalIdentityLinkTests
 {

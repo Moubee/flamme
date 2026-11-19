@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Endpoints.Previews;
+using Flamme.ExternalAuthentication.Endpoints.Previews;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Previews;
+namespace Flamme.ExternalAuthentication.UnitTests.Previews;
 
 public class PreviewNavigationPathTests
 {

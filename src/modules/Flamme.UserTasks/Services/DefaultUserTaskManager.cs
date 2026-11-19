@@ -1,13 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.Common;
-using Elsa.Workflows;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.Common;
+using Flamme.Workflows;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 public sealed class DefaultUserTaskManager(
     IUserTaskRepository repository,

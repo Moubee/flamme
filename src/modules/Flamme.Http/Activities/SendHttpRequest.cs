@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Send an HTTP request.

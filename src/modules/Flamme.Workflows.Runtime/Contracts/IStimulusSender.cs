@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Results;
+using Flamme.Workflows.Runtime.Results;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a broker for delivering stimuli to activities in a workflow.

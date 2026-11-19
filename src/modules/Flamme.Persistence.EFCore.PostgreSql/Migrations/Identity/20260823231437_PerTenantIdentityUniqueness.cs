@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Migrations.Identity
+namespace Flamme.Persistence.EFCore.PostgreSql.Migrations.Identity
 {
     /// <inheritdoc />
     public partial class PerTenantIdentityUniqueness : Migration

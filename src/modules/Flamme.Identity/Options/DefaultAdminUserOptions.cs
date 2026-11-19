@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Options;
+namespace Flamme.Identity.Options;
 
 /// <summary>
 /// Represents configuration options for a default admin user, including username, password, role name, and role permissions.

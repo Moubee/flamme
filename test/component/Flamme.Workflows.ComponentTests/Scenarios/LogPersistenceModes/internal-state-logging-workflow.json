@@ -14,12 +14,12 @@
     "logPersistenceConfig": {
       "default": {
         "evaluationMode": "Strategy",
-        "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Exclude, Elsa.Workflows.Core",
+        "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Exclude, Flamme.Workflows.Core",
         "expression": null
       },
       "internalState": {
         "evaluationMode": "Strategy",
-        "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Include, Elsa.Workflows.Core",
+        "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Include, Flamme.Workflows.Core",
         "expression": null
       }
     }
@@ -87,7 +87,7 @@
           "logPersistenceConfig": {
             "internalState": {
               "evaluationMode": "Strategy",
-              "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Exclude, Elsa.Workflows.Core",
+              "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Exclude, Flamme.Workflows.Core",
               "expression": null
             },
             "inputs": {},

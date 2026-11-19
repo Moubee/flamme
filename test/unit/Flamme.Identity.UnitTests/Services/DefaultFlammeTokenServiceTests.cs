@@ -1,24 +1,24 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa;
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
-public class DefaultElsaTokenServiceTests
+public class DefaultFlammeTokenServiceTests
 {
     [Test]
-    [DisplayName("Token issuance context is projected into an Elsa access token")]
+    [DisplayName("Token issuance context is projected into an Flamme access token")]
     public async Task IssueAccessTokenProjectsContext()
     {
         var clock = new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero));
@@ -29,7 +29,7 @@ public class DefaultElsaTokenServiceTests
             Audience = "elsa-api",
             AccessTokenLifetime = TimeSpan.FromMinutes(15)
         });
-        var service = new DefaultElsaTokenService(clock, options);
+        var service = new DefaultFlammeTokenService(clock, options);
         var user = new User { Id = "user-1", Name = "alice", TenantId = "tenant-a" };
         var context = new TokenIssuanceContext(
             user,
@@ -96,7 +96,7 @@ public class DefaultElsaTokenServiceTests
     public async Task EmptySetSentinelRoundTripsToAKnownEmptySet()
     {
         var options = CreateOptions();
-        var result = await new DefaultElsaTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options).IssueAccessTokenAsync(EmptyGrantContext());
+        var result = await new DefaultFlammeTokenService(new FakeTimeProvider(DateTimeOffset.UtcNow), options).IssueAccessTokenAsync(EmptyGrantContext());
 
         var jwtBearerClaims = await ValidateWithJwtBearerAsync(result.Token, options.Value);
         var wasmClaims = StudioWasmJwtParser.Parse(result.Token);
@@ -184,7 +184,7 @@ public class DefaultElsaTokenServiceTests
         await Assert.That(ReadSessionExpiresAt(continuedShortLived)).IsEqualTo(continuedShortLived.ExpiresAt.ToUnixTimeSeconds());
     }
 
-    private static DefaultElsaTokenService CreateService() =>
+    private static DefaultFlammeTokenService CreateService() =>
         new(new FakeTimeProvider(DateTimeOffset.UtcNow), CreateOptions());
 
     private static IOptions<IdentityTokenOptions> CreateOptions() =>

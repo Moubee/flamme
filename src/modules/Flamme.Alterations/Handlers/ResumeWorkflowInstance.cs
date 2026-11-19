@@ -1,12 +1,12 @@
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Notifications;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Requests;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Handlers;
+namespace Flamme.Alterations.Handlers;
 
 /// <summary>
 /// Resumes a workflow instance when an alteration job has been completed and the workflow contains scheduled work.

@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Persistence.EFCore;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore;
 
 public sealed class PersistedIdentityProviderConnection
 {

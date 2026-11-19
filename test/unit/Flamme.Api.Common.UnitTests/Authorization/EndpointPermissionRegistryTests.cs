@@ -1,6 +1,6 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 
-namespace Elsa.Api.Common.UnitTests.Authorization;
+namespace Flamme.Api.Common.UnitTests.Authorization;
 
 /// <summary>
 /// The registry reports every declaration through its requirement accessors, while the single-permission accessors that

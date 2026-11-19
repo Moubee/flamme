@@ -1,23 +1,23 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Models;
-using Elsa.Alterations.Core.Stores;
-using Elsa.Tenants.Options;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Models;
+using Flamme.Alterations.Core.Stores;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IAlterationPlanStore"/>.
 /// </summary>
 public class EFCoreAlterationPlanStore : IAlterationPlanStore
 {
-    private readonly EntityStore<AlterationsElsaDbContext, AlterationPlan> _store;
+    private readonly EntityStore<AlterationsFlammeDbContext, AlterationPlan> _store;
     private readonly IAlterationSerializer _alterationSerializer;
     private readonly bool _tenantEnabled;
 
@@ -25,7 +25,7 @@ public class EFCoreAlterationPlanStore : IAlterationPlanStore
     /// Constructor.
     /// </summary>
     public EFCoreAlterationPlanStore(
-        EntityStore<AlterationsElsaDbContext, AlterationPlan> store,
+        EntityStore<AlterationsFlammeDbContext, AlterationPlan> store,
         IAlterationSerializer alterationSerializer)
         : this(store, alterationSerializer, Options.Create(new TenantsOptions()))
     {
@@ -37,7 +37,7 @@ public class EFCoreAlterationPlanStore : IAlterationPlanStore
     /// </summary>
     [ActivatorUtilitiesConstructor]
     public EFCoreAlterationPlanStore(
-        EntityStore<AlterationsElsaDbContext, AlterationPlan> store,
+        EntityStore<AlterationsFlammeDbContext, AlterationPlan> store,
         IAlterationSerializer alterationSerializer,
         IOptions<TenantsOptions> tenantsOptions)
     {
@@ -112,26 +112,26 @@ public class EFCoreAlterationPlanStore : IAlterationPlanStore
         return await _store.CountAsync(filter.Apply, cancellationToken);
     }
 
-    private void OnSave(AlterationsElsaDbContext elsaDbContext, AlterationPlan entity)
+    private void OnSave(AlterationsFlammeDbContext flammeDbContext, AlterationPlan entity)
     {
-        elsaDbContext.Entry(entity).Property("SerializedAlterations").CurrentValue = _alterationSerializer.SerializeMany(entity.Alterations);
-        elsaDbContext.Entry(entity).Property("SerializedWorkflowInstanceFilter").CurrentValue = JsonSerializer.Serialize(entity.WorkflowInstanceFilter);
+        flammeDbContext.Entry(entity).Property("SerializedAlterations").CurrentValue = _alterationSerializer.SerializeMany(entity.Alterations);
+        flammeDbContext.Entry(entity).Property("SerializedWorkflowInstanceFilter").CurrentValue = JsonSerializer.Serialize(entity.WorkflowInstanceFilter);
     }
 
-    private ValueTask OnSaveAsync(AlterationsElsaDbContext dbContext, AlterationPlan entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(AlterationsFlammeDbContext dbContext, AlterationPlan entity, CancellationToken cancellationToken)
     {
         OnSave(dbContext, entity);
         return default;
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
-    private ValueTask OnLoadAsync(AlterationsElsaDbContext elsaDbContext, AlterationPlan? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(AlterationsFlammeDbContext flammeDbContext, AlterationPlan? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return default;
 
-        var alterationsJson = elsaDbContext.Entry(entity).Property<string>("SerializedAlterations").CurrentValue;
-        var workflowInstanceFilterJson = elsaDbContext.Entry(entity).Property<string>("SerializedWorkflowInstanceFilter").CurrentValue;
+        var alterationsJson = flammeDbContext.Entry(entity).Property<string>("SerializedAlterations").CurrentValue;
+        var workflowInstanceFilterJson = flammeDbContext.Entry(entity).Property<string>("SerializedWorkflowInstanceFilter").CurrentValue;
         entity.Alterations = _alterationSerializer.DeserializeMany(alterationsJson).ToList();
         entity.WorkflowInstanceFilter = JsonSerializer.Deserialize<AlterationWorkflowInstanceFilter>(workflowInstanceFilterJson)!;
 

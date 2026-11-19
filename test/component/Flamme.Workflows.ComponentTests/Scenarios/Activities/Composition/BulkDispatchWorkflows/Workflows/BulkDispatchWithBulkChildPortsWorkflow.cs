@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
 
 public class BulkDispatchWithBulkChildPortsWorkflow : WorkflowBase
 {

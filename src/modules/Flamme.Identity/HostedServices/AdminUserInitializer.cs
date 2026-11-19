@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Options;
+using Flamme.Common;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.HostedServices;
+namespace Flamme.Identity.HostedServices;
 
 /// <summary>
 /// Hosted service that initializes the admin user and role from <see cref="DefaultAdminUserOptions"/> configuration if provided.

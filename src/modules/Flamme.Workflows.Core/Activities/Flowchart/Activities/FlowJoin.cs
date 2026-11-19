@@ -1,13 +1,13 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Activities.Flowchart.Contracts;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Workflows.Activities.Flowchart.Contracts;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities.Flowchart.Activities;
+namespace Flamme.Workflows.Activities.Flowchart.Activities;
 
 /// <summary>
 /// Merge multiple branches into a single branch of execution.

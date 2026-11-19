@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Results;
+using Flamme.Alterations.Core.Results;
 
-namespace Elsa.Alterations.Endpoints.Workflows.Retry;
+namespace Flamme.Alterations.Endpoints.Workflows.Retry;
 
 /// <summary>
 /// The response from the <see cref="Retry"/> endpoint.

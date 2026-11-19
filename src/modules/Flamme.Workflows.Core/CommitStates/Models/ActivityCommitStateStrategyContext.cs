@@ -1,3 +1,3 @@
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 public record ActivityCommitStateStrategyContext(ActivityExecutionContext ActivityExecutionContext, ActivityLifetimeEvent LifetimeEvent);

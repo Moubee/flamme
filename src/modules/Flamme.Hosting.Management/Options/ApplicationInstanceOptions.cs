@@ -1,4 +1,4 @@
-namespace Elsa.Hosting.Management.Options;
+namespace Flamme.Hosting.Management.Options;
 
 /// <summary>
 /// Options that control how the name of the current application instance is determined.

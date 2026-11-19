@@ -1,8 +1,8 @@
-using Elsa.Common.Entities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Entities;
+namespace Flamme.Workflows.Management.Entities;
 
 /// <summary>
 /// Represents a versioned workflow definition.

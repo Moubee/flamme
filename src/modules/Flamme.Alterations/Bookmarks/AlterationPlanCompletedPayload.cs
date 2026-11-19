@@ -1,6 +1,6 @@
-using Elsa.Alterations.Activities;
+using Flamme.Alterations.Activities;
 
-namespace Elsa.Alterations.Bookmarks;
+namespace Flamme.Alterations.Bookmarks;
 
 /// <summary>
 /// Represents bookmark payload for the <see cref="AlterationPlanCompleted"/> trigger.

@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
-namespace Elsa.Api.Client.Resources.Tests;
+namespace Flamme.Api.Client.Resources.Tests;
 
 public class TestActivityRequest
 {

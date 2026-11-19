@@ -1,9 +1,9 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Endpoints.Users.Create;
-using Elsa.UnitTests.Shared;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Endpoints.Users.Create;
+using Flamme.UnitTests.Shared;
 using FastEndpoints;
 
-namespace Elsa.Identity.UnitTests.Endpoints;
+namespace Flamme.Identity.UnitTests.Endpoints;
 
 /// <summary>
 /// Pins the cleanup the classes in <see cref="FastEndpointsCollection"/> depend on, in the one order that used to fail:

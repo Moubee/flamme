@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Produces the deliberately small, non-sensitive error contract exposed by the authentication broker.

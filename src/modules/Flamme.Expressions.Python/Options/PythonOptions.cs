@@ -2,7 +2,7 @@ using System.Text;
 using JetBrains.Annotations;
 using Python.Runtime;
 
-namespace Elsa.Expressions.Python.Options;
+namespace Flamme.Expressions.Python.Options;
 
 /// <summary>
 /// Options for the Python expression evaluator.

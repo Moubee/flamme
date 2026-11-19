@@ -1,5 +1,5 @@
 
-namespace Elsa.Workflows.Api.Endpoints.Tasks.Complete;
+namespace Flamme.Workflows.Api.Endpoints.Tasks.Complete;
 
 /// <summary>
 /// Provides policy names accepted by the <see cref="Complete"/> endpoint.

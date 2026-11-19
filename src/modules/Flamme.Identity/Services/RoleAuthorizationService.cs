@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using Elsa.Authorization;
-using Elsa.Extensions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
+using Flamme.Authorization;
+using Flamme.Extensions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 public class RoleAuthorizationService(IRoleProvider roleProvider, IPermissionEvaluator evaluator) : IRoleAuthorizationService

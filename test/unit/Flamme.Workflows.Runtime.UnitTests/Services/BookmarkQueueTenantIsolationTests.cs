@@ -1,17 +1,17 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Stores;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class BookmarkQueueTenantIsolationTests
 {
@@ -192,18 +192,18 @@ public class BookmarkQueueTenantIsolationTests
         var accessor = new DefaultTenantAccessor();
         var signaler = new BookmarkQueueSignaler(accessor);
         var tenantsProvider = ITenantsProvider.Mock().Object;
-        var (worker, processor, _) = CreateCountingWorker(signaler, accessor, Elsa.Common.Multitenancy.Tenant.Default, tenantsProvider);
+        var (worker, processor, _) = CreateCountingWorker(signaler, accessor, Flamme.Common.Multitenancy.Tenant.Default, tenantsProvider);
 
         try
         {
-            using (accessor.PushContext(Elsa.Common.Multitenancy.Tenant.Default))
+            using (accessor.PushContext(Flamme.Common.Multitenancy.Tenant.Default))
                 worker.Start();
 
             await Assert.That(accessor.Tenant).IsNull();
             await signaler.TriggerAsync();
             await WaitUntilAsync(() => processor.Calls == 1);
 
-            await Assert.That(processor.AmbientTenantIds).IsEquivalentTo([Elsa.Common.Multitenancy.Tenant.DefaultTenantId], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+            await Assert.That(processor.AmbientTenantIds).IsEquivalentTo([Flamme.Common.Multitenancy.Tenant.DefaultTenantId], StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         }
         finally
         {
@@ -230,8 +230,8 @@ public class BookmarkQueueTenantIsolationTests
         }).GetAwaiter().GetResult();
 
         var resumer = IWorkflowResumer.Mock().Object;
-        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Workflows.Runtime.Filters.BookmarkFilter __arg0, global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions? __arg1, global::System.Threading.CancellationToken __arg2) =>
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Flamme.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+                    .Returns((global::Flamme.Workflows.Runtime.Filters.BookmarkFilter __arg0, global::Flamme.Workflows.Runtime.Options.ResumeBookmarkOptions? __arg1, global::System.Threading.CancellationToken __arg2) =>
                     {
                         lock (resumedLock)
                             resumed.Add(__arg0.BookmarkId!);

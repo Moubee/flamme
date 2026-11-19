@@ -1,6 +1,6 @@
-using Elsa.Resilience.Features;
-using Elsa.Resilience.Options;
-using Elsa.Resilience.Serialization;
+using Flamme.Resilience.Features;
+using Flamme.Resilience.Options;
+using Flamme.Resilience.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TUnit.AspNetCore;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public sealed class ResilienceStrategiesWebApplicationFactory : TestWebApplicationFactory<ResilienceTestEntryPoint>
 {
@@ -32,7 +32,7 @@ public sealed class ResilienceStrategiesWebApplicationFactory : TestWebApplicati
                 {
                     options.Assemblies = [typeof(ResilienceFeature).Assembly];
                     options.DisableAutoDiscovery = true;
-                    options.Filter = endpoint => endpoint.Namespace == "Elsa.Resilience.Endpoints.ResilienceStrategies.List";
+                    options.Filter = endpoint => endpoint.Namespace == "Flamme.Resilience.Endpoints.ResilienceStrategies.List";
                 });
                 services.AddOptions<ResilienceOptions>();
                 services.AddSingleton<ResilienceStrategySerializer>();

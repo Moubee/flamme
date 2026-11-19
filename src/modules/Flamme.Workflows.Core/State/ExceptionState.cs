@@ -2,7 +2,7 @@
 
 // ReSharper disable NotAccessedPositionalProperty.Global
 
-namespace Elsa.Workflows.State;
+namespace Flamme.Workflows.State;
 
 /// <summary>
 /// A simplified, serializable model representing an exception.

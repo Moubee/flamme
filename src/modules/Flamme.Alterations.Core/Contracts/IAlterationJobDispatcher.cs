@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 ///  Dispatches an alteration job for execution.

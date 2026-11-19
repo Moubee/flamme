@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Services;
+namespace Flamme.Workflows.Core.UnitTests.Services;
 
 /// <summary>
 /// Unit tests for ActivityRegistry, specifically testing multi-tenant descriptor resolution logic and refresh behavior.

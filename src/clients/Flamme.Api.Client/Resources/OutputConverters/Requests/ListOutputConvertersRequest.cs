@@ -1,6 +1,6 @@
 using Refit;
 
-namespace Elsa.Api.Client.Resources.OutputConverters.Requests;
+namespace Flamme.Api.Client.Resources.OutputConverters.Requests;
 
 /// <summary>
 /// Represents a request to list output converters compatible with declared types.

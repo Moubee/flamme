@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Permissions;
+namespace Flamme.Workflows.Api.Permissions;
 
 /// <summary>
 /// Stable resource names for Workflows. Endpoints reference these constants rather than string

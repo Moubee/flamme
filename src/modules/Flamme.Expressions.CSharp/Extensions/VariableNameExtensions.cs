@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.CSharp.Extensions;
+namespace Flamme.Expressions.CSharp.Extensions;
 
 public static class VariableNameExtensions
 {

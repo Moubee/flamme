@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Tenants;
+namespace Flamme.Tenants;
 
 /// <summary>
 /// Represents a pipeline builder of tenant resolution strategies.

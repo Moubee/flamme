@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Validation;
+namespace Flamme.ExternalAuthentication.Validation;
 
 /// <summary>
 /// Resolves and validates provider-controlled destinations before any outbound request or connection is made.

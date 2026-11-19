@@ -1,6 +1,6 @@
-using Elsa.Workflows.Api.RealTime.Messages;
+using Flamme.Workflows.Api.RealTime.Messages;
 
-namespace Elsa.Workflows.Api.RealTime.Contracts;
+namespace Flamme.Workflows.Api.RealTime.Contracts;
 
 /// <summary>
 /// Represents a client for receiving workflow events on the client.

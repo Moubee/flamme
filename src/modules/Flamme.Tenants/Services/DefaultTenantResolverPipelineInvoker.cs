@@ -1,9 +1,9 @@
-﻿using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Options;
+﻿using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Tenants;
+namespace Flamme.Tenants;
 
 /// <summary>
 /// Resolves the tenant using a pipeline of resolvers.

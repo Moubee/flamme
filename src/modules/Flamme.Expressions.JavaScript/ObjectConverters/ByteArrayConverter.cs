@@ -3,7 +3,7 @@ using Jint;
 using Jint.Native;
 using Jint.Runtime.Interop;
 
-namespace Elsa.Expressions.JavaScript.ObjectConverters;
+namespace Flamme.Expressions.JavaScript.ObjectConverters;
 
 /// <summary>
 /// Converts a byte array to a <see cref="JsValue"/> instance representing a Uint8Array.

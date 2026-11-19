@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class ActivityGroundingSearchService(ActivityGroundingMapper mapper)
 {

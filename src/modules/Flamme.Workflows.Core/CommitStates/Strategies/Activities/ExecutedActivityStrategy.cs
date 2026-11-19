@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Elsa.Workflows.CommitStates.Strategies;
+namespace Flamme.Workflows.CommitStates.Strategies;
 
 /// <summary>
 /// Represents an activity commit strategy that determines whether a commit action should occur

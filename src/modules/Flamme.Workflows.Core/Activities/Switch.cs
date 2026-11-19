@@ -1,13 +1,13 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// The Switch activity is an approximation of the `switch` construct in C#.

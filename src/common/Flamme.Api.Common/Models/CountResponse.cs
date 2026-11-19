@@ -1,4 +1,4 @@
-namespace Elsa.Models;
+namespace Flamme.Models;
 
 /// <summary>
 /// Represents a count response that offers a unified format for returning count of things from API endpoints.

@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.Activities.StateMachine.Models;
+namespace Flamme.Workflows.Activities.StateMachine.Models;
 
 /// <summary>
 /// Represents a named state in a state machine.

@@ -1,4 +1,4 @@
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Implement this to control what to return to the client in case an unhandled exception occurs while executing the workflow.

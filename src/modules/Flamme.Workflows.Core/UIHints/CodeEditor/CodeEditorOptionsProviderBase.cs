@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.UIHints.CodeEditor;
+namespace Flamme.Workflows.UIHints.CodeEditor;
 
 /// <summary>
 /// Provides options for the code editor component.

@@ -1,4 +1,4 @@
-﻿namespace Elsa.Expressions.Liquid.Helpers;
+﻿namespace Flamme.Expressions.Liquid.Helpers;
 
 /// <summary>
 /// Can be used to provide a factory to return an object based on a property name that is unknown at registration time. 

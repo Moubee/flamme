@@ -1,4 +1,4 @@
-namespace Elsa.Permissions;
+namespace Flamme.Permissions;
 
 /// <summary>
 /// Module-contributed metadata for one resource: what it is called, what it means, and which verbs it

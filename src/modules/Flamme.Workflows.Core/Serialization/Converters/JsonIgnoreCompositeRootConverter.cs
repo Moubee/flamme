@@ -2,10 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Serialization.Helpers;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Ignores properties with the <see cref="JsonIgnoreCompositeRootAttribute"/> attribute.

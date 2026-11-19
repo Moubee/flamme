@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Resilience.Modifiers;
+namespace Flamme.Resilience.Modifiers;
 
 /// <summary>
 /// Modifies the <see cref="ActivityDescriptor"/> for resilient activities.

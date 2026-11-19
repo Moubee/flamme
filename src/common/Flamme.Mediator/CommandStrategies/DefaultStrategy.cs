@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Extensions;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Extensions;
 
-namespace Elsa.Mediator.CommandStrategies;
+namespace Flamme.Mediator.CommandStrategies;
 
 /// <summary>
 /// Invokes command handlers using the default strategy. 

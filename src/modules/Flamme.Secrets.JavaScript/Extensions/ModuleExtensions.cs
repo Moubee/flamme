@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Secrets.JavaScript.Features;
+using Flamme.Features.Services;
+using Flamme.Secrets.JavaScript.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ModuleExtensions
 {

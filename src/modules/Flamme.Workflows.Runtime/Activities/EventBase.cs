@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.Runtime.Activities;
+namespace Flamme.Workflows.Runtime.Activities;
 
 public abstract class EventBase : Trigger<object>;
 

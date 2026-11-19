@@ -1,22 +1,22 @@
-using Elsa.Common.Models;
-using Elsa.KeyValues.Features;
-using Elsa.Mediator.HostedServices;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Common.Models;
+using Flamme.KeyValues.Features;
+using Flamme.Mediator.HostedServices;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Stimuli;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.PublishEventOutbox;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.PublishEventOutbox;
 
 public class Tests
 {
@@ -88,7 +88,7 @@ public class Tests
         return (ServiceProvider)new TestApplicationBuilder(_testOutputHelper)
             .AddWorkflow<PublishOrderShippedEventWorkflow>()
             .AddWorkflow<ConsumeOrderShippedEventWorkflow>()
-            .ConfigureElsa(elsa => elsa.Configure<KeyValueFeature>())
+            .ConfigureFlamme(elsa => elsa.Configure<KeyValueFeature>())
             .ConfigureServices(services => services.Configure<WorkflowDispatcherOptions>(options =>
             {
                 options.UseTransactionalOutbox = useTransactionalOutbox;

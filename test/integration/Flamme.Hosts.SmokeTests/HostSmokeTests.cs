@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared.Databases;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using TUnit.AspNetCore;
 
-namespace Elsa.Hosts.SmokeTests;
+namespace Flamme.Hosts.SmokeTests;
 
 /// <summary>
 /// Boots a host the way its own entry point does and asserts it comes up serving gated routes.
@@ -201,5 +201,5 @@ public abstract class HostWebApplicationFactory<TEntryPoint> : TestWebApplicatio
 
 internal static class HostSmokeTestConstraints
 {
-    public const string EntryPointProcessState = "ElsaHostsEntryPointProcessState";
+    public const string EntryPointProcessState = "FlammeHostsEntryPointProcessState";
 }

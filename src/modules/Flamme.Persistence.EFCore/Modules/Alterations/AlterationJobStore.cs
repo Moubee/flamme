@@ -1,30 +1,30 @@
 using System.Data.Common;
 using System.Text.Json;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Models;
-using Elsa.Alterations.Core.Stores;
-using Elsa.Tenants.Options;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Models;
+using Flamme.Alterations.Core.Stores;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IAlterationJobStore"/>.
 /// </summary>
 public class EFCoreAlterationJobStore : IAlterationJobStore
 {
-    private readonly EntityStore<AlterationsElsaDbContext, AlterationJob> _store;
+    private readonly EntityStore<AlterationsFlammeDbContext, AlterationJob> _store;
     private readonly bool _tenantEnabled;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public EFCoreAlterationJobStore(EntityStore<AlterationsElsaDbContext, AlterationJob> store)
+    public EFCoreAlterationJobStore(EntityStore<AlterationsFlammeDbContext, AlterationJob> store)
         : this(store, Options.Create(new TenantsOptions()))
     {
     }
@@ -34,7 +34,7 @@ public class EFCoreAlterationJobStore : IAlterationJobStore
     /// overload keeps tenancy-aware upsert disabled for compatibility.
     /// </summary>
     [ActivatorUtilitiesConstructor]
-    public EFCoreAlterationJobStore(EntityStore<AlterationsElsaDbContext, AlterationJob> store, IOptions<TenantsOptions> tenantsOptions)
+    public EFCoreAlterationJobStore(EntityStore<AlterationsFlammeDbContext, AlterationJob> store, IOptions<TenantsOptions> tenantsOptions)
     {
         _store = store;
         _tenantEnabled = tenantsOptions.Value.IsEnabled;
@@ -116,7 +116,7 @@ public class EFCoreAlterationJobStore : IAlterationJobStore
     }
 
     private async Task UpsertAsync(
-        AlterationsElsaDbContext dbContext,
+        AlterationsFlammeDbContext dbContext,
         AlterationJob record,
         CancellationToken cancellationToken,
         bool handleDbExceptions = true)
@@ -170,23 +170,23 @@ public class EFCoreAlterationJobStore : IAlterationJobStore
         }
     }
 
-    private static void OnSave(AlterationsElsaDbContext elsaDbContext, AlterationJob entity)
+    private static void OnSave(AlterationsFlammeDbContext flammeDbContext, AlterationJob entity)
     {
-        elsaDbContext.Entry(entity).Property("SerializedLog").CurrentValue = JsonSerializer.Serialize(entity.Log);
+        flammeDbContext.Entry(entity).Property("SerializedLog").CurrentValue = JsonSerializer.Serialize(entity.Log);
     }
 
-    private static ValueTask OnSaveAsync(AlterationsElsaDbContext dbContext, AlterationJob entity, CancellationToken cancellationToken)
+    private static ValueTask OnSaveAsync(AlterationsFlammeDbContext dbContext, AlterationJob entity, CancellationToken cancellationToken)
     {
         OnSave(dbContext, entity);
         return default;
     }
 
-    private static ValueTask OnLoadAsync(AlterationsElsaDbContext elsaDbContext, AlterationJob? entity, CancellationToken cancellationToken)
+    private static ValueTask OnLoadAsync(AlterationsFlammeDbContext flammeDbContext, AlterationJob? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return default;
 
-        var logJson = elsaDbContext.Entry(entity).Property<string>("SerializedLog").CurrentValue;
+        var logJson = flammeDbContext.Entry(entity).Property<string>("SerializedLog").CurrentValue;
         entity.Log = JsonSerializer.Deserialize<AlterationLogEntry[]>(logJson)!;
 
         return default;

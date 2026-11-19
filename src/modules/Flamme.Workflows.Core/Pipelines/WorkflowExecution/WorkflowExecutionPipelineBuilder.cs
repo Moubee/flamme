@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Pipelines.WorkflowExecution;
+namespace Flamme.Workflows.Pipelines.WorkflowExecution;
 
 /// <inheritdoc />
 public class WorkflowExecutionPipelineBuilder : IWorkflowExecutionPipelineBuilder

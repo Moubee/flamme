@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Provides context information when an activity has completed.

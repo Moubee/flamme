@@ -1,14 +1,14 @@
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 using FluentStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TUnit.Logging.Microsoft;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// A builder that can be used to configure an <see cref="IServiceProvider"/> for testing purposes.
@@ -17,7 +17,7 @@ public class TestApplicationBuilder
 {
     private readonly TextWriter _testOutput;
     private readonly ServiceCollection _services;
-    private Action<IModule> _configureElsa;
+    private Action<IModule> _configureFlamme;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestApplicationBuilder"/> class.
@@ -36,7 +36,7 @@ public class TestApplicationBuilder
                 .SetMinimumLevel(LogLevel.Debug)
                 .AddCorrelatedTUnit(LogLevel.Debug));
 
-        _configureElsa += elsa => elsa
+        _configureFlamme += elsa => elsa
             .AddActivitiesFrom<WriteLine>()
             .UseScheduling()
             .UseCSharp(options => options.AllowHostCodeExecution = true)
@@ -54,18 +54,18 @@ public class TestApplicationBuilder
     /// <returns>The <see cref="IServiceProvider"/>.</returns>
     public IServiceProvider Build()
     {
-        _services.AddElsa(_configureElsa);
+        _services.AddFlamme(_configureFlamme);
         return _services.BuildServiceProvider();
     }
 
     /// <summary>
-    /// Configures Elsa.
+    /// Configures Flamme.
     /// </summary>
     /// <param name="configure">The configuration delegate.</param>
     /// <returns>The <see cref="TestApplicationBuilder"/>.</returns>
-    public TestApplicationBuilder ConfigureElsa(Action<IModule> configure)
+    public TestApplicationBuilder ConfigureFlamme(Action<IModule> configure)
     {
-        _configureElsa += configure;
+        _configureFlamme += configure;
         return this;
     }
 
@@ -90,7 +90,7 @@ public class TestApplicationBuilder
         var combinedTextWriter = TextWriter.Synchronized(new CombinedTextWriter(capturingTextWriter, _testOutput));
         var provider = new StandardOutStreamProvider(combinedTextWriter);
 
-        ConfigureElsa(elsa => elsa.UseWorkflows(workflows => workflows.WithStandardOutStreamProvider(_ => provider)));
+        ConfigureFlamme(elsa => elsa.UseWorkflows(workflows => workflows.WithStandardOutStreamProvider(_ => provider)));
         return this;
     }
 
@@ -99,7 +99,7 @@ public class TestApplicationBuilder
     /// </summary>
     public TestApplicationBuilder AddWorkflow<T>() where T : IWorkflow
     {
-        return ConfigureElsa(elsa => elsa.AddWorkflow<T>());
+        return ConfigureFlamme(elsa => elsa.AddWorkflow<T>());
     }
     
     /// <summary>
@@ -107,7 +107,7 @@ public class TestApplicationBuilder
     /// </summary>
     public TestApplicationBuilder AddActivitiesFrom<T>()
     {
-        return ConfigureElsa(elsa => elsa.AddActivitiesFrom<T>());
+        return ConfigureFlamme(elsa => elsa.AddActivitiesFrom<T>());
     }
     
     /// <summary>
@@ -119,7 +119,7 @@ public class TestApplicationBuilder
         var assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
         var assemblyDirectory = Path.GetDirectoryName(assemblyLocation)!;
         var workflowsDirectory = directory.Prepend(assemblyDirectory).ToArray();
-        _configureElsa += elsa => elsa.UseFluentStorageProvider(storage => storage.BlobStorage = sp => StorageFactory.Blobs.DirectoryFiles(Path.Combine(workflowsDirectory)));
+        _configureFlamme += elsa => elsa.UseFluentStorageProvider(storage => storage.BlobStorage = sp => StorageFactory.Blobs.DirectoryFiles(Path.Combine(workflowsDirectory)));
         return this;
     }
 }

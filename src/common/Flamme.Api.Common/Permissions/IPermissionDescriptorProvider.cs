@@ -1,4 +1,4 @@
-namespace Elsa.Permissions;
+namespace Flamme.Permissions;
 
 /// <summary>
 /// Contributes the permission descriptors for one module. Every module exposing protected endpoints

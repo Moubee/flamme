@@ -1,8 +1,8 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
 
-namespace Elsa.Workflows.Runtime.Features;
+namespace Flamme.Workflows.Runtime.Features;
 
 /// <summary>
 /// Installs the default runtime services.

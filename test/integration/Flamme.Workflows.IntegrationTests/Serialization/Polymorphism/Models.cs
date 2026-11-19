@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.Polymorphism;
+namespace Flamme.Workflows.IntegrationTests.Serialization.Polymorphism;
 
 /// <summary>
 /// A model that contains a mixed bag of primitive, complex and expando objects.

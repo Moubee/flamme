@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Dispatches a request for running a task.

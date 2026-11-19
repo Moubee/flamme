@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.CanExecute.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.CanExecute.Workflows;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CanExecute;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CanExecute;
 
 public class CanExecuteTests : IAsyncDisposable
 {

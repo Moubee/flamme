@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Management.Activities.SetOutput;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Management.Activities.SetOutput;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Composition;
+namespace Flamme.Activities.UnitTests.Composition;
 
 public class SetOutputTests
 {

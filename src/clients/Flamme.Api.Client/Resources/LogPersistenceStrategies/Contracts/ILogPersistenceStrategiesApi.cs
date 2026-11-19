@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.LogPersistenceStrategies;
+namespace Flamme.Api.Client.Resources.LogPersistenceStrategies;
 
 /// <summary>
 /// Represents a client API for managing log persistence strategies.

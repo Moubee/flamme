@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// Deletes activity execution log records in response to the <see cref="WorkflowInstancesDeleting"/> notification.

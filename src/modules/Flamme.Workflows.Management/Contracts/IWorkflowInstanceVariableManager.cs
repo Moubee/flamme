@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Defines the operations for managing variables associated with a workflow instance.

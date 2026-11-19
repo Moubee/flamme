@@ -1,11 +1,11 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.Providers;
+namespace Flamme.Identity.Providers;
 
 /// <summary>
 /// Represents a user provider that finds users using <see cref="UsersOptions"/>.

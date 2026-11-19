@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Identity.Multitenancy;
+namespace Flamme.Identity.Multitenancy;
 
 /// <summary>
 /// Resolves the tenant from the current user.

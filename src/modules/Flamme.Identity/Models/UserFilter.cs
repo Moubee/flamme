@@ -1,6 +1,6 @@
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
 /// Represents a user filter.

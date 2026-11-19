@@ -1,6 +1,6 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public class ActivityExecutedEventArgs(ActivityExecutionContext activityExecutionContext) : EventArgs
 {

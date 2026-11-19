@@ -1,23 +1,23 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Options;
-using Elsa.Secrets.Persistence.EFCore;
-using Elsa.Secrets.Persistence.EFCore.PostgreSql.Extensions;
-using Elsa.Secrets.Persistence.EFCore.Repositories;
-using Elsa.Secrets.Repositories;
-using Elsa.Secrets.Services;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Options;
+using Flamme.Secrets.Persistence.EFCore;
+using Flamme.Secrets.Persistence.EFCore.PostgreSql.Extensions;
+using Flamme.Secrets.Persistence.EFCore.Repositories;
+using Flamme.Secrets.Repositories;
+using Flamme.Secrets.Services;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 /// <summary>
 /// One File, InMemory, or EF/PostgreSQL <see cref="ISecretRepository"/> plus the ambient tenant it reads.
@@ -87,16 +87,16 @@ public sealed class SecretRepositoryScenario(
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
                 .AddPostgreSqlEntityModelCreatingHandlers()
-                .AddDbContextFactory<SecretsElsaDbContext>((_, builder) =>
-                    builder.UseElsaPostgreSql(migrationsAssembly, database.ConnectionString)
+                .AddDbContextFactory<SecretsFlammeDbContext>((_, builder) =>
+                    builder.UseFlammePostgreSql(migrationsAssembly, database.ConnectionString)
                         .ReplaceService<IModelCacheKeyFactory, TenantAwareSecretModelCacheKeyFactory>())
-                .Decorate<IDbContextFactory<SecretsElsaDbContext>, TenantAwareDbContextFactory<SecretsElsaDbContext>>()
+                .Decorate<IDbContextFactory<SecretsFlammeDbContext>, TenantAwareDbContextFactory<SecretsFlammeDbContext>>()
                 .AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>()
-                .AddScoped<Store<SecretsElsaDbContext, Secret>>()
+                .AddScoped<Store<SecretsFlammeDbContext, Secret>>()
                 .AddScoped<EFCoreSecretRepository>()
                 .BuildServiceProvider();
 
-            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<SecretsElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<SecretsFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.MigrateAsync();
 
             scope = services.CreateScope();

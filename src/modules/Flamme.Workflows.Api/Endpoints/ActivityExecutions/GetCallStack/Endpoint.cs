@@ -1,10 +1,10 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
 
 /// <summary>
 /// Gets the call stack (execution chain) for a given activity execution.
@@ -12,13 +12,13 @@ namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
 /// Supports pagination for deep call stacks.
 /// </summary>
 [PublicAPI]
-internal class Endpoint(IActivityExecutionStore store) : ElsaEndpoint<Request, Response>
+internal class Endpoint(IActivityExecutionStore store) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/activity-executions/{id}/call-stack");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

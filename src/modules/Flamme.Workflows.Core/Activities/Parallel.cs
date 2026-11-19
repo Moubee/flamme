@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Options;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Execute a set of activities in parallel.

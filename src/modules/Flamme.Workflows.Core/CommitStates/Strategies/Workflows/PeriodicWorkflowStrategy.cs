@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Elsa.Workflows.CommitStates.Strategies;
+namespace Flamme.Workflows.CommitStates.Strategies;
 
 /// <summary>
 /// Implements a periodic workflow commit strategy based on a specified time interval.

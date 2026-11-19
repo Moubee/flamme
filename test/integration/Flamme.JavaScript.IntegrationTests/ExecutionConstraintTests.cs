@@ -1,15 +1,15 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// Verifies that a runaway JavaScript expression cannot occupy the calling thread indefinitely.
@@ -114,7 +114,7 @@ public class ExecutionConstraintTests : IAsyncDisposable
     private IServiceProvider BuildServices(Action<JintOptions> configure)
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseJavaScript(configure))
+            .ConfigureFlamme(elsa => elsa.UseJavaScript(configure))
             .Build();
         return _services;
     }

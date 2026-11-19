@@ -1,6 +1,6 @@
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Extracts workflow state from a workflow execution context and vice versa.

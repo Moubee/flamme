@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows.Activities.Flowchart.Serialization;
+namespace Flamme.Workflows.Activities.Flowchart.Serialization;
 
 /// <summary>
 /// Converts <see cref="ObsoleteConnection"/> to and from JSON.

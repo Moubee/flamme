@@ -3,22 +3,22 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Authorization;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
-/// <summary>Guards Elsa Role deletion against JIT-policy default-role references.</summary>
+/// <summary>Guards Flamme Role deletion against JIT-policy default-role references.</summary>
 /// <remarks>
 /// Roles are tenant-scoped, so impact and remediation only ever consider connections in the role's own tenant
 /// context: the resolved role's own <c>TenantId</c>. The tenant active on <see cref="ITenantAccessor"/> is used
@@ -239,7 +239,7 @@ public sealed class ExternalAuthenticationRoleDeletionDependencyContributor(
                             updated.Connection.Id,
                             null,
                             SecurityEventOutcome.Succeeded,
-                            "An Elsa Role reference was removed from an external authentication JIT policy."),
+                            "An Flamme Role reference was removed from an external authentication JIT policy."),
                         "default-role-removed",
                         updated.Connection.Revision,
                         updated.Connection.MaterialRevision),

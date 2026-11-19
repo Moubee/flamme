@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Scheduling.Tasks;
+namespace Flamme.Scheduling.Tasks;
 
 /// <summary>
 /// A task that runs a workflow.

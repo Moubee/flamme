@@ -1,11 +1,11 @@
 using System.Text.Json.Nodes;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
-using Elsa.Extensions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
+using Flamme.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIWorkflowProposalToolTests
 {

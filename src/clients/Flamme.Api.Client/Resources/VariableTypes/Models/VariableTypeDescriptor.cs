@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.VariableTypes.Models;
+namespace Flamme.Api.Client.Resources.VariableTypes.Models;
 
 /// <summary>
 /// Represents a variable type.

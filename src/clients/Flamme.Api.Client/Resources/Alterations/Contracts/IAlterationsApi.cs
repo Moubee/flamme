@@ -1,12 +1,12 @@
-using Elsa.Api.Client.Resources.Alterations.Models;
-using Elsa.Api.Client.Resources.Alterations.Requests;
-using Elsa.Api.Client.Resources.Alterations.Responses;
+using Flamme.Api.Client.Resources.Alterations.Models;
+using Flamme.Api.Client.Resources.Alterations.Requests;
+using Flamme.Api.Client.Resources.Alterations.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Alterations.Contracts;
+namespace Flamme.Api.Client.Resources.Alterations.Contracts;
 
 /// <summary>
-/// Represents a client for the alterations API. Requires the Elsa.Alterations feature.
+/// Represents a client for the alterations API. Requires the Flamme.Alterations feature.
 /// </summary>
 public interface IAlterationsApi
 {

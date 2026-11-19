@@ -1,13 +1,13 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Contracts;
-using Elsa.Features.Implementations;
-using Elsa.Features.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Contracts;
+using Flamme.Features.Implementations;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 
-namespace Elsa.Features.UnitTests;
+namespace Flamme.Features.UnitTests;
 
 /// <summary>
 /// Tests <see cref="Module.Apply"/>, with an emphasis on features that introduce additional features from their own <see cref="IFeature.Apply"/> method.
@@ -76,7 +76,7 @@ public class ModuleTests
 
         _module.Apply();
 
-        await Assert.That(GetInstalledFeatureRegistry().Find("Elsa.Introduced")).IsNotNull();
+        await Assert.That(GetInstalledFeatureRegistry().Find("Flamme.Introduced")).IsNotNull();
     }
 
     [Test]
@@ -221,12 +221,12 @@ public class ModuleTests
         }
     }
 
-    [Elsa.Features.Attributes.DependsOn(typeof(IntroducedDependencyFeature))]
+    [Flamme.Features.Attributes.DependsOn(typeof(IntroducedDependencyFeature))]
     public class IntroducedDependentFeature(IModule module) : RecordingFeature(module);
 
     public class IntroducedDependencyFeature(IModule module) : RecordingFeature(module);
 
-    [Elsa.Features.Attributes.DependsOn(typeof(DependencyFeature))]
+    [Flamme.Features.Attributes.DependsOn(typeof(DependencyFeature))]
     public class DependentFeature(IModule module) : RecordingFeature(module);
 
     public class DependencyFeature(IModule module) : RecordingFeature(module);

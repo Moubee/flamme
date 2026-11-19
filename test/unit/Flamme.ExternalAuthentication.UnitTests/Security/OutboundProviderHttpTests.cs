@@ -1,13 +1,13 @@
 using System.Net;
 using System.Net.Sockets;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Validation;
 using Microsoft.Extensions.Options;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Security;
+namespace Flamme.ExternalAuthentication.UnitTests.Security;
 
 public class OutboundProviderHttpTests
 {

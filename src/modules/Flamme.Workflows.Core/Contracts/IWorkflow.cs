@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Implement this interface or <see cref="WorkflowBase"/> when implementing workflows using code so that they become available to the system.

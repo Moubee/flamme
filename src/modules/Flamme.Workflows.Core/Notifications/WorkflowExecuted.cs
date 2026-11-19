@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.State;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Notifications;
+namespace Flamme.Workflows.Notifications;
 
 /// <summary>
 /// A domain event that is published every time an execution cycle completes.

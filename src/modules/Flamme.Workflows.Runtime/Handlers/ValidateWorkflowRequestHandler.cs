@@ -1,14 +1,14 @@
 using System.Reflection;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Entities;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// A <see cref="WorkflowDefinitionValidating"/> handler that validates a workflow path and return any errors.

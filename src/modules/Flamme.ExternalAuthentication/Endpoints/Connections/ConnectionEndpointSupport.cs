@@ -1,10 +1,10 @@
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Connections;
+namespace Flamme.ExternalAuthentication.Endpoints.Connections;
 
 internal static class ConnectionEndpointSupport
 {

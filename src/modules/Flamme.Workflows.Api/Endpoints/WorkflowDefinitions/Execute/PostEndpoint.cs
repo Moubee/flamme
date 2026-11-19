@@ -1,12 +1,12 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Workflows.Api.Security;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
+using Flamme.Abstractions;
+using Flamme.Workflows.Api.Security;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Execute;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Execute;
 
 /// <summary>
 /// An API endpoint that executes a given workflow definition through POST method.
@@ -18,13 +18,13 @@ internal class PostEndpoint(
     IWorkflowStarter workflowStarter,
     IApiSerializer apiSerializer,
     WorkflowDefinitionScriptAuthorizationService scriptAuthorizationService)
-    : ElsaEndpointWithoutRequest<Response>
+    : FlammeEndpointWithoutRequest<Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Routes("/workflow-definitions/{definitionId}/execute");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Execute);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Execute);
         Verbs(FastEndpoints.Http.POST);
     }
     /// <inheritdoc />

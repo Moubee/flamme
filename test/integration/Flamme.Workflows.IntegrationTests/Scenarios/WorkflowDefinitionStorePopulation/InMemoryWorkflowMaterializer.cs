@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
 
 public class InMemoryWorkflowMaterializer(Workflow workflow) : IWorkflowMaterializer
 {

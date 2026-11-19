@@ -1,20 +1,20 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Workflows.Management;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Workflows.Management;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Variables.Post;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Variables.Post;
 
 [UsedImplicitly]
-internal class List(IWorkflowInstanceVariableManager workflowInstanceVariableManager) : ElsaEndpoint<Request, ListResponse<ResolvedVariableModel>>
+internal class List(IWorkflowInstanceVariableManager workflowInstanceVariableManager) : FlammeEndpoint<Request, ListResponse<ResolvedVariableModel>>
 {
     public override void Configure()
     {
         Post("/workflow-instances/{id}/variables");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Write);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Write);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

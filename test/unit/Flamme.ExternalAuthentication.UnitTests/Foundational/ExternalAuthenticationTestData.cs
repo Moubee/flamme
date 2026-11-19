@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 internal static class ExternalAuthenticationTestData
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// Manages jobs.

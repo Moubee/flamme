@@ -1,8 +1,8 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
 using Humanizer;
 
-namespace Elsa.Workflows.Memory;
+namespace Flamme.Workflows.Memory;
 
 /// <summary>
 /// Represents a variable that references a memory block.

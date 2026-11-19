@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Attributes;
+namespace Flamme.Workflows.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.ReturnValue)]
 public class OutputAttribute : Attribute

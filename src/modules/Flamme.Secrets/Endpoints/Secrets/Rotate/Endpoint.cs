@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Permissions;
-using Elsa.Secrets.Services;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Permissions;
+using Flamme.Secrets.Services;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Rotate;
+namespace Flamme.Secrets.Endpoints.Secrets.Rotate;
 
-internal class Endpoint(ISecretManager manager) : ElsaEndpoint<RotateSecretRequest, SecretModel>
+internal class Endpoint(ISecretManager manager) : FlammeEndpoint<RotateSecretRequest, SecretModel>
 {
     public override void Configure()
     {
         Post("/secrets/{name}/rotate");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Write);
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Write);
     }
 
     public override async Task HandleAsync(RotateSecretRequest request, CancellationToken cancellationToken)

@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 internal sealed class MutableOptionsMonitor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T value) : IOptionsMonitor<T>
 {

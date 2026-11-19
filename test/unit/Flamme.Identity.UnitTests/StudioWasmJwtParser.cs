@@ -2,7 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-namespace Elsa.Identity.UnitTests;
+namespace Flamme.Identity.UnitTests;
 
 /// <summary>
 /// Mirrors <c>Elsa.Studio.Authentication.ElsaIdentity.Services.JwtParser</c> on elsa-studio

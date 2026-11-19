@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Options;
+namespace Flamme.Alterations.Core.Options;
 
 /// <summary>
 /// Options for the Alteration module.

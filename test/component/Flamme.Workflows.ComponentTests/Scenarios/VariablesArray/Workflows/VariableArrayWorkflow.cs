@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Scenarios.VariablesArray.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Scenarios.VariablesArray.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.VariablesArray.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.VariablesArray.Workflows;
 
 public class VariableArrayWorkflow : WorkflowBase
 {

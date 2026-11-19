@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
 
 public class TestHandler : 
     INotificationHandler<WorkflowDefinitionDispatching>, 

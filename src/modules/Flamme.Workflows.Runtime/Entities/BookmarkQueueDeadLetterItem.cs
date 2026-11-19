@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.Runtime.Entities;
+namespace Flamme.Workflows.Runtime.Entities;
 
 /// <summary>
 /// Represents a bookmark queue item that was moved out of the active queue for operator inspection.

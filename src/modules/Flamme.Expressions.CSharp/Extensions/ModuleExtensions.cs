@@ -1,9 +1,9 @@
-using Elsa.Expressions.CSharp.Features;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Features.Services;
+using Flamme.Expressions.CSharp.Features;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Features.Services;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="IModule"/> that installs the <see cref="CSharpFeature"/> feature.

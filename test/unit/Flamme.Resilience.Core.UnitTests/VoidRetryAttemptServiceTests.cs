@@ -1,8 +1,8 @@
-using Elsa.Resilience.Entities;
-using Elsa.Resilience.Models;
+using Flamme.Resilience.Entities;
+using Flamme.Resilience.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class VoidRetryAttemptServiceTests
 {

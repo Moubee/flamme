@@ -1,10 +1,10 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Provides extension methods for <see cref="IServiceProvider"/>.

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Contains extension methods for <see cref="DbContextOptionsBuilder"/>.
@@ -13,9 +13,9 @@ public static class DbContextOptionsBuilderExtensions
     /// <summary>
     /// Configures Entity Framework Core with PostgreSQL.
     /// </summary>
-    public static DbContextOptionsBuilder UseElsaPostgreSql(this DbContextOptionsBuilder builder, Assembly migrationsAssembly, string connectionString, ElsaDbContextOptions? options = null, Action<NpgsqlDbContextOptionsBuilder>? configure = null) =>
+    public static DbContextOptionsBuilder UseFlammePostgreSql(this DbContextOptionsBuilder builder, Assembly migrationsAssembly, string connectionString, FlammeDbContextOptions? options = null, Action<NpgsqlDbContextOptionsBuilder>? configure = null) =>
         builder
-            .UseElsaDbContextOptions(options)
+            .UseFlammeDbContextOptions(options)
             .UseNpgsql(connectionString, db =>
             {
                 db

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 /// <summary>
 /// Represents an exception that occurred during workflow execution.

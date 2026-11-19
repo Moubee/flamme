@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Scheduling.Activities;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Scheduling.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Looping.ForEach.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Looping.ForEach.Workflows;
 
 public class ForEachWorkflow : WorkflowBase
 {

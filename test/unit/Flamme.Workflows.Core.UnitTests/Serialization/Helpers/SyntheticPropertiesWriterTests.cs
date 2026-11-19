@@ -1,15 +1,15 @@
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.Helpers;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Serialization.Helpers;
+namespace Flamme.Workflows.Core.UnitTests.Serialization.Helpers;
 
 public sealed class SyntheticPropertiesWriterTests
 {

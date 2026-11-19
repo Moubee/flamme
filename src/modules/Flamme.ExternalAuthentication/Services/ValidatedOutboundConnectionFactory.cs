@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Validation;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Pins each outbound connection to an address that was resolved and validated at connection time.

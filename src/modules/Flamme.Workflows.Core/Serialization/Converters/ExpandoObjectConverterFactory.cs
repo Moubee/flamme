@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// A JSON converter factory that creates <see cref="ExpandoObjectConverter"/> instances.

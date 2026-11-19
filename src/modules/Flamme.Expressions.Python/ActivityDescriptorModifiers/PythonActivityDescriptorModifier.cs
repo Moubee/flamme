@@ -1,9 +1,9 @@
-using Elsa.Expressions.Python.Options;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Python.Options;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Python.ActivityDescriptorModifiers;
+namespace Flamme.Expressions.Python.ActivityDescriptorModifiers;
 
 internal class PythonActivityDescriptorModifier(IOptions<PythonOptions> options) : IActivityDescriptorModifier
 {

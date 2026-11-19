@@ -1,6 +1,6 @@
 using Medallion.Threading;
 
-namespace Elsa.Common.DistributedHosting.DistributedLocks;
+namespace Flamme.Common.DistributedHosting.DistributedLocks;
 
 /// <summary>
 /// Represents a Noop distributed synchronization handle. This handle is used in the NoopDistributedLock implementation

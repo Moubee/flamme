@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Options;
+namespace Flamme.Workflows.Runtime.UnitTests.Options;
 
 public class GracefulShutdownOptionsValidationTests
 {

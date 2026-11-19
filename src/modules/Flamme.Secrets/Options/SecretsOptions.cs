@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Options;
+namespace Flamme.Secrets.Options;
 
 public class SecretsOptions
 {

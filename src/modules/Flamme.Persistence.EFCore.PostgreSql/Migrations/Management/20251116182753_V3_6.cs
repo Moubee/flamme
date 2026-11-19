@@ -2,15 +2,15 @@
 
 #nullable disable
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Migrations.Management
+namespace Flamme.Persistence.EFCore.PostgreSql.Migrations.Management
 {
     /// <inheritdoc />
     public partial class V3_6 : Migration
     {
-        private readonly Elsa.Persistence.EFCore.IElsaDbContextSchema _schema;
+        private readonly Flamme.Persistence.EFCore.IFlammeDbContextSchema _schema;
 
         /// <inheritdoc />
-        public V3_6(Elsa.Persistence.EFCore.IElsaDbContextSchema schema)
+        public V3_6(Flamme.Persistence.EFCore.IFlammeDbContextSchema schema)
         {
             _schema = schema;
         }

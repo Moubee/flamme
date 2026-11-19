@@ -1,6 +1,6 @@
-﻿using Elsa.Tenants.Features;
+﻿using Flamme.Tenants.Features;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 /// <summary>
 /// Provides extensions to various management related features.

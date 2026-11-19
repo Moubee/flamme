@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
 
 /// <summary>
 /// Searches the minimal tenant-scoped user picker data used for external identity links.

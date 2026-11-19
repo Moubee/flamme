@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Filters;
+namespace Flamme.Workflows.Runtime.Filters;
 
 /// <summary>
 /// Represents a filter for triggers.

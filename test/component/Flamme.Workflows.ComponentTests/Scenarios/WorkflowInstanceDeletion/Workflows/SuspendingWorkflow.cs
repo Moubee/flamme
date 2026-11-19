@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
 
 /// <summary>
 /// A workflow that uses a long-running activity to test deletion during active execution.

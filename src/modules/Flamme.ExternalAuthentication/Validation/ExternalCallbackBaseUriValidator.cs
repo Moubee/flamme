@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Validation;
+namespace Flamme.ExternalAuthentication.Validation;
 
 /// <summary>Validates the deployment-owned public callback base used by upstream identity providers.</summary>
 public static class ExternalCallbackBaseUriValidator

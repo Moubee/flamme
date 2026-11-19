@@ -1,19 +1,19 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Http.Bookmarks;
-using Elsa.Http.Extensions;
-using Elsa.Http.UIHints;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Http.Bookmarks;
+using Flamme.Http.Extensions;
+using Flamme.Http.UIHints;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Wait for an inbound HTTP request that matches the specified path and methods.
@@ -182,7 +182,7 @@ public class HttpEndpoint : Trigger<HttpRequest>
     {
         var path = Path.Get(context);
         var methods = SupportedMethods.GetOrDefault(context) ?? new List<string> { HttpMethods.Get };
-        await context.WaitForHttpRequestAsync(path, methods, OnResumeAsync, Elsa.Http.HttpStimulusNames.HttpEndpoint);
+        await context.WaitForHttpRequestAsync(path, methods, OnResumeAsync, Flamme.Http.HttpStimulusNames.HttpEndpoint);
     }
 
     private async ValueTask OnResumeAsync(ActivityExecutionContext context)

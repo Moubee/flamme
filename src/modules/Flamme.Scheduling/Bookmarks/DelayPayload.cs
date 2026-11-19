@@ -1,6 +1,6 @@
-using Elsa.Scheduling.Activities;
+using Flamme.Scheduling.Activities;
 
-namespace Elsa.Scheduling.Bookmarks;
+namespace Flamme.Scheduling.Bookmarks;
 
 /// <summary>
 /// A bookmark payload for <see cref="Delay"/>.

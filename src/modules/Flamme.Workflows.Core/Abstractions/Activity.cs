@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Behaviors;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Extensions;
+using Flamme.Workflows.Behaviors;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Base class for custom activities.

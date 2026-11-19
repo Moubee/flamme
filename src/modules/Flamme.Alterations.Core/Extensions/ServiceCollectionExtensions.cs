@@ -1,11 +1,11 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Options;
-using Elsa.Alterations.Core.Serialization;
-using Elsa.Alterations.Core.Services;
-using Elsa.Extensions;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Options;
+using Flamme.Alterations.Core.Serialization;
+using Flamme.Alterations.Core.Services;
+using Flamme.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.Core.Extensions;
+namespace Flamme.Alterations.Core.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.
@@ -13,7 +13,7 @@ namespace Elsa.Alterations.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the core Elsa alterations services.
+    /// Adds the core Flamme alterations services.
     /// </summary>
     public static IServiceCollection AddAlterationsCore(this IServiceCollection services)
     {

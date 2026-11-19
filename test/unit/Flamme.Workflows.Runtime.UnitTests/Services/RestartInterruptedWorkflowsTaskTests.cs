@@ -1,16 +1,16 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Tasks;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Tasks;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class RestartInterruptedWorkflowsTaskTests
 {
@@ -36,7 +36,7 @@ public class RestartInterruptedWorkflowsTaskTests
         Mock.Get(tenantService).FindAsync("tenant-b", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-b", Name = "Tenant B" });
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
-                        (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                        (global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Flamme.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
                         {
                             var pageArgs = __arg1;
                             var items = pageArgs.Offset == 0 ? workflowInstances : new List<WorkflowInstanceSummary>();
@@ -80,7 +80,7 @@ public class RestartInterruptedWorkflowsTaskTests
         timeProvider.SetUtcNow(now);
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
-                        (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                        (global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Flamme.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
                         {
                             var pageArgs = __arg1;
                             var items = pageArgs.Offset == 0 ? workflowInstances : new List<WorkflowInstanceSummary>();
@@ -124,7 +124,7 @@ public class RestartInterruptedWorkflowsTaskTests
         Mock.Get(tenantService).FindAsync("tenant-b", Arg.Any<CancellationToken>()).Returns(new Tenant { Id = "tenant-b", Name = "Tenant B" });
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
-                        (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                        (global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Flamme.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
                         {
                             var pageArgs = __arg1;
                             var items = pageArgs.Offset == 0 ? workflowInstances : new List<WorkflowInstanceSummary>();
@@ -160,7 +160,7 @@ public class RestartInterruptedWorkflowsTaskTests
         timeProvider.SetUtcNow(now);
         Mock.Get(workflowInstanceStore).SummarizeManyAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<PageArgs>(), Arg.Any<CancellationToken>())
                     .Returns(
-                        (global::Elsa.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Elsa.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
+                        (global::Flamme.Workflows.Management.Filters.WorkflowInstanceFilter __arg0, global::Flamme.Common.Models.PageArgs __arg1, global::System.Threading.CancellationToken __arg2) =>
                         {
                             var pageArgs = __arg1;
                             var items = pageArgs.Offset == 0 ? workflowInstances : new List<WorkflowInstanceSummary>();

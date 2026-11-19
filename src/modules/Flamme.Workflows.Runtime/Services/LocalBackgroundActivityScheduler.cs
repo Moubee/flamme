@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Invokes activities from a background worker within the context of its workflow instance using a local background worker.

@@ -1,19 +1,19 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.GetById;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.GetById;
 
 [PublicAPI]
-internal class GetById(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker) : ElsaEndpoint<Request>
+internal class GetById(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker) : FlammeEndpoint<Request>
 {
     public override void Configure()
     {
         Get("/workflow-definitions/by-id/{id}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
         Options(x => x.WithName("GetWorkflowDefinitionById"));
     }
 

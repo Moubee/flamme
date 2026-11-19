@@ -1,12 +1,12 @@
-using Elsa.Common.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowInstanceName;
 
 public class WorkflowInstanceNameTests : IAsyncDisposable
 {

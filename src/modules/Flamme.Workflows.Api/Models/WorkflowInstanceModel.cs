@@ -1,6 +1,6 @@
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 /// <summary>
 /// Represents a workflow instance.

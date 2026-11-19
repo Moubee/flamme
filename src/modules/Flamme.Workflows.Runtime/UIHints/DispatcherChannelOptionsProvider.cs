@@ -1,9 +1,9 @@
 using System.Reflection;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.UIHints.Dropdown;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.UIHints.Dropdown;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.UIHints;
+namespace Flamme.Workflows.Runtime.UIHints;
 
 /// <summary>
 /// Provides options for activities that dispatch workflows to channels.

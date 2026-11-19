@@ -3,27 +3,27 @@ using Microsoft.Extensions.Time.Testing;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Elsa;
-using Elsa.Authorization;
-using Elsa.Common.Services;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Features;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Models;
-using Elsa.Identity.Permissions;
-using Elsa.UnitTests.Shared;
+using Flamme;
+using Flamme.Authorization;
+using Flamme.Common.Services;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Features;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Models;
+using Flamme.Identity.Permissions;
+using Flamme.UnitTests.Shared;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Identity.UnitTests.Endpoints;
+namespace Flamme.Identity.UnitTests.Endpoints;
 
 /// <summary>
-/// A zero-grant user's Elsa tokens must carry a surviving <c>permissions</c> claim so Studio can tell
+/// A zero-grant user's Flamme tokens must carry a surviving <c>permissions</c> claim so Studio can tell
 /// "known empty" from "unknown", while gated endpoints stay 403.
 /// </summary>
 [NotInParallel(nameof(FastEndpointsCollection))]
@@ -53,16 +53,16 @@ public sealed class EmptyPermissionsClaimTests
 
         builder.Services
             .AddSingleton<TimeProvider>(new FakeTimeProvider(DateTimeOffset.UtcNow))
-            .AddElsaAuthorization()
+            .AddFlammeAuthorization()
             .AddPermissionDescriptors<IdentityPermissionsDescriptorProvider>()
             .AddScoped<IUserCredentialsValidator, NameOnlyCredentialsValidator>()
             .AddFastEndpoints(options =>
             {
                 options.Assemblies = [typeof(IdentityFeature).Assembly];
-                options.Filter = x => x.Namespace is "Elsa.Identity.Endpoints.Login"
-                    or "Elsa.Identity.Endpoints.RefreshToken"
-                    or "Elsa.Identity.Endpoints.Me.Permissions"
-                    or "Elsa.Identity.Endpoints.Users.List";
+                options.Filter = x => x.Namespace is "Flamme.Identity.Endpoints.Login"
+                    or "Flamme.Identity.Endpoints.RefreshToken"
+                    or "Flamme.Identity.Endpoints.Me.Permissions"
+                    or "Flamme.Identity.Endpoints.Users.List";
             });
 
         _app = builder.Build();

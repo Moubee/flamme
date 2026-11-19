@@ -1,12 +1,12 @@
-using Elsa.ExternalAuthentication.Options;
-using Elsa.Common.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.Common.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.Features;
+namespace Flamme.ExternalAuthentication.Features;
 
 [DependsOn(typeof(TimeProviderFeature))]
 public sealed class ExternalAuthenticationFeature(IModule module) : FeatureBase(module)

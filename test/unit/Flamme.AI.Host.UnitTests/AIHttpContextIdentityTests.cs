@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using Elsa;
-using Elsa.AI.Host.Endpoints.AI;
+using Flamme;
+using Flamme.AI.Host.Endpoints.AI;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.AI.Host.UnitTests;
+namespace Flamme.AI.Host.UnitTests;
 
 public class AIHttpContextIdentityTests
 {

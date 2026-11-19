@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace Elsa.Common.Codecs;
+namespace Flamme.Common.Codecs;
 
 /// <summary>
 /// Represents a GZip compression strategy.

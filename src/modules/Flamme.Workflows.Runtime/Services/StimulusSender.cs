@@ -1,10 +1,10 @@
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Results;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Results;
 using Microsoft.Extensions.Logging;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class StimulusSender(

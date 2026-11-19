@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 /// <summary>
 /// Represents a workflow state that can be exported and imported.

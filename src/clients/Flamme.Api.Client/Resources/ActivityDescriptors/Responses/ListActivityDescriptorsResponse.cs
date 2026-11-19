@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.ActivityDescriptors.Models;
+using Flamme.Api.Client.Resources.ActivityDescriptors.Models;
 
-namespace Elsa.Api.Client.Resources.ActivityDescriptors.Responses;
+namespace Flamme.Api.Client.Resources.ActivityDescriptors.Responses;
 
 /// <summary>
 /// Represents a response from listing activity descriptors.

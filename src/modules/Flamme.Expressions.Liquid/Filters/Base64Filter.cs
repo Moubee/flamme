@@ -1,11 +1,11 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using Elsa.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Liquid.Contracts;
 using Fluid;
 using Fluid.Values;
 
-namespace Elsa.Expressions.Liquid.Filters;
+namespace Flamme.Expressions.Liquid.Filters;
 
 /// <summary>
 /// A liquid filter that converts a value into a base 64 string representation.

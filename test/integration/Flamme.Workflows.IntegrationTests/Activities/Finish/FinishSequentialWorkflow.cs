@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Activities;
+namespace Flamme.Workflows.IntegrationTests.Activities;
 
 public class FinishSequentialWorkflow : WorkflowBase
 {

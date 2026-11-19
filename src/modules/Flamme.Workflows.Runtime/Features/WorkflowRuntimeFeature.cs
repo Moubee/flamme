@@ -1,39 +1,39 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Elsa.Common;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.Features;
-using Elsa.Common.RecurringTasks;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Features;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Contracts;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.Runtime.Bookmarks;
-using Elsa.Workflows.Runtime.Discovery;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Handlers;
-using Elsa.Workflows.Runtime.Models;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Providers;
-using Elsa.Workflows.Runtime.Stimuli;
-using Elsa.Workflows.Runtime.Stores;
-using Elsa.Workflows.Runtime.Tasks;
-using Elsa.Workflows.Runtime.UIHints;
+using Flamme.Common;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.Features;
+using Flamme.Common.RecurringTasks;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Features;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Contracts;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Runtime.Bookmarks;
+using Flamme.Workflows.Runtime.Discovery;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Handlers;
+using Flamme.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Providers;
+using Flamme.Workflows.Runtime.Stimuli;
+using Flamme.Workflows.Runtime.Stores;
+using Flamme.Workflows.Runtime.Tasks;
+using Flamme.Workflows.Runtime.UIHints;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Runtime.Features;
+namespace Flamme.Workflows.Runtime.Features;
 
 /// <summary>
 /// Installs and configures workflow runtime features.
@@ -248,7 +248,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
         {
             // ExecutionCycleAwareCommitStateHandler decorates DefaultCommitStateHandler — disposes the execution cycle handle AFTER
             // commit so the drain orchestrator's await-disposed sequencing can land its Interrupted write last.
-            workflows.CommitStateHandler = sp => sp.GetRequiredService<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>();
+            workflows.CommitStateHandler = sp => sp.GetRequiredService<Flamme.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>();
         });
 
         Services.Configure<RecurringTaskOptions>(options =>
@@ -281,33 +281,33 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
 
         // Graceful-shutdown core (US1 — quiescence machinery).
         Services
-            .AddSingleton<IQuiescenceSignal>(sp => new Elsa.Workflows.Runtime.Services.QuiescenceSignal(
+            .AddSingleton<IQuiescenceSignal>(sp => new Flamme.Workflows.Runtime.Services.QuiescenceSignal(
                 sp.GetRequiredService<IOptions<GracefulShutdownOptions>>(),
                 sp.GetRequiredService<TimeProvider>(),
                 sp.GetRequiredService<IExecutionCycleRegistry>(),
                 sp.GetRequiredService<IServiceScopeFactory>()))
-            .AddSingleton<IIngressSourceRegistry, Elsa.Workflows.Runtime.Services.IngressSourceRegistry>()
-            .AddSingleton<IExecutionCycleRegistry, Elsa.Workflows.Runtime.Services.ExecutionCycleRegistry>()
+            .AddSingleton<IIngressSourceRegistry, Flamme.Workflows.Runtime.Services.IngressSourceRegistry>()
+            .AddSingleton<IExecutionCycleRegistry, Flamme.Workflows.Runtime.Services.ExecutionCycleRegistry>()
             // Lazy collection breaks the otherwise-circular DI chain QuiescenceSignal → IExecutionCycleRegistry →
             // IIngressSourceRegistry → IEnumerable<IIngressSource> → IQuiescenceSignal. Adapters take a direct
             // IQuiescenceSignal dependency; the registry materializes the collection on first read.
             .AddSingleton(sp => new Lazy<IEnumerable<IIngressSource>>(sp.GetServices<IIngressSource>))
             // Drain orchestrator + hosted service (US1). See FR-029 / R5 — heartbeat must outlive drain.
-            .AddSingleton<IDrainOrchestrator, Elsa.Workflows.Runtime.Services.DrainOrchestrator>()
-            .AddHostedService<Elsa.Workflows.Runtime.HostedServices.DrainOrchestratorHostedService>()
+            .AddSingleton<IDrainOrchestrator, Flamme.Workflows.Runtime.Services.DrainOrchestrator>()
+            .AddHostedService<Flamme.Workflows.Runtime.HostedServices.DrainOrchestratorHostedService>()
             // Domain service that backs all runtime-admin transports (US2). Encapsulates the audit-on-effective-
             // transition rule (SC-007) so transports stay thin. Scoped because INotificationSender is scoped.
-            .AddScoped<IWorkflowRuntimeAdminService, Elsa.Workflows.Runtime.Services.WorkflowRuntimeAdminService>()
+            .AddScoped<IWorkflowRuntimeAdminService, Flamme.Workflows.Runtime.Services.WorkflowRuntimeAdminService>()
             // Interrupted-workflow recovery on shell activation (US3). Disjoint from the timeout-based
             // RestartInterruptedWorkflowsTask: filter is SubStatus = Interrupted AND Status = Running;
             // that task's filter is IsExecuting=true.
-            .AddScoped<IInterruptedRecoveryScanner, Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>()
-            .AddStartupTask<Elsa.Workflows.Runtime.StartupTasks.RecoverInterruptedWorkflowsStartupTask>()
+            .AddScoped<IInterruptedRecoveryScanner, Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>()
+            .AddStartupTask<Flamme.Workflows.Runtime.StartupTasks.RecoverInterruptedWorkflowsStartupTask>()
             // Internal bookmark-queue processor surfaced as an ingress source for diagnostic visibility (FR-006).
             // Pause behavior is enforced inside BookmarkQueueProcessor via IQuiescenceSignal (FR-024).
-            .AddSingleton<IIngressSource, Elsa.Workflows.Runtime.IngressSources.InternalBookmarkQueueIngressSource>()
+            .AddSingleton<IIngressSource, Flamme.Workflows.Runtime.IngressSources.InternalBookmarkQueueIngressSource>()
             // Re-applies persisted pause state on activation when PausePersistence = AcrossReactivations (FR-028).
-            .AddStartupTask<Elsa.Workflows.Runtime.StartupTasks.InitializePauseStateStartupTask>();
+            .AddStartupTask<Flamme.Workflows.Runtime.StartupTasks.InitializePauseStateStartupTask>();
 
         Services
             // Core.
@@ -373,7 +373,7 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
             .AddScoped<INotificationSender, WorkflowCommitNotificationSender>()
             .AddScoped<IWorkflowCommitTransaction, NoopWorkflowCommitTransaction>()
             .AddScoped<DefaultCommitStateHandler>()
-            .AddScoped<Elsa.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>()
+            .AddScoped<Flamme.Workflows.Runtime.Services.ExecutionCycleAwareCommitStateHandler>()
             .AddScoped<WorkflowHeartbeatGeneratorFactory>()
 
             // Deprecated services.

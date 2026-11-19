@@ -1,13 +1,13 @@
 using System.Net;
-using Elsa.Activities.UnitTests.Http.Helpers;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using static Elsa.Activities.UnitTests.Http.Helpers.SendHttpRequestTestHelpers;
+using Flamme.Activities.UnitTests.Http.Helpers;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using static Flamme.Activities.UnitTests.Http.Helpers.SendHttpRequestTestHelpers;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class DownloadHttpFileTests
 {

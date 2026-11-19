@@ -1,4 +1,4 @@
-namespace Elsa.AI.Persistence.EFCore.Entities;
+namespace Flamme.AI.Persistence.EFCore.Entities;
 
 public class AIConversationRecord
 {

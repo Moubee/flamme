@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Generates a unique identifier using a random long value.

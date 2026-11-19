@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Memory;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.VariableTypes;
+namespace Flamme.Workflows.IntegrationTests.Serialization.VariableTypes;
 
 public class Tests : IAsyncDisposable
 {

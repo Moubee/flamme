@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Mediator.Middleware.Command;
+namespace Flamme.Mediator.Middleware.Command;
 
 /// <summary>
 /// Provides context for a command.

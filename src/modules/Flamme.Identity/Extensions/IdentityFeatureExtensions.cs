@@ -1,7 +1,7 @@
-using Elsa.Identity.Features;
+using Flamme.Identity.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IdentityFeature"/>.

@@ -1,15 +1,15 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Signals;
-using Elsa.Workflows.UIHints;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Signals;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Signals the current composite activity to complete itself as a whole.

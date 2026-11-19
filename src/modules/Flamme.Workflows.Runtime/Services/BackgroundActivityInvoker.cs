@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime.Middleware.Activities;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime.Middleware.Activities;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// An activity invoker that invokes activities detached from the workflow. This is useful for invoking activities from a background worker.

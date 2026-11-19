@@ -1,13 +1,13 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management.Activities.HostMethod;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Providers;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management.Activities.HostMethod;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Providers;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Management.UnitTests.Services;
+namespace Flamme.Workflows.Management.UnitTests.Services;
 
 public class ActivityRegistryPopulatorTests
 {

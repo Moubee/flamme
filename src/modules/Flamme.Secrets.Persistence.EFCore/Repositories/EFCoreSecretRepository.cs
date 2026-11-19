@@ -1,22 +1,22 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Tenants.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.Persistence.EFCore.Repositories;
+namespace Flamme.Secrets.Persistence.EFCore.Repositories;
 
 public class EFCoreSecretRepository(
-    Store<SecretsElsaDbContext, Secret> store,
+    Store<SecretsFlammeDbContext, Secret> store,
     ISecretNameValidator secretNameValidator,
     IOptions<TenantsOptions>? tenantsOptions = null) : ISecretRepository
 {
     private readonly bool? _tenancyEnabled = tenantsOptions?.Value.IsEnabled;
 
     // Keep the pre-tenancy constructor in the public binary surface.
-    public EFCoreSecretRepository(Store<SecretsElsaDbContext, Secret> store, ISecretNameValidator secretNameValidator)
+    public EFCoreSecretRepository(Store<SecretsFlammeDbContext, Secret> store, ISecretNameValidator secretNameValidator)
         : this(store, secretNameValidator, null)
     {
     }
@@ -137,13 +137,13 @@ public class EFCoreSecretRepository(
         target.Versions = source.Versions.ToList();
     }
 
-    private Task<Secret?> FindByNameAsync(SecretsElsaDbContext dbContext, string name, CancellationToken cancellationToken)
+    private Task<Secret?> FindByNameAsync(SecretsFlammeDbContext dbContext, string name, CancellationToken cancellationToken)
     {
         var normalizedName = secretNameValidator.Normalize(name);
         return dbContext.Secrets.FirstOrDefaultAsync(x => EF.Property<string>(x, SecretShadowPropertyNames.NormalizedName) == normalizedName, cancellationToken);
     }
 
-    private bool IsTenancyEnabled(SecretsElsaDbContext dbContext)
+    private bool IsTenancyEnabled(SecretsFlammeDbContext dbContext)
     {
         if (_tenancyEnabled.HasValue)
             return _tenancyEnabled.Value;
@@ -156,7 +156,7 @@ public class EFCoreSecretRepository(
 #endif
     }
 
-    private static Task<bool> ExistsByNormalizedNameAsync(SecretsElsaDbContext dbContext, string normalizedName, CancellationToken cancellationToken)
+    private static Task<bool> ExistsByNormalizedNameAsync(SecretsFlammeDbContext dbContext, string normalizedName, CancellationToken cancellationToken)
     {
         return dbContext.Secrets.AnyAsync(x => EF.Property<string>(x, SecretShadowPropertyNames.NormalizedName) == normalizedName, cancellationToken);
     }
@@ -164,7 +164,7 @@ public class EFCoreSecretRepository(
     // The DbUpdateException-to-name-conflict translation below relies on the (TenantId, NormalizedName)
     // unique index. Default-tenant writes are stamped with an empty TenantId before saving so the index
     // provides the same concurrency backstop when multitenancy is disabled. See doc/migrations/secrets-tenancy.md.
-    private async Task SaveChangesAsync(SecretsElsaDbContext dbContext, string name, CancellationToken cancellationToken)
+    private async Task SaveChangesAsync(SecretsFlammeDbContext dbContext, string name, CancellationToken cancellationToken)
     {
         try
         {
@@ -179,7 +179,7 @@ public class EFCoreSecretRepository(
         }
     }
 
-    private async Task<bool> TrySaveChangesAsync(SecretsElsaDbContext dbContext, string name, CancellationToken cancellationToken)
+    private async Task<bool> TrySaveChangesAsync(SecretsFlammeDbContext dbContext, string name, CancellationToken cancellationToken)
     {
         try
         {
@@ -201,7 +201,7 @@ public class EFCoreSecretRepository(
         return await ExistsByNormalizedNameAsync(dbContext, secretNameValidator.Normalize(name), cancellationToken);
     }
 
-    private void SetNormalizedName(SecretsElsaDbContext dbContext, Secret secret)
+    private void SetNormalizedName(SecretsFlammeDbContext dbContext, Secret secret)
     {
         dbContext.Entry(secret).Property(SecretShadowPropertyNames.NormalizedName).CurrentValue = secretNameValidator.Normalize(secret.Name);
     }
@@ -210,7 +210,7 @@ public class EFCoreSecretRepository(
     /// Default-tenant uniqueness uses <see cref="Tenant.DefaultTenantId"/> (<c>""</c>), not null.
     /// Named and agnostic ambient tenants are left for <c>ApplyTenantId</c>.
     /// </summary>
-    private static void AssignDefaultTenantId(Secret secret, SecretsElsaDbContext dbContext)
+    private static void AssignDefaultTenantId(Secret secret, SecretsFlammeDbContext dbContext)
     {
         if (secret.TenantId is not null)
             return;

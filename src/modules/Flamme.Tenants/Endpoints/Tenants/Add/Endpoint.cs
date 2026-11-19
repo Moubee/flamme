@@ -1,18 +1,18 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Serialization;
-using Elsa.Workflows;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Serialization;
+using Flamme.Workflows;
 
-namespace Elsa.Tenants.Endpoints.Tenants.Add;
+namespace Flamme.Tenants.Endpoints.Tenants.Add;
 
-public class Endpoint(ITenantService tenantService, IIdentityGenerator identityGenerator, ITenantStore tenantStore) : ElsaEndpoint<NewTenant, Tenant>
+public class Endpoint(ITenantService tenantService, IIdentityGenerator identityGenerator, ITenantStore tenantStore) : FlammeEndpoint<NewTenant, Tenant>
 {
     public override void Configure()
     {
         Post("/tenants");
-        RequirePermission(Elsa.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.Write);
+        RequirePermission(Flamme.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.Write);
     }
 
     public override async Task HandleAsync(NewTenant req, CancellationToken ct)

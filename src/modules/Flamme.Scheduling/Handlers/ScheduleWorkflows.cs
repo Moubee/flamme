@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Scheduling.Handlers;
+namespace Flamme.Scheduling.Handlers;
 
 /// <summary>
 /// Updates scheduled jobs based on updated workflow triggers and bookmarks.

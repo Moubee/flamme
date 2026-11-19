@@ -1,4 +1,4 @@
-namespace Elsa.Testing.Shared.Services;
+namespace Flamme.Testing.Shared.Services;
 
 public class WorkflowEvents
 {

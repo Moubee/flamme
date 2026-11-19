@@ -1,14 +1,14 @@
-﻿using Elsa.Http.Bookmarks;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Notifications;
+﻿using Flamme.Http.Bookmarks;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// A handler that invalidates the HTTP workflows cache when a workflow definition is published, retracted, or deleted or when triggers are indexed.

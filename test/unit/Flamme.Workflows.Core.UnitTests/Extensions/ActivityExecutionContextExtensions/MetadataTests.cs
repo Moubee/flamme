@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using static Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions.TestHelpers;
+using Flamme.Extensions;
+using static Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions.TestHelpers;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
 
 public class MetadataTests
 {

@@ -1,23 +1,23 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
-using Elsa.Identity.Contracts;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.Identity.Contracts;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Operations;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Operations;
 
 public class PreviewEndpointContractTests : WebApplicationTest<PreviewEndpointContractWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {

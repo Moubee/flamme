@@ -1,8 +1,8 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Builders;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Builders;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Abstractions;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Abstractions;
 
 /// <summary>
 /// A base class for function definition providers.

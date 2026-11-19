@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Common.Services;
+namespace Flamme.Common.Services;
 
 /// <inheritdoc />
 public class JsonFormatter : IFormatter

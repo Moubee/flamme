@@ -1,6 +1,6 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <summary>
 /// A general-purpose downloader of files from a given URL that uses <see cref="HttpClient"/>.

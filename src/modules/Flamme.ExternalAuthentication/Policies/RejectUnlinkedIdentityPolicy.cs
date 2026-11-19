@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Policies;
+namespace Flamme.ExternalAuthentication.Policies;
 
 /// <summary>
 /// Safely rejects external identities that have no explicit link.

@@ -1,8 +1,8 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
-using Elsa.Common.Models;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
+using Flamme.Common.Models;
 
-namespace Elsa.AI.Host.Tools.Runtime;
+namespace Flamme.AI.Host.Tools.Runtime;
 
 public class InstancesSearchTool(IServiceProvider serviceProvider, RuntimeGroundingMapper mapper, AIGroundingResultFormatter formatter) : RuntimeToolBase(serviceProvider, formatter)
 {

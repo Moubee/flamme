@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 internal class WorkflowExecutionState : IDisposable
 {

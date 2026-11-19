@@ -1,13 +1,13 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Secrets.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Secrets.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 /// <summary>
 /// Shared File / InMemory / EF Core store-contract assertions for secret repositories.
 /// Covers per-tenant name uniqueness and ambient-tenant isolation on the existing
-/// <see cref="Elsa.Secrets.Contracts.ISecretRepository"/> surface.
+/// <see cref="Flamme.Secrets.Contracts.ISecretRepository"/> surface.
 /// </summary>
 public abstract class SecretRepositoryConformanceTests
 {

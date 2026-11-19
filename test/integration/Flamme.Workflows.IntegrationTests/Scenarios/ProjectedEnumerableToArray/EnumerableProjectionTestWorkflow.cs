@@ -1,9 +1,9 @@
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
 
 /// <summary>
 /// Code-first workflow that reproduces the "projected IEnumerable to array" scenario end-to-end.

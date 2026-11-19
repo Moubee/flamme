@@ -1,7 +1,7 @@
 using Npgsql;
 using Testcontainers.PostgreSql;
 
-namespace Elsa.Testing.Shared.Databases;
+namespace Flamme.Testing.Shared.Databases;
 
 /// <summary>Creates an isolated PostgreSQL database, using a configured server or a shared test container.</summary>
 public sealed class PostgreSqlTestDatabase : IAsyncDisposable, IDisposable

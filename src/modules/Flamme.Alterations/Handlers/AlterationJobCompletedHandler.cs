@@ -1,9 +1,9 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Notifications;
-using Elsa.Mediator.Contracts;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Notifications;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Handlers;
+namespace Flamme.Alterations.Handlers;
 
 /// <summary>
 /// Handles <see cref="AlterationJobCompleted"/> notifications and updates the plan status if all jobs are completed.

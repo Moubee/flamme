@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Requests;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Requests;
 
 /// <summary>
 /// Represents a request to get a workflow definition.

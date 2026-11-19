@@ -1,6 +1,6 @@
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ActivityDescriptors.Requests;
+namespace Flamme.Api.Client.Resources.ActivityDescriptors.Requests;
 
 /// <summary>
 /// Represents a request to list activity descriptors.

@@ -1,9 +1,9 @@
-using Elsa.Caching;
-using Elsa.Testing.Shared.Services;
+using Flamme.Caching;
+using Flamme.Testing.Shared.Services;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Primitives;
 
-namespace Elsa.Workflows.ComponentTests.Decorators;
+namespace Flamme.Workflows.ComponentTests.Decorators;
 
 /// <summary>
 /// Provides a decorator for the `IChangeTokenSignaler` interface that triggers change token events.

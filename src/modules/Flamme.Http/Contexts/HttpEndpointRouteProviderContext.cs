@@ -1,7 +1,7 @@
-using Elsa.Http.Bookmarks;
+using Flamme.Http.Bookmarks;
 using JetBrains.Annotations;
 
-namespace Elsa.Http.Contexts;
+namespace Flamme.Http.Contexts;
 
 [UsedImplicitly]
 public record HttpEndpointRouteProviderContext(HttpEndpointBookmarkPayload Payload, string? TenantId, CancellationToken CancellationToken);

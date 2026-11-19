@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Helpers that record <c>WorkflowInterrupted</c> entries in the per-instance workflow execution log.

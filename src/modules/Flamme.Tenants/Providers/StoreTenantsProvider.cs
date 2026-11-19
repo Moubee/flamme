@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 
-namespace Elsa.Tenants.Providers;
+namespace Flamme.Tenants.Providers;
 
 [UsedImplicitly]
 public class StoreTenantsProvider(ITenantStore store) : ITenantsProvider

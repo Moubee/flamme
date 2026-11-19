@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Common.Multitenancy.HostedServices;
+namespace Flamme.Common.Multitenancy.HostedServices;
 
 [UsedImplicitly]
 public class ActivateTenants(ITenantService tenantService) : IHostedService

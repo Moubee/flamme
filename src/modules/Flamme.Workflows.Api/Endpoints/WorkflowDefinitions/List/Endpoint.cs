@@ -1,25 +1,25 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Models;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Exceptions;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Models;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Exceptions;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.List;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.List;
 
 [PublicAPI]
-internal class List(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker, IEnumerable<IWorkflowDefinitionFilterProvider>? filterProviders = null) : ElsaEndpoint<Request, PagedListResponse<LinkedWorkflowDefinitionSummary>>
+internal class List(IWorkflowDefinitionStore store, IWorkflowDefinitionLinker linker, IEnumerable<IWorkflowDefinitionFilterProvider>? filterProviders = null) : FlammeEndpoint<Request, PagedListResponse<LinkedWorkflowDefinitionSummary>>
 {
     public override void Configure()
     {
         Get("/workflow-definitions");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
     }
 
     public override async Task<PagedListResponse<LinkedWorkflowDefinitionSummary>> ExecuteAsync(Request request, CancellationToken cancellationToken)

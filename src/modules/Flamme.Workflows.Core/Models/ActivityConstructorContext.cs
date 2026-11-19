@@ -1,14 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Memory;
 using Humanizer;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 public record ActivityConstructorContext(ActivityDescriptor ActivityDescriptor, Func<Type, ActivityConstructionResult> ActivityFactory)
 {

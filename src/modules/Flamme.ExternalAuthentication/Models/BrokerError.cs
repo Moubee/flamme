@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Models;
+namespace Flamme.ExternalAuthentication.Models;
 
 /// <summary>
 /// The safe error categories that the external authentication broker may expose to a browser.

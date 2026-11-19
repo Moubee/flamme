@@ -1,22 +1,22 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
+using Flamme.Common.Multitenancy;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Roles.List;
+namespace Flamme.Identity.Endpoints.Roles.List;
 
 /// <summary>
 /// An endpoint that lists all roles.
 /// </summary>
 [PublicAPI]
-internal class List(IRoleStore roleStore, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest<Response>
+internal class List(IRoleStore roleStore, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest<Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/identity/roles");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.View);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.View);
     }
 
     /// <inheritdoc />

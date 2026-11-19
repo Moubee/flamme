@@ -1,15 +1,15 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Extensions;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Extensions;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Mediator.Contracts;
 using Humanizer;
 using JetBrains.Annotations;
 using Jint;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.JavaScript.Handlers;
+namespace Flamme.Expressions.JavaScript.Handlers;
 
 /// <summary>
 /// A handler that configures the Jint engine with workflow input and output accessors.

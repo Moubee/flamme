@@ -1,9 +1,9 @@
-using Elsa.Resilience.Models;
-using Elsa.Workflows;
+using Flamme.Resilience.Models;
+using Flamme.Workflows;
 using Polly.Retry;
 using Polly.Telemetry;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public class RetryTelemetryListener : TelemetryListener
 {

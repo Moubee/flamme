@@ -1,7 +1,7 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Enums;
 
-namespace Elsa.Alterations.Core.Filters;
+namespace Flamme.Alterations.Core.Filters;
 
 /// <summary>
 /// A filter for querying alteration jobs.

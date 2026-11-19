@@ -1,15 +1,15 @@
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.ActivationValidators;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.ActivationValidators;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.ActivationValidators;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.ActivationValidators;
 using Medallion.Threading;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class WorkflowActivationGate(

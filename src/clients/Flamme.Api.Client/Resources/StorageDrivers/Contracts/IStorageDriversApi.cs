@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.StorageDrivers.Responses;
+using Flamme.Api.Client.Resources.StorageDrivers.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.StorageDrivers.Contracts;
+namespace Flamme.Api.Client.Resources.StorageDrivers.Contracts;
 
 /// <summary>
 /// Represents a client for the storage drivers API.

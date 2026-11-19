@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Http.PortResolvers;
+namespace Flamme.Http.PortResolvers;
 
 /// <summary>
 /// Returns a list of outbound activities for a given <see cref="SendHttpRequest"/> activity's expected status codes.

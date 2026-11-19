@@ -1,17 +1,17 @@
 using System.Reflection;
 using System.Security.Claims;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Endpoints.AI.Tools;
-using Elsa.AI.Host.Options;
-using Elsa.Extensions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Endpoints.AI.Tools;
+using Flamme.AI.Host.Options;
+using Flamme.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
-using Request = Elsa.AI.Host.Endpoints.AI.Tools.Request;
-using ToolsEndpoint = Elsa.AI.Host.Endpoints.AI.Tools.Endpoint;
+using Request = Flamme.AI.Host.Endpoints.AI.Tools.Request;
+using ToolsEndpoint = Flamme.AI.Host.Endpoints.AI.Tools.Endpoint;
 
-namespace Elsa.AI.IntegrationTests;
+namespace Flamme.AI.IntegrationTests;
 
 public class AIToolsEndpointTests
 {

@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Http.UnitTests.Extensions;
+namespace Flamme.Http.UnitTests.Extensions;
 
 public class StringExtensionsTests
 {

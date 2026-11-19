@@ -2,7 +2,7 @@ using Jint;
 using Jint.Runtime.Interop;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="Jint.Options"/>.

@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Notifications;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class WorkflowValidator(INotificationSender notificationSender) : IWorkflowValidator

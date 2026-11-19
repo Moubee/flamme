@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class ActivityExecutionContextSchedulerStrategy : IActivityExecutionContextSchedulerStrategy

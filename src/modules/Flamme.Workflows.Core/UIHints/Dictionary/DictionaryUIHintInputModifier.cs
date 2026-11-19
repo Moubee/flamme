@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.UIHints.Dictionary;
+namespace Flamme.Workflows.UIHints.Dictionary;
 
 public class DictionaryUIHintInputModifier : IActivityDescriptorModifier
 {

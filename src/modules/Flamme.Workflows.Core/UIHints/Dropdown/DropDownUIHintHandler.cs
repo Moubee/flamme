@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.UIHints.Dropdown;
+namespace Flamme.Workflows.UIHints.Dropdown;
 
 /// <inheritdoc />
 public class DropDownUIHintHandler : IUIHintHandler

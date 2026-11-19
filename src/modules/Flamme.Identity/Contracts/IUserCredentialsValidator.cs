@@ -1,6 +1,6 @@
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Validates user credentials.

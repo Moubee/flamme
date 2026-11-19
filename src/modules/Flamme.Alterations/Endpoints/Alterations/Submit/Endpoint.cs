@@ -1,19 +1,19 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Models;
-using Elsa.Common;
-using Elsa.Workflows;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Models;
+using Flamme.Common;
+using Flamme.Workflows;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Alterations.Endpoints.Alterations.Submit;
+namespace Flamme.Alterations.Endpoints.Alterations.Submit;
 
 /// <summary>
 /// Submits an alteration plan to be executed targeting workflow instances by a filter.
 /// </summary>
 [PublicAPI]
-public class Submit : ElsaEndpoint<AlterationPlanParams, Response>
+public class Submit : FlammeEndpoint<AlterationPlanParams, Response>
 {
     private readonly IAlterationPlanScheduler _alterationPlanScheduler;
     private readonly IIdentityGenerator _identityGenerator;
@@ -31,7 +31,7 @@ public class Submit : ElsaEndpoint<AlterationPlanParams, Response>
     public override void Configure()
     {
         Post("/alterations/submit");
-        RequirePermission(Elsa.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
+        RequirePermission(Flamme.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
     }
 
     /// <inheritdoc />

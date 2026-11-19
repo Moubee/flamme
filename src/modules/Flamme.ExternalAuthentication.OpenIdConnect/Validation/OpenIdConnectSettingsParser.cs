@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.OpenIdConnect.Models;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.OpenIdConnect.Models;
 
-namespace Elsa.ExternalAuthentication.OpenIdConnect.Validation;
+namespace Flamme.ExternalAuthentication.OpenIdConnect.Validation;
 
 public sealed class OpenIdConnectSettingsParser
 {

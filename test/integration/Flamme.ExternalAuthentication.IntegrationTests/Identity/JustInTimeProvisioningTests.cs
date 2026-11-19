@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Testing.Shared.Multitenancy;
 using System.Text.Json;
-using Elsa.Common.Services;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Policies;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Services;
-using Elsa.Identity.Providers;
-using Elsa.Workflows;
+using Flamme.Common.Services;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Policies;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Services;
+using Flamme.Identity.Providers;
+using Flamme.Workflows;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Identity;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Identity;
 
 public class JustInTimeProvisioningTests
 {
@@ -109,7 +109,7 @@ public class JustInTimeProvisioningTests
         var provisioner = CreateInMemoryProvisioner(userStore, new SequenceIdentityGenerator("collision", "available", "user-1", "link-1"));
 
         var result = await provisioner.CreateLinkOrGetExistingAsync(CreateProvisioningRequest());
-        var user = await userStore.FindAsync(new Elsa.Identity.Models.UserFilter { Id = result.UserId });
+        var user = await userStore.FindAsync(new Flamme.Identity.Models.UserFilter { Id = result.UserId });
 
         await Assert.That(result.WasCreated).IsTrue();
         await Assert.That(user).IsNotNull();
@@ -127,7 +127,7 @@ public class JustInTimeProvisioningTests
         var provisioner = CreateInMemoryProvisioner(userStore, roleProvider: new StoreBasedRoleProvider(roleStore));
 
         var result = await provisioner.CreateLinkOrGetExistingAsync(CreateProvisioningRequest(defaultRoleIds: ["admin"]));
-        var user = await userStore.FindAsync(new Elsa.Identity.Models.UserFilter { Id = result.UserId });
+        var user = await userStore.FindAsync(new Flamme.Identity.Models.UserFilter { Id = result.UserId });
 
         await Assert.That(user).IsNotNull();
         await Assert.That(user.Roles).IsEquivalentTo(
@@ -153,11 +153,11 @@ public class JustInTimeProvisioningTests
     {
         var services = new ServiceCollection();
         services.AddSingleton<MemoryStore<User>>();
-        services.AddSingleton<IIdentityGenerator>(new Elsa.Workflows.GuidIdentityGenerator());
+        services.AddSingleton<IIdentityGenerator>(new Flamme.Workflows.GuidIdentityGenerator());
         services.AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero)));
         services.AddSingleton<IExternalAuthenticationHandleHasher, HmacExternalAuthenticationHandleHasher>();
         services.AddSingleton<InMemoryExternalIdentityProvisionerState>();
-        services.AddSingleton<Elsa.Common.Multitenancy.ITenantAccessor>(new TestTenantAccessor("tenant-a"));
+        services.AddSingleton<Flamme.Common.Multitenancy.ITenantAccessor>(new TestTenantAccessor("tenant-a"));
         services.AddScoped<IUserStore, MemoryUserStore>();
         services.AddScoped<IUserProvider, StoreBasedUserProvider>();
         services.AddSingleton<IRoleProvider>(IRoleProvider.Mock().Object);
@@ -192,7 +192,7 @@ public class JustInTimeProvisioningTests
         userStore,
         new StoreBasedUserProvider(userStore),
         roleProvider ?? IRoleProvider.Mock().Object,
-        identityGenerator ?? new Elsa.Workflows.GuidIdentityGenerator(),
+        identityGenerator ?? new Flamme.Workflows.GuidIdentityGenerator(),
         new FakeTimeProvider(DateTimeOffset.UtcNow),
         new HmacExternalAuthenticationHandleHasher(),
         new InMemoryExternalIdentityProvisionerState());
@@ -270,7 +270,7 @@ public class JustInTimeProvisioningTests
 
     private sealed class StaticUserProvider(User user) : IUserProvider
     {
-        public Task<User?> FindAsync(Elsa.Identity.Models.UserFilter filter, CancellationToken cancellationToken = default) => Task.FromResult<User?>(filter.Name == user.Name ? user : null);
+        public Task<User?> FindAsync(Flamme.Identity.Models.UserFilter filter, CancellationToken cancellationToken = default) => Task.FromResult<User?>(filter.Name == user.Name ? user : null);
     }
 
     private sealed class SequenceIdentityGenerator(params string[] ids) : IIdentityGenerator

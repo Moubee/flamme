@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Elsa.Api.Client.Resources.Alterations.Responses;
+namespace Flamme.Api.Client.Resources.Alterations.Responses;
 
 /// <summary>
 /// A plan that contains a list of alterations to be applied to a set of workflow instances.

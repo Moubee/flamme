@@ -1,15 +1,15 @@
 using System.Reflection;
 using System.Text.Json;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 using GitHub.Copilot;
 using Microsoft.Extensions.AI;
 
-namespace Elsa.AI.Copilot.Adapters;
+namespace Flamme.AI.Copilot.Adapters;
 
-public class ElsaCopilotToolFunction(AIToolDefinition definition, IAIProviderToolInvoker toolInvoker) : AIFunction
+public class FlammeCopilotToolFunction(AIToolDefinition definition, IAIProviderToolInvoker toolInvoker) : AIFunction
 {
-    private static readonly MethodInfo InvokeMethod = typeof(ElsaCopilotToolFunction).GetMethod(nameof(InvokeToolAsync), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static readonly MethodInfo InvokeMethod = typeof(FlammeCopilotToolFunction).GetMethod(nameof(InvokeToolAsync), BindingFlags.NonPublic | BindingFlags.Instance)!;
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private readonly JsonElement _jsonSchema = JsonSerializer.SerializeToElement(definition.Schema, SerializerOptions);
     private readonly IReadOnlyDictionary<string, object?> _additionalProperties = CreateAdditionalProperties(definition);

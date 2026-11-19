@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.Alterations.Enums;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.Alterations.Enums;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.Alterations.Models;
+namespace Flamme.Api.Client.Resources.Alterations.Models;
 
 /// <summary>
 /// Represents the execution of the plan for an individual workflow instance.

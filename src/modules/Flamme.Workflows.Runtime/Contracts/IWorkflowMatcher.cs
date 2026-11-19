@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a contract for finding triggers and bookmarks associated with workflow activities.

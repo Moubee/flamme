@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Http.Contexts;
-using Elsa.Http.Options;
+using Flamme.Extensions;
+using Flamme.Http.Contexts;
+using Flamme.Http.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <summary>
 /// Provides a route for an HTTP endpoint based on the specified context.

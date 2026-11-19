@@ -1,9 +1,9 @@
-﻿using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime.Notifications;
+﻿using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// A notification handler that invalidates the workflow cache when workflow definitions are reloaded.

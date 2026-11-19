@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides a set of helper extensions to <see cref="Output{T}"/>.

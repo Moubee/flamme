@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Runtime.Matches;
+namespace Flamme.Workflows.Runtime.Matches;
 
 public record ResumableWorkflowMatch(string WorkflowInstanceId, string? CorrelationId, string? BookmarkId, object? Payload)
     : WorkflowMatch(CorrelationId, Payload);

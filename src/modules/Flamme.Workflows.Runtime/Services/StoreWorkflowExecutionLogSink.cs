@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Notifications;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// This implementation saves <see cref="WorkflowExecutionLogRecord"/> directly through the store.

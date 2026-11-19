@@ -1,12 +1,12 @@
 using System.Dynamic;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Memory;
 using Jint;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// Pins how an object-valued workflow variable is marshalled into JavaScript.
@@ -58,7 +58,7 @@ public class VariableMarshallingTests
     {
         Engine? engine = null;
         await using var fixture = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
-        fixture.ConfigureElsa(elsa => elsa.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
+        fixture.ConfigureFlamme(elsa => elsa.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
 
         var context = await fixture.CreateExpressionExecutionContextAsync([new Variable<ExpandoObject>("Person", CreatePerson())]);
         var evaluator = fixture.Services.GetRequiredService<IJavaScriptEvaluator>();

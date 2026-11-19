@@ -1,10 +1,10 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Entities;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Services;
+namespace Flamme.Labels.Services;
 
 /// <summary>
 /// An in-memory store of workflow-label associations.

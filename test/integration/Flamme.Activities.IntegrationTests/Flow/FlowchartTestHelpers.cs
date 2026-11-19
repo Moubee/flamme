@@ -1,13 +1,13 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Activities.IntegrationTests.Flow;
+namespace Flamme.Activities.IntegrationTests.Flow;
 
 /// <summary>
 /// Shared helper methods for Flowchart integration tests.

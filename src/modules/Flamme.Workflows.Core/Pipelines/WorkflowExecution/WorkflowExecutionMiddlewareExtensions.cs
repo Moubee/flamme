@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Pipelines.WorkflowExecution;
+namespace Flamme.Workflows.Pipelines.WorkflowExecution;
 
 /// <summary>
 /// Provides extensions to <see cref="IWorkflowExecutionPipelineBuilder"/> that adds support for installing <see cref="IWorkflowExecutionMiddleware"/> components.

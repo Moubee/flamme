@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Enums;
+using Flamme.Workflows.Management.Enums;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// Represents a timestamp filter used for filtering data based on a specified timestamp column and operator.

@@ -1,20 +1,20 @@
 using System.ComponentModel;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Options;
+using Flamme.Abstractions;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Api.Endpoints.VariableTypes.List;
+namespace Flamme.Workflows.Api.Endpoints.VariableTypes.List;
 
 /// <summary>
 /// Returns a list of available variable types.
 /// </summary>
 [PublicAPI]
-internal class List : ElsaEndpointWithoutRequest<Response>
+internal class List : FlammeEndpointWithoutRequest<Response>
 {
     private readonly IWellKnownTypeRegistry _wellKnownTypeRegistry;
     private readonly ManagementOptions _managementOptions;

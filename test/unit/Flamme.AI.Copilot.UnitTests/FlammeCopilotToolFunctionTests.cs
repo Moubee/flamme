@@ -1,21 +1,21 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Copilot.Adapters;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Copilot.Adapters;
 using GitHub.Copilot;
 using Microsoft.Extensions.AI;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Copilot.UnitTests;
+namespace Flamme.AI.Copilot.UnitTests;
 
-public class ElsaCopilotToolFunctionTests
+public class FlammeCopilotToolFunctionTests
 {
     [Test]
-    [DisplayName("Tool function preserves Elsa metadata and schema")]
-    public async Task ToolFunctionPreservesElsaMetadataAndSchema()
+    [DisplayName("Tool function preserves Flamme metadata and schema")]
+    public async Task ToolFunctionPreservesFlammeMetadataAndSchema()
     {
         var definition = CreateDefinition();
-        var function = new ElsaCopilotToolFunction(definition, new CapturingToolInvoker());
+        var function = new FlammeCopilotToolFunction(definition, new CapturingToolInvoker());
 
         await Assert.That(function.Name).IsEqualTo("workflow.inspect");
         await Assert.That(function.Description).IsEqualTo("Inspect workflow");
@@ -28,11 +28,11 @@ public class ElsaCopilotToolFunctionTests
     }
 
     [Test]
-    [DisplayName("Tool function invokes Elsa provider tool invoker")]
-    public async Task ToolFunctionInvokesElsaProviderToolInvoker()
+    [DisplayName("Tool function invokes Flamme provider tool invoker")]
+    public async Task ToolFunctionInvokesFlammeProviderToolInvoker()
     {
         var invoker = new CapturingToolInvoker();
-        var function = new ElsaCopilotToolFunction(CreateDefinition(), invoker);
+        var function = new FlammeCopilotToolFunction(CreateDefinition(), invoker);
         var arguments = new AIFunctionArguments(new Dictionary<string, object?>
         {
             ["workflowId"] = "workflow-1"

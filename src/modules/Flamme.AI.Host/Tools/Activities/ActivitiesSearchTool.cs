@@ -1,9 +1,9 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
-using Elsa.AI.Host.Tools;
-using Elsa.Workflows;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
+using Flamme.AI.Host.Tools;
+using Flamme.Workflows;
 
-namespace Elsa.AI.Host.Tools.Activities;
+namespace Flamme.AI.Host.Tools.Activities;
 
 public class ActivitiesSearchTool(IServiceProvider serviceProvider, ActivityGroundingSearchService searchService, AIGroundingResultFormatter formatter) : GroundingToolBase
 {

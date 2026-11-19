@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 
-namespace Elsa.Workflows.Runtime.Extensions;
+namespace Flamme.Workflows.Runtime.Extensions;
 
 /// <summary>
 /// Provides extension methods for the <see cref="ITriggerStore"/> interface.

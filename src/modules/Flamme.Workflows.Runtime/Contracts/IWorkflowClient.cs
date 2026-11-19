@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a client that can interact with a workflow instance.

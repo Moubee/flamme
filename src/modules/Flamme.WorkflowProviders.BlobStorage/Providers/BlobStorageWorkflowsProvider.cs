@@ -1,10 +1,10 @@
-﻿using Elsa.Extensions;
-using Elsa.WorkflowProviders.BlobStorage.Contracts;
-using Elsa.Workflows.Runtime;
+﻿using Flamme.Extensions;
+using Flamme.WorkflowProviders.BlobStorage.Contracts;
+using Flamme.Workflows.Runtime;
 using FluentStorage.Blobs;
 using JetBrains.Annotations;
 
-namespace Elsa.WorkflowProviders.BlobStorage.Providers;
+namespace Flamme.WorkflowProviders.BlobStorage.Providers;
 
 /// <summary>
 /// A workflow definition provider that loads workflow definitions from a storage using FluentStorage (See https://github.com/robinrodricks/FluentStorage).

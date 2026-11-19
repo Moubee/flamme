@@ -1,11 +1,11 @@
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Extensions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Workflows;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Extensions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Workflows;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Applies the provider-independent user resolution and creation policy used by external identity provisioners.
@@ -30,9 +30,9 @@ public sealed class ExternalIdentityUserProvisioningService(
         {
             var existingUser = await userProvider.FindAsync(new()
                                    { Id = request.ExistingUserId }, cancellationToken)
-                ?? throw new InvalidOperationException("The requested Elsa user does not exist.");
+                ?? throw new InvalidOperationException("The requested Flamme user does not exist.");
             if (!string.Equals(existingUser.TenantId, request.TenantId, StringComparison.Ordinal))
-                throw new InvalidOperationException("The requested Elsa user is outside the target tenant.");
+                throw new InvalidOperationException("The requested Flamme user is outside the target tenant.");
 
             return (existingUser, false);
         }
@@ -85,7 +85,7 @@ public sealed class ExternalIdentityUserProvisioningService(
             }
         }
 
-        throw new InvalidOperationException("A unique Elsa user name could not be reserved for the external identity.");
+        throw new InvalidOperationException("A unique Flamme user name could not be reserved for the external identity.");
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
 
 /// <summary>
 /// Represents a test scenario for trigger deletion with expected outcomes.

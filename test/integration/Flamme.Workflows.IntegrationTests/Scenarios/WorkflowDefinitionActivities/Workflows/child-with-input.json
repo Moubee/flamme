@@ -10,7 +10,7 @@
   "inputs": [
     {
       "uiHint": "singleline",
-      "storageDriverType": "Elsa.Workflows.WorkflowInstanceStorageDriver, Elsa.Workflows.Core",
+      "storageDriverType": "Flamme.Workflows.WorkflowInstanceStorageDriver, Flamme.Workflows.Core",
       "type": "String",
       "name": "Message",
       "displayName": "Message",

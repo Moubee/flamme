@@ -1,11 +1,11 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Primitives;
+namespace Flamme.Activities.UnitTests.Primitives;
 
 public class PublishEventTests
 {

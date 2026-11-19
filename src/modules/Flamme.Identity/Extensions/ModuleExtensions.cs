@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Identity.Features;
+using Flamme.Features.Services;
+using Flamme.Identity.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extensions for <see cref="IModule"/> that installs the <see cref="IdentityFeature"/> feature.

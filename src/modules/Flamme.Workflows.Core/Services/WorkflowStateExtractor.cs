@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Services;
-using Elsa.Workflows.State;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Services;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class WorkflowStateExtractor(ILogger<WorkflowStateExtractor> logger) : IWorkflowStateExtractor

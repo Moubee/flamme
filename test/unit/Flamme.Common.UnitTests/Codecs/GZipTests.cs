@@ -1,9 +1,9 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Text;
-using GZipCodec = Elsa.Common.Codecs.GZip;
+using GZipCodec = Flamme.Common.Codecs.GZip;
 
-namespace Elsa.Common.UnitTests.Codecs;
+namespace Flamme.Common.UnitTests.Codecs;
 
 public class GZipTests
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Endpoints.Alterations.DryRun;
+namespace Flamme.Alterations.Endpoints.Alterations.DryRun;
 
 /// <summary>
 /// The response from the <see cref="DryRun"/> endpoint.

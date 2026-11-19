@@ -1,12 +1,12 @@
 using System.Net.Mime;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Requests;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Requests;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
+using Flamme.Api.Client.Shared.Models;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
 
 /// <summary>
 /// Represents a client for the workflow definitions API.

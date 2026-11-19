@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Operations;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Operations;
 
 public class PreviewSignInTests
 {

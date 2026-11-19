@@ -1,16 +1,16 @@
-using Elsa.Persistence.EFCore;
-using Elsa.Secrets.Models;
+using Flamme.Persistence.EFCore;
+using Flamme.Secrets.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Secrets.Persistence.EFCore;
+namespace Flamme.Secrets.Persistence.EFCore;
 
 /// <summary>
 /// The database context for the Secrets module.
 /// </summary>
-public class SecretsElsaDbContext : ElsaDbContextBase
+public class SecretsFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public SecretsElsaDbContext(DbContextOptions<SecretsElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public SecretsFlammeDbContext(DbContextOptions<SecretsFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

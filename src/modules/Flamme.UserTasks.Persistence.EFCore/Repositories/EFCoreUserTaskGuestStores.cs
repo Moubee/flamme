@@ -2,16 +2,16 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Common;
-using Elsa.Persistence.EFCore;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
+using Flamme.Common;
+using Flamme.Persistence.EFCore;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Persistence.EFCore.Repositories;
+namespace Flamme.UserTasks.Persistence.EFCore.Repositories;
 
 internal static class UserTaskSecretHashing
 {
@@ -25,7 +25,7 @@ internal static class UserTaskSecretHashing
 /// revocation so a session cannot outlive its task across a restart or a failover.
 /// </summary>
 public sealed class EFCoreUserTaskGuestSessionIssuer(
-    Store<UserTasksElsaDbContext, UserTaskGuestSessionRecord> store,
+    Store<UserTasksFlammeDbContext, UserTaskGuestSessionRecord> store,
     TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskGuestSessionIssuer
 {
@@ -100,7 +100,7 @@ public sealed class EFCoreUserTaskGuestSessionIssuer(
 /// reach the database, so a table dump never yields a usable invitation link.
 /// </summary>
 public sealed class EFCoreUserTaskInvitationOutbox(
-    Store<UserTasksElsaDbContext, UserTaskInvitationDeliveryRecord> store,
+    Store<UserTasksFlammeDbContext, UserTaskInvitationDeliveryRecord> store,
     IDataProtectionProvider dataProtectionProvider,
     TimeProvider timeProvider,
     IOptions<UserTasksOptions> options) : IUserTaskInvitationOutbox

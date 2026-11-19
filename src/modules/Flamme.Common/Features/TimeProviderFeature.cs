@@ -1,9 +1,9 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.Common.Features;
+namespace Flamme.Common.Features;
 
 /// <summary>
 /// Configures the default time provider without replacing a host-supplied provider.

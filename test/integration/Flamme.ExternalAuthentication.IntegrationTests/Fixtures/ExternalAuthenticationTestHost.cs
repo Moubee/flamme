@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elsa.Workflows;
+using Flamme.Workflows;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 
 public sealed class ExternalAuthenticationTestEntryPoint;
 

@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command.Contracts;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command.Contracts;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.Middleware.Command.Components;
+namespace Flamme.Mediator.Middleware.Command.Components;
 
 /// <summary>
 /// A command middleware that invokes the command.

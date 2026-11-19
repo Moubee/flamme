@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Parameters;
+namespace Flamme.Workflows.Runtime.Parameters;
 
 /// <summary>
 /// Options for resuming workflows.

@@ -4,12 +4,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Microsoft.CSharp.RuntimeBinder;
-using Elsa.Expressions.CSharp.Contexts;
-using Elsa.Expressions.CSharp.Models;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.CSharp.Contexts;
+using Flamme.Expressions.CSharp.Models;
+using Flamme.Expressions.Models;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace Elsa.Expressions.CSharp.Options;
+namespace Flamme.Expressions.CSharp.Options;
 
 /// <summary>
 /// Options for the C# expression evaluator.
@@ -37,7 +37,7 @@ public class CSharpOptions
     /// </summary>
     public ISet<Assembly> Assemblies { get; } = new HashSet<Assembly>(new[]
     {
-        typeof(Globals).Assembly, // Elsa.Expressions.CSharp
+        typeof(Globals).Assembly, // Flamme.Expressions.CSharp
         typeof(Enumerable).Assembly, // System.Linq
         typeof(Guid).Assembly, // System.Runtime
         typeof(JsonSerializer).Assembly, // System.Text.Json
@@ -51,7 +51,7 @@ public class CSharpOptions
     /// </summary>
     public ISet<string> Namespaces { get; } = new HashSet<string>(new[]
     {
-        typeof(Globals).Namespace!, // Elsa.Expressions.CSharp
+        typeof(Globals).Namespace!, // Flamme.Expressions.CSharp
         typeof(Enumerable).Namespace!, // System.Linq
         typeof(Guid).Namespace!, // System
         typeof(JsonSerializer).Namespace!, // System.Text.Json

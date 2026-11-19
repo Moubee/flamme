@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A LIFO stack based activity scheduler.

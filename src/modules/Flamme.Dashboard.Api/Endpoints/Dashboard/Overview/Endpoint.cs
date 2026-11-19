@@ -1,13 +1,13 @@
-using Elsa.Abstractions;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Authorization;
+using Flamme.Abstractions;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Authorization;
 using JetBrains.Annotations;
 
-namespace Elsa.Dashboard.Api.Endpoints.Dashboard.Overview;
+namespace Flamme.Dashboard.Api.Endpoints.Dashboard.Overview;
 
 [PublicAPI]
-internal class Endpoint(IDashboardProvider dashboardProvider) : ElsaEndpointWithoutRequest<DashboardOverview>
+internal class Endpoint(IDashboardProvider dashboardProvider) : FlammeEndpointWithoutRequest<DashboardOverview>
 {
     // Any signed-in caller may ask. The provider withholds each section the caller may not read, so the overview never
     // refuses a caller who can read part of it.

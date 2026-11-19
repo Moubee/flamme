@@ -1,11 +1,11 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Activities;
+namespace Flamme.Workflows.IntegrationTests.Activities;
 
 /// <summary>
-/// Integration tests for the <see cref="Elsa.Workflows.Activities.Sequence"/> activity.
+/// Integration tests for the <see cref="Flamme.Workflows.Activities.Sequence"/> activity.
 /// </summary>
 public class SequenceTests : IAsyncDisposable
 {

@@ -1,17 +1,17 @@
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
-using Elsa.UserTasks.Repositories;
-using Elsa.UserTasks.Services;
-using Elsa.Workflows;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
+using Flamme.UserTasks.Repositories;
+using Flamme.UserTasks.Services;
+using Flamme.Workflows;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.UserTasks.UnitTests;
+namespace Flamme.UserTasks.UnitTests;
 
 /// <summary>
 /// Wires the Core User Tasks slice against in-memory doubles. Every test shares this arrangement so a

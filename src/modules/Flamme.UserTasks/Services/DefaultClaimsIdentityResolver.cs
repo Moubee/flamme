@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using Elsa;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
+using Flamme;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 public sealed class DefaultClaimsIdentityResolver(IOptions<UserTasksOptions> options) : IUserTaskIdentityResolver
 {

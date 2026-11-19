@@ -1,8 +1,8 @@
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 public class ConfigurationJsonConverter() : ValueConverter<IConfiguration, string>(
     config => SerializeConfiguration(config),

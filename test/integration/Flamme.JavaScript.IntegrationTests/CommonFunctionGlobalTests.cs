@@ -1,8 +1,8 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// The common functions — <c>getVariable</c>, <c>toJson</c>, <c>newGuid</c> and the rest — are installed as
@@ -40,7 +40,7 @@ public class CommonFunctionGlobalTests : IAsyncDisposable
     {
         // The property is installed eagerly and only its value is deferred, so every existence question is
         // answered without materialising anything. `in` and getOwnPropertyNames are the questions a script — or
-        // Elsa's own tooling — would ask about a function it has not called.
+        // Flamme's own tooling — would ask about a function it has not called.
         await Assert.That(await EvaluateAsync<string>(
             "return ('getVariable' in globalThis) + ' ' + Object.getOwnPropertyNames(globalThis).includes('toJson');")).IsEqualTo("true true");
     }

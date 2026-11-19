@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public class ChangeTrackingDictionary<TKey, TValue>(Action onChange) : Dictionary<TKey, TValue> where TKey : notnull
 {

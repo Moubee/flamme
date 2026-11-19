@@ -1,9 +1,9 @@
-using Elsa.Authorization;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Permissions;
+using Flamme.Authorization;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Permissions;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Dashboard.Api.Authorization;
+namespace Flamme.Dashboard.Api.Authorization;
 
 /// <summary>
 /// Decides what a caller may read from the dashboard. <c>dashboard:view</c> reads the whole operational overview; a

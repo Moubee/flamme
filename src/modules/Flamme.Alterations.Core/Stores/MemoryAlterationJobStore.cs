@@ -1,11 +1,11 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
 
-namespace Elsa.Alterations.Core.Stores;
+namespace Flamme.Alterations.Core.Stores;
 
 /// <summary>
 /// A memory-based store for alteration jobs.

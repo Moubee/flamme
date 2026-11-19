@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.VariableTypes.Responses;
+using Flamme.Api.Client.Resources.VariableTypes.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.VariableTypes.Contracts;
+namespace Flamme.Api.Client.Resources.VariableTypes.Contracts;
 
 /// <summary>
 /// Represents a client for the variable types API.

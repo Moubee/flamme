@@ -1,7 +1,7 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
 
-namespace Elsa.Expressions.Extensions;
+namespace Flamme.Expressions.Extensions;
 
 /// <summary>
 /// Extends <see cref="IWellKnownTypeRegistry"/>.

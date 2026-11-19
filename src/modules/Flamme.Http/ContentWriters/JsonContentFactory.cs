@@ -3,7 +3,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// Creates a <see cref="HttpContent"/> object for application/json.

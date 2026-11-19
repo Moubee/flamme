@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Management;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Export;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Export;
 
 /// <summary>
 /// Exports the specified workflow definition as JSON download.
 /// </summary>
 [UsedImplicitly]
-internal class Export(IWorkflowDefinitionExporter exporter) : ElsaEndpoint<Request>
+internal class Export(IWorkflowDefinitionExporter exporter) : FlammeEndpoint<Request>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Routes("/bulk-actions/export/workflow-definitions", "/workflow-definitions/{definitionId}/export");
         Verbs(FastEndpoints.Http.GET, FastEndpoints.Http.POST);
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

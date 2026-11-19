@@ -1,13 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Common.Multitenancy;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Services;
-using Elsa.Tenants.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Services;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.Repositories;
+namespace Flamme.Secrets.Repositories;
 
 public class FileSecretRepository : ISecretRepository
 {

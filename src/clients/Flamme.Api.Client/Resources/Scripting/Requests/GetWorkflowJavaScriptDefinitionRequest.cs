@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Scripting.Requests;
+namespace Flamme.Api.Client.Resources.Scripting.Requests;
 
 /// <summary>
 /// A request to retrieve the type definitions

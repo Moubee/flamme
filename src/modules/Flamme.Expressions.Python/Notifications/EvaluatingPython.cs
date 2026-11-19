@@ -1,9 +1,9 @@
 using System.Text;
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
 using Python.Runtime;
 
-namespace Elsa.Expressions.Python.Notifications;
+namespace Flamme.Expressions.Python.Notifications;
 
 /// <summary>
 /// This notification is published every time a Python expression is about to be evaluated, giving subscribers a chance to modify the Python engine.

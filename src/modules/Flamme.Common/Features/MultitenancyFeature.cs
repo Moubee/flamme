@@ -1,14 +1,14 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Multitenancy.EventHandlers;
-using Elsa.Common.Multitenancy.HostedServices;
-using Elsa.Common.RecurringTasks;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Multitenancy.EventHandlers;
+using Flamme.Common.Multitenancy.HostedServices;
+using Flamme.Common.RecurringTasks;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.Common.Features;
+namespace Flamme.Common.Features;
 
 public class MultitenancyFeature(IModule module) : FeatureBase(module)
 {

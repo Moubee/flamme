@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class BookmarkQueueItemExtensions
 {

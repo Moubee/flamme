@@ -1,10 +1,10 @@
-using Elsa.ExternalAuthentication.Persistence.EFCore.Features;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Features;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using System.Reflection;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.Extensions;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.Extensions;
 
 public static class PostgreSqlExternalAuthenticationPersistenceFeatureExtensions
 {
@@ -13,7 +13,7 @@ public static class PostgreSqlExternalAuthenticationPersistenceFeatureExtensions
     public static EFCoreExternalAuthenticationPersistenceFeature UsePostgreSql(
         this EFCoreExternalAuthenticationPersistenceFeature feature,
         string connectionString,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
     {
         return feature.UsePostgreSql(_ => connectionString, options, configure);
@@ -22,7 +22,7 @@ public static class PostgreSqlExternalAuthenticationPersistenceFeatureExtensions
     public static EFCoreExternalAuthenticationPersistenceFeature UsePostgreSql(
         this EFCoreExternalAuthenticationPersistenceFeature feature,
         Func<IServiceProvider, string> connectionStringFunc,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
     {
         return feature.UsePostgreSql(Assembly, connectionStringFunc, options, configure);

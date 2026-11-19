@@ -1,9 +1,9 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
-using Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
-using Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Responses;
+using Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
+using Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Contracts;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Contracts;
 
 /// <summary>
 /// Client for administrator-managed external identity links.

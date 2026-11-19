@@ -1,12 +1,12 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.CommitStates.Strategies;
-using Elsa.Workflows.IntegrationTests.SharedHelpers;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.CommitStates.Strategies;
+using Flamme.Workflows.IntegrationTests.SharedHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.DefaultWorkflowCommitStrategy;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.DefaultWorkflowCommitStrategy;
 
 public class Tests
 {
@@ -25,7 +25,7 @@ public class Tests
         var commitTracker = new CommitTracker();
         var defaultStrategy = new ActivityExecutedWorkflowStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflows(workflows =>
                 {
                     workflows.WithDefaultWorkflowCommitStrategy(defaultStrategy);
@@ -60,7 +60,7 @@ public class Tests
         var commitTracker = new CommitTracker();
         var defaultStrategy = new ActivityExecutedWorkflowStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflows(workflows => workflows
                     .WithDefaultWorkflowCommitStrategy(defaultStrategy)
                     .UseCommitStrategies(commitStrategies => commitStrategies.AddStandardStrategies())
@@ -93,7 +93,7 @@ public class Tests
         // Arrange
         var commitTracker = new CommitTracker();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflows(workflows =>
                 {
                     workflows.CommitStateHandler = _ => commitTracker;
@@ -123,7 +123,7 @@ public class Tests
     {
         // Arrange
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflows(workflows => workflows
                     .WithDefaultWorkflowCommitStrategy(new ActivityExecutedWorkflowStrategy())
                 )
@@ -145,7 +145,7 @@ public class Tests
     {
         // Arrange
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflows(workflows => workflows
                     .WithDefaultWorkflowCommitStrategy(new ActivityExecutedWorkflowStrategy())
                     .UseCommitStrategies(commitStrategies => commitStrategies.AddStandardStrategies())

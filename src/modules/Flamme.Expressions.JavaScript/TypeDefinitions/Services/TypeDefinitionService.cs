@@ -1,7 +1,7 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Services;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Services;
 
 /// <inheritdoc />
 public class TypeDefinitionService(

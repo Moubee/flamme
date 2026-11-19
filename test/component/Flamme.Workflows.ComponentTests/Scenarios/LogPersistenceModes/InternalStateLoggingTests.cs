@@ -1,16 +1,16 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
-using Elsa.Testing.Shared.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
+using Flamme.Testing.Shared.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.LogPersistenceModes;
+namespace Flamme.Workflows.ComponentTests.Scenarios.LogPersistenceModes;
 
 public class InternalStateLoggingTests(App app) : AppComponentTest(app)
 {

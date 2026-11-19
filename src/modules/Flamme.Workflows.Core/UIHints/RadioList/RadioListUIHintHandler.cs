@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.UIHints.RadioList;
+namespace Flamme.Workflows.UIHints.RadioList;
 
 /// <inheritdoc />
 public class RadioListUIHintHandler : IUIHintHandler

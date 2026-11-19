@@ -1,22 +1,22 @@
-using Elsa.Workflows.Runtime.HealthChecks;
+using Flamme.Workflows.Runtime.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
+namespace Flamme.Workflows.Runtime.UnitTests.HealthChecks;
 
-public class ElsaRuntimeHealthCheckTests
+public class FlammeRuntimeHealthCheckTests
 {
     private readonly IWorkflowRuntime _workflowRuntime = IWorkflowRuntime.Mock().Object;
     private readonly IQuiescenceSignal _quiescenceSignal = IQuiescenceSignal.Mock().Object;
-    private readonly ElsaRuntimeHealthCheck _sut;
+    private readonly FlammeRuntimeHealthCheck _sut;
 
-    public ElsaRuntimeHealthCheckTests()
+    public FlammeRuntimeHealthCheckTests()
     {
         Mock.Get(_workflowRuntime).CreateClientAsync(Arg.Any<CancellationToken>()).Returns(IWorkflowClient.Mock().Object);
         Mock.Get(_quiescenceSignal).CurrentState.Returns(QuiescenceState.Initial("test"));
         Mock.Get(_quiescenceSignal).ActiveExecutionCycleCount.Returns(0);
-        _sut = new ElsaRuntimeHealthCheck(_workflowRuntime, _quiescenceSignal, NullLogger<ElsaRuntimeHealthCheck>.Instance);
+        _sut = new FlammeRuntimeHealthCheck(_workflowRuntime, _quiescenceSignal, NullLogger<FlammeRuntimeHealthCheck>.Instance);
     }
 
     [Test]

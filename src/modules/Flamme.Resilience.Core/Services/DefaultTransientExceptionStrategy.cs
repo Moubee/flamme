@@ -1,4 +1,4 @@
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 /// <summary>
 /// Default implementation that detects common transient exceptions from the .NET framework and common patterns.

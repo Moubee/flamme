@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 
-namespace Elsa.Http.Options;
+namespace Flamme.Http.Options;
 
 /// <summary>
 /// Options for downloading a file.

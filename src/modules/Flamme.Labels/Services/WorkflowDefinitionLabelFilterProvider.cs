@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Permissions;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Exceptions;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Permissions;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Exceptions;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.Labels.Services;
+namespace Flamme.Labels.Services;
 
 /// <summary>
 /// Applies label relationships to workflow definition filters. A version qualifies when it has any requested label ID; an unknown label produces no matches. A caller filtering by labels must hold the workflow-definition-label view permission. The configured label store must implement <see cref="IWorkflowDefinitionLabelQuery"/> to support this filter.

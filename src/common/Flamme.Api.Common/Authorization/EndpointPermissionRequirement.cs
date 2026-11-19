@@ -1,4 +1,4 @@
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// The permission requirement an endpoint declares: the caller must hold a permission satisfying at least one of

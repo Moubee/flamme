@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.Converters;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Serialization.Configurators;
+namespace Flamme.Workflows.Serialization.Configurators;
 
 /// <summary>
 /// Add additional <see cref="JsonConverter"/> objects.

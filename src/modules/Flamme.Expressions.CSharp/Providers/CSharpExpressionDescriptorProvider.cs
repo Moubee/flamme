@@ -1,12 +1,12 @@
-using Elsa.Expressions.CSharp.Expressions;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.CSharp.Expressions;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.CSharp.Providers;
+namespace Flamme.Expressions.CSharp.Providers;
 
 internal class CSharpExpressionDescriptorProvider(IOptions<CSharpOptions> options) : IExpressionDescriptorProvider
 {

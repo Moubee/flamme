@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Activities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Activities;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides a set of extension methods for <see cref="Workflow"/>.

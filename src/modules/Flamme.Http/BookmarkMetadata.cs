@@ -1,4 +1,4 @@
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Provides metadata for HTTP bookmarks.

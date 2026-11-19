@@ -3,10 +3,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.Unicode;
-using Elsa.Common.Converters;
+using Flamme.Common.Converters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 /// <summary>
 /// A base class for configurable JSON serializers.

@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
 /// Represents a hashed secret.

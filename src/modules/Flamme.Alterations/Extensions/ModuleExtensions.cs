@@ -1,8 +1,8 @@
-using Elsa.Alterations.Features;
-using Elsa.Extensions;
-using Elsa.Features.Services;
+using Flamme.Alterations.Features;
+using Flamme.Extensions;
+using Flamme.Features.Services;
 
-namespace Elsa.Alterations.Extensions;
+namespace Flamme.Alterations.Extensions;
 
 /// <summary>
 /// Adds the <see cref="AlterationsFeature"/>.

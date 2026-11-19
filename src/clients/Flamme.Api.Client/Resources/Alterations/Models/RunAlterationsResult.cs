@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Alterations.Models;
+namespace Flamme.Api.Client.Resources.Alterations.Models;
 
 /// <summary>
 /// The result of running a series of alterations.

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Represents a secret hasher.

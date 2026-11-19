@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class MaterializerRegistry(Func<IEnumerable<IWorkflowMaterializer>> materializers) : IMaterializerRegistry

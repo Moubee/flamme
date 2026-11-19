@@ -1,10 +1,10 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Options;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Persistence.EFCore.EntityHandlers;
+namespace Flamme.Persistence.EFCore.EntityHandlers;
 
 /// <summary>
 /// Represents a handler for applying the tenant ID to an entity before saving changes.
@@ -12,7 +12,7 @@ namespace Elsa.Persistence.EFCore.EntityHandlers;
 public class ApplyTenantId(IOptions<TenantsOptions> tenantsOptions) : IEntitySavingHandler
 {
     /// <inheritdoc />
-    public ValueTask HandleAsync(ElsaDbContextBase dbContext, EntityEntry entry, CancellationToken cancellationToken = default)
+    public ValueTask HandleAsync(FlammeDbContextBase dbContext, EntityEntry entry, CancellationToken cancellationToken = default)
     {
         // Only apply tenant ID if multitenancy is enabled
         if (!tenantsOptions.Value.IsEnabled)

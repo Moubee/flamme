@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
-using Elsa.Workflows.State;
+using Flamme.Common.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Management.Entities;
+namespace Flamme.Workflows.Management.Entities;
 
 /// <summary>
 /// Represents a workflow instance.

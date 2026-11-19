@@ -1,12 +1,12 @@
 // using System.Reflection;
-// using Elsa.Extensions;
-// using Elsa.Workflows.Core.Attributes;
-// using Elsa.Workflows.Core.Contracts;
-// using Elsa.Workflows.Core.Models;
+// using Flamme.Extensions;
+// using Flamme.Workflows.Core.Attributes;
+// using Flamme.Workflows.Core.Contracts;
+// using Flamme.Workflows.Core.Models;
 // using Humanizer;
 // using Microsoft.Extensions.DependencyInjection;
 //
-// namespace Elsa.Workflows.Core.Services;
+// namespace Flamme.Workflows.Core.Services;
 //
 // /// <inheritdoc />
 // public class PropertyOptionsResolver : IPropertyOptionsResolver

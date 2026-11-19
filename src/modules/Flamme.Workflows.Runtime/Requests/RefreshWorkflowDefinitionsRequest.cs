@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Requests;
+namespace Flamme.Workflows.Runtime.Requests;
 
 /// <summary>
 /// Represents a request to refresh workflow definitions by re-indexing their triggers.

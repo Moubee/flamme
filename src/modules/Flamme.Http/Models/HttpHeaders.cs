@@ -1,9 +1,9 @@
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Http.Serialization;
+using Flamme.Extensions;
+using Flamme.Http.Serialization;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Represents the headers of an HTTP message.

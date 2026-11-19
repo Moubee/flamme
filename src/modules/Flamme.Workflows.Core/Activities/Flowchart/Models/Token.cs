@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Activities.Flowchart.Models;
+namespace Flamme.Workflows.Activities.Flowchart.Models;
 
 internal class Token(string fromActivityId, string? fromActivityName, string? outcome, string toActivityId, string? toActivityName, bool consumed, bool blocked)
 {

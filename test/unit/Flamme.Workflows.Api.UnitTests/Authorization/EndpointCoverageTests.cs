@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared.Authorization;
-using Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.List;
+using Flamme.Testing.Shared.Authorization;
+using Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.List;
 
-namespace Elsa.Workflows.Api.UnitTests.Authorization;
+namespace Flamme.Workflows.Api.UnitTests.Authorization;
 
 public class EndpointCoverageTests
 {

@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.Package.Models;
+using Flamme.Api.Client.Resources.Package.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Package.Contracts;
+namespace Flamme.Api.Client.Resources.Package.Contracts;
 
 /// <summary>
 /// A client for working with packages.
@@ -9,7 +9,7 @@ namespace Elsa.Api.Client.Resources.Package.Contracts;
 public interface IPackageApi
 {
     /// <summary>
-    /// Gets the installed package version of Elsa.
+    /// Gets the installed package version of Flamme.
     /// </summary>
     [Get("/package/version")]
     Task<PackageVersionResponse> GetAsync(CancellationToken cancellationToken = default);   

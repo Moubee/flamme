@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Marks the end of a flowchart, causing the flowchart to complete.

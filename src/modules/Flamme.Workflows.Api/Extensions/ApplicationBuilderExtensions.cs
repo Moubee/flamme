@@ -1,8 +1,8 @@
-using Elsa.Workflows.Api.Middleware;
+using Flamme.Workflows.Api.Middleware;
 using Microsoft.AspNetCore.Builder;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IApplicationBuilder"/>.

@@ -1,4 +1,4 @@
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 public abstract class BackgroundTask : IBackgroundTask
 {

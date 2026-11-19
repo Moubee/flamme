@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.RealTime.Messages;
+namespace Flamme.Api.Client.RealTime.Messages;
 
 /// <summary>
 /// Represents a message that is sent when the workflow instance is updated.

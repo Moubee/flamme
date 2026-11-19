@@ -1,4 +1,4 @@
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 /// <summary>
 /// A schedule that can be used to schedule a task.

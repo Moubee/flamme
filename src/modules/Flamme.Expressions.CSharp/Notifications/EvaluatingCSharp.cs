@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace Elsa.Expressions.CSharp.Notifications;
+namespace Flamme.Expressions.CSharp.Notifications;
 
 /// <summary>
 /// This notification is published every time a C# expression is about to be evaluated.

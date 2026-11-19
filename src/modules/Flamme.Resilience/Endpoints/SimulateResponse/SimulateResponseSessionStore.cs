@@ -1,7 +1,7 @@
-using Elsa.Resilience.Options;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Resilience.Endpoints.SimulateResponse;
+namespace Flamme.Resilience.Endpoints.SimulateResponse;
 
 public class SimulateResponseSessionStore(IOptions<SimulateResponseOptions> options, TimeProvider timeProvider)
 {

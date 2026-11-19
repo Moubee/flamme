@@ -1,13 +1,13 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Activities.Flowchart.Options;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Signals;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Options;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Signals;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Activities.Flowchart.Activities;
+namespace Flamme.Workflows.Activities.Flowchart.Activities;
 
 /// <summary>
 /// A flowchart consists of a collection of activities and connections between them.

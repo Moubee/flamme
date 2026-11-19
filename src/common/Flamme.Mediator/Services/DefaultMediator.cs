@@ -1,15 +1,15 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command;
-using Elsa.Mediator.Middleware.Command.Contracts;
-using Elsa.Mediator.Middleware.Notification;
-using Elsa.Mediator.Middleware.Notification.Contracts;
-using Elsa.Mediator.Middleware.Request;
-using Elsa.Mediator.Middleware.Request.Contracts;
-using Elsa.Mediator.Models;
-using Elsa.Mediator.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Command.Contracts;
+using Flamme.Mediator.Middleware.Notification;
+using Flamme.Mediator.Middleware.Notification.Contracts;
+using Flamme.Mediator.Middleware.Request;
+using Flamme.Mediator.Middleware.Request.Contracts;
+using Flamme.Mediator.Models;
+using Flamme.Mediator.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Mediator.Services;
+namespace Flamme.Mediator.Services;
 
 /// <inheritdoc />
 public class DefaultMediator : IMediator

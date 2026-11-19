@@ -1,10 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Scheduling.Activities;
+namespace Flamme.Scheduling.Activities;
 
 /// <summary>
 /// Represents a timer to periodically trigger the workflow.

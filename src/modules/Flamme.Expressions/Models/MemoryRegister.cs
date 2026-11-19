@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// Represents a register of memory. 

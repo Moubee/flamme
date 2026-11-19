@@ -1,4 +1,4 @@
-namespace Elsa.Permissions;
+namespace Flamme.Permissions;
 
 /// <summary>The composed catalog of every resource contributed by the installed modules.</summary>
 public interface IPermissionDescriptorRegistry

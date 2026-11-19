@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Models;
+using Flamme.Alterations.Core.Models;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Scheduler for alteration plans.

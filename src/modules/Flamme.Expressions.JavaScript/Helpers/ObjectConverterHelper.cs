@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Dynamic;
-using Elsa.Extensions;
+using Flamme.Extensions;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
 
-namespace Elsa.Expressions.JavaScript.Helpers;
+namespace Flamme.Expressions.JavaScript.Helpers;
 
 internal static class ObjectConverterHelper
 {
@@ -28,7 +28,7 @@ internal static class ObjectConverterHelper
         // evaluation: it drops the second descriptor allocation the explicit one caused inside Jint's
         // ValidateAndApplyPropertyDescriptor, and objects presenting the same keys — sibling variables, and the
         // nested objects of a repeated payload shape — share one layout instead of each carrying its own
-        // descriptors. Nothing carries across evaluations: hidden classes are interned per engine and Elsa
+        // descriptors. Nothing carries across evaluations: hidden classes are interned per engine and Flamme
         // builds a fresh engine every time.
         return JsObject.CreateFromEntries(engine, expando.Select(kvp => new KeyValuePair<string, JsValue>(kvp.Key, ConvertToJsValue(engine, kvp.Value))));
     }

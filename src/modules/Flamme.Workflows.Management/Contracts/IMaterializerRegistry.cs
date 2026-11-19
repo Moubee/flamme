@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Provides access to registered workflow materializers and their availability.

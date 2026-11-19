@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Tenants;
+namespace Flamme.Tenants;
 
 public interface ITenantStore
 {

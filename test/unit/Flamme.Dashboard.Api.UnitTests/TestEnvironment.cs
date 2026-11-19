@@ -1,7 +1,7 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 internal sealed class TestHostEnvironment : IHostEnvironment
 {

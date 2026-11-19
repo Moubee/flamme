@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Labels.Entities;
-using Elsa.Labels.Services;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Labels.Entities;
+using Flamme.Labels.Services;
+using Flamme.Testing.Shared.Multitenancy;
 
-namespace Elsa.Labels.UnitTests.Services;
+namespace Flamme.Labels.UnitTests.Services;
 
 /// <summary>
 /// Memory Labels must honor ambient tenant the same way EF does via

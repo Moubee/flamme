@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.State;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectSerialization;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectSerialization;
 
 /// <summary>
 /// Tests for serializing and deserializing JSON objects containing reserved keywords such as $id.

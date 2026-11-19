@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Looping;
+namespace Flamme.Activities.UnitTests.Looping;
 
 /// <summary>
 /// Unit tests for the <see cref="Break"/> activity.

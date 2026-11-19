@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Results;
+namespace Flamme.Workflows.Runtime.Results;
 
 public record WorkflowExecutionResult(
     string WorkflowInstanceId, 

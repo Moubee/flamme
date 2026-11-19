@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 
-namespace Elsa.ExternalAuthentication.Stores.InMemory;
+namespace Flamme.ExternalAuthentication.Stores.InMemory;
 
 /// <summary>
 /// Single-node default connection store. Durable hosts replace this registration with their persistence implementation.

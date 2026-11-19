@@ -1,8 +1,8 @@
-using Elsa.Workflows.ComponentTests.Services;
+using Flamme.Workflows.ComponentTests.Services;
 using Npgsql;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.Workflows.ComponentTests.Fixtures;
+namespace Flamme.Workflows.ComponentTests.Fixtures;
 
 /// <summary>
 /// Owns the catalog, host graph, and mutable filesystem root shared by the serialized component-test suite.
@@ -36,7 +36,7 @@ public sealed class App : IAsyncInitializer, IAsyncDisposable
         var catalogBuilder = new NpgsqlConnectionStringBuilder(Infrastructure.DbContainer.GetConnectionString())
         {
             Database = CatalogName,
-            // Elsa's ambient commit transaction opens sequential EF connections. Pool reuse keeps
+            // Flamme's ambient commit transaction opens sequential EF connections. Pool reuse keeps
             // those enlistments on the same PostgreSQL connection, avoiding distributed transactions.
             Pooling = true
         };

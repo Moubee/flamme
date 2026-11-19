@@ -1,4 +1,4 @@
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 /// <summary>
 /// PerTenantLabelUniqueness must stamp null TenantId to "" and must not
@@ -9,7 +9,7 @@ namespace Elsa.Persistence.EFCore.UnitTests;
 public class LabelPerTenantUniquenessMigrationTests
 {
     [Test]
-    [Arguments("Elsa.Persistence.EFCore.PostgreSql")]
+    [Arguments("Flamme.Persistence.EFCore.PostgreSql")]
     public async Task PerTenantLabelUniqueness_StampsNullTenantIdAndDoesNotDeleteDuplicates(string providerProject)
     {
         var migration = FindMigration(providerProject);
@@ -22,7 +22,7 @@ public class LabelPerTenantUniquenessMigrationTests
     }
 
     [Test]
-    [Arguments("Elsa.Persistence.EFCore.PostgreSql", "RAISE EXCEPTION")]
+    [Arguments("Flamme.Persistence.EFCore.PostgreSql", "RAISE EXCEPTION")]
     public async Task PerTenantLabelUniqueness_PreflightsDuplicateKeys(string providerProject, string abortKeyword)
     {
         var migration = FindMigration(providerProject);
@@ -34,7 +34,7 @@ public class LabelPerTenantUniquenessMigrationTests
     }
 
     [Test]
-    [Arguments("Elsa.Persistence.EFCore.PostgreSql")]
+    [Arguments("Flamme.Persistence.EFCore.PostgreSql")]
     public async Task PerTenantLabelUniqueness_KeepsUnboundedProviderColumnTypes(string providerProject)
     {
         var migration = FindMigration(providerProject);
@@ -58,12 +58,12 @@ public class LabelPerTenantUniquenessMigrationTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Elsa.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "Flamme.slnx")))
                 return directory.FullName;
 
             directory = directory.Parent;
         }
 
-        throw new InvalidOperationException("Could not find Elsa.slnx from the test output directory.");
+        throw new InvalidOperationException("Could not find Flamme.slnx from the test output directory.");
     }
 }

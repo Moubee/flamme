@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Services;
+namespace Flamme.Secrets.Services;
 
 public class DefaultSecretManager(ISecretNameValidator nameValidator, ISecretStoreRegistry storeRegistry, ISecretTypeRegistry typeRegistry, ISecretRepository repository) : ISecretManager
 {

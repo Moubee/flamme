@@ -1,13 +1,13 @@
-using Elsa.Abstractions;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Authorization;
+using Flamme.Abstractions;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Authorization;
 using JetBrains.Annotations;
 
-namespace Elsa.Dashboard.Api.Endpoints.Dashboard.NeedsAttention;
+namespace Flamme.Dashboard.Api.Endpoints.Dashboard.NeedsAttention;
 
 [PublicAPI]
-internal class Endpoint(IDashboardProvider dashboardProvider) : ElsaEndpointWithoutRequest<DashboardNeedsAttentionResponse>
+internal class Endpoint(IDashboardProvider dashboardProvider) : FlammeEndpointWithoutRequest<DashboardNeedsAttentionResponse>
 {
     public override void Configure()
     {

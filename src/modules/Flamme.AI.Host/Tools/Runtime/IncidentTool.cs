@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
 
-namespace Elsa.AI.Host.Tools.Runtime;
+namespace Flamme.AI.Host.Tools.Runtime;
 
 public class IncidentTool(IServiceProvider serviceProvider, RuntimeGroundingMapper mapper, AIGroundingResultFormatter formatter) : RuntimeToolBase(serviceProvider, formatter)
 {

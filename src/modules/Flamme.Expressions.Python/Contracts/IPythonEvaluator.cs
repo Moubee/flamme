@@ -1,7 +1,7 @@
-﻿using Elsa.Expressions.Models;
+﻿using Flamme.Expressions.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.Python.Contracts;
+namespace Flamme.Expressions.Python.Contracts;
 
 /// <summary>
 /// Evaluates C# expressions.

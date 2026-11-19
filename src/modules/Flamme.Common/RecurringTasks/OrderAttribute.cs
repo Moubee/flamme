@@ -1,4 +1,4 @@
-namespace Elsa.Common.RecurringTasks;
+namespace Flamme.Common.RecurringTasks;
 
 /// <summary>
 /// Configures a task with a priority.

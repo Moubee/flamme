@@ -1,15 +1,15 @@
 using System.Security.Claims;
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Coordinates tenant-safe administrator operations over external identity links.

@@ -1,17 +1,17 @@
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
-using Elsa.UserTasks.Services;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
+using Flamme.UserTasks.Services;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Endpoints;
+namespace Flamme.UserTasks.Endpoints;
 
 /// <summary>
 /// Shared behavior for the authenticated task endpoints: resolve the actor once, and translate a domain
@@ -54,7 +54,7 @@ internal static class UserTaskEndpointHelpers
     };
 }
 
-internal abstract class UserTaskEndpointBase<TRequest, TResponse> : ElsaEndpoint<TRequest, TResponse>
+internal abstract class UserTaskEndpointBase<TRequest, TResponse> : FlammeEndpoint<TRequest, TResponse>
     where TRequest : notnull, new()
     where TResponse : notnull
 {
@@ -80,7 +80,7 @@ internal abstract class UserTaskEndpointBase<TRequest, TResponse> : ElsaEndpoint
 }
 
 internal sealed class FeatureCapabilitiesEndpoint(IUserTaskIdentityResolver identityResolver, IOptions<UserTasksOptions> options, IUserTaskParticipantDirectory directory)
-    : ElsaEndpointWithoutRequest<UserTaskFeatureCapabilities>
+    : FlammeEndpointWithoutRequest<UserTaskFeatureCapabilities>
 {
     public override void Configure()
     {
@@ -123,7 +123,7 @@ internal sealed class FeatureCapabilitiesEndpoint(IUserTaskIdentityResolver iden
 }
 
 internal sealed class ListEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver, TimeProvider timeProvider)
-    : ElsaEndpoint<ListUserTasksRequest, UserTaskListResponse>
+    : FlammeEndpoint<ListUserTasksRequest, UserTaskListResponse>
 {
     public override void Configure()
     {
@@ -175,7 +175,7 @@ internal sealed class ListEndpoint(IUserTaskManager manager, IUserTaskIdentityRe
     }
 }
 
-internal sealed class GetEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : ElsaEndpointWithoutRequest<UserTaskDetail>
+internal sealed class GetEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : FlammeEndpointWithoutRequest<UserTaskDetail>
 {
     public override void Configure()
     {
@@ -198,7 +198,7 @@ internal sealed class GetEndpoint(IUserTaskManager manager, IUserTaskIdentityRes
     }
 }
 
-internal sealed class CapabilitiesEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : ElsaEndpointWithoutRequest<UserTaskCapabilities>
+internal sealed class CapabilitiesEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : FlammeEndpointWithoutRequest<UserTaskCapabilities>
 {
     public override void Configure()
     {
@@ -219,7 +219,7 @@ internal sealed class CapabilitiesEndpoint(IUserTaskManager manager, IUserTaskId
     }
 }
 
-internal sealed class ListEventsEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : ElsaEndpointWithoutRequest<UserTaskEventsResult>
+internal sealed class ListEventsEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver) : FlammeEndpointWithoutRequest<UserTaskEventsResult>
 {
     public override void Configure()
     {
@@ -421,7 +421,7 @@ internal sealed class RetryResolutionEndpoint(IUserTaskManager manager, IUserTas
 }
 
 internal sealed class RevealFieldEndpoint(IUserTaskManager manager, IUserTaskIdentityResolver identityResolver)
-    : ElsaEndpoint<RevealUserTaskFieldApiRequest, RevealUserTaskFieldResponse>
+    : FlammeEndpoint<RevealUserTaskFieldApiRequest, RevealUserTaskFieldResponse>
 {
     public override void Configure()
     {
@@ -445,7 +445,7 @@ internal sealed class RevealFieldEndpoint(IUserTaskManager manager, IUserTaskIde
 }
 
 internal sealed class IssueInvitationEndpoint(IUserTaskInvitationService invitations, IUserTaskIdentityResolver identityResolver)
-    : ElsaEndpoint<IssueUserTaskInvitationApiRequest, UserTaskInvitationIssueResult>
+    : FlammeEndpoint<IssueUserTaskInvitationApiRequest, UserTaskInvitationIssueResult>
 {
     public override void Configure()
     {
@@ -476,7 +476,7 @@ internal sealed class IssueInvitationEndpoint(IUserTaskInvitationService invitat
 }
 
 internal sealed class ListInvitationsEndpoint(IUserTaskInvitationService invitations, IUserTaskIdentityResolver identityResolver)
-    : ElsaEndpointWithoutRequest<UserTaskInvitationListResponse>
+    : FlammeEndpointWithoutRequest<UserTaskInvitationListResponse>
 {
     public override void Configure()
     {
@@ -498,7 +498,7 @@ internal sealed class ListInvitationsEndpoint(IUserTaskInvitationService invitat
 }
 
 internal sealed class RevokeInvitationEndpoint(IUserTaskInvitationService invitations, IUserTaskIdentityResolver identityResolver)
-    : ElsaEndpoint<UserTaskMutationApiRequest>
+    : FlammeEndpoint<UserTaskMutationApiRequest>
 {
     public override void Configure()
     {
@@ -523,7 +523,7 @@ internal sealed class RevokeInvitationEndpoint(IUserTaskInvitationService invita
 }
 
 internal sealed class ListParticipantsEndpoint(IUserTaskParticipantDirectory directory, IUserTaskIdentityResolver identityResolver)
-    : ElsaEndpoint<UserTaskParticipantLookupApiRequest, UserTaskParticipantSearchResponse>
+    : FlammeEndpoint<UserTaskParticipantLookupApiRequest, UserTaskParticipantSearchResponse>
 {
     public override void Configure()
     {

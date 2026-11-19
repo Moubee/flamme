@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Notifications;
+namespace Flamme.Workflows.Management.Notifications;
 
 /// <summary>
 /// A notification that is sent when workflow definitions are deleted.

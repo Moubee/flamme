@@ -1,4 +1,4 @@
-namespace Elsa.Hosting.Management.Options;
+namespace Flamme.Hosting.Management.Options;
 
 /// <summary>
 /// Represents the options for the application heartbeat feature.

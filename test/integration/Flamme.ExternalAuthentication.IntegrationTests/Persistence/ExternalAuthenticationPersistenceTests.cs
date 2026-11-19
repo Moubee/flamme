@@ -1,29 +1,29 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Testing.Shared.Multitenancy;
 using System.Data.Common;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Services;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Persistence.EFCore;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.Workflows;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common;
+using Flamme.Common.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Persistence.EFCore;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.Workflows;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Persistence;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Persistence;
 
 public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, IAsyncDisposable
 {
@@ -41,14 +41,14 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         _database = new PostgreSqlTestDatabase();
         await _database.OpenAsync();
         _clock = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
-        optionsBuilder.UseElsaDbContextOptions(null);
-        optionsBuilder.UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+        var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>();
+        optionsBuilder.UseFlammeDbContextOptions(null);
+        optionsBuilder.UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
         var options = optionsBuilder.Options;
         _services = new ServiceCollection()
-            .AddSingleton<IDbContextFactory<ExternalAuthenticationElsaDbContext>>(serviceProvider => new TestDbContextFactory(options, serviceProvider))
+            .AddSingleton<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>(serviceProvider => new TestDbContextFactory(options, serviceProvider))
             .BuildServiceProvider();
-        _dbContextFactory = _services.GetRequiredService<IDbContextFactory<ExternalAuthenticationElsaDbContext>>() as TestDbContextFactory ?? throw new InvalidOperationException();
+        _dbContextFactory = _services.GetRequiredService<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>() as TestDbContextFactory ?? throw new InvalidOperationException();
         _leaseFactory = new ExternalAuthenticationDbContextLeaseFactory(_services.GetRequiredService<IServiceScopeFactory>());
         _userStore = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
         _userProvider = new StoreBasedUserProvider(_userStore);
@@ -64,7 +64,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
 
     private EFCoreExternalIdentityProvisioner CreateProvisioner(
         IExternalAuthenticationHandleHasher hasher,
-        IDbContextFactory<ExternalAuthenticationElsaDbContext>? dbContextFactory = null,
+        IDbContextFactory<ExternalAuthenticationFlammeDbContext>? dbContextFactory = null,
         IUserStore? userStore = null,
         IUserProvider? userProvider = null) =>
         new(dbContextFactory ?? _dbContextFactory,
@@ -111,20 +111,20 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         await using var database = new PostgreSqlTestDatabase();
         await database.OpenAsync();
         var connection = database.Connection;
-        var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>();
-        optionsBuilder.UseElsaDbContextOptions(null);
-        optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
+        var optionsBuilder = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>();
+        optionsBuilder.UseFlammeDbContextOptions(null);
+        optionsBuilder.UseNpgsql(database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName));
         var options = optionsBuilder.Options;
         await using var services = new ServiceCollection().BuildServiceProvider();
-        await using var dbContext = new ExternalAuthenticationElsaDbContext(options, services);
+        await using var dbContext = new ExternalAuthenticationFlammeDbContext(options, services);
 
         await dbContext.Database.MigrateAsync();
 
         await Assert.That(await dbContext.Database.GetAppliedMigrationsAsync()).HasSingleItem();
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessionRefreshTokens'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'Flamme' AND table_name = 'ExternalAuthenticationSessionRefreshTokens'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(1L);
-        command.CommandText = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'Elsa' AND table_name = 'ExternalAuthenticationSessions' AND column_name = 'CurrentRefreshTokenHash'";
+        command.CommandText = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'Flamme' AND table_name = 'ExternalAuthenticationSessions' AND column_name = 'CurrentRefreshTokenHash'";
         await Assert.That((long)(await command.ExecuteScalarAsync())!).IsEqualTo(0L);
     }
 
@@ -336,7 +336,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         try
         {
             await using var services = new ServiceCollection().BuildServiceProvider();
-            var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+            var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
                 .UseNpgsql(database.ConnectionString)
                 .Options;
             var factory = new TestDbContextFactory(options, services);
@@ -372,7 +372,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task ProvisionerRemovesTheJustInTimeUserWhenLinkPersistenceFails()
     {
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailingLinkSaveInterceptor())
             .Options;
@@ -414,7 +414,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     [Test]
     public async Task ProvisionerFailsWhenAJustInTimeUserCannotBeCompensated()
     {
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailingLinkSaveInterceptor())
             .Options;
@@ -439,7 +439,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     public async Task ProvisionerRemovesTheLinkWhenUserDeletionWinsTheRace()
     {
         var users = new MemoryUserStore(new MemoryStore<User>(), new TestTenantAccessor("tenant-a"));
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new DeleteLinkedUserBeforeCommitInterceptor(users))
             .Options;
@@ -464,7 +464,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     public async Task ProvisionerReconcilesAmbiguousPublicationForExistingUser()
     {
         await _userStore.SaveAsync(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" });
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new DeleteLinkedUserAfterSaveAndThrowInterceptor(_userStore))
             .Options;
@@ -617,7 +617,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
     {
         await _userStore.SaveAsync(new User { Id = "user-a", Name = "alice", TenantId = "tenant-a" });
         await _userStore.SaveAsync(new User { Id = "user-b", Name = "bob", TenantId = "tenant-a" });
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new FailSelectedLinkDeleteInterceptor(3))
             .Options;
@@ -676,7 +676,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         var originalProvisioner = CreateProvisioner(hasher);
         var old = (await originalProvisioner.CreateLinkOrGetExistingAsync(
             new ProvisioningRequest("tenant-a", "contoso", new ExternalIdentity("https://issuer.example", "subject-old", EmptyClaims), null, "user-a"))).Link;
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new ThrowAfterSelectedCommitInterceptor(1))
             .Options;
@@ -708,7 +708,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         var originalProvisioner = CreateProvisioner(hasher);
         var old = (await originalProvisioner.CreateLinkOrGetExistingAsync(
             new ProvisioningRequest("tenant-a", "contoso", new ExternalIdentity("https://issuer.example", "subject-old", EmptyClaims), null, "user-a"))).Link;
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
             .UseNpgsql(_database.ConnectionString)
             .AddInterceptors(new ThrowAfterSelectedCommitInterceptor(2))
             .Options;
@@ -738,7 +738,7 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         try
         {
             await using var services = new ServiceCollection().BuildServiceProvider();
-            var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
+            var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
                 .UseNpgsql(database.ConnectionString)
                 .Options;
             var factory = new TestDbContextFactory(options, services);
@@ -821,10 +821,10 @@ public sealed class ExternalAuthenticationPersistenceTests : IAsyncInitializer, 
         Id = "session-a", AuthenticationClientId = "studio", TenantId = "tenant-a", UserId = "user-a", ConnectionKey = "contoso", ConnectionMaterialRevision = "revision-a", Issuer = "https://issuer.example", SubjectHash = "subject", ExternalGrants = [], StartedAt = _clock.GetUtcNow(), LastRefreshedAt = _clock.GetUtcNow(), ExpiresAt = _clock.GetUtcNow().AddHours(1), RefreshExpiresAt = _clock.GetUtcNow().AddHours(1), CurrentRefreshTokenHash = "refresh-a"
     };
 
-    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationElsaDbContext> options, IServiceProvider serviceProvider) : IDbContextFactory<ExternalAuthenticationElsaDbContext>
+    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationFlammeDbContext> options, IServiceProvider serviceProvider) : IDbContextFactory<ExternalAuthenticationFlammeDbContext>
     {
-        public ExternalAuthenticationElsaDbContext CreateDbContext() => new(options, serviceProvider);
-        public Task<ExternalAuthenticationElsaDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
+        public ExternalAuthenticationFlammeDbContext CreateDbContext() => new(options, serviceProvider);
+        public Task<ExternalAuthenticationFlammeDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
     }
 
     private sealed class ScriptedTimeProvider(params DateTimeOffset[] instants) : TimeProvider

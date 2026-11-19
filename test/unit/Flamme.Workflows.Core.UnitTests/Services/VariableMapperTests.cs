@@ -1,13 +1,13 @@
 using System.Threading.Tasks;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Services;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Workflows.Core.UnitTests.Services;
+namespace Flamme.Workflows.Core.UnitTests.Services;
 
 public class VariableMapperTests
 {

@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Elsa.Authorization;
-using Elsa.Workflows.Api.Permissions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Workflows.Api.Permissions;
+using Flamme.Workflows.Runtime;
 using FastEndpoints;
-using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
-namespace Elsa.Workflows.Api.UnitTests.Endpoints.RuntimeAdmin;
+using WorkflowsApiFeature = Flamme.Workflows.Api.Features.WorkflowsApiFeature;
+namespace Flamme.Workflows.Api.UnitTests.Endpoints.RuntimeAdmin;
 
 public class RuntimeAdminAuthorizationTests
 {
@@ -13,16 +13,16 @@ public class RuntimeAdminAuthorizationTests
     public async Task StatusEndpoint_RequiresOnlyViewOnTheRuntime()
     {
         // Reading runtime status must not require the verb that pauses or drains it.
-        var permission = await GetDeclaredPermission("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint");
+        var permission = await GetDeclaredPermission("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint");
 
         await Assert.That(permission.Resource).IsEqualTo(WorkflowPermissions.Runtime);
         await Assert.That(permission.Verb).IsEqualTo(CoreVerbs.View);
     }
 
     [Test]
-    [Arguments("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint")]
-    [Arguments("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint")]
-    [Arguments("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint")]
+    [Arguments("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint")]
+    [Arguments("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint")]
+    [Arguments("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint")]
     public async Task MutatingEndpoints_RequireControlOnTheRuntime(string endpointTypeName)
     {
         var permission = await GetDeclaredPermission(endpointTypeName);
@@ -36,10 +36,10 @@ public class RuntimeAdminAuthorizationTests
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     private static Type ResolveEndpointType(string name) => name switch
     {
-        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
-        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
-        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
-        "Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint" => Type.GetType("Elsa.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint, Elsa.Workflows.Api", throwOnError: true)!,
+        "Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint" => Type.GetType("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Status.StatusEndpoint, Flamme.Workflows.Api", throwOnError: true)!,
+        "Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint" => Type.GetType("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Pause.PauseEndpoint, Flamme.Workflows.Api", throwOnError: true)!,
+        "Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint" => Type.GetType("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Resume.ResumeEndpoint, Flamme.Workflows.Api", throwOnError: true)!,
+        "Flamme.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint" => Type.GetType("Flamme.Workflows.Api.Endpoints.RuntimeAdmin.ForceDrain.ForceDrainEndpoint, Flamme.Workflows.Api", throwOnError: true)!,
         _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
     };
 
@@ -82,10 +82,10 @@ public class RuntimeAdminAuthorizationTests
             var genericTypeDefinition = type.GetGenericTypeDefinition();
             var genericArguments = type.GetGenericArguments();
 
-            if (genericTypeDefinition == typeof(Abstractions.ElsaEndpoint<,>))
+            if (genericTypeDefinition == typeof(Abstractions.FlammeEndpoint<,>))
                 return (genericArguments[0], genericArguments[1]);
 
-            if (genericTypeDefinition == typeof(Abstractions.ElsaEndpointWithoutRequest<>))
+            if (genericTypeDefinition == typeof(Abstractions.FlammeEndpointWithoutRequest<>))
                 return (typeof(EmptyRequest), genericArguments[0]);
         }
 

@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>Resolves a deployment-owned secret from configuration without ever exposing it through connection models.</summary>
 public sealed class ConfigurationSecretBindingResolver(

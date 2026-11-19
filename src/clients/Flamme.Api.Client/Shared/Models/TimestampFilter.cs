@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Shared.Enums;
+using Flamme.Api.Client.Shared.Enums;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents a timestamp filter used for filtering data based on a specified timestamp column and operator.

@@ -1,6 +1,6 @@
 using System.Text.Json;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public record ActivityStateFilterContext(ActivityExecutionContext ActivityExecutionContext, InputDescriptor InputDescriptor, JsonElement Value, CancellationToken CancellationToken);

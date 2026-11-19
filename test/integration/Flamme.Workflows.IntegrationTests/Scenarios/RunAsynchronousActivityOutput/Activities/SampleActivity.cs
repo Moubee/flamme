@@ -1,7 +1,7 @@
-﻿using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+﻿using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput.Activities;
 
 [Activity("Elsa.Test", Kind = ActivityKind.Task)]
 internal class SampleActivity : CodeActivity

@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork;
 
 /// <summary>
 /// A container that schedules a child and then decides the child must not run has to be able to withdraw it. Without

@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Identity.Responses;
+namespace Flamme.Api.Client.Resources.Identity.Responses;
 
 /// <summary>
 /// The response of logging in.

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http.Helpers;
+namespace Flamme.Activities.UnitTests.Http.Helpers;
 
 /// <summary>
 /// Shared helper methods for testing SendHttpRequest and FlowSendHttpRequest activities.

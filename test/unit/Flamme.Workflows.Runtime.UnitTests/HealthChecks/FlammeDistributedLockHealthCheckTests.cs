@@ -1,5 +1,5 @@
-using Elsa.Workflows.Runtime.HealthChecks;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.HealthChecks;
+using Flamme.Workflows.Runtime.Options;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -7,23 +7,23 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
+namespace Flamme.Workflows.Runtime.UnitTests.HealthChecks;
 
-public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
+public class FlammeDistributedLockHealthCheckTests : IAsyncDisposable
 {
     private static readonly TimeSpan ExpectedLockAcquisitionTimeout = TimeSpan.FromMilliseconds(250);
     private readonly IDistributedLockProvider _distributedLockProvider = IDistributedLockProvider.Mock().Object;
     private readonly IDistributedLock _distributedLock = IDistributedLock.Mock().Object;
     private readonly ServiceProvider _serviceProvider;
-    private readonly ElsaDistributedLockHealthCheck _sut;
+    private readonly FlammeDistributedLockHealthCheck _sut;
 
-    public ElsaDistributedLockHealthCheckTests()
+    public FlammeDistributedLockHealthCheckTests()
     {
         Mock.Get(_distributedLockProvider).CreateLock(Arg.Any<string>()).Returns(_distributedLock);
         Mock.Get(_distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
                     .Returns(IDistributedSynchronizationHandle.Mock().Object);
         _serviceProvider = CreateServiceProvider(_distributedLockProvider);
-        _sut = new ElsaDistributedLockHealthCheck(_serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
+        _sut = new FlammeDistributedLockHealthCheck(_serviceProvider, CreateOptions(), NullLogger<FlammeDistributedLockHealthCheck>.Instance);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
         Mock.Get(distributedLock).TryAcquireAsync(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
                     .Returns(IDistributedSynchronizationHandle.Mock().Object);
         await using var serviceProvider = CreateServiceProvider(distributedLockProvider);
-        var sut = new ElsaDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
+        var sut = new FlammeDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<FlammeDistributedLockHealthCheck>.Instance);
 
         await sut.CheckHealthAsync(new HealthCheckContext());
         await sut.CheckHealthAsync(new HealthCheckContext());
@@ -87,7 +87,7 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
     public async Task ReturnsDegradedWhenProviderIsNotRegistered()
     {
         await using var serviceProvider = CreateServiceProvider();
-        var sut = new ElsaDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<ElsaDistributedLockHealthCheck>.Instance);
+        var sut = new FlammeDistributedLockHealthCheck(serviceProvider, CreateOptions(), NullLogger<FlammeDistributedLockHealthCheck>.Instance);
 
         var result = await sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -107,7 +107,7 @@ public class ElsaDistributedLockHealthCheckTests : IAsyncDisposable
         return services.BuildServiceProvider();
     }
 
-    private static IOptions<ElsaReadinessHealthCheckOptions> CreateOptions() => Microsoft.Extensions.Options.Options.Create(new ElsaReadinessHealthCheckOptions
+    private static IOptions<FlammeReadinessHealthCheckOptions> CreateOptions() => Microsoft.Extensions.Options.Options.Create(new FlammeReadinessHealthCheckOptions
     {
         DistributedLockAcquisitionTimeout = ExpectedLockAcquisitionTimeout
     });

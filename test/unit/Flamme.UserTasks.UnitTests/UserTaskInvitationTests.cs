@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Elsa.Authorization;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
-using Elsa.UserTasks.Services;
+using Flamme.Authorization;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
+using Flamme.UserTasks.Services;
 
-namespace Elsa.UserTasks.UnitTests;
+namespace Flamme.UserTasks.UnitTests;
 
 /// <summary>
 /// Covers the invitation and guest-session boundary: one-time secrets, generic anonymous responses, rate

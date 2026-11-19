@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
+﻿namespace Flamme.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
 
 public enum TestEnumType
 {

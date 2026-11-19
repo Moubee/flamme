@@ -1,7 +1,7 @@
-using Elsa.Resilience.Models;
-using Elsa.Workflows;
+using Flamme.Resilience.Models;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience.Core.UnitTests.TestHelpers;
+namespace Flamme.Resilience.Core.UnitTests.TestHelpers;
 
 /// <summary>
 /// A resilient activity that reports one detail per retry attempt, plus one detail that is always null so that

@@ -1,6 +1,6 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 
-namespace Elsa.Permissions;
+namespace Flamme.Permissions;
 
 /// <inheritdoc />
 public sealed class DefaultPermissionDescriptorRegistry(IEnumerable<IPermissionDescriptorProvider> providers) : IPermissionDescriptorRegistry

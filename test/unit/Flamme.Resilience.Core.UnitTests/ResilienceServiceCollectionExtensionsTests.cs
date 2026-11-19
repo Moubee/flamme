@@ -1,11 +1,11 @@
-using Elsa.Resilience.Core.UnitTests.TestHelpers;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Options;
+using Flamme.Resilience.Core.UnitTests.TestHelpers;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ResilienceServiceCollectionExtensionsTests
 {

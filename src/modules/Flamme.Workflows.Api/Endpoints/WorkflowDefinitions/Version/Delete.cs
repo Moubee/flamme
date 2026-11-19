@@ -1,26 +1,26 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Version;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Version;
 
 /// <summary>
 /// Deletes a specific version of a workflow definition.
 /// </summary>
 [PublicAPI]
-public class DeleteVersion(IWorkflowDefinitionManager workflowDefinitionManager, IWorkflowDefinitionStore store, IAuthorizationService authorizationService) : ElsaEndpointWithoutRequest
+public class DeleteVersion(IWorkflowDefinitionManager workflowDefinitionManager, IWorkflowDefinitionStore store, IAuthorizationService authorizationService) : FlammeEndpointWithoutRequest
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Delete("workflow-definitions/{definitionId}/version/{version}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.DefinitionVersions, CoreVerbs.Delete);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.DefinitionVersions, CoreVerbs.Delete);
     }
 
     /// <inheritdoc />

@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IEnumerable{T}"/>.

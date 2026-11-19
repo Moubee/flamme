@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 
-namespace Elsa.SasTokens.Contracts;
+namespace Flamme.SasTokens.Contracts;
 
 /// <summary>
 /// A service that can create and decrypt SAS (Shared Access Signature) tokens using the <see cref="Microsoft.AspNetCore.DataProtection.IDataProtector"/> service.
@@ -19,7 +19,7 @@ public class DataProtectorTokenService : ITokenService
     /// </summary>
     public DataProtectorTokenService(IDataProtectionProvider dataProtector)
     {
-        _dataProtector = dataProtector.CreateProtector("Elsa Tokens");
+        _dataProtector = dataProtector.CreateProtector("Flamme Tokens");
         _timeLimitedDataProtector = _dataProtector.ToTimeLimitedDataProtector();
     }
 

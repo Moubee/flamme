@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Request.Contracts;
+namespace Flamme.Mediator.Middleware.Request.Contracts;
 
 /// <summary>
 /// Represents a builder for building a request pipeline.

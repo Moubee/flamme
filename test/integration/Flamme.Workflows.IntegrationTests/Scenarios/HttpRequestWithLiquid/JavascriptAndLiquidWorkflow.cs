@@ -1,9 +1,9 @@
-﻿using Elsa.Expressions.Models;
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+﻿using Flamme.Expressions.Models;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.HttpRequestWithLiquid;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.HttpRequestWithLiquid;
 
 /// <summary>
 /// A workflow that use javascript to get some data, use them with some liquid expressions

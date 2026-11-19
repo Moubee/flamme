@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 /// <summary>
 /// A custom JSON type info resolver that allows private constructors to be used when deserializing JSON.

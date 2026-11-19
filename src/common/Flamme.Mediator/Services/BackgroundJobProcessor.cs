@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Mediator.Services;
+namespace Flamme.Mediator.Services;
 
 /// <summary>
 /// Continuously reads from a channel to which jobs can be sent, executing each received job.

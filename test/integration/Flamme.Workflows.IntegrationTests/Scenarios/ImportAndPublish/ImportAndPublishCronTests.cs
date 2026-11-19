@@ -1,9 +1,9 @@
-﻿using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
+﻿using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ImportAndPublish;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ImportAndPublish;
 
 public class ImportAndPublishCronTests : IAsyncDisposable
 {
@@ -73,7 +73,7 @@ public class ImportAndPublishCronTests : IAsyncDisposable
         // Opt out of strict publishing.
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureElsa(elsa => elsa.UseWorkflowManagement(management => management.UseFailOnValidationErrors(false)))
+            .ConfigureFlamme(elsa => elsa.UseWorkflowManagement(management => management.UseFailOnValidationErrors(false)))
             .Build();
 
         // Populate registries.

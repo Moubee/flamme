@@ -1,10 +1,10 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Handlers.Notifications;
+namespace Flamme.Workflows.Management.Handlers.Notifications;
 
 /// <summary>
 /// Validates output-converter bindings before a workflow definition is accepted.

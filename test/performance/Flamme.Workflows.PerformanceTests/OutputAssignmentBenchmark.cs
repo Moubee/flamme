@@ -1,13 +1,13 @@
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.PerformanceTests;
+namespace Flamme.Workflows.PerformanceTests;
 
 /// <summary>
 /// Guards the allocation-sensitive output assignment path when no converter is configured.
@@ -24,7 +24,7 @@ public class OutputAssignmentBenchmark
     public async Task GlobalSetup()
     {
         var services = new ServiceCollection();
-        services.AddElsa();
+        services.AddFlamme();
         _serviceProvider = services.BuildServiceProvider();
 
         var activity = new WriteLine("benchmark");

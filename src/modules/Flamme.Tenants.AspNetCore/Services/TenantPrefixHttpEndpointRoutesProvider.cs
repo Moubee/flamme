@@ -1,13 +1,13 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Http.Contexts;
-using Elsa.Http.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Http.Contexts;
+using Flamme.Http.Options;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Tenants.AspNetCore.Services;
+namespace Flamme.Tenants.AspNetCore.Services;
 
 /// <summary>
 /// Provides a route for an HTTP endpoint based on the specified context and tenant prefix.

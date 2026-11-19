@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Permissions;
+namespace Flamme.Identity.Permissions;
 
 /// <summary>
 /// Stable resource names for Identity. Endpoints reference these constants rather than string

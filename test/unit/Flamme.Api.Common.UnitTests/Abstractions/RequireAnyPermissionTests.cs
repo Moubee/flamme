@@ -1,11 +1,11 @@
 using System.Net;
 using System.Reflection;
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Testing.Shared.Authorization;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Testing.Shared.Authorization;
 using FastEndpoints;
 
-namespace Elsa.Api.Common.UnitTests.Abstractions;
+namespace Flamme.Api.Common.UnitTests.Abstractions;
 
 /// <summary>
 /// An endpoint declaring <c>RequireAnyPermission</c> opens to a caller holding any one of the permissions it names, and is
@@ -118,7 +118,7 @@ public class RequireAnyPermissionTests
     private Task<HttpResponseMessage> SendAsync(string? permissions = null, bool authenticated = false) =>
         _host.SendAsync(HttpMethod.Get, AnyOfEndpoint.Route, permissions, authenticated);
 
-    public sealed class AnyOfEndpoint : ElsaEndpointWithoutRequest<string>
+    public sealed class AnyOfEndpoint : FlammeEndpointWithoutRequest<string>
     {
         public const string Route = "/tests/any-of";
 
@@ -131,7 +131,7 @@ public class RequireAnyPermissionTests
         public override Task<string> ExecuteAsync(CancellationToken ct) => Task.FromResult("ok");
     }
 
-    public sealed class EmptyDeclarationEndpoint : ElsaEndpointWithoutRequest<string>
+    public sealed class EmptyDeclarationEndpoint : FlammeEndpointWithoutRequest<string>
     {
         public override void Configure()
         {

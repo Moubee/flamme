@@ -1,8 +1,8 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.Features;
+namespace Flamme.Common.Features;
 
 /// <summary>
 /// Adds and configures the Mediator feature.

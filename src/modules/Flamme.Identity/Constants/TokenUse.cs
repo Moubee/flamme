@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Constants;
+namespace Flamme.Identity.Constants;
 
 /// <summary>
 /// Constants for distinguishing identity token usage.

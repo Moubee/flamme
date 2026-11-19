@@ -1,11 +1,11 @@
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Identity.Permissions;
-using Elsa.Permissions;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Identity.Permissions;
+using Flamme.Permissions;
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Permissions.Reach;
+namespace Flamme.Identity.Endpoints.Permissions.Reach;
 
 /// <summary>What a wildcard grant covers right now.</summary>
 /// <param name="Covers">
@@ -27,7 +27,7 @@ public class Request
 /// so an author needs a way to see what it reaches today.
 /// </summary>
 [PublicAPI]
-internal class Reach(IPermissionDescriptorRegistry registry) : ElsaEndpoint<Request, Response>
+internal class Reach(IPermissionDescriptorRegistry registry) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()

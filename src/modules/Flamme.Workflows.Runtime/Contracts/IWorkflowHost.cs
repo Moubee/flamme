@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a single workflow instance that can be executed and takes care of publishing various lifecycle events.

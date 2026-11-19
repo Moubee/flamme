@@ -1,19 +1,19 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Api.Security;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Models;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Api.Security;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.ImportFiles;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.ImportFiles;
 
 /// <summary>
 /// Imports JSON and/or ZIP files containing a workflow definitions.
 /// </summary>
 [PublicAPI]
-internal class ImportFiles : ElsaEndpoint<WorkflowDefinitionModel>
+internal class ImportFiles : FlammeEndpoint<WorkflowDefinitionModel>
 {
     private readonly IWorkflowDefinitionStore _workflowDefinitionStore;
     private readonly IWorkflowDefinitionImporter _workflowDefinitionImporter;
@@ -40,7 +40,7 @@ internal class ImportFiles : ElsaEndpoint<WorkflowDefinitionModel>
     public override void Configure()
     {
         Post("workflow-definitions/import-files");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Write);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Write);
         AllowFileUploads();
     }
 

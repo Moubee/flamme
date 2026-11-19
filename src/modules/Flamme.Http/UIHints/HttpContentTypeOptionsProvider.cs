@@ -1,8 +1,8 @@
 using System.Reflection;
-using Elsa.Http.ContentWriters;
-using Elsa.Workflows.UIHints.Dropdown;
+using Flamme.Http.ContentWriters;
+using Flamme.Workflows.UIHints.Dropdown;
 
-namespace Elsa.Http.UIHints;
+namespace Flamme.Http.UIHints;
 
 /// <summary>
 /// Provides options for the <see cref="SendHttpRequest"/> activity's <see cref="SendHttpRequestBase.ContentType"/> property.

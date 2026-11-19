@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.UserTasks.Persistence.EFCore;
+namespace Flamme.UserTasks.Persistence.EFCore;
 
 internal static class UserTaskEntityConfiguration
 {

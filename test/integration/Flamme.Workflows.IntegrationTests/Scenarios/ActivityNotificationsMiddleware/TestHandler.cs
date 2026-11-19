@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Notifications;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
 
 public class TestHandler : INotificationHandler<ActivityExecuting>, INotificationHandler<ActivityExecuted>
 {

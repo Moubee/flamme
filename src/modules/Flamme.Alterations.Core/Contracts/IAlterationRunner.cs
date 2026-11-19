@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Results;
+using Flamme.Alterations.Core.Results;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Runs a series of alterations on the specified workflow execution context.

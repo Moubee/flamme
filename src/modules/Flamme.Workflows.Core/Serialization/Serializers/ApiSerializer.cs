@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Common.Serialization;
+using Flamme.Workflows.Serialization.Converters;
 
-namespace Elsa.Workflows.Serialization.Serializers;
+namespace Flamme.Workflows.Serialization.Serializers;
 
 /// <inheritdoc cref="IApiSerializer" />
 public class ApiSerializer : ConfigurableSerializer, IApiSerializer

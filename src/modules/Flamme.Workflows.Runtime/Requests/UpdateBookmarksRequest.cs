@@ -1,7 +1,7 @@
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Requests;
+namespace Flamme.Workflows.Runtime.Requests;
 
 /// <summary>
 /// Published when bookmarks needs to be updated.

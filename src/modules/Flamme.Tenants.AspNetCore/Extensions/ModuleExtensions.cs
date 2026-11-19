@@ -1,9 +1,9 @@
-using Elsa.Features.Services;
-using Elsa.Tenants.AspNetCore.Features;
-using Elsa.Tenants.Features;
+using Flamme.Features.Services;
+using Flamme.Tenants.AspNetCore.Features;
+using Flamme.Tenants.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Tenants.Extensions;
+namespace Flamme.Tenants.Extensions;
 
 /// <summary>
 /// Extensions for <see cref="IModule"/> that installs the <see cref="TenantsFeature"/> feature.

@@ -1,13 +1,13 @@
-using Elsa.Common.Services;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Stores;
+using Flamme.Common.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.KeyValues.Features;
+namespace Flamme.KeyValues.Features;
 
 /// <summary>
 /// Installs and configures instance management features.

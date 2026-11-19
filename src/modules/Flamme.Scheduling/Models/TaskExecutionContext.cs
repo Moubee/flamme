@@ -1,4 +1,4 @@
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 /// <summary>
 /// Represents a task execution context.

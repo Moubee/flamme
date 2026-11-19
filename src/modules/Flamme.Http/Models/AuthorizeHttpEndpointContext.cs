@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Represents the context for authorizing an HTTP endpoint.

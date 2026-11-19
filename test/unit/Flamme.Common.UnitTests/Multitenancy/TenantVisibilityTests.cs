@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Common.UnitTests.Multitenancy;
+namespace Flamme.Common.UnitTests.Multitenancy;
 
 /// <summary>
 /// Mirrors EF <c>SetTenantIdFilter</c>: ambient match, <c>*</c>, and null-on-default-tenant.

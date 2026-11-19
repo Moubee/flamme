@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Workflows;
 
 public class SelfCancellingSchedulingWorkflow : WorkflowBase
 {

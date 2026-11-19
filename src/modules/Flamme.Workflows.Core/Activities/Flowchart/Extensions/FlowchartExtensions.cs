@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Activities.Flowchart.Extensions;
+namespace Flamme.Workflows.Activities.Flowchart.Extensions;
 
 public static class FlowchartExtensions
 {

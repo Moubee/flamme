@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.ExecuteWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.ExecuteWorkflows.Workflows;
 
 public class MainWorkflow : WorkflowBase
 {

@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.ActivityExecutions.Models;
+namespace Flamme.Api.Client.Resources.ActivityExecutions.Models;
 
 /// <summary>
 /// Represents a summarized view of a single activity execution of an activity instance.

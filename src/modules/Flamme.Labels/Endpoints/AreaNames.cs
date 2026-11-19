@@ -1,6 +1,6 @@
-namespace Elsa.Labels.Endpoints;
+namespace Flamme.Labels.Endpoints;
 
 public class AreaNames
 {
-    public const string Elsa = "Elsa";
+    public const string Flamme = "Flamme";
 }

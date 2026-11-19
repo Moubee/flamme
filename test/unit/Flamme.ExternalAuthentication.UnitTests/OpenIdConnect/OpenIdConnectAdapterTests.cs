@@ -3,21 +3,21 @@ using System.Text.Json;
 using System.Security.Claims;
 using System.Text;
 using System.Net;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.OpenIdConnect.Models;
-using Elsa.ExternalAuthentication.OpenIdConnect.Services;
-using Elsa.ExternalAuthentication.OpenIdConnect.Validation;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.UnitTests.Foundational;
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.OpenIdConnect.Models;
+using Flamme.ExternalAuthentication.OpenIdConnect.Services;
+using Flamme.ExternalAuthentication.OpenIdConnect.Validation;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.UnitTests.Foundational;
+using Flamme.ExternalAuthentication.Validation;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.OpenIdConnect;
+namespace Flamme.ExternalAuthentication.UnitTests.OpenIdConnect;
 
 public class OpenIdConnectAdapterTests
 {

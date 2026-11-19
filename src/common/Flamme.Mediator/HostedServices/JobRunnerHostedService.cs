@@ -1,7 +1,7 @@
-using Elsa.Mediator.Services;
+using Flamme.Mediator.Services;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Mediator.HostedServices;
+namespace Flamme.Mediator.HostedServices;
 
 /// <summary>
 /// Hosted service adapter for <see cref="BackgroundJobProcessor"/>.

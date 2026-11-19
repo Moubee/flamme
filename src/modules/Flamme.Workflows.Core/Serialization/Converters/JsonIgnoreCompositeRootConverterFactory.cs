@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Workflows.Serialization.Helpers;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// A <see cref="JsonConverterFactory"/> that creates <see cref="JsonIgnoreCompositeRootConverter"/> instances.

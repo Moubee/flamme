@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Scheduling.Tasks;
+namespace Flamme.Scheduling.Tasks;
 
 /// <summary>
 /// A generic task that executes the provided delegate.

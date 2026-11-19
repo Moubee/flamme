@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Elsa.Workflows.CommitStates.Strategies;
+namespace Flamme.Workflows.CommitStates.Strategies;
 
 /// <summary>
 /// Implements a commit strategy that determines whether the workflow state

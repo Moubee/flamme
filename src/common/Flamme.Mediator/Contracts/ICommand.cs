@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// Represents a command.

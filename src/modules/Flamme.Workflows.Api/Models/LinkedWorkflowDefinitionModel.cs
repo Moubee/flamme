@@ -1,7 +1,7 @@
-﻿using Elsa.Models;
-using Elsa.Workflows.Management.Models;
+﻿using Flamme.Models;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 public class LinkedWorkflowDefinitionModel(Link[]? links) : WorkflowDefinitionModel
 {

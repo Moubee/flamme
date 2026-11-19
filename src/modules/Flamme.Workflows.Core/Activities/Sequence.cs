@@ -1,11 +1,11 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Signals;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Signals;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Execute a set of activities in sequence.

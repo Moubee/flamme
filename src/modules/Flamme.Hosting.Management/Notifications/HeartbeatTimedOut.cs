@@ -1,5 +1,5 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Hosting.Management.Notifications;
+namespace Flamme.Hosting.Management.Notifications;
 
 public record HeartbeatTimedOut(string InstanceName) : INotification;

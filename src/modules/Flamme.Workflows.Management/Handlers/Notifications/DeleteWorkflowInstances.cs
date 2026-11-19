@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Handlers.Notifications;
+namespace Flamme.Workflows.Management.Handlers.Notifications;
 
 /// <summary>
 /// Deletes workflow instances when a workflow definition or version is deleted.

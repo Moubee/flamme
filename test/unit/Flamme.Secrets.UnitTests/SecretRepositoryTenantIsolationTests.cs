@@ -1,18 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Elsa.Common.Multitenancy;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Extensions;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Options;
-using Elsa.Secrets.Repositories;
-using Elsa.Tenants.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Extensions;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Options;
+using Flamme.Secrets.Repositories;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 /// <summary>
 /// The default repositories share the EF Secrets tenancy contract: ambient tenant stamping, visibility,

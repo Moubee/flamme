@@ -2,16 +2,16 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Revokes sign-in sessions, and tells whether a refresh token belongs to a revoked one.
@@ -40,7 +40,7 @@ public class SessionRevoker(IRevokedSessionStore store, TimeProvider timeProvide
     /// <summary>
     /// The session named by the specified identity. The refresh-token scheme puts it on the identity it authenticates,
     /// including the session derived for a refresh token issued before sessions existed. <c>null</c> when there is
-    /// none, as with a custom refresh-token scheme, whose tokens are not Elsa Identity's to revoke.
+    /// none, as with a custom refresh-token scheme, whose tokens are not Flamme Identity's to revoke.
     /// </summary>
     public static SignInSession? FindSession(ClaimsIdentity refreshTokenIdentity)
     {

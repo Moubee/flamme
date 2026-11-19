@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Base class for custom activities that return a result.

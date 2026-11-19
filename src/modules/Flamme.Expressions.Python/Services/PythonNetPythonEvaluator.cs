@@ -1,15 +1,15 @@
 using System.Text;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
-using Elsa.Expressions.Python.Contracts;
-using Elsa.Expressions.Python.Models;
-using Elsa.Expressions.Python.Notifications;
-using Elsa.Expressions.Python.Options;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Expressions.Python.Contracts;
+using Flamme.Expressions.Python.Models;
+using Flamme.Expressions.Python.Notifications;
+using Flamme.Expressions.Python.Options;
 using Microsoft.Extensions.Options;
 using Python.Runtime;
 
-namespace Elsa.Expressions.Python.Services;
+namespace Flamme.Expressions.Python.Services;
 
 /// <summary>
 /// Evaluates Python expressions using IronPython.

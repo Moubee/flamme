@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class InMemoryExternalAuthenticationSessionStoreTests
 {

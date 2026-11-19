@@ -1,9 +1,9 @@
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Workflows.Management.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Handlers;
+namespace Flamme.Persistence.EFCore.PostgreSql.Handlers;
 
 /// <summary>
 /// Represents a class that handles entity model creation for PostgreSQL databases.
@@ -11,7 +11,7 @@ namespace Elsa.Persistence.EFCore.PostgreSql.Handlers;
 public class SetupForPostgreSql : IEntityModelCreatingHandler
 {
     /// <inheritdoc />
-    public void Handle(ElsaDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType)
+    public void Handle(FlammeDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType)
     {
         if (!dbContext.Database.IsPostgres())
             return;

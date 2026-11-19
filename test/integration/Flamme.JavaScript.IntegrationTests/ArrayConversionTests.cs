@@ -1,10 +1,10 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
 using Jint;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 /// <summary>
 /// Pins how CLR arrays cross into JavaScript: a script sees a copy, so mutating it does not reach back into
@@ -81,7 +81,7 @@ public class ArrayConversionTests : IAsyncDisposable
     [DisplayName("An expression that touches no CLR array converts none")]
     public async Task ExpressionsWithoutArraysConvertNothing()
     {
-        // Elsa converts collection-valued workflow variables itself, in ObjectConverterHelper, so an ordinary
+        // Flamme converts collection-valued workflow variables itself, in ObjectConverterHelper, so an ordinary
         // evaluation never reaches Jint's array-conversion lane at all. That is what makes the ArrayConversion
         // setting a narrow compatibility pin rather than something every evaluation depends on.
         Engine? engine = null;

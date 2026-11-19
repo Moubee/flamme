@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Users.List;
+namespace Flamme.Identity.Endpoints.Users.List;
 
 internal record UserSummary(
     string Id,

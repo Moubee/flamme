@@ -1,15 +1,15 @@
-using Elsa.Common.Models;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event;
 
 public class EventTests : AppComponentTest
 {

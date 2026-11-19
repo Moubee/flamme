@@ -1,14 +1,14 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Labels.Contracts;
-using Elsa.Workflows;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Labels.Contracts;
+using Flamme.Workflows;
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Elsa.Labels.Endpoints.Labels.Post;
+namespace Flamme.Labels.Endpoints.Labels.Post;
 
 [PublicAPI]
-internal class Create : ElsaEndpoint<Request, Response, LabelMapper>
+internal class Create : FlammeEndpoint<Request, Response, LabelMapper>
 {
     private readonly ILabelStore _store;
 
@@ -20,7 +20,7 @@ internal class Create : ElsaEndpoint<Request, Response, LabelMapper>
     public override void Configure()
     {
         Post("/labels");
-        RequirePermission(Elsa.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Create);
+        RequirePermission(Flamme.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Create);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

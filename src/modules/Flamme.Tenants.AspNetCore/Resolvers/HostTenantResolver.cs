@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Tenants.AspNetCore;
+namespace Flamme.Tenants.AspNetCore;
 
 /// <summary>
 /// Resolves the tenant based on the host in the request.

@@ -1,11 +1,11 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.Providers;
+namespace Flamme.Identity.Providers;
 
 /// <summary>
 /// Represents an application provider that uses <see cref="ApplicationsOptions"/> to find applications.

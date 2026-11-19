@@ -1,7 +1,7 @@
 using System.Text;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests;
+namespace Flamme.UserTasks.Persistence.ConformanceTests;
 
 /// <summary>
 /// States, in one always-running place, which providers this run actually covered.

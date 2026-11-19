@@ -1,6 +1,6 @@
-using Elsa.Workflows.Middleware.Workflows;
+using Flamme.Workflows.Middleware.Workflows;
 
-namespace Elsa.Workflows.Pipelines.WorkflowExecution;
+namespace Flamme.Workflows.Pipelines.WorkflowExecution;
 
 /// <inheritdoc />
 public class WorkflowExecutionPipeline : IWorkflowExecutionPipeline

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowCancellation.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowCancellation.Workflows;
 
 public class SimpleSuspendedWorkflow : WorkflowBase
 {

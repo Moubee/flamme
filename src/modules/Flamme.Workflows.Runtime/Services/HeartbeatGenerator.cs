@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class HeartbeatGenerator : IDisposable
 {

@@ -1,6 +1,6 @@
-using Elsa.Expressions.Helpers;
+using Flamme.Expressions.Helpers;
 
-namespace Elsa.Common.IntegrationTests.Serialization;
+namespace Flamme.Common.IntegrationTests.Serialization;
 
 /// <summary>
 /// Tests for ObjectFormatter.Format() to ensure proper serialization of different types:

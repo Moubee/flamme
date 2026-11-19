@@ -1,10 +1,10 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Results;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Results;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Alterations.Core.Services;
+namespace Flamme.Alterations.Core.Services;
 
 /// <inheritdoc />
 public class AlteredWorkflowDispatcher : IAlteredWorkflowDispatcher

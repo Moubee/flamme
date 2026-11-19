@@ -1,8 +1,8 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 [UsedImplicitly]
 public class DefaultHttpEndpointBasePathProvider(IOptions<HttpActivityOptions> options) : IHttpEndpointBasePathProvider

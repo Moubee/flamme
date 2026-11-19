@@ -1,7 +1,7 @@
 using Cronos;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Common.RecurringTasks;
+namespace Flamme.Common.RecurringTasks;
 
 public class CronSchedule(TimeProvider timeProvider, CronExpression expression) : ISchedule
 {

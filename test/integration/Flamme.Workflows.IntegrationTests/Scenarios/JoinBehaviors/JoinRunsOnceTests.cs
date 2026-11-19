@@ -1,11 +1,11 @@
-using Elsa.Common.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
 
 public class JoinRunsOnceTests : IAsyncDisposable
 {

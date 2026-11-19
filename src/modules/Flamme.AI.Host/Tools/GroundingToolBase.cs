@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 
-namespace Elsa.AI.Host.Tools;
+namespace Flamme.AI.Host.Tools;
 
 public abstract class GroundingToolBase : IAITool
 {

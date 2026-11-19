@@ -1,12 +1,12 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Services;
+namespace Flamme.Workflows.Runtime.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IInterruptedRecoveryScanner"/>.

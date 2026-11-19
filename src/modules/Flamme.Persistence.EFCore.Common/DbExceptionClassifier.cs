@@ -1,4 +1,4 @@
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 internal static class DbExceptionClassifier
 {

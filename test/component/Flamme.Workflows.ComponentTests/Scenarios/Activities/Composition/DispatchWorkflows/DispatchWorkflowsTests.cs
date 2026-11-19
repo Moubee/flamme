@@ -1,18 +1,18 @@
-using Elsa.Common.Models;
-using Elsa.Testing.Shared.Models;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.DispatchWorkflows.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.State;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared.Models;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows.Workflows;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.DispatchWorkflows.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.DispatchWorkflows;
 
 public class DispatchWorkflowsTests : AppComponentTest
 {

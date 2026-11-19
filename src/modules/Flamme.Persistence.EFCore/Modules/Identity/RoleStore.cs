@@ -1,21 +1,21 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IRoleStore"/>.
 /// </summary>
 public class EFCoreRoleStore : IRoleStore, IRoleStoreWithAtomicDelete
 {
-    private readonly EntityStore<IdentityElsaDbContext, Role> _applicationStore;
+    private readonly EntityStore<IdentityFlammeDbContext, Role> _applicationStore;
 
     /// <summary>
     /// Initializes a new instance of <see cref="EFCoreRoleStore"/>.
     /// </summary>
-    public EFCoreRoleStore(EntityStore<IdentityElsaDbContext, Role> applicationStore)
+    public EFCoreRoleStore(EntityStore<IdentityFlammeDbContext, Role> applicationStore)
     {
         _applicationStore = applicationStore;
     }

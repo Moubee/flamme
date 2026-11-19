@@ -1,10 +1,10 @@
-using Elsa.Expressions.Python.Options;
+using Flamme.Expressions.Python.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Python.Runtime;
 
-namespace Elsa.Expressions.Python.HostedServices;
+namespace Flamme.Expressions.Python.HostedServices;
 
 /// <summary>
 /// Initializes the Python engine.

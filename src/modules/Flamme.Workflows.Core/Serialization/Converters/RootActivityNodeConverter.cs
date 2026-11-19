@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Helpers;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Serializes the <see cref="ActivityNode"/> type without its children. Instead, it will serialize the activity children as properties.

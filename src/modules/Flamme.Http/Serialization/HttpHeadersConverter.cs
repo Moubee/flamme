@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Http.Serialization;
+namespace Flamme.Http.Serialization;
 
 /// <summary>
 /// A custom JSON converter for HttpHeaders that supports both single and multiple values.

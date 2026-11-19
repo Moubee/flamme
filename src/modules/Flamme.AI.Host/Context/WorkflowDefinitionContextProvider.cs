@@ -1,10 +1,10 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.AI.Host.Context;
+namespace Flamme.AI.Host.Context;
 
 public class WorkflowDefinitionContextProvider(IServiceProvider serviceProvider, WorkflowGroundingMapper mapper) : IAIContextProvider, IPlaceholderAIContextProvider
 {
@@ -21,7 +21,7 @@ public class WorkflowDefinitionContextProvider(IServiceProvider serviceProvider,
             ?? await store.FindAsync(new WorkflowDefinitionFilter
             {
                 DefinitionId = attachment.ReferenceId,
-                VersionOptions = Elsa.Common.Models.VersionOptions.Latest
+                VersionOptions = Flamme.Common.Models.VersionOptions.Latest
             }, cancellationToken);
         if (definition == null || !string.Equals(NormalizeTenant(definition.TenantId), NormalizeTenant(request.TenantId), StringComparison.Ordinal))
             return NotFound(attachment);

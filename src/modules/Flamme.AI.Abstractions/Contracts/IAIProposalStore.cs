@@ -1,6 +1,6 @@
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 
-namespace Elsa.AI.Abstractions.Contracts;
+namespace Flamme.AI.Abstractions.Contracts;
 
 public interface IAIConversationStore
 {

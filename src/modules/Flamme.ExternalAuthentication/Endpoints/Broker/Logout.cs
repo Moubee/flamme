@@ -1,11 +1,11 @@
-using Elsa.Abstractions;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Constants;
+using Flamme.Abstractions;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Constants;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Broker;
+namespace Flamme.ExternalAuthentication.Endpoints.Broker;
 
-internal sealed class Logout(IExternalAuthenticationBroker broker) : ElsaEndpoint<LogoutRequest>
+internal sealed class Logout(IExternalAuthenticationBroker broker) : FlammeEndpoint<LogoutRequest>
 {
     public override void Configure()
     {
@@ -47,14 +47,14 @@ internal sealed class LogoutRequest
 
 internal sealed record LogoutResponse(bool Completed, string? NavigationUrl, string? RedirectUri);
 
-internal sealed class ContinueLogout(IExternalAuthenticationBroker broker) : ElsaEndpointWithoutRequest
+internal sealed class ContinueLogout(IExternalAuthenticationBroker broker) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
         Get("/external-authentication/logout/continue/{handle}");
 
         // Anonymous, like every other broker endpoint the browser is navigated to. The single-use
-        // route handle carries the authority; the caller's Elsa session has already been revoked by
+        // route handle carries the authority; the caller's Flamme session has already been revoked by
         // the time this runs, and a top-level browser navigation sends no Authorization header, so
         // this endpoint can never present authenticated credentials.
         AllowAnonymous();

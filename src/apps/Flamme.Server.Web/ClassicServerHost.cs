@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Server.Web;
+namespace Flamme.Server.Web;
 
 /// <summary>
 /// Entry-point marker so a test can boot this host with <c>WebApplicationFactory</c>.

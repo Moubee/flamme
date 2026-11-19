@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Contracts;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Contracts;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <inheritdoc />
 public class DefaultRandomStringGenerator : IRandomStringGenerator

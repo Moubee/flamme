@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public class SequentialStatusHandler(IEnumerable<HttpStatusCode> codes) : HttpMessageHandler
 {

@@ -1,5 +1,5 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Secrets.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Secrets.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -7,12 +7,12 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the optional Elsa Secrets bridge for External Authentication.
+    /// Adds the optional Flamme Secrets bridge for External Authentication.
     /// </summary>
-    public static IServiceCollection AddElsaSecretsExternalAuthentication(this IServiceCollection services)
+    public static IServiceCollection AddFlammeSecretsExternalAuthentication(this IServiceCollection services)
     {
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISecretBindingResolver, ElsaSecretBindingResolver>());
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IManagedSecretBindingWriter, ElsaSecretBindingResolver>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ISecretBindingResolver, FlammeSecretBindingResolver>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IManagedSecretBindingWriter, FlammeSecretBindingResolver>());
         return services;
     }
 }

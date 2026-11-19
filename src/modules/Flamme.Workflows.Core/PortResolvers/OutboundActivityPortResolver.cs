@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.PortResolvers;
+namespace Flamme.Workflows.PortResolvers;
 
 /// <summary>
 /// Returns a list of outbound activities for a given activity by reflecting over its public properties matching <see cref="IActivity"/> and <c>ICollection{IActivity}</c>.

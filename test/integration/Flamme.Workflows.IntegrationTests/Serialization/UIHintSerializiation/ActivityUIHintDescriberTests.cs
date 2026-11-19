@@ -1,10 +1,10 @@
-﻿using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.UIHints.Dropdown;
+﻿using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.UIHints.Dropdown;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
+namespace Flamme.Workflows.IntegrationTests.Serialization.UIHintSerializiation;
 
 public class Tests : IAsyncDisposable
 {
@@ -18,7 +18,7 @@ public class Tests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureElsa(elsa =>
+            .ConfigureFlamme(elsa =>
             {
                 elsa.AddActivity<TestActivity>();
             })

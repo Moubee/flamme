@@ -1,5 +1,5 @@
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 static class ObjectDictionaryExtensions
 {

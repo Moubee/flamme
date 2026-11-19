@@ -1,8 +1,8 @@
-using Elsa.Common;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common;
+using Flamme.Common.RecurringTasks;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.StartupTasks;
+namespace Flamme.Workflows.Runtime.StartupTasks;
 
 /// <summary>
 /// Startup task that scans for running workflow instances in the <see cref="WorkflowSubStatus.Interrupted"/> sub-status

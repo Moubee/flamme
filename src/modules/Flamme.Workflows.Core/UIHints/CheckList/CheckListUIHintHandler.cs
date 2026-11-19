@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.UIHints.CheckList;
+namespace Flamme.Workflows.UIHints.CheckList;
 
 /// <inheritdoc />
 public class CheckListUIHintHandler : IUIHintHandler

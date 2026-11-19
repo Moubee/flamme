@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.SmokeTests;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.SmokeTests;
 
 /// <summary>
 /// Comprehensive smoke test workflow that exercises basic control flow and data manipulation activities.

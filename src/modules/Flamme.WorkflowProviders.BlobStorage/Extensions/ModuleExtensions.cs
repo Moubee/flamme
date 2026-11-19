@@ -1,10 +1,10 @@
-using Elsa.Features.Services;
-using Elsa.WorkflowProviders.BlobStorage.Features;
+using Flamme.Features.Services;
+using Flamme.WorkflowProviders.BlobStorage.Features;
 using FluentStorage.Blobs;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IModule"/> to add the fluent storage workflow definition provider.

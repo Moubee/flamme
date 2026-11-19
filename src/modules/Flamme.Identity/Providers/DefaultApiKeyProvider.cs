@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using AspNetCore.Authentication.ApiKey;
-using Elsa;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Providers;
+namespace Flamme.Identity.Providers;
 
 /// <summary>
 /// Validates a given API key and returns an instance of <see cref="IApiKey"/> if the key is valid.

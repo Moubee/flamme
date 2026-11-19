@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkRetract;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkRetract;
 
 [PublicAPI]
 internal class BulkRetract(IWorkflowDefinitionStore store, IWorkflowDefinitionPublisher workflowDefinitionPublisher, IAuthorizationService authorizationService)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
         Post("/bulk-actions/retract/workflow-definitions/by-definition-ids");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "retract");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "retract");
     }
 
     public override async Task<Response> ExecuteAsync(Request request, CancellationToken cancellationToken)

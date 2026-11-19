@@ -1,21 +1,21 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Users.Update;
+namespace Flamme.Identity.Endpoints.Users.Update;
 
 /// <summary>
 /// An endpoint that updates an existing user's password and roles.
 /// </summary>
 [PublicAPI]
-internal class Update(IUserStore userStore, ISecretHasher secretHasher, IRoleAuthorizationService roleAuthorizationService) : ElsaEndpoint<Request, Response>
+internal class Update(IUserStore userStore, ISecretHasher secretHasher, IRoleAuthorizationService roleAuthorizationService) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Put("/identity/users/{id}");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Update);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Users, CoreVerbs.Update);
     }
 
     /// <inheritdoc />

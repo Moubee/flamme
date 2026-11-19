@@ -1,8 +1,8 @@
-using Elsa.Caching.Features;
-using Elsa.Features.Services;
+using Flamme.Caching.Features;
+using Flamme.Features.Services;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides methods to install and configure the distributed caching feature.

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Primitives;
 
-namespace Elsa.Caching.Services;
+namespace Flamme.Caching.Services;
 
 /// <inheritdoc />
 public class ChangeTokenSignalInvoker : IChangeTokenSignalInvoker

@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions;
+namespace Flamme.Expressions;
 
 /// <inheritdoc />
 [UsedImplicitly]

@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Migrations.Runtime
+namespace Flamme.Persistence.EFCore.PostgreSql.Migrations.Runtime
 {
     /// <inheritdoc />
     public partial class V3_8 : Migration
     {
-        private readonly Elsa.Persistence.EFCore.IElsaDbContextSchema _schema;
+        private readonly Flamme.Persistence.EFCore.IFlammeDbContextSchema _schema;
 
         /// <inheritdoc />
-        public V3_8(Elsa.Persistence.EFCore.IElsaDbContextSchema schema)
+        public V3_8(Flamme.Persistence.EFCore.IFlammeDbContextSchema schema)
         {
             _schema = schema;
         }

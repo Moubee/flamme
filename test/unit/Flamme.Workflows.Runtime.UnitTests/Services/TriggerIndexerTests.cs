@@ -1,19 +1,19 @@
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 /// <summary>
 /// Characterises how <see cref="TriggerIndexer"/> turns the payloads of an <see cref="ITrigger"/> into stored triggers.

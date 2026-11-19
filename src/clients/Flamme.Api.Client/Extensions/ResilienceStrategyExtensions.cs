@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 public static class ResilienceStrategyExtensions
 {

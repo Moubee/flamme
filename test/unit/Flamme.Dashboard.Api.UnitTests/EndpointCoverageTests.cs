@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared.Authorization;
-using DashboardApiFeature = Elsa.Dashboard.Api.Features.DashboardApiFeature;
+using Flamme.Testing.Shared.Authorization;
+using DashboardApiFeature = Flamme.Dashboard.Api.Features.DashboardApiFeature;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 public class EndpointCoverageTests
 {

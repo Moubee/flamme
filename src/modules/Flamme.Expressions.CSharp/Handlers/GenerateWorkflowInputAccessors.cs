@@ -1,14 +1,14 @@
 using System.Text;
-using Elsa.Expressions.CSharp.Extensions;
-using Elsa.Expressions.CSharp.Notifications;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.CSharp.Extensions;
+using Flamme.Expressions.CSharp.Notifications;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.CSharp.Handlers;
+namespace Flamme.Expressions.CSharp.Handlers;
 
 /// <summary>
 /// Configures the C# evaluator with methods to access workflow variables.

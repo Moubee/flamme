@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Expressions.Liquid.Helpers;
+namespace Flamme.Expressions.Liquid.Helpers;
 
 public class ConfigurationSectionWrapper(IConfigurationSection section)
 {

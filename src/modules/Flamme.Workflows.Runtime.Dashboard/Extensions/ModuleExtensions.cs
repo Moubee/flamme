@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Workflows.Runtime.Dashboard.Features;
+using Flamme.Features.Services;
+using Flamme.Workflows.Runtime.Dashboard.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class WorkflowRuntimeDashboardModuleExtensions
 {

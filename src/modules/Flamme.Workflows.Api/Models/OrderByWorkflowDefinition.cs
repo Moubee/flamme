@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 /// <summary>
 /// Defines the order by options for workflow definitions.

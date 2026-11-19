@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.StartAt.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.StartAt.Workflows;
 
 public class StartAtWorkflow : WorkflowBase
 {
@@ -14,7 +14,7 @@ public class StartAtWorkflow : WorkflowBase
             Activities =
             {
                 new WriteLine("Starting...") { Id = "WriteLine1" },
-                new Elsa.Scheduling.Activities.StartAt(DateTimeOffset.UtcNow.AddSeconds(1)),
+                new Flamme.Scheduling.Activities.StartAt(DateTimeOffset.UtcNow.AddSeconds(1)),
                 new WriteLine("End") { Id = "WriteLine2" }
             }
         };

@@ -1,18 +1,18 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Connections;
+namespace Flamme.ExternalAuthentication.Endpoints.Connections;
 
-internal sealed class ListConnections(IdentityProviderConnectionManagementService management, IConnectionObservationStore observations, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : ElsaEndpoint<ConnectionListRequest, ConnectionListResponse>
+internal sealed class ListConnections(IdentityProviderConnectionManagementService management, IConnectionObservationStore observations, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : FlammeEndpoint<ConnectionListRequest, ConnectionListResponse>
 {
     public override void Configure()
     {
@@ -100,7 +100,7 @@ internal sealed class ListConnections(IdentityProviderConnectionManagementServic
     private sealed record ConnectionCursor(int ScopeKind, string TenantId, int Order, string Key, string Id);
 }
 
-internal sealed class GetConnection(IdentityProviderConnectionManagementService management, IConnectionObservationStore observations, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class GetConnection(IdentityProviderConnectionManagementService management, IConnectionObservationStore observations, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -122,7 +122,7 @@ internal sealed class GetConnection(IdentityProviderConnectionManagementService 
     }
 }
 
-internal sealed class CreateConnection(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : ElsaEndpoint<ConnectionRequest>
+internal sealed class CreateConnection(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : FlammeEndpoint<ConnectionRequest>
 {
     public override void Configure()
     {
@@ -165,7 +165,7 @@ internal sealed class CreateConnection(IdentityProviderConnectionManagementServi
     private static ConnectionScope ToScope(string tenantId) => tenantId == ConnectionScope.HostTenantId ? ConnectionScope.Host : tenantId.Length == 0 ? ConnectionScope.DefaultTenant : new(ConnectionScopeKind.Tenant, tenantId);
 }
 
-internal sealed class UpdateConnection(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : ElsaEndpoint<ConnectionRequest>
+internal sealed class UpdateConnection(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : FlammeEndpoint<ConnectionRequest>
 {
     public override void Configure()
     {
@@ -225,7 +225,7 @@ internal sealed class UpdateConnection(IdentityProviderConnectionManagementServi
     }
 }
 
-internal abstract class ConnectionLifecycleEndpoint(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal abstract class ConnectionLifecycleEndpoint(IdentityProviderConnectionManagementService management, IExternalAuthenticationAdapterRegistry adapters, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     protected abstract ConnectionLifecycle Action { get; }
     protected abstract string Verb { get; }
@@ -304,7 +304,7 @@ internal sealed class RestoreConnection(IdentityProviderConnectionManagementServ
     protected override void ConfigureRoute() => Post("/external-authentication/connections/{connectionId}/restore");
 }
 
-internal sealed class ValidateConnection(IdentityProviderConnectionManagementService management, ITenantAccessor tenantAccessor) : ElsaEndpointWithoutRequest
+internal sealed class ValidateConnection(IdentityProviderConnectionManagementService management, ITenantAccessor tenantAccessor) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -333,7 +333,7 @@ internal sealed class ReplaceManagedSecretBinding(
     IIdentityProviderConnectionStore store,
     IEnumerable<IManagedSecretBindingWriter> managedSecretBindingWriters,
     ITenantAccessor tenantAccessor,
-    ILogger<ReplaceManagedSecretBinding> logger) : ElsaEndpoint<ManagedSecretBindingRequest>
+    ILogger<ReplaceManagedSecretBinding> logger) : FlammeEndpoint<ManagedSecretBindingRequest>
 {
     private readonly IReadOnlyDictionary<string, IManagedSecretBindingWriter> _writers = managedSecretBindingWriters.ToDictionary(x => x.ResolverType, StringComparer.Ordinal);
 
@@ -442,7 +442,7 @@ internal sealed class RemoveSecretBinding(
     IExternalAuthenticationAdapterRegistry adapters,
     IEnumerable<IManagedSecretBindingWriter> managedSecretBindingWriters,
     ITenantAccessor tenantAccessor,
-    ILogger<RemoveSecretBinding> logger) : ElsaEndpointWithoutRequest
+    ILogger<RemoveSecretBinding> logger) : FlammeEndpointWithoutRequest
 {
     private readonly IReadOnlyDictionary<string, IManagedSecretBindingWriter> _writers = managedSecretBindingWriters.ToDictionary(x => x.ResolverType, StringComparer.Ordinal);
 

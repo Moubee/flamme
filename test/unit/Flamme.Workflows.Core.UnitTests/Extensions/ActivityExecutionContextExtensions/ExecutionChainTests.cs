@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
 
 public class ExecutionChainTests
 {

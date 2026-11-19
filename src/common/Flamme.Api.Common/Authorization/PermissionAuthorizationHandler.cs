@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// Evaluates <see cref="PermissionRequirement"/> through <see cref="IPermissionEvaluator"/>, replacing the

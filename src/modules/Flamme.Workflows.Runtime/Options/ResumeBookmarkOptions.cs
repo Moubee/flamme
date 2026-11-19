@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Options for resuming a workflow.

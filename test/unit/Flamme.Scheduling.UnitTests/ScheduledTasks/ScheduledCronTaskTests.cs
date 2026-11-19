@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.ScheduledTasks;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
+namespace Flamme.Scheduling.UnitTests.ScheduledTasks;
 
 /// <summary>
 /// Tests for ScheduledCronTask to ensure cron triggers continue to fire even in edge cases.
@@ -182,7 +182,7 @@ public class ScheduledCronTaskTests : IDisposable
         // Arrange - Use the exact times from the issue that cause delay.Milliseconds to be 0
         var now = new DateTimeOffset(2025, 11, 06, 22, 50, 00, 0, TimeZoneInfo.Utc.GetUtcOffset(DateTimeOffset.UtcNow));
         var timeProvider = new FakeTimeProvider(now);
-        var realCronParser = new Elsa.Scheduling.Services.CronosCronParser(timeProvider);
+        var realCronParser = new Flamme.Scheduling.Services.CronosCronParser(timeProvider);
         
         // Act - Create scheduled task with real cron parser
         // Before the fix: This would silently fail to schedule if delay <= 0

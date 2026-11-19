@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Serializes and deserializes workflow states.

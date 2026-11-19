@@ -1,22 +1,22 @@
 using System.Net;
-using Elsa.Authorization;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Testing.Shared.Authorization;
-using Elsa.UnitTests.Shared;
-using Elsa.Workflows.Api.Permissions;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Models;
+using Flamme.Authorization;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Contracts;
+using Flamme.Testing.Shared.Authorization;
+using Flamme.UnitTests.Shared;
+using Flamme.Workflows.Api.Permissions;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
+using WorkflowsApiFeature = Flamme.Workflows.Api.Features.WorkflowsApiFeature;
 
-namespace Elsa.Workflows.Api.UnitTests.Endpoints.Descriptors;
+namespace Flamme.Workflows.Api.UnitTests.Endpoints.Descriptors;
 
 /// <summary>
 /// The designer loads the descriptor catalogs, and a definition's versions, to open any definition, so a caller who can
@@ -38,16 +38,16 @@ public class DescriptorCatalogAuthorizationTests
 
     private static readonly string[] CatalogNamespaces =
     [
-        "Elsa.Workflows.Api.Endpoints.ActivityDescriptorOptions",
-        "Elsa.Workflows.Api.Endpoints.ActivityDescriptors",
-        "Elsa.Workflows.Api.Endpoints.CommitStrategies",
-        "Elsa.Workflows.Api.Endpoints.IncidentStrategies",
-        "Elsa.Workflows.Api.Endpoints.LogPersistenceStrategies",
-        "Elsa.Workflows.Api.Endpoints.OutputConverters",
-        "Elsa.Workflows.Api.Endpoints.Scripting.ExpressionDescriptors",
-        "Elsa.Workflows.Api.Endpoints.StorageDrivers",
-        "Elsa.Workflows.Api.Endpoints.VariableTypes",
-        "Elsa.Workflows.Api.Endpoints.WorkflowActivationStrategies"
+        "Flamme.Workflows.Api.Endpoints.ActivityDescriptorOptions",
+        "Flamme.Workflows.Api.Endpoints.ActivityDescriptors",
+        "Flamme.Workflows.Api.Endpoints.CommitStrategies",
+        "Flamme.Workflows.Api.Endpoints.IncidentStrategies",
+        "Flamme.Workflows.Api.Endpoints.LogPersistenceStrategies",
+        "Flamme.Workflows.Api.Endpoints.OutputConverters",
+        "Flamme.Workflows.Api.Endpoints.Scripting.ExpressionDescriptors",
+        "Flamme.Workflows.Api.Endpoints.StorageDrivers",
+        "Flamme.Workflows.Api.Endpoints.VariableTypes",
+        "Flamme.Workflows.Api.Endpoints.WorkflowActivationStrategies"
     ];
 
     private static readonly string[] CatalogPathList =

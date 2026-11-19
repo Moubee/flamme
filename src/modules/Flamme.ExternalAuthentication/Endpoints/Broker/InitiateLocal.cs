@@ -1,13 +1,13 @@
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Constants;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Constants;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.AspNetCore.Builder;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Broker;
+namespace Flamme.ExternalAuthentication.Endpoints.Broker;
 
-internal sealed class InitiateLocal(IExternalAuthenticationBroker broker, ITenantAccessor tenantAccessor) : ElsaEndpoint<InitiateLocalRequest>
+internal sealed class InitiateLocal(IExternalAuthenticationBroker broker, ITenantAccessor tenantAccessor) : FlammeEndpoint<InitiateLocalRequest>
 {
     public override void Configure()
     {

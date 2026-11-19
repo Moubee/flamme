@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Signals;
+namespace Flamme.Workflows.Signals;
 
 /// <summary>
 /// Signaled when the scheduling of a child activity was requested.

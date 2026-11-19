@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Converters;
+namespace Flamme.Api.Client.Converters;
 
 /// <summary>
 /// A JSON converter that serializes <see cref="VersionOptions"/>.

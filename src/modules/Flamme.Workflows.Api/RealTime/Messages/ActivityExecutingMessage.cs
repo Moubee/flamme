@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.Api.RealTime.Messages;
+namespace Flamme.Workflows.Api.RealTime.Messages;
 
 /// <summary>
 /// Contains information about the activity executing event.

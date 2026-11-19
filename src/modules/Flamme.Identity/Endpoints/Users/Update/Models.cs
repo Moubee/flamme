@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Users.Update;
+namespace Flamme.Identity.Endpoints.Users.Update;
 
 internal class Request
 {

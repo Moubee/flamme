@@ -1,23 +1,23 @@
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Http.Bookmarks;
-using Elsa.Scheduling;
-using Elsa.Scheduling.Activities;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Http.Bookmarks;
+using Flamme.Scheduling;
+using Flamme.Scheduling.Activities;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Stimuli;
 using Microsoft.Extensions.DependencyInjection;
-using Timer = Elsa.Scheduling.Activities.Timer;
+using Timer = Flamme.Scheduling.Activities.Timer;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing;
 
 /// <summary>
-/// Characterises how the trigger kinds that ship with Elsa are indexed, so that a change to the indexer that alters any of their rows is visible.
+/// Characterises how the trigger kinds that ship with Flamme are indexed, so that a change to the indexer that alters any of their rows is visible.
 /// The invariant asserted for every row: its hash is the one a publisher computes from that row's own name and payload.
 /// </summary>
 public class ExistingTriggerKindsTests : IAsyncDisposable
@@ -29,7 +29,7 @@ public class ExistingTriggerKindsTests : IAsyncDisposable
     public ExistingTriggerKindsTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseHttp().AddActivity<MultiStimulusTrigger>())
+            .ConfigureFlamme(elsa => elsa.UseHttp().AddActivity<MultiStimulusTrigger>())
             .Build();
 
         _triggerIndexer = _services.GetRequiredService<ITriggerIndexer>();

@@ -1,9 +1,9 @@
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Runtime;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Runtime;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 /// <summary>
 /// Regression tests for the V3_6 Runtime migration's raw SQL statements. `dotnet ef migrations script`
@@ -36,17 +36,17 @@ public class V3_6RuntimeMigrationTests
         await AssertDropIndexStatementsAreTerminated(script, schema);
     }
 
-    // ElsaDbContextOptions.SchemaName always falls back to ElsaDbContextBase.ElsaSchema ("Elsa") when it
+    // FlammeDbContextOptions.SchemaName always falls back to FlammeDbContextBase.FlammeSchema ("Elsa") when it
     // isn't set, so the branch the V3_6 migration guards against with
     // `_schema.Schema != null ? "\"{schema}\"." : ""` - a null schema - is unreachable through the
     // public options and is therefore not covered here.
     private static string GeneratePostgreSqlScript(MigrationsSqlGenerationOptions options, string schema)
     {
-        var migrationsAssembly = typeof(Elsa.Persistence.EFCore.PostgreSql.Migrations.Runtime.V3_6).Assembly;
-        var contextOptions = new ElsaDbContextOptions { SchemaName = schema };
+        var migrationsAssembly = typeof(Flamme.Persistence.EFCore.PostgreSql.Migrations.Runtime.V3_6).Assembly;
+        var contextOptions = new FlammeDbContextOptions { SchemaName = schema };
 
-        return MigrationScriptGenerator.Generate<RuntimeElsaDbContext>(
-            builder => builder.UseElsaPostgreSql(migrationsAssembly, "Host=unused", contextOptions),
+        return MigrationScriptGenerator.Generate<RuntimeFlammeDbContext>(
+            builder => builder.UseFlammePostgreSql(migrationsAssembly, "Host=unused", contextOptions),
             fromMigration: "20250530104953_V3_5",
             toMigration: "20251204150341_V3_6",
             options);

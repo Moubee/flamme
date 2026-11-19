@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Tasks.Requests;
+namespace Flamme.Api.Client.Resources.Tasks.Requests;
 
 /// <summary>
 /// Represents a request to report a task has been completed.

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
 
 /// <summary>
 /// A simple workflow that executes Finish activity.
@@ -17,7 +17,7 @@ public class SimpleFinishWorkflow : WorkflowBase
             Activities =
             {
                 new Start(),
-                new Elsa.Workflows.Activities.Finish()
+                new Flamme.Workflows.Activities.Finish()
             }
         };
     }

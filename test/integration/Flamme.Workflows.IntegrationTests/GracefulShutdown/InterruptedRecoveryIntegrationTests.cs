@@ -1,13 +1,13 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// Integration tests for the activation-time recovery of <see cref="WorkflowSubStatus.Interrupted"/> instances
@@ -21,7 +21,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
     public InterruptedRecoveryIntegrationTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
             .Build();
     }
 
@@ -37,7 +37,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
         var instanceStore = scope.ServiceProvider.GetRequiredService<IWorkflowInstanceStore>();
         await SeedInstancesAsync(instanceStore, count, WorkflowSubStatus.Interrupted, isExecuting: false);
 
-        var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
+        var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
         var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(requeued).IsEqualTo(count);
@@ -59,7 +59,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
         // Stale-executing instance — handled by the existing RestartInterruptedWorkflowsTask, not by the new scan.
         await SeedInstancesAsync(instanceStore, 1, WorkflowSubStatus.Executing, isExecuting: true, idPrefix: "stale-");
 
-        var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
+        var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
         var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(requeued).IsEqualTo(3);
@@ -81,7 +81,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
         await SeedInstancesAsync(instanceStore, 2, WorkflowSubStatus.Interrupted, isExecuting: false, idPrefix: "graceful-");
         await SeedInstancesAsync(instanceStore, 2, WorkflowSubStatus.Executing, isExecuting: true, idPrefix: "ungraceful-");
 
-        var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
+        var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
         var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(requeued).IsEqualTo(2);
@@ -104,7 +104,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
         await SeedInstancesAsync(instanceStore, 2, WorkflowSubStatus.Interrupted, isExecuting: false, idPrefix: "running-", status: WorkflowStatus.Running);
         await SeedInstancesAsync(instanceStore, 3, WorkflowSubStatus.Interrupted, isExecuting: false, idPrefix: "finished-", status: WorkflowStatus.Finished);
 
-        var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
+        var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, fakeRestarter);
         var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
 
         await Assert.That(requeued).IsEqualTo(2);

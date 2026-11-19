@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.UIHints.RadioList;
+namespace Flamme.Api.Client.Shared.UIHints.RadioList;
 
 /// <summary>
 /// Represents a list of radio list items.

@@ -1,7 +1,7 @@
-using Elsa.Alterations.Core.Abstractions;
+using Flamme.Alterations.Core.Abstractions;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.AlterationTypes;
+namespace Flamme.Alterations.AlterationTypes;
 
 /// <summary>
 /// Modifies a variable.

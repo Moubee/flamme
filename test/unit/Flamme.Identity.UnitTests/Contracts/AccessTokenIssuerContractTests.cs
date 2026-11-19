@@ -1,8 +1,8 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.UnitTests.Contracts;
+namespace Flamme.Identity.UnitTests.Contracts;
 
 public class AccessTokenIssuerContractTests
 {

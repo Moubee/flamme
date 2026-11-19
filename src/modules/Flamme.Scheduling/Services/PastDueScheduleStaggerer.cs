@@ -1,7 +1,7 @@
-using Elsa.Scheduling.Options;
+using Flamme.Scheduling.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Scheduling.Services;
+namespace Flamme.Scheduling.Services;
 
 /// <summary>
 /// Distributes already-due schedules over a bounded window to avoid dispatch storms during startup catch-up.

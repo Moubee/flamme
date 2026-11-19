@@ -1,4 +1,4 @@
-namespace Elsa;
+namespace Flamme;
 
 public static class PermissionNames
 {
@@ -6,7 +6,7 @@ public static class PermissionNames
     public const string ClaimType = "permissions";
 
     /// <summary>
-    /// Written into Elsa-issued tokens when the caller has zero grants, so a missing
+    /// Written into Flamme-issued tokens when the caller has zero grants, so a missing
     /// <see cref="ClaimType"/> claim can stay reserved for principals whose permissions are genuinely
     /// unknown (third-party OIDC). Not a grant: <c>Permission.TryParse</c> rejects it, and Studio treats
     /// a present unparseable <c>permissions</c> claim as a known empty set.

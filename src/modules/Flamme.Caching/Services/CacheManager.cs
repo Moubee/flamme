@@ -1,9 +1,9 @@
-using Elsa.Caching.Options;
+using Flamme.Caching.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
-namespace Elsa.Caching.Services;
+namespace Flamme.Caching.Services;
 
 /// <inheritdoc />
 public class CacheManager(IMemoryCache memoryCache, IChangeTokenSignaler changeTokenSignaler, IOptions<CachingOptions> options) : ICacheManager

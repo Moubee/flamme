@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Populates the <see cref="IWorkflowDefinitionStore"/> with workflow definitions provided from <see cref="IWorkflowsProvider"/> implementations.

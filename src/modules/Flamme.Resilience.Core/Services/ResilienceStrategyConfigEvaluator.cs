@@ -1,11 +1,11 @@
 using System.Dynamic;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Resilience.Models;
-using Elsa.Resilience.Serialization;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Resilience.Models;
+using Flamme.Resilience.Serialization;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public class ResilienceStrategyConfigEvaluator(IResilienceStrategyCatalog catalog, IExpressionEvaluator expressionEvaluator, ResilienceStrategySerializer strategySerializer) : IResilienceStrategyConfigEvaluator
 {

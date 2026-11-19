@@ -2,20 +2,20 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.Json;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.Options;
-using Elsa.Expressions.Services;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Expressions;
-using Elsa.Secrets.Extensions;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Providers;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.Options;
+using Flamme.Expressions.Services;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Expressions;
+using Flamme.Secrets.Extensions;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Providers;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretExpressionTests
 {

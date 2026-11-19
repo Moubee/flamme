@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Commands;
 
-namespace Elsa.Workflows.Runtime.Models;
+namespace Flamme.Workflows.Runtime.Models;
 
 /// <summary>
 /// A durable workflow dispatch command waiting for delivery.

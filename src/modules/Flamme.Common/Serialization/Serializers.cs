@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 public static class Serializers
 {

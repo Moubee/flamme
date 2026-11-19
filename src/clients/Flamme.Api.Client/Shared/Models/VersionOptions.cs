@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Text.Json.Serialization;
-using Elsa.Api.Client.Converters;
+using Flamme.Api.Client.Converters;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents the version to get.

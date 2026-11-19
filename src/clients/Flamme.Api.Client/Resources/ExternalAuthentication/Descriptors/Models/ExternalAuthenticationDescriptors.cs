@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
 
 public sealed class ExternalAuthenticationAdapterDescriptor
 {

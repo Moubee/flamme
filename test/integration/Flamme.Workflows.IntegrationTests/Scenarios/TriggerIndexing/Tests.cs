@@ -1,14 +1,14 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.Fakes;
-using Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.Fakes;
+using Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing;
 
 public class Tests : IAsyncDisposable
 {

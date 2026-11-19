@@ -1,19 +1,19 @@
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Models;
-using Elsa.Workflows.Models;
+using Flamme.Abstractions;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.OutputConverters.List;
+namespace Flamme.Workflows.Api.Endpoints.OutputConverters.List;
 
 /// <summary>
 /// Lists output converters compatible with declared output and destination types.
 /// </summary>
 [PublicAPI]
-internal class List(IOutputConverterRegistry registry, ISerializationTypeRegistry serializationTypeRegistry) : ElsaEndpointWithoutRequest<ListResponse<OutputConverterDescriptorModel>>
+internal class List(IOutputConverterRegistry registry, ISerializationTypeRegistry serializationTypeRegistry) : FlammeEndpointWithoutRequest<ListResponse<OutputConverterDescriptorModel>>
 {
     /// <inheritdoc />
     public override void Configure()

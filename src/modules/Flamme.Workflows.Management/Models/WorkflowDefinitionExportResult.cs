@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// Represents the result of exporting one or more workflow definitions.

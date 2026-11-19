@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Mediator.Middleware.Request;
+namespace Flamme.Mediator.Middleware.Request;
 
 /// <summary>
 /// Provides context to a request handler.

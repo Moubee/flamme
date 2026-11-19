@@ -1,10 +1,10 @@
-using Elsa.Identity.Constants;
-using Elsa.Identity.Options;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Configures the <see cref="JwtBearerOptions"/>

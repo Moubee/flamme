@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Activities.IntegrationTests;
+namespace Flamme.Activities.IntegrationTests;
 
 public class ForEachTests : IAsyncDisposable
 {

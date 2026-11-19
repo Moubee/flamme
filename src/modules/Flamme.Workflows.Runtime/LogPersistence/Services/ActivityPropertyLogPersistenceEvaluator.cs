@@ -1,19 +1,19 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.LogPersistence.Strategies;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.LogPersistence.Strategies;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
 using Humanizer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /* The following legacy JSON structure is expected to be found in the custom properties of the workflow and activity:
  * {
@@ -28,10 +28,10 @@ namespace Elsa.Workflows.Runtime;
 /* The following JSON structure is expected to be found in the custom properties of the workflow and activity:
  * {
  *      "logPersistenceConfig": {
- *          "default": { "evaluationMode": "Strategy", "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core", "expression": "..." },
- *          "inputs": { "input1" : { "evaluationMode": "Strategy", "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core", "expression": "..." } },
- *          "outputs": { "output1" : { "evaluationMode": "Strategy", "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core", "expression": "..." } }
- *          "internalState": { "evaluationMode": "Strategy", "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core", "expression": "..." }
+ *          "default": { "evaluationMode": "Strategy", "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core", "expression": "..." },
+ *          "inputs": { "input1" : { "evaluationMode": "Strategy", "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core", "expression": "..." } },
+ *          "outputs": { "output1" : { "evaluationMode": "Strategy", "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core", "expression": "..." } }
+ *          "internalState": { "evaluationMode": "Strategy", "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core", "expression": "..." }
  *          }
  *  }
  */

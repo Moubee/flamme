@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Abstractions;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Abstractions;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.Providers;
+namespace Flamme.Expressions.JavaScript.Providers;
 
 /// <summary>
 /// Produces <see cref="TypeDefinition"/>s for common types.

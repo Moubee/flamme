@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.StorageDrivers.Models;
+namespace Flamme.Api.Client.Resources.StorageDrivers.Models;
 
 /// <summary>
 /// Represents a storage driver descriptor.

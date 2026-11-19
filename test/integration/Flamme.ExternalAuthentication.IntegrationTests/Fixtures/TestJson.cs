@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 
 internal static class TestJson
 {

@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 using System.Threading.Tasks;
 
-namespace Elsa.Expressions.UnitTests.Extensions;
+namespace Flamme.Expressions.UnitTests.Extensions;
 
 public class TypeExtensionsTests
 {

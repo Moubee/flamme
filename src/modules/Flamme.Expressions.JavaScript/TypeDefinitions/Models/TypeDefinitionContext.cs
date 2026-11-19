@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
 /// <summary>
 /// Provides context to intellisense providers.

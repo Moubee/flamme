@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WithdrawingScheduledWork.Activities;
 
 /// <summary>
 /// A container that schedules two children and then decides one of them must not run after all, before the engine has

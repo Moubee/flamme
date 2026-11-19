@@ -1,10 +1,10 @@
-using Elsa.Mediator.Middleware.Command;
-using Elsa.Mediator.Middleware.Command.Contracts;
-using Elsa.Tenants.Mediator.Middleware;
+using Flamme.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Command.Contracts;
+using Flamme.Tenants.Mediator.Middleware;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Tenants.Mediator.Tasks;
+namespace Flamme.Tenants.Mediator.Tasks;
 
 [UsedImplicitly]
 public class SetupMediatorPipelines(ICommandPipeline commandPipeline) : IHostedService

@@ -1,18 +1,18 @@
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Features;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Features;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// Configures the <see cref="IdentityFeature"/> feature with Entity Framework Core persistence providers.
 /// </summary>
 [DependsOn(typeof(IdentityFeature))]
 [PublicAPI]
-public class EFCoreIdentityPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreIdentityPersistenceFeature, IdentityElsaDbContext>(module)
+public class EFCoreIdentityPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreIdentityPersistenceFeature, IdentityFlammeDbContext>(module)
 {
     /// <inheritdoc />
     public override void Configure()

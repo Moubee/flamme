@@ -1,4 +1,4 @@
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Represents the context for resolving a tenant in a tenant resolution strategy pipeline.

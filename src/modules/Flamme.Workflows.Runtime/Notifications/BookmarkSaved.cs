@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 /// <summary>
 /// Triggered when a bookmark has been saved.

@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Models;
+﻿namespace Flamme.Workflows.Models;
 
 public class ActivityConstructionResult(IActivity activity, IEnumerable<Exception>? exceptions = null)
 {

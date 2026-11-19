@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ActivityNotificationsMiddleware;
 
 public class Spy
 {

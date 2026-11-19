@@ -1,8 +1,8 @@
-// using Elsa.Api.Client.Activities;
-// using Elsa.Api.Client.Extensions;
-// using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+// using Flamme.Api.Client.Activities;
+// using Flamme.Api.Client.Extensions;
+// using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 //
-// namespace Elsa.Api.Client.Shared.Models;
+// namespace Flamme.Api.Client.Shared.Models;
 //
 // /// <summary>
 // /// Represents a container activity.

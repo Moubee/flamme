@@ -1,7 +1,7 @@
 using System.Text;
-using Elsa.Identity.Contracts;
+using Flamme.Identity.Contracts;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Generates and parses API keys.

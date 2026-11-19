@@ -1,7 +1,7 @@
-using Elsa.AI.Host.Streaming;
+using Flamme.AI.Host.Streaming;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Streaming;
+namespace Flamme.AI.Host.UnitTests.Streaming;
 
 public class AIReconnectGraceTests
 {

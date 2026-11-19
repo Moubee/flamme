@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Mappers;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Mappers;
 
-namespace Elsa.Workflows.Management.Materializers;
+namespace Flamme.Workflows.Management.Materializers;
 
 /// <summary>
 /// Materializes a <see cref="Workflow"/> from a <see cref="WorkflowDefinition"/>'s JSON data.

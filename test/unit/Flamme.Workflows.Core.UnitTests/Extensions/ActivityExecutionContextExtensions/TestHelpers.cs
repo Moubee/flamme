@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
 
 /// <summary>
 /// Provides helper methods for ActivityExecutionContextExtensions unit tests.

@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Options;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides a set of extension methods for <see cref="IMediator"/>.

@@ -1,4 +1,4 @@
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 /// <summary>
 /// A registry of types that may be resolved from serialization type identifiers.

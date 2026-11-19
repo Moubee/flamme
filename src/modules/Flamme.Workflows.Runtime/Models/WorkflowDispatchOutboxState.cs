@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Models;
+namespace Flamme.Workflows.Runtime.Models;
 
 /// <summary>
 /// Workflow-state marker proving that outbox items belong to a committed workflow state.

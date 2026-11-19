@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api;
+namespace Flamme.Workflows.Api;
 
 public class ApiEndpointOptions
 {
@@ -8,8 +8,8 @@ public class ApiEndpointOptions
     public string RoutePrefix { get; set; } = "elsa/api";
 
     /// <summary>
-    /// The ASP.NET Core rate limiting policy to apply to Elsa API endpoints.
-    /// <c>null</c> means unspecified and allows a host to assign a default policy; an empty string disables Elsa API rate limiting.
+    /// The ASP.NET Core rate limiting policy to apply to Flamme API endpoints.
+    /// <c>null</c> means unspecified and allows a host to assign a default policy; an empty string disables Flamme API rate limiting.
     /// </summary>
     public string? RateLimitingPolicyName { get; set; }
 }

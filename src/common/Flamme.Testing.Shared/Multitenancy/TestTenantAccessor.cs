@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Testing.Shared.Multitenancy;
+namespace Flamme.Testing.Shared.Multitenancy;
 
 /// <summary>
 /// A tenant accessor for tests that construct tenant-aware services directly.

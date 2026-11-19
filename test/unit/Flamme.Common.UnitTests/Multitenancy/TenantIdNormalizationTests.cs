@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using System.Threading.Tasks;
 
-namespace Elsa.Common.UnitTests.Multitenancy;
+namespace Flamme.Common.UnitTests.Multitenancy;
 
 public class TenantIdNormalizationTests
 {

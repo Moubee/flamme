@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Runtime.Models;
+namespace Flamme.Workflows.Runtime.Models;
 
 /// <summary>
 /// Represents a reloaded workflow definition with necessary properties for 

@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Routing;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 [UsedImplicitly]
 public class HttpRouteData

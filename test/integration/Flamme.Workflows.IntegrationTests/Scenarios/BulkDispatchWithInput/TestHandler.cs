@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.BulkDispatchWithInput;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.BulkDispatchWithInput;
 
 public class TestHandler(Spy spy) : INotificationHandler<WorkflowDefinitionDispatching>
 {

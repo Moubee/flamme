@@ -1,25 +1,25 @@
 ﻿using System.Runtime.ExceptionServices;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Middleware.Workflows;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Middleware.Workflows;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public static class DispatchWorkflowExtensions
 {
     public static async Task<WorkflowStateCommitted?> DispatchWorkflowAndRunToCompletion(
         this IWorkflow workflowDefinition,
         Action<IServiceCollection>? configureServices = null,
-        Action<IModule>? configureElsa = null,
+        Action<IModule>? configureFlamme = null,
         string? instanceId = null,
         TimeSpan? timeout = null)
     {
@@ -48,7 +48,7 @@ public static class DispatchWorkflowExtensions
                 workflowFinished.TrySetResult((notification, cycleDisposed));
             }));
 
-            services.AddElsa(elsa => configureElsa?.Invoke(elsa));
+            services.AddFlamme(elsa => configureFlamme?.Invoke(elsa));
         });
         var host = hostBuilder.Build();
 

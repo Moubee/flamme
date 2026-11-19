@@ -1,18 +1,18 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Labels.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Labels.Contracts;
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Elsa.Labels.Endpoints.Labels.Update;
+namespace Flamme.Labels.Endpoints.Labels.Update;
 
 [PublicAPI]
-internal class Update(ILabelStore store) : ElsaEndpoint<Request, Response, LabelMapper>
+internal class Update(ILabelStore store) : FlammeEndpoint<Request, Response, LabelMapper>
 {
     public override void Configure()
     {
         Post("/labels/{id}");
-        RequirePermission(Elsa.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Update);
+        RequirePermission(Flamme.Labels.Permissions.LabelPermissions.Labels, CoreVerbs.Update);
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

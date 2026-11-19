@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Contracts;
+namespace Flamme.UserTasks.Contracts;
 
 public interface IUserTaskIdentityResolver
 {

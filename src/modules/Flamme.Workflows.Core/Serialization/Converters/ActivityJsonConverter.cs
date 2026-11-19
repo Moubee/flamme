@@ -1,15 +1,15 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// (De)serializes objects of type <see cref="IActivity"/>.

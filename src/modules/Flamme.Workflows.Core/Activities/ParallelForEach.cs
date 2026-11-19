@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Schedule an activity for each item in parallel.

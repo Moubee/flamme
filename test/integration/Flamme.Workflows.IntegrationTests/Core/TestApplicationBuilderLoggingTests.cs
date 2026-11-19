@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.IntegrationTests.Core;
+namespace Flamme.Workflows.IntegrationTests.Core;
 
 public class TestApplicationBuilderLoggingTests
 {

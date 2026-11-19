@@ -1,14 +1,14 @@
-﻿using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.Liquid.Contracts;
-using Elsa.Expressions.Liquid.Notifications;
-using Elsa.Expressions.Liquid.Options;
-using Elsa.Mediator.Contracts;
+﻿using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.Liquid.Contracts;
+using Flamme.Expressions.Liquid.Notifications;
+using Flamme.Expressions.Liquid.Options;
+using Flamme.Mediator.Contracts;
 using Fluid;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Liquid.Services;
+namespace Flamme.Expressions.Liquid.Services;
 
 /// <inheritdoc />
 public class LiquidTemplateManager : ILiquidTemplateManager

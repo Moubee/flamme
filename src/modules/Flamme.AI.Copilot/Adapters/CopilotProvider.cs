@@ -1,15 +1,15 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Copilot.Options;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Copilot.Options;
 using GitHub.Copilot;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Copilot.Adapters;
+namespace Flamme.AI.Copilot.Adapters;
 
 public class CopilotProvider(
     IOptions<CopilotOptions> options,
@@ -129,7 +129,7 @@ public class CopilotProvider(
         var providerConfiguration = request.ProviderConfiguration;
         var model = providerConfiguration?.Model ?? copilotOptions.Model;
 
-        config.ClientName = "Elsa Weaver";
+        config.ClientName = "Flamme Weaver";
         config.Model = model;
         config.ReasoningEffort = copilotOptions.ReasoningEffort;
         config.Streaming = copilotOptions.EnableStreaming;
@@ -152,7 +152,7 @@ public class CopilotProvider(
     private static ICollection<AIFunctionDeclaration> CreateTools(IReadOnlyCollection<AIToolDefinition> tools, IAIProviderToolInvoker toolInvoker) =>
         tools
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .Select(x => (AIFunctionDeclaration)new ElsaCopilotToolFunction(x, toolInvoker))
+            .Select(x => (AIFunctionDeclaration)new FlammeCopilotToolFunction(x, toolInvoker))
             .ToList();
 
     private static string BuildPrompt(AITurnRequest request)
@@ -163,7 +163,7 @@ public class CopilotProvider(
         var prompt = new StringBuilder();
         prompt.AppendLine(request.Message);
         prompt.AppendLine();
-        prompt.AppendLine("Elsa context references resolved by the server:");
+        prompt.AppendLine("Flamme context references resolved by the server:");
 
         foreach (var context in request.Context)
         {

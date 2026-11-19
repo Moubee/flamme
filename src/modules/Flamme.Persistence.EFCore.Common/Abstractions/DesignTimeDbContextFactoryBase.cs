@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Abstractions;
+namespace Flamme.Persistence.EFCore.Abstractions;
 
 /// <summary>
 /// A design-time factory base class that can be inherited from by provider-specific implementations.

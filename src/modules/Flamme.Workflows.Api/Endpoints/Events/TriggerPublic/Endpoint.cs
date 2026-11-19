@@ -1,15 +1,15 @@
-using Elsa.Abstractions;
-using Elsa.SasTokens.Contracts;
-using Elsa.Workflows.Runtime;
+using Flamme.Abstractions;
+using Flamme.SasTokens.Contracts;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Events.TriggerPublic;
+namespace Flamme.Workflows.Api.Endpoints.Events.TriggerPublic;
 
 /// <summary>
 /// Resumes a workflow instance blocked by a specified event encoded in the provided SAS token.
 /// </summary>
 [PublicAPI]
-internal class Trigger : ElsaEndpointWithoutRequest
+internal class Trigger : FlammeEndpointWithoutRequest
 {
     private readonly ITokenService _tokenService;
     private readonly IEventPublisher _eventPublisher;

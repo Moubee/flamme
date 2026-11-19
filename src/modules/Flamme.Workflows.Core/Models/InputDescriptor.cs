@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// A descriptor of an activity's input property.

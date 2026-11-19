@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.ComponentTests.Services;
+namespace Flamme.Workflows.ComponentTests.Services;
 
 /// <summary>
 /// Mutable JavaScript value scoped to one component-test host.

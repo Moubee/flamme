@@ -1,14 +1,14 @@
 using System.Net;
 using System.Text;
-using Elsa.Http;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.Parsers;
-using Elsa.Resilience;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Http;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.Parsers;
+using Flamme.Resilience;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Activities.UnitTests.Http.Helpers;
+namespace Flamme.Activities.UnitTests.Http.Helpers;
 
 /// <summary>
 /// Extension methods for configuring HTTP-related services in ActivityTestFixture.

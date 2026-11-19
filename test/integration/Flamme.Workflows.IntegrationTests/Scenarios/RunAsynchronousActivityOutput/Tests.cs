@@ -1,12 +1,12 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Runtime.Distributed.Extensions;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Runtime.Distributed.Extensions;
+using Flamme.Workflows.Runtime.Stores;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.RunAsynchronousActivityOutput;
 
 public class Tests
 {
@@ -84,7 +84,7 @@ public class Tests
         {
             var variable1 = new Variable<int>();
             var variable2 = new Variable<int>();
-            workflowBuilder.Root = new Elsa.Workflows.Activities.Parallel
+            workflowBuilder.Root = new Flamme.Workflows.Activities.Parallel
             {
                 Variables =
                 {

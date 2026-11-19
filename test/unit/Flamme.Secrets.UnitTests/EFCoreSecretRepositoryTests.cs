@@ -1,22 +1,22 @@
 using System.IO;
 using System.Threading.Tasks;
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Persistence.EFCore;
-using Elsa.Secrets.Persistence.EFCore.PostgreSql.Extensions;
-using Elsa.Secrets.Persistence.EFCore.Repositories;
-using Elsa.Secrets.Services;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Persistence.EFCore;
+using Flamme.Secrets.Persistence.EFCore.PostgreSql.Extensions;
+using Flamme.Secrets.Persistence.EFCore.Repositories;
+using Flamme.Secrets.Services;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class EFCoreSecretRepositoryTests
 {
@@ -28,9 +28,9 @@ public class EFCoreSecretRepositoryTests
         var services = new ServiceCollection();
         var connectionString = _database.ConnectionString;
         services.AddPostgreSqlEntityModelCreatingHandlers();
-        services.AddDbContextFactory<SecretsElsaDbContext>(builder => builder.UseElsaPostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, connectionString));
+        services.AddDbContextFactory<SecretsFlammeDbContext>(builder => builder.UseFlammePostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, connectionString));
         services.AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>();
-        services.AddScoped<Store<SecretsElsaDbContext, Secret>>();
+        services.AddScoped<Store<SecretsFlammeDbContext, Secret>>();
         services.AddScoped<EFCoreSecretRepository>();
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -40,7 +40,7 @@ public class EFCoreSecretRepositoryTests
     public async Task InitializeAsync()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsFlammeDbContext>>();
         await using var dbContext = await factory.CreateDbContextAsync();
         await dbContext.Database.MigrateAsync();
     }
@@ -57,10 +57,10 @@ public class EFCoreSecretRepositoryTests
     public async Task Repository_RetainsPreTenancyConstructorShape()
     {
         await Assert.That(typeof(EFCoreSecretRepository).GetConstructor([
-            typeof(Store<SecretsElsaDbContext, Secret>),
+            typeof(Store<SecretsFlammeDbContext, Secret>),
             typeof(ISecretNameValidator)])).IsNotNull();
         await Assert.That(typeof(EFCoreSecretRepository).GetConstructor([
-            typeof(Store<SecretsElsaDbContext, Secret>),
+            typeof(Store<SecretsFlammeDbContext, Secret>),
             typeof(ISecretNameValidator),
             typeof(IOptions<TenantsOptions>)])).IsNotNull();
     }
@@ -74,7 +74,7 @@ public class EFCoreSecretRepositoryTests
         // this change owns is the index, and a global unique index would make the name a shared resource: the
         // second tenant to want "smtp:password" could not create one.
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsFlammeDbContext>>();
         await using var dbContext = await factory.CreateDbContextAsync();
 
         var index = dbContext.Model
@@ -103,7 +103,7 @@ public class EFCoreSecretRepositoryTests
     public async Task UniqueIndexRejectsDuplicateDefaultTenantNames()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsFlammeDbContext>>();
         await using var dbContext = await factory.CreateDbContextAsync();
 
         await InsertSecretAsync(dbContext, "first", "smtp:password", Tenant.DefaultTenantId);
@@ -461,25 +461,25 @@ public class EFCoreSecretRepositoryTests
             .Configure<TenantsOptions>(options => options.IsEnabled = true)
             .AddScoped<IEntitySavingHandler, ApplyTenantId>()
             .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
-            .AddDbContextFactory<SecretsElsaDbContext>(builder => builder
+            .AddDbContextFactory<SecretsFlammeDbContext>(builder => builder
                 .EnableServiceProviderCaching(false)
-                .UseElsaPostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, database.ConnectionString))
-            .Decorate<IDbContextFactory<SecretsElsaDbContext>, TenantAwareDbContextFactory<SecretsElsaDbContext>>()
+                .UseFlammePostgreSql(typeof(PostgreSqlSecretsPersistenceFeatureExtensions).Assembly, database.ConnectionString))
+            .Decorate<IDbContextFactory<SecretsFlammeDbContext>, TenantAwareDbContextFactory<SecretsFlammeDbContext>>()
             .AddSingleton<ISecretNameValidator, DefaultSecretNameValidator>()
-            .AddScoped<Store<SecretsElsaDbContext, Secret>>()
+            .AddScoped<Store<SecretsFlammeDbContext, Secret>>()
             .AddScoped<EFCoreSecretRepository>()
             .BuildServiceProvider();
 
         try
         {
             await using var scope = services.CreateAsyncScope();
-            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsElsaDbContext>>();
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SecretsFlammeDbContext>>();
             await using (var dbContext = await factory.CreateDbContextAsync())
                 await dbContext.Database.MigrateAsync();
 
             var repository = useLegacyConstructor
                 ? new EFCoreSecretRepository(
-                    scope.ServiceProvider.GetRequiredService<Store<SecretsElsaDbContext, Secret>>(),
+                    scope.ServiceProvider.GetRequiredService<Store<SecretsFlammeDbContext, Secret>>(),
                     scope.ServiceProvider.GetRequiredService<ISecretNameValidator>())
                 : scope.ServiceProvider.GetRequiredService<EFCoreSecretRepository>();
             await test(repository, tenantAccessor);
@@ -494,7 +494,7 @@ public class EFCoreSecretRepositoryTests
     private static IDisposable UseTenant(DefaultTenantAccessor tenantAccessor, string tenantId) =>
         tenantAccessor.PushContext(new Tenant { Id = tenantId, Name = tenantId });
 
-    private static async Task InsertSecretAsync(SecretsElsaDbContext dbContext, string id, string name, string tenantId)
+    private static async Task InsertSecretAsync(SecretsFlammeDbContext dbContext, string id, string name, string tenantId)
     {
         var secret = new Secret
         {

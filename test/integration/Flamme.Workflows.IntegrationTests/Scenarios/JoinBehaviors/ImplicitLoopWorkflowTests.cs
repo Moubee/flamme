@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
 
 public class ImplicitWorkflowTests : IAsyncDisposable
 {

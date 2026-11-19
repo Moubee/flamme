@@ -1,20 +1,20 @@
 using System.Collections.ObjectModel;
-using Elsa.Common;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.State;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A delegate entry that is used by activities to be notified when the activities they scheduled are completed.

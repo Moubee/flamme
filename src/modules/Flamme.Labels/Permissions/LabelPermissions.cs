@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Labels.Permissions;
+namespace Flamme.Labels.Permissions;
 
 /// <summary>
 /// Stable resource names for Labels. Endpoints reference these constants rather than string

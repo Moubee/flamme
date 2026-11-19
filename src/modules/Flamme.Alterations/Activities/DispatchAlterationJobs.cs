@@ -1,15 +1,15 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Alterations.Activities;
+namespace Flamme.Alterations.Activities;
 
 /// <summary>
 /// Submits an alteration plan for execution.

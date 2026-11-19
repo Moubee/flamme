@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Shared.UIHints.CodeEditor;
+namespace Flamme.Api.Client.Shared.UIHints.CodeEditor;
 
 /// <summary>
 /// Height options for the code editor component.

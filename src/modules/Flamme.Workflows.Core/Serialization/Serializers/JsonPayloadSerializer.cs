@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.Converters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Serialization.Serializers;
+namespace Flamme.Workflows.Serialization.Serializers;
 
 /// <summary>
 /// Serializes simple DTOs from and to JSON.

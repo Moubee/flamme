@@ -1,22 +1,22 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Roles.Update;
+namespace Flamme.Identity.Endpoints.Roles.Update;
 
 /// <summary>
 /// An endpoint that updates an existing role.
 /// </summary>
 [PublicAPI]
-internal class Update(IRoleStore roleStore, IRoleAuthorizationService roleAuthorizationService, IPermissionGrantValidator grantValidator, Services.RoleSecurityNotifier securityNotifier) : ElsaEndpoint<Request, Response>
+internal class Update(IRoleStore roleStore, IRoleAuthorizationService roleAuthorizationService, IPermissionGrantValidator grantValidator, Services.RoleSecurityNotifier securityNotifier) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Put("/identity/roles/{id}");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Update);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Update);
     }
 
     /// <inheritdoc />

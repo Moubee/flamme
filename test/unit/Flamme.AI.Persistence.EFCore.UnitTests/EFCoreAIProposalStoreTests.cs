@@ -1,13 +1,13 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Persistence.EFCore.Entities;
-using Elsa.AI.Persistence.EFCore.Stores;
-using Elsa.Testing.Shared.Databases;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Persistence.EFCore.Entities;
+using Flamme.AI.Persistence.EFCore.Stores;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Threading.Tasks;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.AI.Persistence.EFCore.UnitTests;
+namespace Flamme.AI.Persistence.EFCore.UnitTests;
 
 public class EFCoreAIProposalStoreTests : IAsyncInitializer, IAsyncDisposable
 {

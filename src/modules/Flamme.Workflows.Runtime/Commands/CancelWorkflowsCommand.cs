@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Workflows.Runtime.Commands;
+namespace Flamme.Workflows.Runtime.Commands;
 
 /// <summary>
 /// Sends a command to cancel workflows.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// Represents a description of a .NET type that can be used as a workflow variable.

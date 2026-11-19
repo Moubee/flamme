@@ -1,17 +1,17 @@
-using Elsa.Extensions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Labels.Entities;
-using Elsa.Labels.Features;
+using Flamme.Extensions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Labels.Entities;
+using Flamme.Labels.Features;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
 /// <summary>
 /// Configures the <see cref="LabelsFeature"/> feature with an Entity Framework Core persistence provider.
 /// </summary>
 [DependsOn(typeof(LabelsFeature))]
-public class EFCoreLabelPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreLabelPersistenceFeature, LabelsElsaDbContext>(module)
+public class EFCoreLabelPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreLabelPersistenceFeature, LabelsFlammeDbContext>(module)
 {
     public override void Configure()
     {

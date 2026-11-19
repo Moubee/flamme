@@ -1,4 +1,4 @@
-using Elsa.Identity.Options;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -16,7 +16,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddIdentityTokenOptionsValidation(this IServiceCollection services)
     {
         services.AddOptions<IdentityTokenOptions>().ValidateOnStart();
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<IdentityTokenOptions>, Elsa.Extensions.ValidateIdentityTokenOptions>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<IdentityTokenOptions>, Flamme.Extensions.ValidateIdentityTokenOptions>());
         return services;
     }
 }

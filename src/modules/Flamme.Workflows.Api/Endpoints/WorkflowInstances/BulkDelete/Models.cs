@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.BulkDelete;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.BulkDelete;
 
 internal class Request
 {

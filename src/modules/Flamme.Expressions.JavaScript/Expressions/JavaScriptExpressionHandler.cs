@@ -1,12 +1,12 @@
 using System.Dynamic;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Expressions.JavaScript.Contracts;
 using Humanizer;
 using Jint;
 
-namespace Elsa.Expressions.JavaScript.Expressions;
+namespace Flamme.Expressions.JavaScript.Expressions;
 
 /// <summary>
 /// Evaluates JavaScript expressions.

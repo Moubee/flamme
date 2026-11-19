@@ -1,14 +1,14 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Persistence.EFCore;
-using Elsa.AI.Persistence.EFCore.Services;
-using Elsa.AI.Persistence.EFCore.Stores;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Persistence.EFCore;
+using Flamme.AI.Persistence.EFCore.Services;
+using Flamme.AI.Persistence.EFCore.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ServiceCollectionExtensions
 {

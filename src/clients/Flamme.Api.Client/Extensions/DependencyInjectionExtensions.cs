@@ -1,35 +1,35 @@
-using Elsa.Api.Client.Options;
-using Elsa.Api.Client.Resources.ActivityDescriptorOptions.Contracts;
-using Elsa.Api.Client.Resources.ActivityDescriptors.Contracts;
-using Elsa.Api.Client.Resources.ActivityExecutions.Contracts;
-using Elsa.Api.Client.Resources.Alterations.Contracts;
-using Elsa.Api.Client.Resources.CommitStrategies.Contracts;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Contracts;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Descriptors.Contracts;
-using Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Contracts;
-using Elsa.Api.Client.Resources.Features.Contracts;
-using Elsa.Api.Client.Resources.Identity.Contracts;
-using Elsa.Api.Client.Resources.IncidentStrategies.Contracts;
-using Elsa.Api.Client.Resources.LogPersistenceStrategies;
-using Elsa.Api.Client.Resources.OutputConverters.Contracts;
-using Elsa.Api.Client.Resources.Resilience.Contracts;
-using Elsa.Api.Client.Resources.Scripting.Contracts;
-using Elsa.Api.Client.Resources.StorageDrivers.Contracts;
-using Elsa.Api.Client.Resources.Tasks.Contracts;
-using Elsa.Api.Client.Resources.Tests;
-using Elsa.Api.Client.Resources.VariableTypes.Contracts;
-using Elsa.Api.Client.Resources.WorkflowActivationStrategies.Contracts;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
-using Elsa.Api.Client.Resources.WorkflowExecutionContexts.Contracts;
-using Elsa.Api.Client.Resources.WorkflowInstances.Contracts;
+using Flamme.Api.Client.Options;
+using Flamme.Api.Client.Resources.ActivityDescriptorOptions.Contracts;
+using Flamme.Api.Client.Resources.ActivityDescriptors.Contracts;
+using Flamme.Api.Client.Resources.ActivityExecutions.Contracts;
+using Flamme.Api.Client.Resources.Alterations.Contracts;
+using Flamme.Api.Client.Resources.CommitStrategies.Contracts;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Contracts;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Descriptors.Contracts;
+using Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Contracts;
+using Flamme.Api.Client.Resources.Features.Contracts;
+using Flamme.Api.Client.Resources.Identity.Contracts;
+using Flamme.Api.Client.Resources.IncidentStrategies.Contracts;
+using Flamme.Api.Client.Resources.LogPersistenceStrategies;
+using Flamme.Api.Client.Resources.OutputConverters.Contracts;
+using Flamme.Api.Client.Resources.Resilience.Contracts;
+using Flamme.Api.Client.Resources.Scripting.Contracts;
+using Flamme.Api.Client.Resources.StorageDrivers.Contracts;
+using Flamme.Api.Client.Resources.Tasks.Contracts;
+using Flamme.Api.Client.Resources.Tests;
+using Flamme.Api.Client.Resources.VariableTypes.Contracts;
+using Flamme.Api.Client.Resources.WorkflowActivationStrategies.Contracts;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
+using Flamme.Api.Client.Resources.WorkflowExecutionContexts.Contracts;
+using Flamme.Api.Client.Resources.WorkflowInstances.Contracts;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Refit;
-using static Elsa.Api.Client.RefitSettingsHelper;
+using static Flamme.Api.Client.RefitSettingsHelper;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Provides extension methods for dependency injection.
@@ -38,11 +38,11 @@ namespace Elsa.Api.Client.Extensions;
 public static class DependencyInjectionExtensions
 {
     /// <summary>
-    /// Adds default Elsa API clients configured to use an API key.
+    /// Adds default Flamme API clients configured to use an API key.
     /// </summary>
-    public static IServiceCollection AddDefaultApiClientsUsingApiKey(this IServiceCollection services, Action<ElsaClientOptions> configureOptions)
+    public static IServiceCollection AddDefaultApiClientsUsingApiKey(this IServiceCollection services, Action<FlammeClientOptions> configureOptions)
     {
-        var options = new ElsaClientOptions();
+        var options = new FlammeClientOptions();
         configureOptions(options);
 
         return services.AddDefaultApiClients(client =>
@@ -54,13 +54,13 @@ public static class DependencyInjectionExtensions
     }
 
     /// <summary>
-    /// Adds default Elsa API clients.
+    /// Adds default Flamme API clients.
     /// </summary>
-    public static IServiceCollection AddDefaultApiClients(this IServiceCollection services, Action<ElsaClientBuilderOptions>? configureClient = null)
+    public static IServiceCollection AddDefaultApiClients(this IServiceCollection services, Action<FlammeClientBuilderOptions>? configureClient = null)
     {
         return services.AddApiClients(configureClient, builderOptions =>
         {
-            var builderOptionsWithoutRetryPolicy = new ElsaClientBuilderOptions
+            var builderOptionsWithoutRetryPolicy = new FlammeClientBuilderOptions
             {
                 ApiKey = builderOptions.ApiKey,
                 AuthenticationHandler = builderOptions.AuthenticationHandler,
@@ -100,25 +100,25 @@ public static class DependencyInjectionExtensions
     }
 
     /// <summary>
-    /// Adds an API client to the service collection. Requires AddElsaClient to be called exactly once.
+    /// Adds an API client to the service collection. Requires AddFlammeClient to be called exactly once.
     /// </summary>
-    public static IServiceCollection AddApiClient<T>(this IServiceCollection services, Action<ElsaClientBuilderOptions>? configureClient = null) where T : class
+    public static IServiceCollection AddApiClient<T>(this IServiceCollection services, Action<FlammeClientBuilderOptions>? configureClient = null) where T : class
     {
         return services.AddApiClients(configureClient, builderOptions => services.AddApi<T>(builderOptions));
     }
 
     /// <summary>
-    /// Adds the Elsa client to the service collection.
+    /// Adds the Flamme client to the service collection.
     /// </summary>
-    public static IServiceCollection AddApiClients(this IServiceCollection services, Action<ElsaClientBuilderOptions>? configureClient = null, Action<ElsaClientBuilderOptions>? configureServices = null)
+    public static IServiceCollection AddApiClients(this IServiceCollection services, Action<FlammeClientBuilderOptions>? configureClient = null, Action<FlammeClientBuilderOptions>? configureServices = null)
     {
-        var builderOptions = new ElsaClientBuilderOptions();
+        var builderOptions = new FlammeClientBuilderOptions();
         configureClient?.Invoke(builderOptions);
         builderOptions.ConfigureHttpClientBuilder += builder => builder.AddHttpMessageHandler(sp => (DelegatingHandler)sp.GetRequiredService(builderOptions.AuthenticationHandler));
 
         services.TryAddScoped(builderOptions.AuthenticationHandler);
 
-        services.Configure<ElsaClientOptions>(options =>
+        services.Configure<FlammeClientOptions>(options =>
         {
             options.BaseAddress = builderOptions.BaseAddress;
             options.ConfigureHttpClient = builderOptions.ConfigureHttpClient;
@@ -135,7 +135,7 @@ public static class DependencyInjectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="httpClientBuilderOptions">An options object that can be used to configure the HTTP client builder.</param>
     /// <typeparam name="T">The type representing the API.</typeparam>
-    public static IServiceCollection AddApi<T>(this IServiceCollection services, ElsaClientBuilderOptions? httpClientBuilderOptions = null) where T : class
+    public static IServiceCollection AddApi<T>(this IServiceCollection services, FlammeClientBuilderOptions? httpClientBuilderOptions = null) where T : class
     {
         return services.AddApi(typeof(T), httpClientBuilderOptions);
     }
@@ -146,9 +146,9 @@ public static class DependencyInjectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="apiType">The type representing the API</param>
     /// <param name="httpClientBuilderOptions">An options object that can be used to configure the HTTP client builder.</param>
-    public static IServiceCollection AddApi(this IServiceCollection services, Type apiType, ElsaClientBuilderOptions? httpClientBuilderOptions = null)
+    public static IServiceCollection AddApi(this IServiceCollection services, Type apiType, FlammeClientBuilderOptions? httpClientBuilderOptions = null)
     {
-        var builder = services.AddRefitClient(apiType, sp => CreateRefitSettings(sp, httpClientBuilderOptions?.ConfigureJsonSerializerOptions), apiType.Name).ConfigureHttpClient(ConfigureElsaApiHttpClient);
+        var builder = services.AddRefitClient(apiType, sp => CreateRefitSettings(sp, httpClientBuilderOptions?.ConfigureJsonSerializerOptions), apiType.Name).ConfigureHttpClient(ConfigureFlammeApiHttpClient);
         httpClientBuilderOptions?.ConfigureHttpClientBuilder(builder);
         httpClientBuilderOptions?.ConfigureRetryPolicy?.Invoke(builder);
         return services;
@@ -160,11 +160,11 @@ public static class DependencyInjectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="httpClientBuilderOptions">An options object that can be used to configure the HTTP client builder.</param>
     /// <typeparam name="T">The type representing the API.</typeparam>
-    public static void AddApiWithoutRetryPolicy<T>(this IServiceCollection services, ElsaClientBuilderOptions? httpClientBuilderOptions = null) where T : class
+    public static void AddApiWithoutRetryPolicy<T>(this IServiceCollection services, FlammeClientBuilderOptions? httpClientBuilderOptions = null) where T : class
     {
         var builder = services
             .AddRefitClient<T>(sp => CreateRefitSettings(sp), typeof(T).Name)
-            .ConfigureHttpClient(ConfigureElsaApiHttpClient);
+            .ConfigureHttpClient(ConfigureFlammeApiHttpClient);
         httpClientBuilderOptions?.ConfigureHttpClientBuilder(builder);
     }
 
@@ -187,9 +187,9 @@ public static class DependencyInjectionExtensions
         return RestService.For<T>(httpClient, CreateRefitSettings(serviceProvider));
     }
 
-    private static void ConfigureElsaApiHttpClient(IServiceProvider serviceProvider, HttpClient httpClient)
+    private static void ConfigureFlammeApiHttpClient(IServiceProvider serviceProvider, HttpClient httpClient)
     {
-        var options = serviceProvider.GetRequiredService<IOptions<ElsaClientOptions>>().Value;
+        var options = serviceProvider.GetRequiredService<IOptions<FlammeClientOptions>>().Value;
         httpClient.BaseAddress = options.BaseAddress;
         options.ConfigureHttpClient?.Invoke(serviceProvider, httpClient);
     }

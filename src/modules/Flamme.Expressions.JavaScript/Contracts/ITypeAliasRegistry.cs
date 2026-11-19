@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.JavaScript.Contracts;
+namespace Flamme.Expressions.JavaScript.Contracts;
 
 /// <summary>
 /// A central registry of type aliases.

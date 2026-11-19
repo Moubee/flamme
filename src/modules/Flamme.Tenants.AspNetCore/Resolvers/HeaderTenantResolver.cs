@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.AspNetCore.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.AspNetCore.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Tenants.AspNetCore;
+namespace Flamme.Tenants.AspNetCore;
 
 /// <summary>
 /// Resolves the tenant based on the header in the request.

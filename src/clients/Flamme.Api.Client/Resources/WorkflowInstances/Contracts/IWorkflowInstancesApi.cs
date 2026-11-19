@@ -1,11 +1,11 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
-using Elsa.Api.Client.Resources.WorkflowInstances.Models;
-using Elsa.Api.Client.Resources.WorkflowInstances.Requests;
-using Elsa.Api.Client.Resources.WorkflowInstances.Responses;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Resources.WorkflowInstances.Models;
+using Flamme.Api.Client.Resources.WorkflowInstances.Requests;
+using Flamme.Api.Client.Resources.WorkflowInstances.Responses;
+using Flamme.Api.Client.Shared.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Contracts;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Contracts;
 
 /// <summary>
 /// Represents a client for the workflow instances API.

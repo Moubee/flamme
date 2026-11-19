@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 public class ToJsonTests : IAsyncDisposable
 {

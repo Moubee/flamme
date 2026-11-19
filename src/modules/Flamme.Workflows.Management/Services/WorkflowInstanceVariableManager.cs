@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 public class WorkflowInstanceVariableManager(
     IWorkflowInstanceManager workflowInstanceManager,

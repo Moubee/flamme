@@ -1,8 +1,8 @@
 using System.Reflection;
-using Elsa.Workflows.UIHints.CodeEditor;
+using Flamme.Workflows.UIHints.CodeEditor;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.CSharp.Activities;
+namespace Flamme.Expressions.CSharp.Activities;
 
 internal class RunCSharpOptionsProvider : CodeEditorOptionsProviderBase
 {

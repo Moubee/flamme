@@ -1,7 +1,7 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Filters;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// A store for alteration jobs.

@@ -1,13 +1,13 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Options;
-using Elsa.Tenants.Mediator;
-using Elsa.Workflows.Runtime.Commands;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Options;
+using Flamme.Tenants.Mediator;
+using Flamme.Workflows.Runtime.Commands;
+using Flamme.Workflows.Runtime.Requests;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class BackgroundWorkflowCancellationDispatcherTests
 {
@@ -26,7 +26,7 @@ public class BackgroundWorkflowCancellationDispatcherTests
 
         // Assert
         Mock.Get(_commandSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand __typed && (__typed.Request == request)), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+            Arg.Is<global::Flamme.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand __typed && (__typed.Request == request)), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class BackgroundWorkflowCancellationDispatcherTests
 
         // Assert
         Mock.Get(_commandSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
+            Arg.Is<global::Flamme.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
                 headers.ContainsKey(TenantHeaders.TenantIdKey) &&
                 headers[TenantHeaders.TenantIdKey].ToString() == tenantId), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
@@ -67,7 +67,7 @@ public class BackgroundWorkflowCancellationDispatcherTests
 
         // Assert
         Mock.Get(_commandSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
+            Arg.Is<global::Flamme.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Is<IDictionary<object, object>>(headers =>
                 !headers.ContainsKey(TenantHeaders.TenantIdKey)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
@@ -98,7 +98,7 @@ public class BackgroundWorkflowCancellationDispatcherTests
 
         // Assert - background commands run independently of caller's lifecycle
         Mock.Get(_commandSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
+            Arg.Is<global::Flamme.Mediator.Contracts.ICommand>(__value => __value is CancelWorkflowsCommand), CommandStrategy.Background, Arg.Any<IDictionary<object, object>>(), CancellationToken.None).WasCalled(Times.Exactly(1));
     }
 
     private BackgroundWorkflowCancellationDispatcher CreateDispatcher()

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore;
 
 internal sealed class Configurations :
     IEntityTypeConfiguration<PersistedIdentityProviderConnection>,

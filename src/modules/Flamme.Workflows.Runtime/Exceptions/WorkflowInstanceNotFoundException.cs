@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Exceptions;
+namespace Flamme.Workflows.Runtime.Exceptions;
 
 public class WorkflowInstanceNotFoundException(string message, string instanceId) : Exception(message)
 {

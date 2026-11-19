@@ -1,17 +1,17 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Expressions.Models;
-using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.State;
+using Flamme.Common.Multitenancy;
+using Flamme.Expressions.Models;
+using Flamme.Features.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.State;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// A test fixture for integration testing workflows and activities.
@@ -45,14 +45,14 @@ public class WorkflowTestFixture : IAsyncDisposable
     public IServiceProvider Services => _services ?? throw new InvalidOperationException("Build() must be called before accessing services");
 
     /// <summary>
-    /// Configures Elsa features.
+    /// Configures Flamme features.
     /// </summary>
-    /// <param name="configure">Action to configure Elsa</param>
+    /// <param name="configure">Action to configure Flamme</param>
     /// <returns>The fixture instance for method chaining</returns>
     [UsedImplicitly]
-    public WorkflowTestFixture ConfigureElsa(Action<IModule> configure)
+    public WorkflowTestFixture ConfigureFlamme(Action<IModule> configure)
     {
-        _testApplicationBuilder.ConfigureElsa(configure);
+        _testApplicationBuilder.ConfigureFlamme(configure);
         return this;
     }
 

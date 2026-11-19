@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Composition.Activities;
+namespace Flamme.Activities.IntegrationTests.Composition.Activities;
 
 /// <summary>
 /// Simple composite activity that uses Complete to terminate early.

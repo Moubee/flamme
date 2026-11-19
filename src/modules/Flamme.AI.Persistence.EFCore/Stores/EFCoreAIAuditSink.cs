@@ -1,10 +1,10 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Persistence.EFCore.Entities;
-using Elsa.AI.Persistence.EFCore.Helpers;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Persistence.EFCore.Entities;
+using Flamme.AI.Persistence.EFCore.Helpers;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.AI.Persistence.EFCore.Stores;
+namespace Flamme.AI.Persistence.EFCore.Stores;
 
 public class EFCoreAIAuditSink(AIDbContext dbContext, ILogger<EFCoreAIAuditSink> logger) : IAIAuditEventHandler
 {

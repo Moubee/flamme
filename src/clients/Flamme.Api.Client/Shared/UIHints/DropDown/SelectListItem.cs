@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.UIHints.DropDown;
+namespace Flamme.Api.Client.Shared.UIHints.DropDown;
 
 /// <summary>
 /// Represents an item in a <see cref="SelectList"/>.

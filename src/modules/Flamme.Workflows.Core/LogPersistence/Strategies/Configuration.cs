@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.LogPersistence.Strategies;
+namespace Flamme.Workflows.LogPersistence.Strategies;
 
 /// <summary>
 /// A log persistence strategy that uses the configured persistence mode.

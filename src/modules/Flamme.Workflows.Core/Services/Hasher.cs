@@ -2,10 +2,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Common.Serialization;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class Hasher : IHasher

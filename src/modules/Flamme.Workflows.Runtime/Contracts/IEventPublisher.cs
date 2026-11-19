@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Publishes events using the workflow runtime, effectively triggering all <see cref="Event"/> activities.

@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Generates secrets.

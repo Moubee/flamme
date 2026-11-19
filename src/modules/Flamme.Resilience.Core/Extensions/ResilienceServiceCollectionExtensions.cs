@@ -1,8 +1,8 @@
-using Elsa.Resilience.Options;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Resilience.Extensions;
+namespace Flamme.Resilience.Extensions;
 
 /// <summary>
 /// <see cref="IServiceCollection"/> extension methods for registering resilience strategy types

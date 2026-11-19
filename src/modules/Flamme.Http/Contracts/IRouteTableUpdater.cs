@@ -1,8 +1,8 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Updates the route table based on current workflow triggers and bookmarks.

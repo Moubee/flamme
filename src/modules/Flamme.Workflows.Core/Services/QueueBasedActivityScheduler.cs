@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A FIFO queue based activity scheduler.

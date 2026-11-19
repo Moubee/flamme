@@ -1,7 +1,7 @@
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.CSharp.Extensions;
+namespace Flamme.Expressions.CSharp.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="ICSharpEvaluator"/>.

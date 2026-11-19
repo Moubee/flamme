@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// A generic repository class around EF Core for accessing entities that inherit from <see cref="Entity"/>.

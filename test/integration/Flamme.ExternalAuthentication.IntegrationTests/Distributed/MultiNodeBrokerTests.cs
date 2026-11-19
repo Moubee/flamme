@@ -1,20 +1,20 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Persistence.EFCore;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Persistence.EFCore;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Distributed;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Distributed;
 
 /// <summary>
 /// Exercises durable state through independently constructed stores, which represent requests landing on
-/// different Elsa nodes while sharing the same persistence database.
+/// different Flamme nodes while sharing the same persistence database.
 /// </summary>
 public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
 {
@@ -28,11 +28,11 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
     {
         _database = new PostgreSqlTestDatabase();
         await _database.OpenAsync();
-        var options = new DbContextOptionsBuilder<ExternalAuthenticationElsaDbContext>()
-            .UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName))
+        var options = new DbContextOptionsBuilder<ExternalAuthenticationFlammeDbContext>()
+            .UseNpgsql(_database.ConnectionString, postgres => postgres.MigrationsAssembly(typeof(Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.ExternalAuthenticationDbContextFactory).Assembly.FullName))
             .Options;
         _services = new ServiceCollection()
-            .AddSingleton<IDbContextFactory<ExternalAuthenticationElsaDbContext>>(services => new TestDbContextFactory(options, services))
+            .AddSingleton<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>(services => new TestDbContextFactory(options, services))
             .BuildServiceProvider();
         _contexts = new ExternalAuthenticationDbContextLeaseFactory(_services.GetRequiredService<IServiceScopeFactory>());
         await using var dbContext = await _contexts.CreateAsync();
@@ -109,9 +109,9 @@ public sealed class MultiNodeBrokerTests : IAsyncInitializer, IAsyncDisposable
         Issuer = "https://issuer.example", SubjectHash = "subject-hash", StartedAt = _clock.GetUtcNow(), LastRefreshedAt = _clock.GetUtcNow(), ExpiresAt = _clock.GetUtcNow().AddHours(1), RefreshExpiresAt = _clock.GetUtcNow().AddHours(1), CurrentRefreshTokenHash = "refresh-a"
     };
 
-    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationElsaDbContext> options, IServiceProvider services) : IDbContextFactory<ExternalAuthenticationElsaDbContext>
+    private sealed class TestDbContextFactory(DbContextOptions<ExternalAuthenticationFlammeDbContext> options, IServiceProvider services) : IDbContextFactory<ExternalAuthenticationFlammeDbContext>
     {
-        public ExternalAuthenticationElsaDbContext CreateDbContext() => new(options, services);
-        public Task<ExternalAuthenticationElsaDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
+        public ExternalAuthenticationFlammeDbContext CreateDbContext() => new(options, services);
+        public Task<ExternalAuthenticationFlammeDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) => Task.FromResult(CreateDbContext());
     }
 }

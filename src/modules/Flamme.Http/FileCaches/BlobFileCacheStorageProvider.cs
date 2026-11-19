@@ -1,6 +1,6 @@
 using FluentStorage.Blobs;
 
-namespace Elsa.Http.FileCaches;
+namespace Flamme.Http.FileCaches;
 
 /// <summary>
 /// A file cache that stores files in blob storage using FluentStorage.

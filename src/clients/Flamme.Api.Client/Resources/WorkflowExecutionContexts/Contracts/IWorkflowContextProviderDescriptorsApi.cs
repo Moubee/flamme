@@ -1,9 +1,9 @@
-using Elsa.Api.Client.Resources.WorkflowExecutionContexts.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.WorkflowExecutionContexts.Models;
+using Flamme.Api.Client.Shared.Models;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.WorkflowExecutionContexts.Contracts;
+namespace Flamme.Api.Client.Resources.WorkflowExecutionContexts.Contracts;
 
 /// <summary>
 /// Provides workflow context provider descriptors.

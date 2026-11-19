@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Requests;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public interface IBookmarkUpdater
 {

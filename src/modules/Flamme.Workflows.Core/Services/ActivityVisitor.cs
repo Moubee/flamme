@@ -1,6 +1,6 @@
-using ActivityNode = Elsa.Workflows.Models.ActivityNode;
+using ActivityNode = Flamme.Workflows.Models.ActivityNode;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class ActivityVisitor : IActivityVisitor

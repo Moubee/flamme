@@ -1,10 +1,10 @@
 using System.Reflection;
 
-namespace Elsa.Testing.Shared.Authorization;
+namespace Flamme.Testing.Shared.Authorization;
 
 /// <summary>
 /// The fail-closed endpoint gate, as a reusable assertion. Omitting a declaration inherits the
-/// FastEndpoints default with no Elsa-level fallback, so an endpoint can reach production ungated with
+/// FastEndpoints default with no Flamme-level fallback, so an endpoint can reach production ungated with
 /// nobody noticing. This asserts every endpoint in an assembly states its access explicitly.
 /// </summary>
 /// <remarks>
@@ -24,13 +24,13 @@ public static class EndpointCoverage
         "AllowAnonymous"
     ];
 
-    /// <summary>Asserts every Elsa endpoint in <paramref name="assembly"/> declares its access.</summary>
+    /// <summary>Asserts every Flamme endpoint in <paramref name="assembly"/> declares its access.</summary>
     public static void AssertEveryEndpointDeclaresAccess(Assembly assembly)
     {
         var endpoints = FindEndpoints(assembly).ToArray();
 
         // A reflection gate that silently matches nothing passes forever.
-        TestAssert.True(endpoints.Length > 0, $"No Elsa endpoints found in {assembly.GetName().Name}. The gate is not looking where it thinks it is.");
+        TestAssert.True(endpoints.Length > 0, $"No Flamme endpoints found in {assembly.GetName().Name}. The gate is not looking where it thinks it is.");
 
         var undeclared = endpoints.Where(x => !DeclaresAccess(x)).Select(x => x.FullName).OrderBy(x => x, StringComparer.Ordinal).ToArray();
 
@@ -41,7 +41,7 @@ public static class EndpointCoverage
             + "There is no exemption list: an endpoint that states nothing is indistinguishable from one whose author forgot.");
     }
 
-    /// <summary>The Elsa endpoint types declared in <paramref name="assembly"/>.</summary>
+    /// <summary>The Flamme endpoint types declared in <paramref name="assembly"/>.</summary>
     public static IEnumerable<Type> FindEndpoints(Assembly assembly)
     {
         Type[] types;
@@ -65,7 +65,7 @@ public static class EndpointCoverage
 
         for (var baseType = type.BaseType; baseType is not null; baseType = baseType.BaseType)
         {
-            if (baseType.FullName?.StartsWith("Elsa.Abstractions.ElsaEndpoint", StringComparison.Ordinal) == true)
+            if (baseType.FullName?.StartsWith("Flamme.Abstractions.FlammeEndpoint", StringComparison.Ordinal) == true)
                 return true;
         }
 

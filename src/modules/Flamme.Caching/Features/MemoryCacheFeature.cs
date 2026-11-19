@@ -1,10 +1,10 @@
-﻿using Elsa.Caching.Options;
-using Elsa.Caching.Services;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+﻿using Flamme.Caching.Options;
+using Flamme.Caching.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Caching.Features;
+namespace Flamme.Caching.Features;
 
 /// <summary>
 /// Configures the MemoryCache.

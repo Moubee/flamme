@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Services;
+﻿namespace Flamme.Workflows.Services;
 
 /// <summary>
 /// Generates logger state for the specified <see cref="ActivityExecutionContext"/>.

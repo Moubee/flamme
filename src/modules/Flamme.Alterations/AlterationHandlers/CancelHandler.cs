@@ -1,9 +1,9 @@
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Abstractions;
-using Elsa.Alterations.Core.Contexts;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Abstractions;
+using Flamme.Alterations.Core.Contexts;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.AlterationHandlers;
+namespace Flamme.Alterations.AlterationHandlers;
 
 /// <summary>
 /// Upgrades the version of the workflow instance.

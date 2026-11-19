@@ -1,6 +1,6 @@
-using Elsa.Http.Contexts;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http.Parsers;
+namespace Flamme.Http.Parsers;
 
 /// <summary>
 /// Reads application/xml and text/xml content type streams.

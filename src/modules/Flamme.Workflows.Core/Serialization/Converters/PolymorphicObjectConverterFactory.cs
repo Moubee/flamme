@@ -1,10 +1,10 @@
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// A JSON converter factory that creates <see cref="PolymorphicObjectConverter"/> instances.

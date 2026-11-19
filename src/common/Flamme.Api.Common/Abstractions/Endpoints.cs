@@ -1,11 +1,11 @@
 using FastEndpoints;
 
-namespace Elsa.Abstractions;
+namespace Flamme.Abstractions;
 
 /// <summary>
 /// An endpoint that maps a request to a response.
 /// </summary>
-public abstract class ElsaEndpointWithMapper<TRequest, TMapper> : EndpointWithMapper<TRequest, TMapper> where TMapper : class, IRequestMapper where TRequest : notnull
+public abstract class FlammeEndpointWithMapper<TRequest, TMapper> : EndpointWithMapper<TRequest, TMapper> where TMapper : class, IRequestMapper where TRequest : notnull
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);
@@ -20,7 +20,7 @@ public abstract class ElsaEndpointWithMapper<TRequest, TMapper> : EndpointWithMa
     protected void ConfigurePermissions(params string[] permissions) => EndpointSecurity.ConfigurePermissions(Definition, permissions);
 }
 
-public abstract class ElsaEndpointWithoutRequest : EndpointWithoutRequest
+public abstract class FlammeEndpointWithoutRequest : EndpointWithoutRequest
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);
@@ -35,7 +35,7 @@ public abstract class ElsaEndpointWithoutRequest : EndpointWithoutRequest
     protected void ConfigurePermissions(params string[] permissions) => EndpointSecurity.ConfigurePermissions(Definition, permissions);
 }
 
-public abstract class ElsaEndpointWithoutRequest<TResponse> : EndpointWithoutRequest<TResponse> where TResponse : notnull
+public abstract class FlammeEndpointWithoutRequest<TResponse> : EndpointWithoutRequest<TResponse> where TResponse : notnull
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);
@@ -50,7 +50,7 @@ public abstract class ElsaEndpointWithoutRequest<TResponse> : EndpointWithoutReq
     protected void ConfigurePermissions(params string[] permissions) => EndpointSecurity.ConfigurePermissions(Definition, permissions);
 }
 
-public class ElsaEndpoint<TRequest, TResponse> : Endpoint<TRequest, TResponse> where TRequest : notnull where TResponse : notnull
+public class FlammeEndpoint<TRequest, TResponse> : Endpoint<TRequest, TResponse> where TRequest : notnull where TResponse : notnull
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);
@@ -65,7 +65,7 @@ public class ElsaEndpoint<TRequest, TResponse> : Endpoint<TRequest, TResponse> w
     protected void ConfigurePermissions(params string[] permissions) => EndpointSecurity.ConfigurePermissions(Definition, permissions);
 }
 
-public class ElsaEndpoint<TRequest, TResponse, TMapper> : Endpoint<TRequest, TResponse, TMapper> where TRequest : notnull where TResponse : notnull where TMapper : class, IMapper, new()
+public class FlammeEndpoint<TRequest, TResponse, TMapper> : Endpoint<TRequest, TResponse, TMapper> where TRequest : notnull where TResponse : notnull where TMapper : class, IMapper, new()
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);
@@ -80,7 +80,7 @@ public class ElsaEndpoint<TRequest, TResponse, TMapper> : Endpoint<TRequest, TRe
     protected void ConfigurePermissions(params string[] permissions) => EndpointSecurity.ConfigurePermissions(Definition, permissions);
 }
 
-public class ElsaEndpoint<TRequest> : Endpoint<TRequest> where TRequest : notnull
+public class FlammeEndpoint<TRequest> : Endpoint<TRequest> where TRequest : notnull
 {
     /// <summary>Requires a permission satisfying <paramref name="resource"/> and <paramref name="verb"/>.</summary>
     protected void RequirePermission(string resource, string verb) => EndpointSecurity.RequirePermission(Definition, resource, verb);

@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Common;
+using Flamme.Authorization;
+using Flamme.Common;
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Testing.Shared.Databases;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Permissions;
-using Elsa.UserTasks.Persistence.EFCore;
-using Elsa.UserTasks.Persistence.EFCore.PostgreSql.Extensions;
-using Elsa.UserTasks.Persistence.EFCore.Repositories;
-using Elsa.UserTasks.Services;
-using Elsa.Workflows;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Testing.Shared.Databases;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Permissions;
+using Flamme.UserTasks.Persistence.EFCore;
+using Flamme.UserTasks.Persistence.EFCore.PostgreSql.Extensions;
+using Flamme.UserTasks.Persistence.EFCore.Repositories;
+using Flamme.UserTasks.Services;
+using Flamme.Workflows;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Persistence.EFCore.UnitTests;
+namespace Flamme.UserTasks.Persistence.EFCore.UnitTests;
 
 public sealed class EFCoreUserTaskRepositoryTests
 {
@@ -28,9 +28,9 @@ public sealed class EFCoreUserTaskRepositoryTests
     {
         var services = new ServiceCollection();
         services.AddPostgreSqlEntityModelCreatingHandlers();
-        services.AddDbContextFactory<UserTasksElsaDbContext>(builder =>
-            builder.UseElsaPostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly, database.ConnectionString));
-        services.AddScoped<Store<UserTasksElsaDbContext, UserTaskRecord>>();
+        services.AddDbContextFactory<UserTasksFlammeDbContext>(builder =>
+            builder.UseFlammePostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly, database.ConnectionString));
+        services.AddScoped<Store<UserTasksFlammeDbContext, UserTaskRecord>>();
         services.AddScoped<EFCoreUserTaskRepository>();
         serviceProvider = services.BuildServiceProvider();
     }
@@ -40,7 +40,7 @@ public sealed class EFCoreUserTaskRepositoryTests
     public async Task InitializeAsync()
     {
         await using var scope = serviceProvider.CreateAsyncScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksFlammeDbContext>>();
         await using var dbContext = await factory.CreateDbContextAsync();
         await dbContext.Database.MigrateAsync();
     }
@@ -92,7 +92,7 @@ public sealed class EFCoreUserTaskRepositoryTests
         var actor = new ParticipantReference("tenant-1", "directory", UserTaskParticipantType.User, "u1");
         var task = CreateTask(DateTimeOffset.UtcNow, actor);
         await repository.AddProjectionAsync(task);
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksFlammeDbContext>>();
 
         await using (var context = await factory.CreateDbContextAsync())
         {
@@ -115,15 +115,15 @@ public sealed class EFCoreUserTaskRepositoryTests
         await using var database = new PostgreSqlTestDatabase();
         await using var services = new ServiceCollection()
             .AddPostgreSqlEntityModelCreatingHandlers()
-            .AddDbContextFactory<UserTasksElsaDbContext>(builder => builder
-                .UseElsaPostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly,
-                    database.ConnectionString, new ElsaDbContextOptions { SchemaName = schemaName })
+            .AddDbContextFactory<UserTasksFlammeDbContext>(builder => builder
+                .UseFlammePostgreSql(typeof(PostgreSqlUserTasksPersistenceFeatureExtensions).Assembly,
+                    database.ConnectionString, new FlammeDbContextOptions { SchemaName = schemaName })
                 .EnableServiceProviderCaching(false))
-            .AddScoped<Store<UserTasksElsaDbContext, UserTaskRecord>>()
+            .AddScoped<Store<UserTasksFlammeDbContext, UserTaskRecord>>()
             .AddScoped<EFCoreUserTaskRepository>()
             .BuildServiceProvider();
         await using var scope = services.CreateAsyncScope();
-        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksElsaDbContext>>();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserTasksFlammeDbContext>>();
         await using (var context = await factory.CreateDbContextAsync())
             await context.Database.EnsureCreatedAsync();
         var repository = scope.ServiceProvider.GetRequiredService<EFCoreUserTaskRepository>();

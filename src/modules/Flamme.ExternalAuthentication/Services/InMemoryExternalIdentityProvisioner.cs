@@ -1,12 +1,12 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Workflows;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Provides a replaceable single-node implementation of atomic external identity linking and just-in-time provisioning.
@@ -67,7 +67,7 @@ public sealed class InMemoryExternalIdentityProvisioner(
             if (!await _userProvisioningService.ExistsAsync(user, wasCreated, CancellationToken.None))
             {
                 state.Links.Remove(key);
-                throw new InvalidOperationException("The Elsa user was deleted while its external identity link was being created.");
+                throw new InvalidOperationException("The Flamme user was deleted while its external identity link was being created.");
             }
             return new(user.Id, link, wasCreated, true);
         }
@@ -146,7 +146,7 @@ public sealed class InMemoryExternalIdentityProvisioner(
                 var previousUser = new User { Id = oldEntry.Value.UserId, TenantId = oldEntry.Value.TenantId };
                 if (!await _userProvisioningService.ExistsAsync(previousUser, false, CancellationToken.None))
                     state.Links.Remove(oldEntry.Key);
-                throw new InvalidOperationException("The Elsa user was deleted while its external identity link was being replaced.");
+                throw new InvalidOperationException("The Flamme user was deleted while its external identity link was being replaced.");
             }
             return new ExternalIdentityLinkReplaceResult.Success(oldEntry.Value, replacement);
         }

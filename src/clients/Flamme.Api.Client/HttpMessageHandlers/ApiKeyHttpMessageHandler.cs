@@ -1,20 +1,20 @@
 using System.Net.Http.Headers;
-using Elsa.Api.Client.Options;
+using Flamme.Api.Client.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Api.Client.HttpMessageHandlers;
+namespace Flamme.Api.Client.HttpMessageHandlers;
 
 /// <summary>
 /// An <see cref="HttpMessageHandler"/> that configures the outgoing HTTP request to use an API key as the authorization header.
 /// </summary>
 public class ApiKeyHttpMessageHandler : DelegatingHandler
 {
-    private readonly ElsaClientOptions _options;
+    private readonly FlammeClientOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiKeyHttpMessageHandler"/> class.
     /// </summary>
-    public ApiKeyHttpMessageHandler(IOptions<ElsaClientOptions> options)
+    public ApiKeyHttpMessageHandler(IOptions<FlammeClientOptions> options)
     {
         _options = options.Value;
     }

@@ -1,20 +1,20 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Expressions.Options;
-using Elsa.Expressions.Services;
-using Elsa.Extensions;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Services;
-using Elsa.Workflows.State;
+using Flamme.Expressions.Options;
+using Flamme.Expressions.Services;
+using Flamme.Extensions;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Services;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
+namespace Flamme.Workflows.Core.UnitTests.Serialization.Converters;
 
 public sealed class SerializationTypeResolverTests
 {
@@ -174,14 +174,14 @@ public sealed class SerializationTypeResolverTests
         await Assert.That(memoryStorageDriverType).IsEqualTo(typeof(MemoryStorageDriver));
         await Assert.That(registry.TryGetType(typeof(MemoryStorageDriver).GetSimpleAssemblyQualifiedName(), out var legacyMemoryStorageDriverType)).IsTrue();
         await Assert.That(legacyMemoryStorageDriverType).IsEqualTo(typeof(MemoryStorageDriver));
-        await Assert.That(registry.TryGetAlias(typeof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy), out var incidentStrategyAlias)).IsTrue();
-        await Assert.That(incidentStrategyAlias).IsEqualTo(nameof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
-        await Assert.That(registry.TryGetType(typeof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy).GetSimpleAssemblyQualifiedName(), out var legacyIncidentStrategyType)).IsTrue();
-        await Assert.That(legacyIncidentStrategyType).IsEqualTo(typeof(Elsa.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
-        await Assert.That(registry.TryGetAlias(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy), out var activationStrategyAlias)).IsTrue();
-        await Assert.That(activationStrategyAlias).IsEqualTo(nameof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy));
-        await Assert.That(registry.TryGetType(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy).GetSimpleAssemblyQualifiedName(), out var legacyActivationStrategyType)).IsTrue();
-        await Assert.That(legacyActivationStrategyType).IsEqualTo(typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy));
+        await Assert.That(registry.TryGetAlias(typeof(Flamme.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy), out var incidentStrategyAlias)).IsTrue();
+        await Assert.That(incidentStrategyAlias).IsEqualTo(nameof(Flamme.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
+        await Assert.That(registry.TryGetType(typeof(Flamme.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy).GetSimpleAssemblyQualifiedName(), out var legacyIncidentStrategyType)).IsTrue();
+        await Assert.That(legacyIncidentStrategyType).IsEqualTo(typeof(Flamme.Workflows.IncidentStrategies.ContinueWithIncidentsStrategy));
+        await Assert.That(registry.TryGetAlias(typeof(Flamme.Workflows.ActivationValidators.AllowAlwaysStrategy), out var activationStrategyAlias)).IsTrue();
+        await Assert.That(activationStrategyAlias).IsEqualTo(nameof(Flamme.Workflows.ActivationValidators.AllowAlwaysStrategy));
+        await Assert.That(registry.TryGetType(typeof(Flamme.Workflows.ActivationValidators.AllowAlwaysStrategy).GetSimpleAssemblyQualifiedName(), out var legacyActivationStrategyType)).IsTrue();
+        await Assert.That(legacyActivationStrategyType).IsEqualTo(typeof(Flamme.Workflows.ActivationValidators.AllowAlwaysStrategy));
     }
 
     [Test]
@@ -189,7 +189,7 @@ public sealed class SerializationTypeResolverTests
     {
         using var serviceProvider = CreateWorkflowsServices();
         var serializer = serviceProvider.GetRequiredService<IApiSerializer>();
-        var strategyType = typeof(Elsa.Workflows.ActivationValidators.AllowAlwaysStrategy);
+        var strategyType = typeof(Flamme.Workflows.ActivationValidators.AllowAlwaysStrategy);
 
         var byAlias = serializer.Deserialize<WorkflowOptions>("""{"activationStrategyType":"AllowAlwaysStrategy"}""");
         await Assert.That(byAlias.ActivationStrategyType).IsEqualTo(strategyType);

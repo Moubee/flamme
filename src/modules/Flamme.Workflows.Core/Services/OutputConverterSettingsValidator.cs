@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using Json.Schema;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class OutputConverterSettingsValidator : IOutputConverterSettingsValidator

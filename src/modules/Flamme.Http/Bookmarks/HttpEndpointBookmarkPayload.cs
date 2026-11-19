@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Http.Bookmarks;
+namespace Flamme.Http.Bookmarks;
 
 /// <summary>
 /// A bookmark used by the <see cref="HttpEndpoint"/> activity.

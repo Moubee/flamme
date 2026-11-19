@@ -1,14 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Serialization.Converters;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Activities.Flowchart.Serialization;
+namespace Flamme.Workflows.Activities.Flowchart.Serialization;
 
 /// <summary>
 /// A JSON converter for <see cref="Activities.Flowchart"/>.

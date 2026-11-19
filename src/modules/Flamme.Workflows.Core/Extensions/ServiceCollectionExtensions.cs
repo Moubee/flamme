@@ -1,8 +1,8 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ServiceCollectionExtensions
 {

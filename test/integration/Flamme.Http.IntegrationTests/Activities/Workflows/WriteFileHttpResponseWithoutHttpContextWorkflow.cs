@@ -1,6 +1,6 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Http.IntegrationTests.Activities.Workflows;
+namespace Flamme.Http.IntegrationTests.Activities.Workflows;
 
 /// <summary>
 /// A workflow that attempts to write a file HTTP response without HTTP context.

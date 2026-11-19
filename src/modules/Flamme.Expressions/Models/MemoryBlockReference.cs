@@ -1,6 +1,6 @@
-using Elsa.Expressions.Helpers;
+using Flamme.Expressions.Helpers;
 
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// A base class for types that represent a reference to a block of memory. 

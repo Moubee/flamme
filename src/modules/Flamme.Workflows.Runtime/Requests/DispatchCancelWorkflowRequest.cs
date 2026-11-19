@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Requests;
+namespace Flamme.Workflows.Runtime.Requests;
 
 /// <summary>
 /// A dispatch request that indicates that one or more workflows are requested to be cancelled.

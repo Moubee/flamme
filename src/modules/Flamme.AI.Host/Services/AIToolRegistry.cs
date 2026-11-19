@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class AIToolRegistry(IServiceScopeFactory scopeFactory, AIToolEnablementService enablementService) : IAIToolRegistry
 {

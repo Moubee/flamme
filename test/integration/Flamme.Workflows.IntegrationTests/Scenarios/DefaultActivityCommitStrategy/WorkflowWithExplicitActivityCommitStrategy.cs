@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.DefaultActivityCommitStrategy;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.DefaultActivityCommitStrategy;
 
 public class WorkflowWithExplicitActivityCommitStrategy : WorkflowBase
 {

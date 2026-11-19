@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore;
 
 /// <summary>Creates external authentication contexts from a short-lived scope so singleton stores never capture tenant-scoped services.</summary>
 public sealed class ExternalAuthenticationDbContextLeaseFactory(IServiceScopeFactory scopeFactory)
@@ -11,7 +11,7 @@ public sealed class ExternalAuthenticationDbContextLeaseFactory(IServiceScopeFac
         var scope = scopeFactory.CreateAsyncScope();
         try
         {
-            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ExternalAuthenticationElsaDbContext>>();
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ExternalAuthenticationFlammeDbContext>>();
             var dbContext = await factory.CreateDbContextAsync(cancellationToken);
             return new Lease(scope, dbContext);
         }
@@ -22,9 +22,9 @@ public sealed class ExternalAuthenticationDbContextLeaseFactory(IServiceScopeFac
         }
     }
 
-    public sealed class Lease(AsyncServiceScope scope, ExternalAuthenticationElsaDbContext dbContext) : IAsyncDisposable
+    public sealed class Lease(AsyncServiceScope scope, ExternalAuthenticationFlammeDbContext dbContext) : IAsyncDisposable
     {
-        public ExternalAuthenticationElsaDbContext DbContext { get; } = dbContext;
+        public ExternalAuthenticationFlammeDbContext DbContext { get; } = dbContext;
 
         public async ValueTask DisposeAsync()
         {

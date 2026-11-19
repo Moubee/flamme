@@ -1,10 +1,10 @@
 using System.Net;
-using Elsa.Http.Resilience;
-using Elsa.Resilience.Options;
+using Flamme.Http.Resilience;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.AspNetCore;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 /// <summary>
 /// The designer lists the resilience strategies to open a definition, and they describe what is configured for the

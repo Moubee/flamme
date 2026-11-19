@@ -1,8 +1,8 @@
-﻿using Elsa.Expressions.Liquid.Contracts;
+﻿using Flamme.Expressions.Liquid.Contracts;
 using Fluid;
 using Fluid.Values;
 
-namespace Elsa.Expressions.Liquid.Filters;
+namespace Flamme.Expressions.Liquid.Filters;
 
 /// <summary>
 /// A liquid filter that extracts the key values from a <see cref="DictionaryValue"/> value.

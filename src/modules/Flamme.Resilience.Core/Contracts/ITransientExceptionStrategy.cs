@@ -1,4 +1,4 @@
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 /// <summary>
 /// Defines a contract for detecting whether an exception is transient and may be resolved by retrying.

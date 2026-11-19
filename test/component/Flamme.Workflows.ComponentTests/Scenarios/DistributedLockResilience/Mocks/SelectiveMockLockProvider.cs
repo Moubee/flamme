@@ -1,6 +1,6 @@
 using Medallion.Threading;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
+namespace Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
 
 /// <summary>
 /// A lock provider that selectively mocks specific locks while allowing others to use the real implementation.

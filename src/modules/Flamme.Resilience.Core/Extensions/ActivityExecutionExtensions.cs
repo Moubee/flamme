@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience.Extensions;
+namespace Flamme.Resilience.Extensions;
 
 public static class ActivityExecutionExtensions
 {

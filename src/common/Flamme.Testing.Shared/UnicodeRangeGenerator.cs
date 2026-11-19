@@ -1,4 +1,4 @@
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Generates Unicode ranges.

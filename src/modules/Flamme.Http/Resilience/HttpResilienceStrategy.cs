@@ -1,9 +1,9 @@
-using Elsa.Http.Extensions;
-using Elsa.Resilience;
+using Flamme.Http.Extensions;
+using Flamme.Resilience;
 using Polly;
 using Polly.Retry;
 
-namespace Elsa.Http.Resilience;
+namespace Flamme.Http.Resilience;
 
 [ResilienceCategory("HTTP")]
 public class HttpResilienceStrategy : IResilienceStrategy

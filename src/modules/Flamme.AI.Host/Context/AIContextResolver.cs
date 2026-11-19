@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.AI.Host.Context;
+namespace Flamme.AI.Host.Context;
 
 public class AIContextResolver(IServiceScopeFactory scopeFactory, ILogger<AIContextResolver> logger)
 {

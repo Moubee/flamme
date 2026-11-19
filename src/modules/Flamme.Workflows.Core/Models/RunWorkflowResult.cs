@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Contains information about a workflow run, such as <see cref="WorkflowState"/>.

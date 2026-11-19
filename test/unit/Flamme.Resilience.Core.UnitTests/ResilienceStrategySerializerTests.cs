@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Elsa.Resilience.Core.UnitTests.TestHelpers;
-using Elsa.Resilience.Options;
-using Elsa.Resilience.Serialization;
+using Flamme.Resilience.Core.UnitTests.TestHelpers;
+using Flamme.Resilience.Options;
+using Flamme.Resilience.Serialization;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ResilienceStrategySerializerTests
 {

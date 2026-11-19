@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
 
 /// <summary>
 /// A workflow that publishes an event to itself (local event).
@@ -26,7 +26,7 @@ public class PublishAndConsumeEventWorkflow : WorkflowBase
                     Payload = new(new { OrderId = 123 })
                 },
                 // Wait for the local event
-                new Elsa.Workflows.Runtime.Activities.Event("LocalOrderEvent"),
+                new Flamme.Workflows.Runtime.Activities.Event("LocalOrderEvent"),
                 new End()
             }
         };

@@ -1,12 +1,12 @@
-using Elsa.Caching.Features;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows.Runtime.Handlers;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Caching.Features;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows.Runtime.Handlers;
+using Flamme.Workflows.Runtime.Stores;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Runtime.Features;
+namespace Flamme.Workflows.Runtime.Features;
 
 /// <summary>
 /// Installs and configures workflow runtime caching features.

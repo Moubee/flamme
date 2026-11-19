@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.UnitTests;
+namespace Flamme.Mediator.UnitTests;
 
 public class CommandCancellationBehaviorTests
 {

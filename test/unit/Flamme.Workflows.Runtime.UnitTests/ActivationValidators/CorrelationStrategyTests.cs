@@ -1,10 +1,10 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.ActivationValidators;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.ActivationValidators;
+namespace Flamme.Workflows.Runtime.UnitTests.ActivationValidators;
 
 public class CorrelationStrategyTests
 {

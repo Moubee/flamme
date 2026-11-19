@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Variables.Activities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Variables.Activities;
 
 public class CountdownStep : Activity
 {

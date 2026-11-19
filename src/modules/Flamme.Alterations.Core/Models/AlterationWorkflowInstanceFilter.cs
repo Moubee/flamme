@@ -1,8 +1,8 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 /// <summary>
 /// Represents a filter for workflow instances.

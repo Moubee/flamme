@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Messages;
+namespace Flamme.Workflows.Runtime.Messages;
 
 /// <summary>
 /// Represents a response from running a workflow instance.

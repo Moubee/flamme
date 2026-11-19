@@ -1,14 +1,14 @@
 using System.Security.Claims;
-using Elsa.Identity.Entities;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
-/// Contains the trusted Elsa identity data to project into a token.
+/// Contains the trusted Flamme identity data to project into a token.
 /// </summary>
-/// <param name="User">The Elsa user.</param>
-/// <param name="Roles">The effective Elsa roles.</param>
-/// <param name="Permissions">The effective Elsa permissions.</param>
+/// <param name="User">The Flamme user.</param>
+/// <param name="Roles">The effective Flamme roles.</param>
+/// <param name="Permissions">The effective Flamme permissions.</param>
 /// <param name="AdditionalClaims">Additional trusted claims.</param>
 /// <param name="ExternalAuthenticationSessionId">The optional external authentication session ID.</param>
 public sealed record TokenIssuanceContext(

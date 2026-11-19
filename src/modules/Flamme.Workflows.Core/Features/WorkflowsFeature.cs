@@ -1,40 +1,40 @@
-using Elsa.Common;
-using Elsa.Common.Features;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows.ActivationValidators;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Builders;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.LogPersistence.Strategies;
-using Elsa.Workflows.Middleware.Activities;
-using Elsa.Workflows.Middleware.Workflows;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
-using Elsa.Workflows.PortResolvers;
-using Elsa.Workflows.Serialization.Configurators;
-using Elsa.Workflows.Serialization.Helpers;
-using Elsa.Workflows.Serialization.Serializers;
-using Elsa.Workflows.Services;
-using Elsa.Workflows.State;
-using Elsa.Workflows.UIHints.CheckList;
-using Elsa.Workflows.UIHints.Dictionary;
-using Elsa.Workflows.UIHints.Dropdown;
-using Elsa.Workflows.UIHints.JsonEditor;
-using Elsa.Workflows.UIHints.RadioList;
+using Flamme.Common;
+using Flamme.Common.Features;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows.ActivationValidators;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Builders;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.LogPersistence.Strategies;
+using Flamme.Workflows.Middleware.Activities;
+using Flamme.Workflows.Middleware.Workflows;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.PortResolvers;
+using Flamme.Workflows.Serialization.Configurators;
+using Flamme.Workflows.Serialization.Helpers;
+using Flamme.Workflows.Serialization.Serializers;
+using Flamme.Workflows.Services;
+using Flamme.Workflows.State;
+using Flamme.Workflows.UIHints.CheckList;
+using Flamme.Workflows.UIHints.Dictionary;
+using Flamme.Workflows.UIHints.Dropdown;
+using Flamme.Workflows.UIHints.JsonEditor;
+using Flamme.Workflows.UIHints.RadioList;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json.Linq;
 
-namespace Elsa.Workflows.Features;
+namespace Flamme.Workflows.Features;
 
 /// <summary>
 /// Adds workflow services to the system.
@@ -165,10 +165,10 @@ public class WorkflowsFeature : FeatureBase
     /// <inheritdoc />
     public override void Apply()
     {
-        AddElsaCore(Services);
+        AddFlammeCore(Services);
     }
 
-    private void AddElsaCore(IServiceCollection services)
+    private void AddFlammeCore(IServiceCollection services)
     {
         services.Configure<SerializationTypeOptions>(options =>
         {

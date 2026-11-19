@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.Enums;
+namespace Flamme.Api.Client.Shared.Enums;
 
 /// <summary>
 /// Specifies the strategy for handling multiple inbound execution paths in a workflow.

@@ -1,8 +1,8 @@
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Api.Services;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Api.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Dashboard.Api.Extensions;
+namespace Flamme.Dashboard.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {

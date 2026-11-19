@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.Enums;
+namespace Flamme.Api.Client.Shared.Enums;
 
 public enum LogPersistenceEvaluationMode
 {

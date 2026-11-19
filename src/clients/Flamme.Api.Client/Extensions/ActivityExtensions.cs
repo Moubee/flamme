@@ -1,10 +1,10 @@
 using System.Text.Json.Nodes;
-using Elsa.Api.Client.Resources.Resilience.Models;
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
-using Elsa.Api.Client.Shared.Enums;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.Resilience.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Shared.Enums;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Extensions;
+namespace Flamme.Api.Client.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="JsonObject"/>.

@@ -1,17 +1,17 @@
 using AspNetCore.Authentication.ApiKey;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Options;
-using Elsa.Identity.Providers;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Options;
+using Flamme.Identity.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Identity.Features;
+namespace Flamme.Identity.Features;
 
 /// <summary>
 /// Provides an authorization feature that configures the system with JWT bearer and API key authentication.

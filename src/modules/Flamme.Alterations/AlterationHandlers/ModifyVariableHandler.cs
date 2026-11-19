@@ -1,15 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Abstractions;
-using Elsa.Alterations.Core.Contexts;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Abstractions;
+using Flamme.Alterations.Core.Contexts;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.AlterationHandlers;
+namespace Flamme.Alterations.AlterationHandlers;
 
 /// <summary>
 /// Modifies a workflow variable.

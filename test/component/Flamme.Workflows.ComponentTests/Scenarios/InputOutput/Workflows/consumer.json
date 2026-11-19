@@ -13,7 +13,7 @@
       "typeName": "String",
       "isArray": false,
       "value": "",
-      "storageDriverTypeName": "Elsa.Workflows.WorkflowInstanceStorageDriver, Elsa.Workflows.Core"
+      "storageDriverTypeName": "Flamme.Workflows.WorkflowInstanceStorageDriver, Flamme.Workflows.Core"
     }
   ],
   "inputs": [],
@@ -23,7 +23,7 @@
     "logPersistenceConfig": {
       "default": {
         "evaluationMode": "Strategy",
-        "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core",
+        "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core",
         "expression": null
       }
     }

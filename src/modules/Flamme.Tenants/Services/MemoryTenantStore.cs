@@ -1,8 +1,8 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
 using JetBrains.Annotations;
 
-namespace Elsa.Tenants;
+namespace Flamme.Tenants;
 
 [UsedImplicitly]
 public class MemoryTenantStore(MemoryStore<Tenant> store) : ITenantStore

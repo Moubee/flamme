@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities.Flowchart.Attributes;
-using Elsa.Workflows.Attributes;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities.Flowchart.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Server.Web.Activities;
+namespace Flamme.Server.Web.Activities;
 
 [Activity("Elsa", "Authorization", "Authorizes a flow based on the configured policies.")]
 [FlowNode("Authorized", "Unauthorized", "Error")]

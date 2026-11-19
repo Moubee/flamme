@@ -1,7 +1,7 @@
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
 
 /// <summary>
-/// Safe metadata for an external identity linked to an Elsa user.
+/// Safe metadata for an external identity linked to an Flamme user.
 /// </summary>
 public record ExternalIdentityLink(
     string Id,

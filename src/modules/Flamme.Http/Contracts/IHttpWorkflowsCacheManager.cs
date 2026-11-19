@@ -1,6 +1,6 @@
-using Elsa.Caching;
+using Flamme.Caching;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Represents a service that caches HTTP workflows and triggers.

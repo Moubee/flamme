@@ -1,12 +1,12 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.Python.Expressions;
-using Elsa.Expressions.Python.Options;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.Python.Expressions;
+using Flamme.Expressions.Python.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Python.Providers;
+namespace Flamme.Expressions.Python.Providers;
 
 internal class PythonExpressionDescriptorProvider(IOptions<PythonOptions> options) : IExpressionDescriptorProvider
 {

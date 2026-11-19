@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.ActivityDescriptors.Models;
+namespace Flamme.Api.Client.Resources.ActivityDescriptors.Models;
 
 /// <summary>
 /// A base type for <see cref="InputDescriptor"/> and <see cref="OutputDescriptor"/>.

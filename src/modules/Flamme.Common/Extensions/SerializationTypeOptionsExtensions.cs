@@ -1,7 +1,7 @@
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extends <see cref="SerializationTypeOptions"/>.

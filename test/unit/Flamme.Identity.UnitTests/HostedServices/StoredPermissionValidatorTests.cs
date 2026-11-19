@@ -1,13 +1,13 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Models;
-using Elsa.Permissions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Models;
+using Flamme.Permissions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.HostedServices;
+namespace Flamme.Identity.UnitTests.HostedServices;
 
 public class StoredPermissionValidatorTests
 {

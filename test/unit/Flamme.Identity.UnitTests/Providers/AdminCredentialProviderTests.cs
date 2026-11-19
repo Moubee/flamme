@@ -1,11 +1,11 @@
-using Elsa;
-using Elsa.Identity.Options;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
+using Flamme;
+using Flamme.Identity.Options;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Providers;
+namespace Flamme.Identity.UnitTests.Providers;
 
 public class AdminCredentialProviderTests
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Scans the workflow instance store for instances in the <see cref="WorkflowSubStatus.Interrupted"/> sub-status —

@@ -1,6 +1,6 @@
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 
-namespace Elsa.Models;
+namespace Flamme.Models;
 
 public record PagedListResponse<T>: LinkedResource
 {

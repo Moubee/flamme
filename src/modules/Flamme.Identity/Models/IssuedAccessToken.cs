@@ -1,7 +1,7 @@
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
-/// Represents an issued Elsa token.
+/// Represents an issued Flamme token.
 /// </summary>
 /// <param name="Token">The serialized token.</param>
 /// <param name="ExpiresAt">The token expiration time.</param>

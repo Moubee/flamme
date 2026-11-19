@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared.Authorization;
-using Elsa.UserTasks.Services;
+using Flamme.Testing.Shared.Authorization;
+using Flamme.UserTasks.Services;
 
-namespace Elsa.UserTasks.UnitTests.Authorization;
+namespace Flamme.UserTasks.UnitTests.Authorization;
 
 public class EndpointCoverageTests
 {

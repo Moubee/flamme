@@ -1,4 +1,4 @@
-namespace Elsa.Caching.Options;
+namespace Flamme.Caching.Options;
 
 /// <summary>
 /// Provides options for configuring caching.

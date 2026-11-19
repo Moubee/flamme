@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Controls whether an administrative pause survives a runtime generation boundary (host restart or shell reactivation).

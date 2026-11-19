@@ -1,4 +1,4 @@
-namespace Elsa.UserTasks.Options;
+namespace Flamme.UserTasks.Options;
 
 public sealed class UserTasksOptions
 {

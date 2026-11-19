@@ -1,9 +1,9 @@
-using Elsa.Common;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Common;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Stimuli;
 
-namespace Elsa.Workflows.Runtime.Bookmarks;
+namespace Flamme.Workflows.Runtime.Bookmarks;
 
 /// <summary>
 /// Contains information created by <see cref="RunTask"/>.  

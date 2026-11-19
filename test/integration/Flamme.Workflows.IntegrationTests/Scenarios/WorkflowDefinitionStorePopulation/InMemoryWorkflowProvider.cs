@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
 
 public class InMemoryWorkflowsProvider(Workflow workflow) : IWorkflowsProvider
 {

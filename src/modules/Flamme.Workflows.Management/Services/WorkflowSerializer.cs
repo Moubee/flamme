@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Mappers;
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Mappers;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <summary>
 /// A serializer that parses JSON.

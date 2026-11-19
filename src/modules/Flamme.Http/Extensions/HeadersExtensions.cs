@@ -1,7 +1,7 @@
 // ReSharper disable once CheckNamespace
-using Elsa.Http;
+using Flamme.Http;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for HTTP headers.

@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Resilience.Core.UnitTests.TestHelpers;
+namespace Flamme.Resilience.Core.UnitTests.TestHelpers;
 
 internal static class ContextFactory
 {

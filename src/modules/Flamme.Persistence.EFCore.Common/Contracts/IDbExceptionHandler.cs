@@ -1,4 +1,4 @@
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// Defines the contract for an exception handler in a database context.

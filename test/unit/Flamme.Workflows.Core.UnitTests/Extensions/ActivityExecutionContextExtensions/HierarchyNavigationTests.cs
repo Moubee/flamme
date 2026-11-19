@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using static Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions.TestHelpers;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using static Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions.TestHelpers;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
 
 public class HierarchyNavigationTests
 {

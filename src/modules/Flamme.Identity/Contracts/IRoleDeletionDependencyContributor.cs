@@ -1,6 +1,6 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
 /// Allows an installed module to guard role deletion and remove its editable role references.

@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Validation;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ClientReturnPathValidatorTests
 {

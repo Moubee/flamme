@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Models;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Responses;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Responses;
 
 public sealed class ListExternalAuthenticationConnectionsResponse
 {

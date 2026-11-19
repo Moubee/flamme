@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Elsa.Workflows.Runtime.Discovery;
+namespace Flamme.Workflows.Runtime.Discovery;
 
 internal static class WorkflowTypeScanner
 {

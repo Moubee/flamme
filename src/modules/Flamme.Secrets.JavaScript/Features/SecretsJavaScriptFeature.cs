@@ -1,13 +1,13 @@
-using Elsa.Expressions.JavaScript.Extensions;
-using Elsa.Expressions.JavaScript.Features;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Secrets.Features;
-using Elsa.Secrets.JavaScript.Scripting.JavaScript;
+using Flamme.Expressions.JavaScript.Extensions;
+using Flamme.Expressions.JavaScript.Features;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Secrets.Features;
+using Flamme.Secrets.JavaScript.Scripting.JavaScript;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Secrets.JavaScript.Features;
+namespace Flamme.Secrets.JavaScript.Features;
 
 [DependsOn(typeof(JavaScriptFeature))]
 [DependsOn(typeof(SecretsFeature))]

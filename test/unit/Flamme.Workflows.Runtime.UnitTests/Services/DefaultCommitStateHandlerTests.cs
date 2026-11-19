@@ -1,16 +1,16 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.State;
+using Flamme.Mediator.Contracts;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class DefaultCommitStateHandlerTests
 {
@@ -40,7 +40,7 @@ public class DefaultCommitStateHandlerTests
         await Assert.That(fixture.Transaction.Completed).IsTrue();
         await Assert.That(fixture.ActivityExecutionContext.IsDirty).IsFalse();
         Mock.Get(fixture.NotificationSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted __typed && (__typed.WorkflowInstance == fixture.WorkflowInstance && __typed.WorkflowState == fixture.WorkflowState)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+            Arg.Is<global::Flamme.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted __typed && (__typed.WorkflowInstance == fixture.WorkflowInstance && __typed.WorkflowState == fixture.WorkflowState)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class DefaultCommitStateHandlerTests
         await Assert.That(fixture.Transaction.Completed).IsFalse();
         await Assert.That(fixture.ActivityExecutionContext.IsDirty).IsTrue();
         await Assert.That(fixture.WorkflowExecutionContext.ExecutionLog).IsNotEmpty();
-        Mock.Get(fixture.NotificationSender).SendAsync(Arg.Is<global::Elsa.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(fixture.NotificationSender).SendAsync(Arg.Is<global::Flamme.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -68,13 +68,13 @@ public class DefaultCommitStateHandlerTests
         Mock.Get(fixture.WorkflowInstanceManager).SaveAsync(fixture.WorkflowState, Arg.Any<CancellationToken>()).Returns(fixture.WorkflowInstance);
         Mock.Get(fixture.ActivityExecutionLogSink).PersistExecutionLogsAsync(fixture.WorkflowExecutionContext, Arg.Any<CancellationToken>())
                     .Returns(() => bufferedNotificationSender.SendAsync(bufferedNotification));
-        Mock.Get(fixture.Mediator).SendAsync(bufferedNotification, Arg.Any<global::Elsa.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
+        Mock.Get(fixture.Mediator).SendAsync(bufferedNotification, Arg.Any<global::Flamme.Mediator.Contracts.IEventPublishingStrategy?>(), Arg.Any<CancellationToken>())
                     .Returns(() => throw new InvalidOperationException("Buffered handler failed"));
 
         await Assert.ThrowsExactlyAsync<AggregateException>(() => fixture.Handler.CommitAsync(fixture.WorkflowExecutionContext, fixture.WorkflowState));
 
         Mock.Get(fixture.NotificationSender).SendAsync(
-            Arg.Is<global::Elsa.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted __typed && (__typed.WorkflowInstance == fixture.WorkflowInstance && __typed.WorkflowState == fixture.WorkflowState)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+            Arg.Is<global::Flamme.Mediator.Contracts.INotification>(__value => __value is WorkflowStateCommitted __typed && (__typed.WorkflowInstance == fixture.WorkflowInstance && __typed.WorkflowState == fixture.WorkflowState)), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private class CommitTestFixture : IAsyncDisposable

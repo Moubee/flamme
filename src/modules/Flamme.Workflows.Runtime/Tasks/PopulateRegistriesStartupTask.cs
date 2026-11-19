@@ -1,8 +1,8 @@
-using Elsa.Common;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common;
+using Flamme.Common.RecurringTasks;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Tasks;
+namespace Flamme.Workflows.Runtime.Tasks;
 
 /// <summary>
 /// Updates the workflow store from <see cref="IWorkflowsProvider"/> implementations, creates triggers and updates the <see cref="IActivityRegistry"/>.

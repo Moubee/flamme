@@ -1,9 +1,9 @@
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
-using Elsa.UserTasks.Repositories;
-using Elsa.UserTasks.Services;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.UserTasks.Repositories;
+using Flamme.UserTasks.Services;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 
 /// <summary>
 /// The in-process stores. They are the reference implementation the durable providers are held against,

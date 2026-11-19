@@ -1,12 +1,12 @@
 using System.Security.Cryptography;
-using Elsa.Extensions;
-using Elsa.Http.Exceptions;
-using Elsa.Http.Options;
-using Elsa.Http.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Http.Exceptions;
+using Flamme.Http.Options;
+using Flamme.Http.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Models;
 using FluentStorage.Blobs;
 using FluentStorage.Utils.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +19,7 @@ using Microsoft.Net.Http.Headers;
 using EntityTagHeaderValue = System.Net.Http.Headers.EntityTagHeaderValue;
 using RangeHeaderValue = System.Net.Http.Headers.RangeHeaderValue;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Sends a file to the HTTP response.

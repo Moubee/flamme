@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Elsa.Http.Extensions;
+namespace Flamme.Http.Extensions;
 
 public static class HttpStatusCodeExtensions
 {

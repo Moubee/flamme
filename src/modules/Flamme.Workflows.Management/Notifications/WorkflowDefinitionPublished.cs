@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management.Notifications;
+namespace Flamme.Workflows.Management.Notifications;
 
 /// <summary>
 /// A notification that is sent when a workflow definition is published.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Stores bookmark parameters for matching bookmarks to resume when said bookmarks appear in the system.

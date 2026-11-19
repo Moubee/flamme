@@ -44,7 +44,7 @@
     "activities": [
       {
         "mode": {
-          "typeName": "Elsa.Workflows.Activities.Flowchart.Models.FlowJoinMode, Elsa.Workflows.Core",
+          "typeName": "Flamme.Workflows.Activities.Flowchart.Models.FlowJoinMode, Flamme.Workflows.Core",
           "expression": {
             "type": "Literal",
             "value": "WaitAll"

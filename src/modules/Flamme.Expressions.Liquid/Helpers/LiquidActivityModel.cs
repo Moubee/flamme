@@ -1,6 +1,6 @@
-﻿using Elsa.Workflows;
+﻿using Flamme.Workflows;
 
-namespace Elsa.Expressions.Liquid.Helpers;
+namespace Flamme.Expressions.Liquid.Helpers;
 
 /// <summary>
 /// A model that is passed to Liquid templates when rendering an activity.

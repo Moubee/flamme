@@ -1,8 +1,8 @@
-﻿using Elsa.Api.Client.Resources.Scripting.Requests;
+﻿using Flamme.Api.Client.Resources.Scripting.Requests;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Scripting.Contracts;
+namespace Flamme.Api.Client.Resources.Scripting.Contracts;
 
 /// <summary>
 /// Represents a client for the workflow javascript API.

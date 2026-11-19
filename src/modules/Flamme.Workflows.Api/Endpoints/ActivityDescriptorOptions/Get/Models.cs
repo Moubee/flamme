@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptorOptions.Get;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptorOptions.Get;
 
 internal class Request
 {

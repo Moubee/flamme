@@ -1,12 +1,12 @@
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Workflows.Management;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Workflows.Management;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityDescriptors.List;
+namespace Flamme.Workflows.Api.Endpoints.ActivityDescriptors.List;
 
 [PublicAPI]
-internal class List(IActivityRegistry registry, IActivityRegistryPopulator registryPopulator) : ElsaEndpointWithoutRequest<Response>
+internal class List(IActivityRegistry registry, IActivityRegistryPopulator registryPopulator) : FlammeEndpointWithoutRequest<Response>
 {
     public override void Configure()
     {
@@ -39,7 +39,7 @@ internal class List(IActivityRegistry registry, IActivityRegistryPopulator regis
             return true;
 
         var evaluator = HttpContext.GetPermissionEvaluator();
-        return evaluator.HasPermission(User, Elsa.Workflows.Api.Permissions.WorkflowPermissions.DescriptorsActivities, CoreVerbs.View)
-               || evaluator.HasPermission(User, Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        return evaluator.HasPermission(User, Flamme.Workflows.Api.Permissions.WorkflowPermissions.DescriptorsActivities, CoreVerbs.View)
+               || evaluator.HasPermission(User, Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
     }
 }

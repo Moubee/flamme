@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Validation;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Validation;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Security;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Security;
 
 /// <summary>HTTP broker security contract invariants shared by every browser entry point.</summary>
 public class BrokerSecurityTests

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Exceptions;
+using Flamme.Workflows.Exceptions;
 
-namespace Elsa.Workflows.Runtime.Responses;
+namespace Flamme.Workflows.Runtime.Responses;
 
 /// <summary>
 /// Represents the response of a dispatch action for a workflow definition.

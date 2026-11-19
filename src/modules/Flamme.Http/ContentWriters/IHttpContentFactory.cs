@@ -1,4 +1,4 @@
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// Creates a concrete <see cref="HttpContent"/> instance based on the specified content type.

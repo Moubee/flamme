@@ -1,9 +1,9 @@
-using Elsa.Dashboard.Api.Extensions;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Dashboard.Api.Extensions;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 
-namespace Elsa.Dashboard.Api.Features;
+namespace Flamme.Dashboard.Api.Features;
 
 public class DashboardApiFeature(IModule module) : FeatureBase(module)
 {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// Resolves the <see cref="IPermissionEvaluator"/> for a request.

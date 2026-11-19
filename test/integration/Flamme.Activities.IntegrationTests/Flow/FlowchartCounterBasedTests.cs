@@ -1,11 +1,11 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using static Elsa.Activities.IntegrationTests.Flow.FlowchartTestHelpers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using static Flamme.Activities.IntegrationTests.Flow.FlowchartTestHelpers;
 
-namespace Elsa.Activities.IntegrationTests.Flow;
+namespace Flamme.Activities.IntegrationTests.Flow;
 
 /// <summary>
 /// Integration tests for counter-based flowchart execution strategy.

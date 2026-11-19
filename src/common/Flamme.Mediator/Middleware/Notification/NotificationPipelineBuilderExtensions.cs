@@ -1,7 +1,7 @@
-using Elsa.Mediator.Middleware.Notification.Components;
-using Elsa.Mediator.Middleware.Notification.Contracts;
+using Flamme.Mediator.Middleware.Notification.Components;
+using Flamme.Mediator.Middleware.Notification.Contracts;
 
-namespace Elsa.Mediator.Middleware.Notification;
+namespace Flamme.Mediator.Middleware.Notification;
 
 /// <summary>
 /// Provides a set of static methods for building a notification pipeline.

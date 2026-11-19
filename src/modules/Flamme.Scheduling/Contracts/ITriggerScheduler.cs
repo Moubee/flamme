@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 /// <summary>
 /// Schedules tasks for the specified list of triggers.

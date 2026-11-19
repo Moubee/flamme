@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.KeyValues.Entities;
+namespace Flamme.KeyValues.Entities;
 
 /// <summary>
 /// Represents a key-value pair with a serialized value.

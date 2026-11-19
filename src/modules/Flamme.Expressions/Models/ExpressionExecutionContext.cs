@@ -1,7 +1,7 @@
-using Elsa.Expressions.Helpers;
+using Flamme.Expressions.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// Provides context to workflow expressions. 

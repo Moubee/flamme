@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Enums;
+namespace Flamme.Workflows.Management.Enums;
 
 /// <summary>
 /// Specifies the operators for filtering timestamps in a TimestampFilter object.

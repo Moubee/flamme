@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Identity.Permissions;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Identity.Permissions;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Identity;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Identity;
 
 public sealed class RoleDeletionEndpointContractTests : WebApplicationTest<RoleDeletionEndpointContractWebApplicationFactory, ExternalAuthenticationTestEntryPoint>
 {

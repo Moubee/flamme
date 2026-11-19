@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.Identity.Requests;
-using Elsa.Api.Client.Resources.Identity.Responses;
+using Flamme.Api.Client.Resources.Identity.Requests;
+using Flamme.Api.Client.Resources.Identity.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Identity.Contracts;
+namespace Flamme.Api.Client.Resources.Identity.Contracts;
 
 /// <summary>
 /// Represents a client for the login API.

@@ -1,16 +1,16 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Extensions;
-using Elsa.Features.Services;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Extensions;
+using Flamme.Features.Services;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 public class SecretsJavaScriptTests : IAsyncDisposable
 {
@@ -22,7 +22,7 @@ public class SecretsJavaScriptTests : IAsyncDisposable
         _fixture = new(TestContext.Current!.Output.StandardOutput);
         _fixture
             .ConfigureServices(services => services.AddSingleton<ISecretResolver>(_secretResolver))
-            .ConfigureElsa(ConfigureElsa);
+            .ConfigureFlamme(ConfigureFlamme);
     }
 
     public ValueTask DisposeAsync() => _fixture.DisposeAsync();
@@ -62,7 +62,7 @@ public class SecretsJavaScriptTests : IAsyncDisposable
         await Assert.That(typeDefinitions).Contains("declare function getSecret(name: string): Promise<string>;", StringComparison.CurrentCulture);
     }
 
-    private static void ConfigureElsa(IModule module)
+    private static void ConfigureFlamme(IModule module)
     {
         module.UseSecretsJavaScript();
     }

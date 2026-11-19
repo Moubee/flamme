@@ -1,4 +1,4 @@
-namespace Elsa.Scheduling;
+namespace Flamme.Scheduling;
 
 /// <summary>
 /// A contract for scheduling workflows to execute at a specific future instant. Can be used to implement a custom scheduler, e.g. using Quartz.NET and Hangfire.

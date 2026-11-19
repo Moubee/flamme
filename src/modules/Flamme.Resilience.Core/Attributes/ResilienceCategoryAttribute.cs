@@ -1,4 +1,4 @@
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class ResilienceCategoryAttribute(string category) : Attribute

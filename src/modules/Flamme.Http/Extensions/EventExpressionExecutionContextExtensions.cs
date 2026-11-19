@@ -1,12 +1,12 @@
-using Elsa.Expressions.Models;
-using Elsa.Http;
-using Elsa.SasTokens.Contracts;
-using Elsa.Workflows.Api;
-using Elsa.Workflows.Runtime;
+using Flamme.Expressions.Models;
+using Flamme.Http;
+using Flamme.SasTokens.Contracts;
+using Flamme.Workflows.Api;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for working with <see cref="ExpressionExecutionContext"/>.

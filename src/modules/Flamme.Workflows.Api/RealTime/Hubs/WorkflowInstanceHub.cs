@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Workflows.Api.RealTime.Contracts;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Workflows.Api.RealTime.Contracts;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
 using FastEndpoints.Security;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Elsa.Workflows.Api.RealTime.Hubs;
+namespace Flamme.Workflows.Api.RealTime.Hubs;
 
 /// <summary>
 /// Represents a SignalR hub for receiving workflow events on the client.
@@ -19,7 +19,7 @@ namespace Elsa.Workflows.Api.RealTime.Hubs;
 [Authorize]
 public class WorkflowInstanceHub : Hub<IWorkflowInstanceClient>
 {
-    private static readonly Permission ReadInstances = new(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
+    private static readonly Permission ReadInstances = new(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
     private readonly IWorkflowInstanceStore _workflowInstanceStore;
     private readonly ITenantAccessor? _tenantAccessor;
 

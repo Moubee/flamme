@@ -1,15 +1,15 @@
 using System.Runtime.CompilerServices;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Stimuli;
-using Elsa.Workflows.UIHints;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.Stimuli;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Activities;
+namespace Flamme.Workflows.Runtime.Activities;
 
 /// <summary>
 /// Creates a new workflow instance of the specified workflow and dispatches it for execution.

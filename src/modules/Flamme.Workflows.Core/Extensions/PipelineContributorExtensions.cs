@@ -1,9 +1,9 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 internal static class PipelineContributorExtensions
 {

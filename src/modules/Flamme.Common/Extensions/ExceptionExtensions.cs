@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Helpers for classifying exceptions during best-effort error handling.

@@ -1,8 +1,8 @@
-﻿using Elsa.Common.Multitenancy;
+﻿using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Tenants.AspNetCore.Middleware;
+namespace Flamme.Tenants.AspNetCore.Middleware;
 
 /// <summary>
 /// Middleware to initialize the tenant for each incoming HTTP request.

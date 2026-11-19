@@ -1,11 +1,11 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.Policies;
+namespace Flamme.ExternalAuthentication.Policies;
 
 /// <summary>
-/// Requests just-in-time creation of a credential-less Elsa user for an unlinked external identity.
+/// Requests just-in-time creation of a credential-less Flamme user for an unlinked external identity.
 /// </summary>
 public sealed class CreateUserUnlinkedIdentityPolicy : IUnlinkedIdentityPolicy
 {
@@ -17,7 +17,7 @@ public sealed class CreateUserUnlinkedIdentityPolicy : IUnlinkedIdentityPolicy
     public UnlinkedIdentityPolicyDescriptor Describe() => new(
         Type,
         "Create a user",
-        "Creates a credential-less Elsa user and an external identity link after successful external authentication.",
+        "Creates a credential-less Flamme user and an external identity link after successful external authentication.",
         1,
         [new("defaultRoleIds", "Default roles", "Role IDs assigned only when this policy creates a new user.", "string-array", false, "tags", null, [], new(), false, false, null, null, false)],
         null);

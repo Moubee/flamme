@@ -1,8 +1,8 @@
-using Elsa.Common;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common;
+using Flamme.Common.RecurringTasks;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Distributed.StartupTasks;
+namespace Flamme.Workflows.Runtime.Distributed.StartupTasks;
 
 /// <summary>
 /// Checks the distributed runtime lock provider during startup.

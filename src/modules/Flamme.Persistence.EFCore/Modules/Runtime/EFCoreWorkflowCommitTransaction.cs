@@ -1,7 +1,7 @@
 using System.Transactions;
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// Wraps workflow commit persistence operations in an ambient transaction so EF Core stores enlist automatically.

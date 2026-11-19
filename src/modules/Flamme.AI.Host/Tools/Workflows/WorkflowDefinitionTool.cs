@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
 
-namespace Elsa.AI.Host.Tools.Workflows;
+namespace Flamme.AI.Host.Tools.Workflows;
 
 public class WorkflowDefinitionTool(IServiceProvider serviceProvider, WorkflowGroundingMapper mapper, AIGroundingResultFormatter formatter) : WorkflowToolBase(serviceProvider, formatter)
 {

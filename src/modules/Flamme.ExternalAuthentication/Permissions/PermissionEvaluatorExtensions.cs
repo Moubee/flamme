@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Elsa.Authorization;
+using Flamme.Authorization;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
 /// <summary>
 /// Evaluates permissions the module carries as configured or delegated <em>strings</em> rather than as a

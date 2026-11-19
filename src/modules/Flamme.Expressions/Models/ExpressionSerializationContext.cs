@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// Defines the context for expression serialization.

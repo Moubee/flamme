@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.UIHints.CheckList;
+namespace Flamme.Workflows.UIHints.CheckList;
 
 /// <summary>
 /// Provides static drop-down options for a given property.

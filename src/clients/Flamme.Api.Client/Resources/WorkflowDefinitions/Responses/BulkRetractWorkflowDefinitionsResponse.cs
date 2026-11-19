@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
 
 /// <summary>
 /// The response from a request to publish workflow definitions.

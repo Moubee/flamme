@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.Runtime.Filters;
+namespace Flamme.Workflows.Runtime.Filters;
 
 /// <summary>
 /// A filter for finding workflows to trigger.

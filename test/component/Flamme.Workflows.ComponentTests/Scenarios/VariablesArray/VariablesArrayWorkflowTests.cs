@@ -1,19 +1,19 @@
-using Elsa.Common.Models;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.VariablesArray.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.State;
+using Flamme.Common.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.VariablesArray.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Assertions.Enums;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.VariablesArray;
+namespace Flamme.Workflows.ComponentTests.Scenarios.VariablesArray;
 
 public class VariablesArrayWorkflowTests(App app) : AppComponentTest(app)
 {

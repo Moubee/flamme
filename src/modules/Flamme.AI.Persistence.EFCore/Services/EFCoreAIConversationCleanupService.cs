@@ -1,11 +1,11 @@
 using System.Data.Common;
-using Elsa.AI.Persistence.EFCore.Helpers;
+using Flamme.AI.Persistence.EFCore.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.AI.Persistence.EFCore.Services;
+namespace Flamme.AI.Persistence.EFCore.Services;
 
 public class EFCoreAIConversationCleanupService(
     IServiceScopeFactory scopeFactory,

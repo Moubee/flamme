@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 public static class TenantExtensions
 {

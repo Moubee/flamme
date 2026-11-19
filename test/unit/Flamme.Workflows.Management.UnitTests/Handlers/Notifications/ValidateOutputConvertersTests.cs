@@ -1,12 +1,12 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Handlers.Notifications;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Handlers.Notifications;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Management.UnitTests.Handlers.Notifications;
+namespace Flamme.Workflows.Management.UnitTests.Handlers.Notifications;
 
 public class ValidateOutputConvertersTests
 {

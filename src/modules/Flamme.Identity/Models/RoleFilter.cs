@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Entities;
 
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
 /// Represents a role filter.

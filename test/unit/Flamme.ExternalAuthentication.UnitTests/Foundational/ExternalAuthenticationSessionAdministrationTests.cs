@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Stores.InMemory;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Stores.InMemory;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ExternalAuthenticationSessionAdministrationTests
 {

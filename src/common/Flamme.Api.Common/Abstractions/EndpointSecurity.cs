@@ -1,9 +1,9 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Abstractions;
+namespace Flamme.Abstractions;
 
 /// <summary>
 /// The one implementation behind every base class's security helpers. The base classes cannot share a
@@ -40,7 +40,7 @@ internal static class EndpointSecurity
         EndpointPermissionRegistry.Record(definition.EndpointType, requirement);
 
         // Evaluated inline rather than through a registered IAuthorizationHandler. A handler would make
-        // enforcement depend on the host having called AddElsaAuthorization: miss it, and every endpoint
+        // enforcement depend on the host having called AddFlammeAuthorization: miss it, and every endpoint
         // answers 403 with nothing to indicate why. Hosts that wire FastEndpoints themselves -- several
         // test hosts among them -- do exactly that. The evaluator is stateless, so falling back to a shared
         // instance is safe, while a host that registers its own still wins.

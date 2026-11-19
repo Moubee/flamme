@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.Tasks.Complete;
+namespace Flamme.Workflows.Api.Endpoints.Tasks.Complete;
 
 public class Request
 {

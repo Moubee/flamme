@@ -1,9 +1,9 @@
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.PublishingStrategies;
+namespace Flamme.Mediator.PublishingStrategies;
 
 /// <summary>
 /// Invokes event handlers in parallel and does not wait for the result.

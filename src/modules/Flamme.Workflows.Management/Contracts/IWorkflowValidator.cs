@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Validates a workflow definition.

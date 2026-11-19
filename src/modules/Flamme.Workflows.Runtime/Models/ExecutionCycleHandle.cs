@@ -1,6 +1,6 @@
-using Elsa.Common;
+using Flamme.Common;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Tracks a single in-flight execution cycle of the workflow runtime. Created when a cycle starts, disposed when

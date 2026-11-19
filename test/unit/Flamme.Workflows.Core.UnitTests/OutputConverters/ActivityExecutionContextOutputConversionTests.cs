@@ -1,13 +1,13 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.OutputConverters;
+namespace Flamme.Workflows.Core.UnitTests.OutputConverters;
 
 public class ActivityExecutionContextOutputConversionTests
 {
@@ -45,7 +45,7 @@ public class ActivityExecutionContextOutputConversionTests
         var converter = new RecordingConverter(context => context.Value.ToString()!);
         var activity = new TestActivity
         {
-            Result = new(new Elsa.Expressions.Models.MemoryBlockReference("workflowResult"))
+            Result = new(new Flamme.Expressions.Models.MemoryBlockReference("workflowResult"))
             {
                 Converter = new(ConverterId)
             }

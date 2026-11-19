@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 public class HttpEndpointOptions
 {

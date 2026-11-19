@@ -1,9 +1,9 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
+using Flamme.Expressions.Helpers;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
 
 public class EnumerableProjectionTests : IAsyncDisposable
 {

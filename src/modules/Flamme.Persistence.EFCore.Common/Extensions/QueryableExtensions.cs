@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IQueryable{T}"/>.

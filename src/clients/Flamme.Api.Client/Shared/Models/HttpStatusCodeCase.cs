@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents an expected status code in the FlowSendHttpRequest activity.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 /// <summary>
 /// An exception that when a unique key constraint has been violated.

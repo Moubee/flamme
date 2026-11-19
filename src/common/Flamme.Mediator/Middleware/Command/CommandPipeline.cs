@@ -1,6 +1,6 @@
-using Elsa.Mediator.Middleware.Command.Contracts;
+using Flamme.Mediator.Middleware.Command.Contracts;
 
-namespace Elsa.Mediator.Middleware.Command;
+namespace Flamme.Mediator.Middleware.Command;
 
 /// <inheritdoc />
 public class CommandPipeline : ICommandPipeline

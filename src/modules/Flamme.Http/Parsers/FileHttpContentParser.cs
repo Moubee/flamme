@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Http.Contexts;
+using Flamme.Extensions;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http.Parsers;
+namespace Flamme.Http.Parsers;
 
 /// <summary>
 /// Reads received file from the HTTP response, if any.

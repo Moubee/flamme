@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class InMemoryAIConversationStore : IAITransientConversationStore
 {

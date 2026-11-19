@@ -1,4 +1,4 @@
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Base class for implementing a tenant resolution strategy.

@@ -1,8 +1,8 @@
-﻿using Elsa.Expressions.Models;
+﻿using Flamme.Expressions.Models;
 using JetBrains.Annotations;
 using Jint;
 
-namespace Elsa.Expressions.JavaScript.Contracts;
+namespace Flamme.Expressions.JavaScript.Contracts;
 
 /// <summary>
 /// Evaluates JavaScript expressions.

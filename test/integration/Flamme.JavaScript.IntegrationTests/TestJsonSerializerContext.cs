@@ -2,7 +2,7 @@ using System.Dynamic;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 [JsonSerializable(typeof(ExpandoObject))]
 [JsonSerializable(typeof(BigInteger))]

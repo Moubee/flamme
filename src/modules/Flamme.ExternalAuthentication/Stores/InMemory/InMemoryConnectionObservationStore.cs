@@ -1,7 +1,7 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Stores.InMemory;
+namespace Flamme.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryConnectionObservationStore : IConnectionObservationStore
 {

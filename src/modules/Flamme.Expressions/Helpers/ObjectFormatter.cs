@@ -2,7 +2,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace Elsa.Expressions.Helpers;
+namespace Flamme.Expressions.Helpers;
 
 /// <summary>
 /// Provides a set of static methods for formatting objects.

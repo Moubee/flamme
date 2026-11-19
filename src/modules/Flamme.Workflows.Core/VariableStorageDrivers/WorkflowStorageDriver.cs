@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
 
 // ReSharper disable once CheckNamespace
 // Backwards compatibility for the old namespace. 
-namespace Elsa.Workflows.Services;
+namespace Flamme.Workflows.Services;
 
 /// <summary>
 /// A storage driver that stores objects in the workflow state itself.

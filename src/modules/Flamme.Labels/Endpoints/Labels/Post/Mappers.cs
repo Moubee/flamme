@@ -1,8 +1,8 @@
-using Elsa.Labels.Entities;
-using Elsa.Workflows;
+using Flamme.Labels.Entities;
+using Flamme.Workflows;
 using FastEndpoints;
 
-namespace Elsa.Labels.Endpoints.Labels.Post;
+namespace Flamme.Labels.Endpoints.Labels.Post;
 
 internal class LabelMapper : Mapper<Request, Response, Label>
 {

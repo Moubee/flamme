@@ -80,7 +80,7 @@
       },
       {
         "mode": {
-          "typeName": "Elsa.Workflows.Core.Activities.Flowchart.Models.FlowJoinMode, Elsa.Workflows.Core",
+          "typeName": "Flamme.Workflows.Activities.Flowchart.Models.FlowJoinMode, Flamme.Workflows.Core",
           "expression": {
             "type": "Literal",
             "value": "WaitAny"

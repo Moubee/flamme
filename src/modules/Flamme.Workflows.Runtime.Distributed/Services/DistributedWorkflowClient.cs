@@ -1,14 +1,14 @@
-using Elsa.Common.DistributedHosting;
-using Elsa.Resilience;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.State;
+using Flamme.Common.DistributedHosting;
+using Flamme.Resilience;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.State;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 
-namespace Elsa.Workflows.Runtime.Distributed;
+namespace Flamme.Workflows.Runtime.Distributed;
 
 public class DistributedWorkflowClient(
     string workflowInstanceId,

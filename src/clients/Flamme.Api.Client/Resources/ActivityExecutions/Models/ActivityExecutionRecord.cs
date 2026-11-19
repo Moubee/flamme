@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.WorkflowInstances.Models;
+using Flamme.Api.Client.Shared.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.ActivityExecutions.Models;
+namespace Flamme.Api.Client.Resources.ActivityExecutions.Models;
 
 /// <summary>
 /// Represents a single workflow execution, associated with an individual activity instance.

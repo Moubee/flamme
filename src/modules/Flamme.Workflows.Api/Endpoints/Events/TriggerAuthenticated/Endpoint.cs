@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Events.TriggerAuthenticated;
+namespace Flamme.Workflows.Api.Endpoints.Events.TriggerAuthenticated;
 
 /// <summary>
 /// Triggers all workflows that are waiting for the specified event.
 /// </summary>
 [PublicAPI]
-internal class Trigger : ElsaEndpoint<Request>
+internal class Trigger : FlammeEndpoint<Request>
 {
     private readonly IEventPublisher _eventPublisher;
 
@@ -24,7 +24,7 @@ internal class Trigger : ElsaEndpoint<Request>
     public override void Configure()
     {
         Post("/events/{eventName}/trigger");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Events, "trigger");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Events, "trigger");
     }
 
     /// <inheritdoc />

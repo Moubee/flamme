@@ -1,17 +1,17 @@
 using System.Collections.Frozen;
-using Elsa.Abstractions;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Models;
+using Flamme.Abstractions;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Scripting.ExpressionDescriptors.List;
+namespace Flamme.Workflows.Api.Endpoints.Scripting.ExpressionDescriptors.List;
 
 /// <summary>
 /// Returns a TypeScript definition that is used by the Monaco editor to display intellisense for JavaScript expressions.
 /// </summary>
 [UsedImplicitly]
-internal class List(IExpressionDescriptorRegistry expressionDescriptorRegistry) : ElsaEndpointWithoutRequest<ListResponse<ExpressionDescriptorModel>>
+internal class List(IExpressionDescriptorRegistry expressionDescriptorRegistry) : FlammeEndpointWithoutRequest<ListResponse<ExpressionDescriptorModel>>
 {
     /// <summary>
     /// The expression types the host can switch off, which are omitted entirely rather than listed as

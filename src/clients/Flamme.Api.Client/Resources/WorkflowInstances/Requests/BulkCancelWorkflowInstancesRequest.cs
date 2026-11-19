@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Requests;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Requests;
 
 /// <summary>
 /// Represents a request to bulk cancel workflow instances.

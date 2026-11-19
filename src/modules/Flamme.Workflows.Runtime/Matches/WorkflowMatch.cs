@@ -1,5 +1,5 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Runtime.Matches;
+namespace Flamme.Workflows.Runtime.Matches;
 
 public record WorkflowMatch(string? CorrelationId, object? Payload);

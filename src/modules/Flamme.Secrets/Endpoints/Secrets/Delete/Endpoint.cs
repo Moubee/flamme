@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Permissions;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Delete;
+namespace Flamme.Secrets.Endpoints.Secrets.Delete;
 
-internal class Endpoint(ISecretManager manager) : ElsaEndpointWithoutRequest
+internal class Endpoint(ISecretManager manager) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
         Delete("/secrets/{name}");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Delete);
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

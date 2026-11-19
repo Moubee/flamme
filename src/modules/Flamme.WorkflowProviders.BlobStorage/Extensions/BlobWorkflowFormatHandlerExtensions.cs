@@ -1,6 +1,6 @@
-using Elsa.WorkflowProviders.BlobStorage.Contracts;
+using Flamme.WorkflowProviders.BlobStorage.Contracts;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class BlobWorkflowFormatHandlerExtensions
 {

@@ -1,13 +1,13 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore;
-using Elsa.Tenants.Options;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore;
+using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 public sealed class OwnershipStoreScenario : IAsyncDisposable
 {

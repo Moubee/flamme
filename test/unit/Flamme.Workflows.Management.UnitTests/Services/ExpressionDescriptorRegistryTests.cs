@@ -1,9 +1,9 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Management.Services;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Management.Services;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Management.UnitTests.Services;
+namespace Flamme.Workflows.Management.UnitTests.Services;
 
 public class ExpressionDescriptorRegistryTests
 {

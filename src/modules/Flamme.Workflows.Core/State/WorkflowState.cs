@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.State;
+namespace Flamme.Workflows.State;
 
 /// <summary>
 /// Represents the current state of a workflow. 

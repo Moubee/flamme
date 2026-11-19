@@ -1,9 +1,9 @@
-using Elsa.Abstractions;
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Abstractions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Me.Permissions;
+namespace Flamme.Identity.Endpoints.Me.Permissions;
 
 /// <summary>
 /// Returns the calling principal's effective grants, so a client can hide sections, disable actions and
@@ -14,7 +14,7 @@ namespace Elsa.Identity.Endpoints.Me.Permissions;
 /// re-evaluates independently, and this response is never an authorization decision.
 /// </remarks>
 [PublicAPI]
-internal class Get(IPermissionDescriptorRegistry registry, IPermissionEvaluator evaluator) : ElsaEndpointWithoutRequest<Response>
+internal class Get(IPermissionDescriptorRegistry registry, IPermissionEvaluator evaluator) : FlammeEndpointWithoutRequest<Response>
 {
     /// <inheritdoc />
     public override void Configure()

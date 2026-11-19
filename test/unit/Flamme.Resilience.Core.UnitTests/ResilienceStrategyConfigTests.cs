@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
-using Elsa.Expressions.Models;
-using Elsa.Resilience.Models;
+using Flamme.Expressions.Models;
+using Flamme.Resilience.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ResilienceStrategyConfigTests
 {

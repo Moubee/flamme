@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Elsa.Http.Serialization;
-using Elsa.Workflows;
-using Elsa.Workflows.State;
+using Flamme.Http.Serialization;
+using Flamme.Workflows;
+using Flamme.Workflows.State;
 
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// Configures the serialization of <see cref="WorkflowState"/> objects.

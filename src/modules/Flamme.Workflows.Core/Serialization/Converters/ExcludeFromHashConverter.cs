@@ -2,10 +2,10 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Serializes an object to JSON, excluding properties marked with <see cref="ExcludeFromHashAttribute"/>.

@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Services;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Services;
 
 /// <inheritdoc />
 public class TypeDescriber : ITypeDescriber

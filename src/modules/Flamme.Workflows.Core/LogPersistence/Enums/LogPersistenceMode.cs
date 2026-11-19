@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.LogPersistence;
+namespace Flamme.Workflows.LogPersistence;
 
 /// <summary>
 /// Define the Log Persistence mode to store information

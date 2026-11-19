@@ -1,6 +1,6 @@
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
 
-namespace Elsa.Workflows.Runtime.Middleware.Workflows;
+namespace Flamme.Workflows.Runtime.Middleware.Workflows;
 
 /// <summary>
 /// Creates and updates activity execution records from activity execution contexts.

@@ -1,9 +1,9 @@
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Stimuli;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class EventPublisher(IStimulusSender stimulusSender, IWorkflowDispatcher workflowDispatcher) : IEventPublisher

@@ -1,8 +1,8 @@
 using Cronos;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common.RecurringTasks;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Common.UnitTests.RecurringTasks;
+namespace Flamme.Common.UnitTests.RecurringTasks;
 
 public class CronScheduleUtcTests
 {

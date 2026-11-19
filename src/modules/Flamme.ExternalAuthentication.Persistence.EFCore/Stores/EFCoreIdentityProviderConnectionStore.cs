@@ -1,9 +1,9 @@
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
 
 /// <summary>Durable database-owned connection store. Registered as a singleton, so it leases a context from a short-lived scope.</summary>
 public sealed class EFCoreIdentityProviderConnectionStore(ExternalAuthenticationDbContextLeaseFactory dbContextFactory) : IIdentityProviderConnectionStore

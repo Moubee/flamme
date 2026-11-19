@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.UnitTests;
+namespace Flamme.UserTasks.UnitTests;
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(UserTaskSummary))]

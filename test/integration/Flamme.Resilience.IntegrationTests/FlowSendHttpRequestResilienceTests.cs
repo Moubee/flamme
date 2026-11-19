@@ -1,14 +1,14 @@
 using System.Net;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public class FlowSendHttpRequestResilienceTests : IAsyncDisposable
 {
@@ -35,7 +35,7 @@ public class FlowSendHttpRequestResilienceTests : IAsyncDisposable
             {
                 s.AddSingleton<IConfiguration>(configuration);
             })
-            .ConfigureElsa(module =>
+            .ConfigureFlamme(module =>
             {
                 module.UseHttp(http =>
                 {

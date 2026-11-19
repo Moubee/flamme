@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// A simplified, serializable model representing an exception.

@@ -1,10 +1,10 @@
 using System.Reflection;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Services;
+namespace Flamme.Workflows.Core.UnitTests.Services;
 
 public class ActivityDescriberTests
 {

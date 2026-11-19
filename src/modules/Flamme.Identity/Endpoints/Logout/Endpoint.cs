@@ -1,20 +1,20 @@
 using System.Security.Claims;
-using Elsa.Abstractions;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme.Abstractions;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.Identity.Endpoints.Logout;
+namespace Flamme.Identity.Endpoints.Logout;
 
 /// <summary>
 /// Ends the caller's sign-in session: the refresh token presented, and every refresh token issued in the same session,
 /// can no longer be exchanged. Access tokens already issued stay valid until they expire.
 /// </summary>
 [PublicAPI]
-internal class Logout(SessionRevoker sessionRevoker, IOptions<IdentityTokenOptions> identityTokenOptions) : ElsaEndpoint<Request>
+internal class Logout(SessionRevoker sessionRevoker, IOptions<IdentityTokenOptions> identityTokenOptions) : FlammeEndpoint<Request>
 {
     /// <inheritdoc />
     public override void Configure()
@@ -36,7 +36,7 @@ internal class Logout(SessionRevoker sessionRevoker, IOptions<IdentityTokenOptio
         validationParameters.LifetimeValidator = null;
         var validationResult = await new JsonWebTokenHandler().ValidateTokenAsync(request.RefreshToken, validationParameters);
 
-        // Not an Elsa Identity refresh token, so there is no session to end here; answer idempotently. Opaque refresh tokens
+        // Not an Flamme Identity refresh token, so there is no session to end here; answer idempotently. Opaque refresh tokens
         // of the External Authentication broker are revoked through the broker's own sign-out.
         if (!validationResult.IsValid)
         {

@@ -1,16 +1,16 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Handlers;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Results;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Handlers;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Results;
+using Flamme.Workflows.Runtime.Stimuli;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Handlers;
+namespace Flamme.Workflows.Runtime.UnitTests.Handlers;
 
 public class ResumeDispatchWorkflowActivityTests
 {
@@ -23,7 +23,7 @@ public class ResumeDispatchWorkflowActivityTests
         var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, stimulusHasher, stimulusSender);
         StimulusMetadata? observedMetadata = null;
         Mock.Get(stimulusSender).SendAsync(Arg.Any<string>(), Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>())
-                    .Returns((string __arg0, global::Elsa.Workflows.Runtime.StimulusMetadata? __arg1, global::System.Threading.CancellationToken __arg2) =>
+                    .Returns((string __arg0, global::Flamme.Workflows.Runtime.StimulusMetadata? __arg1, global::System.Threading.CancellationToken __arg2) =>
                     {
                         observedMetadata = __arg1;
                         return Task.FromResult(new SendStimulusResult([]));

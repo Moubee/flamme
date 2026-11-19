@@ -1,16 +1,16 @@
-using Elsa.Common;
-using Elsa.Hosting.Management.Notifications;
-using Elsa.Hosting.Management.Options;
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Common;
+using Flamme.Hosting.Management.Notifications;
+using Flamme.Hosting.Management.Options;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Models;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Hosting.Management.HostedServices;
+namespace Flamme.Hosting.Management.HostedServices;
 
 /// <summary>
 /// Service to check the heartbeats of all running instances and determine whether instances have stopped working. 

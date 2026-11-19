@@ -4,15 +4,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.PostgreSql.Migrations.ExternalAuthentication
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.Migrations.ExternalAuthentication
 {
     /// <inheritdoc />
     public partial class Initial : Migration
     {
-        private readonly Elsa.Persistence.EFCore.IElsaDbContextSchema _schema;
+        private readonly Flamme.Persistence.EFCore.IFlammeDbContextSchema _schema;
 
         /// <inheritdoc />
-        public Initial(Elsa.Persistence.EFCore.IElsaDbContextSchema schema)
+        public Initial(Flamme.Persistence.EFCore.IFlammeDbContextSchema schema)
         {
             _schema = schema;
         }

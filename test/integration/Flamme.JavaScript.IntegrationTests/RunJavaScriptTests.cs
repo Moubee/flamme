@@ -1,10 +1,10 @@
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.JavaScript.IntegrationTests;
+namespace Flamme.JavaScript.IntegrationTests;
 
 public class RunJavaScriptTests : IAsyncDisposable
 {

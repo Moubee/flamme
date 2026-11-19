@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Common.RecurringTasks;
-using Elsa.Common.Services;
+using Flamme.Common;
+using Flamme.Common.RecurringTasks;
+using Flamme.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.

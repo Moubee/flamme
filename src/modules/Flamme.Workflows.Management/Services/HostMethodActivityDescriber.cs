@@ -1,14 +1,14 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Management.Activities.HostMethod;
-using Elsa.Workflows.Management.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Management.Activities.HostMethod;
+using Flamme.Workflows.Management.Attributes;
+using Flamme.Workflows.Models;
 using Humanizer;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) : IHostMethodActivityDescriber
 {

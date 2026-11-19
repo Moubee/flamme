@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 [UsedImplicitly]
 public static class TenantsProviderExtensions

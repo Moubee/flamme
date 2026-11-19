@@ -1,8 +1,8 @@
-using Elsa.Labels.Entities;
+using Flamme.Labels.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
 public class Configurations : IEntityTypeConfiguration<Label>, IEntityTypeConfiguration<WorkflowDefinitionLabel>
 {

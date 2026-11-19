@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// Verifies that the workflow execution pipeline registers a <see cref="ExecutionCycleHandle"/> with <see cref="IExecutionCycleRegistry"/>
@@ -19,7 +19,7 @@ public class ExecutionCycleTrackingMiddlewareTests : IAsyncDisposable
     public ExecutionCycleTrackingMiddlewareTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
             .Build();
         _workflowRunner = _services.GetRequiredService<IWorkflowRunner>();
         _cycleRegistry = _services.GetRequiredService<IExecutionCycleRegistry>();

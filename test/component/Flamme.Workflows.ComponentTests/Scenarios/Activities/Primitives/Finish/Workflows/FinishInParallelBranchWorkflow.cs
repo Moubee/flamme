@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
 
 /// <summary>
 /// A workflow where Finish is executed in one branch of a Fork while other branches have Event activities.
@@ -24,7 +24,7 @@ public class FinishInParallelBranchWorkflow : WorkflowBase
                     JoinMode = ForkJoinMode.WaitAll,
                     Branches =
                     {
-                        new Elsa.Workflows.Activities.Finish(),
+                        new Flamme.Workflows.Activities.Finish(),
                         new Runtime.Activities.Event("ShouldNotExecute")
                     }
                 }

@@ -1,15 +1,15 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>Executes an administrator-bound adapter flow without resolving links, provisioning users, sessions, or credentials.</summary>
 public sealed class PreviewSignInService(
@@ -99,7 +99,7 @@ public sealed class PreviewSignInService(
             var existingLink = await provisioner.FindLinkAsync(transaction.TenantId, ConnectionRevisionCalculator.NormalizeKey(connection.Connection.Key), authentication.Identity, cancellationToken);
             var decision = existingLink is null ? await DescribePolicyAsync(connection, authentication, cancellationToken) : "would_sign_in_existing_link";
             var grants = existingLink is null
-                ? new([], [new("user_resolution_required", "Permission grants require an existing Elsa user link.")])
+                ? new([], [new("user_resolution_required", "Permission grants require an existing Flamme user link.")])
                 : await permissionGrants.ResolveAsync(new(transaction.TenantId, existingLink.UserId, connection, authentication.Identity, authentication.ProjectedClaims), cancellationToken);
             var result = new PreviewResult(handles.Hash(transaction.ClientState), transaction.ClientId, transaction.TenantId, connection.Connection.Id, connection.Connection.MaterialRevision,
                 authentication.Identity.Issuer, Mask(authentication.Identity.Subject), ExternalAuthenticationRedactor.RedactProjectedClaims(authentication.ProjectedClaims, connection.Connection.ClaimProjection.RedactedClaimTypes), decision, grants.Grants, [.. authentication.Warnings, .. grants.Warnings.Select(x => x.Message)], transaction.ExpiresAt, null);

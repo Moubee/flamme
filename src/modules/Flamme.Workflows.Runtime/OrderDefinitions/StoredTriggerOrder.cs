@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.OrderDefinitions;
+namespace Flamme.Workflows.Runtime.OrderDefinitions;
 
 public class StoredTriggerOrder<TProp> : OrderDefinition<StoredTrigger, TProp>
 {

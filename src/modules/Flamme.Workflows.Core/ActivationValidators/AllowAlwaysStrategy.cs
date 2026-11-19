@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Elsa.Workflows.ActivationValidators;
+namespace Flamme.Workflows.ActivationValidators;
 
 /// <summary>
 /// Always allow the creation of a new workflow instance.

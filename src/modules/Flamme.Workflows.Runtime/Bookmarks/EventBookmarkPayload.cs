@@ -1,7 +1,7 @@
-using Elsa.Common;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Common;
+using Flamme.Workflows.Runtime.Stimuli;
 
-namespace Elsa.Workflows.Runtime.Bookmarks;
+namespace Flamme.Workflows.Runtime.Bookmarks;
 
 [Obsolete("Use EventStimulus instead.")]
 [ForwardedType(typeof(EventStimulus))]

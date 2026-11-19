@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using FastEndpoints;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UnitTests.Shared;
+namespace Flamme.UnitTests.Shared;
 
 /// <summary>
 /// <c>UseFastEndpoints()</c> points FastEndpoints' process-wide service resolver at the host's container and nothing
@@ -13,7 +13,7 @@ namespace Elsa.UnitTests.Shared;
 /// A test class that starts an endpoint host therefore calls <see cref="Reset"/> when it disposes that host.
 /// </summary>
 /// <remarks>
-/// Linked into the test projects that need it rather than living in <c>Elsa.Testing.Shared</c>: that library also
+/// Linked into the test projects that need it rather than living in <c>Flamme.Testing.Shared</c>: that library also
 /// targets frameworks that resolve a FastEndpoints version without <c>UseMessaging()</c>, the only public API that
 /// replaces the resolver.
 /// </remarks>

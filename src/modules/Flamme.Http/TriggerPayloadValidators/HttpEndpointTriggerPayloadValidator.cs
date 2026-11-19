@@ -1,13 +1,13 @@
-﻿using Elsa.Http.Bookmarks;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+﻿using Flamme.Http.Bookmarks;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 
-namespace Elsa.Http.TriggerPayloadValidators;
+namespace Flamme.Http.TriggerPayloadValidators;
 
 public class HttpEndpointTriggerPayloadValidator(ITriggerStore triggerStore) : ITriggerPayloadValidator<HttpEndpointBookmarkPayload>
 {

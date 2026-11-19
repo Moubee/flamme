@@ -1,18 +1,18 @@
 using System.Net;
 using System.Net.Http.Json;
-using Elsa.Common.Multitenancy;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Broker;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Broker;
 
 /// <summary>
 /// The upstream-logout continuation is reached by a top-level browser navigation, after the caller's
-/// Elsa session has already been revoked. These tests pin that it answers without credentials, and that
+/// Flamme session has already been revoked. These tests pin that it answers without credentials, and that
 /// its sibling <c>Logout</c> still does not.
 /// </summary>
 public class LogoutAuthorizationTests : WebApplicationTest<LogoutAuthorizationWebApplicationFactory, ExternalAuthenticationTestEntryPoint>

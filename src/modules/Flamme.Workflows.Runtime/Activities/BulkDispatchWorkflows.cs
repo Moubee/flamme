@@ -1,24 +1,24 @@
 using System.Runtime.CompilerServices;
-using Elsa.Common.Models;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Attributes;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Stimuli;
-using Elsa.Workflows.Runtime.UIHints;
-using Elsa.Workflows.UIHints;
+using Flamme.Common.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Attributes;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Stimuli;
+using Flamme.Workflows.Runtime.UIHints;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Activities;
+namespace Flamme.Workflows.Runtime.Activities;
 
 /// <summary>
 /// Creates new workflow instances of the specified workflow for each item in the data source and dispatches them for execution.

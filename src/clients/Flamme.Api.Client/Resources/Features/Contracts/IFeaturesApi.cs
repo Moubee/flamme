@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.Features.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.Features.Models;
+using Flamme.Api.Client.Shared.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Features.Contracts;
+namespace Flamme.Api.Client.Resources.Features.Contracts;
 
 /// <summary>
 /// A client for working with features.

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Holds the per-tenant activity descriptor dictionaries that back the activity registry.

@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Enums;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Enums;
 
 /// <summary>
 /// Represents the workflow sub-status.

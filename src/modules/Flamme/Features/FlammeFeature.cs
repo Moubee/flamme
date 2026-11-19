@@ -1,32 +1,32 @@
-using Elsa.Common.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Features;
-using Elsa.Workflows.Management.Features;
-using Elsa.Workflows.Runtime.Features;
+using Flamme.Common.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Features;
+using Flamme.Workflows.Management.Features;
+using Flamme.Workflows.Runtime.Features;
 
-namespace Elsa.Features;
+namespace Flamme.Features;
 
 /// <summary>
-/// Represents Elsa as a feature of the system.
+/// Represents Flamme as a feature of the system.
 /// </summary>
 [DependsOn(typeof(MediatorFeature))]
 [DependsOn(typeof(WorkflowsFeature))]
 [DependsOn(typeof(FlowchartFeature))]
 [DependsOn(typeof(DefaultWorkflowRuntimeFeature))]
 [DependsOn(typeof(WorkflowManagementFeature))]
-public class ElsaFeature : FeatureBase
+public class FlammeFeature : FeatureBase
 {
     /// <summary>
-    /// Set this to true to opt out of automatically registering activities from Elsa.Workflows.Core.
+    /// Set this to true to opt out of automatically registering activities from Flamme.Workflows.Core.
     /// </summary>
     public bool DisableAutomaticActivityRegistration { get; set; }
 
     /// <inheritdoc />
-    public ElsaFeature(IModule module) : base(module)
+    public FlammeFeature(IModule module) : base(module)
     {
     }
 

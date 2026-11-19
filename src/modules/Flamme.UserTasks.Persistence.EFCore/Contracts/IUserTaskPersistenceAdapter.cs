@@ -1,4 +1,4 @@
-namespace Elsa.UserTasks.Persistence.EFCore.Contracts;
+namespace Flamme.UserTasks.Persistence.EFCore.Contracts;
 
 /// <summary>
 /// Low-level record adapter used by migration/reconciliation infrastructure. The public aggregate
@@ -25,7 +25,7 @@ public interface IUserTaskPersistenceAdapter
 public sealed class UserTaskPersistenceQuery
 {
     public string TenantId { get; init; } = default!;
-    public IReadOnlyCollection<Elsa.UserTasks.Models.UserTaskStatus> Statuses { get; init; } = [];
+    public IReadOnlyCollection<Flamme.UserTasks.Models.UserTaskStatus> Statuses { get; init; } = [];
     public string? AssigneeProvider { get; init; }
     public string? AssigneeType { get; init; }
     public string? AssigneeId { get; init; }

@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Provides extension methods for <see cref="IActivityDescriber"/>.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.State;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.IntegrationTests.SharedHelpers;
+namespace Flamme.Workflows.IntegrationTests.SharedHelpers;
 
 /// <summary>
 /// Test helper to track commit invocations

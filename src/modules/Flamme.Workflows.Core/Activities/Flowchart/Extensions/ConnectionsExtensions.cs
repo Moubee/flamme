@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows.Activities.Flowchart.Extensions;
+namespace Flamme.Workflows.Activities.Flowchart.Extensions;
 
 /// <summary>
 /// Contains extension methods for <see cref="ICollection{Connection}"/>.

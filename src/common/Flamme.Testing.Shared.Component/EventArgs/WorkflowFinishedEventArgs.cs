@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public class WorkflowFinishedEventArgs(Workflow workflow, WorkflowState workflowState) : EventArgs
 {

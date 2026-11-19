@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Serialization.ReferenceHandlers;
-using Elsa.Workflows.State;
+using Flamme.Common.Serialization;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.ReferenceHandlers;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Serialization.Serializers;
+namespace Flamme.Workflows.Serialization.Serializers;
 
 /// <summary>
 /// Serializes and deserializes workflow states from and to JSON.

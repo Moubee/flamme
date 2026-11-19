@@ -1,9 +1,9 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
-/// Validates and exchanges Elsa identity refresh tokens.
+/// Validates and exchanges Flamme identity refresh tokens.
 /// </summary>
 public interface IIdentityRefreshTokenService
 {

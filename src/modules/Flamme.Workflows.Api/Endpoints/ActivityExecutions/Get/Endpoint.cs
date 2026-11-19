@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.Get;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.Get;
 
 /// <summary>
 /// Gets an individual execution for a given activity.
 /// </summary>
 [PublicAPI]
-internal class Endpoint(IActivityExecutionStore store) : ElsaEndpointWithoutRequest<ActivityExecutionRecord>
+internal class Endpoint(IActivityExecutionStore store) : FlammeEndpointWithoutRequest<ActivityExecutionRecord>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/activity-executions/{id}", "/activity-executions/{*id}", "/activity-executions/by-id");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

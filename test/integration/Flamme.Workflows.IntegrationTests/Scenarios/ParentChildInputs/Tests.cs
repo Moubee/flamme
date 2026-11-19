@@ -1,6 +1,6 @@
-﻿using Elsa.Testing.Shared;
+﻿using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ParentChildInputs;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ParentChildInputs;
 
 /// <summary>
 /// Tests for the flowchart completion feature using various workflow setups.

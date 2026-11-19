@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Helpers;
+namespace Flamme.Workflows.Helpers;
 
 /// <summary>
 /// A utility that compares two collections and returns a set of added, removed and unchanged items.

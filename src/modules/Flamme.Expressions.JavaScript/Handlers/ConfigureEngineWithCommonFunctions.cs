@@ -4,18 +4,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Helpers;
-using Elsa.Expressions.JavaScript.Notifications;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Mediator.Contracts;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Helpers;
+using Flamme.Expressions.JavaScript.Notifications;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Mediator.Contracts;
 using JetBrains.Annotations;
 using Jint;
 using Jint.Native;
 using Jint.Runtime.Descriptors;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.JavaScript.Handlers;
+namespace Flamme.Expressions.JavaScript.Handlers;
 
 /// <summary>
 /// A handler that configures the Jint engine with common functions.

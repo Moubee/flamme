@@ -1,14 +1,14 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.Helpers;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Abstractions;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.Helpers;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Abstractions;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Workflows.Activities;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.JavaScript.Providers;
+namespace Flamme.Expressions.JavaScript.Providers;
 
 /// <summary>
 /// Produces <see cref="FunctionDefinition"/>s for common functions.

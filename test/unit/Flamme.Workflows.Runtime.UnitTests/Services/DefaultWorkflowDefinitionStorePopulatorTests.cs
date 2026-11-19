@@ -1,15 +1,15 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using Open.Linq.AsyncExtensions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class DefaultWorkflowDefinitionStorePopulatorTests
 {
@@ -81,7 +81,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
         await _populator.AddAsync(workflow);
 
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
 
@@ -158,7 +158,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
         await _populator.AddAsync(workflow);
 
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
         await _populator.AddAsync(workflow);
 
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "2"))), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "2"))), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         await CheckIfWorkflowWasSaved(workflow.Workflow.Identity, wd => wd.IsLatest == false);
     }
@@ -210,25 +210,25 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
         }, "Test", "Test");
 
         await _populator.AddAsync(workflow);
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "2"))), Arg.Any<CancellationToken>()).WasNeverCalled();
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "1" && wd.IsPublished == false))), Arg.Any<CancellationToken>()).WasCalled();
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "2"))), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(wd => wd.Id == "1" && wd.IsPublished == false))), Arg.Any<CancellationToken>()).WasCalled();
     }
 
     private async Task CheckIfWorkflowWasSaved(WorkflowIdentity identity, Func<WorkflowDefinition, bool> predicate)
     {
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Where(wd => wd.Id == identity.Id
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Where(wd => wd.Id == identity.Id
                           && wd.DefinitionId == identity.DefinitionId
                           && wd.Version == identity.Version).Any(predicate))), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private async Task CheckIfWorkflowWasSaved(Func<WorkflowDefinition, bool> predicate)
     {
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(predicate))), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition> __typed && (__typed.Any(predicate))), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     private async Task CheckAmountOfWorkflowsSaved(int count)
     {
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(count));
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(count));
     }
 
     [Test]
@@ -244,7 +244,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
         var result = await populator.PopulateStoreAsync();
 
         await Assert.That(result.Count()).IsEqualTo(2);
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(2));
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(2));
     }
 
     [Test]
@@ -262,7 +262,7 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
 
         var importedWorkflow = await Assert.That(result).HasSingleItem();
         await Assert.That(importedWorkflow.DefinitionId).IsEqualTo("workflow-1");
-        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
     }
 
     [Test]
@@ -280,12 +280,12 @@ public class DefaultWorkflowDefinitionStorePopulatorTests
         if (shouldImport)
         {
             await Assert.That(result).HasSingleItem();
-            Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+            Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
         }
         else
         {
             await Assert.That(result).IsEmpty();
-            Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
+            Mock.Get(_storeMock).SaveManyAsync(Arg.Is<global::System.Collections.Generic.IEnumerable<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>(__value => __value is IEnumerable<WorkflowDefinition>), Arg.Any<CancellationToken>()).WasNeverCalled();
         }
     }
 

@@ -1,14 +1,14 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.HostedServices;
+namespace Flamme.Identity.UnitTests.HostedServices;
 
 public class IdentityBootstrapDiagnosticTests
 {

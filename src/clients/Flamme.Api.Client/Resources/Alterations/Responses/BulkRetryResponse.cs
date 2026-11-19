@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.Alterations.Models;
+using Flamme.Api.Client.Resources.Alterations.Models;
 
-namespace Elsa.Api.Client.Resources.Alterations.Responses;
+namespace Flamme.Api.Client.Resources.Alterations.Responses;
 
 /// <summary>
 /// Represents a response to bulk retry workflow instances.

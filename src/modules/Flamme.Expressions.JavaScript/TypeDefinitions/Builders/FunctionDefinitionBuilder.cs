@@ -1,6 +1,6 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Builders;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Builders;
 
 /// <summary>
 /// A builder API for building <see cref="FunctionDefinition"/>s.

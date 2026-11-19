@@ -1,14 +1,14 @@
 using System.Text.Json;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class HttpEndpointTests
 {

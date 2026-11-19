@@ -1,6 +1,6 @@
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
 
-namespace Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
+namespace Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
 
 /// <summary>
 /// Generates type definitions for the specified context.

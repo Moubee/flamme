@@ -1,19 +1,19 @@
 using System.Security.Claims;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Options;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Elsa.Identity.UnitTests;
+namespace Flamme.Identity.UnitTests;
 
 /// <summary>
-/// Creates refresh tokens in the shapes Elsa used to issue, for compatibility and rejection tests.
+/// Creates refresh tokens in the shapes Flamme used to issue, for compatibility and rejection tests.
 /// </summary>
 internal static class LegacyRefreshToken
 {
     /// <summary>
-    /// Creates a refresh token the way Elsa issued them before sessions existed: with a subject, without a session claim.
+    /// Creates a refresh token the way Flamme issued them before sessions existed: with a subject, without a session claim.
     /// </summary>
     public static string Create(IdentityTokenOptions options, User user) => Create(options, user.Name, user.Id);
 

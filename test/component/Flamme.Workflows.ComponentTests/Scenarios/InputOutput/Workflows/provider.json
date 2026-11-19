@@ -10,7 +10,7 @@
   "inputs": [
     {
       "uiHint": "singleline",
-      "storageDriverType": "Elsa.Workflows.WorkflowInstanceStorageDriver, Elsa.Workflows.Core",
+      "storageDriverType": "Flamme.Workflows.WorkflowInstanceStorageDriver, Flamme.Workflows.Core",
       "type": "Object",
       "name": "Input1",
       "displayName": "Input 1",
@@ -34,7 +34,7 @@
     "logPersistenceConfig": {
       "default": {
         "evaluationMode": "Strategy",
-        "strategyType": "Elsa.Workflows.LogPersistence.Strategies.Inherit, Elsa.Workflows.Core",
+        "strategyType": "Flamme.Workflows.LogPersistence.Strategies.Inherit, Flamme.Workflows.Core",
         "expression": null
       }
     }

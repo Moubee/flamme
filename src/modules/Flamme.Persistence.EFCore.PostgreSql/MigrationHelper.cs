@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Elsa.Persistence.EFCore.PostgreSql;
+namespace Flamme.Persistence.EFCore.PostgreSql;
 
 public static class MigrationHelper
 {
-    public static void AlterColumnDateTime(MigrationBuilder migrationBuilder, IElsaDbContextSchema schema, string tableName, string columnName, bool nullable)
+    public static void AlterColumnDateTime(MigrationBuilder migrationBuilder, IFlammeDbContextSchema schema, string tableName, string columnName, bool nullable)
     {
         migrationBuilder.AddColumn<DateTimeOffset>(
             name: $"{columnName}Temp",
@@ -41,7 +41,7 @@ public static class MigrationHelper
             oldNullable: nullable);
     }
 
-    public static void AlterColumnBoolean(MigrationBuilder migrationBuilder, IElsaDbContextSchema schema, string tableName, string columnName, bool nullable)
+    public static void AlterColumnBoolean(MigrationBuilder migrationBuilder, IFlammeDbContextSchema schema, string tableName, string columnName, bool nullable)
     {
         // Step 1: Add a new temporary nullable column
         migrationBuilder.AddColumn<bool>(

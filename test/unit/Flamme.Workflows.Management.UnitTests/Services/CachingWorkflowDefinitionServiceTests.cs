@@ -1,17 +1,17 @@
-using Elsa.Caching;
-using Elsa.Caching.Options;
-using Elsa.Common.Models;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Management.UnitTests.Helpers;
-using Elsa.Workflows.Models;
+using Flamme.Caching;
+using Flamme.Caching.Options;
+using Flamme.Common.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Management.UnitTests.Helpers;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Caching.Memory;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Management.UnitTests.Services;
+namespace Flamme.Workflows.Management.UnitTests.Services;
 
 public class CachingWorkflowDefinitionServiceTests
 {
@@ -488,16 +488,16 @@ public class CachingWorkflowDefinitionServiceTests
         Mock.Get(_cache).CachingOptions.Returns(cachingOptions);
 
         // Setup cache to call factory functions for all types
-        Mock.Get(_cache).GetOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
-                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
-        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
-                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
-        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraphFindResult>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Models.WorkflowGraphFindResult>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraphFindResult>>))
-                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Models.WorkflowGraphFindResult>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
-        Mock.Get(_cache).FindOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
-                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => (WorkflowDefinition?)await __arg1(ICacheEntry.Mock().Object));
-        Mock.Get(_cache).FindOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
-                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Elsa.Workflows.Models.WorkflowGraph>> __arg1) => (WorkflowGraph?)await __arg1(ICacheEntry.Mock().Object));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Models.WorkflowGraph>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
+        Mock.Get(_cache).GetOrCreateAsync<WorkflowGraphFindResult>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Models.WorkflowGraphFindResult>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraphFindResult>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Models.WorkflowGraphFindResult>> __arg1) => await __arg1(ICacheEntry.Mock().Object));
+        Mock.Get(_cache).FindOrCreateAsync<WorkflowDefinition>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>>>(__value => __value is Func<ICacheEntry, Task<WorkflowDefinition>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Management.Entities.WorkflowDefinition>> __arg1) => (WorkflowDefinition?)await __arg1(ICacheEntry.Mock().Object));
+        Mock.Get(_cache).FindOrCreateAsync<WorkflowGraph>(Arg.Any<object>(), Arg.Is<global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Models.WorkflowGraph>>>(__value => __value is Func<ICacheEntry, Task<WorkflowGraph>>))
+                    .Returns(async (object __arg0, global::System.Func<global::Microsoft.Extensions.Caching.Memory.ICacheEntry, global::System.Threading.Tasks.Task<global::Flamme.Workflows.Models.WorkflowGraph>> __arg1) => (WorkflowGraph?)await __arg1(ICacheEntry.Mock().Object));
     }
 
     /// <summary>

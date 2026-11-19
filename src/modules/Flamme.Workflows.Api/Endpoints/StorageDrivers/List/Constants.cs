@@ -1,5 +1,5 @@
 
-namespace Elsa.Workflows.Api.Endpoints.StorageDrivers.List;
+namespace Flamme.Workflows.Api.Endpoints.StorageDrivers.List;
 
 /// <summary>
 /// Provides policy names accepted by the <see cref="List"/> endpoint.

@@ -1,7 +1,7 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 
-namespace Elsa.Testing.Shared.Services;
+namespace Flamme.Testing.Shared.Services;
 
 [UsedImplicitly]
 public class TestTenantsProvider(params string[] tenantIds) : ITenantsProvider

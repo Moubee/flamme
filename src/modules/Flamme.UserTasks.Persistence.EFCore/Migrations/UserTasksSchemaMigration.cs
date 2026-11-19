@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Elsa.UserTasks.Persistence.EFCore.Migrations;
+namespace Flamme.UserTasks.Persistence.EFCore.Migrations;
 
 /// <summary>
 /// Provider-neutral initial schema operations. Provider migration assemblies call this helper so their

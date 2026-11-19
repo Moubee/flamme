@@ -1,8 +1,8 @@
-using Elsa.Scheduling.Options;
-using Elsa.Scheduling.Services;
+using Flamme.Scheduling.Options;
+using Flamme.Scheduling.Services;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
-namespace Elsa.Scheduling.UnitTests.Services;
+namespace Flamme.Scheduling.UnitTests.Services;
 
 public class PastDueScheduleStaggererTests
 {

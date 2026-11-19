@@ -1,20 +1,20 @@
-using Elsa.Permissions;
+using Flamme.Permissions;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Permissions;
+namespace Flamme.ExternalAuthentication.UnitTests.Permissions;
 
 public class PermissionGrantPipelineTests
 {
@@ -313,7 +313,7 @@ public class PermissionGrantPipelineTests
     }
 
     private static DefaultPermissionGrantResolver CreateResolver(IUserProvider userProvider, IRoleProvider roleProvider, ExternalAuthenticationOptions options) => new(
-        [new ElsaRolePermissionGrantSource(userProvider, roleProvider), new ClaimMappingPermissionGrantSource(), new GroupMappingPermissionGrantSource(), new ClaimPassThroughPermissionGrantSource()],
+        [new FlammeRolePermissionGrantSource(userProvider, roleProvider), new ClaimMappingPermissionGrantSource(), new GroupMappingPermissionGrantSource(), new ClaimPassThroughPermissionGrantSource()],
         new DefaultPermissionDescriptorRegistry([]),
         Microsoft.Extensions.Options.Options.Create(options));
 

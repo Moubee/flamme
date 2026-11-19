@@ -11,7 +11,7 @@
       "typeName": "Object",
       "isArray": false,
       "value": null,
-      "storageDriverType": "Elsa.Workflows.Services.WorkflowStorageDriver, Elsa.Workflows.Core"
+      "storageDriverType": "Flamme.Workflows.Services.WorkflowStorageDriver, Flamme.Workflows.Core"
     }
   ],
   "inputs": [],

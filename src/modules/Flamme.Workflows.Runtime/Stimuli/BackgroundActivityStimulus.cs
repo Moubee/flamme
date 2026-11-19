@@ -1,6 +1,6 @@
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 
-namespace Elsa.Workflows.Runtime.Stimuli;
+namespace Flamme.Workflows.Runtime.Stimuli;
 
 /// <summary>
 /// A bookmark that is used to resume a workflow that is waiting for a background activity to complete.

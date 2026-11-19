@@ -1,24 +1,24 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Services;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Management.Providers;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.PortResolvers;
-using Elsa.Workflows.Serialization.Serializers;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Services;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Management.Providers;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.PortResolvers;
+using Flamme.Workflows.Serialization.Serializers;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// A test fixture for unit testing activities in isolation.

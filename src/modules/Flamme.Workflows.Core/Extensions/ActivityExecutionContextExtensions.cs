@@ -1,23 +1,23 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Signals;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Signals;
+using Flamme.Workflows.State;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="ActivityExecutionContext"/>.
@@ -387,7 +387,7 @@ public static partial class ActivityExecutionContextExtensions
         /// It remains asymmetric with <c>Fault</c> in one respect: it <i>sets</i> the current context's fault count to zero, which is
         /// idempotent, but <i>decrements</i> the count on every ancestor, which is not. Calling it more than once per fault drives
         /// ancestor counts negative. The status transition only applies to an activity that is still
-        /// <see cref="ActivityStatus.Faulted"/>, so that a <see cref="Elsa.Workflows.Signals.FaultSignal"/> handler that already
+        /// <see cref="ActivityStatus.Faulted"/>, so that a <see cref="Flamme.Workflows.Signals.FaultSignal"/> handler that already
         /// terminalized the activity does not see its decision undone.
         /// </para>
         /// </remarks>

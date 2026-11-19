@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows.Runtime.Dashboard.Extensions;
-using Elsa.Workflows.Runtime.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows.Runtime.Dashboard.Extensions;
+using Flamme.Workflows.Runtime.Features;
 
-namespace Elsa.Workflows.Runtime.Dashboard.Features;
+namespace Flamme.Workflows.Runtime.Dashboard.Features;
 
 [DependsOn(typeof(WorkflowRuntimeFeature))]
 public class WorkflowRuntimeDashboardFeature(IModule module) : FeatureBase(module)

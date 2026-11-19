@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Command;
+namespace Flamme.Mediator.Middleware.Command;
 
 /// <summary>
 /// Represents a command middleware delegate.

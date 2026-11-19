@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 /// <summary>
 /// Represents a summary view of a <see cref="WorkflowInstance"/>.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 public class WorkflowCommitStrategyRegistration : ObjectRegistration<IWorkflowCommitStrategy, CommitStrategyMetadata>
 {

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Finds all latest versions of workflow definitions that reference a specific workflow definition.

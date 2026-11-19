@@ -1,4 +1,4 @@
-namespace Elsa.UnitTests.Shared;
+namespace Flamme.UnitTests.Shared;
 
 /// <summary>
 /// Serializes the test classes of an assembly that depend on FastEndpoints' process-wide state: the service resolver

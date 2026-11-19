@@ -1,22 +1,22 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IBookmarkQueueDeadLetterStore"/>.
 /// </summary>
 [UsedImplicitly]
-public class EFBookmarkQueueDeadLetterStore(Store<RuntimeElsaDbContext, BookmarkQueueDeadLetterItem> store, IPayloadSerializer serializer) : IBookmarkQueueDeadLetterStore
+public class EFBookmarkQueueDeadLetterStore(Store<RuntimeFlammeDbContext, BookmarkQueueDeadLetterItem> store, IPayloadSerializer serializer) : IBookmarkQueueDeadLetterStore
 {
     /// <inheritdoc />
     public Task SaveAsync(BookmarkQueueDeadLetterItem record, CancellationToken cancellationToken = default)
@@ -144,13 +144,13 @@ public class EFBookmarkQueueDeadLetterStore(Store<RuntimeElsaDbContext, Bookmark
         return results;
     }
 
-    private ValueTask OnSaveAsync(RuntimeElsaDbContext dbContext, BookmarkQueueDeadLetterItem entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(RuntimeFlammeDbContext dbContext, BookmarkQueueDeadLetterItem entity, CancellationToken cancellationToken)
     {
         dbContext.Entry(entity).Property("SerializedOptions").CurrentValue = entity.Options != null ? serializer.Serialize(entity.Options) : default;
         return default;
     }
 
-    private ValueTask OnLoadAsync(RuntimeElsaDbContext dbContext, BookmarkQueueDeadLetterItem? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(RuntimeFlammeDbContext dbContext, BookmarkQueueDeadLetterItem? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return default;

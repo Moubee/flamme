@@ -1,8 +1,8 @@
-﻿using Elsa.Expressions.Liquid.Options;
+﻿using Flamme.Expressions.Liquid.Options;
 using Fluid;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.Liquid.Services;
+namespace Flamme.Expressions.Liquid.Services;
 
 /// <summary>
 /// A parser for the Liquid templating engine.

@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Management.Features;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Workflows.Management.Features;
+using Flamme.Workflows.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 [PublicAPI]
 public static class WorkflowManagementFeatureExtensions

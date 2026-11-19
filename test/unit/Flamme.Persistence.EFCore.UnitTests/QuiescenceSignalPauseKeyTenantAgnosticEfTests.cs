@@ -1,24 +1,24 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
-using Elsa.Persistence.EFCore;
-using Elsa.Persistence.EFCore.EntityHandlers;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Runtime;
-using Elsa.Persistence.EFCore.PostgreSql;
-using Elsa.Tenants.Options;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Services;
-using Elsa.Testing.Shared.Databases;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
+using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Runtime;
+using Flamme.Persistence.EFCore.PostgreSql;
+using Flamme.Tenants.Options;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Services;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 /// <summary>
 /// The host-wide pause key must persist as * so EF tenant filters cannot hide it, and a 3.8
@@ -321,20 +321,20 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
                 .AddScoped<IEntitySavingHandler, ApplyTenantId>()
                 .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
                 .AddPostgreSqlEntityModelCreatingHandlers()
-                .AddDbContextFactory<RuntimeElsaDbContext>((_, builder) =>
+                .AddDbContextFactory<RuntimeFlammeDbContext>((_, builder) =>
                 {
-                    builder.UseElsaPostgreSql(migrationsAssembly, database.ConnectionString);
+                    builder.UseFlammePostgreSql(migrationsAssembly, database.ConnectionString);
                     if (tenancyEnabled)
                         builder.ReplaceService<IModelCacheKeyFactory, TenancyOnModelCacheKeyFactory>();
                     else
                         builder.ReplaceService<IModelCacheKeyFactory, TenancyOffModelCacheKeyFactory>();
                 })
-                .Decorate<IDbContextFactory<RuntimeElsaDbContext>, TenantAwareDbContextFactory<RuntimeElsaDbContext>>()
-                .AddScoped<Store<RuntimeElsaDbContext, SerializedKeyValuePair>>()
+                .Decorate<IDbContextFactory<RuntimeFlammeDbContext>, TenantAwareDbContextFactory<RuntimeFlammeDbContext>>()
+                .AddScoped<Store<RuntimeFlammeDbContext, SerializedKeyValuePair>>()
                 .AddScoped<EFCoreKeyValueStore>()
                 .BuildServiceProvider();
 
-            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await services.GetRequiredService<IDbContextFactory<RuntimeFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.EnsureCreatedAsync();
 
             var scope = services.CreateScope();
@@ -367,7 +367,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
 
         public async Task SeedAsync(string key, string value, string? tenantId)
         {
-            var factory = _services.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>();
+            var factory = _services.GetRequiredService<IDbContextFactory<RuntimeFlammeDbContext>>();
             await using var dbContext = await factory.CreateDbContextAsync();
             dbContext.KeyValuePairs.Add(new SerializedKeyValuePair
             {
@@ -380,7 +380,7 @@ public class QuiescenceSignalPauseKeyTenantAgnosticEfTests
 
         public async Task<SerializedKeyValuePair?> FindIgnoringFiltersAsync(string key)
         {
-            var factory = _services.GetRequiredService<IDbContextFactory<RuntimeElsaDbContext>>();
+            var factory = _services.GetRequiredService<IDbContextFactory<RuntimeFlammeDbContext>>();
             await using var dbContext = await factory.CreateDbContextAsync();
             return await dbContext.KeyValuePairs.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == key);
         }

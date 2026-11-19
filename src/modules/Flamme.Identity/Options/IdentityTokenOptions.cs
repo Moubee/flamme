@@ -1,14 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Services;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using JsonWebToken = Microsoft.IdentityModel.JsonWebTokens.JsonWebToken;
 
-namespace Elsa.Identity.Options;
+namespace Flamme.Identity.Options;
 
 /// <summary>
 /// Represents options about token validation and generation.
@@ -93,7 +93,7 @@ public class IdentityTokenOptions
     }
 
     /// <summary>
-    /// Creates token validation parameters for Elsa identity tokens.
+    /// Creates token validation parameters for Flamme identity tokens.
     /// </summary>
     public TokenValidationParameters CreateTokenValidationParameters() => new()
     {

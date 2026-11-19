@@ -1,11 +1,11 @@
 using System.Collections.Concurrent;
 using System.Reflection;
-using Elsa.Common.Helpers;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common.Helpers;
+using Flamme.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Coordinates the lifecycle of startup, background, and recurring tasks for tenants.

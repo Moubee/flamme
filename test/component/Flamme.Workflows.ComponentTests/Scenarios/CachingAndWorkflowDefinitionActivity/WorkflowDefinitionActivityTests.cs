@@ -1,10 +1,10 @@
-﻿using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+﻿using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.CachingAndWorkflowDefinitionActivity;
+namespace Flamme.Workflows.ComponentTests.Scenarios.CachingAndWorkflowDefinitionActivity;
 
 // Tests the behavior of the WorkflowDefinitionActivity.
 // See https://github.com/elsa-workflows/elsa-core/issues/5314

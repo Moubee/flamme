@@ -1,10 +1,10 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 using JetBrains.Annotations;
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Activities;
+namespace Flamme.Workflows.Runtime.Activities;
 
 /// <summary>
 /// Faults the workflow.

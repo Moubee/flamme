@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.SmokeTests;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.SmokeTests;
 
 /// <summary>
 /// Smoke tests that verify basic functionality of core workflow activities.

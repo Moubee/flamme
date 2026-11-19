@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Defines a strategy interface for scheduling activities within the context of a workflow execution.

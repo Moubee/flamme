@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Responses;
+namespace Flamme.Workflows.Runtime.Responses;
 
 /// <summary>
 /// Represents a response to a request to refresh workflow definitions.

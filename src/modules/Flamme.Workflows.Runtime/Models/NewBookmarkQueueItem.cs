@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class NewBookmarkQueueItem
 {

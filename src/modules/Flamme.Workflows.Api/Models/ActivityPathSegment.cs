@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 /// <summary>
 /// Represents a path segment in a workflow. For example, the following is a list of segments: ForEach:Body -> Container:Body -> MyCustomActivity:Root

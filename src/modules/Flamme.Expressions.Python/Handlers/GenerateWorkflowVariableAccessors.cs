@@ -1,11 +1,11 @@
 using System.Text;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Expressions.Python.Notifications;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Expressions.Python.Notifications;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.Python.Handlers;
+namespace Flamme.Expressions.Python.Handlers;
 
 /// <summary>
 /// Configures the C# evaluator with methods to access workflow variables.

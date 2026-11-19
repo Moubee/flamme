@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
 
 public class SimpleWorkflow : WorkflowBase
 {

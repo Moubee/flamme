@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// The single place permission decisions are made. Every enforcement path — endpoint authorization,

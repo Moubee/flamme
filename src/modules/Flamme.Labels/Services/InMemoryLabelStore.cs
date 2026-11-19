@@ -1,12 +1,12 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Extensions;
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Entities;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Extensions;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Services;
+namespace Flamme.Labels.Services;
 
 /// <summary>
 /// An in-memory store of labels.

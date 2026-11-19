@@ -1,7 +1,7 @@
 using System.Text.Json;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Parses a <see cref="JsonElement"/> into a .NET object.

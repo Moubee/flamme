@@ -1,17 +1,17 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Resilience.Options;
+using Flamme.Abstractions;
+using Flamme.Resilience.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using static Elsa.Resilience.Endpoints.SimulateResponse.StatusCodeMessageLookup;
+using static Flamme.Resilience.Endpoints.SimulateResponse.StatusCodeMessageLookup;
 
-namespace Elsa.Resilience.Endpoints.SimulateResponse;
+namespace Flamme.Resilience.Endpoints.SimulateResponse;
 
-public class SimulateResponseEndpoint(SimulateResponseSessionStore sessionStore, IOptions<SimulateResponseOptions> options) : ElsaEndpointWithoutRequest<SimulatedResponse>
+public class SimulateResponseEndpoint(SimulateResponseSessionStore sessionStore, IOptions<SimulateResponseOptions> options) : FlammeEndpointWithoutRequest<SimulatedResponse>
 {
     private static readonly int[] DefaultCodes = [429, 503, 200];
     private readonly SimulateResponseOptions _options = options.Value;
@@ -19,7 +19,7 @@ public class SimulateResponseEndpoint(SimulateResponseSessionStore sessionStore,
     public override void Configure()
     {
         Get("/simulate-response");
-        RequirePermission(Elsa.Resilience.Permissions.ResiliencePermissions.Simulation, CoreVerbs.Execute);
+        RequirePermission(Flamme.Resilience.Permissions.ResiliencePermissions.Simulation, CoreVerbs.Execute);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

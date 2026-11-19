@@ -1,4 +1,4 @@
-namespace Elsa.Identity.UnitTests;
+namespace Flamme.Identity.UnitTests;
 
 internal static class IdentityTokenTestConstants
 {

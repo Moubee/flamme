@@ -1,8 +1,8 @@
 using System.Collections;
-using Elsa.Http.Abstractions;
-using Elsa.Http.Contexts;
+using Flamme.Http.Abstractions;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http.DownloadableContentHandlers;
+namespace Flamme.Http.DownloadableContentHandlers;
 
 /// <summary>
 /// Handles content that represents a list of downloadable objects.

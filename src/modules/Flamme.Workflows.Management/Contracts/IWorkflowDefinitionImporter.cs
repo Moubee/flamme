@@ -1,6 +1,6 @@
-﻿using Elsa.Workflows.Management.Models;
+﻿using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Imports a workflow definition.

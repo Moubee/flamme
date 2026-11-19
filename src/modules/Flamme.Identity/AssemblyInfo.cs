@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Elsa.Identity.UnitTests")]
+[assembly: InternalsVisibleTo("Flamme.Identity.UnitTests")]

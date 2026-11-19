@@ -1,23 +1,23 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Alterations.AlterationTypes;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Results;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Alterations.AlterationTypes;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Results;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Requests;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Endpoints.Workflows.Retry;
+namespace Flamme.Alterations.Endpoints.Workflows.Retry;
 
 /// <summary>
 /// Retries the specified workflow instances.
 /// </summary>
 [PublicAPI]
-public class Retry : ElsaEndpoint<Request, Response>
+public class Retry : FlammeEndpoint<Request, Response>
 {
     private readonly IAlterationRunner _alterationRunner;
     private readonly IWorkflowDispatcher _workflowDispatcher;
@@ -36,7 +36,7 @@ public class Retry : ElsaEndpoint<Request, Response>
     {
         Routes("/alterations/workflows/retry");
         Verbs(FastEndpoints.Http.GET, FastEndpoints.Http.POST);
-        RequirePermission(Elsa.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
+        RequirePermission(Flamme.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.Execute);
     }
 
     /// <inheritdoc />

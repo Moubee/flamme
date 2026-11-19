@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
+namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 
 /// <summary>
 /// Provides activity descriptors based on <see cref="WorkflowDefinition"/>s stored in the database.

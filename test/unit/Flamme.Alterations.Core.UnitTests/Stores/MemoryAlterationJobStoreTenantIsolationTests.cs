@@ -1,12 +1,12 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Stores;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Testing.Shared.Multitenancy;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Stores;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Testing.Shared.Multitenancy;
 
-namespace Elsa.Alterations.Core.UnitTests.Stores;
+namespace Flamme.Alterations.Core.UnitTests.Stores;
 
 /// <summary>
 /// Memory alteration jobs must honor ambient tenant the same way EF does via

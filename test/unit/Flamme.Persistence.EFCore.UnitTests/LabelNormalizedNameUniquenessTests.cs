@@ -1,8 +1,8 @@
-using Elsa.Labels.Entities;
-using Elsa.Persistence.EFCore.Modules.Labels;
+using Flamme.Labels.Entities;
+using Flamme.Persistence.EFCore.Modules.Labels;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.UnitTests;
+namespace Flamme.Persistence.EFCore.UnitTests;
 
 /// <summary>
 /// The Labels unique index must be per tenant, matching Secrets'

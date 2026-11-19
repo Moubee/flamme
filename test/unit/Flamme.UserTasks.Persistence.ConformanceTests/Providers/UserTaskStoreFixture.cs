@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Options;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Options;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 
 /// <summary>
 /// One provider's live stores, shared by every conformance class carrying the same fixture key.

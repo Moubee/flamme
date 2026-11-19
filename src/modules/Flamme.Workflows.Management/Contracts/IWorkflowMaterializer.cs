@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// A service that can materialize a workflow from a workflow definition.

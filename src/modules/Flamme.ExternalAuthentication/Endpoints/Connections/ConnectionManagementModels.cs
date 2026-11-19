@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Connections;
+namespace Flamme.ExternalAuthentication.Endpoints.Connections;
 
 internal sealed class ConnectionScopeRequest
 {
@@ -53,7 +53,7 @@ internal sealed class ConnectionRequest
         OverridesConfigurationConnection = OverridesConfigurationConnection,
         UnlinkedPolicy = UnlinkedPolicy,
         PermissionGrantSources = PermissionGrantSources?.Select(x => new GrantSourceSelection(x.Type, x.SettingsVersion, x.Settings.ValueKind == JsonValueKind.Undefined ? default : x.Settings.Clone(), x.Order)).ToArray() ?? [],
-        ClaimProjection = ClaimProjection?.ToProjection() ?? Elsa.ExternalAuthentication.Models.ClaimProjection.Empty,
+        ClaimProjection = ClaimProjection?.ToProjection() ?? Flamme.ExternalAuthentication.Models.ClaimProjection.Empty,
         UpstreamLogoutMode = UpstreamLogoutMode
     };
 }

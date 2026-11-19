@@ -1,6 +1,6 @@
-using Elsa.Common.Codecs;
+using Flamme.Common.Codecs;
 
-namespace Elsa.Common.Services;
+namespace Flamme.Common.Services;
 
 /// <inheritdoc />
 public class CompressionCodecResolver : ICompressionCodecResolver

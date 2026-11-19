@@ -1,18 +1,18 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.Delete;
+namespace Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.Delete;
 
 [UsedImplicitly]
-internal class Endpoint(IBookmarkQueueDeadLetterStore store) : ElsaEndpointWithoutRequest
+internal class Endpoint(IBookmarkQueueDeadLetterStore store) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
         Delete("/bookmark-queue/dead-letters/{id}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, CoreVerbs.Delete);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

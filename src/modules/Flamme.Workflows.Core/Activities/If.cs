@@ -1,11 +1,11 @@
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Expressions.Models;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Evaluate a Boolean condition to determine which activity to execute next.

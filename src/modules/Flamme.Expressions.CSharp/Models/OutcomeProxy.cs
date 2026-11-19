@@ -1,6 +1,6 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Expressions.CSharp.Models;
+namespace Flamme.Expressions.CSharp.Models;
 
 /// <summary>
 /// Provides access to activity outcomes.

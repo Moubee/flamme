@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Multitenancy.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Multitenancy.Workflows;
 
 [UsedImplicitly]
 public class WorkflowForTenant2 : WorkflowBase

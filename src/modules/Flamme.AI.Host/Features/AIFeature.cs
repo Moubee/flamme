@@ -1,11 +1,11 @@
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Services;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Services;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.Host.Features;
+namespace Flamme.AI.Host.Features;
 
 public class AIFeature(IModule module) : FeatureBase(module)
 {

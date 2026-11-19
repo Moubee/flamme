@@ -8,7 +8,7 @@
   "inputs": [
     {
       "uiHint": "singleline",
-      "storageDriverType": "Elsa.Workflows.Services.WorkflowStorageDriver, Elsa.Workflows.Core",
+      "storageDriverType": "Flamme.Workflows.Services.WorkflowStorageDriver, Flamme.Workflows.Core",
       "type": "Object",
       "name": "Input1",
       "displayName": "Input1",

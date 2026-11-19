@@ -1,28 +1,28 @@
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.HealthChecks;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.HealthChecks;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.HealthChecks;
+namespace Flamme.Workflows.Runtime.UnitTests.HealthChecks;
 
-public class ElsaWorkflowPersistenceHealthCheckTests
+public class FlammeWorkflowPersistenceHealthCheckTests
 {
     private readonly IServiceProvider _serviceProvider = IServiceProvider.Mock().Object;
     private readonly IWorkflowDefinitionStore _workflowDefinitionStore = IWorkflowDefinitionStore.Mock().Object;
     private readonly IWorkflowInstanceStore _workflowInstanceStore = IWorkflowInstanceStore.Mock().Object;
     private readonly ITriggerStore _triggerStore = ITriggerStore.Mock().Object;
     private readonly IBookmarkQueueStore _bookmarkQueueStore = IBookmarkQueueStore.Mock().Object;
-    private readonly ElsaWorkflowPersistenceHealthCheck _sut;
+    private readonly FlammeWorkflowPersistenceHealthCheck _sut;
 
-    public ElsaWorkflowPersistenceHealthCheckTests()
+    public FlammeWorkflowPersistenceHealthCheckTests()
     {
         Mock.Get(_workflowDefinitionStore).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(() => null);
         Mock.Get(_workflowInstanceStore).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>()).Returns(0);
-        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns((Elsa.Workflows.Runtime.Entities.StoredTrigger?)null);
+        Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>()).Returns((Flamme.Workflows.Runtime.Entities.StoredTrigger?)null);
         Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>()).Returns(() => null);
         Mock.Get(_serviceProvider).GetService(typeof(IWorkflowDefinitionStore)).Returns(_workflowDefinitionStore);
         Mock.Get(_serviceProvider).GetService(typeof(IWorkflowInstanceStore)).Returns(_workflowInstanceStore);
@@ -49,13 +49,13 @@ public class ElsaWorkflowPersistenceHealthCheckTests
     {
         var tracker = new ProbeConcurrencyTracker();
         Mock.Get(_workflowDefinitionStore).FindAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-                    .Returns(() => TrackProbeAsync<Elsa.Workflows.Management.Entities.WorkflowDefinition?>(tracker, null));
+                    .Returns(() => TrackProbeAsync<Flamme.Workflows.Management.Entities.WorkflowDefinition?>(tracker, null));
         Mock.Get(_workflowInstanceStore).CountAsync(Arg.Any<WorkflowInstanceFilter>(), Arg.Any<CancellationToken>())
                     .Returns(() => new ValueTask<long>(TrackProbeAsync(tracker, 0L)));
         Mock.Get(_triggerStore).FindAsync(Arg.Any<TriggerFilter>(), Arg.Any<CancellationToken>())
-                    .Returns(() => new ValueTask<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(TrackProbeAsync<Elsa.Workflows.Runtime.Entities.StoredTrigger?>(tracker, null)));
+                    .Returns(() => new ValueTask<Flamme.Workflows.Runtime.Entities.StoredTrigger?>(TrackProbeAsync<Flamme.Workflows.Runtime.Entities.StoredTrigger?>(tracker, null)));
         Mock.Get(_bookmarkQueueStore).FindAsync(Arg.Any<BookmarkQueueFilter>(), Arg.Any<CancellationToken>())
-                    .Returns(() => TrackProbeAsync<Elsa.Workflows.Runtime.Entities.BookmarkQueueItem?>(tracker, null));
+                    .Returns(() => TrackProbeAsync<Flamme.Workflows.Runtime.Entities.BookmarkQueueItem?>(tracker, null));
 
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
@@ -71,7 +71,7 @@ public class ElsaWorkflowPersistenceHealthCheckTests
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
         await Assert.That(result.Status).IsEqualTo(HealthStatus.Unhealthy);
-        await Assert.That(result.Description).IsEqualTo("Elsa workflow store 'triggers' is not reachable.");
+        await Assert.That(result.Description).IsEqualTo("Flamme workflow store 'triggers' is not reachable.");
         await Assert.That(result.Data["category"]).IsEqualTo("persistence");
         await Assert.That(result.Data["failedStore"]).IsEqualTo("triggers");
         await Assert.That(result.Data["failedProbe"]).IsEqualTo("triggers");
@@ -122,20 +122,20 @@ public class ElsaWorkflowPersistenceHealthCheckTests
         var result = await _sut.CheckHealthAsync(new HealthCheckContext());
 
         await Assert.That(result.Status).IsEqualTo(HealthStatus.Degraded);
-        await Assert.That(result.Description).IsEqualTo("No Elsa workflow persistence stores are registered.");
+        await Assert.That(result.Description).IsEqualTo("No Flamme workflow persistence stores are registered.");
         await Assert.That(result.Data["category"]).IsEqualTo("persistence");
         await Assert.That(result.Data["skippedProbes"]).IsEqualTo("workflow-definitions,workflow-instances,triggers,bookmark-queue");
         await Assert.That(result.Data.ContainsKey("successfulProbes")).IsFalse();
     }
 
-    private ElsaWorkflowPersistenceHealthCheck CreateSut(bool continueAfterFailure = false)
+    private FlammeWorkflowPersistenceHealthCheck CreateSut(bool continueAfterFailure = false)
     {
-        var options = Microsoft.Extensions.Options.Options.Create(new ElsaReadinessHealthCheckOptions
+        var options = Microsoft.Extensions.Options.Options.Create(new FlammeReadinessHealthCheckOptions
         {
             ContinuePersistenceProbesAfterFailure = continueAfterFailure
         });
 
-        return new ElsaWorkflowPersistenceHealthCheck(_serviceProvider, options, NullLogger<ElsaWorkflowPersistenceHealthCheck>.Instance);
+        return new FlammeWorkflowPersistenceHealthCheck(_serviceProvider, options, NullLogger<FlammeWorkflowPersistenceHealthCheck>.Instance);
     }
 
     private static async Task<T> TrackProbeAsync<T>(ProbeConcurrencyTracker tracker, T result)

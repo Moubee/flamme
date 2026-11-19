@@ -1,6 +1,6 @@
 ﻿using Polly;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public interface IResilienceStrategy
 {

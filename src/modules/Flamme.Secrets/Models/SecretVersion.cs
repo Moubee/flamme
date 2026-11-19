@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Models;
+namespace Flamme.Secrets.Models;
 
 public class SecretVersion
 {

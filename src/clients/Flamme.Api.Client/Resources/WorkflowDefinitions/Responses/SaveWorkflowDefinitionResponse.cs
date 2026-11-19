@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Responses;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Responses;
 
 /// <summary>
 /// Represents the response for saving a workflow definition.

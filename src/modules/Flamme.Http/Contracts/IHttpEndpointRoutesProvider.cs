@@ -1,6 +1,6 @@
-using Elsa.Http.Contexts;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 public interface IHttpEndpointRoutesProvider
 {

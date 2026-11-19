@@ -1,19 +1,19 @@
 ﻿using System.Text.Json;
-using Elsa.Common.Serialization;
-using Elsa.Expressions.Services;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
-using Elsa.Workflows.Management.Services;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Configurators;
-using Elsa.Workflows.Serialization.Converters;
-using Elsa.Workflows.Serialization.Helpers;
+using Flamme.Common.Serialization;
+using Flamme.Expressions.Services;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Services;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Configurators;
+using Flamme.Workflows.Serialization.Converters;
+using Flamme.Workflows.Serialization.Helpers;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Serialization.Converters;
+namespace Flamme.Workflows.Core.UnitTests.Serialization.Converters;
 
 public sealed class ActivityJsonConverterTests
 {
@@ -150,7 +150,7 @@ public sealed class ActivityJsonConverterTests
         Mock.Get(activityRegistry).Find(Arg.Any<string>()).Returns((ActivityDescriptor?)null);
         Mock.Get(activityRegistry).Find(Arg.Any<string>(), Arg.Any<int>()).Returns((ActivityDescriptor?)null);
         Mock.Get(activityRegistry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
-                    .Returns((global::System.Func<global::Elsa.Workflows.Models.ActivityDescriptor, bool> __arg0) => __arg0(descriptor) ? descriptor : null);
+                    .Returns((global::System.Func<global::Flamme.Workflows.Models.ActivityDescriptor, bool> __arg0) => __arg0(descriptor) ? descriptor : null);
 
         return activityRegistry;
     }

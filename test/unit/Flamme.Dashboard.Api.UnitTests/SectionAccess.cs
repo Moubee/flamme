@@ -1,6 +1,6 @@
-using Elsa.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Abstractions.Models;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 /// <summary>Which overview sections a caller reads: a section is either readable, with its data, or withheld, without it.</summary>
 public record SectionAccess

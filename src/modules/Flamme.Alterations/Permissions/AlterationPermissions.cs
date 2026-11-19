@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Permissions;
+namespace Flamme.Alterations.Permissions;
 
 /// <summary>
 /// Stable resource names for Alterations. Endpoints reference these constants rather than string

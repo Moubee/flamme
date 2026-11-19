@@ -1,12 +1,12 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Hosting.Management.Contracts;
-using Elsa.Hosting.Management.HostedServices;
-using Elsa.Hosting.Management.Options;
-using Elsa.Hosting.Management.Services;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Hosting.Management.Contracts;
+using Flamme.Hosting.Management.HostedServices;
+using Flamme.Hosting.Management.Options;
+using Flamme.Hosting.Management.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Hosting.Management.Features;
+namespace Flamme.Hosting.Management.Features;
 
 /// <summary>
 /// Installs and configures the clustering feature.

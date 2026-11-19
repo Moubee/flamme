@@ -1,6 +1,6 @@
-using Elsa.Workflows.LogPersistence;
+using Flamme.Workflows.LogPersistence;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class ActivityLogPersistenceModeMap
 {

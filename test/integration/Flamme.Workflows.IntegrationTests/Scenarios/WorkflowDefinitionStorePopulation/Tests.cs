@@ -1,14 +1,14 @@
-﻿using Elsa.Common.Multitenancy;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Stimuli;
+﻿using Flamme.Common.Multitenancy;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Stimuli;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionStorePopulation;
 
 /// <summary>
 /// Represents a test class for integration testing various scenarios related to the

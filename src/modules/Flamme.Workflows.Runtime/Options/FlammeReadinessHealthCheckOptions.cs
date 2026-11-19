@@ -1,9 +1,9 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
-/// Configures Elsa workflow runtime readiness health checks.
+/// Configures Flamme workflow runtime readiness health checks.
 /// </summary>
-public class ElsaReadinessHealthCheckOptions
+public class FlammeReadinessHealthCheckOptions
 {
     /// <summary>
     /// The maximum time the distributed-lock readiness probe waits to acquire its probe lock.

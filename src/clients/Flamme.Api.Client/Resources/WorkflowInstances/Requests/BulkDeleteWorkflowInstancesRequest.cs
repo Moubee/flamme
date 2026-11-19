@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Requests;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Requests;
 
 /// <summary>
 /// Represents a request to bulk delete workflow instances.

@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.ComponentTests.Activities;
+namespace Flamme.Workflows.ComponentTests.Activities;
 
 public class TriggerSignal : CodeActivity
 {

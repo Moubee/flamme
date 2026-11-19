@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Policies;
+namespace Flamme.ExternalAuthentication.Policies;
 
-/// <summary>Delegates external-to-Elsa identity matching to one trusted matcher and applies a safe configured no-match action.</summary>
+/// <summary>Delegates external-to-Flamme identity matching to one trusted matcher and applies a safe configured no-match action.</summary>
 public sealed class MatchExternalUserUnlinkedIdentityPolicy(IExternalUserMatcherRegistry matchers) : IUnlinkedIdentityPolicy
 {
     public const string PolicyType = "match-user";

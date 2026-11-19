@@ -1,11 +1,11 @@
-using Elsa.Common.Models;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers;
 
 public abstract class TimerActivityTestBase(App app) : AppComponentTest(app)
 {

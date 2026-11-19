@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using Elsa.Activities.UnitTests.Http.Helpers;
-using Elsa.Extensions;
-using Elsa.Http;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Activities.UnitTests.Http.Helpers;
+using Flamme.Extensions;
+using Flamme.Http;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class SendHttpRequestTests
 {
@@ -177,7 +177,7 @@ public class SendHttpRequestTests
             expectedCategory: "HTTP",
             expectedDisplayName: "HTTP Request",
             expectedDescription: "Send an HTTP request.",
-            expectedKind: Elsa.Workflows.ActivityKind.Task
+            expectedKind: Flamme.Workflows.ActivityKind.Task
         );
     }
 

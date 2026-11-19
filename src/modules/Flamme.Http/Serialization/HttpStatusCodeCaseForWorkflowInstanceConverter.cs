@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Http.Serialization;
+namespace Flamme.Http.Serialization;
 
 /// <summary>
 /// A custom JSON converter for <see cref="HttpStatusCodeCase"/> objects when serializing workflow states.

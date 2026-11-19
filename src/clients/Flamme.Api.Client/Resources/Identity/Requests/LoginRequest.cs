@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Identity.Requests;
+namespace Flamme.Api.Client.Resources.Identity.Requests;
 
 /// <summary>
 /// Represents a request to log in.

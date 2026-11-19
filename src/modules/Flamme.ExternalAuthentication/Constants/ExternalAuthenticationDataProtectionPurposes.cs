@@ -1,4 +1,4 @@
-namespace Elsa.ExternalAuthentication.Constants;
+namespace Flamme.ExternalAuthentication.Constants;
 
 /// <summary>
 /// Stable Data Protection purpose segments for broker-owned opaque payloads.

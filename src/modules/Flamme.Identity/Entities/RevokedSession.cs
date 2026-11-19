@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Identity.Entities;
+namespace Flamme.Identity.Entities;
 
 /// <summary>
 /// A sign-in session whose refresh tokens are no longer accepted. The <see cref="Entity.Id"/> is the session ID.

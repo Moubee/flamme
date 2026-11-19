@@ -1,8 +1,8 @@
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Middleware.Activities;
+namespace Flamme.Workflows.Middleware.Activities;
 
 /// <summary>
 /// Adds extension methods to <see cref="ExecutionLogMiddleware"/>.

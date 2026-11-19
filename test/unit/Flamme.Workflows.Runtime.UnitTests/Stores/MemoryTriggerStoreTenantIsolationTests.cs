@@ -1,12 +1,12 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Stores;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Stores;
+namespace Flamme.Workflows.Runtime.UnitTests.Stores;
 
 /// <summary>
 /// Memory must honor ambient tenant + <see cref="TriggerFilter.TenantAgnostic"/>

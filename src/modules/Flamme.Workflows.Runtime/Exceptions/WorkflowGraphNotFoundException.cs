@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Exceptions;
+namespace Flamme.Workflows.Runtime.Exceptions;
 
 [Obsolete("Use WorkflowDefinitionNotFoundException instead.")]
 public class WorkflowGraphNotFoundException(string message, WorkflowDefinitionHandle workflowDefinitionHandle) : Exception(message)

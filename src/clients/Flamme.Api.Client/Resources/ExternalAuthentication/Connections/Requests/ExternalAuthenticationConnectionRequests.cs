@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Models;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
 
 public sealed class ListExternalAuthenticationConnectionsRequest
 {

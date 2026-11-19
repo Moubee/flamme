@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Contracts;
+namespace Flamme.Workflows.Management.Contracts;
 
 /// <summary>
 /// Represents a service for updating the activity registry.

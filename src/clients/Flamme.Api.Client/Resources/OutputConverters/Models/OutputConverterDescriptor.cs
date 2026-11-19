@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Api.Client.Resources.OutputConverters.Models;
+namespace Flamme.Api.Client.Resources.OutputConverters.Models;
 
 /// <summary>
 /// Describes an output converter that can be selected by a workflow author.

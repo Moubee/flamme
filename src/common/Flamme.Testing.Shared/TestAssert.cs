@@ -3,10 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
-/// Provides the small set of framework-neutral assertions used by Elsa's shared test helpers.
+/// Provides the small set of framework-neutral assertions used by Flamme's shared test helpers.
 /// </summary>
 public static class TestAssert
 {

@@ -1,6 +1,6 @@
-﻿using Elsa.Testing.Shared;
+﻿using Flamme.Testing.Shared;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowOutputMapping;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowOutputMapping;
 
 /// <summary>
 /// Tests for mapping an activity's output directly to the workflow's output definition.

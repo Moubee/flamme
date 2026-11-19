@@ -115,7 +115,7 @@
         },
         "contentType": null,
         "responseHeaders": {
-          "typeName": "Elsa.Http.Models.HttpHeaders, Elsa.Http",
+          "typeName": "Flamme.Http.Models.HttpHeaders, Flamme.Http",
           "expression": {
             "type": "Literal",
             "value": "{}"

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Options;
+namespace Flamme.Workflows.Management.Options;
 
 /// <summary>
 /// Options for configuring the workflow reference graph builder behavior.

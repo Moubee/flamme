@@ -1,4 +1,4 @@
-namespace Elsa.Features.Attributes;
+namespace Flamme.Features.Attributes;
 
 /// <summary>
 /// Specifies that the feature depends on another feature.

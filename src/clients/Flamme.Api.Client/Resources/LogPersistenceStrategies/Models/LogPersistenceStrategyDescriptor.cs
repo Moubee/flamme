@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.LogPersistenceStrategies;
+namespace Flamme.Api.Client.Resources.LogPersistenceStrategies;
 
 /// <summary>
 /// Represents a log persistence strategy.

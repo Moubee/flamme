@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.ProjectedEnumerableToArray;
 
 /// <summary>
 /// A test activity that produces an IEnumerable&lt;string&gt; via Select projection, which has two generic arguments and was triggering the bug in ConvertIEnumerableToArray.

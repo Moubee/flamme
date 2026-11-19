@@ -1,27 +1,27 @@
 using System.Text.Json;
-using Elsa.Api.Client.HttpMessageHandlers;
+using Flamme.Api.Client.HttpMessageHandlers;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
-namespace Elsa.Api.Client.Options;
+namespace Flamme.Api.Client.Options;
 
 /// <summary>
-/// Represents options for building an Elsa API client.
+/// Represents options for building an Flamme API client.
 /// </summary>
-public class ElsaClientBuilderOptions
+public class FlammeClientBuilderOptions
 {
     /// <summary>
-    /// Gets or sets the base address of the Elsa server.
+    /// Gets or sets the base address of the Flamme server.
     /// </summary>
     public Uri BaseAddress { get; set; } = default!;
 
     /// <summary>
-    /// Gets or sets the API key function to use when authenticating with the Elsa server.
+    /// Gets or sets the API key function to use when authenticating with the Flamme server.
     /// </summary>
     public string? ApiKey { get; set; }
 
     /// <summary>
-    /// A <see cref="DelegatingHandler"/> type that can be used to authenticate with the Elsa server.
+    /// A <see cref="DelegatingHandler"/> type that can be used to authenticate with the Flamme server.
     /// Defaults to <see cref="ApiKeyHttpMessageHandler"/>.
     /// </summary>
     public Type AuthenticationHandler { get; set; } = typeof(ApiKeyHttpMessageHandler);

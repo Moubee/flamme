@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Polly;
 using Polly.Retry;
 
-namespace Elsa.Resilience.Core.UnitTests.TestHelpers;
+namespace Flamme.Resilience.Core.UnitTests.TestHelpers;
 
 /// <summary>
 /// A strategy that configures a real Polly retry pipeline with zero delay, so tests can exercise actual retry behavior.

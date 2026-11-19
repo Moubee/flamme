@@ -1,4 +1,4 @@
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 /// <summary>
 /// Default implementation of <see cref="ITransientExceptionDetector"/> that delegates to registered detectors.

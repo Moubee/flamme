@@ -1,26 +1,26 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutionSummaries.ListSummaries;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutionSummaries.ListSummaries;
 
 /// <summary>
 /// Lists a summary view of the executions for a given activity.
 /// </summary>
 [PublicAPI]
-internal class Endpoint(IActivityExecutionStore store) : ElsaEndpoint<Request, ListResponse<ActivityExecutionRecordSummary>>
+internal class Endpoint(IActivityExecutionStore store) : FlammeEndpoint<Request, ListResponse<ActivityExecutionRecordSummary>>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Get("/activity-execution-summaries/list");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.ActivityExecutions, CoreVerbs.View);
     }
 
     /// <inheritdoc />

@@ -1,24 +1,24 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Identity.Endpoints.Roles.Create;
+namespace Flamme.Identity.Endpoints.Roles.Create;
 
 /// <summary>
 /// An endpoint that creates a new role.
 /// </summary>
 [PublicAPI]
-internal class Create(IRoleManager roleManager, IRoleAuthorizationService roleAuthorizationService, IPermissionGrantValidator grantValidator, Services.RoleSecurityNotifier securityNotifier) : ElsaEndpoint<Request, Response>
+internal class Create(IRoleManager roleManager, IRoleAuthorizationService roleAuthorizationService, IPermissionGrantValidator grantValidator, Services.RoleSecurityNotifier securityNotifier) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Post("/identity/roles");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Create);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Create);
     }
 
     /// <inheritdoc />

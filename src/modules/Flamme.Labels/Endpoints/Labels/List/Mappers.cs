@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
-using Elsa.Labels.Entities;
+using Flamme.Common.Models;
+using Flamme.Labels.Entities;
 using FastEndpoints;
 
-namespace Elsa.Labels.Endpoints.Labels.List;
+namespace Flamme.Labels.Endpoints.Labels.List;
 
 public class PageMapper : Mapper<Request, Response, Page<Label>>
 {

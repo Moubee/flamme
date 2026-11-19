@@ -1,6 +1,6 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.State;
+namespace Flamme.Workflows.State;
 
 /// <summary>
 /// A serialized representation of an activity work item.

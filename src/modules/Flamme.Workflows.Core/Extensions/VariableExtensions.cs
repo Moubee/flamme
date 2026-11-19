@@ -3,14 +3,14 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Serialization.Converters;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extension methods to <see cref="Variable"/> for configuring storage.

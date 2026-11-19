@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
-using Elsa.Features.Services;
-using Elsa.Mediator;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.HostedServices;
-using Elsa.Mediator.Models;
+using Flamme.Features.Services;
+using Flamme.Mediator;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.HostedServices;
+using Flamme.Mediator.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Common.UnitTests.HostedServices;
+namespace Flamme.Common.UnitTests.HostedServices;
 
 public class MediatorHostedServiceTests
 {
@@ -43,7 +43,7 @@ public class MediatorHostedServiceTests
         services.AddLogging();
         var module = IModule.Mock().Object;
         Mock.Get(module).Services.Returns(services);
-        new Elsa.Common.Features.MediatorFeature(module).Apply();
+        new Flamme.Common.Features.MediatorFeature(module).Apply();
         services.AddSingleton<CommandSink>();
         services.AddCommandHandler<TestCommandHandler>();
         return services.BuildServiceProvider();

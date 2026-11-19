@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Tenants.Options;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Persistence.EFCore.EntityHandlers;
+namespace Flamme.Persistence.EFCore.EntityHandlers;
 
 /// <summary>
 /// Represents a class that applies a filter to set the TenantId for entities.
@@ -14,7 +14,7 @@ namespace Elsa.Persistence.EFCore.EntityHandlers;
 public class SetTenantIdFilter(IOptions<TenantsOptions> tenantsOptions) : IEntityModelCreatingHandler
 {
     /// <inheritdoc />
-    public void Handle(ElsaDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType)
+    public void Handle(FlammeDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType)
     {
         if (!typeof(Entity).IsAssignableFrom(entityType.ClrType))
             return;
@@ -28,7 +28,7 @@ public class SetTenantIdFilter(IOptions<TenantsOptions> tenantsOptions) : IEntit
             .HasQueryFilter(CreateTenantFilterExpression(dbContext, entityType.ClrType));
     }
 
-    private LambdaExpression CreateTenantFilterExpression(ElsaDbContextBase dbContext, Type clrType)
+    private LambdaExpression CreateTenantFilterExpression(FlammeDbContextBase dbContext, Type clrType)
     {
         var parameter = Expression.Parameter(clrType, "e");
 
@@ -42,7 +42,7 @@ public class SetTenantIdFilter(IOptions<TenantsOptions> tenantsOptions) : IEntit
 
         var tenantIdOnContext = Expression.Property(
             Expression.Constant(dbContext),
-            nameof(ElsaDbContextBase.TenantId));
+            nameof(FlammeDbContextBase.TenantId));
 
         var equalityCheck = Expression.Equal(tenantIdProperty, tenantIdOnContext);
         var agnosticCheck = Expression.Equal(tenantIdProperty, Expression.Constant(Tenant.AgnosticTenantId, typeof(string)));

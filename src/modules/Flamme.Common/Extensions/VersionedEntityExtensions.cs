@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
 using LinqKit;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="VersionedEntity"/> objects.

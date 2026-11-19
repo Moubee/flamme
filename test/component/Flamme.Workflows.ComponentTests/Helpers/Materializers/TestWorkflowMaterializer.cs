@@ -1,10 +1,10 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.ComponentTests.WorkflowProviders;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.ComponentTests.WorkflowProviders;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.ComponentTests.Materializers;
+namespace Flamme.Workflows.ComponentTests.Materializers;
 
 /// <summary>
 /// A workflow materializer that deserializes workflows created from <see cref="TestWorkflowProvider"/>.

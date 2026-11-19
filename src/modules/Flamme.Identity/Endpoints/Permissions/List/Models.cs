@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Permissions.List;
+namespace Flamme.Identity.Endpoints.Permissions.List;
 
 /// <summary>The permission catalog: every resource the installed modules have registered.</summary>
 /// <param name="CoreVerbs">The recommended verb set modules should reuse. A convention, not a closed vocabulary.</param>

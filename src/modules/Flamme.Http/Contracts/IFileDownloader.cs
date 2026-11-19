@@ -1,6 +1,6 @@
-using Elsa.Http.Options;
+using Flamme.Http.Options;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// A general-purpose downloader of files from a given URL.

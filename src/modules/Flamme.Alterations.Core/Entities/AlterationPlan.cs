@@ -1,9 +1,9 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Models;
-using Elsa.Common.Entities;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Models;
+using Flamme.Common.Entities;
 
-namespace Elsa.Alterations.Core.Entities;
+namespace Flamme.Alterations.Core.Entities;
 
 /// <summary>
 /// A plan that contains a list of alterations to be applied to a set of workflow instances.

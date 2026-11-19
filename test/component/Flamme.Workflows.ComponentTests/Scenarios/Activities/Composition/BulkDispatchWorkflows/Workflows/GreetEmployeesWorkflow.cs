@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows.Activities;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.BulkDispatchWorkflows.Workflows;
 
 public class GreetEmployeesWorkflow : WorkflowBase
 {

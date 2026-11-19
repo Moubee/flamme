@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
 /// Represents handler for entities before saving changes.
@@ -10,5 +10,5 @@ public interface IEntitySavingHandler
     /// <summary>
     /// Handles the entity before saving changes.
     /// </summary>
-    ValueTask HandleAsync(ElsaDbContextBase dbContext, EntityEntry entry, CancellationToken cancellationToken = default);
+    ValueTask HandleAsync(FlammeDbContextBase dbContext, EntityEntry entry, CancellationToken cancellationToken = default);
 }

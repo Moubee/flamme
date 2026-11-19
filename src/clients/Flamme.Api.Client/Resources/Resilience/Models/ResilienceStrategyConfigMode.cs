@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Resilience.Models;
+namespace Flamme.Api.Client.Resources.Resilience.Models;
 
 public enum ResilienceStrategyConfigMode
 {

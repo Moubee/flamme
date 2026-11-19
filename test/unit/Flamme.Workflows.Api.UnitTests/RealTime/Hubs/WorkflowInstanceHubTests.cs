@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Api.RealTime.Hubs;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Api.RealTime.Hubs;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Elsa.Workflows.Api.UnitTests.RealTime.Hubs;
+namespace Flamme.Workflows.Api.UnitTests.RealTime.Hubs;
 
 public class WorkflowInstanceHubTests
 {
@@ -72,10 +72,10 @@ public class WorkflowInstanceHubTests
     }
 
     [Test]
-    public async Task ObserveInstanceAsync_UsesElsaPermissionClaimType()
+    public async Task ObserveInstanceAsync_UsesFlammePermissionClaimType()
     {
-        // Elsa is the only authority that expands roles into permission claims (ADR 0009), so a
-        // similarly named FastEndpoints claim must not grant an Elsa workflow permission.
+        // Flamme is the only authority that expands roles into permission claims (ADR 0009), so a
+        // similarly named FastEndpoints claim must not grant an Flamme workflow permission.
         UseUserClaim(CustomPermissionsClaimType, ReadWorkflowInstancesPermission);
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));

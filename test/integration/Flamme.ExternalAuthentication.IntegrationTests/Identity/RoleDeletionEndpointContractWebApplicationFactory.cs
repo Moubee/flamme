@@ -1,11 +1,11 @@
 using System.Reflection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
-using Elsa.Identity.Features;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.Identity.Features;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Identity;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Identity;
 
 public sealed class RoleDeletionEndpointContractWebApplicationFactory : TestWebApplicationFactory<ExternalAuthenticationTestEntryPoint>
 {
@@ -14,6 +14,6 @@ public sealed class RoleDeletionEndpointContractWebApplicationFactory : TestWebA
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);
-        ExternalAuthenticationTestHost.Configure(builder, typeof(IdentityFeature).Assembly, endpoint => endpoint.Namespace == "Elsa.Identity.Endpoints.Roles.Delete");
+        ExternalAuthenticationTestHost.Configure(builder, typeof(IdentityFeature).Assembly, endpoint => endpoint.Namespace == "Flamme.Identity.Endpoints.Roles.Delete");
     }
 }

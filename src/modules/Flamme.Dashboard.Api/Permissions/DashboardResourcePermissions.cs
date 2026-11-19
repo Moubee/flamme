@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Dashboard.Api.Permissions;
+namespace Flamme.Dashboard.Api.Permissions;
 
 /// <summary>
 /// Stable resource names for Dashboard. Endpoints reference these constants rather than string

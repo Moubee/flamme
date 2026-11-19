@@ -2,7 +2,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// Creates a <see cref="HttpContent"/> object for XML types.

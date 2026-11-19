@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <summary>
 /// Convenience implementation of <see cref="IHostMethodParameterValueProvider"/> that delegates to a user-provided function.

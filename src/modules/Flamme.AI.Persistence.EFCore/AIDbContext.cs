@@ -1,10 +1,10 @@
-using Elsa.AI.Persistence.EFCore.Entities;
-using Elsa.Persistence.EFCore;
+using Flamme.AI.Persistence.EFCore.Entities;
+using Flamme.Persistence.EFCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.AI.Persistence.EFCore;
+namespace Flamme.AI.Persistence.EFCore;
 
-public class AIDbContext : ElsaDbContextBase
+public class AIDbContext : FlammeDbContextBase
 {
     private static readonly IServiceProvider EmptyServiceProvider = new ServiceCollection().BuildServiceProvider();
 

@@ -1,21 +1,21 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
 
 /// <summary>
 /// Represents an endpoint for bulk cancelling workflow instances.
 /// </summary>
 [PublicAPI]
-public class BulkCancel(IWorkflowCancellationService workflowCancellationService) : ElsaEndpoint<Request, Response>
+public class BulkCancel(IWorkflowCancellationService workflowCancellationService) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Post("/bulk-actions/cancel/workflow-instances/");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, "cancel");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, "cancel");
     }
 
     /// <inheritdoc />

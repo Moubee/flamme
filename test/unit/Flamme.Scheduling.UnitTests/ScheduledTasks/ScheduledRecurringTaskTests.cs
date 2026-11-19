@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.ScheduledTasks;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
+namespace Flamme.Scheduling.UnitTests.ScheduledTasks;
 
 /// <summary>
 /// Tests for ScheduledRecurringTask to ensure recurring tasks handle edge cases correctly.

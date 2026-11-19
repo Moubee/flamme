@@ -3,11 +3,11 @@ using System.Diagnostics.Metrics;
 
 using DiagnosticsActivity = System.Diagnostics.Activity;
 using DiagnosticsActivityKind = System.Diagnostics.ActivityKind;
-using WorkflowActivityStatus = Elsa.Workflows.ActivityStatus;
-using WorkflowInstanceStatus = Elsa.Workflows.WorkflowStatus;
-using WorkflowInstanceSubStatus = Elsa.Workflows.WorkflowSubStatus;
+using WorkflowActivityStatus = Flamme.Workflows.ActivityStatus;
+using WorkflowInstanceStatus = Flamme.Workflows.WorkflowStatus;
+using WorkflowInstanceSubStatus = Flamme.Workflows.WorkflowSubStatus;
 
-namespace Elsa.Workflows.Telemetry;
+namespace Flamme.Workflows.Telemetry;
 
 /// <summary>
 /// Provides tracing and metrics instrumentation for workflow and activity execution.

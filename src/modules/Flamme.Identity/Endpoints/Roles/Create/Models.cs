@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Roles.Create;
+namespace Flamme.Identity.Endpoints.Roles.Create;
 
 internal class Request
 {

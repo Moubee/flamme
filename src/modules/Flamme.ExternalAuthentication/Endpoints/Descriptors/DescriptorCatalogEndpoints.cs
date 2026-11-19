@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Permissions;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Permissions;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Descriptors;
+namespace Flamme.ExternalAuthentication.Endpoints.Descriptors;
 
 /// <summary>Publishes only startup-installed, deployment-allowed extension metadata for generic management editors.</summary>
-internal sealed class ListAdapterDescriptors(IExternalAuthenticationAdapterRegistry registry, IOptions<ExternalAuthenticationOptions> options) : ElsaEndpointWithoutRequest<IReadOnlyCollection<ExternalAuthenticationAdapterDescriptor>>
+internal sealed class ListAdapterDescriptors(IExternalAuthenticationAdapterRegistry registry, IOptions<ExternalAuthenticationOptions> options) : FlammeEndpointWithoutRequest<IReadOnlyCollection<ExternalAuthenticationAdapterDescriptor>>
 {
     public override void Configure()
     {
@@ -28,7 +28,7 @@ internal sealed class ListAdapterDescriptors(IExternalAuthenticationAdapterRegis
     }
 }
 
-internal sealed class ListPolicyDescriptors(IUnlinkedIdentityPolicyRegistry registry) : ElsaEndpointWithoutRequest<IReadOnlyCollection<UnlinkedIdentityPolicyDescriptor>>
+internal sealed class ListPolicyDescriptors(IUnlinkedIdentityPolicyRegistry registry) : FlammeEndpointWithoutRequest<IReadOnlyCollection<UnlinkedIdentityPolicyDescriptor>>
 {
     public override void Configure()
     {
@@ -42,7 +42,7 @@ internal sealed class ListPolicyDescriptors(IUnlinkedIdentityPolicyRegistry regi
     }
 }
 
-internal sealed class ListPermissionSourceDescriptors(IPermissionGrantSourceRegistry registry) : ElsaEndpointWithoutRequest<IReadOnlyCollection<PermissionGrantSourceDescriptor>>
+internal sealed class ListPermissionSourceDescriptors(IPermissionGrantSourceRegistry registry) : FlammeEndpointWithoutRequest<IReadOnlyCollection<PermissionGrantSourceDescriptor>>
 {
     public override void Configure()
     {
@@ -56,7 +56,7 @@ internal sealed class ListPermissionSourceDescriptors(IPermissionGrantSourceRegi
     }
 }
 
-internal sealed class ListExternalUserMatcherDescriptors(IExternalUserMatcherRegistry registry) : ElsaEndpointWithoutRequest<IReadOnlyCollection<ExternalUserMatcherDescriptor>>
+internal sealed class ListExternalUserMatcherDescriptors(IExternalUserMatcherRegistry registry) : FlammeEndpointWithoutRequest<IReadOnlyCollection<ExternalUserMatcherDescriptor>>
 {
     public override void Configure()
     {
@@ -71,7 +71,7 @@ internal sealed record ManagedSecretResolverDescriptor(string Type, string Displ
 internal sealed record ManagedSecretResolverDescriptorResponse(IReadOnlyCollection<ManagedSecretResolverDescriptor> Items);
 
 /// <summary>Lists installed managed secret writers without revealing any bound secret reference.</summary>
-internal sealed class ListManagedSecretResolverDescriptors(IEnumerable<IManagedSecretBindingWriter> writers) : ElsaEndpointWithoutRequest<ManagedSecretResolverDescriptorResponse>
+internal sealed class ListManagedSecretResolverDescriptors(IEnumerable<IManagedSecretBindingWriter> writers) : FlammeEndpointWithoutRequest<ManagedSecretResolverDescriptorResponse>
 {
     public override void Configure()
     {
@@ -88,10 +88,10 @@ internal sealed class ListManagedSecretResolverDescriptors(IEnumerable<IManagedS
 /// </summary>
 /// <remarks>
 /// This serves the core catalog rather than a registry private to this module. Choosing what an external
-/// mapping confers means choosing from everything Elsa declares, not just from this module's own resources,
+/// mapping confers means choosing from everything Flamme declares, not just from this module's own resources,
 /// and the module's registry only ever held its legacy permission names anyway.
 /// </remarks>
-internal sealed class ListPermissionDescriptors(IPermissionDescriptorRegistry registry) : ElsaEndpointWithoutRequest<IReadOnlyCollection<PermissionDescriptor>>
+internal sealed class ListPermissionDescriptors(IPermissionDescriptorRegistry registry) : FlammeEndpointWithoutRequest<IReadOnlyCollection<PermissionDescriptor>>
 {
     public override void Configure()
     {

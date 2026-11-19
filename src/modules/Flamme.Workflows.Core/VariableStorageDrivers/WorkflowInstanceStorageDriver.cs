@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A storage driver that stores objects in the workflow state itself.

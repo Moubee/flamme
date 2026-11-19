@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Common.Converters;
+namespace Flamme.Common.Converters;
 
 /// <summary>
 /// Converts integers to and from JSON strings.

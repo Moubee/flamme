@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants.Features;
+namespace Flamme.Tenants.Features;
 
 /// <summary>
 /// Enables tenant management endpoints.

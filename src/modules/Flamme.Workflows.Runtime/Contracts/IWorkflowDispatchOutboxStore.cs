@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Models;
+using Flamme.Workflows.Runtime.Models;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Durable store for workflow dispatch outbox items.

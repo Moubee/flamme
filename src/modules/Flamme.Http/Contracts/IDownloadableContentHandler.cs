@@ -1,6 +1,6 @@
-using Elsa.Http.Contexts;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Provides downloadables from the specified content, if supported.

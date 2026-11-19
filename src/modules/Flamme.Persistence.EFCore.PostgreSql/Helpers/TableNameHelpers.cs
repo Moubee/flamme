@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Helpers;
+namespace Flamme.Persistence.EFCore.PostgreSql.Helpers;
 
 public static class TableNameHelpers
 {

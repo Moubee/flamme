@@ -1,16 +1,16 @@
-using Elsa.KeyValues.Entities;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.KeyValues.Entities;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// DB context for the runtime module.
 /// </summary>
-public class RuntimeElsaDbContext : ElsaDbContextBase
+public class RuntimeFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public RuntimeElsaDbContext(DbContextOptions<RuntimeElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public RuntimeFlammeDbContext(DbContextOptions<RuntimeFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

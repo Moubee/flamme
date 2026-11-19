@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 /// <summary>
-/// Contains options for configuring Elsa's Entity Framework Core integration.
+/// Contains options for configuring Flamme's Entity Framework Core integration.
 /// </summary>
 public class CustomDbContextOptionsExtensionInfo : DbContextOptionsExtensionInfo
 {

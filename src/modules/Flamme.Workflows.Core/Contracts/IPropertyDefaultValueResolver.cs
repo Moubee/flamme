@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Resolves default values for a property.

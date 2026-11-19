@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Contains extension methods for the <see cref="StringValues"/> Enumerable dictonaries.

@@ -1,14 +1,14 @@
-using Elsa.Common.Features;
-using Elsa.Common.Multitenancy;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Tenants.Mediator.Tasks;
-using Elsa.Tenants.Options;
-using Elsa.Tenants.Providers;
+using Flamme.Common.Features;
+using Flamme.Common.Multitenancy;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Tenants.Mediator.Tasks;
+using Flamme.Tenants.Options;
+using Flamme.Tenants.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Tenants.Features;
+namespace Flamme.Tenants.Features;
 
 /// <summary>
 /// Configures multi-tenancy features.

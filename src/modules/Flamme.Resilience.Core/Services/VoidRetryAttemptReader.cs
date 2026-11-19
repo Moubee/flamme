@@ -1,7 +1,7 @@
-using Elsa.Common.Models;
-using Elsa.Resilience.Entities;
+using Flamme.Common.Models;
+using Flamme.Resilience.Entities;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public class VoidRetryAttemptReader : IRetryAttemptReader
 {

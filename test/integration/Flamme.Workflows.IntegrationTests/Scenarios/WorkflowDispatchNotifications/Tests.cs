@@ -1,10 +1,10 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Requests;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Requests;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDispatchNotifications;
 
 public class Tests : IAsyncDisposable
 {

@@ -1,15 +1,15 @@
 using System.Data.Common;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Persistence.EFCore;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Alterations.Persistence.ConformanceTests;
+namespace Flamme.Alterations.Persistence.ConformanceTests;
 
 /// <summary>
 /// EF Alterations Save/SaveMany must refuse ID collisions atomically (no pre-read guard).
@@ -255,7 +255,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationPlans\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Flamme\".\"AlterationPlans\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Plans.SaveAsync(Plan(
@@ -274,7 +274,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"Elsa\".\"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("INSERT INTO \"Flamme\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveAsync(Job(
@@ -293,7 +293,7 @@ public sealed class EFCoreAlterationStoreTenantOwnershipTests
         await using var scenario = await AlterationStoreScenario.CreatePostgreSqlAsync(
             "tenant-a",
             tenantsEnabled: true,
-            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Elsa\".\"AlterationJobs\""),
+            commandInterceptor: new ThrowOnAlterationCommand("UPDATE \"Flamme\".\"AlterationJobs\""),
             dbExceptionHandler: handler);
 
         var exception = await Assert.ThrowsExactlyAsync<DbUpdateException>(() => scenario.Jobs.SaveManyAsync([
@@ -619,7 +619,7 @@ public sealed class GateFirstAlterationUpdates(
     }
 
     private bool IsArmedAlterationUpdate(DbCommand command) =>
-        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"Elsa\".\"{tableName}\"", StringComparison.OrdinalIgnoreCase);
+        Volatile.Read(ref _armed) != 0 && command.CommandText.Contains($"UPDATE \"Flamme\".\"{tableName}\"", StringComparison.OrdinalIgnoreCase);
 
     private async Task CoordinateAsync(CancellationToken cancellationToken)
     {

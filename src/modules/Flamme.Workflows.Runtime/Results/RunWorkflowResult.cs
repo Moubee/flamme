@@ -1,7 +1,7 @@
-// using Elsa.Workflows.Helpers;
-// using Elsa.Workflows.Models;
+// using Flamme.Workflows.Helpers;
+// using Flamme.Workflows.Models;
 //
-// namespace Elsa.Workflows.Runtime.Results;
+// namespace Flamme.Workflows.Runtime.Results;
 //
 // /// <summary>
 // /// Represents the result of executing a workflow.

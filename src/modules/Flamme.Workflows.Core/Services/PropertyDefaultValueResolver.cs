@@ -1,8 +1,8 @@
 using System.Reflection;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class PropertyDefaultValueResolver(IServiceScopeFactory scopeFactory) : IPropertyDefaultValueResolver

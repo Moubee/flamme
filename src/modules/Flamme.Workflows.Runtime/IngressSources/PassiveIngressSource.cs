@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.IngressSources;
+namespace Flamme.Workflows.Runtime.IngressSources;
 
 /// <summary>
 /// Base class for <see cref="IIngressSource"/> implementations whose actual pause/resume

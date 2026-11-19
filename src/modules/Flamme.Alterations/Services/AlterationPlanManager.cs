@@ -1,12 +1,12 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Notifications;
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Notifications;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Alterations.Services;
+namespace Flamme.Alterations.Services;
 
 /// <inheritdoc />
 public class AlterationPlanManager(IAlterationPlanStore planStore, IAlterationJobStore jobStore, TimeProvider timeProvider, INotificationSender notificationSender) : IAlterationPlanManager

@@ -1,8 +1,8 @@
-using Elsa.Workflows.Api.RealTime.Hubs;
+using Flamme.Workflows.Api.RealTime.Hubs;
 using Microsoft.AspNetCore.Builder;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="IApplicationBuilder"/>.

@@ -1,6 +1,6 @@
-using Elsa.Http.Contexts;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http.Abstractions;
+namespace Flamme.Http.Abstractions;
 
 /// <summary>
 /// Provides a base class for <see cref="IDownloadableContentHandler"/> implementations.

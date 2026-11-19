@@ -1,7 +1,7 @@
-using Elsa.Workflows.Api.Features;
+using Flamme.Workflows.Api.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to <see cref="WorkflowsApiFeature"/>.

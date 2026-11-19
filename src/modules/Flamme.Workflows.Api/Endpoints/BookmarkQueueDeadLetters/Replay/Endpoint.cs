@@ -1,19 +1,19 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.Replay;
+namespace Flamme.Workflows.Api.Endpoints.BookmarkQueueDeadLetters.Replay;
 
 [UsedImplicitly]
-internal class Endpoint(IBookmarkQueueDeadLetterManager manager) : ElsaEndpointWithoutRequest<ReplayResponse>
+internal class Endpoint(IBookmarkQueueDeadLetterManager manager) : FlammeEndpointWithoutRequest<ReplayResponse>
 {
     public override void Configure()
     {
         Post("/bookmark-queue/dead-letters/{id}/replay");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, "replay");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.BookmarkQueueDeadLetters, "replay");
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

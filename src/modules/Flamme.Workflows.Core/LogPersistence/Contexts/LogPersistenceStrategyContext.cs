@@ -1,3 +1,3 @@
-namespace Elsa.Workflows.LogPersistence;
+namespace Flamme.Workflows.LogPersistence;
 
 public record LogPersistenceStrategyContext(CancellationToken CancellationToken);

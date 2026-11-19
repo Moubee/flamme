@@ -1,22 +1,22 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Secrets.Services;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Secrets.Services;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Secrets;
+namespace Flamme.ExternalAuthentication.UnitTests.Secrets;
 
-public class ElsaSecretBindingResolverTests
+public class FlammeSecretBindingResolverTests
 {
     [Test]
     public async Task MissingBindingReportsOnlySafeState()
     {
         var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).GetAsync("missing", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
-        var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
+        var resolver = new FlammeSecretBindingResolver(manager, new TestHasher());
 
-        var state = await resolver.GetStateAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "missing"));
+        var state = await resolver.GetStateAsync(new SecretBinding(FlammeSecretBindingResolver.ResolverType, "missing"));
 
         await Assert.That(state.IsConfigured).IsFalse();
         await Assert.That(state.IsResolvable).IsFalse();
@@ -28,8 +28,8 @@ public class ElsaSecretBindingResolverTests
         var manager = ISecretManager.Mock().Object;
         var secret = CreateSecret();
         Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
-        var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
-        var binding = new SecretBinding(ElsaSecretBindingResolver.ResolverType, secret.Name, "certificate", "other-scope");
+        var resolver = new FlammeSecretBindingResolver(manager, new TestHasher());
+        var binding = new SecretBinding(FlammeSecretBindingResolver.ResolverType, secret.Name, "certificate", "other-scope");
 
         var state = await resolver.GetStateAsync(binding);
 
@@ -47,8 +47,8 @@ public class ElsaSecretBindingResolverTests
         Mock.Get(manager).GetAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(secret));
         Mock.Get(manager).TestAsync(secret.Name, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(new SecretTestResponse { Succeeded = true }));
         Mock.Get(manager).ResolvePayloadAsync(secret, Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(new SecretPayload { Value = "super-secret" }));
-        var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
-        var binding = new SecretBinding(ElsaSecretBindingResolver.ResolverType, secret.Name, SecretTypeNames.Text, "external-authentication");
+        var resolver = new FlammeSecretBindingResolver(manager, new TestHasher());
+        var binding = new SecretBinding(FlammeSecretBindingResolver.ResolverType, secret.Name, SecretTypeNames.Text, "external-authentication");
 
         var state = await resolver.GetStateAsync(binding);
         var first = await resolver.ResolveAsync(binding);
@@ -84,14 +84,14 @@ public class ElsaSecretBindingResolverTests
         var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult<Secret?>(null));
         Mock.Get(manager).CreateAsync(Arg.Any<CreateSecretRequest>(), Arg.Any<CancellationToken>()).Returns((CreateSecretRequest request, CancellationToken _) => new Secret { Name = request.Name });
-        var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
+        var resolver = new FlammeSecretBindingResolver(manager, new TestHasher());
 
         using var value = new SensitiveString("super-secret");
         var binding = await resolver.StageAsync(new ManagedSecretBindingWriteRequest("connection-a", "clientSecret", value));
         var replacementBinding = await resolver.StageAsync(new ManagedSecretBindingWriteRequest("connection-a", "clientSecret", value));
 
         await Assert.That(binding.Ownership).IsEqualTo(SecretBindingOwnership.Managed);
-        await Assert.That(binding.ResolverType).IsEqualTo(ElsaSecretBindingResolver.ResolverType);
+        await Assert.That(binding.ResolverType).IsEqualTo(FlammeSecretBindingResolver.ResolverType);
         await Assert.That(binding.Reference).StartsWith("external-authentication:").WithComparison(StringComparison.Ordinal);
         await Assert.That(Guid.TryParseExact(binding.Reference["external-authentication:".Length..], "N", out _)).IsTrue();
         await Assert.That(replacementBinding.Reference).IsNotEqualTo(binding.Reference);
@@ -105,12 +105,12 @@ public class ElsaSecretBindingResolverTests
     {
         var manager = ISecretManager.Mock().Object;
         Mock.Get(manager).DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).ReturnsAsync(Task.FromResult(true));
-        var resolver = new ElsaSecretBindingResolver(manager, new TestHasher());
+        var resolver = new FlammeSecretBindingResolver(manager, new TestHasher());
 
-        await resolver.RemoveAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "managed-secret", Ownership: SecretBindingOwnership.Managed));
+        await resolver.RemoveAsync(new SecretBinding(FlammeSecretBindingResolver.ResolverType, "managed-secret", Ownership: SecretBindingOwnership.Managed));
 
         Mock.Get(manager).DeleteAsync("managed-secret", Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
-        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => resolver.RemoveAsync(new SecretBinding(ElsaSecretBindingResolver.ResolverType, "deployment-secret")).AsTask());
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => resolver.RemoveAsync(new SecretBinding(FlammeSecretBindingResolver.ResolverType, "deployment-secret")).AsTask());
         Mock.Get(manager).DeleteAsync("deployment-secret", Arg.Any<CancellationToken>()).WasNeverCalled();
     }
 

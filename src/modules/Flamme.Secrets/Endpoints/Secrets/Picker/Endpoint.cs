@@ -1,17 +1,17 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Permissions;
-using Elsa.Secrets.Services;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Permissions;
+using Flamme.Secrets.Services;
 
-namespace Elsa.Secrets.Endpoints.Secrets.Picker;
+namespace Flamme.Secrets.Endpoints.Secrets.Picker;
 
-internal class Endpoint(ISecretManager manager, ISecretStoreRegistry storeRegistry) : ElsaEndpoint<SecretPickerRequest, SecretPickerResponse>
+internal class Endpoint(ISecretManager manager, ISecretStoreRegistry storeRegistry) : FlammeEndpoint<SecretPickerRequest, SecretPickerResponse>
 {
     public override void Configure()
     {
         Post("/secrets/picker");
-        RequirePermission(Elsa.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.View);
+        RequirePermission(Flamme.Secrets.Permissions.SecretsResourcePermissions.Secrets, CoreVerbs.View);
     }
 
     public override async Task<SecretPickerResponse> ExecuteAsync(SecretPickerRequest request, CancellationToken cancellationToken)

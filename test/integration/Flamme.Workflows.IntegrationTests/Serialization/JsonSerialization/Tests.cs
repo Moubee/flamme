@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.JsonSerialization;
+namespace Flamme.Workflows.IntegrationTests.Serialization.JsonSerialization;
 
 public class SerializationTests : IAsyncDisposable
 {

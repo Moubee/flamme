@@ -1,11 +1,11 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Http.Bookmarks;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Http.Bookmarks;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using Microsoft.AspNetCore.Routing.Patterns;
 
-namespace Elsa.Http.Extensions;
+namespace Flamme.Http.Extensions;
 
 public static class HttpEndpointActivityExecutionContextExtensions
 {
@@ -38,7 +38,7 @@ public static async ValueTask WaitForHttpRequestAsync(this ActivityExecutionCont
         var expressionExecutionContext = context.ExpressionExecutionContext;
         if (!context.IsTriggerOfWorkflow())
         {
-            var name = bookmarkName ?? Elsa.Http.HttpStimulusNames.HttpEndpoint;
+            var name = bookmarkName ?? Flamme.Http.HttpStimulusNames.HttpEndpoint;
             context.CreateBookmarks(expressionExecutionContext.GetHttpEndpointStimuli(options), includeActivityInstanceId: false, bookmarkName: name, callback: callback);
             return;
         }

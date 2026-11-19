@@ -1,9 +1,9 @@
-using Elsa.Features.Implementations;
-using Elsa.Features.Services;
+using Flamme.Features.Implementations;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extension methods to <see cref="IServiceCollection"/> that creates and configures modules.  

@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Primitives;
+namespace Flamme.Activities.UnitTests.Primitives;
 
 public class SetNameTests
 {

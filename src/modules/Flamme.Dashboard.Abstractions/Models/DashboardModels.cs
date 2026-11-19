@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Dashboard.Abstractions.Models;
+namespace Flamme.Dashboard.Abstractions.Models;
 
 /// <summary>
 /// A permission, as a resource path and a verb, that guards a piece of dashboard data. Contributors declare the one that

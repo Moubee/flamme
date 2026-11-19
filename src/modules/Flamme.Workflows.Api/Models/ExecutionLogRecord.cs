@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Models;
+namespace Flamme.Workflows.Api.Models;
 
 internal record ExecutionLogRecord(
     string Id,

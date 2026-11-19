@@ -1,9 +1,9 @@
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.Workflows.Runtime;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.Workflows.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 public sealed class DefaultUserTaskWorkflowResumer(IServiceProvider services) : IUserTaskWorkflowResumer
 {
@@ -15,7 +15,7 @@ public sealed class DefaultUserTaskWorkflowResumer(IServiceProvider services) : 
 
         await resumer.ResumeAsync(task.BookmarkId, new Dictionary<string, object>
         {
-            [Elsa.UserTasks.Activities.UserTask.InputKey] = stimulus
+            [Flamme.UserTasks.Activities.UserTask.InputKey] = stimulus
         }, cancellationToken);
     }
 }

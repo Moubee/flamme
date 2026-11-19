@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.Resilience.Models;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.Resilience.Models;
+using Flamme.Api.Client.Shared.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Resilience.Contracts;
+namespace Flamme.Api.Client.Resources.Resilience.Contracts;
 
 public interface IRetryAttemptsApi
 {

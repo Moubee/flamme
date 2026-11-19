@@ -1,16 +1,16 @@
 using System.ComponentModel;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Signals;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Signals;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Management.Activities.WorkflowDefinitionActivity;
+namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 
 /// <summary>
 /// Loads and executes an <see cref="WorkflowDefinition"/>.

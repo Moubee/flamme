@@ -1,15 +1,15 @@
 using System.Collections.Concurrent;
-using Elsa.Mediator.Channels;
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Notification;
-using Elsa.Mediator.Options;
-using Elsa.Mediator.PublishingStrategies;
-using Elsa.Mediator.Services;
+using Flamme.Mediator.Channels;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Notification;
+using Flamme.Mediator.Options;
+using Flamme.Mediator.PublishingStrategies;
+using Flamme.Mediator.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Mediator.UnitTests;
+namespace Flamme.Mediator.UnitTests;
 
 public class BackgroundNotificationProcessorTests
 {

@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public static class ActivityExecutionContextExtensions
 {

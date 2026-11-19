@@ -1,28 +1,28 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Common.Codecs;
-using Elsa.Common.Entities;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Common.Codecs;
+using Flamme.Common.Entities;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
+using Flamme.Workflows.State;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IActivityExecutionStore"/>.
 /// </summary>
 [UsedImplicitly]
 public class EFCoreActivityExecutionStore(
-    EntityStore<RuntimeElsaDbContext, ActivityExecutionRecord> store,
+    EntityStore<RuntimeFlammeDbContext, ActivityExecutionRecord> store,
     IPayloadSerializer payloadSerializer,
     ICompressionCodecResolver compressionCodecResolver) : IActivityExecutionStore
 {
@@ -36,7 +36,7 @@ public class EFCoreActivityExecutionStore(
     public async Task AddManyAsync(IEnumerable<ActivityExecutionRecord> records, CancellationToken cancellationToken = default) => await store.AddManyAsync(records, OnSaveAsync, cancellationToken);
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("Calls Elsa.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeElsaDbContext, ActivityExecutionRecord, CancellationToken)")]
+    [RequiresUnreferencedCode("Calls Flamme.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeFlammeDbContext, ActivityExecutionRecord, CancellationToken)")]
     public async Task<ActivityExecutionRecord?> FindAsync(ActivityExecutionRecordFilter filter, CancellationToken cancellationToken = default)
     {
         return await store.QueryAsync(queryable => Filter(queryable, filter), OnLoadAsync, cancellationToken).FirstOrDefault();
@@ -49,7 +49,7 @@ public class EFCoreActivityExecutionStore(
     }
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("Calls Elsa.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeElsaDbContext, ActivityExecutionRecord, CancellationToken)")]
+    [RequiresUnreferencedCode("Calls Flamme.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeFlammeDbContext, ActivityExecutionRecord, CancellationToken)")]
     public async Task<IEnumerable<ActivityExecutionRecord>> FindManyAsync(ActivityExecutionRecordFilter filter, CancellationToken cancellationToken = default)
     {
         return await store.QueryAsync(queryable => Filter(queryable, filter), OnLoadAsync, cancellationToken).ToList();
@@ -82,7 +82,7 @@ public class EFCoreActivityExecutionStore(
     }
 
 
-    private ValueTask OnSaveAsync(RuntimeElsaDbContext dbContext, ActivityExecutionRecord entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(RuntimeFlammeDbContext dbContext, ActivityExecutionRecord entity, CancellationToken cancellationToken)
     {
         var snapshot = entity.SerializedSnapshot;
 
@@ -99,8 +99,8 @@ public class EFCoreActivityExecutionStore(
         return ValueTask.CompletedTask;
     }
 
-    [RequiresUnreferencedCode("Calls Elsa.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeElsaDbContext, ActivityExecutionRecord, CancellationToken)")]
-    private async ValueTask OnLoadAsync(RuntimeElsaDbContext dbContext, ActivityExecutionRecord? entity, CancellationToken cancellationToken)
+    [RequiresUnreferencedCode("Calls Flamme.Persistence.EFCore.Modules.Runtime.EFCoreActivityExecutionStore.DeserializeActivityState(RuntimeFlammeDbContext, ActivityExecutionRecord, CancellationToken)")]
+    private async ValueTask OnLoadAsync(RuntimeFlammeDbContext dbContext, ActivityExecutionRecord? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return;
@@ -114,7 +114,7 @@ public class EFCoreActivityExecutionStore(
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
-    private async Task<IDictionary<string, object?>?> DeserializeActivityState(RuntimeElsaDbContext dbContext, ActivityExecutionRecord entity, CancellationToken cancellationToken)
+    private async Task<IDictionary<string, object?>?> DeserializeActivityState(RuntimeFlammeDbContext dbContext, ActivityExecutionRecord entity, CancellationToken cancellationToken)
     {
         var json = dbContext.Entry(entity).Property<string>("SerializedActivityState").CurrentValue;
 
@@ -131,14 +131,14 @@ public class EFCoreActivityExecutionStore(
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
-    private T Deserialize<T>(RuntimeElsaDbContext dbContext, ActivityExecutionRecord entity, string propertyName)
+    private T Deserialize<T>(RuntimeFlammeDbContext dbContext, ActivityExecutionRecord entity, string propertyName)
     {
         var json = dbContext.Entry(entity).Property<string>(propertyName).CurrentValue;
         var value = !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<T>(json) : default;
         return value!;
     }
 
-    private T DeserializePayload<T>(RuntimeElsaDbContext dbContext, ActivityExecutionRecord entity, string propertyName)
+    private T DeserializePayload<T>(RuntimeFlammeDbContext dbContext, ActivityExecutionRecord entity, string propertyName)
     {
         var json = dbContext.Entry(entity).Property<string>(propertyName).CurrentValue;
         var payload = !string.IsNullOrEmpty(json) ? payloadSerializer.Deserialize<T>(json) : default;

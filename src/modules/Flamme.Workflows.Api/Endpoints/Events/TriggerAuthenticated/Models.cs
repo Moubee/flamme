@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Serialization.Converters;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Serialization.Converters;
 
-namespace Elsa.Workflows.Api.Endpoints.Events.TriggerAuthenticated;
+namespace Flamme.Workflows.Api.Endpoints.Events.TriggerAuthenticated;
 
 internal class Request
 {

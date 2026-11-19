@@ -1,9 +1,9 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator.Contracts;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.Services;
+namespace Flamme.Alterations.Services;
 
 /// <summary>
 /// Dispatches an alteration job for execution using an in-memory channel.

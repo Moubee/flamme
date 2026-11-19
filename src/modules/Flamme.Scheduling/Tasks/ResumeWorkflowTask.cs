@@ -1,10 +1,10 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Exceptions;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Exceptions;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Scheduling.Tasks;
+namespace Flamme.Scheduling.Tasks;
 
 /// <summary>
 /// A task that resumes a workflow.

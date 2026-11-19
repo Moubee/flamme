@@ -1,8 +1,8 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Workflows.Runtime.Services;
+namespace Flamme.Workflows.Runtime.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IWorkflowRuntimeAdminService"/>. Encapsulates the pause/resume/force-drain

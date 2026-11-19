@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Shared.UIHints.DropDown;
+namespace Flamme.Api.Client.Shared.UIHints.DropDown;
 
 /// <summary>
 /// Provides properties for the <c>dropdown</c> UI hint.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Get;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Get;
 
 internal class Request
 {

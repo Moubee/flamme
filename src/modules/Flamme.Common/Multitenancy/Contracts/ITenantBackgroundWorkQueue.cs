@@ -1,4 +1,4 @@
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public delegate Task TenantBackgroundWorkItem(IServiceProvider serviceProvider, CancellationToken cancellationToken);
 

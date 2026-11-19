@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Parallel = Elsa.Workflows.Activities.Parallel;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Parallel = Flamme.Workflows.Activities.Parallel;
 
-namespace Elsa.Activities.IntegrationTests;
+namespace Flamme.Activities.IntegrationTests;
 
 public class ParallelTests : IAsyncDisposable
 {

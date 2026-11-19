@@ -1,15 +1,15 @@
-﻿using Elsa.Persistence.EFCore;
+﻿using Flamme.Persistence.EFCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Migrations.Runtime
+namespace Flamme.Persistence.EFCore.PostgreSql.Migrations.Runtime
 {
     /// <inheritdoc />
     public partial class Initial : Migration
     {
-        private readonly IElsaDbContextSchema _schema;
-        public Initial(IElsaDbContextSchema schema)
+        private readonly IFlammeDbContextSchema _schema;
+        public Initial(IFlammeDbContextSchema schema)
         {
             _schema = schema ?? throw new ArgumentNullException(nameof(schema));
         }

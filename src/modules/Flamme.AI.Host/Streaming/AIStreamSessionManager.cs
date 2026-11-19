@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Elsa.AI.Host.Streaming;
+namespace Flamme.AI.Host.Streaming;
 
 public class AIStreamSessionManager
 {

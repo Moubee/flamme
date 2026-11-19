@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Thrown by an <c>IBookmarkQueue</c> decorator when the queue depth exceeds the configured threshold while the

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public class WorkflowInstanceSavedEventArgs(WorkflowInstance workflowInstance) : EventArgs 
 {

@@ -1,7 +1,7 @@
 using System.Reflection;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Provides descriptions of workflow activities that are backed by methods on a host type.

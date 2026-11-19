@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Pipelines.ActivityExecution;
+namespace Flamme.Workflows.Pipelines.ActivityExecution;
 
 /// <inheritdoc />
 public class ActivityExecutionPipelinePipelineBuilder(IServiceProvider serviceProvider) : IActivityExecutionPipelineBuilder

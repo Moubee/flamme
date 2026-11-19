@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Authorization;
-using Elsa.Mediator.Contracts;
+using Flamme.Authorization;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.UserTasks.Models;
+namespace Flamme.UserTasks.Models;
 
 public enum UserTaskParticipantType
 {

@@ -1,23 +1,23 @@
-﻿using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
+﻿using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Version;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Version;
 
 [PublicAPI]
-internal class ListVersions(IWorkflowDefinitionStore store) : ElsaEndpointWithoutRequest
+internal class ListVersions(IWorkflowDefinitionStore store) : FlammeEndpointWithoutRequest
 {
     public override void Configure()
     {
         Get("workflow-definitions/{definitionId}/versions");
 
         // Anyone who can read a definition can already read any of its versions, and the designer lists them to open one.
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.View);
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

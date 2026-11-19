@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Attributes;
+namespace Flamme.Workflows.Attributes;
 
 /// <summary>
 /// Indicates that a property should be excluded from the hash computation.

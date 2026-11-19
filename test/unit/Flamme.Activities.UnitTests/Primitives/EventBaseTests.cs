@@ -1,13 +1,13 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Stimuli;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Primitives;
+namespace Flamme.Activities.UnitTests.Primitives;
 
 public class EventBaseTests
 {
@@ -98,7 +98,7 @@ public class EventBaseTests
 
         // Act
         var context = await ExecuteAsync(activity);
-        context.WorkflowExecutionContext.Input[Elsa.Workflows.Runtime.Activities.Event.EventInputWorkflowInputKey] = testPayload;
+        context.WorkflowExecutionContext.Input[Flamme.Workflows.Runtime.Activities.Event.EventInputWorkflowInputKey] = testPayload;
         await activity.InvokeCallbackAsync(context);
 
         // Assert

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Workflows.Runtime.Extensions;
+namespace Flamme.Workflows.Runtime.Extensions;
 
 /// <summary>
 /// Provides extension methods for sanitizing log messages.

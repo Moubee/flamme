@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// Represents a tenant filter.

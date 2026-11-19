@@ -1,26 +1,26 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Management;
+namespace Flamme.Persistence.EFCore.Modules.Management;
 
 /// <inheritdoc />
 [UsedImplicitly]
-public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementElsaDbContext, WorkflowDefinition> store, IPayloadSerializer payloadSerializer, ILogger<EFCoreWorkflowDefinitionStore> logger)
+public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext, WorkflowDefinition> store, IPayloadSerializer payloadSerializer, ILogger<EFCoreWorkflowDefinitionStore> logger)
     : IWorkflowDefinitionStore
 {
     /// <inheritdoc />
@@ -253,12 +253,12 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementElsaDbContext, 
         return !exists;
     }
 
-    private ValueTask OnSaveAsync(ManagementElsaDbContext managementElsaDbContext, WorkflowDefinition entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(ManagementFlammeDbContext managementFlammeDbContext, WorkflowDefinition entity, CancellationToken cancellationToken)
     {
         var json = SerializeState(entity);
 
-        managementElsaDbContext.Entry(entity).Property("Data").CurrentValue = json;
-        managementElsaDbContext.Entry(entity).Property("UsableAsActivity").CurrentValue = entity.Options.UsableAsActivity;
+        managementFlammeDbContext.Entry(entity).Property("Data").CurrentValue = json;
+        managementFlammeDbContext.Entry(entity).Property("UsableAsActivity").CurrentValue = entity.Options.UsableAsActivity;
         return ValueTask.CompletedTask;
     }
 
@@ -268,13 +268,13 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementElsaDbContext, 
         return payloadSerializer.Serialize(data);
     }
 
-    private ValueTask OnLoadAsync(ManagementElsaDbContext managementElsaDbContext, WorkflowDefinition? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(ManagementFlammeDbContext managementFlammeDbContext, WorkflowDefinition? entity, CancellationToken cancellationToken)
     {
         if (entity == null)
             return ValueTask.CompletedTask;
 
         var data = new WorkflowDefinitionState(entity.Options, entity.Variables, entity.Inputs, entity.Outputs, entity.Outcomes, entity.CustomProperties);
-        var json = (string?)managementElsaDbContext.Entry(entity).Property("Data").CurrentValue;
+        var json = (string?)managementFlammeDbContext.Entry(entity).Property("Data").CurrentValue;
 
         try
         {
@@ -313,7 +313,7 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementElsaDbContext, 
         if (filter.UsableAsActivity != null) queryable = queryable.Where(x => EF.Property<bool>(x, "UsableAsActivity") == filter.UsableAsActivity);
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm)) queryable = queryable.Where(x => x.Name!.ToLower().Contains(filter.SearchTerm.ToLower()) || x.Description!.ToLower().Contains(filter.SearchTerm.ToLower()) || x.Id.Contains(filter.SearchTerm) || x.DefinitionId.Contains(filter.SearchTerm));
 
-        // TEMP: IsSystem may be null when upgrading from older versions of Elsa to 3.2. See issue #5366.
+        // TEMP: IsSystem may be null when upgrading from older versions of Flamme to 3.2. See issue #5366.
         // In a future version, we should remove this check and simply do queryable.Where(x => x.IsSystem == filter.IsSystem).
         if (filter.IsSystem != null)
             queryable = filter.IsSystem == true

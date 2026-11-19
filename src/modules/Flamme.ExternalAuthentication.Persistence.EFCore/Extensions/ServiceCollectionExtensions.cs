@@ -1,12 +1,12 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Persistence.EFCore;
-using Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Persistence.EFCore;
+using Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-/// <summary>Registers durable, cross-node external authentication state backed by <c>ExternalAuthenticationElsaDbContext</c>.</summary>
+/// <summary>Registers durable, cross-node external authentication state backed by <c>ExternalAuthenticationFlammeDbContext</c>.</summary>
 public static class ExternalAuthenticationPersistenceServiceCollectionExtensions
 {
     /// <summary>
@@ -15,7 +15,7 @@ public static class ExternalAuthenticationPersistenceServiceCollectionExtensions
     /// <remarks>
     /// Every store is a singleton that leases a context from a short-lived scope, so none of them capture
     /// tenant-scoped services. <see cref="EFCoreExternalIdentityProvisioner"/> is the exception: it consumes the
-    /// scoped <see cref="Elsa.Identity.Contracts.IUserStore"/> and <see cref="Elsa.Identity.Contracts.IUserProvider"/>,
+    /// scoped <see cref="Flamme.Identity.Contracts.IUserStore"/> and <see cref="Flamme.Identity.Contracts.IUserProvider"/>,
     /// so it stays scoped.
     /// </remarks>
     public static IServiceCollection AddExternalAuthenticationEntityFrameworkCore(this IServiceCollection services)

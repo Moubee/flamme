@@ -1,3 +1,3 @@
-namespace Elsa.Workflows.UIHints.CheckList;
+namespace Flamme.Workflows.UIHints.CheckList;
 
 public record CheckListItem(string Text, string Value);

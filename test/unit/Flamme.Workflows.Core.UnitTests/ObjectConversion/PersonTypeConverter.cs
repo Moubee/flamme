@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 
-namespace Elsa.Workflows.Core.UnitTests.ObjectConversion;
+namespace Flamme.Workflows.Core.UnitTests.ObjectConversion;
 
 public class PersonTypeConverter : TypeConverter
 {

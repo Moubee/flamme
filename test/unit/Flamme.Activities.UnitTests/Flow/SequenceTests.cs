@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Flow;
+namespace Flamme.Activities.UnitTests.Flow;
 
 /// <summary>
 /// Unit tests for the <see cref="Sequence"/> activity focusing on sequential scheduling behavior.

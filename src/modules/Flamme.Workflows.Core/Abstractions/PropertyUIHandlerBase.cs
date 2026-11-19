@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 public abstract class PropertyUIHandlerBase : IPropertyUIHandler
 {

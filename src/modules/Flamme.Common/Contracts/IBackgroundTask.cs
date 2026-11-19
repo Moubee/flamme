@@ -1,4 +1,4 @@
-namespace Elsa.Common;
+namespace Flamme.Common;
 
 /// <summary>
 /// Represents a task that is executed in the background.

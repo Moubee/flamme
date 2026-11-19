@@ -1,14 +1,14 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Context;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Context;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MicrosoftOptions = Microsoft.Extensions.Options.Options;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Context;
+namespace Flamme.AI.Host.UnitTests.Context;
 
 public class AIContextResolverTests
 {

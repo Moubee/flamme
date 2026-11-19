@@ -1,16 +1,16 @@
 using System.Reflection;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.WorkflowProviders.BlobStorage.Contracts;
-using Elsa.WorkflowProviders.BlobStorage.Handlers;
-using Elsa.WorkflowProviders.BlobStorage.Providers;
-using Elsa.Workflows.Management.Features;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.WorkflowProviders.BlobStorage.Contracts;
+using Flamme.WorkflowProviders.BlobStorage.Handlers;
+using Flamme.WorkflowProviders.BlobStorage.Providers;
+using Flamme.Workflows.Management.Features;
 using FluentStorage;
 using FluentStorage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.WorkflowProviders.BlobStorage.Features;
+namespace Flamme.WorkflowProviders.BlobStorage.Features;
 
 /// <summary>
 /// A feature that enables the FluentStorage workflow definition provider.

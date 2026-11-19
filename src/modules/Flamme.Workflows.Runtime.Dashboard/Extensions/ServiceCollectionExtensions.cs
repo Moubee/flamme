@@ -1,8 +1,8 @@
-using Elsa.Dashboard.Abstractions.Extensions;
-using Elsa.Workflows.Runtime.Dashboard;
+using Flamme.Dashboard.Abstractions.Extensions;
+using Flamme.Workflows.Runtime.Dashboard;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Runtime.Dashboard.Extensions;
+namespace Flamme.Workflows.Runtime.Dashboard.Extensions;
 
 public static class ServiceCollectionExtensions
 {

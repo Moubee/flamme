@@ -1,15 +1,15 @@
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// Entity Framework implementation of the <see cref="IKeyValueStore"/>
 /// </summary>
 [UsedImplicitly]
-public class EFCoreKeyValueStore(Store<RuntimeElsaDbContext, SerializedKeyValuePair> store) : IKeyValueStore
+public class EFCoreKeyValueStore(Store<RuntimeFlammeDbContext, SerializedKeyValuePair> store) : IKeyValueStore
 {
     /// <inheritdoc />
     public Task SaveAsync(SerializedKeyValuePair keyValuePair, CancellationToken cancellationToken)

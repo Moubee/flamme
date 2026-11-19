@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Flow.Workflows;
+namespace Flamme.Activities.IntegrationTests.Flow.Workflows;
 
 /// <summary>
 /// Workflow demonstrating that End activity completes successfully in a sequence.

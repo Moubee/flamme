@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.IngressSources;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.IngressSources;
 
-namespace Elsa.Http.IngressSources;
+namespace Flamme.Http.IngressSources;
 
 /// <summary>
 /// Surfaces HTTP-triggered workflow ingress as an <see cref="IIngressSource"/> in the runtime's diagnostic registry.

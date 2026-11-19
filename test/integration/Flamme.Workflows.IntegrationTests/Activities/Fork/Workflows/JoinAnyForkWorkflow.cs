@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Activities.Workflows;
 
 public class JoinAnyForkWorkflow : WorkflowBase
 {

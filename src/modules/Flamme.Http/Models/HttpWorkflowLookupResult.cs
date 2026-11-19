@@ -1,7 +1,7 @@
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Entities;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Represents the result of a workflow lookup.

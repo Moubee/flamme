@@ -1,17 +1,17 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Common;
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Common;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Core.UnitTests;
+namespace Flamme.Workflows.Core.UnitTests;
 
 public class ExpressionExecutionContextExtensionsTests
 {

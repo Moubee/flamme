@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for working with property accessors.

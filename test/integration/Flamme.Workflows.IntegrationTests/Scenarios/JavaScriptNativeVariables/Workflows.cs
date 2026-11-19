@@ -1,8 +1,8 @@
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Expressions.JavaScript.Models;
-using Elsa.Workflows.Activities;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Expressions.JavaScript.Models;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JavaScriptNativeVariables;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JavaScriptNativeVariables;
 
 public class JavaScriptWorkflow : WorkflowBase
 {

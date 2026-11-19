@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Extensions;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Middleware.Workflows;
+namespace Flamme.Workflows.Middleware.Workflows;
 
 /// <summary>
 /// Installs middleware that executes scheduled work items.

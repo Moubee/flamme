@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Time.Testing;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures.ConformanceExtensions;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures.ConformanceExtensions;
 
 public class ConformanceExtensionTests
 {

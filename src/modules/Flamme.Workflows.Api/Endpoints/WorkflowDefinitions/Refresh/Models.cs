@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Refresh;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Refresh;
 
 internal class Request
 {

@@ -5,13 +5,13 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Elsa.Extensions;
-using Elsa.Workflows.Serialization.ReferenceHandlers;
+using Flamme.Extensions;
+using Flamme.Workflows.Serialization.ReferenceHandlers;
 using Newtonsoft.Json.Linq;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// Reads objects as primitive types rather than <see cref="JsonElement"/> values while also maintaining the .NET type name for reconstructing the actual type.

@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.UIHints.CodeEditor;
+namespace Flamme.Workflows.UIHints.CodeEditor;
 
 /// <summary>
 /// Options for the code editor component.

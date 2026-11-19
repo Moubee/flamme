@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.IncidentStrategies.Models;
+namespace Flamme.Api.Client.Resources.IncidentStrategies.Models;
 
 /// <summary>
 /// Represents an incident strategy.

@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// A serializable shape of an <c>ActivityExecutionContext</c>.

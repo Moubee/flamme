@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Activity type names for built-in workflow script activities.
@@ -6,7 +6,7 @@ namespace Elsa.Workflows;
 public static class WorkflowScriptActivityTypeNames
 {
     /// <summary>
-    /// The Elsa activity namespace for built-in script activities.
+    /// The Flamme activity namespace for built-in script activities.
     /// </summary>
     public const string Namespace = "Elsa";
 

@@ -1,23 +1,23 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
-public sealed class ElsaRolePermissionGrantSource(IUserProvider userProvider, IRoleProvider roleProvider) : IPermissionGrantSource
+public sealed class FlammeRolePermissionGrantSource(IUserProvider userProvider, IRoleProvider roleProvider) : IPermissionGrantSource
 {
     public const string SourceType = "elsa-roles";
     public string Type => SourceType;
 
-    public PermissionGrantSourceDescriptor Describe() => new(Type, "Elsa roles", "Grants the permissions assigned to the Elsa user's current roles.", 1, [], null);
+    public PermissionGrantSourceDescriptor Describe() => new(Type, "Flamme roles", "Grants the permissions assigned to the Flamme user's current roles.", 1, [], null);
 
     public async ValueTask<PermissionGrantResult> GetGrantsAsync(PermissionGrantContext context, CancellationToken cancellationToken = default)
     {
         var user = await userProvider.FindAsync(new()
             { Id = context.UserId }, cancellationToken);
         if (user is null || !string.Equals(user.TenantId, context.TargetTenantId, StringComparison.Ordinal))
-            return new([], [new("user_not_available", "The Elsa user is not available in the target tenant.")]);
+            return new([], [new("user_not_available", "The Flamme user is not available in the target tenant.")]);
 
         var roles = await roleProvider.FindManyAsync(new()
             { Ids = user.Roles.ToArray() }, cancellationToken);

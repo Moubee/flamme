@@ -1,9 +1,9 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
+using Flamme.Expressions.Helpers;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="MemoryBlockReference"/>.

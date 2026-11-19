@@ -1,20 +1,20 @@
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.Models;
-using Elsa.Resilience;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
-using Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.Models;
+using Flamme.Resilience;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
+using Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience;
+namespace Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience;
 
 public class DistributedLockResilienceTests(App app) : AppComponentTest(app)
 {

@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.NamedVariablePersistence;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.NamedVariablePersistence;
 
 public class Tests : IAsyncDisposable
 {

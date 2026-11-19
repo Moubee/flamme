@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using Elsa.ExternalAuthentication.IntegrationTests.Security;
-using Elsa.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.IntegrationTests.Security;
+using Flamme.ExternalAuthentication.Notifications;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(SensitiveDataLeakageTests.ErrorAndRedirect), TypeInfoPropertyName = "ErrorAndRedirect")]

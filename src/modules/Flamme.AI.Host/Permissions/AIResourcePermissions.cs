@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.AI.Host.Permissions;
+namespace Flamme.AI.Host.Permissions;
 
 /// <summary>
 /// Stable resource names for AI. Endpoints reference these constants rather than string

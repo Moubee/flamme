@@ -1,19 +1,19 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Common;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Providers;
-using Elsa.Mediator.Contracts;
+using Flamme.Common;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Providers;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>
 /// Applies management-only invariants before mutating database-owned connections.
@@ -36,7 +36,7 @@ public sealed partial class IdentityProviderConnectionManagementService(
     ConnectionRevisionCalculator revisionCalculator,
     TimeProvider timeProvider,
     IOptions<ExternalAuthenticationOptions> options,
-    Elsa.Identity.Contracts.IRoleAuthorizationService roleAuthorizationService,
+    Flamme.Identity.Contracts.IRoleAuthorizationService roleAuthorizationService,
     IExternalAuthenticationSessionStore sessions,
     IServiceProvider services,
     ILogger<IdentityProviderConnectionManagementService> logger)

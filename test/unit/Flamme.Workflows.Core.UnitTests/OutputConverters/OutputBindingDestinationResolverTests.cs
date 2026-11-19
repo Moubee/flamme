@@ -1,11 +1,11 @@
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.OutputConverters;
+namespace Flamme.Workflows.Core.UnitTests.OutputConverters;
 
 public class OutputBindingDestinationResolverTests
 {

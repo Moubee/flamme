@@ -1,8 +1,8 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Tasks;
+namespace Flamme.Workflows.Runtime.Tasks;
 
 /// <summary>
 /// Periodically signals the bookmark queue processor to check for new items. This is a reliability measure that ensures stimuli never gets missed.

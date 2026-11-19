@@ -1,10 +1,10 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Expressions.Liquid.Expressions;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.Liquid.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Liquid.Providers;
+namespace Flamme.Expressions.Liquid.Providers;
 
 /// <summary>
 /// Provides Liquid expression descriptors.

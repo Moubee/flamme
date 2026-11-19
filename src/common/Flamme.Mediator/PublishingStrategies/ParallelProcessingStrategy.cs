@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contexts;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Extensions;
+using Flamme.Mediator.Contexts;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Extensions;
 
-namespace Elsa.Mediator.PublishingStrategies;
+namespace Flamme.Mediator.PublishingStrategies;
 
 /// <summary>
 /// Invokes event handlers in parallel and waits for the result.

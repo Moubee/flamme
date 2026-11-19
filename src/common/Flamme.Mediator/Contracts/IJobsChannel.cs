@@ -1,7 +1,7 @@
 using System.Threading.Channels;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Models;
 
-namespace Elsa.Mediator.Contracts;
+namespace Flamme.Mediator.Contracts;
 
 /// <summary>
 /// A channel that can be used to enqueue jobs.

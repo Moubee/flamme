@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Common.RecurringTasks;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common;
+using Flamme.Common.RecurringTasks;
+using Flamme.Workflows.Runtime.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Tasks;
+namespace Flamme.Workflows.Runtime.Tasks;
 
 /// <summary>
 /// Periodically processes pending workflow dispatch outbox items.

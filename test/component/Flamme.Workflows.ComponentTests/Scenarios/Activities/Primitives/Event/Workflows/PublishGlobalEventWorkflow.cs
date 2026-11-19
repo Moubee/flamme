@@ -1,8 +1,8 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
 
 /// <summary>
 /// A workflow that publishes a global event with the workflow's correlation ID.

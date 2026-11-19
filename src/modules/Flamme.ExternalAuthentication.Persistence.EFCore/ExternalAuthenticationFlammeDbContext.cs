@@ -1,15 +1,15 @@
-using Elsa.Persistence.EFCore;
+using Flamme.Persistence.EFCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore;
 
 /// <summary>
 /// The database context for the External Authentication module.
 /// </summary>
-public class ExternalAuthenticationElsaDbContext : ElsaDbContextBase
+public class ExternalAuthenticationFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public ExternalAuthenticationElsaDbContext(DbContextOptions<ExternalAuthenticationElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public ExternalAuthenticationFlammeDbContext(DbContextOptions<ExternalAuthenticationFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 
@@ -19,7 +19,7 @@ public class ExternalAuthenticationElsaDbContext : ElsaDbContextBase
     public DbSet<PersistedIdentityProviderConnection> IdentityProviderConnections { get; set; } = null!;
 
     /// <summary>
-    /// The links between external identities and Elsa users.
+    /// The links between external identities and Flamme users.
     /// </summary>
     public DbSet<PersistedExternalIdentityLink> ExternalIdentityLinks { get; set; } = null!;
 

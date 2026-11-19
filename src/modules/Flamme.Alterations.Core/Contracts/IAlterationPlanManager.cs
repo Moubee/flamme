@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Entities;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Represents a manager for alteration plans.

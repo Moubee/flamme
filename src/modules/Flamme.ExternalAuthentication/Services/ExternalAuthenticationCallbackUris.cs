@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
-/// <summary>Builds Elsa-owned upstream callback URIs without allowing a configured base path to be discarded.</summary>
+/// <summary>Builds Flamme-owned upstream callback URIs without allowing a configured base path to be discarded.</summary>
 public static class ExternalAuthenticationCallbackUris
 {
     /// <summary>Returns the provider callback for a normal external sign-in or an administrator preview.</summary>

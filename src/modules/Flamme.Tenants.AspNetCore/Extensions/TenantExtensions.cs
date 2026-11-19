@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Tenants.AspNetCore;
+namespace Flamme.Tenants.AspNetCore;
 
 public static class TenantExtensions
 {

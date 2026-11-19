@@ -1,16 +1,16 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Features;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Features;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// Configures the default workflow runtime to use EF Core persistence providers.
 /// </summary>
 [DependsOn(typeof(AlterationsFeature))]
-public class EFCoreAlterationsPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreAlterationsPersistenceFeature, AlterationsElsaDbContext>(module)
+public class EFCoreAlterationsPersistenceFeature(IModule module) : PersistenceFeatureBase<EFCoreAlterationsPersistenceFeature, AlterationsFlammeDbContext>(module)
 {
     /// <inheritdoc />
     public override void Configure()

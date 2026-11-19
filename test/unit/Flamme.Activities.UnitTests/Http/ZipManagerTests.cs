@@ -3,22 +3,22 @@ using System.IO;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Reflection;
-using Elsa.Common;
-using Elsa.Http;
-using Elsa.Http.FileCaches;
-using Elsa.Http.Options;
+using Flamme.Common;
+using Flamme.Http;
+using Flamme.Http.FileCaches;
+using Flamme.Http.Options;
 using FluentStorage;
 using FluentStorage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Http;
+namespace Flamme.Activities.UnitTests.Http;
 
 public class ZipManagerTests : IDisposable
 {
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
-    private static readonly Type ZipManagerType = Type.GetType("Elsa.Http.Services.ZipManager, Elsa.Http", throwOnError: true)!;
+    private static readonly Type ZipManagerType = Type.GetType("Flamme.Http.Services.ZipManager, Flamme.Http", throwOnError: true)!;
     private static readonly MethodInfo CreateAsyncMethod = ZipManagerType.GetRequiredMethod("CreateAsync");
     private static readonly MethodInfo LoadAsyncMethod = ZipManagerType.GetRequiredMethod("LoadAsync");
     private readonly string _cacheDirectory = Path.Join(Path.GetTempPath(), "elsa-zip-manager-tests", Guid.NewGuid().ToString("N"));

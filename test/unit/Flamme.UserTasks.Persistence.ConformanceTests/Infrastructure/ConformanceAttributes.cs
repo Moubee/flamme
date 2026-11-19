@@ -1,7 +1,7 @@
 using System.Reflection;
 using TUnit.Core.Helpers;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
 
 /// <summary>
 /// Names the provider a conformance test class runs against. The provider key drives the coverage report,

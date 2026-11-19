@@ -1,4 +1,4 @@
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 public class WorkflowDefinitionDeletedEventArgs(string definitionId) : EventArgs 
 {

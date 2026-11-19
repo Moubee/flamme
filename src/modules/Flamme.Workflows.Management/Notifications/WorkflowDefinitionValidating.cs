@@ -1,8 +1,8 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Models;
 
-namespace Elsa.Workflows.Management.Notifications;
+namespace Flamme.Workflows.Management.Notifications;
 
 /// <summary>
 /// A request to validate a workflow definition.

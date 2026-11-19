@@ -1,7 +1,7 @@
-using Elsa.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Dashboard.Abstractions.Extensions;
+namespace Flamme.Dashboard.Abstractions.Extensions;
 
 public static class ServiceCollectionExtensions
 {

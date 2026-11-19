@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.GetCallStack;
 
 /// <summary>
 /// Request for retrieving the call stack of an activity execution.

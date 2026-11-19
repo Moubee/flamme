@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Multitenancy.EventHandlers;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Multitenancy.EventHandlers;
+using Flamme.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Common.UnitTests.Multitenancy;
+namespace Flamme.Common.UnitTests.Multitenancy;
 
 /// <summary>
 /// Tests for <see cref="DefaultTenantService"/>, including the fallback to activate

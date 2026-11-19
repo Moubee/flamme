@@ -1,8 +1,8 @@
-﻿using Elsa.Expressions.Models;
+﻿using Flamme.Expressions.Models;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace Elsa.Expressions.CSharp.Contracts;
+namespace Flamme.Expressions.CSharp.Contracts;
 
 /// <summary>
 /// Evaluates C# expressions.

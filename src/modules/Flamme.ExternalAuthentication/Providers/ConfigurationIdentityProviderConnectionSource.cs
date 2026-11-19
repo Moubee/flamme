@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Services;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Providers;
+namespace Flamme.ExternalAuthentication.Providers;
 
 /// <summary>
 /// Supplies deployment-owned connections from the current External Authentication options.

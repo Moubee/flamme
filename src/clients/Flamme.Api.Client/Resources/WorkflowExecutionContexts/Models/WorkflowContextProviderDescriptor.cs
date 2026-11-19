@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowExecutionContexts.Models;
+namespace Flamme.Api.Client.Resources.WorkflowExecutionContexts.Models;
 
 /// <summary>
 /// Represents a workflow context provider descriptor.

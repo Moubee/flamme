@@ -1,6 +1,6 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 
-namespace Elsa.Permissions;
+namespace Flamme.Permissions;
 
 /// <summary>Why one submitted permission was rejected.</summary>
 public record PermissionGrantError(string Permission, string Reason);

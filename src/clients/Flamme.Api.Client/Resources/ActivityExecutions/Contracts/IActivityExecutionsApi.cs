@@ -1,9 +1,9 @@
-using Elsa.Api.Client.Resources.ActivityExecutions.Models;
-using Elsa.Api.Client.Resources.ActivityExecutions.Requests;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.ActivityExecutions.Models;
+using Flamme.Api.Client.Resources.ActivityExecutions.Requests;
+using Flamme.Api.Client.Shared.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ActivityExecutions.Contracts;
+namespace Flamme.Api.Client.Resources.ActivityExecutions.Contracts;
 
 /// <summary>
 /// Represents a client for the activity executions API.

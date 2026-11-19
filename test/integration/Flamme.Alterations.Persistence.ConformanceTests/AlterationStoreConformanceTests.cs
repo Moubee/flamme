@@ -1,11 +1,11 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Filters;
-using Elsa.Alterations.Core.Models;
-using Elsa.Common.Multitenancy;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Filters;
+using Flamme.Alterations.Core.Models;
+using Flamme.Common.Multitenancy;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Alterations.Persistence.ConformanceTests;
+namespace Flamme.Alterations.Persistence.ConformanceTests;
 
 /// <summary>
 /// Shared Memory / EF Core store-contract assertions for Alterations plan and job ports.

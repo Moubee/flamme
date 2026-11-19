@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Pipelines.ActivityExecution;
+namespace Flamme.Workflows.Pipelines.ActivityExecution;
 
 public static class ActivityExecutionMiddlewareExtensions
 {

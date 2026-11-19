@@ -1,18 +1,18 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.CSharp.Models;
-using Elsa.Expressions.CSharp.Notifications;
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Expressions.Models;
-using Elsa.Mediator.Contracts;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.CSharp.Models;
+using Flamme.Expressions.CSharp.Notifications;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Expressions.Models;
+using Flamme.Mediator.Contracts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.CSharp.Services;
+namespace Flamme.Expressions.CSharp.Services;
 
 /// <summary>
 /// A C# expression evaluator using Roslyn.

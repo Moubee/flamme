@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elsa.Mediator.CommandStrategies;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command;
-using Elsa.Mediator.Middleware.Command.Components;
+using Flamme.Mediator.CommandStrategies;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command;
+using Flamme.Mediator.Middleware.Command.Components;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Mediator.UnitTests;
+namespace Flamme.Mediator.UnitTests;
 
 public class RuntimeAsyncCompatibilityTests
 {
@@ -25,7 +25,7 @@ public class RuntimeAsyncCompatibilityTests
         // The Async metadata flag was introduced in .NET 11; verify its absence on .NET 10.
         const MethodImplAttributes asyncFlag = (MethodImplAttributes)0x2000;
 #endif
-#if ELSA_RUNTIME_ASYNC
+#if FLAMME_RUNTIME_ASYNC
         await Assert.That((method.GetMethodImplementationFlags() & asyncFlag) != 0).IsTrue();
         await Assert.That(method.IsDefined(typeof(AsyncStateMachineAttribute), false)).IsFalse();
 #else

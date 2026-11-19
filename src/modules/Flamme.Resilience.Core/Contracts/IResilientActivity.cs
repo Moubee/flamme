@@ -1,7 +1,7 @@
-using Elsa.Resilience.Models;
-using Elsa.Workflows;
+using Flamme.Resilience.Models;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public interface IResilientActivity : IActivity
 {

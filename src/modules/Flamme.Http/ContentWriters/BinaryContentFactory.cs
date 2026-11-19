@@ -1,6 +1,6 @@
 using System.Net.Mime;
 
-namespace Elsa.Http.ContentWriters;
+namespace Flamme.Http.ContentWriters;
 
 /// <summary>
 /// Creates a <see cref="HttpContent"/> object for application/octet-stream.

@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
 
 /// <summary>
 /// Atomically replaces an external identity link with a newly created link.

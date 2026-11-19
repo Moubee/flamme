@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Expressions.Python.Features;
+using Flamme.Features.Services;
+using Flamme.Expressions.Python.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to <see cref="IModule"/> that installs the <see cref="PythonFeature"/> feature.

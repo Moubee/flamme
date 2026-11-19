@@ -1,8 +1,8 @@
-using Elsa.Http;
-using Elsa.Workflows;
+using Flamme.Http;
+using Flamme.Workflows;
 using JetBrains.Annotations;
 
-namespace Elsa.Server.Web.Filters;
+namespace Flamme.Server.Web.Filters;
 
 /// <summary>
 /// Mask the value of the input if it is a HttpRequest and the input name is "Authorization".

@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Time.Testing;
 using System.Reflection;
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.ScheduledTasks;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.ScheduledTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Elsa.Scheduling.UnitTests.ScheduledTasks;
+namespace Flamme.Scheduling.UnitTests.ScheduledTasks;
 
 public class ScheduledTaskDisposalTests : IDisposable
 {

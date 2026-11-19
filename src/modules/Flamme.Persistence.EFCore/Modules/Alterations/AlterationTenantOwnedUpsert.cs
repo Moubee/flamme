@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// Compare-and-swap upsert for Alterations EF writes. Ownership is decided in the UPDATE
@@ -21,7 +21,7 @@ internal static class AlterationTenantOwnedUpsert
             entity.TenantId = ambientTenantId;
     }
 
-    public static string AmbientTenantId(AlterationsElsaDbContext dbContext) =>
+    public static string AmbientTenantId(AlterationsFlammeDbContext dbContext) =>
         dbContext.TenantId ?? Tenant.DefaultTenantId;
 
     /// <summary>
@@ -40,7 +40,7 @@ internal static class AlterationTenantOwnedUpsert
     }
 
     public static async Task<bool> InsertIfAbsentAsync<TEntity>(
-        AlterationsElsaDbContext dbContext,
+        AlterationsFlammeDbContext dbContext,
         TEntity entity,
         CancellationToken cancellationToken)
         where TEntity : Entity

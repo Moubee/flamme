@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 
-namespace Elsa.Server.Web.ActivityHosts;
+namespace Flamme.Server.Web.ActivityHosts;
 
 /// <summary>
 /// A sample activity host that represents a penguin.

@@ -1,6 +1,6 @@
-using Elsa.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Abstractions.Models;
 
-namespace Elsa.Dashboard.Abstractions.Contracts;
+namespace Flamme.Dashboard.Abstractions.Contracts;
 
 public interface IDashboardContributor
 {

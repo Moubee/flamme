@@ -1,20 +1,20 @@
 using System.Reflection;
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
-/// <summary>Registers Elsa's permission model: the evaluator, the descriptor catalog, and the authorization handler.</summary>
+/// <summary>Registers Flamme's permission model: the evaluator, the descriptor catalog, and the authorization handler.</summary>
 public static class AuthorizationServiceCollectionExtensions
 {
     /// <summary>
     /// Adds the single permission evaluator and the descriptor registry. Safe to call more than once, and
     /// safe to call before any module has contributed descriptors.
     /// </summary>
-    public static IServiceCollection AddElsaAuthorization(this IServiceCollection services)
+    public static IServiceCollection AddFlammeAuthorization(this IServiceCollection services)
     {
         services.TryAddSingleton<IPermissionEvaluator, PermissionEvaluator>();
         services.TryAddSingleton<IPermissionDescriptorRegistry, DefaultPermissionDescriptorRegistry>();
@@ -40,17 +40,17 @@ public static class AuthorizationServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Contributes every <see cref="IPermissionDescriptorProvider"/> declared in the loaded Elsa assemblies.
+    /// Contributes every <see cref="IPermissionDescriptorProvider"/> declared in the loaded Flamme assemblies.
     /// </summary>
     /// <remarks>
     /// Module registration discovers descriptors alongside FastEndpoints assemblies. Hosts that register
-    /// endpoint assemblies independently can explicitly scan the loaded Elsa assemblies with this helper.
+    /// endpoint assemblies independently can explicitly scan the loaded Flamme assemblies with this helper.
     /// </remarks>
     public static IServiceCollection AddPermissionDescriptorsFromLoadedAssemblies(this IServiceCollection services)
     {
         var assemblies = AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(x => x.GetName().Name?.StartsWith("Elsa.", StringComparison.Ordinal) == true && !x.IsDynamic);
+            .Where(x => x.GetName().Name?.StartsWith("Flamme.", StringComparison.Ordinal) == true && !x.IsDynamic);
 
         foreach (var assembly in assemblies)
         {

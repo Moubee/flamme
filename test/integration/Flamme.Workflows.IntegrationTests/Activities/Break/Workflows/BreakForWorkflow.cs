@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Activities.Workflows;
 
 public class BreakForWorkflow : WorkflowBase
 {

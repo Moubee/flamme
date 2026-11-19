@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text;
-using Elsa.SasTokens.Contracts;
-using Elsa.Workflows.Api.Endpoints.Bookmarks.Resume;
-using Elsa.Workflows.Runtime;
+using Flamme.SasTokens.Contracts;
+using Flamme.Workflows.Api.Endpoints.Bookmarks.Resume;
+using Flamme.Workflows.Runtime;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.IntegrationTests.Api.Bookmarks;
+namespace Flamme.Workflows.IntegrationTests.Api.Bookmarks;
 
 public class ResumeEndpointSecurityTests
 {

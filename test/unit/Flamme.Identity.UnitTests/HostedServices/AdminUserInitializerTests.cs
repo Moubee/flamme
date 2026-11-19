@@ -1,15 +1,15 @@
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.HostedServices;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.HostedServices;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.HostedServices;
+namespace Flamme.Identity.UnitTests.HostedServices;
 
 public class AdminUserInitializerTests
 {

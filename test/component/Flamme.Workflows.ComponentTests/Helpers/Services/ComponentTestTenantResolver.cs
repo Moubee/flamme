@@ -1,6 +1,6 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Workflows.ComponentTests.Services;
+namespace Flamme.Workflows.ComponentTests.Services;
 
 /// <summary>
 /// A tenant resolver for component tests that resolves to the default/empty tenant.

@@ -1,6 +1,6 @@
 using System.Dynamic;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JavaScriptNativeVariables;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JavaScriptNativeVariables;
 
 public class Data
 {

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
 internal static class PermissionGrantMappingSettings
 {

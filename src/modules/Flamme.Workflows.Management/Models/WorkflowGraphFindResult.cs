@@ -1,7 +1,7 @@
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Management.Models;
+namespace Flamme.Workflows.Management.Models;
 
 public record WorkflowGraphFindResult(WorkflowDefinition? WorkflowDefinition, WorkflowGraph? WorkflowGraph)
 {

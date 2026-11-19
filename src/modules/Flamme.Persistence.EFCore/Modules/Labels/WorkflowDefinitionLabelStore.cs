@@ -1,17 +1,17 @@
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Entities;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
 /// <inheritdoc />
 public class EFCoreWorkflowDefinitionLabelStore : IWorkflowDefinitionLabelStore, IWorkflowDefinitionLabelQuery
 {
-    private readonly EntityStore<LabelsElsaDbContext, WorkflowDefinitionLabel> _store;
+    private readonly EntityStore<LabelsFlammeDbContext, WorkflowDefinitionLabel> _store;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    public EFCoreWorkflowDefinitionLabelStore(EntityStore<LabelsElsaDbContext, WorkflowDefinitionLabel> store) => _store = store;
+    public EFCoreWorkflowDefinitionLabelStore(EntityStore<LabelsFlammeDbContext, WorkflowDefinitionLabel> store) => _store = store;
 
     /// <inheritdoc />
     public async Task SaveAsync(WorkflowDefinitionLabel record, CancellationToken cancellationToken = default) => await _store.SaveAsync(record, cancellationToken);

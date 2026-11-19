@@ -1,6 +1,6 @@
 using Refit;
 
-namespace Elsa.Api.Client.Resources.Tests;
+namespace Flamme.Api.Client.Resources.Tests;
 
 /// <summary>
 /// Represents a client for the testing API.

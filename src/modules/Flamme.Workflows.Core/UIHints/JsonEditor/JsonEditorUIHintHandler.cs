@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows.UIHints.JsonEditor;
+namespace Flamme.Workflows.UIHints.JsonEditor;
 
 /// <inheritdoc />
 public class JsonEditorUIHintHandler : IUIHintHandler

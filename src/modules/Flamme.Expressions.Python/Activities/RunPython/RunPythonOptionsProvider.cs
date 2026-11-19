@@ -1,8 +1,8 @@
 using System.Reflection;
-using Elsa.Workflows.UIHints.CodeEditor;
+using Flamme.Workflows.UIHints.CodeEditor;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.Python.Activities;
+namespace Flamme.Expressions.Python.Activities;
 
 internal class RunPythonOptionsProvider : CodeEditorOptionsProviderBase
 {

@@ -1,11 +1,11 @@
 using System.Reflection;
-using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime.Features;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Features.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime.Features;
+using Flamme.Workflows.Runtime.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Adds extensions to setup the <see cref="WorkflowRuntimeFeature"/> feature.

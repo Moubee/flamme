@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.StorageDrivers.List;
+namespace Flamme.Workflows.Api.Endpoints.StorageDrivers.List;
 
 public class Response(ICollection<StorageDriverDescriptor> items)
 {

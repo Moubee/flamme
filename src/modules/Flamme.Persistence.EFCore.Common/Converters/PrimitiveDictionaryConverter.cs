@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Persistence.EFCore.Converters;
+namespace Flamme.Persistence.EFCore.Converters;
 
 public class PrimitiveDictionaryConverter : JsonConverter<IDictionary<string, object>>
 {

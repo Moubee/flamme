@@ -1,15 +1,15 @@
-using Elsa.Common.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Labels.Contracts;
-using Elsa.Labels.Entities;
-using Elsa.Labels.Services;
-using Elsa.Workflows.Management;
+using Flamme.Common.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Labels.Contracts;
+using Flamme.Labels.Entities;
+using Flamme.Labels.Services;
+using Flamme.Workflows.Management;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Labels.Features;
+namespace Flamme.Labels.Features;
 
 /// <summary>
 /// Enables functionality to tag workflows with labels.

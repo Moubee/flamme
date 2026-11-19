@@ -1,7 +1,7 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods to the <see cref="IServiceProvider"/>.

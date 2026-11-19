@@ -1,8 +1,8 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Copilot.UnitTests;
+namespace Flamme.AI.Copilot.UnitTests;
 
 public class CopilotBoundaryTests
 {

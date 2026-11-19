@@ -1,13 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Options;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Options;
+using Flamme.Workflows;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.UserTasks.Services;
+namespace Flamme.UserTasks.Services;
 
 /// <summary>
 /// Implements the invitation protocol. Secrets never leave this service in plaintext except across the

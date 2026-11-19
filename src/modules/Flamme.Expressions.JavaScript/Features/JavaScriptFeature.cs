@@ -1,26 +1,26 @@
-using Elsa.Caching.Features;
-using Elsa.Expressions.Options;
-using Elsa.Common.Features;
-using Elsa.Expressions.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.Extensions;
-using Elsa.Expressions.JavaScript.HostedServices;
-using Elsa.Expressions.JavaScript.Options;
-using Elsa.Expressions.JavaScript.Providers;
-using Elsa.Expressions.JavaScript.Services;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Caching.Features;
+using Flamme.Expressions.Options;
+using Flamme.Common.Features;
+using Flamme.Expressions.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.Extensions;
+using Flamme.Expressions.JavaScript.HostedServices;
+using Flamme.Expressions.JavaScript.Options;
+using Flamme.Expressions.JavaScript.Providers;
+using Flamme.Expressions.JavaScript.Services;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Expressions.JavaScript.Features;
+namespace Flamme.Expressions.JavaScript.Features;
 
 /// <summary>
 /// Installs JavaScript integration.

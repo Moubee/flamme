@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Secrets.Models;
+namespace Flamme.Secrets.Models;
 
 public class Secret : Entity
 {

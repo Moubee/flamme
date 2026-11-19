@@ -1,21 +1,21 @@
-using Elsa.Expressions.Options;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Resilience.Endpoints.SimulateResponse;
-using Elsa.Resilience.Entities;
-using Elsa.Resilience.Modifiers;
-using Elsa.Resilience.Options;
-using Elsa.Resilience.Recorders;
-using Elsa.Resilience.Serialization;
-using Elsa.Resilience.StrategySources;
-using Elsa.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Expressions.Options;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Resilience.Endpoints.SimulateResponse;
+using Flamme.Resilience.Entities;
+using Flamme.Resilience.Modifiers;
+using Flamme.Resilience.Options;
+using Flamme.Resilience.Recorders;
+using Flamme.Resilience.Serialization;
+using Flamme.Resilience.StrategySources;
+using Flamme.Workflows;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Resilience.Features;
+namespace Flamme.Resilience.Features;
 
 public class ResilienceFeature(IModule module) : FeatureBase(module)
 {

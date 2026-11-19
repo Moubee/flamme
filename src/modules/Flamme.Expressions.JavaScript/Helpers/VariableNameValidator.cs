@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.JavaScript.Helpers;
+namespace Flamme.Expressions.JavaScript.Helpers;
 
 public static class VariableNameValidator
 {

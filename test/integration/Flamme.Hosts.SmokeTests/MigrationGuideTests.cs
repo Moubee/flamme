@@ -1,16 +1,16 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 
-namespace Elsa.Hosts.SmokeTests;
+namespace Flamme.Hosts.SmokeTests;
 
 /// <summary>
 /// Checks the upgrade guide's mapping table against the catalog a host actually builds.
 /// </summary>
 /// <remarks>
 /// The table tells operators how to rewrite every stored permission, and nothing had ever checked that what
-/// it tells them to write is a permission Elsa accepts. That is not hypothetical: the cutover left several
+/// it tells them to write is a permission Flamme accepts. That is not hypothetical: the cutover left several
 /// checks comparing against legacy constants which the guide itself instructs you to replace, so following
 /// it silently disabled them. A table entry that does not parse, or that names a resource or verb no module
 /// advertises, is a deployment locked out of an endpoint by doing exactly as it was told.
@@ -56,7 +56,7 @@ public class MigrationGuideTests
 
     /// <summary>The resources and verbs every retained module shipped alongside these tests contributes.</summary>
     /// <remarks>
-    /// Loads every <c>Elsa.*.dll</c> in the output directory. The project explicitly references retained
+    /// Loads every <c>Flamme.*.dll</c> in the output directory. The project explicitly references retained
     /// modules whose permission descriptors are documented even when the reference server does not enable them.
     /// This keeps the catalog deterministic without depending on which assemblies earlier tests touched.
     /// </remarks>
@@ -65,7 +65,7 @@ public class MigrationGuideTests
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2067",
         Justification = "This JIT-only coverage check instantiates each discovered permission provider with a public parameterless constructor.")]
     private static Dictionary<string, IReadOnlyCollection<string>> BuildCatalog() =>
-        Directory.GetFiles(AppContext.BaseDirectory, "Elsa.*.dll")
+        Directory.GetFiles(AppContext.BaseDirectory, "Flamme.*.dll")
             .Select(TryLoad)
             .Where(x => x is not null)
             .SelectMany(x => SafeGetTypes(x!))

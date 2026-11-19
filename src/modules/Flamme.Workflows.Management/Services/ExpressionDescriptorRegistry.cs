@@ -1,7 +1,7 @@
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class ExpressionDescriptorRegistry : IExpressionDescriptorRegistry

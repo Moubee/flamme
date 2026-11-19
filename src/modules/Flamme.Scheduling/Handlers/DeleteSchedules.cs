@@ -1,10 +1,10 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Notifications;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Notifications;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Notifications;
 
-namespace Elsa.Scheduling.Handlers;
+namespace Flamme.Scheduling.Handlers;
 
 /// <summary>
 /// Deletes scheduled jobs based on deleted workflow triggers and bookmarks.

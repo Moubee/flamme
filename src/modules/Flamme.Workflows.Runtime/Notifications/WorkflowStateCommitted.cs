@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.State;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Runtime.Notifications;
+namespace Flamme.Workflows.Runtime.Notifications;
 
 public record WorkflowStateCommitted(WorkflowExecutionContext WorkflowExecutionContext, WorkflowState WorkflowState, WorkflowInstance WorkflowInstance) : INotification;

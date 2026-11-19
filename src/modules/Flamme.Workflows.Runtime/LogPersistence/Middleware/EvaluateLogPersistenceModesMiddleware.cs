@@ -1,6 +1,6 @@
-using Elsa.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.ActivityExecution;
 
-namespace Elsa.Workflows.Runtime.Middleware;
+namespace Flamme.Workflows.Runtime.Middleware;
 
 public class EvaluateLogPersistenceModesMiddleware(ActivityMiddlewareDelegate next, IActivityPropertyLogPersistenceEvaluator persistenceEvaluator) : IActivityExecutionMiddleware
 {

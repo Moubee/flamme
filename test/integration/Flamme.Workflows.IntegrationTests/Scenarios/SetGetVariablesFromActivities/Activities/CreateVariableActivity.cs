@@ -1,6 +1,6 @@
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Activities;
 
 public class CreateVariableActivity : CodeActivity
 {

@@ -1,18 +1,18 @@
 using System.Text.Json;
-using Elsa.Common.Models;
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Messages;
+using Flamme.Common.Models;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Messages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event;
 
 public class PublishEventTests : AppComponentTest
 {

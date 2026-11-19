@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
 
 public class JsonObjectProducer : CodeActivity<JsonObject>
 {

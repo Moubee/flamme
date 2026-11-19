@@ -1,13 +1,13 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Scheduling.Activities;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Common.Multitenancy;
+using Flamme.Scheduling.Activities;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Timer = Elsa.Scheduling.Activities.Timer;
+using Timer = Flamme.Scheduling.Activities.Timer;
 
-namespace Elsa.Scheduling.Handlers;
+namespace Flamme.Scheduling.Handlers;
 
 public class UpdateTenantSchedules : ITenantDeletedEvent
 {

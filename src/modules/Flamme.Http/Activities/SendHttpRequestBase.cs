@@ -1,18 +1,18 @@
 using System.Net;
 using System.Net.Http.Headers;
-using Elsa.Extensions;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.UIHints;
-using Elsa.Resilience;
-using Elsa.Resilience.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.UIHints;
+using Flamme.Resilience;
+using Flamme.Resilience.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Base class for activities that send HTTP requests.

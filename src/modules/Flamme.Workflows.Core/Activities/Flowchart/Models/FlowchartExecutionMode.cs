@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Activities.Flowchart.Models;
+namespace Flamme.Workflows.Activities.Flowchart.Models;
 
 /// <summary>
 /// Specifies the execution mode for flowchart activities.

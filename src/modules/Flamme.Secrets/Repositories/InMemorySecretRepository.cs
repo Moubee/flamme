@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Services;
-using Elsa.Tenants.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Services;
+using Flamme.Tenants.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.Repositories;
+namespace Flamme.Secrets.Repositories;
 
 /// <summary>
 /// An in-memory secret repository that mirrors the EF Core tenant contract.

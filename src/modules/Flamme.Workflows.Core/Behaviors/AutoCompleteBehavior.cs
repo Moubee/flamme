@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Behaviors;
+namespace Flamme.Workflows.Behaviors;
 
 /// <summary>
 /// Automatically completes the currently executing activity.

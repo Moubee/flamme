@@ -1,6 +1,6 @@
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 public interface ICommitStateHandler
 {

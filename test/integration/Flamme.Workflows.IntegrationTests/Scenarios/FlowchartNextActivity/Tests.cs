@@ -1,14 +1,14 @@
-using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Workflows;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Options;
+using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity.Workflows;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.FlowchartNextActivity;
 
 public class FlowchartNextActivityTests : IAsyncDisposable
 {

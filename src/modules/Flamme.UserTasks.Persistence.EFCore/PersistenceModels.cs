@@ -1,6 +1,6 @@
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Persistence.EFCore;
+namespace Flamme.UserTasks.Persistence.EFCore;
 
 /// <summary>
 /// EF records intentionally keep JSON payloads and participant references flattened so every relational

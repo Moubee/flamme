@@ -1,14 +1,14 @@
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
 
-namespace Elsa.ExternalAuthentication.Permissions;
+namespace Flamme.ExternalAuthentication.Permissions;
 
 public sealed class ClaimMappingPermissionGrantSource : IPermissionGrantSource
 {
     public const string SourceType = "claim-mapping";
     public string Type => SourceType;
 
-    public PermissionGrantSourceDescriptor Describe() => new(Type, "Claim mapping", "Grants explicitly mapped Elsa permissions for projected external claims.", 1, BuiltInPermissionGrantSourceDescriptors.Mapping(""), null);
+    public PermissionGrantSourceDescriptor Describe() => new(Type, "Claim mapping", "Grants explicitly mapped Flamme permissions for projected external claims.", 1, BuiltInPermissionGrantSourceDescriptors.Mapping(""), null);
 
     public ValueTask<PermissionGrantResult> GetGrantsAsync(PermissionGrantContext context, CancellationToken cancellationToken = default) => ValueTask.FromResult(CreateResult(context, Type));
 

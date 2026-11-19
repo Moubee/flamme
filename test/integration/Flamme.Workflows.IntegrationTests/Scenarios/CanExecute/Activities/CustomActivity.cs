@@ -1,8 +1,8 @@
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.CanExecute.Activities;
 
 public class CustomActivity : CodeActivity
 {

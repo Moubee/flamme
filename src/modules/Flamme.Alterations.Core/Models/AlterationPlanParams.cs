@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Contracts;
 
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 /// <summary>
 /// Represents a new alteration plan.

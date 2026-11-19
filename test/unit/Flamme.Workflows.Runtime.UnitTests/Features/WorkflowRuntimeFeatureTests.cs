@@ -1,19 +1,19 @@
 using System.Reflection;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Features;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime.ActivationValidators;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Providers;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Features;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime.ActivationValidators;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Providers;
 using TUnit.Mocks;
-using RuntimeFeature = Elsa.Workflows.Runtime.Features.WorkflowRuntimeFeature;
+using RuntimeFeature = Flamme.Workflows.Runtime.Features.WorkflowRuntimeFeature;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Features;
+namespace Flamme.Workflows.Runtime.UnitTests.Features;
 
 public class WorkflowRuntimeFeatureTests
 {
@@ -108,7 +108,7 @@ public class WorkflowRuntimeFeatureTests
     public async Task RuntimeFeature_DependsOnWorkflowsFeature()
     {
         var dependencyTypes = typeof(RuntimeFeature)
-            .GetCustomAttributes<Elsa.Features.Attributes.DependsOnAttribute>()
+            .GetCustomAttributes<Flamme.Features.Attributes.DependsOnAttribute>()
             .Select(x => x.Type);
 
         await Assert.That(dependencyTypes).Contains(typeof(WorkflowsFeature));

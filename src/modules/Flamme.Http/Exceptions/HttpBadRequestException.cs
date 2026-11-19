@@ -1,4 +1,4 @@
-namespace Elsa.Http.Exceptions;
+namespace Flamme.Http.Exceptions;
 
 /// <summary>
 /// Exception thrown when a bad request is received.

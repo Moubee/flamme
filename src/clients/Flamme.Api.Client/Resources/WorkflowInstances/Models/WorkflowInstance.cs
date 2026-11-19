@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.WorkflowInstances.Enums;
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Resources.WorkflowInstances.Enums;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowInstances.Models;
+namespace Flamme.Api.Client.Resources.WorkflowInstances.Models;
 
 /// <summary>
 /// Represents a workflow instance.

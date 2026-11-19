@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Notifications;
+using Flamme.Common.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Notifications;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class WorkflowDefinitionManager(

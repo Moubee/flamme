@@ -1,8 +1,8 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 using System;
 
-namespace Elsa.Activities.IntegrationTests.Primitives.Workflows;
+namespace Flamme.Activities.IntegrationTests.Primitives.Workflows;
 
 public class FinishInSequenceWorkflow : WorkflowBase
 {

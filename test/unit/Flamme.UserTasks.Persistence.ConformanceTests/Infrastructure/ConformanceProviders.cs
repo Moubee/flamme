@@ -1,4 +1,4 @@
-namespace Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
+namespace Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
 
 /// <summary>
 /// The persistence providers the conformance suite knows about, and whether this run can reach them.
@@ -15,7 +15,7 @@ public static class ConformanceProviders
     /// <summary>Every provider, in report order. Availability is resolved once per test run.</summary>
     public static IReadOnlyList<ConformanceProvider> All { get; } =
     [
-        Always(InMemory, "Elsa.UserTasks in-process stores"),
+        Always(InMemory, "Flamme.UserTasks in-process stores"),
         RequiredPostgreSql()
     ];
 
@@ -31,7 +31,7 @@ public static class ConformanceProviders
         var reason = configured is not null && string.IsNullOrWhiteSpace(configured)
             ? $"{variable} is set but empty or whitespace. Supply a PostgreSQL connection string or unset it to use an isolated test database."
             : null;
-        return new(PostgreSql, "Elsa.UserTasks.Persistence.EFCore over PostgreSQL", variable, reason);
+        return new(PostgreSql, "Flamme.UserTasks.Persistence.EFCore over PostgreSQL", variable, reason);
     }
 
 }

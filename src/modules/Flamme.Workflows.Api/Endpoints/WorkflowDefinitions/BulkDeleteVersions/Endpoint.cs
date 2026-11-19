@@ -1,21 +1,21 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Management;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Management;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.BulkDeleteVersions;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.BulkDeleteVersions;
 
 [PublicAPI]
 internal class BulkDeleteVersions(IWorkflowDefinitionManager workflowDefinitionManager, IAuthorizationService authorizationService)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
         Post("/bulk-actions/delete/workflow-definitions/by-id");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Delete);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, CoreVerbs.Delete);
     }
 
     public override async Task<Response> ExecuteAsync(Request request, CancellationToken cancellationToken)

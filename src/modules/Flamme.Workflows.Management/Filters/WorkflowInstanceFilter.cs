@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Enums;
-using Elsa.Workflows.Management.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Enums;
+using Flamme.Workflows.Management.Models;
 using System.Linq.Dynamic.Core;
 
-namespace Elsa.Workflows.Management.Filters;
+namespace Flamme.Workflows.Management.Filters;
 
 /// <summary>
 /// A filter for querying workflow instances.

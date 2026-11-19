@@ -1,9 +1,9 @@
-using Elsa.Expressions.Helpers;
-using Elsa.Server.Web;
+using Flamme.Expressions.Helpers;
+using Flamme.Server.Web;
 
-namespace Elsa.Hosts.SmokeTests;
+namespace Flamme.Hosts.SmokeTests;
 
-/// <summary>Elsa.Server.Web, which registers its modules through the classic <c>Features/</c> path.</summary>
+/// <summary>Flamme.Server.Web, which registers its modules through the classic <c>Features/</c> path.</summary>
 [InheritsTests]
 [NotInParallel(HostSmokeTestConstraints.EntryPointProcessState)]
 public class ClassicHostSmokeTests : HostSmokeTests<ClassicHostWebApplicationFactory, ClassicServerHost>

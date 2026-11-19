@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Elsa.Secrets.Services;
+namespace Flamme.Secrets.Services;
 
 public partial class DefaultSecretNameValidator : ISecretNameValidator
 {

@@ -1,10 +1,10 @@
-using Elsa.Http;
-using Elsa.Http.Contexts;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Http;
+using Flamme.Http.Contexts;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 internal static class HttpActivityExecutionContextExtensions
 {

@@ -2,15 +2,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Elsa.Persistence.EFCore.PostgreSql.Migrations.Labels
+namespace Flamme.Persistence.EFCore.PostgreSql.Migrations.Labels
 {
     /// <inheritdoc />
     public partial class PerTenantLabelUniqueness : Migration
     {
-        private readonly Elsa.Persistence.EFCore.IElsaDbContextSchema _schema;
+        private readonly Flamme.Persistence.EFCore.IFlammeDbContextSchema _schema;
 
         /// <inheritdoc />
-        public PerTenantLabelUniqueness(Elsa.Persistence.EFCore.IElsaDbContextSchema schema)
+        public PerTenantLabelUniqueness(Flamme.Persistence.EFCore.IFlammeDbContextSchema schema)
         {
             _schema = schema;
         }

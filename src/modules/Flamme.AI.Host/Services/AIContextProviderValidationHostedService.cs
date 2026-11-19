@@ -1,9 +1,9 @@
-using Elsa.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class AIContextProviderValidationHostedService(
     IServiceScopeFactory scopeFactory,

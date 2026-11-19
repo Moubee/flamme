@@ -1,22 +1,22 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.IO.Compression;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Import;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Import;
 
 /// <summary>
 /// Imports JSON and/or ZIP files containing a workflow instances.
 /// </summary>
 [PublicAPI]
-internal class Import : ElsaEndpointWithoutRequest<Response>
+internal class Import : FlammeEndpointWithoutRequest<Response>
 {
     private readonly IWorkflowInstanceManager _workflowInstanceManager;
     private readonly IWorkflowInstanceStore _workflowInstanceStore;
@@ -55,7 +55,7 @@ internal class Import : ElsaEndpointWithoutRequest<Response>
     public override void Configure()
     {
         Post("/bulk-actions/import/workflow-instances");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Write);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.Write);
         AllowFileUploads();
     }
 

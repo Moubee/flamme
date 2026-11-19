@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Results;
+namespace Flamme.Workflows.Runtime.Results;
 
 /// <summary>
 /// Represents the result of a cancellation operation.

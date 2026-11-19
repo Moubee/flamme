@@ -1,9 +1,9 @@
-﻿using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+﻿using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Login;
+namespace Flamme.Identity.Endpoints.Login;
 
 [PublicAPI]
 internal class Login(IUserCredentialsValidator userCredentialsValidator, IAccessTokenIssuer tokenIssuer) : Endpoint<Request, LoginResponse>

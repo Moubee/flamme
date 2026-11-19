@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
-using Elsa.Secrets.Expressions;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
+using Flamme.Secrets.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Secrets.Providers;
+namespace Flamme.Secrets.Providers;
 
 /// <summary>
 /// Provides the Secret expression descriptor.

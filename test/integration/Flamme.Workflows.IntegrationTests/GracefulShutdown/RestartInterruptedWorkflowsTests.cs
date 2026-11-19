@@ -1,15 +1,15 @@
-﻿using Elsa.Common;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Tasks;
+﻿using Flamme.Common;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// Integration tests for the <see cref="RestartInterruptedWorkflowsTask" />
@@ -21,7 +21,7 @@ public class RestartInterruptedWorkflowsTests : IAsyncDisposable
     public RestartInterruptedWorkflowsTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureElsa(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
             .Build();
     }
 

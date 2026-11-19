@@ -1,12 +1,12 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Send an HTTP request.

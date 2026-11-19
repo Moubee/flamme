@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Identity.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Identity.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Identity.Multitenancy;
+namespace Flamme.Identity.Multitenancy;
 
 /// <summary>
 /// Resolves the tenant from the user's claims.

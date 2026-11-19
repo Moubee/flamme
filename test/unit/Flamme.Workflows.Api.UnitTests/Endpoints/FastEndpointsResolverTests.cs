@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.UnitTests.Shared;
-using Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.List;
-using Elsa.Workflows.Api.UnitTests.Endpoints.Descriptors;
-using Elsa.Workflows.Api.UnitTests.Endpoints.Features;
-using Elsa.Workflows.Management;
+using Flamme.UnitTests.Shared;
+using Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.List;
+using Flamme.Workflows.Api.UnitTests.Endpoints.Descriptors;
+using Flamme.Workflows.Api.UnitTests.Endpoints.Features;
+using Flamme.Workflows.Management;
 using FastEndpoints;
 
-namespace Elsa.Workflows.Api.UnitTests.Endpoints;
+namespace Flamme.Workflows.Api.UnitTests.Endpoints;
 
 /// <summary>
 /// Pins the cleanup the classes in <see cref="FastEndpointsCollection"/> depend on, in the one order that used to fail:

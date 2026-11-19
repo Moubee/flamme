@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Testing.Shared.Activities;
+namespace Flamme.Testing.Shared.Activities;
 
 /// <summary>
 /// Concrete implementation of Container for testing that schedules children sequentially.

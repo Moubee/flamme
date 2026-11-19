@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Composition;
+namespace Flamme.Activities.UnitTests.Composition;
 
 /// <summary>
 /// Unit tests for the <see cref="Container"/> activity focusing on ExecuteAsync behavior.

@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Scheduling.Commands;
+namespace Flamme.Scheduling.Commands;
 
 /// <summary>
 /// A command to run a scheduled task.

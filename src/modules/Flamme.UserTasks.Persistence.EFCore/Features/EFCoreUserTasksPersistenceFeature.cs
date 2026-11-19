@@ -1,20 +1,20 @@
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Persistence.EFCore;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Features;
-using Elsa.UserTasks.Persistence.EFCore.Contracts;
-using Elsa.UserTasks.Persistence.EFCore.Repositories;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Persistence.EFCore;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Features;
+using Flamme.UserTasks.Persistence.EFCore.Contracts;
+using Flamme.UserTasks.Persistence.EFCore.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.UserTasks.Persistence.EFCore.Features;
+namespace Flamme.UserTasks.Persistence.EFCore.Features;
 
 /// <summary>
 /// Configures the identity-neutral User Tasks repository with EF Core persistence.
 /// </summary>
 [DependsOn(typeof(UserTasksFeature))]
 public class EFCoreUserTasksPersistenceFeature(IModule module)
-    : PersistenceFeatureBase<EFCoreUserTasksPersistenceFeature, UserTasksElsaDbContext>(module)
+    : PersistenceFeatureBase<EFCoreUserTasksPersistenceFeature, UserTasksFlammeDbContext>(module)
 {
     public override void Apply()
     {

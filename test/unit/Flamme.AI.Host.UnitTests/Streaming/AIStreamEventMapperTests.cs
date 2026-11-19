@@ -1,14 +1,14 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Streaming;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Streaming;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Streaming;
+namespace Flamme.AI.Host.UnitTests.Streaming;
 
 public class AIStreamEventMapperTests
 {
     [Test]
-    [DisplayName("Provider events map to Elsa stream events")]
-    public async Task ProviderEventsMapToElsaStreamEvents()
+    [DisplayName("Provider events map to Flamme stream events")]
+    public async Task ProviderEventsMapToFlammeStreamEvents()
     {
         var mapper = new AIStreamEventMapper();
 

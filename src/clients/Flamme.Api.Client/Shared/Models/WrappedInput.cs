@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Resources.Scripting.Models;
+using Flamme.Api.Client.Resources.Scripting.Models;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 /// <summary>
 /// Represents an input value for an activity.

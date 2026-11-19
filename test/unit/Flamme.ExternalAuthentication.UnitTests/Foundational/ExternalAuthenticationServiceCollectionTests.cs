@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Permissions;
-using Elsa.Authorization;
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.OpenIdConnect.Services;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Providers;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.ExternalAuthentication.Stores.InMemory;
-using Elsa.Identity.Contracts;
+using Flamme.Permissions;
+using Flamme.Authorization;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.OpenIdConnect.Services;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Providers;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.ExternalAuthentication.Stores.InMemory;
+using Flamme.Identity.Contracts;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.ExternalAuthentication.UnitTests.Foundational;
+namespace Flamme.ExternalAuthentication.UnitTests.Foundational;
 
 public class ExternalAuthenticationServiceCollectionTests
 {

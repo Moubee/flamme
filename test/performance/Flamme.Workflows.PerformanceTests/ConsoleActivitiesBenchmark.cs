@@ -1,9 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.PerformanceTests;
+namespace Flamme.Workflows.PerformanceTests;
 
 [Config(typeof(Config))]
 public class ConsoleActivitiesBenchmark
@@ -16,7 +16,7 @@ public class ConsoleActivitiesBenchmark
     public void GlobalSetup()
     {
         var services = new ServiceCollection();
-        services.AddElsa();
+        services.AddFlamme();
 
         _serviceProvider = services.BuildServiceProvider();
         _workflowRunner = _serviceProvider.GetRequiredService<IWorkflowRunner>();

@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 /// <summary>
 /// Hold a reference to a <see cref="Workflow"/> and a collection of <see cref="ActivityNode"/> instances representing the workflow.

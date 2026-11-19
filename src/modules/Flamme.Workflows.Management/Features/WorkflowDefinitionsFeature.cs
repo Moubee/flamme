@@ -1,9 +1,9 @@
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Workflows.Management.Stores;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Workflows.Management.Stores;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Management.Features;
+namespace Flamme.Workflows.Management.Features;
 
 /// <summary>
 /// Configures workflow definition storage.

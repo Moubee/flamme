@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.Runtime.Bookmarks;
+namespace Flamme.Workflows.Runtime.Bookmarks;
 
 /// <summary>
 /// Bookmark payload for the <see cref="ExecuteWorkflow"/> activity.

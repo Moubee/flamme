@@ -1,18 +1,18 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Tenants;
+namespace Flamme.Persistence.EFCore.Modules.Tenants;
 
 /// <summary>
 /// DB context for the runtime module.
 /// </summary>
 [UsedImplicitly]
-public class TenantsElsaDbContext : ElsaDbContextBase
+public class TenantsFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public TenantsElsaDbContext(DbContextOptions<TenantsElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public TenantsFlammeDbContext(DbContextOptions<TenantsFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

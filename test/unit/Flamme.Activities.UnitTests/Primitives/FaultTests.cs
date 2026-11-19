@@ -1,9 +1,9 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Exceptions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Exceptions;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Primitives;
+namespace Flamme.Activities.UnitTests.Primitives;
 
 /// <summary>
 /// Unit tests for the <see cref="Fault"/> activity.

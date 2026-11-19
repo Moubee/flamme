@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Services;
+namespace Flamme.Workflows.Core.UnitTests.Services;
 
 /// <summary>
 /// Covers <see cref="IActivityScheduler.RemoveWhere"/>, the operation a container uses to withdraw work it scheduled

@@ -1,13 +1,13 @@
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IUserStore"/>.
 /// </summary>
-public class EFCoreUserStore(EntityStore<IdentityElsaDbContext, User> userStore) : IUserStore
+public class EFCoreUserStore(EntityStore<IdentityFlammeDbContext, User> userStore) : IUserStore
 {
     /// <inheritdoc />
     public async Task SaveAsync(User user, CancellationToken cancellationToken = default)

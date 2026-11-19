@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elsa;
-using Elsa.Resilience.Endpoints.SimulateResponse;
-using Elsa.Resilience.Features;
-using Elsa.Resilience.Options;
-using Elsa.Resilience.Serialization;
+using Flamme;
+using Flamme.Resilience.Endpoints.SimulateResponse;
+using Flamme.Resilience.Features;
+using Flamme.Resilience.Options;
+using Flamme.Resilience.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TUnit.AspNetCore;
 
-namespace Elsa.Resilience.IntegrationTests;
+namespace Flamme.Resilience.IntegrationTests;
 
 public sealed class ResilienceTestEntryPoint;
 

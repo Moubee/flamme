@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Permissions;
-using Elsa.Workflows;
-using Elsa.Workflows.Management;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Permissions;
+using Flamme.Workflows;
+using Flamme.Workflows.Management;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Host.Endpoints.AI.Capabilities;
+namespace Flamme.AI.Host.Endpoints.AI.Capabilities;
 
 [PublicAPI]
 public class Endpoint(
@@ -18,12 +18,12 @@ public class Endpoint(
     IEnumerable<IAIProvider> providers,
     IEnumerable<IAIConversationStore> conversationStores,
     IEnumerable<IAIProposalStore> proposalStores,
-    IServiceScopeFactory serviceScopeFactory) : ElsaEndpointWithoutRequest<Response>
+    IServiceScopeFactory serviceScopeFactory) : FlammeEndpointWithoutRequest<Response>
 {
     public override void Configure()
     {
         Get("/ai/capabilities");
-        RequirePermission(Elsa.AI.Host.Permissions.AIResourcePermissions.Capabilities, CoreVerbs.View);
+        RequirePermission(Flamme.AI.Host.Permissions.AIResourcePermissions.Capabilities, CoreVerbs.View);
     }
 
     public override Task<Response> ExecuteAsync(CancellationToken cancellationToken)

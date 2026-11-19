@@ -1,3 +1,3 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Count;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Count;
 
 internal record Response(long Count);

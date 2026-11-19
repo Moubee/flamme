@@ -1,13 +1,13 @@
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Authorization;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Authorization;
 using System.Security.Claims;
-using Elsa.Common.Services;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
+using Flamme.Common.Services;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class RoleAuthorizationServiceTests
 {

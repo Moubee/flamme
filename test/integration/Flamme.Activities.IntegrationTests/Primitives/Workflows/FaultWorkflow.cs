@@ -1,7 +1,7 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Primitives.Workflows;
+namespace Flamme.Activities.IntegrationTests.Primitives.Workflows;
 
 public class FaultWorkflow : WorkflowBase
 {

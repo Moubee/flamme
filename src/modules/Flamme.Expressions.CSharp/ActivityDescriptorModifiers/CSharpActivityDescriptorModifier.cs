@@ -1,9 +1,9 @@
-using Elsa.Expressions.CSharp.Options;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.CSharp.Options;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.CSharp.ActivityDescriptorModifiers;
+namespace Flamme.Expressions.CSharp.ActivityDescriptorModifiers;
 
 internal class CSharpActivityDescriptorModifier(IOptions<CSharpOptions> options) : IActivityDescriptorModifier
 {

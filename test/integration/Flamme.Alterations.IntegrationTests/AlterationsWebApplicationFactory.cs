@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elsa;
-using Elsa.Alterations.Endpoints.Alterations.DryRun;
+using Flamme;
+using Flamme.Alterations.Endpoints.Alterations.DryRun;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -11,9 +11,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TUnit.AspNetCore;
-using SubmitEndpoint = Elsa.Alterations.Endpoints.Alterations.Submit.Submit;
+using SubmitEndpoint = Flamme.Alterations.Endpoints.Alterations.Submit.Submit;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 public sealed class AlterationsTestEntryPoint;
 

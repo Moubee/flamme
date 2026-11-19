@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Elsa.Secrets.Models;
+namespace Flamme.Secrets.Models;
 
 public class CaseInsensitiveHashSetConverter : JsonConverter<HashSet<string>>
 {

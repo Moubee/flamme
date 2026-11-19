@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
+using Flamme.Testing.Shared;
 using TUnit.Assertions.Attributes;
 using TUnit.Assertions.Core;
 
-namespace Elsa.Workflows.IntegrationTests.SharedHelpers;
+namespace Flamme.Workflows.IntegrationTests.SharedHelpers;
 
 file static class EquivalencyAssertionGeneration
 {

@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Entities;
 
-namespace Elsa.Alterations.Endpoints.Alterations.Get;
+namespace Flamme.Alterations.Endpoints.Alterations.Get;
 
 /// <summary>
 /// Represents a response to a request to get an alteration plan. 

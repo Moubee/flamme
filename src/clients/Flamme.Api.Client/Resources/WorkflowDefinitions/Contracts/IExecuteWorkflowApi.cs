@@ -1,8 +1,8 @@
-using Elsa.Api.Client.Resources.WorkflowDefinitions.Requests;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Requests;
 using JetBrains.Annotations;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Contracts;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
 
 /// <summary>
 /// Represents a client for the workflow definitions API.

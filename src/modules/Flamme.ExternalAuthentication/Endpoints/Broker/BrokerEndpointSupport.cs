@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Models;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.ExternalAuthentication.Endpoints.Broker;
+namespace Flamme.ExternalAuthentication.Endpoints.Broker;
 
 internal static class BrokerEndpointSupport
 {

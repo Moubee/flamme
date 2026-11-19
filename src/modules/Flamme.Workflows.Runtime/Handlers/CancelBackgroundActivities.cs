@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Runtime.Middleware.Activities;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Runtime.Middleware.Activities;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Stimuli;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.Handlers;
+namespace Flamme.Workflows.Runtime.Handlers;
 
 /// <summary>
 /// A handler that cancels background activities based on removed bookmarks.

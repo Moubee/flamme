@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Contracts;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Contracts;
 
-namespace Elsa.Expressions.JavaScript.Extensions;
+namespace Flamme.Expressions.JavaScript.Extensions;
 
 /// <summary>
 /// Extends <see cref="ITypeAliasRegistry"/>.

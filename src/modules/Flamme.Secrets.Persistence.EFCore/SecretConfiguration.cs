@@ -1,8 +1,8 @@
-using Elsa.Secrets.Models;
+using Flamme.Secrets.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Secrets.Persistence.EFCore;
+namespace Flamme.Secrets.Persistence.EFCore;
 
 internal class SecretConfiguration : IEntityTypeConfiguration<Secret>
 {

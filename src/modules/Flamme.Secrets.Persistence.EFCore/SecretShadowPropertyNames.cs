@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Persistence.EFCore;
+namespace Flamme.Secrets.Persistence.EFCore;
 
 public static class SecretShadowPropertyNames
 {

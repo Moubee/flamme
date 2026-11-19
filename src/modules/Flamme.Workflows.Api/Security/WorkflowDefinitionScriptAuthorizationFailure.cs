@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Security;
+namespace Flamme.Workflows.Api.Security;
 
 internal static class WorkflowDefinitionScriptAuthorizationFailure
 {

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Common.Services;
+namespace Flamme.Common.Services;
 
 /// <summary>
 /// A simple in-memory store for entities.

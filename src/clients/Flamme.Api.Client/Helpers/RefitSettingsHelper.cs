@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Api.Client.Converters;
+using Flamme.Api.Client.Converters;
 using Refit;
 
-namespace Elsa.Api.Client;
+namespace Flamme.Api.Client;
 
 /// <summary>
 /// Contains helper methods for configuring Refit settings.
@@ -11,7 +11,7 @@ namespace Elsa.Api.Client;
 public static class RefitSettingsHelper
 {
     /// <summary>
-    /// Creates a <see cref="RefitSettings"/> instance configured for Elsa. 
+    /// Creates a <see cref="RefitSettings"/> instance configured for Flamme. 
     /// </summary>
     public static RefitSettings CreateRefitSettings(IServiceProvider serviceProvider, Action<IServiceProvider, JsonSerializerOptions>? configureJsonSerializerOptions = null)
     {
@@ -24,7 +24,7 @@ public static class RefitSettingsHelper
     }
 
     /// <summary>
-    /// Creates a <see cref="JsonSerializerOptions"/> instance configured for Elsa.
+    /// Creates a <see cref="JsonSerializerOptions"/> instance configured for Flamme.
     /// </summary>
     public static JsonSerializerOptions CreateJsonSerializerOptions(IServiceProvider serviceProvider, Action<IServiceProvider, JsonSerializerOptions>? configureJsonSerializerOptions = null)
     {

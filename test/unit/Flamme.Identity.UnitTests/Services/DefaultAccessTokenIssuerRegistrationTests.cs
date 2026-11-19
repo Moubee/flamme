@@ -1,11 +1,11 @@
-using Elsa.Features.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Services;
+using Flamme.Features.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Services;
 using Microsoft.Extensions.DependencyInjection;
-using ModuleIdentityFeature = Elsa.Identity.Features.IdentityFeature;
+using ModuleIdentityFeature = Flamme.Identity.Features.IdentityFeature;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class DefaultAccessTokenIssuerRegistrationTests
 {
@@ -48,7 +48,7 @@ public class DefaultAccessTokenIssuerRegistrationTests
 
     private static async Task AssertAccessTokenIssuerResolves(IServiceCollection services)
     {
-        services.AddScoped(_ => IElsaTokenService.Mock().Object);
+        services.AddScoped(_ => IFlammeTokenService.Mock().Object);
         using var serviceProvider = services.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
         await Assert.That(scope.ServiceProvider.GetRequiredService<IAccessTokenIssuer>()).IsOfType(typeof(DefaultAccessTokenIssuer));

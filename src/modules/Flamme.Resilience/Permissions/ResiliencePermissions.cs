@@ -1,8 +1,8 @@
-using Elsa.Authorization;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Resilience.Permissions;
+namespace Flamme.Resilience.Permissions;
 
 /// <summary>
 /// Stable resource names for Resilience. Endpoints reference these constants rather than string

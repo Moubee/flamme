@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Request;
+namespace Flamme.Mediator.Middleware.Request;
 
 /// <summary>
 /// Represents a delegate for a request middleware.

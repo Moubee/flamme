@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Results;
+using Flamme.Alterations.Core.Results;
 
-namespace Elsa.Alterations.Core.Contracts;
+namespace Flamme.Alterations.Core.Contracts;
 
 /// <summary>
 /// Schedules a workflow instance to be resumed when an alteration job has been completed.

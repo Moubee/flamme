@@ -1,17 +1,17 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Services;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Dashboard;
-using Elsa.Workflows.Runtime.Dashboard.Extensions;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Services;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Dashboard;
+using Flamme.Workflows.Runtime.Dashboard.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using static Elsa.Dashboard.Api.UnitTests.TestContributor;
+using static Flamme.Dashboard.Api.UnitTests.TestContributor;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 public class DefaultDashboardProviderTests
 {
@@ -571,12 +571,12 @@ public class DefaultDashboardProviderTests
     [Test]
     public async Task DashboardApiProject_DoesNotReferenceWorkflowOrDiagnosticsModules()
     {
-        var projectFile = FindRepositoryRoot().Combine("src/modules/Elsa.Dashboard.Api/Elsa.Dashboard.Api.csproj");
+        var projectFile = FindRepositoryRoot().Combine("src/modules/Flamme.Dashboard.Api/Flamme.Dashboard.Api.csproj");
         var project = File.ReadAllText(projectFile);
 
         await Assert.That(project).DoesNotContain("Elsa.Workflows");
         await Assert.That(project).DoesNotContain("Elsa.Diagnostics");
-        await Assert.That(project).Contains("Elsa.Dashboard.Abstractions");
+        await Assert.That(project).Contains("Flamme.Dashboard.Abstractions");
     }
 
     [Test]
@@ -585,13 +585,13 @@ public class DefaultDashboardProviderTests
         var root = FindRepositoryRoot();
         var ownerProjects = new[]
         {
-            "src/modules/Elsa.Workflows.Runtime/Elsa.Workflows.Runtime.csproj"
+            "src/modules/Flamme.Workflows.Runtime/Flamme.Workflows.Runtime.csproj"
         };
 
         foreach (var ownerProject in ownerProjects)
         {
             var project = File.ReadAllText(root.Combine(ownerProject));
-            await Assert.That(project).DoesNotContain("Elsa.Dashboard.Abstractions");
+            await Assert.That(project).DoesNotContain("Flamme.Dashboard.Abstractions");
         }
     }
 
@@ -632,7 +632,7 @@ public class DefaultDashboardProviderTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory != null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "Elsa.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "Flamme.slnx")))
                 return directory;
 
             directory = directory.Parent;

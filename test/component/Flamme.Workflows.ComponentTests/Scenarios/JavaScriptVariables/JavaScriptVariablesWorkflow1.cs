@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Activities;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.JavaScriptVariables;
+namespace Flamme.Workflows.ComponentTests.Scenarios.JavaScriptVariables;
 
 public class JavaScriptVariablesWorkflow1 : WorkflowBase
 {

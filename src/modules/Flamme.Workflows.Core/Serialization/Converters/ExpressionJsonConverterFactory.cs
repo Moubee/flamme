@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Models;
 
-namespace Elsa.Workflows.Serialization.Converters;
+namespace Flamme.Workflows.Serialization.Converters;
 
 /// <summary>
 /// A JSON converter factory that creates <see cref="ExpressionJsonConverter"/> instances.

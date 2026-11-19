@@ -1,9 +1,9 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.State;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Management.Contracts;
+namespace Flamme.Workflows.Management.Contracts;
 
 /// <summary>
 /// Creates new <see cref="WorkflowInstance"/> objects.

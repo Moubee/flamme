@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime.Tasks;
+using Flamme.Workflows.Runtime.Tasks;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Defines the contract for restarting workflows in the runtime environment.

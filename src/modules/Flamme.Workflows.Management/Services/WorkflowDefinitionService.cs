@@ -1,12 +1,12 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Management.Exceptions;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Models;
-using Elsa.Workflows.Models;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class WorkflowDefinitionService(

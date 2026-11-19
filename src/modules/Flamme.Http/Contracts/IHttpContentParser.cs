@@ -1,6 +1,6 @@
-using Elsa.Http.Contexts;
+using Flamme.Http.Contexts;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// A strategy that reads a <see cref="HttpResponseMessage"/> of a given content type.

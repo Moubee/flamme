@@ -1,22 +1,22 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Endpoints.AI;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Endpoints.AI;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Permissions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Host.Endpoints.AI.Tools;
+namespace Flamme.AI.Host.Endpoints.AI.Tools;
 
 [PublicAPI]
-public class Endpoint(IAIToolRegistry toolRegistry, IOptions<AIHostOptions> options) : ElsaEndpoint<Request, IReadOnlyCollection<AIToolDefinition>>
+public class Endpoint(IAIToolRegistry toolRegistry, IOptions<AIHostOptions> options) : FlammeEndpoint<Request, IReadOnlyCollection<AIToolDefinition>>
 {
     public override void Configure()
     {
         Get("/ai/tools");
-        RequirePermission(Elsa.AI.Host.Permissions.AIResourcePermissions.Tools, CoreVerbs.View);
+        RequirePermission(Flamme.AI.Host.Permissions.AIResourcePermissions.Tools, CoreVerbs.View);
     }
 
     public override async Task<IReadOnlyCollection<AIToolDefinition>> ExecuteAsync(Request request, CancellationToken cancellationToken)

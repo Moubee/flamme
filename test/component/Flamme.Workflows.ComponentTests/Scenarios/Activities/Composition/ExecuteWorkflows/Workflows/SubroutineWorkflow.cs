@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Composition.ExecuteWorkflows.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Composition.ExecuteWorkflows.Workflows;
 
 [UsedImplicitly]
 public class SubroutineWorkflow : WorkflowBase

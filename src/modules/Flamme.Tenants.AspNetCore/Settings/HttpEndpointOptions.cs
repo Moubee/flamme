@@ -1,4 +1,4 @@
-namespace Elsa.Tenants.AspNetCore.Settings;
+namespace Flamme.Tenants.AspNetCore.Settings;
 
 public class HttpEndpointSettings
 {

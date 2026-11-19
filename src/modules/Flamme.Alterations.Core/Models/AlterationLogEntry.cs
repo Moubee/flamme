@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 /// <summary>
 /// A log entry for an alteration.

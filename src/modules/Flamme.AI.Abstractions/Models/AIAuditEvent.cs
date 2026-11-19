@@ -1,4 +1,4 @@
-namespace Elsa.AI.Abstractions.Models;
+namespace Flamme.AI.Abstractions.Models;
 
 public record AIAuditEvent
 {

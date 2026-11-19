@@ -1,8 +1,8 @@
 using System.Text.Encodings.Web;
-using Elsa.Expressions.Liquid.Services;
+using Flamme.Expressions.Liquid.Services;
 using Fluid;
 
-namespace Elsa.Expressions.Liquid.Options;
+namespace Flamme.Expressions.Liquid.Options;
 
 /// <summary>
 /// Options for configuring the Liquid templating engine.
@@ -30,7 +30,7 @@ public class FluidOptions
     public TextEncoder Encoder { get; set; } = NullEncoder.Default;
 
     /// <summary>
-    /// Get or set the fluid filters enabled in Elsa.
+    /// Get or set the fluid filters enabled in Flamme.
     /// </summary>
     public Action<TemplateContext> ConfigureFilters { get; set; } = _ => { };
 }

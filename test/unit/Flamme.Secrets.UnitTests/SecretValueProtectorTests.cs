@@ -1,7 +1,7 @@
-using Elsa.Secrets.Options;
-using Elsa.Secrets.Services;
+using Flamme.Secrets.Options;
+using Flamme.Secrets.Services;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretValueProtectorTests
 {

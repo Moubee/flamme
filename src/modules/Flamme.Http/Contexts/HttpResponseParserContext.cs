@@ -1,4 +1,4 @@
-namespace Elsa.Http.Contexts;
+namespace Flamme.Http.Contexts;
 
 /// <summary>
 /// Represents the context in which an HTTP response is being parsed.

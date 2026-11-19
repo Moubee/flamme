@@ -1,10 +1,10 @@
 using System.Threading.RateLimiting;
-using Elsa.ExternalAuthentication.Constants;
+using Flamme.ExternalAuthentication.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Options;
+namespace Flamme.ExternalAuthentication.Options;
 
 public sealed class ConfigureExternalAuthenticationRateLimiterOptions(IOptions<ExternalAuthenticationOptions> externalAuthenticationOptions) : IConfigureOptions<RateLimiterOptions>
 {

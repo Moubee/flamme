@@ -1,9 +1,9 @@
 using System.Net;
-using Elsa.Http;
-using Elsa.Workflows.Activities;
+using Flamme.Http;
+using Flamme.Workflows.Activities;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Http.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Http.Workflows;
 
 public class FormDataWorkflow : WorkflowBase
 {

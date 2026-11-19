@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.Workflows;
+using Flamme.Workflows;
 
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// A binding between an HTTP status code and an activity.

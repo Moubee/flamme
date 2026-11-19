@@ -1,12 +1,12 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Services;
+namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class StimulusSenderTests
 {

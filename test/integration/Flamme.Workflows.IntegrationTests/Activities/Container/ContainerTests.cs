@@ -1,8 +1,8 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Activities.Container;
+namespace Flamme.Workflows.IntegrationTests.Activities.Container;
 
 /// <summary>
 /// Integration tests for the <see cref="Container"/> activity.

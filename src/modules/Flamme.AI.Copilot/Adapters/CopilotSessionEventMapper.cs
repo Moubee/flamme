@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 using GitHub.Copilot;
 
-namespace Elsa.AI.Copilot.Adapters;
+namespace Flamme.AI.Copilot.Adapters;
 
 public class CopilotSessionEventMapper
 {

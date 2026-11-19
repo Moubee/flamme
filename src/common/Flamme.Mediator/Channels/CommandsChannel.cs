@@ -1,10 +1,10 @@
-using Elsa.Mediator.Abstractions;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Middleware.Command;
+using Flamme.Mediator.Abstractions;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Middleware.Command;
 
-namespace Elsa.Mediator.Channels;
+namespace Flamme.Mediator.Channels;
 
-/// <inheritdoc cref="Elsa.Mediator.Contracts.ICommandsChannel" />
+/// <inheritdoc cref="Flamme.Mediator.Contracts.ICommandsChannel" />
 public class CommandsChannel : ChannelBase<CommandContext>, ICommandsChannel
 {
 }

@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Elsa.Http.Bookmarks;
+using Flamme.Http.Bookmarks;
 
-namespace Elsa.Http.UnitTests.Bookmarks;
+namespace Flamme.Http.UnitTests.Bookmarks;
 
 public class HttpEndpointBookmarkPayloadTests
 {

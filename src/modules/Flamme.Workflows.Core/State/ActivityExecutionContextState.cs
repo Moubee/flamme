@@ -1,6 +1,6 @@
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.State;
+namespace Flamme.Workflows.State;
 
 /// <summary>
 /// A serializable shape of <see cref="ActivityExecutionContext"/>.

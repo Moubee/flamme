@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Endpoints.Workflows.Retry;
+namespace Flamme.Alterations.Endpoints.Workflows.Retry;
 
 /// <summary>
 /// A request to retry one or more faulted workflow instances.

@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Policies;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Policies;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Validation;
+namespace Flamme.ExternalAuthentication.Validation;
 
 /// <summary>
 /// Validates the deployment-owned External Authentication configuration before it is used by the broker.

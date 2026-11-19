@@ -1,13 +1,13 @@
-using Elsa.Common;
-using Elsa.Scheduling.Activities;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Scheduling.Services;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Common;
+using Flamme.Scheduling.Activities;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Scheduling.Services;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Scheduling.UnitTests.Services;
+namespace Flamme.Scheduling.UnitTests.Services;
 
 public class DefaultTriggerSchedulerTests
 {

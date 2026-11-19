@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
 
-namespace Elsa.Tenants.Features;
+namespace Flamme.Tenants.Features;
 
 /// <summary>
 /// Enables tenant management endpoints.

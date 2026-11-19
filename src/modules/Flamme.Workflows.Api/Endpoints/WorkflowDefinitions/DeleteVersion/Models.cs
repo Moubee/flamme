@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.DeleteVersion;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.DeleteVersion;
 
 internal class Request
 {

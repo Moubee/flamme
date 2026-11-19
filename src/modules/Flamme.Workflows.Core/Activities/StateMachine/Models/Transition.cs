@@ -1,9 +1,9 @@
 using System.ComponentModel;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 
-namespace Elsa.Workflows.Activities.StateMachine.Models;
+namespace Flamme.Workflows.Activities.StateMachine.Models;
 
 /// <summary>
 /// Represents a directed transition between two states.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Implemented by trigger activities that generate events. For example, a timer activity is an event generator. 

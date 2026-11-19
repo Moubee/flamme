@@ -1,20 +1,20 @@
-using Elsa.Common.Features;
-using Elsa.Expressions.Python.ActivityDescriptorModifiers;
-using Elsa.Expressions.Features;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Expressions.Python.Activities;
-using Elsa.Expressions.Python.Contracts;
-using Elsa.Expressions.Python.HostedServices;
-using Elsa.Expressions.Python.Options;
-using Elsa.Expressions.Python.Providers;
-using Elsa.Expressions.Python.Services;
-using Elsa.Workflows;
+using Flamme.Common.Features;
+using Flamme.Expressions.Python.ActivityDescriptorModifiers;
+using Flamme.Expressions.Features;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Expressions.Python.Activities;
+using Flamme.Expressions.Python.Contracts;
+using Flamme.Expressions.Python.HostedServices;
+using Flamme.Expressions.Python.Options;
+using Flamme.Expressions.Python.Providers;
+using Flamme.Expressions.Python.Services;
+using Flamme.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Python.Features;
+namespace Flamme.Expressions.Python.Features;
 
 /// <summary>
 /// Installs Python integration.

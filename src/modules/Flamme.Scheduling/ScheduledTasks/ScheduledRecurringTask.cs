@@ -1,11 +1,11 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.Commands;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Timer = System.Timers.Timer;
 
-namespace Elsa.Scheduling.ScheduledTasks;
+namespace Flamme.Scheduling.ScheduledTasks;
 
 /// <summary>
 /// A scheduled recurring task.

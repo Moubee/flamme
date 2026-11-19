@@ -1,16 +1,16 @@
-using Elsa.Abstractions;
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
-using Elsa.Models;
+using Flamme.Abstractions;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
+using Flamme.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Features.List;
+namespace Flamme.Workflows.Api.Endpoints.Features.List;
 
 /// <summary>
 /// Returns a list of installed features.
 /// </summary>
 [PublicAPI]
-internal class List(IInstalledFeatureProvider installedFeatureProvider) : ElsaEndpointWithoutRequest<ListResponse<FeatureDescriptor>>
+internal class List(IInstalledFeatureProvider installedFeatureProvider) : FlammeEndpointWithoutRequest<ListResponse<FeatureDescriptor>>
 {
     /// <inheritdoc />
     public override void Configure()

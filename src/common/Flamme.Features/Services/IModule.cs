@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Features.Services;
+namespace Flamme.Features.Services;
 
 /// <summary>
 /// A thin abstraction on top of <see cref="IServiceCollection"/> to help organize features and dependencies. 

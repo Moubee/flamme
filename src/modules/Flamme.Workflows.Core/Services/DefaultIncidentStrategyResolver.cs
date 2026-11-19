@@ -1,9 +1,9 @@
-using Elsa.Workflows.IncidentStrategies;
-using Elsa.Workflows.Options;
+using Flamme.Workflows.IncidentStrategies;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class DefaultIncidentStrategyResolver : IIncidentStrategyResolver

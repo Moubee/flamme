@@ -2,17 +2,17 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Attributes;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.UIHints;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Attributes;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.UIHints;
 using Humanizer;
-using Container = Elsa.Workflows.Activities.Container;
+using Container = Flamme.Workflows.Activities.Container;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <inheritdoc />
 public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolver, IPropertyUIHandlerResolver propertyUIHandlerResolver) : IActivityDescriber

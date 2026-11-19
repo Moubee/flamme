@@ -1,8 +1,8 @@
-using Elsa.AI.Host.Services;
-using Elsa.Workflows.Models;
+using Flamme.AI.Host.Services;
+using Flamme.Workflows.Models;
 using System.Threading.Tasks;
 
-namespace Elsa.AI.Host.UnitTests.Grounding;
+namespace Flamme.AI.Host.UnitTests.Grounding;
 
 public class ActivityGroundingMapperTests
 {

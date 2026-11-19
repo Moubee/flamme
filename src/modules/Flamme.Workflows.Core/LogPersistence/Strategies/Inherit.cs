@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.LogPersistence.Strategies;
+namespace Flamme.Workflows.LogPersistence.Strategies;
 
 /// <summary>
 /// A log persistence strategy that returns <see cref="LogPersistenceMode.Inherit"/>.

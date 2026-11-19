@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
-using Elsa.Resilience.Models;
+using Flamme.Expressions.Models;
+using Flamme.Resilience.Models;
 
-namespace Elsa.Resilience;
+namespace Flamme.Resilience;
 
 public interface IResilienceStrategyConfigEvaluator
 {

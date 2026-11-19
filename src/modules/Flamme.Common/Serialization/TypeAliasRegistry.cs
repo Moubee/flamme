@@ -1,4 +1,4 @@
-namespace Elsa.Common.Serialization;
+namespace Flamme.Common.Serialization;
 
 public static class TypeAliasRegistry
 {

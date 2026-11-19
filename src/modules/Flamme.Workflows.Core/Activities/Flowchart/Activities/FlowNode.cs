@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using Elsa.Workflows.Attributes;
+using Flamme.Workflows.Attributes;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Activities.Flowchart.Activities;
+namespace Flamme.Workflows.Activities.Flowchart.Activities;
 
 /// <summary>
 /// A simple container that executes the specified activity.

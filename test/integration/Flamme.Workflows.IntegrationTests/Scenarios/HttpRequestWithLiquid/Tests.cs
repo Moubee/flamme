@@ -1,10 +1,10 @@
 ﻿using System.Text.Json;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.HttpRequestWithLiquid;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.HttpRequestWithLiquid;
 
 public sealed class Tests : IAsyncDisposable
 {
@@ -16,7 +16,7 @@ public sealed class Tests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureElsa(configure => configure.UseHttp())
+            .ConfigureFlamme(configure => configure.UseHttp())
             .Build();
         _workflowRunner = _services.GetRequiredService<IWorkflowRunner>();
     }

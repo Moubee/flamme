@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.UIHints.SingleLine;
+namespace Flamme.Workflows.UIHints.SingleLine;
 
 /// <summary>
 /// Provides additional options for the SingleLine input field.

@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
 
 public class BraidedWorkflow : WorkflowBase
 {

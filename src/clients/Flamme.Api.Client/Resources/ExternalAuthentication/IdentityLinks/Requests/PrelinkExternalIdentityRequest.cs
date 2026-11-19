@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Requests;
 
 /// <summary>
 /// Links an external identity tuple to an existing tenant user.

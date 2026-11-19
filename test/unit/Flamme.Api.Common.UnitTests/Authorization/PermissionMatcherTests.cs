@@ -1,7 +1,7 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Threading.Tasks;
 
-namespace Elsa.Api.Common.UnitTests.Authorization;
+namespace Flamme.Api.Common.UnitTests.Authorization;
 
 public class PermissionMatcherTests
 {

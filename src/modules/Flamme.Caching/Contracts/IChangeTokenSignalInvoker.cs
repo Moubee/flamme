@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Primitives;
 
-namespace Elsa.Caching;
+namespace Flamme.Caching;
 
 /// <summary>
 /// Triggers the change token associated with the specified key.

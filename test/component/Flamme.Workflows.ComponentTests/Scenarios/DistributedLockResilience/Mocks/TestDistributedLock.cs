@@ -1,6 +1,6 @@
 using Medallion.Threading;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
+namespace Flamme.Workflows.ComponentTests.Scenarios.DistributedLockResilience.Mocks;
 
 /// <summary>
 /// Test implementation of IDistributedLock that delegates to an inner lock

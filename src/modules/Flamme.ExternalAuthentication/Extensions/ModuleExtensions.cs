@@ -1,8 +1,8 @@
-using Elsa.ExternalAuthentication.Features;
-using Elsa.Features.Services;
+using Flamme.ExternalAuthentication.Features;
+using Flamme.Features.Services;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ModuleExtensions
 {

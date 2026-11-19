@@ -1,7 +1,7 @@
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
 
-namespace Elsa.Features.Services;
+namespace Flamme.Features.Services;
 
 /// <inheritdoc />
 public class InstalledFeatureRegistry : IInstalledFeatureRegistry

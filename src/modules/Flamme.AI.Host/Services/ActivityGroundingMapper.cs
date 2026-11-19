@@ -1,7 +1,7 @@
-using Elsa.AI.Abstractions.Models;
-using Elsa.Workflows.Models;
+using Flamme.AI.Abstractions.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class ActivityGroundingMapper
 {

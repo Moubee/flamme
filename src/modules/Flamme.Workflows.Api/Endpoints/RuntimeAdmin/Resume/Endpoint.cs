@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using FastEndpoints;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume;
+namespace Flamme.Workflows.Api.Endpoints.RuntimeAdmin.Resume;
 
 /// <summary>
 /// <c>POST /admin/workflow-runtime/resume</c> — clears <see cref="QuiescenceReason.AdministrativePause"/>.
@@ -13,12 +13,12 @@ namespace Elsa.Workflows.Api.Endpoints.RuntimeAdmin.Resume;
 /// Idempotent on the success path.
 /// </summary>
 [PublicAPI]
-internal sealed class ResumeEndpoint(IWorkflowRuntimeAdminService admin) : ElsaEndpoint<EmptyRequest, StatusResponse>
+internal sealed class ResumeEndpoint(IWorkflowRuntimeAdminService admin) : FlammeEndpoint<EmptyRequest, StatusResponse>
 {
     public override void Configure()
     {
         Post("/admin/workflow-runtime/resume");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Runtime, "control");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Runtime, "control");
     }
 
     public override async Task HandleAsync(EmptyRequest _, CancellationToken ct)

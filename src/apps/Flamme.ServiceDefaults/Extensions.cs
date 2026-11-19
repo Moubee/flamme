@@ -1,4 +1,4 @@
-using Elsa.Workflows.Telemetry;
+using Flamme.Workflows.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-namespace Elsa.ServiceDefaults;
+namespace Flamme.ServiceDefaults;
 
 /// <summary>Configures host and workflow telemetry for local development and OTLP collectors.</summary>
 public static class Extensions

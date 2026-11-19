@@ -1,15 +1,15 @@
-using Elsa.Abstractions;
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
+using Flamme.Abstractions;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.Features.Get;
+namespace Flamme.Workflows.Api.Endpoints.Features.Get;
 
 /// <summary>
 /// Returns the specified installed feature.
 /// </summary>
 [PublicAPI]
-internal class Get(IInstalledFeatureProvider installedFeatureProvider) : ElsaEndpointWithoutRequest<FeatureDescriptor>
+internal class Get(IInstalledFeatureProvider installedFeatureProvider) : FlammeEndpointWithoutRequest<FeatureDescriptor>
 {
     /// <inheritdoc />
     public override void Configure()

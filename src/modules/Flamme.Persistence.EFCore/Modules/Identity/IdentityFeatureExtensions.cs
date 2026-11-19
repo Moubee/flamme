@@ -1,6 +1,6 @@
-﻿using Elsa.Identity.Features;
+﻿using Flamme.Identity.Features;
 
-namespace Elsa.Persistence.EFCore.Modules.Identity;
+namespace Flamme.Persistence.EFCore.Modules.Identity;
 
 /// <summary>
 /// Provides extensions for <see cref="IdentityFeature"/> 

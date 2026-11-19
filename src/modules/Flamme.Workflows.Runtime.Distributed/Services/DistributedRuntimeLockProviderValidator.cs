@@ -1,13 +1,13 @@
 using System.Linq;
 using System.Reflection;
-using Elsa.Common.DistributedHosting;
-using Elsa.Common.DistributedHosting.DistributedLocks;
+using Flamme.Common.DistributedHosting;
+using Flamme.Common.DistributedHosting.DistributedLocks;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Distributed;
+namespace Flamme.Workflows.Runtime.Distributed;
 
 /// <summary>
 /// Logs when the distributed runtime is backed by a local-only lock provider.

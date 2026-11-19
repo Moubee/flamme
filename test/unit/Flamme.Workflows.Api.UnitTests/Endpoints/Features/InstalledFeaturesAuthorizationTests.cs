@@ -1,9 +1,9 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Elsa.Features.Contracts;
-using Elsa.Features.Models;
-using Elsa.UnitTests.Shared;
+using Flamme.Features.Contracts;
+using Flamme.Features.Models;
+using Flamme.UnitTests.Shared;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using WorkflowsApiFeature = Elsa.Workflows.Api.Features.WorkflowsApiFeature;
+using WorkflowsApiFeature = Flamme.Workflows.Api.Features.WorkflowsApiFeature;
 
-namespace Elsa.Workflows.Api.UnitTests.Endpoints.Features;
+namespace Flamme.Workflows.Api.UnitTests.Endpoints.Features;
 
 /// <summary>
 /// Studio decides which modules to render from the installed features, so any signed-in user must be able to read
@@ -23,7 +23,7 @@ namespace Elsa.Workflows.Api.UnitTests.Endpoints.Features;
 [NotInParallel(nameof(FastEndpointsCollection))]
 public class InstalledFeaturesAuthorizationTests
 {
-    private const string FeatureFullName = "Elsa.Secrets.SecretsFeature";
+    private const string FeatureFullName = "Flamme.Secrets.SecretsFeature";
     private WebApplication? _app;
 
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "This JIT-run test host intentionally discovers production endpoints through FastEndpoints reflection.")]
@@ -36,7 +36,7 @@ public class InstalledFeaturesAuthorizationTests
         builder.Services.AddFastEndpoints(options =>
         {
             options.Assemblies = [typeof(WorkflowsApiFeature).Assembly];
-            options.Filter = endpoint => endpoint.Namespace?.StartsWith("Elsa.Workflows.Api.Endpoints.Features", StringComparison.Ordinal) == true;
+            options.Filter = endpoint => endpoint.Namespace?.StartsWith("Flamme.Workflows.Api.Endpoints.Features", StringComparison.Ordinal) == true;
         });
 
         var feature = new FeatureDescriptor("SecretsFeature", "Elsa.Secrets", "Secrets");

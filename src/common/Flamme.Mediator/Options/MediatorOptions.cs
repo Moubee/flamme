@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Mediator.Options;
+namespace Flamme.Mediator.Options;
 
 /// <summary>
 /// Options for the mediator.

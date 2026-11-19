@@ -1,7 +1,7 @@
-using Elsa.Authorization;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Applies an optional workflow definition filter that is provided by another module. A provider should leave an omitted or empty criterion unchanged, clear each criterion only after successfully applying it, and report unsupported non-empty criteria explicitly.

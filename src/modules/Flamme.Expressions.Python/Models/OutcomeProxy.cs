@@ -1,7 +1,7 @@
-using Elsa.Expressions.Models;
+using Flamme.Expressions.Models;
 // ReSharper disable InconsistentNaming
 
-namespace Elsa.Expressions.Python.Models;
+namespace Flamme.Expressions.Python.Models;
 
 /// <summary>
 /// Provides access to activity outcomes.

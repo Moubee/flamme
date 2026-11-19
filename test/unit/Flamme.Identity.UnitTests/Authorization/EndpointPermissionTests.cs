@@ -1,14 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elsa.Authorization;
-using Elsa.Identity.Permissions;
-using Elsa.Identity.Services;
-using Elsa.Permissions;
+using Flamme.Authorization;
+using Flamme.Identity.Permissions;
+using Flamme.Identity.Services;
+using Flamme.Permissions;
 using FastEndpoints;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Authorization;
+namespace Flamme.Identity.UnitTests.Authorization;
 
 /// <summary>
 /// Pins what the three endpoints that used to carry the <c>SecurityRoot</c> policy require now that the
@@ -26,9 +26,9 @@ public class EndpointPermissionTests
 
     public static IEnumerable<(string, string, string)> Declarations =>
     [
-        ("Elsa.Identity.Endpoints.Secrets.Hash.Hash", IdentityPermissions.Users, CoreVerbs.Create),
-        ("Elsa.Identity.Endpoints.Roles.Create.Create", IdentityPermissions.Roles, CoreVerbs.Create),
-        ("Elsa.Identity.Endpoints.Applications.Create.Create", IdentityPermissions.Applications, CoreVerbs.Create)
+        ("Flamme.Identity.Endpoints.Secrets.Hash.Hash", IdentityPermissions.Users, CoreVerbs.Create),
+        ("Flamme.Identity.Endpoints.Roles.Create.Create", IdentityPermissions.Roles, CoreVerbs.Create),
+        ("Flamme.Identity.Endpoints.Applications.Create.Create", IdentityPermissions.Applications, CoreVerbs.Create)
     ];
 
     [Test]
@@ -59,9 +59,9 @@ public class EndpointPermissionTests
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     private static Type ResolveEndpointType(string name) => name switch
     {
-        "Elsa.Identity.Endpoints.Secrets.Hash.Hash" => Type.GetType("Elsa.Identity.Endpoints.Secrets.Hash.Hash, Elsa.Identity", throwOnError: true)!,
-        "Elsa.Identity.Endpoints.Roles.Create.Create" => Type.GetType("Elsa.Identity.Endpoints.Roles.Create.Create, Elsa.Identity", throwOnError: true)!,
-        "Elsa.Identity.Endpoints.Applications.Create.Create" => Type.GetType("Elsa.Identity.Endpoints.Applications.Create.Create, Elsa.Identity", throwOnError: true)!,
+        "Flamme.Identity.Endpoints.Secrets.Hash.Hash" => Type.GetType("Flamme.Identity.Endpoints.Secrets.Hash.Hash, Flamme.Identity", throwOnError: true)!,
+        "Flamme.Identity.Endpoints.Roles.Create.Create" => Type.GetType("Flamme.Identity.Endpoints.Roles.Create.Create, Flamme.Identity", throwOnError: true)!,
+        "Flamme.Identity.Endpoints.Applications.Create.Create" => Type.GetType("Flamme.Identity.Endpoints.Applications.Create.Create, Flamme.Identity", throwOnError: true)!,
         _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown endpoint.")
     };
 
@@ -91,11 +91,11 @@ public class EndpointPermissionTests
             var definition = type.GetGenericTypeDefinition();
             var arguments = type.GetGenericArguments();
 
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpoint<,>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpoint<,>))
                 return (arguments[0], arguments[1]);
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpointWithoutRequest<>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpointWithoutRequest<>))
                 return (typeof(EmptyRequest), arguments[0]);
-            if (definition == typeof(Elsa.Abstractions.ElsaEndpoint<>))
+            if (definition == typeof(Flamme.Abstractions.FlammeEndpoint<>))
                 return (arguments[0], typeof(object));
         }
 

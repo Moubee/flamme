@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.Exceptions;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 // ReSharper disable ExplicitCallerInfoArgument
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// Faults the workflow.

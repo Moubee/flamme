@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Options;
+namespace Flamme.Workflows.Options;
 
 /// <summary>
 /// Options for configuring how incidents are handled.

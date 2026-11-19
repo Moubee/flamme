@@ -1,4 +1,4 @@
-namespace Elsa.Http;
+namespace Flamme.Http;
 
 /// <summary>
 /// Stores a list of all routes provided by <see cref="HttpEndpoint"/> activities.

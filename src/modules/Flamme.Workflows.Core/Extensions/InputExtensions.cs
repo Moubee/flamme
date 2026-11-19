@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using Elsa.Expressions.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions on <see cref="ExpressionExecutionContext"/> and <see cref="ActivityExecutionContext"/>

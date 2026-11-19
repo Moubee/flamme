@@ -1,7 +1,7 @@
-using Elsa.Resilience.Models;
+using Flamme.Resilience.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Resilience.Recorders;
+namespace Flamme.Resilience.Recorders;
 
 [UsedImplicitly]
 public class ActivityExecutionContextRetryAttemptRecorder : IRetryAttemptRecorder

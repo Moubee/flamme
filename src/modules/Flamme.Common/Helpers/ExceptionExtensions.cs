@@ -1,4 +1,4 @@
-namespace Elsa.Common.Helpers;
+namespace Flamme.Common.Helpers;
 
 /// <summary>
 /// Extension methods for <see cref="Exception"/>.

@@ -1,18 +1,18 @@
 using Microsoft.Extensions.Time.Testing;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Authorization;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Authorization;
 using System.Security.Claims;
-using Elsa.Common.Services;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Identity.Notifications;
-using Elsa.Identity.Providers;
-using Elsa.Identity.Services;
-using Elsa.Mediator.Contracts;
+using Flamme.Common.Services;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Identity.Notifications;
+using Flamme.Identity.Providers;
+using Flamme.Identity.Services;
+using Flamme.Mediator.Contracts;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Services;
+namespace Flamme.Identity.UnitTests.Services;
 
 public class RoleDeletionCoordinatorTests
 {
@@ -411,7 +411,7 @@ public class RoleDeletionCoordinatorTests
 
     private static async Task AssertRoleDeletedNotificationAsync(INotificationSender notificationSender) =>
         Mock.Get(notificationSender).SendAsync(
-            Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is RoleChanged notification &&
+            Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is RoleChanged notification &&
                 notification.Operation == "deleted" &&
                 notification.RoleId == "workflow-user" &&
                 notification.RoleName == "Workflow user" &&
@@ -421,7 +421,7 @@ public class RoleDeletionCoordinatorTests
             Arg.Is<CancellationToken>(token => !token.CanBeCanceled)).WasCalled(Times.Exactly(1));
 
     private static async Task AssertNoRoleNotificationAsync(INotificationSender notificationSender) =>
-        Mock.Get(notificationSender).SendAsync(Arg.Is<Elsa.Mediator.Contracts.INotification>(value => value is RoleChanged), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(notificationSender).SendAsync(Arg.Is<Flamme.Mediator.Contracts.INotification>(value => value is RoleChanged), Arg.Any<CancellationToken>()).WasNeverCalled();
 
     private static ClaimsPrincipal Administrator() => new(new ClaimsIdentity([new Claim(PermissionNames.ClaimType, PermissionNames.All)]));
 

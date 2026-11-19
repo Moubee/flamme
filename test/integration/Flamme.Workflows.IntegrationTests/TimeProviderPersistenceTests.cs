@@ -1,20 +1,20 @@
-using Elsa.Extensions;
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Persistence.EFCore.Modules.Management;
-using Elsa.Scheduling.Activities;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Databases;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Management.Mappers;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Scheduling.Activities;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Databases;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Mappers;
+using Flamme.Workflows.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Workflows.IntegrationTests;
+namespace Flamme.Workflows.IntegrationTests;
 
 public class TimeProviderPersistenceTests
 {
@@ -34,7 +34,7 @@ public class TimeProviderPersistenceTests
 
         await using (var firstHost = CreateHost(database.ConnectionString, new FakeTimeProvider(StartedUtc)))
         {
-            await using (var dbContext = await firstHost.GetRequiredService<IDbContextFactory<ManagementElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await firstHost.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.MigrateAsync();
 
             await firstHost.PopulateRegistriesAsync();
@@ -72,7 +72,7 @@ public class TimeProviderPersistenceTests
 
         await using (var importingHost = CreateHost(database.ConnectionString, new FakeTimeProvider(ResumedUtc)))
         {
-            await using (var dbContext = await importingHost.GetRequiredService<IDbContextFactory<ManagementElsaDbContext>>().CreateDbContextAsync())
+            await using (var dbContext = await importingHost.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync())
                 await dbContext.Database.MigrateAsync();
 
             await importingHost.PopulateRegistriesAsync();
@@ -84,7 +84,7 @@ public class TimeProviderPersistenceTests
 
             // Keep the baseline serializer's actual payload in the row, rather than a new serializer's
             // re-emission. The next host must deserialize those legacy bytes through the EF store.
-            await using var persistedContext = await importingHost.GetRequiredService<IDbContextFactory<ManagementElsaDbContext>>().CreateDbContextAsync();
+            await using var persistedContext = await importingHost.GetRequiredService<IDbContextFactory<ManagementFlammeDbContext>>().CreateDbContextAsync();
             var persistedInstance = await persistedContext.WorkflowInstances.SingleAsync(x => x.Id == instanceId);
             persistedContext.Entry(persistedInstance).Property("Data").CurrentValue = legacyJson;
             persistedContext.Entry(persistedInstance).Property("DataCompressionAlgorithm").CurrentValue = "None";
@@ -138,7 +138,7 @@ public class TimeProviderPersistenceTests
     private static ServiceProvider CreateHost(string connectionString, TimeProvider timeProvider) =>
         (ServiceProvider)new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .ConfigureServices(services => services.AddSingleton<TimeProvider>(timeProvider))
-            .ConfigureElsa(elsa => elsa.UseWorkflowManagement(management =>
+            .ConfigureFlamme(elsa => elsa.UseWorkflowManagement(management =>
                 management.UseWorkflowInstances(instances => instances.UseEntityFrameworkCore(ef => ef.UsePostgreSql(connectionString)))))
             .Build();
 

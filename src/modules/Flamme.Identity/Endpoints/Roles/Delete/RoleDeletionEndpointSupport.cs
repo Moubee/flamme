@@ -1,7 +1,7 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Identity.Endpoints.Roles.Delete;
+namespace Flamme.Identity.Endpoints.Roles.Delete;
 
 internal static class RoleDeletionEndpointSupport
 {

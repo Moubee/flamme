@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Features.Services;
+namespace Flamme.Features.Services;
 
 /// <summary>
 /// Represents a feature.

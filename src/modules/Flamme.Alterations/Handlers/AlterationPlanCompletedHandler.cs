@@ -1,12 +1,12 @@
-using Elsa.Alterations.Bookmarks;
-using Elsa.Alterations.Core.Notifications;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows;
-using Elsa.Workflows.Helpers;
-using Elsa.Workflows.Runtime;
+using Flamme.Alterations.Bookmarks;
+using Flamme.Alterations.Core.Notifications;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows;
+using Flamme.Workflows.Helpers;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Handlers;
+namespace Flamme.Alterations.Handlers;
 
 /// <summary>
 /// Handles <see cref="AlterationPlanCompleted"/> notifications and triggers any workflows that are waiting for the plan to complete.

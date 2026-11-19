@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.Activities;
+namespace Flamme.Workflows.Activities;
 
 /// <summary>
 /// A base class for activities that control a collection of activities.

@@ -1,4 +1,4 @@
-namespace Elsa.Common.Codecs;
+namespace Flamme.Common.Codecs;
 
 /// <summary>
 /// Represents a compression strategy that does not compress or decompress the input.

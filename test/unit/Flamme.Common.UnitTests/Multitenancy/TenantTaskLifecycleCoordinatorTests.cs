@@ -1,12 +1,12 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Common.RecurringTasks;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.RecurringTasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 
-namespace Elsa.Common.UnitTests.Multitenancy;
+namespace Flamme.Common.UnitTests.Multitenancy;
 
 public class TenantTaskLifecycleCoordinatorTests : IAsyncDisposable
 {

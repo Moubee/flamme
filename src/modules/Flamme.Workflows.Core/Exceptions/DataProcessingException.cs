@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 /// <summary>
 /// An exception that occurs during data processing.

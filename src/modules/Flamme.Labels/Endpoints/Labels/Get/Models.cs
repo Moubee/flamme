@@ -1,4 +1,4 @@
-namespace Elsa.Labels.Endpoints.Labels.Get;
+namespace Flamme.Labels.Endpoints.Labels.Get;
 
 public class Request
 {

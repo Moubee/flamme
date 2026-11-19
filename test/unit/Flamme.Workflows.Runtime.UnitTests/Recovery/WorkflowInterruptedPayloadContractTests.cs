@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Recovery;
+namespace Flamme.Workflows.Runtime.UnitTests.Recovery;
 
 /// <summary>
 /// Freezes the JSON shape of <see cref="WorkflowInterruptedPayload"/>. Persisted log entries from prior runtime

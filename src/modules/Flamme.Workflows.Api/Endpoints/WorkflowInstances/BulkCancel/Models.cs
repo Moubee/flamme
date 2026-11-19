@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Elsa.Common.Models;
+using Flamme.Common.Models;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.BulkCancel;
 
 public class Request
 {

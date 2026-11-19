@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using Elsa.Extensions;
+using Flamme.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Http.Services;
+namespace Flamme.Http.Services;
 
 /// <inheritdoc />
 public class RouteTable(IMemoryCache cache, ILogger<RouteTable> logger) : IRouteTable

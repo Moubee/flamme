@@ -1,20 +1,20 @@
 using System.Security.Cryptography;
 using System.Text;
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Notifications;
-using Elsa.ExternalAuthentication.Validation;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Notifications;
+using Flamme.ExternalAuthentication.Validation;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 public sealed class ExternalAuthenticationBroker(
     IIdentityProviderConnectionRegistry connectionRegistry,
@@ -32,7 +32,7 @@ public sealed class ExternalAuthenticationBroker(
     IUserCredentialsValidator credentialsValidator,
     IUserProvider userProvider,
     IRoleProvider roleProvider,
-    IElsaTokenService elsaTokenService,
+    IFlammeTokenService flammeTokenService,
     IIdentityRefreshTokenService identityRefreshTokenService,
     ITenantAccessor tenantAccessor,
     TimeProvider timeProvider,
@@ -377,8 +377,8 @@ public sealed class ExternalAuthenticationBroker(
         {
             var roles = (await roleProvider.FindByIdsAsync(user.Roles, cancellationToken)).ToArray();
             var context = new TokenIssuanceContext(user, roles.Select(x => x.Name).ToArray(), roles.SelectMany(x => x.Permissions).Distinct().ToArray(), []);
-            var access = await elsaTokenService.IssueAccessTokenAsync(context, cancellationToken);
-            var refresh = await elsaTokenService.IssueRefreshTokenAsync(context, cancellationToken);
+            var access = await flammeTokenService.IssueAccessTokenAsync(context, cancellationToken);
+            var refresh = await flammeTokenService.IssueRefreshTokenAsync(context, cancellationToken);
             return await TokenOutcomeAsync(BrokerTokenResult.Success(new(
                 access.Token,
                 "Bearer",

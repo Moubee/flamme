@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Elsa.Common.Entities;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Common.Entities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management.Filters;
+namespace Flamme.Workflows.Management.Filters;
 
 /// <summary>
 /// Represents the order by which to order the results of a query.

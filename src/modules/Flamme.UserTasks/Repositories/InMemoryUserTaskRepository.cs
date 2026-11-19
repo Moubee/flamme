@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.UserTasks.Contracts;
-using Elsa.UserTasks.Models;
+using Flamme.UserTasks.Contracts;
+using Flamme.UserTasks.Models;
 
-namespace Elsa.UserTasks.Repositories;
+namespace Flamme.UserTasks.Repositories;
 
 /// <summary>
 /// A deterministic repository for the Core module and development hosts. It uses a single lock to

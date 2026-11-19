@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Options;
+namespace Flamme.Workflows.Options;
 
 /// <summary>
 /// Provides options for running a workflow.

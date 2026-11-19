@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Http;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Http;
 
 public class HttpEndpointTests(App app) : AppComponentTest(app)
 {

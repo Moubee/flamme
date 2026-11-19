@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Composition.Activities;
+namespace Flamme.Activities.IntegrationTests.Composition.Activities;
 
 /// <summary>
 /// Outer composite activity for nested composite testing.

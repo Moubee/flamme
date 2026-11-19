@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Secrets.Stores;
+namespace Flamme.Secrets.Stores;
 
 public class ConfigurationSecretStore(IConfiguration configuration, IOptions<SecretsOptions> options) : ISecretStore
 {
@@ -12,7 +12,7 @@ public class ConfigurationSecretStore(IConfiguration configuration, IOptions<Sec
     public SecretStoreDescriptor Descriptor { get; } = new(
         SecretStoreNames.Configuration,
         "Configuration",
-        "Reads values from application configuration without storing the value in Elsa.",
+        "Reads values from application configuration without storing the value in Flamme.",
         SecretStoreCapabilities.Read | SecretStoreCapabilities.Write | SecretStoreCapabilities.Test,
         true);
 

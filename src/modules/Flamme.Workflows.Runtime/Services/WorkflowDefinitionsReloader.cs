@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Runtime;
+﻿namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class WorkflowDefinitionsReloader(IRegistriesPopulator registriesPopulator) : IWorkflowDefinitionsReloader

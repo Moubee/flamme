@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Activities;
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Activities;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.SetGetVariablesFromActivities.Workflows;
 
 class SampleWorkflow : WorkflowBase
 {

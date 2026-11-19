@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.Workflows.Features;
+using Flamme.Features.Services;
+using Flamme.Workflows.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ModuleExtensions
 {

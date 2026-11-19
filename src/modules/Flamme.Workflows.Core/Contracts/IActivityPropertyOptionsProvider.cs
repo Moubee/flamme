@@ -1,6 +1,6 @@
 // using System.Reflection;
 //
-// namespace Elsa.Workflows.Core.Contracts;
+// namespace Flamme.Workflows.Core.Contracts;
 //
 // /// <summary>
 // /// Provides options about a given activity property.

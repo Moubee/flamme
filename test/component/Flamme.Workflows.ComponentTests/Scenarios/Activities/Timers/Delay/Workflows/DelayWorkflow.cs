@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.Delay.Workflows;
 
 public class DelayWorkflow : WorkflowBase
 {
@@ -14,7 +14,7 @@ public class DelayWorkflow : WorkflowBase
             Activities =
             {
                 new WriteLine("Starting...") { Id = "WriteLine1" },
-                Elsa.Scheduling.Activities.Delay.FromSeconds(1),
+                Flamme.Scheduling.Activities.Delay.FromSeconds(1),
                 new WriteLine("End") { Id = "WriteLine2" }
             }
         };

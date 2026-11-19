@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Represents an interface for handling UI hint information and retrieving property UI handlers.

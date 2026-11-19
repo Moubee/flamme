@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Elsa.Expressions.Contracts;
-using Elsa.Extensions;
+using Flamme.Expressions.Contracts;
+using Flamme.Extensions;
 
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// Describes an expression type.

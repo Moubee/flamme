@@ -1,10 +1,10 @@
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Alterations.Core.Contexts;
+namespace Flamme.Alterations.Core.Contexts;
 
 /// <summary>
 /// Provides contextual information about an alteration.

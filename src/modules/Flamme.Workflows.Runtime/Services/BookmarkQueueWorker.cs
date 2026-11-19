@@ -1,9 +1,9 @@
-using Elsa.Common.Multitenancy;
+using Flamme.Common.Multitenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ThrottleDebounce;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 public class BookmarkQueueWorker : IBookmarkQueueWorker
 {

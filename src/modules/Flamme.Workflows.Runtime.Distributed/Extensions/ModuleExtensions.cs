@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Distributed.Features;
-using Elsa.Workflows.Runtime.Features;
+using Flamme.Workflows.Runtime.Distributed.Features;
+using Flamme.Workflows.Runtime.Features;
 
-namespace Elsa.Workflows.Runtime.Distributed.Extensions;
+namespace Flamme.Workflows.Runtime.Distributed.Extensions;
 
 public static class ModuleExtensions
 {

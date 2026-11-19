@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Activities.SetOutput;
-using Elsa.Workflows.Memory;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Activities.SetOutput;
+using Flamme.Workflows.Memory;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Event.Workflows;
 
 /// <summary>
 /// A workflow that listens for global events as a trigger and captures the payload.

@@ -1,9 +1,9 @@
-using Elsa.Mediator.Middleware.Command.Contracts;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Middleware.Command.Contracts;
+using Flamme.Mediator.Models;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.Middleware.Command.Components;
+namespace Flamme.Mediator.Middleware.Command.Components;
 
 /// <summary>
 /// A command middleware that logs the command being invoked.

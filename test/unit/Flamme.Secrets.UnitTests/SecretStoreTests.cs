@@ -1,12 +1,12 @@
 using System.IO;
-using Elsa.Secrets.Contracts;
-using Elsa.Secrets.Models;
-using Elsa.Secrets.Options;
-using Elsa.Secrets.Repositories;
+using Flamme.Secrets.Contracts;
+using Flamme.Secrets.Models;
+using Flamme.Secrets.Options;
+using Flamme.Secrets.Repositories;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
-namespace Elsa.Secrets.UnitTests;
+namespace Flamme.Secrets.UnitTests;
 
 public class SecretStoreTests
 {

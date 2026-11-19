@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Common.Serialization;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Alterations.Core.Serialization;
+namespace Flamme.Alterations.Core.Serialization;
 
 /// <summary>
 /// A serializer for <see cref="IAlteration"/> objects.

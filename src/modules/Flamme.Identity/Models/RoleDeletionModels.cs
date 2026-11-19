@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>Identifies whether a role dependency can be changed through an administration API.</summary>
 public enum RoleDeletionDependencyOwnership

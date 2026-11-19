@@ -1,4 +1,4 @@
-namespace Elsa.Mediator.Middleware.Notification.Contracts;
+namespace Flamme.Mediator.Middleware.Notification.Contracts;
 
 /// <summary>
 /// Represents a notification request pipeline. A notification pipeline is a chain of middleware that can be used to process a notification.

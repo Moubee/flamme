@@ -2,14 +2,14 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Compatibility;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Compatibility;
 
 /// <summary>
 /// Protects the existing direct local-credential contracts while the broker-local flow remains additive.

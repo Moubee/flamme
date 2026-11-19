@@ -1,19 +1,19 @@
-using Elsa.Identity.Models;
+using Flamme.Identity.Models;
 
-namespace Elsa.Identity.Contracts;
+namespace Flamme.Identity.Contracts;
 
 /// <summary>
-/// Creates Elsa access and local refresh tokens from trusted issuance data.
+/// Creates Flamme access and local refresh tokens from trusted issuance data.
 /// </summary>
-public interface IElsaTokenService
+public interface IFlammeTokenService
 {
     /// <summary>
-    /// Issues an Elsa access token.
+    /// Issues an Flamme access token.
     /// </summary>
     ValueTask<IssuedAccessToken> IssueAccessTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Issues a local Elsa refresh token.
+    /// Issues a local Flamme refresh token.
     /// </summary>
     ValueTask<IssuedAccessToken> IssueRefreshTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default);
 }

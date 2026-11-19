@@ -1,10 +1,10 @@
-using Elsa.UserTasks.Contracts;
+using Flamme.UserTasks.Contracts;
 using Microsoft.Extensions.Time.Testing;
-using Elsa.UserTasks.Models;
-using Elsa.UserTasks.Persistence.ConformanceTests.Infrastructure;
-using Elsa.UserTasks.Persistence.ConformanceTests.Providers;
+using Flamme.UserTasks.Models;
+using Flamme.UserTasks.Persistence.ConformanceTests.Infrastructure;
+using Flamme.UserTasks.Persistence.ConformanceTests.Providers;
 
-namespace Elsa.UserTasks.Persistence.ConformanceTests;
+namespace Flamme.UserTasks.Persistence.ConformanceTests;
 
 /// <summary>
 /// Shared arrangement for every conformance class.

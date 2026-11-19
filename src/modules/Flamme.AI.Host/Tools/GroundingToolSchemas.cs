@@ -1,4 +1,4 @@
-namespace Elsa.AI.Host.Tools;
+namespace Flamme.AI.Host.Tools;
 
 internal static class GroundingToolSchemas
 {

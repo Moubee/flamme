@@ -1,8 +1,8 @@
-using Elsa.Expressions.Options;
-using Elsa.Extensions;
+using Flamme.Expressions.Options;
+using Flamme.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Expressions.Extensions;
+namespace Flamme.Expressions.Extensions;
 
 public static class ServiceCollectionExtensions
 {

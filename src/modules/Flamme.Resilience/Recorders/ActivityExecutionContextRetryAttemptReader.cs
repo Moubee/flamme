@@ -1,10 +1,10 @@
-using Elsa.Common.Models;
-using Elsa.Expressions.Helpers;
-using Elsa.Extensions;
-using Elsa.Resilience.Entities;
-using Elsa.Workflows.Runtime;
+using Flamme.Common.Models;
+using Flamme.Expressions.Helpers;
+using Flamme.Extensions;
+using Flamme.Resilience.Entities;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Resilience.Recorders;
+namespace Flamme.Resilience.Recorders;
 
 public class ActivityExecutionContextRetryAttemptReader(IActivityExecutionStore activityExecutionStore) : IRetryAttemptReader
 {

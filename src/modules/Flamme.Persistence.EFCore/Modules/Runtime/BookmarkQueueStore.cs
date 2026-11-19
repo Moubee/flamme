@@ -1,21 +1,21 @@
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 using Open.Linq.AsyncExtensions;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// An EF Core implementation of <see cref="IBookmarkQueueStore"/>.
 /// </summary>
 [UsedImplicitly]
-public class EFBookmarkQueueStore(Store<RuntimeElsaDbContext, BookmarkQueueItem> store, IPayloadSerializer serializer) : IBookmarkQueueStore
+public class EFBookmarkQueueStore(Store<RuntimeFlammeDbContext, BookmarkQueueItem> store, IPayloadSerializer serializer) : IBookmarkQueueStore
 {
     /// <inheritdoc />
     public Task SaveAsync(BookmarkQueueItem record, CancellationToken cancellationToken = default)
@@ -61,13 +61,13 @@ public class EFBookmarkQueueStore(Store<RuntimeElsaDbContext, BookmarkQueueItem>
         return await store.DeleteWhereAsync(filter.Apply, cancellationToken);
     }
 
-    private ValueTask OnSaveAsync(RuntimeElsaDbContext dbContext, BookmarkQueueItem entity, CancellationToken cancellationToken)
+    private ValueTask OnSaveAsync(RuntimeFlammeDbContext dbContext, BookmarkQueueItem entity, CancellationToken cancellationToken)
     {
         dbContext.Entry(entity).Property("SerializedOptions").CurrentValue = entity.Options != null ? serializer.Serialize(entity.Options) : default;
         return default;
     }
 
-    private ValueTask OnLoadAsync(RuntimeElsaDbContext dbContext, BookmarkQueueItem? entity, CancellationToken cancellationToken)
+    private ValueTask OnLoadAsync(RuntimeFlammeDbContext dbContext, BookmarkQueueItem? entity, CancellationToken cancellationToken)
     {
         if (entity is null)
             return default;

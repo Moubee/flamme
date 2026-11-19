@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Runtime.Options;
+namespace Flamme.Workflows.Runtime.Options;
 
 /// <summary>
 /// Configures the graceful-shutdown machinery of the workflow runtime: drain deadline, per-ingress-source pause timeout,

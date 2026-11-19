@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 public class InputEvaluationException(string inputName, string message, Exception exception) : Exception(message, exception)
 {

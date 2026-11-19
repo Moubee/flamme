@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Elsa.Extensions;
+using Flamme.Extensions;
 
-namespace Elsa.Expressions.Options;
+namespace Flamme.Expressions.Options;
 
 /// <summary>
 /// Options for the expression feature.

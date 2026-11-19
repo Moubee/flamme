@@ -1,10 +1,10 @@
-using Elsa.Http.IntegrationTests.Activities.Workflows;
-using Elsa.Http.IntegrationTests.Helpers;
-using Elsa.Testing.Shared;
+using Flamme.Http.IntegrationTests.Activities.Workflows;
+using Flamme.Http.IntegrationTests.Helpers;
+using Flamme.Testing.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Http.IntegrationTests.Activities;
+namespace Flamme.Http.IntegrationTests.Activities;
 
 /// <summary>
 /// Integration tests for HTTP response activities when HTTP context is lost.

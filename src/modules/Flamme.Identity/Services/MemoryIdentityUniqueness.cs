@@ -1,7 +1,7 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Services;
+using Flamme.Common.Entities;
+using Flamme.Common.Services;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Memory counterpart of the EF <c>PerTenantIdentityUniqueness</c> indexes on

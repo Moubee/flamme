@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.Scripting.Models;
-using Elsa.Api.Client.Shared.Enums;
+using Flamme.Api.Client.Resources.Scripting.Models;
+using Flamme.Api.Client.Shared.Enums;
 
-namespace Elsa.Api.Client.Shared.Models;
+namespace Flamme.Api.Client.Shared.Models;
 
 public class LogPersistenceConfiguration
 {

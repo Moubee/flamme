@@ -1,16 +1,16 @@
-using Elsa.Common;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Params;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Results;
+using Flamme.Common;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Params;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Results;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a proxy for sending stimulus to the workflow runtime while <see cref="IWorkflowInbox"/> is being deprecated.

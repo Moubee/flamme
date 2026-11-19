@@ -1,6 +1,6 @@
 using ThrottleDebounce;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Adds extension methods for <see cref="RateLimitedFunc{TResult}"/> and <see cref="RateLimitedFunc{T, TResult}"/>.

@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 public class NewAlterationJob
 {

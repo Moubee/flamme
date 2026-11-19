@@ -1,9 +1,9 @@
-using Elsa.Caching;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Caching;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.Workflows.Management.Services;
+namespace Flamme.Workflows.Management.Services;
 
 /// <inheritdoc />
 public class WorkflowDefinitionCacheManager(ICacheManager cache, IHasher hasher, ITenantAccessor tenantAccessor) : IWorkflowDefinitionCacheManager

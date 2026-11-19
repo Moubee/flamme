@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Management.Options;
+namespace Flamme.Workflows.Management.Options;
 
 /// <summary>
 /// Represents the options for managing host method-based activities in workflows.

@@ -1,16 +1,16 @@
-using Elsa.Common;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Models;
-using Elsa.Scheduling.Options;
-using Elsa.Scheduling.Services;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Tasks;
+using Flamme.Common;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Models;
+using Flamme.Scheduling.Options;
+using Flamme.Scheduling.Services;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Scheduling.StartupTasks;
+namespace Flamme.Scheduling.StartupTasks;
 
 /// <summary>
 /// Enqueues schedule creation when using the default scheduler, which doesn't have its own persistence layer like Quartz or Hangfire.

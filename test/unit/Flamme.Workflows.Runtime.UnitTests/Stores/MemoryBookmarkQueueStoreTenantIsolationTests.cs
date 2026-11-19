@@ -1,19 +1,19 @@
-using Elsa.Common;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Common.Services;
-using Elsa.Testing.Shared.Multitenancy;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Messages;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.OrderDefinitions;
-using Elsa.Workflows.Runtime.Stores;
+using Flamme.Common;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Common.Services;
+using Flamme.Testing.Shared.Multitenancy;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Messages;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.OrderDefinitions;
+using Flamme.Workflows.Runtime.Stores;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 
-namespace Elsa.Workflows.Runtime.UnitTests.Stores;
+namespace Flamme.Workflows.Runtime.UnitTests.Stores;
 
 /// <summary>
 /// Memory must honor ambient tenant the same way EF does via <c>SetTenantIdFilter</c>.
@@ -61,7 +61,7 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
         await Assert.That(pageB.Items).IsEmpty();
 
         var resumer = IWorkflowResumer.Mock().Object;
-        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Flamme.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>())
                     .Returns([new RunWorkflowInstanceResponse { WorkflowInstanceId = "instance-b" }]);
 
         var processor = new BookmarkQueueProcessor(
@@ -74,7 +74,7 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
 
         await processor.ProcessAsync();
 
-        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Elsa.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
+        Mock.Get(resumer).ResumeAsync(Arg.Any<BookmarkFilter>(), Arg.Any<global::Flamme.Workflows.Runtime.Options.ResumeBookmarkOptions?>(), Arg.Any<CancellationToken>()).WasNeverCalled();
 
         var remaining = (await storeA.FindManyAsync(new BookmarkQueueFilter())).ToList();
         await Assert.That(remaining).HasSingleItem();

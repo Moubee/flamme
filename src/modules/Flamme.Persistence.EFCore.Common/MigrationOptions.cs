@@ -1,5 +1,5 @@
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore;
+namespace Flamme.Persistence.EFCore;
 
 public class MigrationOptions
 {

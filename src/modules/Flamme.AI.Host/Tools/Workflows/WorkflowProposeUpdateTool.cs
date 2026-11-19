@@ -1,8 +1,8 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Services;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Services;
 
-namespace Elsa.AI.Host.Tools.Workflows;
+namespace Flamme.AI.Host.Tools.Workflows;
 
 public class WorkflowProposeUpdateTool(IServiceProvider serviceProvider, WorkflowDraftValidationService validationService, WorkflowProposalDiffService diffService, WorkflowGroundingMapper workflowMapper, AIGroundingResultFormatter formatter) : WorkflowToolBase(serviceProvider, formatter)
 {
@@ -33,7 +33,7 @@ public class WorkflowProposeUpdateTool(IServiceProvider serviceProvider, Workflo
         if (baseline == null || !IsTenantAllowed(baseline, context.TenantId))
             return new AIToolResult { Status = AIToolInvocationStatus.Failed, Error = "Baseline workflow definition was not found." };
 
-        var latest = await workflowStore.FindAsync(new() { DefinitionId = baseline.DefinitionId, VersionOptions = Elsa.Common.Models.VersionOptions.Latest }, cancellationToken);
+        var latest = await workflowStore.FindAsync(new() { DefinitionId = baseline.DefinitionId, VersionOptions = Flamme.Common.Models.VersionOptions.Latest }, cancellationToken);
         var draft = GetObject(context.Arguments, "draft") ?? [];
         var diagnostics = validationService.Validate(draft, baselineVersionId, latest?.Id);
         var proposal = new AIProposal

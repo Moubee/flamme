@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Workflows.Notifications;
+namespace Flamme.Workflows.Notifications;
 
 /// <summary>
 /// A notification that is sent when an activity is cancelled.

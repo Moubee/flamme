@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.Exceptions;
+namespace Flamme.Expressions.Exceptions;
 
 public class TypeConversionException : Exception
 {

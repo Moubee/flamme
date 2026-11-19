@@ -1,17 +1,17 @@
-﻿using Elsa.Workflows.Management.Entities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.State;
+﻿using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.State;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Management;
+namespace Flamme.Persistence.EFCore.Modules.Management;
 
 /// <summary>
 /// The database context for the Management module.
 /// </summary>
-public class ManagementElsaDbContext : ElsaDbContextBase
+public class ManagementFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public ManagementElsaDbContext(DbContextOptions<ManagementElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public ManagementFlammeDbContext(DbContextOptions<ManagementFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

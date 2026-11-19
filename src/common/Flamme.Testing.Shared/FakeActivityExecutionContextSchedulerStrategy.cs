@@ -1,9 +1,9 @@
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Provides a fake implementation of the <see cref="IActivityExecutionContextSchedulerStrategy"/> interface,

@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Timers.Cron.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Timers.Cron.Workflows;
 
 public class CronWorkflow : WorkflowBase
 {
@@ -14,7 +14,7 @@ public class CronWorkflow : WorkflowBase
             Activities =
             {
                 new WriteLine("Starting...") { Id = "WriteLine1" },
-                Elsa.Scheduling.Activities.Cron.FromCronExpression("* * * * * *"), // Every second
+                Flamme.Scheduling.Activities.Cron.FromCronExpression("* * * * * *"), // Every second
                 new WriteLine("End") { Id = "WriteLine2" }
             }
         };

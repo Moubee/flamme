@@ -1,14 +1,14 @@
 using System.Text;
 using System.Text.Json.Nodes;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Persistence.EFCore.Services;
-using Elsa.AI.Persistence.EFCore.Stores;
-using Elsa.Testing.Shared.Databases;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Persistence.EFCore.Services;
+using Flamme.AI.Persistence.EFCore.Stores;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using TUnit.Core.Interfaces;
 
-namespace Elsa.AI.Persistence.EFCore.UnitTests;
+namespace Flamme.AI.Persistence.EFCore.UnitTests;
 
 public class EFCoreAIConversationStoreTests : IAsyncInitializer, IAsyncDisposable
 {

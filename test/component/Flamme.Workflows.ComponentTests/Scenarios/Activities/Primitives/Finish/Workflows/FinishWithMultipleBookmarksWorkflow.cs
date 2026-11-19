@@ -1,7 +1,7 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Primitives.Finish.Workflows;
 
 /// <summary>
 /// A workflow with multiple Event branches and a Finish activity.
@@ -36,7 +36,7 @@ public class FinishWithMultipleBookmarksWorkflow : WorkflowBase
                         new Runtime.Activities.Event("EventC")
                     }
                 },
-                new Elsa.Workflows.Activities.Finish()
+                new Flamme.Workflows.Activities.Finish()
             }
         };
     }

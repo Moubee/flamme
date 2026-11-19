@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 public class TenantBackgroundWorkQueue : ITenantBackgroundWorkQueue
 {

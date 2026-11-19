@@ -1,6 +1,6 @@
-using Elsa.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Entities;
 
-namespace Elsa.Alterations.Core.Filters;
+namespace Flamme.Alterations.Core.Filters;
 
 /// <summary>
 /// A filter for querying alteration plans.

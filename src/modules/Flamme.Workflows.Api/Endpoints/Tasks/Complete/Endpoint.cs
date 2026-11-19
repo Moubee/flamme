@@ -1,14 +1,14 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Activities;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Activities;
 
-namespace Elsa.Workflows.Api.Endpoints.Tasks.Complete;
+namespace Flamme.Workflows.Api.Endpoints.Tasks.Complete;
 
 /// <summary>
 /// Resumes the <see cref="RunTask"/> activity matching the received Task ID.
 /// </summary>
-public class Complete : ElsaEndpoint<Request, Response>
+public class Complete : FlammeEndpoint<Request, Response>
 {
     private readonly ITaskReporter _taskReporter;
 
@@ -22,7 +22,7 @@ public class Complete : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Post("/tasks/{taskId}/complete");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Tasks, "complete");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Tasks, "complete");
     }
 
     /// <inheritdoc />

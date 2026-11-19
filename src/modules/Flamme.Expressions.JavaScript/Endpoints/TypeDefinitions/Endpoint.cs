@@ -1,21 +1,21 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Expressions.JavaScript.Permissions;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Contracts;
-using Elsa.Expressions.JavaScript.TypeDefinitions.Models;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Expressions.JavaScript.Permissions;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
+using Flamme.Expressions.JavaScript.TypeDefinitions.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
-namespace Elsa.Expressions.JavaScript.Endpoints.TypeDefinitions;
+namespace Flamme.Expressions.JavaScript.Endpoints.TypeDefinitions;
 
 /// <summary>
 /// Returns a TypeScript definition that is used by the Monaco editor to display intellisense for JavaScript expressions.
 /// </summary>
 [PublicAPI]
-internal class Get : ElsaEndpoint<Request>
+internal class Get : FlammeEndpoint<Request>
 {
     private readonly ITypeDefinitionService _typeDefinitionService;
     private readonly IWorkflowDefinitionService _workflowDefinitionService;

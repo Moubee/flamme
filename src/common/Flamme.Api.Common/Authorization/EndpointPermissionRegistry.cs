@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <summary>
 /// Records the permission requirement each endpoint declares, keyed by endpoint type.

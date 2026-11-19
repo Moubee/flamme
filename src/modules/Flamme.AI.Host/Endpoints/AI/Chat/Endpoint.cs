@@ -1,28 +1,28 @@
-using Elsa.Authorization;
+using Flamme.Authorization;
 using System.Text.Json;
-using Elsa.Abstractions;
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Abstractions.Models;
-using Elsa.AI.Host.Endpoints.AI;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Permissions;
-using Elsa.AI.Host.Streaming;
+using Flamme.Abstractions;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Abstractions.Models;
+using Flamme.AI.Host.Endpoints.AI;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Permissions;
+using Flamme.AI.Host.Streaming;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.AI.Host.Endpoints.AI.Chat;
+namespace Flamme.AI.Host.Endpoints.AI.Chat;
 
 [PublicAPI]
 public class Endpoint(
     IAIOrchestrator orchestrator,
     AIStreamSessionManager sessionManager,
-    IOptions<AIHostOptions> options) : ElsaEndpoint<AIChatRequest>
+    IOptions<AIHostOptions> options) : FlammeEndpoint<AIChatRequest>
 {
     public override void Configure()
     {
         Post("/ai/chat");
-        RequirePermission(Elsa.AI.Host.Permissions.AIResourcePermissions.Chat, CoreVerbs.Execute);
+        RequirePermission(Flamme.AI.Host.Permissions.AIResourcePermissions.Chat, CoreVerbs.Execute);
     }
 
     public override async Task HandleAsync(AIChatRequest request, CancellationToken cancellationToken)

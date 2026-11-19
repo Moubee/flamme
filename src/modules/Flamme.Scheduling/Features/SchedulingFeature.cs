@@ -1,21 +1,21 @@
-using Elsa.Common.Features;
-using Elsa.Common.Multitenancy;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Scheduling.Bookmarks;
-using Elsa.Scheduling.Handlers;
-using Elsa.Scheduling.Options;
-using Elsa.Scheduling.Services;
-using Elsa.Scheduling.StartupTasks;
-using Elsa.Scheduling.TriggerPayloadValidators;
-using Elsa.Workflows.Management.Features;
-using Elsa.Workflows.Options;
+using Flamme.Common.Features;
+using Flamme.Common.Multitenancy;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Scheduling.Bookmarks;
+using Flamme.Scheduling.Handlers;
+using Flamme.Scheduling.Options;
+using Flamme.Scheduling.Services;
+using Flamme.Scheduling.StartupTasks;
+using Flamme.Scheduling.TriggerPayloadValidators;
+using Flamme.Workflows.Management.Features;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Scheduling.Features;
+namespace Flamme.Scheduling.Features;
 
 /// <summary>
 /// Provides scheduling features to the system.
@@ -59,7 +59,7 @@ public class SchedulingFeature : FeatureBase
             .AddTriggerPayloadValidator<CronTriggerPayloadValidator, CronTriggerPayload>()
 
             // Graceful shutdown: register scheduled-trigger ingress for diagnostic visibility (FR-006).
-            .AddSingleton<Elsa.Workflows.Runtime.IIngressSource, Elsa.Scheduling.IngressSources.ScheduledTriggerIngressSource>();
+            .AddSingleton<Flamme.Workflows.Runtime.IIngressSource, Flamme.Scheduling.IngressSources.ScheduledTriggerIngressSource>();
 
         Services.Configure<SchedulingOptions>(_ => { });
         Services.Configure<SerializationTypeOptions>(options =>

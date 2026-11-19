@@ -1,6 +1,6 @@
-using Elsa.Workflows.Runtime;
+using Flamme.Workflows.Runtime;
 
-namespace Elsa.Workflows.Api.Endpoints.ActivityExecutions.Report;
+namespace Flamme.Workflows.Api.Endpoints.ActivityExecutions.Report;
 
 /// <summary>
 /// Represents a request for a list of activity execution log records for a given activity in a workflow instance.

@@ -1,7 +1,7 @@
-﻿using Elsa.Alterations.Features;
+﻿using Flamme.Alterations.Features;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// Provides extensions to the <see cref="AlterationsFeature"/> feature.

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.GetByDefinitionId;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.GetByDefinitionId;
 
 internal class Request
 {

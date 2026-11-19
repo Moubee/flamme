@@ -1,7 +1,7 @@
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Resumes workflows using a given stimulus or bookmark filter.

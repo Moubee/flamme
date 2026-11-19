@@ -1,24 +1,24 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Constants;
-using Elsa.Workflows.Api.Requirements;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Contracts;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Constants;
+using Flamme.Workflows.Api.Requirements;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Contracts;
+using Flamme.Workflows.Management.Filters;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.UpdateReferences;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.UpdateReferences;
 
 [PublicAPI]
 internal class UpdateReferences(IWorkflowReferenceUpdater workflowReferenceUpdater, IWorkflowDefinitionStore store, IAuthorizationService authorizationService)
-    : ElsaEndpoint<Request, Response>
+    : FlammeEndpoint<Request, Response>
 {
     public override void Configure()
     {
         Post("/workflow-definitions/{definitionId}/update-references");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "publish");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "publish");
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

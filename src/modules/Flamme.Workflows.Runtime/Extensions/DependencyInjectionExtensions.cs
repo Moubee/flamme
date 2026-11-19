@@ -1,16 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Contracts;
-using Elsa.Workflows.Runtime.Discovery;
-using Elsa.Workflows.Runtime.Options;
-using Elsa.Workflows.Runtime.Providers;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Contracts;
+using Flamme.Workflows.Runtime.Discovery;
+using Flamme.Workflows.Runtime.Options;
+using Flamme.Workflows.Runtime.Providers;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -26,7 +26,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddGracefulShutdownOptions(this IServiceCollection services, Action<GracefulShutdownOptions>? configure = null)
     {
         var builder = services.AddOptions<GracefulShutdownOptions>().ValidateOnStart();
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<GracefulShutdownOptions>, Elsa.Extensions.ValidateGracefulShutdownOptions>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<GracefulShutdownOptions>, Flamme.Extensions.ValidateGracefulShutdownOptions>());
 
         if (configure != null)
             builder.Configure(configure);

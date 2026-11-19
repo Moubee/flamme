@@ -1,15 +1,15 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Middleware.Workflows;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Middleware.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.GracefulShutdown;
+namespace Flamme.Workflows.IntegrationTests.GracefulShutdown;
 
 /// <summary>
 /// End-to-end test for the drain orchestrator's deadline-breach path against a real workflow execution. A workflow
@@ -33,7 +33,7 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .AddActivitiesFrom<DeadlineBreachEndToEndTests>()
-            .ConfigureElsa(elsa => elsa
+            .ConfigureFlamme(elsa => elsa
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     // The deadline test holds its activity until drain cancellation, regardless of scheduling delay.
@@ -93,7 +93,7 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
             await Assert.That(cancelled.SubStatus).IsEqualTo(WorkflowSubStatus.Cancelled);
 
             var restarter = new RecordingRestarter();
-            var scanner = ActivatorUtilities.CreateInstance<Elsa.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, restarter);
+            var scanner = ActivatorUtilities.CreateInstance<Flamme.Workflows.Runtime.Services.InterruptedRecoveryScanner>(scope.ServiceProvider, restarter);
             var requeued = await scanner.ScanAndRequeueAsync(CancellationToken.None);
             await Assert.That(requeued).IsEqualTo(0);
             await Assert.That(restarter.RestartedIds).IsEmpty();

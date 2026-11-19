@@ -1,6 +1,6 @@
-using Elsa.Mediator.Contracts;
+using Flamme.Mediator.Contracts;
 
-namespace Elsa.Identity.Notifications;
+namespace Flamme.Identity.Notifications;
 
 /// <summary>
 /// Safe context shared by role and assignment security notifications. It deliberately carries no secret,

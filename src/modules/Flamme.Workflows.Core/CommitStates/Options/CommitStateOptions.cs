@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 /// <summary>
 /// Configuration options for commit state strategies.

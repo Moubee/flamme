@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Services;
-using Elsa.Workflows.CommitStates.Strategies;
-using Elsa.Workflows.CommitStates.Tasks;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Services;
+using Flamme.Workflows.CommitStates.Strategies;
+using Flamme.Workflows.CommitStates.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.CommitStates;
+namespace Flamme.Workflows.CommitStates;
 
 public class CommitStrategiesFeature(IModule module) : FeatureBase(module)
 {

@@ -1,15 +1,15 @@
-using Elsa.Http;
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Services;
-using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.Filters;
+using Flamme.Http;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Services;
+using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowActivities;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowActivities;
 
 public class AutoUpdateTests : AppComponentTest
 {

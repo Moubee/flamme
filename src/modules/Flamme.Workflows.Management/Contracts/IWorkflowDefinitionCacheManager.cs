@@ -1,8 +1,8 @@
-using Elsa.Caching;
-using Elsa.Common.Models;
-using Elsa.Workflows.Management.Filters;
+using Flamme.Caching;
+using Flamme.Common.Models;
+using Flamme.Workflows.Management.Filters;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Specifies the contract for managing the cache of workflow definitions.

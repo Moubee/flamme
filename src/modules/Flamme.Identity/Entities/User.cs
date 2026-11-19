@@ -1,6 +1,6 @@
-using Elsa.Common.Entities;
+using Flamme.Common.Entities;
 
-namespace Elsa.Identity.Entities;
+namespace Flamme.Identity.Entities;
 
 /// <summary>
 /// Represents a user.

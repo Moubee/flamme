@@ -1,20 +1,20 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Entities;
-using Elsa.Common.Models;
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Journal.List;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Journal.List;
 
 /// <summary>
 /// Gets the journal for a workflow instance.
 /// </summary>
 [PublicAPI]
-internal class Get : ElsaEndpoint<Request, Response>
+internal class Get : FlammeEndpoint<Request, Response>
 {
     private readonly IWorkflowExecutionLogStore _store;
 
@@ -28,7 +28,7 @@ internal class Get : ElsaEndpoint<Request, Response>
     public override void Configure()
     {
         Get("/workflow-instances/{id}/journal");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, CoreVerbs.View);
     }
 
     /// <inheritdoc />

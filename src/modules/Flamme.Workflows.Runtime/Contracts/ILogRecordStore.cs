@@ -1,6 +1,6 @@
-using Elsa.Common;
+using Flamme.Common;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <summary>
 /// Represents a store of log records.

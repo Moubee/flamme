@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.ExternalAuthentication.Services;
+namespace Flamme.ExternalAuthentication.Services;
 
 /// <summary>Prevents a management edit from removing the final ordinary sign-in path by accident.</summary>
 public sealed class FinalLoginPathGuard(IIdentityProviderConnectionRegistry registry, IOptions<ExternalAuthenticationOptions> options, IPermissionEvaluator permissionEvaluator)

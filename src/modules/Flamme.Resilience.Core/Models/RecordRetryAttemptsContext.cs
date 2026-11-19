@@ -1,6 +1,6 @@
-using Elsa.Resilience.Entities;
-using Elsa.Workflows;
+using Flamme.Resilience.Entities;
+using Flamme.Workflows;
 
-namespace Elsa.Resilience.Models;
+namespace Flamme.Resilience.Models;
 
 public record RecordRetryAttemptsContext(ActivityExecutionContext ActivityExecutionContext, ICollection<RetryAttemptRecord> Attempts, CancellationToken CancellationToken);

@@ -2,7 +2,7 @@
 
 // ReSharper disable once CheckNamespace
 
-using Elsa.Workflows;
+using Flamme.Workflows;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

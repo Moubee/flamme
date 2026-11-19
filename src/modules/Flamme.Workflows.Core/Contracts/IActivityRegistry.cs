@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// Stores all activity descriptors available to the system.

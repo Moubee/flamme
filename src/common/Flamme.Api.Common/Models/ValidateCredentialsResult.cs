@@ -1,4 +1,4 @@
-namespace Elsa.Models;
+namespace Flamme.Models;
 
 public record ValidateCredentialsResult(bool IsValid, object? Context = null)
 {

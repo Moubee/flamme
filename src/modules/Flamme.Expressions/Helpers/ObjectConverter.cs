@@ -9,14 +9,14 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using Elsa.Common.Models;
-using Elsa.Expressions.Contracts;
-using Elsa.Expressions.Exceptions;
-using Elsa.Expressions.Extensions;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
+using Flamme.Common.Models;
+using Flamme.Expressions.Contracts;
+using Flamme.Expressions.Exceptions;
+using Flamme.Expressions.Extensions;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
 
-namespace Elsa.Expressions.Helpers;
+namespace Flamme.Expressions.Helpers;
 
 /// <summary>
 /// Provides options to the conversion method.

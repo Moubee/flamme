@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.Fakes;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.Fakes;
 
 /// <summary>
 /// A custom materializer that successfully materializes workflows from a registry.

@@ -1,6 +1,6 @@
-using Elsa.AI.Abstractions.Models;
+using Flamme.AI.Abstractions.Models;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 public class WorkflowProposalDiffService
 {

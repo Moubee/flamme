@@ -1,21 +1,21 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Requests;
-using Elsa.Workflows.Runtime.Responses;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Requests;
+using Flamme.Workflows.Runtime.Responses;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.Refresh;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.Refresh;
 
 [PublicAPI]
-internal class Refresh(IWorkflowDefinitionsRefresher workflowDefinitionsRefresher) : ElsaEndpoint<Request>
+internal class Refresh(IWorkflowDefinitionsRefresher workflowDefinitionsRefresher) : FlammeEndpoint<Request>
 {
     private const int BatchSize = 10;
 
     public override void Configure()
     {
         Post("/actions/workflow-definitions/refresh");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "refresh");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Definitions, "refresh");
     }
 
     public override async Task HandleAsync(Request request, CancellationToken cancellationToken)

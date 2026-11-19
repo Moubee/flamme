@@ -1,14 +1,14 @@
 ﻿using System.Runtime.CompilerServices;
-using Elsa.Extensions;
-using Elsa.Expressions.Python.Contracts;
-using Elsa.Expressions.Python.Models;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.Python.Contracts;
+using Flamme.Expressions.Python.Models;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.Python.Activities;
+namespace Flamme.Expressions.Python.Activities;
 
 /// <summary>
 /// Executes Python code.

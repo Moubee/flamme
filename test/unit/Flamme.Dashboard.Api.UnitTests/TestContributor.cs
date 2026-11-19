@@ -1,10 +1,10 @@
-using Elsa.Authorization;
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Permissions;
-using Elsa.Workflows.Api.Permissions;
+using Flamme.Authorization;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Permissions;
+using Flamme.Workflows.Api.Permissions;
 
-namespace Elsa.Dashboard.Api.UnitTests;
+namespace Flamme.Dashboard.Api.UnitTests;
 
 internal sealed class TestContributor(string id, int order) : IDashboardContributor
 {

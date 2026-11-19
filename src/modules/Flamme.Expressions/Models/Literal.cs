@@ -1,4 +1,4 @@
-namespace Elsa.Expressions.Models;
+namespace Flamme.Expressions.Models;
 
 /// <summary>
 /// A literal expression that represents a constant value.

@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
+using Flamme.Extensions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
 /// Default implementation of <see cref="IAccessTokenIssuer"/>.
@@ -12,14 +12,14 @@ namespace Elsa.Identity.Services;
 public class DefaultAccessTokenIssuer : IAccessTokenIssuer
 {
     private readonly IRoleProvider _roleProvider;
-    private readonly IElsaTokenService _tokenService;
+    private readonly IFlammeTokenService _tokenService;
     private readonly IPermissionStampCalculator? _stampCalculator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultAccessTokenIssuer"/> class.
     /// </summary>
     [ActivatorUtilitiesConstructor]
-    public DefaultAccessTokenIssuer(IRoleProvider roleProvider, IElsaTokenService tokenService, IPermissionStampCalculator? stampCalculator = null)
+    public DefaultAccessTokenIssuer(IRoleProvider roleProvider, IFlammeTokenService tokenService, IPermissionStampCalculator? stampCalculator = null)
     {
         _roleProvider = roleProvider;
         _tokenService = tokenService;

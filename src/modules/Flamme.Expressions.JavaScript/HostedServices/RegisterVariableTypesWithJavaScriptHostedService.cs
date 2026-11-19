@@ -1,9 +1,9 @@
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Workflows.Management.Options;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Workflows.Management.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Expressions.JavaScript.HostedServices;
+namespace Flamme.Expressions.JavaScript.HostedServices;
 
 /// <summary>
 /// Registers variable types with the JavaScript type alias registry

@@ -1,22 +1,22 @@
-using Elsa.Common;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Management.Filters;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.Options;
+using Flamme.Common;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.HealthChecks;
+namespace Flamme.Workflows.Runtime.HealthChecks;
 
 /// <summary>
 /// Performs small read-only probes against the workflow management and runtime stores.
 /// </summary>
-public class ElsaWorkflowPersistenceHealthCheck(
+public class FlammeWorkflowPersistenceHealthCheck(
     IServiceProvider serviceProvider,
-    IOptions<ElsaReadinessHealthCheckOptions> options,
-    ILogger<ElsaWorkflowPersistenceHealthCheck> logger) : IHealthCheck
+    IOptions<FlammeReadinessHealthCheckOptions> options,
+    ILogger<FlammeWorkflowPersistenceHealthCheck> logger) : IHealthCheck
 {
     private const string ProbeId = "00000000-0000-0000-0000-000000000000";
 
@@ -72,14 +72,14 @@ public class ElsaWorkflowPersistenceHealthCheck(
                 data["failedStore"] = failedProbe.StoreName;
                 data["failedProbe"] = failedProbe.StoreName;
 
-                logger.LogWarning(failedProbe.Exception, "Elsa workflow store {StoreName} is not reachable.", failedProbe.StoreName);
-                return HealthCheckResult.Unhealthy($"Elsa workflow store '{failedProbe.StoreName}' is not reachable.", data: data);
+                logger.LogWarning(failedProbe.Exception, "Flamme workflow store {StoreName} is not reachable.", failedProbe.StoreName);
+                return HealthCheckResult.Unhealthy($"Flamme workflow store '{failedProbe.StoreName}' is not reachable.", data: data);
             }
 
             var healthyData = CreateData();
             return attemptedProbes.Count == 0
-                ? HealthCheckResult.Degraded("No Elsa workflow persistence stores are registered.", data: healthyData)
-                : HealthCheckResult.Healthy("Elsa workflow stores are reachable.", healthyData);
+                ? HealthCheckResult.Degraded("No Flamme workflow persistence stores are registered.", data: healthyData)
+                : HealthCheckResult.Healthy("Flamme workflow stores are reachable.", healthyData);
 
             Dictionary<string, object> CreateData()
             {

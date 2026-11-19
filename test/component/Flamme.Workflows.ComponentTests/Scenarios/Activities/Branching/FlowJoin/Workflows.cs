@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Branching.FlowJoin;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Branching.FlowJoin;
 
 public class SingleJoinWorkflow : WorkflowBase
 {

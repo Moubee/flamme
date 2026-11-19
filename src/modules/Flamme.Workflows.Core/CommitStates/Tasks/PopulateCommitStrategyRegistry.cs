@@ -1,8 +1,8 @@
-using Elsa.Common;
+using Flamme.Common;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.CommitStates.Tasks;
+namespace Flamme.Workflows.CommitStates.Tasks;
 
 [UsedImplicitly]
 public class PopulateCommitStrategyRegistry(ICommitStrategyRegistry registry, IOptions<CommitStateOptions> options) : IStartupTask

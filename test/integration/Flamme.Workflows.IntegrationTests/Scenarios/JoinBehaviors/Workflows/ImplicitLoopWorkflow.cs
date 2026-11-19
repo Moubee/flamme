@@ -1,8 +1,8 @@
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors.Workflows;
 
 public class ImplicitLoopWorkflow : WorkflowBase
 {

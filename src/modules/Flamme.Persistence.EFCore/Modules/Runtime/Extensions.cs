@@ -1,7 +1,7 @@
-﻿using Elsa.Workflows.Runtime.Features;
+﻿using Flamme.Workflows.Runtime.Features;
 using JetBrains.Annotations;
 
-namespace Elsa.Persistence.EFCore.Modules.Runtime;
+namespace Flamme.Persistence.EFCore.Modules.Runtime;
 
 /// <summary>
 /// Provides extensions to the <see cref="WorkflowRuntimeFeature"/> feature.

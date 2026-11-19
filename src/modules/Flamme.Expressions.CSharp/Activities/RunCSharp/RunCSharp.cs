@@ -1,16 +1,16 @@
 ﻿using System.Runtime.CompilerServices;
-using Elsa.Expressions.CSharp.Contracts;
-using Elsa.Expressions.CSharp.Extensions;
-using Elsa.Expressions.CSharp.Models;
-using Elsa.Expressions.Models;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.UIHints;
-using Elsa.Workflows.Models;
+using Flamme.Expressions.CSharp.Contracts;
+using Flamme.Expressions.CSharp.Extensions;
+using Flamme.Expressions.CSharp.Models;
+using Flamme.Expressions.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.UIHints;
+using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Expressions.CSharp.Activities;
+namespace Flamme.Expressions.CSharp.Activities;
 
 /// <summary>
 /// Executes C# code.

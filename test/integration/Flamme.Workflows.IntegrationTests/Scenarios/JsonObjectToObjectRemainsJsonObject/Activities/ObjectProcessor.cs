@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JsonObjectToObjectRemainsJsonObject.Activities;
 
 public class ObjectProcessor : CodeActivity<object>
 {

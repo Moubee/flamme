@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Endpoints.Roles.List;
+namespace Flamme.Identity.Endpoints.Roles.List;
 
 internal record RoleSummary(
     string Id,

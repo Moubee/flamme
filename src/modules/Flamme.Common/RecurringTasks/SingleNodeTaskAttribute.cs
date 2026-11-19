@@ -1,4 +1,4 @@
-namespace Elsa.Common.RecurringTasks;
+namespace Flamme.Common.RecurringTasks;
 
 /// <summary>
 /// Configures a task to be executed on a single node in a multi-node environment.

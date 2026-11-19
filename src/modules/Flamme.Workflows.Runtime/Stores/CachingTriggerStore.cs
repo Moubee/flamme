@@ -1,12 +1,12 @@
-using Elsa.Caching;
-using Elsa.Common.Models;
-using Elsa.Common.Multitenancy;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Filters;
-using Elsa.Workflows.Runtime.OrderDefinitions;
+using Flamme.Caching;
+using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Filters;
+using Flamme.Workflows.Runtime.OrderDefinitions;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Elsa.Workflows.Runtime.Stores;
+namespace Flamme.Workflows.Runtime.Stores;
 
 /// <summary>
 /// A decorator for <see cref="ITriggerStore"/> that caches trigger records.

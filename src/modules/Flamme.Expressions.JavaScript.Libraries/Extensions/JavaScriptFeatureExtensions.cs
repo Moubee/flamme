@@ -1,7 +1,7 @@
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Features;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Features;
 
-namespace Elsa.Expressions.JavaScript.Libraries.Extensions;
+namespace Flamme.Expressions.JavaScript.Libraries.Extensions;
 
 public static class JavaScriptFeatureExtensions
 {

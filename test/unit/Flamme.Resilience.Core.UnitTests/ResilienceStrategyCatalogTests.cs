@@ -1,8 +1,8 @@
-using Elsa.Resilience.Core.UnitTests.TestHelpers;
+using Flamme.Resilience.Core.UnitTests.TestHelpers;
 using Open.Linq.AsyncExtensions;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ResilienceStrategyCatalogTests
 {

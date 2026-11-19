@@ -1,21 +1,21 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Roles.Delete;
+namespace Flamme.Identity.Endpoints.Roles.Delete;
 
 /// <summary>
 /// An endpoint that deletes a role by ID.
 /// </summary>
 [PublicAPI]
-internal class Delete(IRoleDeletionCoordinator coordinator) : ElsaEndpointWithoutRequest
+internal class Delete(IRoleDeletionCoordinator coordinator) : FlammeEndpointWithoutRequest
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Delete("/identity/roles/{id}");
-        RequirePermission(Elsa.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Delete);
+        RequirePermission(Flamme.Identity.Permissions.IdentityPermissions.Roles, CoreVerbs.Delete);
     }
 
     /// <inheritdoc />

@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.TriggerIndexing.TestData;
 
 /// <summary>
 /// Configuration for a workflow in a test scenario.

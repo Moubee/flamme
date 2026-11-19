@@ -1,13 +1,13 @@
-﻿using Elsa.Expressions.Models;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+﻿using Flamme.Expressions.Models;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Activities;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.ContainerSerialization;
+namespace Flamme.Workflows.IntegrationTests.Serialization.ContainerSerialization;
 
 public class Tests : IAsyncDisposable
 {

@@ -1,7 +1,7 @@
-﻿using Elsa.Testing.Shared;
+﻿using Flamme.Testing.Shared;
 using System.Threading.Tasks;
 
-namespace Elsa.Activities.UnitTests.Primitives;
+namespace Flamme.Activities.UnitTests.Primitives;
 
 public class SetVariableOfTTests
 {

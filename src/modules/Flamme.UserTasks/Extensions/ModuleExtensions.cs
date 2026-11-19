@@ -1,8 +1,8 @@
-using Elsa.Features.Services;
-using Elsa.UserTasks.Features;
+using Flamme.Features.Services;
+using Flamme.UserTasks.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class UserTasksModuleExtensions
 {

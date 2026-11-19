@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using Elsa.Features;
-using Elsa.Features.Services;
+using Flamme.Features;
+using Flamme.Features.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods to <see cref="IServiceCollection"/>. 
@@ -13,9 +13,9 @@ public static class ModuleExtensions
     private static readonly IDictionary<IServiceCollection, IModule> Modules = new ConcurrentDictionary<IServiceCollection, IModule>();
     
     /// <summary>
-    /// Creates a new Elsa module and adds the <see cref="ElsaFeature"/> to it.
+    /// Creates a new Flamme module and adds the <see cref="FlammeFeature"/> to it.
     /// </summary>
-    public static IModule AddElsa(this IServiceCollection services, Action<IModule>? configure = null)
+    public static IModule AddFlamme(this IServiceCollection services, Action<IModule>? configure = null)
     {
         var module = services.GetOrCreateModule();
         module.Configure<AppFeature>(app => app.Configurator += configure);
@@ -25,9 +25,9 @@ public static class ModuleExtensions
     }
     
     /// <summary>
-    /// Configures the Elsa module.
+    /// Configures the Flamme module.
     /// </summary>
-    public static IModule ConfigureElsa(this IServiceCollection services, Action<IModule>? configure = null)
+    public static IModule ConfigureFlamme(this IServiceCollection services, Action<IModule>? configure = null)
     {
         var module = services.GetOrCreateModule();
         

@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Core.Stores;
+namespace Flamme.Alterations.Core.Stores;
 
 /// <summary>
 /// Shared refuse-to-overwrite exceptions for Memory and EF alteration stores.

@@ -1,11 +1,11 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Management;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.State;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Api.Endpoints.Tests.Activities;
+namespace Flamme.Workflows.Api.Endpoints.Tests.Activities;
 
 /// <summary>
 /// Represents an endpoint for testing activities in workflows. This endpoint is responsible for handling requests
@@ -21,13 +21,13 @@ internal class Endpoint(
     IWorkflowDefinitionService workflowDefinitionService,
     IActivityTestRunner activityTestRunner,
     IActivityExecutionMapper activityExecutionMapper)
-    : ElsaEndpoint<Request>
+    : FlammeEndpoint<Request>
 {
     /// <inheritdoc />
     public override void Configure()
     {
         Post("/tests/activities");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Tests, CoreVerbs.Execute);
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Tests, CoreVerbs.Execute);
     }
 
     /// <inheritdoc />

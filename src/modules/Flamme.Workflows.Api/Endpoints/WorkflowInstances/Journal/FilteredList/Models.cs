@@ -1,9 +1,9 @@
-using Elsa.Workflows.Api.Models;
+using Flamme.Workflows.Api.Models;
 using FastEndpoints;
 
 // ReSharper disable NotAccessedPositionalProperty.Global
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Journal.FilteredList;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Journal.FilteredList;
 
 /// <summary>
 /// Represents a request for a page of workflow execution log records.

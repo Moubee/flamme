@@ -1,9 +1,9 @@
 using System.Dynamic;
-using Elsa.Expressions.JavaScript.Contracts;
-using Elsa.Expressions.JavaScript.Extensions;
-using Elsa.Workflows.LogPersistence;
+using Flamme.Expressions.JavaScript.Contracts;
+using Flamme.Expressions.JavaScript.Extensions;
+using Flamme.Workflows.LogPersistence;
 
-namespace Elsa.Expressions.JavaScript.Services;
+namespace Flamme.Expressions.JavaScript.Services;
 
 /// <inheritdoc />
 public class TypeAliasRegistry : ITypeAliasRegistry

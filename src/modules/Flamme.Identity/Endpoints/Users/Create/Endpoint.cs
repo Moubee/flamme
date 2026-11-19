@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Permissions;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Permissions;
 using JetBrains.Annotations;
 
-namespace Elsa.Identity.Endpoints.Users.Create;
+namespace Flamme.Identity.Endpoints.Users.Create;
 
 /// <summary>
 /// An endpoint that creates a new user.
 /// </summary>
 [PublicAPI]
-internal class Create(IUserManager userManager, IRoleAuthorizationService roleAuthorizationService) : ElsaEndpoint<Request, Response>
+internal class Create(IUserManager userManager, IRoleAuthorizationService roleAuthorizationService) : FlammeEndpoint<Request, Response>
 {
     /// <inheritdoc />
     public override void Configure()

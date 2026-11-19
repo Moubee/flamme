@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Api.Endpoints.WorkflowDefinitions.GetManyById;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowDefinitions.GetManyById;
 
 internal class Request
 {

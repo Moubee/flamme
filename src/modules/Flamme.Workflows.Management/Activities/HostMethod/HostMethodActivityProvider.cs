@@ -1,9 +1,9 @@
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Management.Activities.HostMethod;
+namespace Flamme.Workflows.Management.Activities.HostMethod;
 
 /// <summary>
 /// Provides activities for each configured host method type registered via <see cref="HostMethodActivitiesOptions"/>.

@@ -1,9 +1,9 @@
-using Elsa.Caching.Options;
+using Flamme.Caching.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
-namespace Elsa.Caching;
+namespace Flamme.Caching;
 
 /// <summary>
 /// A thin wrapper around <see cref="IMemoryCache"/>, allowing for centralized handling of cache entries.

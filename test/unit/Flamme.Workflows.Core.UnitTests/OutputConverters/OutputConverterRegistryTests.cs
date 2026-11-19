@@ -1,8 +1,8 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.OutputConverters;
+namespace Flamme.Workflows.Core.UnitTests.OutputConverters;
 
 public class OutputConverterRegistryTests
 {

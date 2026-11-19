@@ -1,5 +1,5 @@
-using Elsa.Workflows.State;
+using Flamme.Workflows.State;
 
-namespace Elsa.Workflows.Models;
+namespace Flamme.Workflows.Models;
 
 public record InvokeWorkflowResult(WorkflowState WorkflowState, ICollection<Bookmark> Bookmarks);

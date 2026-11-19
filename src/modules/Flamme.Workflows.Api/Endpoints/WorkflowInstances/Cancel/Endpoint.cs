@@ -1,19 +1,19 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Workflows.Runtime;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Workflows.Runtime;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Cancel;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Cancel;
 
 [PublicAPI]
 internal class Cancel(IWorkflowCancellationService workflowCancellationService)
-    : ElsaEndpoint<Request>
+    : FlammeEndpoint<Request>
 {
     public override void Configure()
     {
         Post("/cancel/workflow-instances/{id}");
-        RequirePermission(Elsa.Workflows.Api.Permissions.WorkflowPermissions.Instances, "cancel");
+        RequirePermission(Flamme.Workflows.Api.Permissions.WorkflowPermissions.Instances, "cancel");
         //Allows for post with empty body
         Description(x => x.Accepts<Request>("*/*"), clearDefaults: true);
     }

@@ -1,11 +1,11 @@
-using Elsa.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Contracts;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
-using Elsa.Workflows.Activities.Flowchart.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Signals;
+using Flamme.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Contracts;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Activities.Flowchart.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Signals;
 
-namespace Elsa.Workflows.Activities.Flowchart.Activities;
+namespace Flamme.Workflows.Activities.Flowchart.Activities;
 
 public partial class Flowchart
 {

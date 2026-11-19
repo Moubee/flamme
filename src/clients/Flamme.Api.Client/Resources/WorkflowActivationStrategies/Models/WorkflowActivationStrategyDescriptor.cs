@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.WorkflowActivationStrategies.Models;
+namespace Flamme.Api.Client.Resources.WorkflowActivationStrategies.Models;
 
 /// <summary>
 /// Represents a workflow activation strategy.

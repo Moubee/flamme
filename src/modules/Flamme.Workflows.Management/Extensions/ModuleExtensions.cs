@@ -1,13 +1,13 @@
-using Elsa.Features.Services;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Features;
-using Elsa.Workflows.Options;
+using Flamme.Features.Services;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Features;
+using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extensions to the specified <see cref="IModule"/>/

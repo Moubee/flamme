@@ -1,8 +1,8 @@
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
 
-namespace Elsa.Testing.Shared;
+namespace Flamme.Testing.Shared;
 
 /// <summary>
 /// Bypasses validation and schedules the activity immediately.

@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Core.UnitTests.ObjectConversion;
+﻿namespace Flamme.Workflows.Core.UnitTests.ObjectConversion;
 
 public class Person
 {

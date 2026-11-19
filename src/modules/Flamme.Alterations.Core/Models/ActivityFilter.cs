@@ -1,7 +1,7 @@
-using Elsa.Workflows;
+using Flamme.Workflows;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Core.Models;
+namespace Flamme.Alterations.Core.Models;
 
 /// <summary>
 /// Represents a filter for activities.

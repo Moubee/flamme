@@ -1,4 +1,4 @@
-namespace Elsa.Workflows.Exceptions;
+namespace Flamme.Workflows.Exceptions;
 
 /// <summary>
 /// Represents a privacy-safe failure while converting an activity output's bound value.

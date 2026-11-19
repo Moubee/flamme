@@ -1,6 +1,6 @@
-using Elsa.Workflows.Models;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.Runtime.Exceptions;
+namespace Flamme.Workflows.Runtime.Exceptions;
 
 public class WorkflowDefinitionNotFoundException(string message, WorkflowDefinitionHandle workflowDefinitionHandle) : Exception(message)
 {

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Elsa.Api.Client.Extensions;
+using Flamme.Api.Client.Extensions;
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Converters;
+namespace Flamme.Api.Client.Converters;
 
 /// <summary>
 /// Converts <see cref="Type"/> objects to and from their assembly-qualified name.

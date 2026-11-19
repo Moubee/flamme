@@ -1,7 +1,7 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Descriptors.Models;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Descriptors.Contracts;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Descriptors.Contracts;
 
 /// <summary>
 /// Client for the installed External Authentication extension catalogs.

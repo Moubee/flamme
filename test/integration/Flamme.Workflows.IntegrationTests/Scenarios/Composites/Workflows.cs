@@ -1,10 +1,10 @@
-using Elsa.Extensions;
-using Elsa.Expressions.JavaScript.Activities;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Memory;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Expressions.JavaScript.Activities;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Memory;
+using Flamme.Workflows.Models;
 
-namespace Elsa.Workflows.IntegrationTests.Scenarios.Composites;
+namespace Flamme.Workflows.IntegrationTests.Scenarios.Composites;
 
 /// <summary>
 /// A composite activity that sums two inputs and returns the result.

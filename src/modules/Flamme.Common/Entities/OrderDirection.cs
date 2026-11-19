@@ -1,4 +1,4 @@
-namespace Elsa.Common.Entities;
+namespace Flamme.Common.Entities;
 
 /// <summary>
 /// The order direction.

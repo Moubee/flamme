@@ -1,4 +1,4 @@
-﻿namespace Elsa.Workflows.Api.Constants;
+﻿namespace Flamme.Workflows.Api.Constants;
 
 public static class AuthorizationPolicies
 {

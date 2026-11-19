@@ -1,6 +1,6 @@
-using Elsa.Mediator.Middleware.Request.Contracts;
+using Flamme.Mediator.Middleware.Request.Contracts;
 
-namespace Elsa.Mediator.Middleware.Request.Components;
+namespace Flamme.Mediator.Middleware.Request.Components;
 
 /// <summary>
 /// A middleware that logs the request.

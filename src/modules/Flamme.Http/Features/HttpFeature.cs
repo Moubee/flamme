@@ -1,35 +1,35 @@
 using System.Net;
-using Elsa.Extensions;
-using Elsa.Features.Abstractions;
-using Elsa.Features.Attributes;
-using Elsa.Features.Services;
-using Elsa.Http.Bookmarks;
-using Elsa.Http.ContentWriters;
-using Elsa.Http.DownloadableContentHandlers;
-using Elsa.Http.FileCaches;
-using Elsa.Http.Handlers;
-using Elsa.Http.Options;
-using Elsa.Http.Parsers;
-using Elsa.Http.PortResolvers;
-using Elsa.Http.Resilience;
-using Elsa.Http.Selectors;
-using Elsa.Http.Services;
-using Elsa.Http.Tasks;
-using Elsa.Http.TriggerPayloadValidators;
-using Elsa.Http.UIHints;
-using Elsa.Resilience.Extensions;
-using Elsa.Resilience.Features;
-using Elsa.Workflows;
-using Elsa.Workflows.Options;
+using Flamme.Extensions;
+using Flamme.Features.Abstractions;
+using Flamme.Features.Attributes;
+using Flamme.Features.Services;
+using Flamme.Http.Bookmarks;
+using Flamme.Http.ContentWriters;
+using Flamme.Http.DownloadableContentHandlers;
+using Flamme.Http.FileCaches;
+using Flamme.Http.Handlers;
+using Flamme.Http.Options;
+using Flamme.Http.Parsers;
+using Flamme.Http.PortResolvers;
+using Flamme.Http.Resilience;
+using Flamme.Http.Selectors;
+using Flamme.Http.Services;
+using Flamme.Http.Tasks;
+using Flamme.Http.TriggerPayloadValidators;
+using Flamme.Http.UIHints;
+using Flamme.Resilience.Extensions;
+using Flamme.Resilience.Features;
+using Flamme.Workflows;
+using Flamme.Workflows.Options;
 using FluentStorage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Elsa.Common.Serialization;
+using Flamme.Common.Serialization;
 
-namespace Elsa.Http.Features;
+namespace Flamme.Http.Features;
 
 /// <summary>
 /// Installs services related to HTTP services and activities.
@@ -180,7 +180,7 @@ public class HttpFeature(IModule module) : FeatureBase(module)
 
             // Graceful shutdown: register HTTP ingress for diagnostic visibility in the runtime's IIngressSourceRegistry.
             // The middleware short-circuits to 503 when paused (FR-006).
-            .AddSingleton<Elsa.Workflows.Runtime.IIngressSource, Elsa.Http.IngressSources.HttpTriggerIngressSource>()
+            .AddSingleton<Flamme.Workflows.Runtime.IIngressSource, Flamme.Http.IngressSources.HttpTriggerIngressSource>()
 
             // Content parsers.
             .AddSingleton<IHttpContentParser, JsonHttpContentParser>()

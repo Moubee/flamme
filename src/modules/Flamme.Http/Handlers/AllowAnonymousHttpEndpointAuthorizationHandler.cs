@@ -1,4 +1,4 @@
-namespace Elsa.Http.Handlers;
+namespace Flamme.Http.Handlers;
 
 /// <summary>
 /// A default <see cref="IHttpEndpointAuthorizationHandler"/> that allows all requests.

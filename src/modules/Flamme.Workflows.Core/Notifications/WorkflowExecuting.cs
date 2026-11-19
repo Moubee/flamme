@@ -1,7 +1,7 @@
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Activities;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.Notifications;
+namespace Flamme.Workflows.Notifications;
 
 /// <summary>
 /// A domain event that is published before an execution cycle begins.

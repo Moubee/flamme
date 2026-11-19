@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Common.Multitenancy;
+namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// A tenant provider that provides the default tenant only. To turn on multitenancy, use another implementation.

@@ -1,4 +1,4 @@
-﻿namespace Elsa.Common.Multitenancy;
+﻿namespace Flamme.Common.Multitenancy;
 
 /// <summary>
 /// A strategy for resolving the current tenant, called from the tenant initializer.

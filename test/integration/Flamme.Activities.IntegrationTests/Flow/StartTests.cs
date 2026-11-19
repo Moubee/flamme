@@ -1,9 +1,9 @@
-using Elsa.Activities.IntegrationTests.Flow.Workflows;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
+using Flamme.Activities.IntegrationTests.Flow.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Activities.IntegrationTests.Flow;
+namespace Flamme.Activities.IntegrationTests.Flow;
 
 /// <summary>
 /// Integration tests for the <see cref="Start"/> activity.

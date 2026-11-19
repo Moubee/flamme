@@ -1,15 +1,15 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Common.Multitenancy;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Common.Multitenancy;
 
-namespace Elsa.Tenants.Endpoints.Tenants.Delete;
+namespace Flamme.Tenants.Endpoints.Tenants.Delete;
 
-public class Endpoint(ITenantService tenantService, ITenantStore store) : ElsaEndpointWithoutRequest<Tenant>
+public class Endpoint(ITenantService tenantService, ITenantStore store) : FlammeEndpointWithoutRequest<Tenant>
 {
     public override void Configure()
     {
         Delete("/tenants/{id}");
-        RequirePermission(Elsa.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.Delete);
+        RequirePermission(Flamme.Tenants.Permissions.TenantPermissions.Tenants, CoreVerbs.Delete);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

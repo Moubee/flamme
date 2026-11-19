@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Elsa.Api.Client.Resources.Features.Models;
+namespace Flamme.Api.Client.Resources.Features.Models;
 
 /// <summary>
 /// Represents a feature descriptor.

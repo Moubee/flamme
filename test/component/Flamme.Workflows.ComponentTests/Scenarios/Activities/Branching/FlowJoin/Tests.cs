@@ -1,8 +1,8 @@
-﻿using Elsa.Workflows.ComponentTests.Abstractions;
-using Elsa.Workflows.ComponentTests.Fixtures;
+﻿using Flamme.Workflows.ComponentTests.Abstractions;
+using Flamme.Workflows.ComponentTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.Activities.Branching.FlowJoin;
+namespace Flamme.Workflows.ComponentTests.Scenarios.Activities.Branching.FlowJoin;
 
 public class Tests(App app) : AppComponentTest(app)
 {

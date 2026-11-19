@@ -1,7 +1,7 @@
 using System.Text.Json;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class JsonElementExtensions
 {

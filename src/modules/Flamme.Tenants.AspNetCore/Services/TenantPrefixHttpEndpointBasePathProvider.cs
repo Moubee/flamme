@@ -1,10 +1,10 @@
-using Elsa.Common.Multitenancy;
-using Elsa.Http;
-using Elsa.Http.Options;
+using Flamme.Common.Multitenancy;
+using Flamme.Http;
+using Flamme.Http.Options;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Tenants.AspNetCore.Services;
+namespace Flamme.Tenants.AspNetCore.Services;
 
 [UsedImplicitly]
 public class TenantPrefixHttpEndpointBasePathProvider(

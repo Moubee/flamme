@@ -1,13 +1,13 @@
-using Elsa.Common;
-using Elsa.Common.Codecs;
-using Elsa.Workflows.LogPersistence;
-using Elsa.Workflows.Management.Options;
-using Elsa.Workflows.Runtime.Entities;
-using Elsa.Workflows.Runtime.Extensions;
-using Elsa.Workflows.State;
+using Flamme.Common;
+using Flamme.Common.Codecs;
+using Flamme.Workflows.LogPersistence;
+using Flamme.Workflows.Management.Options;
+using Flamme.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime.Extensions;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime;
+namespace Flamme.Workflows.Runtime;
 
 /// <inheritdoc />
 public class DefaultActivityExecutionMapper(

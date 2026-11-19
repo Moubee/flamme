@@ -1,19 +1,19 @@
 using System.Text.Json;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Workflows.Attributes;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Middleware.Activities;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Runtime.Notifications;
-using Elsa.Workflows.Runtime.Stimuli;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Middleware.Activities;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Runtime.Notifications;
+using Flamme.Workflows.Runtime.Stimuli;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Workflows.Runtime.Middleware.Activities;
+namespace Flamme.Workflows.Runtime.Middleware.Activities;
 
 /// <summary>
 /// Collects the current activity for scheduling for execution from a background job if the activity is of kind <see cref="ActivityKind.Job"/> or <see cref="Task"/>.

@@ -1,10 +1,10 @@
-using Elsa.Common.Codecs;
+using Flamme.Common.Codecs;
 #if NET11_0_OR_GREATER
 using System.Text;
 using IronCompress;
 #endif
 
-namespace Elsa.Common.UnitTests.Codecs;
+namespace Flamme.Common.UnitTests.Codecs;
 
 public class ZstdTests
 {

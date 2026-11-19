@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Services;
-using Elsa.Common.Multitenancy;
-using Elsa.Mediator.Contracts;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Services;
+using Flamme.Common.Multitenancy;
+using Flamme.Mediator.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Alterations.IntegrationTests;
+namespace Flamme.Alterations.IntegrationTests;
 
 public class BackgroundAlterationJobDispatcherTests : IAsyncDisposable
 {

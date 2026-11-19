@@ -1,17 +1,17 @@
-using Elsa.AI.Abstractions.Contracts;
-using Elsa.AI.Host.Context;
-using Elsa.AI.Host.Options;
-using Elsa.AI.Host.Services;
-using Elsa.AI.Host.Streaming;
-using Elsa.AI.Host.Tools.Activities;
-using Elsa.AI.Host.Tools.Runtime;
-using Elsa.AI.Host.Tools.Workflows;
+using Flamme.AI.Abstractions.Contracts;
+using Flamme.AI.Host.Context;
+using Flamme.AI.Host.Options;
+using Flamme.AI.Host.Services;
+using Flamme.AI.Host.Streaming;
+using Flamme.AI.Host.Tools.Activities;
+using Flamme.AI.Host.Tools.Runtime;
+using Flamme.AI.Host.Tools.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class ServiceCollectionExtensions
 {

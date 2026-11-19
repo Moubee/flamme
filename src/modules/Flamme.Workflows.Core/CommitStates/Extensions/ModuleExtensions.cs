@@ -1,8 +1,8 @@
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Features;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Features;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring commit strategies on <see cref="WorkflowsFeature"/>.

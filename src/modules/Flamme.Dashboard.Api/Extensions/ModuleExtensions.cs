@@ -1,7 +1,7 @@
-using Elsa.Dashboard.Api.Features;
-using Elsa.Features.Services;
+using Flamme.Dashboard.Api.Features;
+using Flamme.Features.Services;
 
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 public static class DashboardModuleExtensions
 {

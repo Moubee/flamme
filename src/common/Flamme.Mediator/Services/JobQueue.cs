@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using Elsa.Mediator.Contracts;
-using Elsa.Mediator.Models;
+using Flamme.Mediator.Contracts;
+using Flamme.Mediator.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Mediator.Services;
+namespace Flamme.Mediator.Services;
 
 /// <inheritdoc />
 public class JobQueue(IJobsChannel jobsChannel, ILogger<JobQueue> logger) : IJobQueue

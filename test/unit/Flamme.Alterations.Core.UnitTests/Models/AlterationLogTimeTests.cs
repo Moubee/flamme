@@ -1,8 +1,8 @@
-using Elsa.Alterations.Core.Models;
+using Flamme.Alterations.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Elsa.Alterations.Core.UnitTests.Models;
+namespace Flamme.Alterations.Core.UnitTests.Models;
 
 public class AlterationLogTimeTests
 {

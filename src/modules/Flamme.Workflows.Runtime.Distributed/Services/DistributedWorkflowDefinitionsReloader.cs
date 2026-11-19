@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using Medallion.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.Runtime.Distributed;
+namespace Flamme.Workflows.Runtime.Distributed;
 
 /// <summary>
 /// Decorator class that adds distributed locking to the Workflow Definitions Reloader.

@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Elsa.Authorization;
+namespace Flamme.Authorization;
 
 /// <inheritdoc />
 public sealed class PermissionEvaluator : IPermissionEvaluator
@@ -34,7 +34,7 @@ public sealed class PermissionEvaluator : IPermissionEvaluator
     }
 
     /// <remarks>
-    /// Reads Elsa's own permission claim type. Elsa is the only authority that expands roles into
+    /// Reads Flamme's own permission claim type. Flamme is the only authority that expands roles into
     /// permission claims (ADR 0009), and this model no longer uses the FastEndpoints permission mechanism,
     /// so its separately configurable claim type is not consulted.
     /// </remarks>

@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Elsa.Mediator.Middleware;
+namespace Flamme.Mediator.Middleware;
 
 /// <summary>
 /// Provides a set of static methods for working with middleware.

@@ -1,6 +1,6 @@
-using Elsa.Labels.Features;
+using Flamme.Labels.Features;
 
-namespace Elsa.Persistence.EFCore.Modules.Labels;
+namespace Flamme.Persistence.EFCore.Modules.Labels;
 
 public static class Extensions
 {

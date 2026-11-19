@@ -1,6 +1,6 @@
-using Elsa.Api.Client.Shared.Models;
+using Flamme.Api.Client.Shared.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Requests;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Requests;
 
 /// <summary>
 /// A request to dispatches a request to execute the specified workflow definition.

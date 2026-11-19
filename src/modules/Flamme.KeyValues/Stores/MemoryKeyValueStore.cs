@@ -1,11 +1,11 @@
-using Elsa.Common.Entities;
-using Elsa.Common.Multitenancy;
-using Elsa.Common.Services;
-using Elsa.KeyValues.Contracts;
-using Elsa.KeyValues.Entities;
-using Elsa.KeyValues.Models;
+using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
+using Flamme.Common.Services;
+using Flamme.KeyValues.Contracts;
+using Flamme.KeyValues.Entities;
+using Flamme.KeyValues.Models;
 
-namespace Elsa.KeyValues.Stores;
+namespace Flamme.KeyValues.Stores;
 
 /// <summary>
 /// Stores key value records in memory.

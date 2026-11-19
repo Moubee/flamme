@@ -1,17 +1,17 @@
-using Elsa.Common;
-using Elsa.Common.Models;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Extensions;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Models;
-using Elsa.Workflows;
+using Flamme.Common;
+using Flamme.Common.Models;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Extensions;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Models;
+using Flamme.Workflows;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
+namespace Flamme.ExternalAuthentication.Persistence.EFCore.Stores;
 
 /// <summary>
 /// Creates users and external links, converging safely on the durable unique link.
@@ -23,7 +23,7 @@ namespace Elsa.ExternalAuthentication.Persistence.EFCore.Stores;
 /// index remains the sole arbiter of the "at most one link per external identity" invariant.
 /// </remarks>
 public sealed class EFCoreExternalIdentityProvisioner(
-    IDbContextFactory<ExternalAuthenticationElsaDbContext> dbContextFactory,
+    IDbContextFactory<ExternalAuthenticationFlammeDbContext> dbContextFactory,
     IUserStore userStore,
     IUserProvider userProvider,
     IRoleProvider roleProvider,
@@ -261,7 +261,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
 
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
         await dbContext.ExternalIdentityLinks.Where(x => x.Id == link.Id).ExecuteDeleteAsync(cancellationToken);
-        throw new InvalidOperationException("The Elsa user was deleted while its external identity link was being created.");
+        throw new InvalidOperationException("The Flamme user was deleted while its external identity link was being created.");
     }
 
     private async ValueTask EnsureReplacementUserStillExistsAsync(
@@ -274,7 +274,7 @@ public sealed class EFCoreExternalIdentityProvisioner(
             return;
 
         await CompensateReplacementAsync(oldLink, replacementLink, cancellationToken);
-        throw new InvalidOperationException("The Elsa user was deleted while its external identity link was being replaced.");
+        throw new InvalidOperationException("The Flamme user was deleted while its external identity link was being replaced.");
     }
 
     private async ValueTask CompensateReplacementAsync(

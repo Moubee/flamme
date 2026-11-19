@@ -1,7 +1,7 @@
-using Elsa.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Contracts;
 // ReSharper disable CollectionNeverUpdated.Global
 
-namespace Elsa.Alterations.Endpoints.Alterations.Run;
+namespace Flamme.Alterations.Endpoints.Alterations.Run;
 
 /// <summary>
 /// A plan that contains a list of alterations to be applied to a set of workflow instances.

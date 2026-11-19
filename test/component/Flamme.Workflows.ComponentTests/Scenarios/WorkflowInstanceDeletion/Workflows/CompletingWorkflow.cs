@@ -1,6 +1,6 @@
-using Elsa.Workflows.Activities;
+using Flamme.Workflows.Activities;
 
-namespace Elsa.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
+namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowInstanceDeletion.Workflows;
 
 public class CompletingWorkflow : WorkflowBase
 {

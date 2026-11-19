@@ -1,14 +1,14 @@
-using Elsa.Common;
-using Elsa.Mediator.Contracts;
-using Elsa.Scheduling.Commands;
-using Elsa.Scheduling.Options;
-using Elsa.Scheduling.Services;
+using Flamme.Common;
+using Flamme.Mediator.Contracts;
+using Flamme.Scheduling.Commands;
+using Flamme.Scheduling.Options;
+using Flamme.Scheduling.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Timer = System.Timers.Timer;
 using OptionsFactory = Microsoft.Extensions.Options.Options;
 
-namespace Elsa.Scheduling.ScheduledTasks;
+namespace Flamme.Scheduling.ScheduledTasks;
 
 /// <summary>
 /// A task that is scheduled to execute at a specific instant.

@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
-using Elsa.Common.Serialization;
-using Elsa.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Workflows.State;
+using Flamme.Common.Serialization;
+using Flamme.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Elsa.Workflows.IntegrationTests.Core;
+namespace Flamme.Workflows.IntegrationTests.Core;
 
 /// <summary>
 /// A payload whose type has no registered serialization alias is stored without a type discriminator and read back

@@ -1,8 +1,8 @@
-using Elsa.Abstractions;
-using Elsa.Models;
-using Elsa.Workflows.CommitStates;
+using Flamme.Abstractions;
+using Flamme.Models;
+using Flamme.Workflows.CommitStates;
 
-namespace Elsa.Workflows.Api.Endpoints.CommitStrategies.Activities.List;
+namespace Flamme.Workflows.Api.Endpoints.CommitStrategies.Activities.List;
 
 /// <summary>
 /// Represents an API endpoint that provides a list of registered workflow commit strategies.
@@ -11,7 +11,7 @@ namespace Elsa.Workflows.Api.Endpoints.CommitStrategies.Activities.List;
 /// This class is an implementation of an endpoint that retrieves a collection of workflow commit strategy registrations
 /// from a provided registry and returns them in a unified response.
 /// </remarks>
-internal class List(ICommitStrategyRegistry registry) : ElsaEndpointWithoutRequest<ListResponse<CommitStrategyDescriptor>>
+internal class List(ICommitStrategyRegistry registry) : FlammeEndpointWithoutRequest<ListResponse<CommitStrategyDescriptor>>
 {
     public override void Configure()
     {

@@ -1,4 +1,4 @@
-namespace Elsa.Secrets.Stores;
+namespace Flamme.Secrets.Stores;
 
 public class EncryptedSecretStore(ISecretValueProtector protector) : ISecretStore
 {
@@ -8,8 +8,8 @@ public class EncryptedSecretStore(ISecretValueProtector protector) : ISecretStor
 
     public SecretStoreDescriptor Descriptor { get; } = new(
         SecretStoreNames.Encrypted,
-        "Elsa Encrypted Store",
-        "Stores values in Elsa-managed encrypted payloads.",
+        "Flamme Encrypted Store",
+        "Stores values in Flamme-managed encrypted payloads.",
         SecretStoreCapabilities.Read | SecretStoreCapabilities.Write | SecretStoreCapabilities.Delete | SecretStoreCapabilities.Test | SecretStoreCapabilities.Versioned,
         false);
 

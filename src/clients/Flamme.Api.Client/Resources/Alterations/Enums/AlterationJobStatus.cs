@@ -1,4 +1,4 @@
-namespace Elsa.Api.Client.Resources.Alterations.Enums;
+namespace Flamme.Api.Client.Resources.Alterations.Enums;
 
 /// <summary>
 /// The status of an alteration plan for a workflow instance.

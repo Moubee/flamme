@@ -1,9 +1,9 @@
-using Elsa.Common;
-using Elsa.ExternalAuthentication.Contracts;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Services;
+using Flamme.Common;
+using Flamme.ExternalAuthentication.Contracts;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Services;
 
-namespace Elsa.ExternalAuthentication.Stores.InMemory;
+namespace Flamme.ExternalAuthentication.Stores.InMemory;
 
 public sealed class InMemoryExternalAuthenticationSessionStore(TimeProvider timeProvider) : IExternalAuthenticationSessionStore
 {

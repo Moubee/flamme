@@ -1,8 +1,8 @@
-using Elsa.Workflows.Api.Models;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Api.Models;
+using Flamme.Workflows.Management.Entities;
 using FastEndpoints;
 
-namespace Elsa.Workflows.Api.Endpoints.WorkflowInstances.Get;
+namespace Flamme.Workflows.Api.Endpoints.WorkflowInstances.Get;
 
 /// <summary>
 /// Maps a <see cref="WorkflowInstance"/> to <see cref="WorkflowInstanceModel"/>.

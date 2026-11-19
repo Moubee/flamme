@@ -1,7 +1,7 @@
-using Elsa.Testing.Shared;
-using Elsa.Workflows.IntegrationTests.Activities.Workflows;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.IntegrationTests.Activities.Workflows;
 
-namespace Elsa.Workflows.IntegrationTests.Activities;
+namespace Flamme.Workflows.IntegrationTests.Activities;
 
 /// <summary>
 /// Integration tests for the <see cref="Workflows.Activities.Break"/> activity.

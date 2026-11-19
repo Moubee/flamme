@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
-using Elsa.Extensions;
-using Elsa.Persistence.EFCore.PostgreSql.Handlers;
+using Flamme.Extensions;
+using Flamme.Persistence.EFCore.PostgreSql.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Persistence.EFCore.Extensions;
+namespace Flamme.Persistence.EFCore.Extensions;
 
 /// <summary>
 /// Provides extensions to configure EF Core to use PostgreSQL.
@@ -19,9 +19,9 @@ public static class PostgreSqlProvidersExtensions
 
     public static TFeature UsePostgreSql<TFeature, TDbContext>(this PersistenceFeatureBase<TFeature, TDbContext> feature,
         string connectionString,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
-        where TDbContext : ElsaDbContextBase
+        where TDbContext : FlammeDbContextBase
         where TFeature : PersistenceFeatureBase<TFeature, TDbContext>
     {
         return feature.UsePostgreSql(Assembly, connectionString, options, configure);
@@ -29,9 +29,9 @@ public static class PostgreSqlProvidersExtensions
 
     public static TFeature UsePostgreSql<TFeature, TDbContext>(this PersistenceFeatureBase<TFeature, TDbContext> feature,
         Func<IServiceProvider, string> connectionStringFunc,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
-        where TDbContext : ElsaDbContextBase
+        where TDbContext : FlammeDbContextBase
         where TFeature : PersistenceFeatureBase<TFeature, TDbContext>
     {
         return feature.UsePostgreSql(Assembly, connectionStringFunc, options, configure);
@@ -40,9 +40,9 @@ public static class PostgreSqlProvidersExtensions
     public static TFeature UsePostgreSql<TFeature, TDbContext>(this PersistenceFeatureBase<TFeature, TDbContext> feature,
         Assembly migrationsAssembly,
         string connectionString,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
-        where TDbContext : ElsaDbContextBase
+        where TDbContext : FlammeDbContextBase
         where TFeature : PersistenceFeatureBase<TFeature, TDbContext>
     {
         return feature.UsePostgreSql(migrationsAssembly, _ => connectionString, options, configure);
@@ -51,13 +51,13 @@ public static class PostgreSqlProvidersExtensions
     public static TFeature UsePostgreSql<TFeature, TDbContext>(this PersistenceFeatureBase<TFeature, TDbContext> feature,
         Assembly migrationsAssembly,
         Func<IServiceProvider, string> connectionStringFunc,
-        ElsaDbContextOptions? options = null,
+        FlammeDbContextOptions? options = null,
         Action<NpgsqlDbContextOptionsBuilder>? configure = null)
-        where TDbContext : ElsaDbContextBase
+        where TDbContext : FlammeDbContextBase
         where TFeature : PersistenceFeatureBase<TFeature, TDbContext>
     {
         feature.Module.Services.AddPostgreSqlEntityModelCreatingHandlers();
-        feature.DbContextOptionsBuilder = (sp, db) => db.UseElsaPostgreSql(migrationsAssembly, connectionStringFunc(sp), options, configure: configure);
+        feature.DbContextOptionsBuilder = (sp, db) => db.UseFlammePostgreSql(migrationsAssembly, connectionStringFunc(sp), options, configure: configure);
         return (TFeature)feature;
     }
 }

@@ -1,8 +1,8 @@
-using Elsa.Alterations.Core.Enums;
-using Elsa.Alterations.Core.Models;
-using Elsa.Common.Entities;
+using Flamme.Alterations.Core.Enums;
+using Flamme.Alterations.Core.Models;
+using Flamme.Common.Entities;
 
-namespace Elsa.Alterations.Core.Entities;
+namespace Flamme.Alterations.Core.Entities;
 
 /// <summary>
 /// Represents the execution of the plan for an individual workflow instance.

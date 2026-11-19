@@ -1,9 +1,9 @@
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Models;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
-using Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Responses;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Models;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Requests;
+using Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Responses;
 using Refit;
 
-namespace Elsa.Api.Client.Resources.ExternalAuthentication.Connections.Contracts;
+namespace Flamme.Api.Client.Resources.ExternalAuthentication.Connections.Contracts;
 
 /// <summary>
 /// Client for administrator-managed external authentication connections.

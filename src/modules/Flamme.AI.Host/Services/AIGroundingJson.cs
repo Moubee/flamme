@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Elsa.AI.Host.Services;
+namespace Flamme.AI.Host.Services;
 
 internal static class AIGroundingJson
 {

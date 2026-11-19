@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Options;
+namespace Flamme.Identity.Options;
 
 /// <summary>Controls the optional permission stamp, which tightens revocation below the token lifetime.</summary>
 public class PermissionStampOptions

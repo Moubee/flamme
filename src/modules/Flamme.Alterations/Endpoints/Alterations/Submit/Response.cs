@@ -1,4 +1,4 @@
-namespace Elsa.Alterations.Endpoints.Alterations.Submit;
+namespace Flamme.Alterations.Endpoints.Alterations.Submit;
 
 /// <summary>
 /// The response from the Submit endpoint.

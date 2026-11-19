@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Elsa.Persistence.EFCore.Modules.Management;
+namespace Flamme.Persistence.EFCore.Modules.Management;
 
 internal class Configurations : IEntityTypeConfiguration<WorkflowDefinition>, IEntityTypeConfiguration<WorkflowInstance>
 {

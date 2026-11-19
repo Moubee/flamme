@@ -1,6 +1,6 @@
-using Elsa.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Abstractions.Models;
 
-namespace Elsa.Dashboard.Api.Services;
+namespace Flamme.Dashboard.Api.Services;
 
 public class DashboardRangeResolver(TimeProvider timeProvider)
 {

@@ -2,27 +2,27 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
-using Elsa.Common;
-using Elsa.Extensions;
-using Elsa.Mediator.Contracts;
-using Elsa.Testing.Shared;
-using Elsa.Workflows;
-using Elsa.Workflows.CommitStates;
-using Elsa.Workflows.Middleware.Workflows;
-using Elsa.Workflows.Models;
-using Elsa.Workflows.Notifications;
-using Elsa.Workflows.Options;
-using Elsa.Workflows.Pipelines.ActivityExecution;
-using Elsa.Workflows.Pipelines.WorkflowExecution;
-using Elsa.Workflows.Services;
-using Elsa.Workflows.State;
-using Elsa.Workflows.Telemetry;
+using Flamme.Common;
+using Flamme.Extensions;
+using Flamme.Mediator.Contracts;
+using Flamme.Testing.Shared;
+using Flamme.Workflows;
+using Flamme.Workflows.CommitStates;
+using Flamme.Workflows.Middleware.Workflows;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Notifications;
+using Flamme.Workflows.Options;
+using Flamme.Workflows.Pipelines.ActivityExecution;
+using Flamme.Workflows.Pipelines.WorkflowExecution;
+using Flamme.Workflows.Services;
+using Flamme.Workflows.State;
+using Flamme.Workflows.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using TUnit.Mocks;
 using System.Threading.Tasks;
 
-namespace Elsa.Workflows.Core.UnitTests.Telemetry;
+namespace Flamme.Workflows.Core.UnitTests.Telemetry;
 
 using DiagnosticsActivity = System.Diagnostics.Activity;
 
@@ -219,7 +219,7 @@ public class WorkflowInstrumentationTests
         var context = activityExecutionContext.WorkflowExecutionContext;
         var notificationSender = INotificationSender.Mock().Object;
         Mock.Get(notificationSender).SendAsync(Arg.Any<INotification>(), Arg.Any<CancellationToken>())
-                    .Returns((global::Elsa.Mediator.Contracts.INotification __arg0, global::System.Threading.CancellationToken __arg1) =>
+                    .Returns((global::Flamme.Mediator.Contracts.INotification __arg0, global::System.Threading.CancellationToken __arg1) =>
                     {
                         if (__arg0 is WorkflowExecuting)
                             context.Cancel();
@@ -625,7 +625,7 @@ public class WorkflowInstrumentationTests
         public Task ExecuteAsync(WorkflowExecutionContext context) => Task.CompletedTask;
     }
 
-    private sealed class TestActivity : Elsa.Workflows.Activity
+    private sealed class TestActivity : Flamme.Workflows.Activity
     {
     }
 

@@ -1,6 +1,6 @@
-﻿using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
+﻿using Flamme.Api.Client.Resources.WorkflowDefinitions.Models;
 
-namespace Elsa.Api.Client.Resources.WorkflowDefinitions.Requests;
+namespace Flamme.Api.Client.Resources.WorkflowDefinitions.Requests;
 
 /// <summary>
 /// Represents a request to save a workflow definition.

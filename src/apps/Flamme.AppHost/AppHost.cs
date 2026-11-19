@@ -10,7 +10,7 @@ var postgres = builder.AddPostgres("postgres")
 var database = postgres.AddDatabase("elsa");
 
 // Ignore the standalone launch profile's fixed ports; Aspire allocates both endpoints.
-var server = builder.AddProject<Projects.Elsa_Server_Web>("server", options => options.ExcludeLaunchProfile = true)
+var server = builder.AddProject<Projects.Flamme_Server_Web>("server", options => options.ExcludeLaunchProfile = true)
     // With no launch profile, these select the framework for Aspire's `dotnet run` launcher.
     .WithArgs("--framework", "net11.0")
     .WithHttpEndpoint()

@@ -1,12 +1,12 @@
 using System.Reflection;
-using Elsa.ExternalAuthentication.IntegrationTests.Fixtures;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Features;
+using Flamme.ExternalAuthentication.IntegrationTests.Fixtures;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Features;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using TUnit.AspNetCore;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Compatibility;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Compatibility;
 
 public sealed class LegacyIdentityEndpointWebApplicationFactory : TestWebApplicationFactory<ExternalAuthenticationTestEntryPoint>
 {
@@ -18,7 +18,7 @@ public sealed class LegacyIdentityEndpointWebApplicationFactory : TestWebApplica
         ExternalAuthenticationTestHost.Configure(
             builder,
             typeof(IdentityFeature).Assembly,
-            endpoint => endpoint.Namespace is "Elsa.Identity.Endpoints.Login" or "Elsa.Identity.Endpoints.RefreshToken",
+            endpoint => endpoint.Namespace is "Flamme.Identity.Endpoints.Login" or "Flamme.Identity.Endpoints.RefreshToken",
             IdentityAuthenticationSchemes.RefreshToken);
     }
 }

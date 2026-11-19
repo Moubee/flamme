@@ -1,8 +1,8 @@
-using Elsa.Workflows.Runtime;
-using Elsa.Workflows.Runtime.Entities;
+using Flamme.Workflows.Runtime;
+using Flamme.Workflows.Runtime.Entities;
 
 // ReSharper disable once CheckNamespace
-namespace Elsa.Extensions;
+namespace Flamme.Extensions;
 
 /// <summary>
 /// Canonical default order for <see cref="IWorkflowExecutionLogStore"/> queries that omit an explicit order.

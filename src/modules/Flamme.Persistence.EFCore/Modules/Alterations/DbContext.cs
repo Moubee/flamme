@@ -1,19 +1,19 @@
-using Elsa.Alterations.Core.Entities;
-using Elsa.Alterations.Core.Models;
-using Elsa.Workflows.Management.Models;
+using Flamme.Alterations.Core.Entities;
+using Flamme.Alterations.Core.Models;
+using Flamme.Workflows.Management.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Elsa.Persistence.EFCore.Modules.Alterations;
+namespace Flamme.Persistence.EFCore.Modules.Alterations;
 
 /// <summary>
 /// DB context for the runtime module.
 /// </summary>
 [UsedImplicitly]
-public class AlterationsElsaDbContext : ElsaDbContextBase
+public class AlterationsFlammeDbContext : FlammeDbContextBase
 {
     /// <inheritdoc />
-    public AlterationsElsaDbContext(DbContextOptions<AlterationsElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public AlterationsFlammeDbContext(DbContextOptions<AlterationsFlammeDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 

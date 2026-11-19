@@ -1,14 +1,14 @@
 using System.Text.Json.Nodes;
-using Elsa.Resilience.Core.UnitTests.TestHelpers;
-using Elsa.Resilience.Extensions;
-using Elsa.Testing.Shared;
-using Elsa.Testing.Shared.Activities;
-using Elsa.Workflows;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Options;
+using Flamme.Resilience.Core.UnitTests.TestHelpers;
+using Flamme.Resilience.Extensions;
+using Flamme.Testing.Shared;
+using Flamme.Testing.Shared.Activities;
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Options;
 using System.Threading.Tasks;
 
-namespace Elsa.Resilience.Core.UnitTests;
+namespace Flamme.Resilience.Core.UnitTests;
 
 public class ActivityExecutionExtensionsTests
 {

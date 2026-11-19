@@ -1,8 +1,8 @@
-using Elsa.Common.Models;
-using Elsa.Workflows.Activities;
-using Elsa.Workflows.Management.Entities;
+using Flamme.Common.Models;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Entities;
 
-namespace Elsa.Workflows.Management;
+namespace Flamme.Workflows.Management;
 
 /// <summary>
 /// Extension methods for <see cref="IWorkflowDefinitionService"/>.

@@ -1,7 +1,7 @@
-using Elsa.Common;
+using Flamme.Common;
 using JetBrains.Annotations;
 
-namespace Elsa.Workflows.Runtime.StartupTasks;
+namespace Flamme.Workflows.Runtime.StartupTasks;
 
 /// <summary>
 /// Startup task that re-applies any persisted administrative pause via <see cref="IQuiescenceSignal.InitializePersistedStateAsync"/>.

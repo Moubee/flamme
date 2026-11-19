@@ -1,8 +1,8 @@
-﻿using Elsa.Testing.Shared;
+﻿using Flamme.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Nodes;
 
-namespace Elsa.Workflows.IntegrationTests.Serialization.SpecialPropertySerialization
+namespace Flamme.Workflows.IntegrationTests.Serialization.SpecialPropertySerialization
 {
     public class Tests : IAsyncDisposable
     {

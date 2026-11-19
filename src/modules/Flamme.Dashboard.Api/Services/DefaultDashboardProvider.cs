@@ -1,9 +1,9 @@
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Models;
-using Elsa.Dashboard.Api.Authorization;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Api.Authorization;
 using Microsoft.Extensions.Hosting;
 
-namespace Elsa.Dashboard.Api.Services;
+namespace Flamme.Dashboard.Api.Services;
 
 public class DefaultDashboardProvider(
     IEnumerable<IDashboardContributor> contributors,

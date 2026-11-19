@@ -1,16 +1,16 @@
-using Elsa.Authorization;
-using Elsa.Abstractions;
-using Elsa.Alterations.Core.Contracts;
-using Elsa.Alterations.Core.Filters;
+using Flamme.Authorization;
+using Flamme.Abstractions;
+using Flamme.Alterations.Core.Contracts;
+using Flamme.Alterations.Core.Filters;
 using JetBrains.Annotations;
 
-namespace Elsa.Alterations.Endpoints.Alterations.Get;
+namespace Flamme.Alterations.Endpoints.Alterations.Get;
 
 /// <summary>
 /// Gets an alteration plan and its associated jobs.
 /// </summary>
 [PublicAPI]
-public class Get : ElsaEndpointWithoutRequest<Response>
+public class Get : FlammeEndpointWithoutRequest<Response>
 {
     private readonly IAlterationPlanStore _alterationPlanStore;
     private readonly IAlterationJobStore _alterationJobStore;
@@ -26,7 +26,7 @@ public class Get : ElsaEndpointWithoutRequest<Response>
     public override void Configure()
     {
         Get("/alterations/{id}");
-        RequirePermission(Elsa.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.View);
+        RequirePermission(Flamme.Alterations.Permissions.AlterationPermissions.Alterations, CoreVerbs.View);
     }
 
     /// <inheritdoc />

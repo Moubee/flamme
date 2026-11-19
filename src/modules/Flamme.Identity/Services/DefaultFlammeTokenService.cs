@@ -1,21 +1,21 @@
 using System.Globalization;
 using System.Security.Claims;
-using Elsa;
-using Elsa.Common;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Contracts;
-using Elsa.Identity.Models;
-using Elsa.Identity.Options;
+using Flamme;
+using Flamme.Common;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Contracts;
+using Flamme.Identity.Models;
+using Flamme.Identity.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Elsa.Identity.Services;
+namespace Flamme.Identity.Services;
 
 /// <summary>
-/// Creates signed Elsa JWTs from trusted issuance data.
+/// Creates signed Flamme JWTs from trusted issuance data.
 /// </summary>
-public sealed class DefaultElsaTokenService(TimeProvider timeProvider, IOptions<IdentityTokenOptions> identityTokenOptions) : IElsaTokenService
+public sealed class DefaultFlammeTokenService(TimeProvider timeProvider, IOptions<IdentityTokenOptions> identityTokenOptions) : IFlammeTokenService
 {
     /// <inheritdoc />
     public ValueTask<IssuedAccessToken> IssueAccessTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default)
@@ -93,7 +93,7 @@ public sealed class DefaultElsaTokenService(TimeProvider timeProvider, IOptions<
     }
 
     /// <summary>
-    /// Elsa tokens always carry <see cref="PermissionNames.ClaimType"/>. Zero grants become
+    /// Flamme tokens always carry <see cref="PermissionNames.ClaimType"/>. Zero grants become
     /// <see cref="PermissionNames.None"/> so a missing claim can keep meaning "unknown".
     /// </summary>
     private static IEnumerable<Claim> PermissionClaims(IReadOnlyCollection<string> permissions)

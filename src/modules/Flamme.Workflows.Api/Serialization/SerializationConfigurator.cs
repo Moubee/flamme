@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Elsa.Workflows.Api.Serialization;
+namespace Flamme.Workflows.Api.Serialization;
 
 internal class SerializationConfigurator(IServiceProvider serviceProvider) : SerializationOptionsConfiguratorBase
 {

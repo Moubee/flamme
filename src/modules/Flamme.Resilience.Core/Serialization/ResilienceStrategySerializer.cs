@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Elsa.Extensions;
-using Elsa.Resilience.Options;
+using Flamme.Extensions;
+using Flamme.Resilience.Options;
 using Microsoft.Extensions.Options;
 
-namespace Elsa.Resilience.Serialization;
+namespace Flamme.Resilience.Serialization;
 
 public class ResilienceStrategySerializer
 {

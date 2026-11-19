@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Time.Testing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Elsa.Common.Services;
-using Elsa.Identity.Constants;
-using Elsa.Identity.Entities;
-using Elsa.Identity.Options;
-using Elsa.Identity.Services;
+using Flamme.Common.Services;
+using Flamme.Identity.Constants;
+using Flamme.Identity.Entities;
+using Flamme.Identity.Options;
+using Flamme.Identity.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 
-namespace Elsa.Identity.UnitTests.Options;
+namespace Flamme.Identity.UnitTests.Options;
 
 public class IdentityTokenOptionsTokenUseTests
 {

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 
-namespace Elsa.Workflows.PerformanceTests;
+namespace Flamme.Workflows.PerformanceTests;
 
 public class Config : ManualConfig
 {

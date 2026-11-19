@@ -1,6 +1,6 @@
-using Elsa.Labels.Entities;
+using Flamme.Labels.Entities;
 
-namespace Elsa.Labels.Contracts;
+namespace Flamme.Labels.Contracts;
 
 /// <summary>
 /// Queries workflow definition label relationships for workflow-definition filter providers.

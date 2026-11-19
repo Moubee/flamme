@@ -1,4 +1,4 @@
-namespace Elsa.Identity.Models;
+namespace Flamme.Identity.Models;
 
 /// <summary>
 /// The sign-in session a refresh token belongs to.

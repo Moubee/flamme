@@ -1,13 +1,13 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Elsa.Authorization;
-using Elsa.ExternalAuthentication.Models;
-using Elsa.ExternalAuthentication.Options;
-using Elsa.ExternalAuthentication.Permissions;
-using Elsa.ExternalAuthentication.Services;
-using Elsa.Identity.Models;
+using Flamme.Authorization;
+using Flamme.ExternalAuthentication.Models;
+using Flamme.ExternalAuthentication.Options;
+using Flamme.ExternalAuthentication.Permissions;
+using Flamme.ExternalAuthentication.Services;
+using Flamme.Identity.Models;
 
-namespace Elsa.ExternalAuthentication.IntegrationTests.Permissions;
+namespace Flamme.ExternalAuthentication.IntegrationTests.Permissions;
 
 public class PermissionDelegationTests
 {
