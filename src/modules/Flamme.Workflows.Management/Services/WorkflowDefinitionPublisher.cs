@@ -103,22 +103,28 @@ public class WorkflowDefinitionPublisher(
             VersionOptions = VersionOptions.LatestOrPublished
         }, cancellationToken);
 
-        foreach (var publishedAndOrLatestWorkflow in publishedWorkflows)
+        // Publish the new head and demote its predecessors in one store operation. Cloning
+        // also avoids mutating visible rows before the in-memory store validates the batch.
+        var demotions = new List<WorkflowDefinition>();
+        var retractions = new List<WorkflowDefinition>();
+        foreach (var previous in publishedWorkflows)
         {
-            var isPublished = publishedAndOrLatestWorkflow.IsPublished;
-            publishedAndOrLatestWorkflow.IsPublished = false;
-            publishedAndOrLatestWorkflow.IsLatest = false;
-            await workflowDefinitionStore.SaveAsync(publishedAndOrLatestWorkflow, cancellationToken);
-
-            if (isPublished)
-                await mediator.SendAsync(new WorkflowDefinitionVersionRetracted(publishedAndOrLatestWorkflow), cancellationToken);
+            var demoted = previous.ShallowClone();
+            demoted.IsLatest = false;
+            demoted.IsPublished = false;
+            if (previous.IsPublished)
+                retractions.Add(demoted);
+            if (previous.Id != definition.Id)
+                demotions.Add(demoted);
         }
 
-        // Save the newly published definition.
+        definition = Initialize(definition);
         definition.IsPublished = true;
         definition.IsLatest = true;
-        definition = Initialize(definition);
-        await workflowDefinitionStore.SaveAsync(definition, cancellationToken);
+        await workflowDefinitionStore.SaveManyAsync(demotions.Append(definition), cancellationToken);
+
+        foreach (var retracted in retractions)
+            await mediator.SendAsync(new WorkflowDefinitionVersionRetracted(retracted), cancellationToken);
 
         var affectedWorkflows = new AffectedWorkflows(new List<WorkflowDefinition>());
         await mediator.SendAsync(new WorkflowDefinitionPublished(definition, affectedWorkflows), cancellationToken);
@@ -198,10 +204,11 @@ public class WorkflowDefinitionPublisher(
         if (definition == null!)
             return null;
 
-        if (!definition.IsPublished)
+        if (!definition.IsPublished && !definition.IsReadonly)
             return definition;
 
         var draft = definition.ShallowClone();
+        draft.CustomProperties = new Dictionary<string, object>(definition.CustomProperties);
 
         draft.Version = lastVersion?.Version + 1 ?? 1;
         draft.CreatedAt = timeProvider.GetUtcNow();

@@ -21,6 +21,40 @@ public class Tests : IAsyncDisposable
     }
 
     [Test]
+    public async Task RejectedPublicationShouldLeavePreviousHeadPublished()
+    {
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
+        var previous = await publisher.NewAsync();
+        await publisher.PublishAsync(previous);
+        var conflicting = await publisher.NewAsync();
+        conflicting.DefinitionId = previous.DefinitionId;
+        conflicting.Version = previous.Version;
+
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => publisher.PublishAsync(conflicting));
+        var head = await store.FindAsync(new() { DefinitionId = previous.DefinitionId, VersionOptions = VersionOptions.Published });
+        await Assert.That(head!.Id).IsEqualTo(previous.Id);
+        await Assert.That(head.IsLatest).IsTrue();
+    }
+
+    [Test]
+    public async Task RetractedReadOnlyPublicationShouldForkWhenEdited()
+    {
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var previous = await publisher.NewAsync();
+        previous.IsReadonly = true;
+        previous.CustomProperties["example"] = "v1";
+        await publisher.PublishAsync(previous);
+        await publisher.RetractAsync(previous);
+
+        var draft = await publisher.GetDraftAsync(previous.DefinitionId, VersionOptions.Latest);
+        await Assert.That(draft!.Id).IsNotEqualTo(previous.Id);
+        await Assert.That(draft.Version).IsEqualTo(2);
+        draft.CustomProperties["example"] = "v2";
+        await Assert.That(previous.CustomProperties["example"]).IsEqualTo("v1");
+    }
+
+    [Test]
     public async Task SaveDraftAsync_ShouldClearLatestFlagFromPreviousUnpublishedDraft()
     {
         const string definitionId = "test-definition";
