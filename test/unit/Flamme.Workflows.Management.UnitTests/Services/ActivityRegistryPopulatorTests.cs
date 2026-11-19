@@ -1,6 +1,8 @@
 using Flamme.Common.Multitenancy;
 using Flamme.Workflows.Management.Activities.HostMethod;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Providers;
 using Flamme.Workflows.Management.Services;
 using Flamme.Workflows.Models;
@@ -57,6 +59,23 @@ public class ActivityRegistryPopulatorTests
         await Assert.That(typeof(ITenantAgnosticActivityProvider).IsAssignableFrom(typeof(TypedActivityProvider))).IsTrue();
         await Assert.That(typeof(ITenantAgnosticActivityProvider).IsAssignableFrom(typeof(HostMethodActivityProvider))).IsTrue();
         await Assert.That(typeof(ITenantAgnosticActivityProvider).IsAssignableFrom(typeof(WorkflowDefinitionActivityProvider))).IsFalse();
+    }
+
+    [Test]
+    public async Task UnnamedStoredWorkflowLeavesNamedActivitiesAvailable()
+    {
+        WorkflowDefinition[] definitions =
+        [
+            new() { Id = "unnamed", DefinitionId = "blank", Name = "  ", Version = 1 },
+            new() { Id = "named", DefinitionId = "valid", Name = "Send", Version = 1 }
+        ];
+        var store = IWorkflowDefinitionStore.Mock().Object;
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definitions);
+        var provider = new WorkflowDefinitionActivityProvider(store, new WorkflowDefinitionActivityDescriptorFactory());
+
+        var descriptors = await provider.GetDescriptorsAsync();
+        var descriptor = await Assert.That(descriptors).HasSingleItem();
+        await Assert.That(descriptor.TypeName).IsEqualTo("Send");
     }
 
     private static ActivityRegistry CreateRegistry()
