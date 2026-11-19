@@ -93,7 +93,7 @@ jobs:
 
       - name: Upload unit and integration test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-integration-test-results-${{ matrix.framework }}
           path: artifacts/test-results/unit-integration
@@ -170,7 +170,7 @@ jobs:
 
       - name: Upload component test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: component-test-results-${{ matrix.framework }}
           path: artifacts/test-results/component
@@ -224,7 +224,7 @@ jobs:
 
       - name: Upload coverage reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-reports
           path: artifacts/coverage-report
@@ -269,7 +269,7 @@ jobs:
         run: dotnet pack Elsa.slnx --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: elsa-nuget-packages
           path: packages/*nupkg
