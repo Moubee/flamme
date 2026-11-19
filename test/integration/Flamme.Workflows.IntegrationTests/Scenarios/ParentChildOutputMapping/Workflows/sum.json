@@ -46,7 +46,7 @@
     "activityCategory": "Custom"
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "4FUOkS0zNUGe8JyVY3Sqmw",
     "metadata": {},
@@ -77,7 +77,7 @@
         },
         "id": "weO38K8Dfk-cSK8KVIiQMg",
         "name": "RunJavaScript1",
-        "type": "Elsa.RunJavaScript",
+        "type": "Scripting.RunJavaScript",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

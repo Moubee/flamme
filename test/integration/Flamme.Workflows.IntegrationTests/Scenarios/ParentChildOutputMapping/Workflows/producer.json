@@ -28,7 +28,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "nn98bbdkmvkbkuda",
     "nodeId": "Workflow1:nn98bbdkmvkbkuda",
@@ -66,7 +66,7 @@
         "id": "4c9j38qta2bmc096",
         "nodeId": "Workflow1:nn98bbdkmvkbkuda:4c9j38qta2bmc096",
         "name": "SetOutput1",
-        "type": "Elsa.SetOutput",
+        "type": "Data.SetOutput",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

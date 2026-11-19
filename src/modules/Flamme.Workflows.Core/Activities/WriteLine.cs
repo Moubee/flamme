@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 ///  Write a line of text to the console.
 /// </summary>
-[Activity("Elsa", "Console", "Write a line of text to the console.")]
+[Activity("Console", "WriteLine", 1, "Write a line of text to the console.", "Console")]
 public class WriteLine : CodeActivity
 {
     /// <inheritdoc />

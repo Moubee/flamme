@@ -7,7 +7,7 @@ namespace Flamme.Http;
 /// <summary>
 /// Send an HTTP request.
 /// </summary>
-[Activity("Elsa", "HTTP", "Send an HTTP request.", DisplayName = "HTTP Request", Kind = ActivityKind.Task)]
+[Activity("Http", "SendRequest", 1, "Send an HTTP request.", "HTTP", DisplayName = "HTTP Request", Kind = ActivityKind.Task)]
 public class SendHttpRequest : SendHttpRequestBase
 {
     /// <inheritdoc />

@@ -14,7 +14,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Signals the current composite activity to complete itself as a whole.
 /// </summary>
-[Activity("Elsa", "Composition", "Signals the current composite activity to complete itself as a whole.")]
+[Activity("ControlFlow", "Complete", 1, "Signals the current composite activity to complete itself as a whole.", "Composition")]
 [PublicAPI]
 public class Complete : Activity, ITerminalNode
 {

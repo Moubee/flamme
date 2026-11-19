@@ -12,7 +12,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Branch execution into multiple branches.
 /// </summary>
-[Activity("Elsa", "Control Flow", "Branch execution into multiple branches.")]
+[Activity("ControlFlow", "ForkBranches", 1, "Branch execution into multiple branches.", "Control Flow")]
 [PublicAPI]
 [Browsable(false)]
 public class Fork : Activity

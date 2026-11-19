@@ -12,7 +12,7 @@ namespace Flamme.Scheduling.Activities;
 /// <summary>
 /// Delay execution for the specified amount of time.
 /// </summary>
-[Activity("Elsa", "Scheduling", "Delay execution for the specified amount of time.")]
+[Activity("Time", "Delay", 1, "Delay execution for the specified amount of time.", "Scheduling")]
 public class Delay : Activity, IActivityPropertyDefaultValueProvider
 {
     /// <inheritdoc />

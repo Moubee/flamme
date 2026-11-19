@@ -14,7 +14,7 @@ namespace Flamme.Workflows.Activities;
 /// Rescheduled direct children retain completion callback ownership by this sequence.
 /// </remarks>
 [Category("Workflows")]
-[Activity("Elsa", "Workflows", "Execute a set of activities in sequence.")]
+[Activity("ControlFlow", "Sequence", 1, "Execute a set of activities in sequence.", "Workflows")]
 [PublicAPI]
 [Browsable(false)]
 public class Sequence : Container

@@ -9,7 +9,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Break out of a loop.
 /// </summary>
-[Activity("Elsa", "Looping", "Break out of a loop.")]
+[Activity("ControlFlow", "Break", 1, "Break out of a loop.", "Looping")]
 [PublicAPI]
 public class Break : CodeActivity, ITerminalNode
 {

@@ -13,7 +13,7 @@ namespace Flamme.Workflows.Activities;
 /// The Switch activity is an approximation of the `switch` construct in C#.
 /// When a case evaluates to true, the associated activity is then scheduled for execution.
 /// </summary>
-[Activity("Elsa", "Branching", "Evaluate a set of case conditions and schedule the activity for a matching case.")]
+[Activity("ControlFlow", "Switch", 1, "Evaluate a set of case conditions and schedule the activity for a matching case.", "Branching")]
 [PublicAPI]
 public class Switch : Activity
 {

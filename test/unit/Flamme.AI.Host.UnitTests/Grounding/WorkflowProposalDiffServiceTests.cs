@@ -15,7 +15,7 @@ public class WorkflowProposalDiffServiceTests
         {
             ["activities"] = new JsonArray
             {
-                (JsonNode)new JsonObject { ["id"] = "kept", ["type"] = "Elsa.WriteLine" },
+                (JsonNode)new JsonObject { ["id"] = "kept", ["type"] = "Console.WriteLine" },
                 (JsonNode)new JsonObject { ["id"] = "removed", ["type"] = "Elsa.Http.HttpEndpoint" }
             }
         };
@@ -23,7 +23,7 @@ public class WorkflowProposalDiffServiceTests
         {
             ["activities"] = new JsonArray
             {
-                (JsonNode)new JsonObject { ["id"] = "kept", ["type"] = "Elsa.WriteLine" },
+                (JsonNode)new JsonObject { ["id"] = "kept", ["type"] = "Console.WriteLine" },
                 (JsonNode)new JsonObject { ["id"] = "added", ["type"] = "Elsa.SendEmail" }
             }
         };

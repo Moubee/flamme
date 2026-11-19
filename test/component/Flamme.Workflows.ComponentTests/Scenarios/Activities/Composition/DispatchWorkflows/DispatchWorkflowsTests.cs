@@ -37,7 +37,7 @@ public class DispatchWorkflowsTests : AppComponentTest
         var result = await RunWorkflowAsync(DispatchAndWaitWorkflow.DefinitionId);
 
         await AssertWorkflowFinished(result);
-        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Elsa.WriteLine").ToList();
+        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Console.WriteLine").ToList();
         await Assert.That(writeLineExecutionRecords.Count).IsEqualTo(ExpectedWriteLineCount);
     }
 
@@ -65,7 +65,7 @@ public class DispatchWorkflowsTests : AppComponentTest
         var result = await RunWorkflowAsync(DispatchWithInputWorkflow.DefinitionId);
 
         await AssertWorkflowFinished(result);
-        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Elsa.WriteLine").ToList();
+        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Console.WriteLine").ToList();
         await Assert.That(writeLineExecutionRecords.Count).IsEqualTo(ExpectedWriteLineCount);
 
         var writtenTexts = writeLineExecutionRecords

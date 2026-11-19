@@ -13,7 +13,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Execute an activity while a given condition evaluates to true.
 /// </summary>
-[Activity("Elsa", "Looping", "Execute an activity while a given condition evaluates to true.")]
+[Activity("ControlFlow", "While", 1, "Execute an activity while a given condition evaluates to true.", "Looping")]
 [PublicAPI]
 public class While : Activity
 {

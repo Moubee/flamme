@@ -7,7 +7,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Marks the end of a flowchart, causing the flowchart to complete.
 /// </summary>
-[Activity("Elsa", "Flow", "A milestone activity that marks the end of a flowchart.", Kind = ActivityKind.Action)]
+[Activity("ControlFlow", "End", 1, "A milestone activity that marks the end of a flowchart.", "Flow", Kind = ActivityKind.Action)]
 [PublicAPI]
 public class End : CodeActivity, ITerminalNode
 {

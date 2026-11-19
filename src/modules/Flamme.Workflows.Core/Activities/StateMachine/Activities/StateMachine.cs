@@ -15,7 +15,7 @@ namespace Flamme.Workflows.Activities.StateMachine.Activities;
 /// <summary>
 /// Executes a state machine made of named states and trigger-driven transitions.
 /// </summary>
-[Activity("Elsa", "Flow", "Executes a state machine made of named states and trigger-driven transitions.")]
+[Activity("ControlFlow", "StateMachine", 1, "Executes a state machine made of named states and trigger-driven transitions.", "Flow")]
 [PublicAPI]
 public class StateMachine : Activity
 {
@@ -323,7 +323,7 @@ public class StateMachine : Activity
             var duplicatesId = !string.IsNullOrWhiteSpace(trigger.Id) && !seenIds.Add(trigger.Id);
 
             if (sharesInstance || duplicatesId)
-                throw new InvalidOperationException("StateMachine transitions cannot share a Trigger activity in Flamme 3.8. Give each transition its own trigger activity with a unique ID.");
+                throw new InvalidOperationException("StateMachine transitions cannot share a Trigger activity. Give each transition its own trigger activity with a unique ID.");
         }
     }
 

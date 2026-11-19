@@ -13,7 +13,7 @@ namespace Flamme.Alterations.Activities;
 /// Submits an alteration plan for execution.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Alterations", "Triggered when an Alteration Plan completed")]
+[Activity("Alterations", "PlanCompleted", 1, "Triggered when an Alteration Plan completed", "Alterations")]
 public class AlterationPlanCompleted : Trigger
 {
     /// <inheritdoc />

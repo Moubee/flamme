@@ -14,7 +14,7 @@
   "isLatest": true,
   "isPublished": true,
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "uEnFWEdaWkadgIMHT2umLA",
     "metadata": {},
@@ -27,7 +27,7 @@
       {
         "id": "MLDV_altcUO5MwP7p5xJWw",
         "name": "Start1",
-        "type": "Elsa.Start",
+        "type": "ControlFlow.Start",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -59,7 +59,7 @@
         },
         "id": "EIh3Q0Um1U-QSCh1b3GBjQ",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -82,7 +82,7 @@
         "text": null,
         "id": "0Z7Velr5CEW_r7YYoeEjBQ",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -103,7 +103,7 @@
       },
       {
         "body": {
-          "type": "Elsa.Flowchart",
+          "type": "ControlFlow.Flowchart",
           "version": 1,
           "id": "NJ5fh2bUWU-TxWeXsbNaSg",
           "metadata": {},
@@ -127,7 +127,7 @@
               "result": null,
               "id": "8KVHRw-WpUizyxOq0C6Nvg",
               "name": "Event1",
-              "type": "Elsa.Event",
+              "type": "Signals.Event",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -151,7 +151,7 @@
         },
         "id": "HG4wfBhvlEW_149HwNyzHw",
         "name": "FlowNode1",
-        "type": "Elsa.FlowNode",
+        "type": "ControlFlow.Node",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

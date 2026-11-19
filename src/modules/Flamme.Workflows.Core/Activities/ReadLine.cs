@@ -8,7 +8,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Read a line of text from the console.
 /// </summary>
-[Activity("Elsa", "Console", "Read a line of text from the console.")]
+[Activity("Console", "ReadLine", 1, "Read a line of text from the console.", "Console")]
 public class ReadLine : CodeActivity<string>
 {
     /// <inheritdoc />

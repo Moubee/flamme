@@ -241,6 +241,6 @@ public class MemoryTriggerStoreTests
             WorkflowDefinitionVersionId = workflowDefinitionVersionId,
             ActivityId = activityId,
             Hash = hash,
-            Name = "Elsa.HttpEndpoint"
+            Name = "Http.Endpoint"
         };
 }

@@ -19,7 +19,7 @@
     "activityCategory": "Testing"
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "v-ii0Vp0yUCPWReLNUiosg",
     "metadata": {},

@@ -15,7 +15,7 @@ namespace Flamme.Alterations.Activities;
 /// Submits an alteration plan for execution.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Alterations", "Dispatches jobs for the specified Alteration Plan", Kind = ActivityKind.Task)]
+[Activity("Alterations", "DispatchJobs", 1, "Dispatches jobs for the specified Alteration Plan", "Alterations", Kind = ActivityKind.Task)]
 public class DispatchAlterationJobs : CodeActivity
 {
     /// <inheritdoc />

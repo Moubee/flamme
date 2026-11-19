@@ -215,7 +215,7 @@ public class WorkflowTriggerEqualityComparerTests
         object payload,
         string workflowDefinitionId = "workflow-1",
         string workflowDefinitionVersionId = "workflow-1:v1",
-        string name = "Elsa.HttpEndpoint",
+        string name = "Http.Endpoint",
         string activityId = "activity-1",
         string hash = "some-hash") => new()
     {

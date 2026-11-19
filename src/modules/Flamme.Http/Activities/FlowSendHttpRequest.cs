@@ -11,7 +11,7 @@ namespace Flamme.Http;
 /// <summary>
 /// Send an HTTP request.
 /// </summary>
-[Activity("Elsa", "HTTP", "Send an HTTP request.", DisplayName = "HTTP Request (flow)", Kind = ActivityKind.Task)]
+[Activity("Http", "FlowSendRequest", 1, "Send an HTTP request.", "HTTP", DisplayName = "HTTP Request (flow)", Kind = ActivityKind.Task)]
 public class FlowSendHttpRequest : SendHttpRequestBase, IActivityPropertyDefaultValueProvider
 {
     /// <inheritdoc />

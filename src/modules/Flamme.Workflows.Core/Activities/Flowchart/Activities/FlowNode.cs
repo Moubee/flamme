@@ -7,7 +7,7 @@ namespace Flamme.Workflows.Activities.Flowchart.Activities;
 /// <summary>
 /// A simple container that executes the specified activity.
 /// </summary>
-[Activity("Elsa", "Flow", "A simple container that executes the specified activity.", DisplayName = "Container")]
+[Activity("ControlFlow", "Node", 1, "A simple container that executes the specified activity.", "Flow", DisplayName = "Container")]
 [PublicAPI]
 public class FlowNode : Activity
 {

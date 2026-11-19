@@ -115,7 +115,7 @@ public class DispatchWorkflowCommandHandlerTests
     public async Task HandleAsync_ReportsActivationDenialForWaitingParent_WithoutChangingQueuedDispatchResult()
     {
         var properties = new Dictionary<string, object> { ["WaitForCompletion"] = true };
-        DispatchWorkflowActivationDeniedRoute.Add(properties, "Elsa.DispatchWorkflow", "dispatch-hash");
+        DispatchWorkflowActivationDeniedRoute.Add(properties, "Workflows.Dispatch", "dispatch-hash");
         var command = new DispatchWorkflowDefinitionCommand("definition-version-1")
         {
             InstanceId = "child-1",
@@ -129,10 +129,10 @@ public class DispatchWorkflowCommandHandlerTests
 
         await Assert.That(result).IsSameReferenceAs(Unit.Instance);
         Mock.Get(_notificationSender).SendAsync(
-            Arg.Is<INotification>(value => value is DispatchWorkflowActivationDenied notification && notification.ParentWorkflowInstanceId == "parent-1" && notification.WorkflowInstanceId == "child-1" && notification.ActivityTypeName == "Elsa.DispatchWorkflow" && notification.StimulusHash == "dispatch-hash"),
+            Arg.Is<INotification>(value => value is DispatchWorkflowActivationDenied notification && notification.ParentWorkflowInstanceId == "parent-1" && notification.WorkflowInstanceId == "child-1" && notification.ActivityTypeName == "Workflows.Dispatch" && notification.StimulusHash == "dispatch-hash"),
             Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
 
-        await Assert.That(properties["__elsa.internal.dispatch-activation-denied.activity-type-name"]).IsEqualTo("Elsa.DispatchWorkflow");
+        await Assert.That(properties["__elsa.internal.dispatch-activation-denied.activity-type-name"]).IsEqualTo("Workflows.Dispatch");
         await Assert.That(properties["__elsa.internal.dispatch-activation-denied.stimulus-hash"]).IsEqualTo("dispatch-hash");
     }
 
@@ -157,7 +157,7 @@ public class DispatchWorkflowCommandHandlerTests
     public async Task HandleAsync_SanitizesActivationDenialRouteBeforePersistingProperties()
     {
         var properties = new Dictionary<string, object> { ["WaitForCompletion"] = true };
-        DispatchWorkflowActivationDeniedRoute.Add(properties, "Elsa.DispatchWorkflow", "dispatch-hash");
+        DispatchWorkflowActivationDeniedRoute.Add(properties, "Workflows.Dispatch", "dispatch-hash");
         var command = new DispatchWorkflowDefinitionCommand("definition-version-1")
         {
             InstanceId = "child-1",

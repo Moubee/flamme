@@ -7,7 +7,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Marks the start of a flowchart.
 /// </summary>
-[Activity("Elsa", "Flow", "A milestone activity that marks the start of a flowchart.", Kind = ActivityKind.Action)]
+[Activity("ControlFlow", "Start", 1, "A milestone activity that marks the start of a flowchart.", "Flow", Kind = ActivityKind.Action)]
 [PublicAPI]
 public class Start : CodeActivity, IStartNode
 {

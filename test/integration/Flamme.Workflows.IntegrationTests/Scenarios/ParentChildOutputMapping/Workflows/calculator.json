@@ -25,7 +25,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "GGOfdS1e60-vuDvSskzt6A",
     "metadata": {},
@@ -101,7 +101,7 @@
         },
         "id": "NDqbEDwcIUu7zJ0FDxbHdg",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

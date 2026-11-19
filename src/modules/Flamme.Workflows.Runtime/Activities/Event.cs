@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// <summary>
 /// Wait for an event to be triggered.
 /// </summary>
-[Activity("Elsa", "Primitives", "Wait for an event to be published.")]
+[Activity("Signals", "Event", 1, "Wait for an event to be published.", "Primitives")]
 [UsedImplicitly]
 public class Event : Trigger<object?>
 {

@@ -1,6 +1,6 @@
 namespace Flamme.Workflows.Attributes;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Method, Inherited = false)]
 public class ActivityAttribute : Attribute
 {
     public ActivityAttribute()

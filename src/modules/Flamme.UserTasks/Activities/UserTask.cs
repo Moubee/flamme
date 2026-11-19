@@ -16,7 +16,7 @@ namespace Flamme.UserTasks.Activities;
 /// <summary>
 /// Creates a workflow-bound human task and suspends the workflow until a governed outcome resumes it.
 /// </summary>
-[Activity("Elsa", "User Tasks", "Creates a user task and waits for a human outcome.", Kind = ActivityKind.Task)]
+[Activity("Tasks", "UserTask", 1, "Creates a user task and waits for a human outcome.", "User Tasks", Kind = ActivityKind.Task)]
 public sealed class UserTask : Activity<UserTaskResult>
 {
     public const string InputKey = "UserTaskInput";

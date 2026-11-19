@@ -39,7 +39,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "5f72efc9043753fa",
     "nodeId": "Workflow1:5f72efc9043753fa",
@@ -69,7 +69,7 @@
         "id": "402076f12c1220a9",
         "nodeId": "Workflow1:5f72efc9043753fa:402076f12c1220a9",
         "name": "SetOutput1",
-        "type": "Elsa.SetOutput",
+        "type": "Data.SetOutput",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -114,7 +114,7 @@
         "id": "db1d1c02cbfac590",
         "nodeId": "Workflow1:5f72efc9043753fa:db1d1c02cbfac590",
         "name": "SetOutput2",
-        "type": "Elsa.SetOutput",
+        "type": "Data.SetOutput",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

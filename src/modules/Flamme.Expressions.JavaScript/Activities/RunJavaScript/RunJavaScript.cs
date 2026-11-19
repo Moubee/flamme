@@ -14,7 +14,7 @@ namespace Flamme.Expressions.JavaScript.Activities;
 /// <summary>
 /// Executes JavaScript code.
 /// </summary>
-[Activity("Elsa", "Scripting", "Executes JavaScript code", DisplayName = "Run JavaScript")]
+[Activity("Scripting", "RunJavaScript", 1, "Executes JavaScript code", "Scripting", DisplayName = "Run JavaScript")]
 public class RunJavaScript : CodeActivity<object?>
 {
     /// <inheritdoc />

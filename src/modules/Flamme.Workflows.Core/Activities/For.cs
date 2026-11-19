@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Iterate over a sequence of steps between a start and an end number.
 /// </summary>
-[Activity("Elsa", "Looping", "Iterate over a sequence of steps between a start and an end number.")]
+[Activity("ControlFlow", "For", 1, "Iterate over a sequence of steps between a start and an end number.", "Looping")]
 [PublicAPI]
 public class For : Activity
 {

@@ -22,7 +22,7 @@
     "id": "990d07168c5223de",
     "nodeId": "Workflow1:990d07168c5223de",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -42,7 +42,7 @@
         "id": "a38215f28410f472",
         "nodeId": "Workflow1:990d07168c5223de:a38215f28410f472",
         "name": "FlowDecision1",
-        "type": "Elsa.FlowDecision",
+        "type": "ControlFlow.Decide",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -65,7 +65,7 @@
         "id": "50e042cfab596891",
         "nodeId": "Workflow1:990d07168c5223de:50e042cfab596891",
         "name": "Start1",
-        "type": "Elsa.Start",
+        "type": "ControlFlow.Start",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -88,7 +88,7 @@
         "id": "d5b9c2affe09a93b",
         "nodeId": "Workflow1:990d07168c5223de:d5b9c2affe09a93b",
         "name": "End1",
-        "type": "Elsa.End",
+        "type": "ControlFlow.End",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

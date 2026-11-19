@@ -6,7 +6,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Schedule an activity for each item in parallel.
 /// </summary>
-[Activity("Elsa", "Looping", "Schedule an activity for each item in parallel.")]
+[Activity("ControlFlow", "ParallelForEach", 1, "Schedule an activity for each item in parallel.", "Looping")]
 public class ParallelForEach : ParallelForEach<object>
 {
     /// <inheritdoc />

@@ -23,7 +23,7 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
         var activityAttr = activityType.GetCustomAttribute<ActivityAttribute>();
         var ns = activityAttr?.Namespace ?? ActivityTypeNameHelper.GenerateNamespace(activityType) ?? "Elsa";
         var friendlyName = GetFriendlyActivityName(activityType);
-        var typeName = activityAttr?.Type ?? friendlyName;
+        var typeName = ActivityTypeNameHelper.GenerateTypeName(activityType, null);
         var typeVersion = activityAttr?.Version ?? 1;
         var fullTypeName = ActivityTypeNameHelper.GenerateTypeName(activityType);
         var displayNameAttr = activityType.GetCustomAttribute<DisplayNameAttribute>();

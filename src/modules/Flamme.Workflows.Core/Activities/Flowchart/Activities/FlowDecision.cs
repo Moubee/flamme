@@ -12,7 +12,7 @@ namespace Flamme.Workflows.Activities.Flowchart.Activities;
 /// Performs a boolean condition and returns an outcome based on the result.
 /// </summary>
 [FlowNode("True", "False")]
-[Activity("Elsa", "Branching", "Evaluate a Boolean condition to determine which path to execute next.", DisplayName = "Decision")]
+[Activity("ControlFlow", "Decide", 1, "Evaluate a Boolean condition to determine which path to execute next.", "Branching", DisplayName = "Decision")]
 [PublicAPI]
 public class FlowDecision : Activity
 {

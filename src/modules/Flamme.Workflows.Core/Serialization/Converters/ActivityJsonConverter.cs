@@ -119,9 +119,7 @@ public class ActivityJsonConverter(
             activityTypeVersion = activityVersionElement.GetInt32();
             activityDescriptor = activityRegistry.Find(activityTypeName, activityTypeVersion);
         }
-
-        // If a version is not specified, or activity with specified version is not found: use the latest version of the activity descriptor.
-        if (activityDescriptor == null)
+        else
         {
             activityDescriptor = activityRegistry.Find(activityTypeName);
             activityTypeVersion = activityDescriptor?.Version ?? 0;
@@ -142,20 +140,21 @@ public class ActivityJsonConverter(
                  && activityRoot.TryGetProperty("workflowDefinitionId", out var workflowDefinitionIdElement)
                  && workflowDefinitionIdElement.ValueKind == JsonValueKind.String)
         {
-            activityDescriptor = FindActivityDescriptorByCustomProperty("WorkflowDefinitionId", workflowDefinitionIdElement);
-            activityTypeVersion = activityDescriptor?.Version ?? 0;
+            int? requestedVersion = activityVersionElement.ValueKind == JsonValueKind.Undefined ? null : activityTypeVersion;
+            activityDescriptor = FindActivityDescriptorByCustomProperty("WorkflowDefinitionId", workflowDefinitionIdElement, requestedVersion);
+            activityTypeVersion = activityDescriptor?.Version ?? activityTypeVersion;
         }
 
         return activityTypeName;
     }
 
-    private ActivityDescriptor? FindActivityDescriptorByCustomProperty(string customPropertyName, JsonElement valueElement)
+    private ActivityDescriptor? FindActivityDescriptorByCustomProperty(string customPropertyName, JsonElement valueElement, int? version = null)
     {
         if (valueElement.ValueKind != JsonValueKind.String)
             return null;
 
         var searchValue = valueElement.GetString();
-        return activityRegistry.Find(x => x.CustomProperties.TryGetValue(customPropertyName, out var value) && (string?)value == searchValue);
+        return activityRegistry.Find(x => (version == null || x.Version == version) && x.CustomProperties.TryGetValue(customPropertyName, out var value) && (string?)value == searchValue);
     }
 
     private JsonSerializerOptions GetClonedOptions(JsonSerializerOptions options)

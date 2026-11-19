@@ -17,7 +17,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "B2jpPDriPEe-zSOhVuAGeQ",
     "metadata": {},
@@ -41,7 +41,7 @@
         },
         "id": "2yPLgUudQEGPaschdLdkGg",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -63,7 +63,7 @@
       },
       {
         "body": {
-          "type": "Elsa.Flowchart",
+          "type": "ControlFlow.Flowchart",
           "version": 1,
           "id": "zaAIlUtQDEaPqeITeRJ4_w",
           "metadata": {},
@@ -87,7 +87,7 @@
               },
               "id": "g3jVTdvU3EK7V5JqRqfqjQ",
               "name": "WriteLine1",
-              "type": "Elsa.WriteLine",
+              "type": "Console.WriteLine",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -112,7 +112,7 @@
         },
         "id": "eHAEEQ-Iu0GwM3mRxZin0Q",
         "name": "FlowNode1",
-        "type": "Elsa.FlowNode",
+        "type": "ControlFlow.Node",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -145,7 +145,7 @@
         },
         "id": "7RQ2sbVHo0SxsyK0dvTKEA",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -178,7 +178,7 @@
         },
         "id": "dVUuwMm5XUiYpiYoGo5JKA",
         "name": "FlowJoin1",
-        "type": "Elsa.FlowJoin",
+        "type": "ControlFlow.Join",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -210,7 +210,7 @@
         },
         "id": "NpZ_yT_irUuE9ASEfYLxbw",
         "name": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

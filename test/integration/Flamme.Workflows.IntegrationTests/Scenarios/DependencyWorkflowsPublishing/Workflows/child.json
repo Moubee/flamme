@@ -20,7 +20,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "c22918340b6cb7cd",
     "nodeId": "Workflow1:c22918340b6cb7cd",

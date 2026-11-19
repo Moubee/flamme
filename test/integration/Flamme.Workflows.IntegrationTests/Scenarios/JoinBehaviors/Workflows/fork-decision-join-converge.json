@@ -34,7 +34,7 @@
     "id": "8d3ecf38f4425d86",
     "nodeId": "Workflow1:8d3ecf38f4425d86",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -54,7 +54,7 @@
         "id": "35c0f40b240666c6",
         "nodeId": "Workflow1:8d3ecf38f4425d86:35c0f40b240666c6",
         "name": "FlowDecision1",
-        "type": "Elsa.FlowDecision",
+        "type": "ControlFlow.Decide",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -77,7 +77,7 @@
         "id": "342cf539286a991d",
         "nodeId": "Workflow1:8d3ecf38f4425d86:342cf539286a991d",
         "name": "Start1",
-        "type": "Elsa.Start",
+        "type": "ControlFlow.Start",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -107,7 +107,7 @@
         "id": "79e963ee9889c30a",
         "nodeId": "Workflow1:8d3ecf38f4425d86:79e963ee9889c30a",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -138,7 +138,7 @@
         "id": "af2cc31d1cef7a90",
         "nodeId": "Workflow1:8d3ecf38f4425d86:af2cc31d1cef7a90",
         "name": "WriteLine9",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -169,7 +169,7 @@
         "id": "768b5a7e58c3ecf8",
         "nodeId": "Workflow1:8d3ecf38f4425d86:768b5a7e58c3ecf8",
         "name": "WriteLine4",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

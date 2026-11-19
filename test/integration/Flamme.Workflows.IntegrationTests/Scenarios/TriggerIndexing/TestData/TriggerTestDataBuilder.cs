@@ -39,7 +39,7 @@ public class TriggerTestDataBuilder
             IsPublished = true,
             IsLatest = true,
             MaterializerName = materializerName,
-            StringData = "{\"root\":{\"type\":\"Elsa.Sequence\",\"id\":\"seq1\",\"version\":1,\"activities\":[]}}"
+            StringData = "{\"root\":{\"type\":\"ControlFlow.Sequence\",\"id\":\"seq1\",\"version\":1,\"activities\":[]}}"
         };
     }
 

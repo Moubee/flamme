@@ -17,7 +17,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "k0HQeDE_gk-OxcsjGj3tbQ",
     "metadata": {},
@@ -41,7 +41,7 @@
         },
         "id": "35MeNlWlAUKXd5JFDJtJ3w",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -73,7 +73,7 @@
         },
         "id": "CvdSrKs5DESezhkLjb0YIw",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

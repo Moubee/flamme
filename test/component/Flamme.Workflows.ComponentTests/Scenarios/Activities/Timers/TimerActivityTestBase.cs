@@ -18,7 +18,7 @@ public abstract class TimerActivityTestBase(App app) : AppComponentTest(app)
         await Assert.That(result.WorkflowExecutionContext.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
 
         var writeLineRecords = result.ActivityExecutionRecords
-            .Where(x => x.ActivityType == "Elsa.WriteLine")
+            .Where(x => x.ActivityType == "Console.WriteLine")
             .OrderBy(x => x.CompletedAt)
             .ToList();
 

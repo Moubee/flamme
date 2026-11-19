@@ -22,7 +22,7 @@
     "activityCategory": "Testing"
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "Gn-5gEC2-UCmmzWTgvYCmw",
     "metadata": {},
@@ -46,7 +46,7 @@
         },
         "id": "tyDvLNGiYkCbUabhgzcSdw",
         "name": "Complete1",
-        "type": "Elsa.Complete",
+        "type": "ControlFlow.Complete",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

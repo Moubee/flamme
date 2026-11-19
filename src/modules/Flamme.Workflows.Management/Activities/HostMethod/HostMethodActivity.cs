@@ -1,3 +1,4 @@
+using Flamme.Workflows.Attributes;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Flamme.Workflows.Management.Activities.HostMethod;
 /// Executes a public async method on a configured CLR type. Internal activity used by <see cref="HostMethodActivityProvider"/>.
 /// </summary>
 [Browsable(false)]
+[Activity("System", "HostMethod", 1)]
 public class HostMethodActivity : Activity
 {
     [JsonIgnore] internal Type HostType { get; set; } = null!;

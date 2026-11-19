@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Activities;
 /// Represents an executable process.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Workflows", "A workflow is an activity that executes its Root activity.")]
+[Activity("Workflows", "Workflow", 1, "A workflow is an activity that executes its Root activity.", "Workflows")]
 [PublicAPI]
 public class Workflow : Composite<object>, ICloneable
 {

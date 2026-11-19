@@ -18,7 +18,7 @@ namespace Flamme.Http;
 /// <summary>
 /// Wait for an inbound HTTP request that matches the specified path and methods.
 /// </summary>
-[Activity("Elsa", "HTTP", "Wait for an inbound HTTP request that matches the specified path and methods.", DisplayName = "HTTP Endpoint")]
+[Activity("Http", "Endpoint", 1, "Wait for an inbound HTTP request that matches the specified path and methods.", "HTTP", DisplayName = "HTTP Endpoint")]
 [Output(IsSerializable = false)]
 public class HttpEndpoint : Trigger<HttpRequest>
 {

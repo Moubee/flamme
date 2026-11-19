@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Faults the workflow.
 /// </summary>
-[Activity("Elsa", "Primitives", "Faults the workflow.")]
+[Activity("ControlFlow", "Fault", 1, "Faults the workflow.", "Primitives")]
 [PublicAPI]
 public class Fault : Activity
 {

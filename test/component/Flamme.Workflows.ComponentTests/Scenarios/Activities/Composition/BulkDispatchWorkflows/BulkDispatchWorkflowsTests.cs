@@ -43,7 +43,7 @@ public class BulkDispatchWorkflowsTests : AppComponentTest
     {
         var result = await RunWorkflowAsync(BulkDispatchAndWaitWorkflow.DefinitionId);
 
-        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Elsa.WriteLine").ToList();
+        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Console.WriteLine").ToList();
         await Assert.That(writeLineExecutionRecords.Count).IsEqualTo(4);
     }
 
@@ -126,7 +126,7 @@ public class BulkDispatchWorkflowsTests : AppComponentTest
         var result = await RunWorkflowAsync(MixFruitsWorkflow.DefinitionId);
         await AssertWorkflowFinished(result);
 
-        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Elsa.WriteLine").ToList();
+        var writeLineExecutionRecords = result.ActivityExecutionRecords.Where(x => x.ActivityType == "Console.WriteLine").ToList();
         await Assert.That(writeLineExecutionRecords.Count).IsEqualTo(3);
 
         var writtenTexts = writeLineExecutionRecords

@@ -23,7 +23,7 @@
     "id": "83f95a4ca749c950",
     "nodeId": "Workflow1:83f95a4ca749c950",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -79,7 +79,7 @@
         "id": "607c2042a187fe5a",
         "nodeId": "Workflow1:83f95a4ca749c950:607c2042a187fe5a",
         "name": "HttpEndpoint1",
-        "type": "Elsa.HttpEndpoint",
+        "type": "Http.Endpoint",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,

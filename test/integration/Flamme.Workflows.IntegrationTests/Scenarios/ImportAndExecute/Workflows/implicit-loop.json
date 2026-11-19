@@ -21,7 +21,7 @@
   "isLatest": true,
   "isPublished": true,
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "Flowchart1",
     "metadata": {},
@@ -49,7 +49,7 @@
           }
         },
         "id": "SetVariable1",
-        "type": "Elsa.SetVariable",
+        "type": "Data.SetVariable",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -78,7 +78,7 @@
           }
         },
         "id": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -107,7 +107,7 @@
           }
         },
         "id": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -136,7 +136,7 @@
           }
         },
         "id": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -165,7 +165,7 @@
           }
         },
         "id": "FlowDecision1",
-        "type": "Elsa.FlowDecision",
+        "type": "ControlFlow.Decide",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -184,7 +184,7 @@
       },
       {
         "id": "Start1",
-        "type": "Elsa.Start",
+        "type": "ControlFlow.Start",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,

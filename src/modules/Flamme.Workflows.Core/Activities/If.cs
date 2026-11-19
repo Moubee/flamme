@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Evaluate a Boolean condition to determine which activity to execute next.
 /// </summary>
-[Activity("Elsa", "Branching", "Evaluate a Boolean condition to determine which activity to execute next.")]
+[Activity("ControlFlow", "If", 1, "Evaluate a Boolean condition to determine which activity to execute next.", "Branching")]
 [PublicAPI]
 public class If : Activity<bool>
 {

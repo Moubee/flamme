@@ -39,7 +39,7 @@
     "id": "938f2c91bb759a6a",
     "nodeId": "Workflow2:938f2c91bb759a6a",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],

@@ -18,7 +18,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "refgraph-parent-flowchart",
     "nodeId": "RefGraphParent:refgraph-parent-flowchart",

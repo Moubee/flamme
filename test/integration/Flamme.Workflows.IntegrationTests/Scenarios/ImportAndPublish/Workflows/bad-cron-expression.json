@@ -27,7 +27,7 @@
     "id": "57363d0e76c3e9d2",
     "nodeId": "Workflow1:57363d0e76c3e9d2",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [
@@ -49,7 +49,7 @@
         "id": "1bf2412c9603f5d3",
         "nodeId": "Workflow1:57363d0e76c3e9d2:1bf2412c9603f5d3",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -79,7 +79,7 @@
         "id": "13658e4b3bfafaaf",
         "nodeId": "Workflow1:57363d0e76c3e9d2:13658e4b3bfafaaf",
         "name": "Cron1",
-        "type": "Elsa.Cron",
+        "type": "Time.Cron",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,

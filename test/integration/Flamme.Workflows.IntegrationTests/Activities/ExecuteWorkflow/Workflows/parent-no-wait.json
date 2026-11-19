@@ -13,7 +13,7 @@
   "isLatest": true,
   "isPublished": true,
   "root": {
-    "type": "Elsa.Sequence",
+    "type": "ControlFlow.Sequence",
     "version": 1,
     "id": "Sequence1",
     "metadata": {},
@@ -34,7 +34,7 @@
           }
         },
         "id": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -64,7 +64,7 @@
           }
         },
         "id": "ExecuteWorkflow1",
-        "type": "Elsa.ExecuteWorkflow",
+        "type": "Workflows.Execute",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -84,7 +84,7 @@
           }
         },
         "id": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

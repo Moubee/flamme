@@ -5,7 +5,7 @@ using Flamme.Workflows.Attributes;
 
 namespace Flamme.Server.Web.Activities;
 
-[Activity("Elsa", "Authorization", "Authorizes a flow based on the configured policies.")]
+[Activity("Authorization", "AuthorizeFlow", 1, "Authorizes a flow based on the configured policies.", "Authorization")]
 [FlowNode("Authorized", "Unauthorized", "Error")]
 public class AuthorizeFlow : Activity<string>
 {

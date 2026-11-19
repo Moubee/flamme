@@ -5,7 +5,7 @@
   "version": 2,
   "toolVersion": "3.0.0.0",
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "52ae1d65f7896a9e",
     "nodeId": "Workflow1:52ae1d65f7896a9e",
@@ -21,7 +21,8 @@
         "id": "3a1ab61a351fe232",
         "nodeId": "Workflow1:52ae1d65f7896a9e:3a1ab61a351fe232",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
+        "version": 1,
         "metadata": {
           "designer": {
             "position": {

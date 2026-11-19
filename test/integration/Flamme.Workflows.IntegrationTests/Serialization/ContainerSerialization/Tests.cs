@@ -53,7 +53,7 @@ public class Tests : IAsyncDisposable
         {
             Id = "flowchart",
             Name = "Flowchart",
-            Type = "Elsa.Flowchart",
+            Type = "ControlFlow.Flowchart",
             Version = 42,
             CustomProperties = new Dictionary<string, object>
             {
@@ -101,7 +101,7 @@ public class Tests : IAsyncDisposable
         {
             Id = "sequence",
             Name = "Sequence",
-            Type = "Elsa.Sequence",
+            Type = "ControlFlow.Sequence",
             Version = 42,
             Variables = new List<Variable> {
                 new Variable<string>("TextVar", "This is the text to write")
@@ -149,7 +149,7 @@ public class Tests : IAsyncDisposable
         {
             Id = "parallel",
             Name = "Parallel",
-            Type = "Elsa.Parallel",
+            Type = "ControlFlow.Parallel",
             Version = 42,
             Variables = new List<Variable> {
                 new Variable<string>("TextVar", "This is the text to write")

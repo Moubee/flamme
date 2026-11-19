@@ -14,7 +14,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// <summary>
 /// Creates a new workflow instance of the specified workflow and dispatches it for execution.
 /// </summary>
-[Activity("Elsa", "Composition", "Create a new workflow instance of the specified workflow and execute it.", Kind = ActivityKind.Task)]
+[Activity("Workflows", "Execute", 1, "Create a new workflow instance of the specified workflow and execute it.", "Composition", Kind = ActivityKind.Task)]
 [UsedImplicitly]
 public class ExecuteWorkflow : Activity<ExecuteWorkflowResult>
 {

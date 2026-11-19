@@ -108,6 +108,6 @@ public class MemoryTriggerStoreTenantIsolationTests
             WorkflowDefinitionVersionId = "v1",
             ActivityId = id,
             Hash = hash,
-            Name = "Elsa.HttpEndpoint"
+            Name = "Http.Endpoint"
         };
 }
