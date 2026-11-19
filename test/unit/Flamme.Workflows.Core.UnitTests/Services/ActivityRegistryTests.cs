@@ -1,4 +1,6 @@
 using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 using Flamme.Workflows.Management.Entities;
@@ -19,19 +21,20 @@ public class ActivityRegistryTests
     private const string TestActivityType = "TestActivity";
     private const string CurrentTenant = "tenant1";
 
+    private readonly ITenantAccessor _tenantAccessor;
     private readonly IActivityDescriber _activityDescriber;
     private readonly ILogger<ActivityRegistry> _logger;
     private readonly ActivityRegistry _registry;
 
     public ActivityRegistryTests()
     {
-        var tenantAccessor = ITenantAccessor.Mock().Object;
+        _tenantAccessor = ITenantAccessor.Mock().Object;
         _activityDescriber = IActivityDescriber.Mock().Object;
         _logger = ILogger<ActivityRegistry>.Mock().Object;
-        _registry = new(_activityDescriber, [], tenantAccessor, _logger);
+        _registry = new(_activityDescriber, [], _tenantAccessor, _logger);
 
         // Set default tenant for all tests
-        Mock.Get(tenantAccessor).TenantId.Returns(CurrentTenant);
+        Mock.Get(_tenantAccessor).TenantId.Returns(CurrentTenant);
     }
 
     [Test]
@@ -346,24 +349,62 @@ public class ActivityRegistryTests
     }
 
     [Test]
-    public async Task IncrementalWorkflowDescriptorUpdatesPreserveTheLogicalOwner()
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task RegisterAsyncChecksTheModifiedScopeWhenTheAmbientTenantAlreadyHasABinding(bool sameClrType)
     {
-        var definitions = new[] { "first", "second" }.Select(owner => new WorkflowDefinition
-        {
-            DefinitionId = owner, Id = owner + "-revision", TenantId = CurrentTenant, Name = "Send", Version = 1
-        }).ToArray();
+        var name = ActivityTypeNameHelper.GenerateTypeName<WriteLine>();
+        var local = CreateDescriptor(name, 1, CurrentTenant);
+        local.ClrType = sameClrType ? typeof(WriteLine) : typeof(ReadLine);
+        var incoming = CreateDescriptor(name, 1, "before-modifiers");
+        incoming.ClrType = typeof(WriteLine);
+        Mock.Get(_activityDescriber).DescribeActivityAsync(typeof(WriteLine), Arg.Any<CancellationToken>()).Returns(incoming);
+        var registry = new ActivityRegistry(_activityDescriber, [new SetSharedScope()], _tenantAccessor, _logger);
+        registry.Register(local);
+
+        await registry.RegisterAsync(typeof(WriteLine), default);
+
+        await Assert.That(registry.FindMany(d => d.TypeName == name && d.TenantId == Tenant.AgnosticTenantId).Single()).IsSameReferenceAs(incoming);
+        await Assert.That(registry.Find(name, 1)).IsSameReferenceAs(local);
+    }
+
+    [Test]
+    public async Task PublishedUpdateReconcilesOwnershipAfterADraftRenameAndRejectsSimultaneousClaims()
+    {
+        var first = new WorkflowDefinition { DefinitionId = "first", Id = "first-revision", TenantId = CurrentTenant, Name = "Send", Version = 1 };
+        var second = new WorkflowDefinition { DefinitionId = "second", Id = "second-revision", TenantId = CurrentTenant, Name = "Send", Version = 1 };
+        var definitions = new List<WorkflowDefinition> { first };
         var store = IWorkflowDefinitionStore.Mock().Object;
-        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
-            .Returns(definitions);
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>()).Returns(definitions);
         var provider = new WorkflowDefinitionActivityProvider(store, new WorkflowDefinitionActivityDescriptorFactory());
         var updater = new WorkflowDefinitionActivityRegistryUpdater(provider, _registry);
 
-        await updater.AddToRegistry("first-revision", default);
-        await updater.AddToRegistry("first-revision", default);
-        await Assert.That(() => updater.AddToRegistry("second-revision", default)).Throws<InvalidOperationException>();
+        await updater.AddToRegistry(first.Id, default);
+        definitions.Add(second);
+        await Assert.That(() => updater.AddToRegistry(second.Id, default)).Throws<InvalidOperationException>();
+        await Assert.That(_registry.Find("Send", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(first.DefinitionId);
 
-        var selected = _registry.Find("Send", 1);
-        await Assert.That(selected!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo("first");
+        first.Name = "Renamed";
+        await updater.AddToRegistry(second.Id, default);
+
+        await Assert.That(_registry.Find("Send", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(second.DefinitionId);
+        await Assert.That(_registry.Find("Renamed", 1)!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo(first.DefinitionId);
+    }
+
+    [Test]
+    public async Task AnOlderProviderReadCannotRemoveANewerBinding()
+    {
+        var added = CreateDescriptor("New", 1, CurrentTenant);
+        var provider = new DelayedSnapshotProvider();
+        var first = _registry.RefreshDescriptorsAsync(provider);
+        await provider.FirstRead.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        provider.Descriptors = [added];
+
+        var second = _registry.RefreshDescriptorsAsync(provider);
+        provider.ReleaseFirstRead.SetResult();
+        await Task.WhenAll(first, second);
+
+        await Assert.That(_registry.Find("New", 1)).IsSameReferenceAs(added);
     }
 
     [Test]
@@ -562,6 +603,30 @@ public class ActivityRegistryTests
     private sealed class Provider2(IEnumerable<ActivityDescriptor> descriptors) : IActivityProvider
     {
         public ValueTask<IEnumerable<ActivityDescriptor>> GetDescriptorsAsync(CancellationToken cancellationToken = default) => new(descriptors);
+    }
+
+    private sealed class SetSharedScope : IActivityDescriptorModifier
+    {
+        public void Modify(ActivityDescriptor descriptor)
+        {
+            if (descriptor.TenantId == "before-modifiers")
+                descriptor.TenantId = Tenant.AgnosticTenantId;
+        }
+    }
+
+    private sealed class DelayedSnapshotProvider : IActivityProvider
+    {
+        public IEnumerable<ActivityDescriptor> Descriptors { get; set; } = [];
+        public TaskCompletionSource FirstRead { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource ReleaseFirstRead { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public async ValueTask<IEnumerable<ActivityDescriptor>> GetDescriptorsAsync(CancellationToken cancellationToken = default)
+        {
+            var snapshot = Descriptors;
+            if (FirstRead.TrySetResult())
+                await ReleaseFirstRead.Task.WaitAsync(cancellationToken);
+            return snapshot;
+        }
     }
 
     private sealed class MutableProvider(IEnumerable<ActivityDescriptor> descriptors) : IActivityProvider

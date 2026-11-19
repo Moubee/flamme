@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Flamme.Common.Multitenancy;
-using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +22,7 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
 
     // Tracks tenant-agnostic providers initialized for this registry instance.
     private readonly ConcurrentDictionary<Type, byte> _initializedProviders = new();
-    private readonly ConcurrentDictionary<Type, SemaphoreSlim> _providerInitializationLocks = new();
+    private readonly ConcurrentDictionary<Type, SemaphoreSlim> _providerRefreshLocks = new();
 
     /// <inheritdoc />
     public void Add(Type providerType, ActivityDescriptor descriptor)
@@ -162,24 +161,17 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
     /// <inheritdoc />
     public async Task RegisterAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type activityType, CancellationToken cancellationToken)
     {
-        var name = ActivityTypeNameHelper.GenerateTypeName(activityType);
-        var version = ActivityTypeNameHelper.GetVersion(activityType);
-        if (Find(name, version)?.ClrType == activityType)
-            return;
-
         var descriptor = await activityDescriber.DescribeActivityAsync(activityType, cancellationToken);
         lock (_registrationLock)
         {
-            var existing = Find(descriptor.TypeName, descriptor.Version);
-            if (existing != null)
+            ApplyModifiers(descriptor);
+            var registry = GetOrCreateRegistry(descriptor.TenantId);
+            if (registry.ActivityDescriptors.TryGetValue((descriptor.TypeName, descriptor.Version), out var existing))
             {
-                if (existing.ClrType != activityType)
+                if (!HasSameBinding(existing, descriptor))
                     throw ConflictingBinding(descriptor);
                 return;
             }
-            ApplyModifiers(descriptor);
-            var registry = GetOrCreateRegistry(descriptor.TenantId);
-            ValidateBinding(registry, _manualActivityDescriptors, descriptor);
             StoreDescriptor(registry, _manualActivityDescriptors, descriptor);
         }
     }
@@ -205,13 +197,40 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
             await RefreshDescriptorsAsync(activityProvider, cancellationToken);
     }
 
-    public async Task RefreshDescriptorsAsync(IActivityProvider activityProvider, CancellationToken cancellationToken = default)
+    public Task RefreshDescriptorsAsync(IActivityProvider activityProvider, CancellationToken cancellationToken = default) =>
+        RefreshProviderAsync(activityProvider, initializeOnce: false, cancellationToken);
+
+    /// <inheritdoc />
+    public Task EnsureDescriptorsAsync(IActivityProvider activityProvider, CancellationToken cancellationToken = default) =>
+        RefreshProviderAsync(activityProvider, activityProvider is ITenantAgnosticActivityProvider, cancellationToken);
+
+    private async Task RefreshProviderAsync(IActivityProvider provider, bool initializeOnce, CancellationToken cancellationToken)
     {
-        var providerType = activityProvider.GetType();
+        var providerType = provider.GetType();
+        if (initializeOnce && _initializedProviders.ContainsKey(providerType))
+            return;
 
-        // Get new descriptors from provider
-        var descriptors = (await activityProvider.GetDescriptorsAsync(cancellationToken)).ToList();
+        // Shared descriptors can be returned by multiple tenant scopes. Keep each provider's read and replacement in order.
+        var refreshLock = _providerRefreshLocks.GetOrAdd(providerType, _ => new(1, 1));
+        await refreshLock.WaitAsync(cancellationToken);
+        try
+        {
+            if (initializeOnce && _initializedProviders.ContainsKey(providerType))
+                return;
 
+            var descriptors = (await provider.GetDescriptorsAsync(cancellationToken)).ToList();
+            ReplaceProviderDescriptors(providerType, descriptors);
+            if (initializeOnce)
+                _initializedProviders.TryAdd(providerType, 0);
+        }
+        finally
+        {
+            refreshLock.Release();
+        }
+    }
+
+    private void ReplaceProviderDescriptors(Type providerType, List<ActivityDescriptor> descriptors)
+    {
         lock (_registrationLock)
         {
             foreach (var descriptor in descriptors)
@@ -230,7 +249,7 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
                 {
                     if (!keys.Add((descriptor.TypeName, descriptor.Version)))
                         throw ConflictingBinding(descriptor);
-                    ValidateBinding(registry, owned, descriptor);
+                    ValidateBinding(registry, owned, descriptor, replacingProviderSnapshot: true);
                 }
             }
 
@@ -251,36 +270,6 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
         }
     }
 
-    /// <inheritdoc />
-    public async Task EnsureDescriptorsAsync(IActivityProvider activityProvider, CancellationToken cancellationToken = default)
-    {
-        if (activityProvider is not ITenantAgnosticActivityProvider)
-        {
-            await RefreshDescriptorsAsync(activityProvider, cancellationToken);
-            return;
-        }
-
-        var providerType = activityProvider.GetType();
-        if (_initializedProviders.ContainsKey(providerType))
-            return;
-
-        var initializationLock = _providerInitializationLocks.GetOrAdd(providerType, _ => new(1, 1));
-        await initializationLock.WaitAsync(cancellationToken);
-
-        try
-        {
-            if (_initializedProviders.ContainsKey(providerType))
-                return;
-
-            await RefreshDescriptorsAsync(activityProvider, cancellationToken);
-            _initializedProviders.TryAdd(providerType, 0);
-        }
-        finally
-        {
-            initializationLock.Release();
-        }
-    }
-
     private void ApplyModifiers(ActivityDescriptor descriptor)
     {
         foreach (var modifier in modifiers)
@@ -291,17 +280,25 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
                 throw new InvalidOperationException(error);
     }
 
-    private void ValidateBinding(TenantRegistryData registry, ICollection<ActivityDescriptor>? owned, ActivityDescriptor descriptor)
+    private void ValidateBinding(TenantRegistryData registry, ICollection<ActivityDescriptor>? owned, ActivityDescriptor descriptor, bool replacingProviderSnapshot = false)
     {
         if (!registry.ActivityDescriptors.TryGetValue((descriptor.TypeName, descriptor.Version), out var existing))
             return;
 
+        var ownsExisting = owned?.Contains(existing) == true;
+        if (replacingProviderSnapshot && ownsExisting)
+            return;
+
+        if (!HasSameBinding(existing, descriptor) || (!ownsExisting && !_manualActivityDescriptors.Contains(existing)))
+            throw ConflictingBinding(descriptor);
+    }
+
+    private static bool HasSameBinding(ActivityDescriptor existing, ActivityDescriptor incoming)
+    {
         // Workflow-as-activity descriptors share a CLR implementation across logical definitions.
         existing.CustomProperties.TryGetValue("WorkflowDefinitionId", out var existingOwner);
-        descriptor.CustomProperties.TryGetValue("WorkflowDefinitionId", out var incomingOwner);
-        if (existing.ClrType != descriptor.ClrType || !Equals(existingOwner, incomingOwner) ||
-            (owned?.Contains(existing) != true && !_manualActivityDescriptors.Contains(existing)))
-            throw ConflictingBinding(descriptor);
+        incoming.CustomProperties.TryGetValue("WorkflowDefinitionId", out var incomingOwner);
+        return existing.ClrType == incoming.ClrType && Equals(existingOwner, incomingOwner);
     }
 
     private InvalidOperationException ConflictingBinding(ActivityDescriptor descriptor)
