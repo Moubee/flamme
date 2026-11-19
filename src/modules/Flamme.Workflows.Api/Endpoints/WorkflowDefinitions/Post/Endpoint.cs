@@ -8,6 +8,7 @@ using Flamme.Workflows.Api.Models;
 using Flamme.Workflows.Api.Requirements;
 using Flamme.Workflows.Api.Security;
 using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Mappers;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -113,7 +114,16 @@ internal class Post(
         }
         else
         {
-            await workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            try
+            {
+                await workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            }
+            catch (WorkflowDefinitionValidationException e)
+            {
+                AddError(e.Message);
+                await Send.ErrorsAsync(400, cancellationToken);
+                return;
+            }
         }
 
         var mappedDefinition = await linker.MapAsync(draft, cancellationToken);

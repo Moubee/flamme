@@ -1,6 +1,7 @@
 using Flamme.Extensions;
 using Flamme.Common.Multitenancy;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Models;
 using Humanizer;
 
@@ -75,7 +76,7 @@ public class WorkflowDefinitionActivityDescriptorFactory
     }
     
     internal static string GetTypeName(string? name) =>
-        !string.IsNullOrWhiteSpace(name) ? name.Pascalize() : throw new InvalidOperationException("A workflow exposed as an activity requires a name.");
+        !string.IsNullOrWhiteSpace(name) ? name.Pascalize() : throw new WorkflowDefinitionValidationException("A workflow exposed as an activity requires a name.");
 
     private static IEnumerable<InputDescriptor> DescribeInputs(WorkflowDefinition definition)
     {

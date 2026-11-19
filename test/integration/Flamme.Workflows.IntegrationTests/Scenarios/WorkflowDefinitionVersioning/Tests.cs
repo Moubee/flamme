@@ -4,6 +4,7 @@ using Flamme.Mediator.Contracts;
 using Flamme.Testing.Shared;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Notifications;
 using Flamme.Workflows.Management.Services;
@@ -18,6 +19,27 @@ public class Tests : IAsyncDisposable
     public Tests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput).Build();
+    }
+
+    [Test]
+    public async Task RejectedNativeDraftDoesNotChangeSavedActivityOptions()
+    {
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
+        var owner = await publisher.NewAsync();
+        owner.Name = "NativeActivity";
+        owner.Options.UsableAsActivity = true;
+        await publisher.SaveDraftAsync(owner);
+        var other = await publisher.NewAsync();
+        other.Name = owner.Name;
+        await publisher.SaveDraftAsync(other);
+
+        var draft = await publisher.GetDraftAsync(other.DefinitionId, VersionOptions.Latest);
+        draft!.Options.UsableAsActivity = true;
+        await Assert.ThrowsExactlyAsync<WorkflowDefinitionValidationException>(() => publisher.SaveDraftAsync(draft));
+        var saved = await store.FindAsync(new() { Id = other.Id });
+        await Assert.That(saved!.Options.UsableAsActivity).IsNull();
+        await Assert.That(saved.IsLatest).IsTrue();
     }
 
     [Test]

@@ -34,4 +34,7 @@ public class WorkflowOptions
     /// The options for committing workflow state.
     /// </summary>
     public string? CommitStrategyName { get; set; }
+
+    /// <summary>Creates a copy of the options for editing another workflow revision.</summary>
+    public WorkflowOptions ShallowClone() => (WorkflowOptions)MemberwiseClone();
 }

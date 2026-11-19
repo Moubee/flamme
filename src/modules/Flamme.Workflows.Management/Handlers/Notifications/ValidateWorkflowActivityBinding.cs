@@ -3,6 +3,7 @@ using Flamme.Common.Multitenancy;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Notifications;
 
 namespace Flamme.Workflows.Management.Handlers.Notifications;
@@ -38,6 +39,6 @@ public class ValidateWorkflowActivityBinding(IWorkflowDefinitionStore store, ITe
         var scope = definition.TenantId ?? tenantAccessor.TenantId;
         var matches = await store.FindManyAsync(new() { Ids = potentialConflicts }, cancellationToken);
         if (matches.Any(x => x.TenantId.NormalizeTenantId() == scope))
-            throw new InvalidOperationException($"Another workflow already provides '{name}' version {version} in tenant '{scope}'.");
+            throw new WorkflowDefinitionValidationException($"Another workflow already provides '{name}' version {version} in tenant '{scope}'.");
     }
 }

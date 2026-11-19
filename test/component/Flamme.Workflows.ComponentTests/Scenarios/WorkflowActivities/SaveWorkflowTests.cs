@@ -1,12 +1,17 @@
+using System.Net;
+using Flamme.Api.Client.Resources.WorkflowDefinitions.Contracts;
 using Flamme.Common.Models;
 using Flamme.Common.Multitenancy;
 using Flamme.Workflows.ComponentTests.Abstractions;
 using Flamme.Workflows.ComponentTests.Fixtures;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Models;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Refit;
+using ClientWorkflowModel = Flamme.Api.Client.Resources.WorkflowDefinitions.Models.WorkflowDefinitionModel;
 
 namespace Flamme.Workflows.ComponentTests.Scenarios.WorkflowActivities;
 
@@ -50,12 +55,57 @@ public class SaveWorkflowTests(App app) : AppComponentTest(app)
         secondDraft!.Name = first.Name;
         await publisher.PublishAsync(secondDraft);
 
-        await Assert.That(async () => { await publisher.RevertVersionAsync(first.DefinitionId, 1); }).Throws<InvalidOperationException>();
+        var client = WorkflowServer.CreateApiClient<IWorkflowDefinitionsApi>();
+        var rejected = await Assert.ThrowsExactlyAsync<ValidationApiException>(() => client.RevertVersionAsync(first.DefinitionId, 1));
+        await Assert.That(rejected!.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         var versions = await store.FindManyAsync(new() { DefinitionId = first.DefinitionId });
         var head = versions.Single();
         await Assert.That(head.Id).IsEqualTo(first.Id);
         await Assert.That(head.IsLatest).IsTrue();
         await Assert.That(head.IsPublished).IsTrue();
+    }
+
+    [Test]
+    public async Task RevertingToAMissingVersionPreservesTheCurrentHead()
+    {
+        var publisher = Scope.ServiceProvider.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = Scope.ServiceProvider.GetRequiredService<IWorkflowDefinitionStore>();
+        var original = await publisher.NewAsync();
+        original.Name = $"Notice{Guid.NewGuid():N}";
+        await publisher.PublishAsync(original);
+
+        var client = WorkflowServer.CreateApiClient<IWorkflowDefinitionsApi>();
+        var missing = await Assert.ThrowsExactlyAsync<ApiException>(() => client.RevertVersionAsync(original.DefinitionId, 99));
+        await Assert.That(missing!.StatusCode).IsEqualTo(HttpStatusCode.NotFound);
+        await Assert.ThrowsExactlyAsync<WorkflowDefinitionValidationException>(() => publisher.RevertVersionAsync(original.DefinitionId, 99));
+        await Assert.ThrowsExactlyAsync<WorkflowDefinitionValidationException>(() => publisher.RevertVersionAsync(original.DefinitionId, 0));
+        var head = (await store.FindManyAsync(new() { DefinitionId = original.DefinitionId })).Single();
+        await Assert.That(head.Id).IsEqualTo(original.Id);
+        await Assert.That(head.IsLatest).IsTrue();
+        await Assert.That(head.IsPublished).IsTrue();
+    }
+
+    [Test]
+    public async Task ImportAndDesignerReportNativeNameConflictsAsBadRequests()
+    {
+        var client = WorkflowServer.CreateApiClient<IWorkflowDefinitionsApi>();
+        var name = $"Notice{Guid.NewGuid():N}";
+        var model = new ClientWorkflowModel
+        {
+            DefinitionId = name + "-first", Name = name, Options = new() { UsableAsActivity = true }
+        };
+        await client.ImportAsync(model);
+        model.DefinitionId = name + "-second";
+
+        ApiException? rejected = await Assert.ThrowsExactlyAsync<ValidationApiException>(() => client.ImportAsync(model));
+        await Assert.That(rejected!.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(rejected.Content!).Contains(name);
+        foreach (var publish in new[] { false, true })
+        {
+            ApiException? save = await Assert.ThrowsExactlyAsync<ValidationApiException>(() => client.SaveAsync(new() { Model = model, Publish = publish }));
+            await Assert.That(save!.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+            await Assert.That(save.Content!).Contains(name);
+        }
     }
 
     [Test]
@@ -71,16 +121,21 @@ public class SaveWorkflowTests(App app) : AppComponentTest(app)
         var first = await Import(name + "-first", publishFirst);
         await Assert.That(first.Succeeded).IsTrue();
 
-        await Assert.That(async () => { await Import(name + "-second", publishSecond); }).Throws<InvalidOperationException>();
+        foreach (var revision in new[] { null, Guid.NewGuid().ToString("N") })
+        {
+            var rejected = await Import(name + "-second", publishSecond, revision);
+            await Assert.That(rejected.Succeeded).IsFalse();
+            await Assert.That(rejected.ValidationErrors.Single().Message).Contains(name);
+        }
         var saved = await store.FindAsync(new() { DefinitionId = name + "-first" });
         await Assert.That(saved!.Id).IsEqualTo(first.WorkflowDefinition.Id);
         await Assert.That(saved.IsPublished).IsEqualTo(publishFirst);
         await Assert.That(saved.IsLatest).IsTrue();
         await Assert.That(await store.FindAsync(new() { DefinitionId = name + "-second" })).IsNull();
 
-        Task<ImportWorkflowResult> Import(string owner, bool publish) => importer.ImportAsync(new()
+        Task<ImportWorkflowResult> Import(string owner, bool publish, string? revision = null) => importer.ImportAsync(new()
         {
-            Model = new() { DefinitionId = owner, Name = name, Options = new() { UsableAsActivity = true } },
+            Model = new() { Id = revision!, DefinitionId = owner, Name = name, Options = new() { UsableAsActivity = true } },
             Publish = publish
         });
     }

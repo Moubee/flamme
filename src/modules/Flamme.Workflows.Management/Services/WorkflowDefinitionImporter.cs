@@ -1,5 +1,6 @@
 using Flamme.Common.Models;
 using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Mappers;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -81,7 +82,14 @@ namespace Flamme.Workflows.Management.Services
                 return new ImportWorkflowResult(result.Succeeded, draft, result.ValidationErrors);
             }
 
-            await _workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            try
+            {
+                await _workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            }
+            catch (WorkflowDefinitionValidationException e)
+            {
+                return new(false, draft, [new(e.Message)]);
+            }
             return new ImportWorkflowResult(true, draft, new List<WorkflowValidationError>());
         }
     }

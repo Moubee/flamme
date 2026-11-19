@@ -5,6 +5,7 @@ using Flamme.Common.Multitenancy;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -58,17 +59,13 @@ public class WorkflowDefinitionPublisher(
     {
         definition = Initialize(definition);
         definition.Version = 1;
-        List<WorkflowValidationError> errors = [];
-        if (publish)
-        {
-            errors = await ValidateAsync(definition, cancellationToken);
-            if (errors.Count > 0 && options.Value.FailOnValidationErrors)
-                return new(false, definition, errors);
+        List<WorkflowValidationError> errors = publish ? await ValidateAsync(definition, cancellationToken) : [];
+        if (errors.Count > 0 && options.Value.FailOnValidationErrors)
+            return new(false, definition, errors);
 
-            await mediator.SendAsync(new WorkflowDefinitionPublishing(definition), cancellationToken);
-        }
-        else
-            await mediator.SendAsync(new WorkflowDefinitionDraftSaving(definition), cancellationToken);
+        INotification notification = publish ? new WorkflowDefinitionPublishing(definition) : new WorkflowDefinitionDraftSaving(definition);
+        if (!await TryNotifyBeforeSaveAsync(notification, errors, cancellationToken))
+            return new(false, definition, errors);
 
         definition.IsPublished = publish;
         definition.IsLatest = true;
@@ -108,7 +105,8 @@ public class WorkflowDefinitionPublisher(
         if (validationErrors.Any() && options.Value.FailOnValidationErrors)
             return new(false, validationErrors, new([]));
 
-        await mediator.SendAsync(new WorkflowDefinitionPublishing(definition), cancellationToken);
+        if (!await TryNotifyBeforeSaveAsync(new WorkflowDefinitionPublishing(definition), validationErrors, cancellationToken))
+            return new(false, validationErrors, new([]));
         var definitionId = definition.DefinitionId;
 
         // Reset current latest and published definitions.
@@ -174,9 +172,14 @@ public class WorkflowDefinitionPublisher(
 
     public async Task<WorkflowDefinition> RevertVersionAsync(string definitionId, int version, CancellationToken cancellationToken = default)
     {
-        var draft = await GetDraftAsync(definitionId, VersionOptions.SpecificVersion(version), cancellationToken)
-                    ?? throw new InvalidOperationException($"Workflow definition '{definitionId}' was not found.");
+        if (version < 1)
+            throw new WorkflowDefinitionValidationException("The requested workflow revision must have a positive version.");
+        var source = await workflowDefinitionStore.FindAsync(new() { DefinitionId = definitionId, VersionOptions = VersionOptions.SpecificVersion(version) }, cancellationToken)
+                     ?? throw new WorkflowDefinitionValidationException($"Workflow definition '{definitionId}' version {version} was not found.");
+        var draft = CopyForEditing(source);
         draft.Id = identityGenerator.GenerateId();
+        draft.CreatedAt = timeProvider.GetUtcNow();
+        draft.IsPublished = false;
         return await SaveDraftAsync(draft, cancellationToken);
     }
 
@@ -198,8 +201,7 @@ public class WorkflowDefinitionPublisher(
         if (definition == null!)
             return null;
 
-        var draft = definition.ShallowClone();
-        draft.CustomProperties = new Dictionary<string, object>(definition.CustomProperties);
+        var draft = CopyForEditing(definition);
         if (!definition.IsPublished && !definition.IsReadonly)
             return draft;
 
@@ -267,6 +269,28 @@ public class WorkflowDefinitionPublisher(
             definition.Version = 1;
 
         return definition;
+    }
+
+    private async Task<bool> TryNotifyBeforeSaveAsync(INotification notification, ICollection<WorkflowValidationError> errors, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await mediator.SendAsync(notification, cancellationToken);
+            return true;
+        }
+        catch (WorkflowDefinitionValidationException e)
+        {
+            errors.Add(new(e.Message));
+            return false;
+        }
+    }
+
+    private static WorkflowDefinition CopyForEditing(WorkflowDefinition definition)
+    {
+        var draft = definition.ShallowClone();
+        draft.Options = definition.Options.ShallowClone();
+        draft.CustomProperties = new Dictionary<string, object>(definition.CustomProperties);
+        return draft;
     }
 
     private async Task<List<WorkflowValidationError>> ValidateAsync(WorkflowDefinition definition, CancellationToken cancellationToken)
