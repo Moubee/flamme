@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
-using Flamme.Workflows.Attributes;
 using System.Text.Json.Serialization;
 using Flamme.Extensions;
 using Flamme.Workflows.Behaviors;
@@ -27,7 +25,7 @@ public abstract class Activity : IActivity, ISignalHandler
     {
         this.SetSource(source, line);
         Type = ActivityTypeNameHelper.GenerateTypeName(GetType());
-        Version = GetType().GetCustomAttribute<ActivityAttribute>()?.Version ?? 1;
+        Version = ActivityTypeNameHelper.GetVersion(GetType());
         Behaviors.Add<ScheduledChildCallbackBehavior>(this);
     }
 

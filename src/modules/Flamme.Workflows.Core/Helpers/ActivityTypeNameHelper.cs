@@ -5,6 +5,8 @@ namespace Flamme.Workflows.Helpers;
 
 public static class ActivityTypeNameHelper
 {
+    public static int GetVersion(Type type) => type.GetCustomAttribute<ActivityAttribute>()?.Version ?? 1;
+
     public static string? GenerateNamespace(Type activityType)
     {
         var activityAttr = activityType.GetCustomAttribute<ActivityAttribute>();

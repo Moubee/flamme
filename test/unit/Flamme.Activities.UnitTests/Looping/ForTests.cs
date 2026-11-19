@@ -151,7 +151,7 @@ public class ForTests
 
         // Act & Assert
         fixture.AssertActivityAttributes(
-            expectedNamespace: "Elsa",
+            expectedNamespace: "ControlFlow",
             expectedKind: ActivityKind.Action,
             expectedCategory: "Looping", 
             expectedDisplayName: null,

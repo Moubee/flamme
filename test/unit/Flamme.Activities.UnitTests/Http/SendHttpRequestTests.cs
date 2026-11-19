@@ -173,7 +173,7 @@ public class SendHttpRequestTests
     {
         var fixture = new ActivityTestFixture(new SendHttpRequest());
         fixture.AssertActivityAttributes(
-            expectedNamespace: "Elsa",
+            expectedNamespace: "Http",
             expectedCategory: "HTTP",
             expectedDisplayName: "HTTP Request",
             expectedDescription: "Send an HTTP request.",

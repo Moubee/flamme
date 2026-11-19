@@ -1,0 +1,65 @@
+using System.Text;
+using System.Text.Json;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
+using Flamme.Workflows.Activities.Flowchart.Extensions;
+using Flamme.Workflows.Models;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Models;
+using Flamme.Workflows.Options;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
+
+public class SerializedForkJoinTests
+{
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task RuntimeRejectsScopedOrImpersonatingPrimitiveBeforeAndAfterBuiltinRegistration(bool registerBuiltinFirst)
+    {
+        await using var host = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
+        await host.BuildAsync();
+        var registry = host.Services.GetRequiredService<IActivityRegistry>();
+        var describer = host.Services.GetRequiredService<IActivityDescriber>();
+        registry.Clear();
+        var descriptor = await describer.DescribeActivityAsync(typeof(WriteLine));
+        if (registerBuiltinFirst)
+            registry.Register(descriptor);
+
+        var scoped = new ActivityDescriptor { TypeName = "Console.WriteLine", Version = 1, ClrType = typeof(WriteLine), TenantId = "tenant" };
+        var impersonator = new ActivityDescriptor { TypeName = "Console.WriteLine", Version = 1, ClrType = typeof(ReadLine) };
+        await Assert.That(() => registry.Register(scoped)).Throws<InvalidOperationException>();
+        await Assert.That(() => registry.Register(impersonator)).Throws<InvalidOperationException>();
+
+        if (!registerBuiltinFirst)
+            registry.Register(descriptor);
+        await Assert.That(registry.Find("Console.WriteLine", 1)).IsSameReferenceAs(descriptor);
+    }
+
+    [Test]
+    public async Task ExportedWaitAnyJoinCancelsTheOtherBranchAndWritesOneReceipt()
+    {
+        await using var author = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
+        var definition = await author.ImportWorkflowDefinitionAsync("Scenarios/JoinBehaviors/Workflows/capability-fork-join.json");
+        var exporter = author.Services.GetRequiredService<IWorkflowDefinitionExporter>();
+        var export = await exporter.ExportDefinitionAsync(definition);
+        using var json = JsonDocument.Parse(export.Data);
+        var join = json.RootElement.GetProperty("root").GetProperty("activities").EnumerateArray().Single(x => x.GetProperty("id").GetString() == "join");
+        await Assert.That(join.GetProperty("type").GetString()).IsEqualTo("ControlFlow.Join");
+        await Assert.That(join.GetProperty("version").GetInt32()).IsEqualTo(1);
+
+        await using var consumer = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
+        await consumer.BuildAsync();
+        var serializer = consumer.Services.GetRequiredService<IActivitySerializer>();
+        var model = serializer.Deserialize<WorkflowDefinitionModel>(Encoding.UTF8.GetString(export.Data));
+        var importer = consumer.Services.GetRequiredService<IWorkflowDefinitionImporter>();
+        var imported = await importer.ImportAsync(new() { Model = model, Publish = true });
+        var state = await consumer.RunWorkflowAsync(imported.WorkflowDefinition.DefinitionId, options: new RunWorkflowOptions().WithTokenBasedFlowchart());
+
+        await Assert.That(state.SubStatus).IsEqualTo(WorkflowSubStatus.Finished);
+        await Assert.That(state.Incidents).IsEmpty();
+        await Assert.That(state.Bookmarks).IsEmpty();
+        await Assert.That(consumer.CapturingTextWriter.Lines).IsEquivalentTo(new[] { "ready", "Elsa.WriteLine" }, StringComparer.Ordinal, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
+}

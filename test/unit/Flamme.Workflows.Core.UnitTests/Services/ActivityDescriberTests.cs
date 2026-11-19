@@ -1,4 +1,5 @@
 using System.Reflection;
+using Flamme.Workflows.Activities;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
 using TUnit.Mocks;
@@ -35,6 +36,33 @@ public class ActivityDescriberTests
             await Assert.That(publicInput.IsSensitive).IsFalse();
         }
     }
+
+    [Test]
+    public async Task ClosedGenericIdentityMatchesBothDescriptorAndAuthoredNode()
+    {
+        var activity = new ForEach<string>();
+        var descriptor = await _describer.DescribeActivityAsync(typeof(ForEach<string>));
+
+        await Assert.That(descriptor.TypeName).IsEqualTo("ControlFlow.ForEach<String>");
+        await Assert.That(descriptor.Name).IsEqualTo("ForEach<String>");
+        await Assert.That(activity.Type).IsEqualTo(descriptor.TypeName);
+        await Assert.That(activity.Version).IsEqualTo(descriptor.Version);
+    }
+
+    [Test]
+    public async Task DerivedTypesOwnTheirActivityIdentityAndVersion()
+    {
+        var extension = new CustomWriteLine();
+        var explicitVersion = new VersionedWriteLine();
+        await Assert.That(extension.Type).IsEqualTo(typeof(CustomWriteLine).Namespace + ".CustomWriteLine");
+        await Assert.That(explicitVersion.Type).IsEqualTo("Samples.Write");
+        await Assert.That(explicitVersion.Version).IsEqualTo(2);
+    }
+
+    private sealed class CustomWriteLine() : WriteLine("sample");
+
+    [Activity("Samples", "Write", 2)]
+    private sealed class VersionedWriteLine() : WriteLine("sample");
 
     private sealed class ActivityWithSensitiveInputs : CodeActivity
     {

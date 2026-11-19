@@ -14,7 +14,7 @@ public class HostMethodActivityTests(App app) : AppComponentTest(app)
         // Arrange
         var allDescriptors = ActivityRegistry.ListAll().ToList();
         var hostMethodDescriptors = allDescriptors
-            .Where(d => d.TypeName.StartsWith("Elsa.Dynamic.HostMethod.TestHostMethod."))
+            .Where(d => d.TypeName.StartsWith("System.HostMethod.TestHostMethod."))
             .ToList();
 
         // Assert - We expect all public methods except ClearLog (which is static) and CustomAttributeMethod (which has custom namespace)
@@ -52,7 +52,7 @@ public class HostMethodActivityTests(App app) : AppComponentTest(app)
         // Assert
         await Assert.That(descriptor).IsNotNull();
         await Assert.That(descriptor.Name).IsEqualTo(methodName);
-        await Assert.That(descriptor.TypeName).IsEqualTo($"Elsa.Dynamic.HostMethod.TestHostMethod.{methodName}");
+        await Assert.That(descriptor.TypeName).IsEqualTo($"System.HostMethod.TestHostMethod.{methodName}");
         await Assert.That(descriptor.Category).IsEqualTo("Test Host Method");
 
         if (expectedDescription != null)
@@ -214,5 +214,5 @@ public class HostMethodActivityTests(App app) : AppComponentTest(app)
     private IActivityRegistry ActivityRegistry => Scope.ServiceProvider.GetRequiredService<IActivityRegistry>();
 
     private ActivityDescriptor? FindDescriptor(string methodName) =>
-        ActivityRegistry.Find($"Elsa.Dynamic.HostMethod.TestHostMethod.{methodName}");
+        ActivityRegistry.Find($"System.HostMethod.TestHostMethod.{methodName}");
 }

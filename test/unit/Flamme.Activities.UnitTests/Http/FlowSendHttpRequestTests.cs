@@ -163,7 +163,7 @@ public class FlowSendHttpRequestTests
     {
         var fixture = new ActivityTestFixture(new FlowSendHttpRequest());
         fixture.AssertActivityAttributes(
-            expectedNamespace: "Elsa",
+            expectedNamespace: "Http",
             expectedCategory: "HTTP",
             expectedDisplayName: "HTTP Request (flow)",
             expectedDescription: "Send an HTTP request.",
