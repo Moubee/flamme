@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <FlammeVersion Condition="'$(FlammeVersion)' == ''">3.9.0-local.1</FlammeVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Flamme" Version="$(FlammeVersion)" />
+    <PackageReference Include="Flamme.Persistence.EFCore.PostgreSql" Version="$(FlammeVersion)" />
+  </ItemGroup>
+</Project>
