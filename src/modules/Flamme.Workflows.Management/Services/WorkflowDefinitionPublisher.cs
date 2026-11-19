@@ -310,6 +310,12 @@ public class WorkflowDefinitionPublisher(
     private async Task<List<WorkflowValidationError>> ValidateAsync(WorkflowDefinition definition, CancellationToken cancellationToken)
     {
         var graph = await workflowDefinitionService.MaterializeWorkflowAsync(definition, cancellationToken);
-        return (await workflowValidator.ValidateAsync(graph.Workflow, cancellationToken)).ToList();
+        var errors = (await workflowValidator.ValidateAsync(graph.Workflow, cancellationToken)).ToList();
+        foreach (var node in graph.Nodes)
+        {
+            if (node.Activity is NotFoundActivity missing)
+                errors.Add(new($"Activity '{missing.Id}' references unresolved type '{missing.MissingTypeName}' version {missing.MissingTypeVersion}.", missing.Id));
+        }
+        return errors;
     }
 }
