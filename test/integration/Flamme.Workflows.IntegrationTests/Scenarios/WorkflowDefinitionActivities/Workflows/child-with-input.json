@@ -33,7 +33,7 @@
     "id": "855226c76e9ad551",
     "nodeId": "Workflow1:855226c76e9ad551",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -53,7 +53,7 @@
         "id": "eff084a902159510",
         "nodeId": "Workflow1:855226c76e9ad551:eff084a902159510",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

@@ -14,7 +14,7 @@ namespace Flamme.Scheduling.Activities;
 /// <summary>
 /// Triggers the workflow at a specific future timestamp.
 /// </summary>
-[Activity("Elsa", "Scheduling", "Trigger execution at a specific time in the future.")]
+[Activity("Time", "StartAt", 1, "Trigger execution at a specific time in the future.", "Scheduling")]
 public class StartAt : Trigger
 {
     private const string InputKey = "ExecuteAt";

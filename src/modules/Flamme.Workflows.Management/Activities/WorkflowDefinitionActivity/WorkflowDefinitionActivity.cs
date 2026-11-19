@@ -1,3 +1,4 @@
+using Flamme.Workflows.Attributes;
 using System.ComponentModel;
 using Flamme.Common.Models;
 using Flamme.Extensions;
@@ -16,6 +17,7 @@ namespace Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 /// Loads and executes an <see cref="WorkflowDefinition"/>.
 /// </summary>
 [Browsable(false)]
+[Activity("Workflows", "Definition", 1)]
 public class WorkflowDefinitionActivity : Composite, IInitializable
 {
     private bool IsInitialized => Root.Id != null!;

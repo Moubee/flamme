@@ -14,7 +14,7 @@ namespace Flamme.Workflows.Activities;
 /// Schedule an activity for each item in parallel.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[Activity("Elsa", "Looping", "Schedule an activity for each item in parallel.")]
+[Activity("ControlFlow", "ParallelForEach", 1, "Schedule an activity for each item in parallel.", "Looping")]
 public class ParallelForEach<T> : Activity
 {
     private const string ScheduledTagsProperty = nameof(ScheduledTagsProperty);

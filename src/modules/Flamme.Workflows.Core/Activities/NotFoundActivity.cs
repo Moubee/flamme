@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Activities;
 /// This activity is instantiated in case a workflow references an activity type that could not be found.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "System", "A placeholder activity that will be used in case a workflow definition references an activity type that cannot be found.")]
+[Activity("System", "NotFound", 1, "A placeholder activity that will be used in case a workflow definition references an activity type that cannot be found.", "System")]
 [PublicAPI]
 public class NotFoundActivity : CodeActivity
 {

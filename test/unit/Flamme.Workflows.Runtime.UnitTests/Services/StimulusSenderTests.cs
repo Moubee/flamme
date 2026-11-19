@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Runtime.UnitTests.Services;
 
 public class StimulusSenderTests
 {
-    private const string ActivityTypeName = "Elsa.RunTask";
+    private const string ActivityTypeName = "Tasks.Run";
     private const string StimulusHash = "stimulus-hash";
     private const string ActivityInstanceId = "activity-instance-1";
     private const string WorkflowInstanceId = "workflow-instance-1";

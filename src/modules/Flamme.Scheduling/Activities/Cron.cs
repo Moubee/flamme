@@ -10,7 +10,7 @@ namespace Flamme.Scheduling.Activities;
 /// <summary>
 /// Represents a timer to periodically trigger the workflow.
 /// </summary>
-[Activity("Elsa", "Scheduling", "Trigger workflow execution at a specific interval using a CRON expression.")]
+[Activity("Time", "Cron", 1, "Trigger workflow execution at a specific interval using a CRON expression.", "Scheduling")]
 public class Cron : EventGenerator
 {
     /// <inheritdoc />

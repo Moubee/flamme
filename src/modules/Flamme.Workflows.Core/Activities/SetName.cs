@@ -9,7 +9,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Sets a property on the workflow execution context with the specified name value.
 /// </summary>
-[Activity("Elsa", "Primitives", "Set the name of the workflow instance to a specified value.")]
+[Activity("Workflows", "SetName", 1, "Set the name of the workflow instance to a specified value.", "Primitives")]
 [PublicAPI]
 public class SetName : CodeActivity
 {

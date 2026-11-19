@@ -13,7 +13,7 @@ namespace Flamme.Alterations.Activities;
 /// Marks an alteration plan as completed.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Alterations", "Dispatches jobs for the specified Alteration Plan", Kind = ActivityKind.Task)]
+[Activity("Alterations", "CompletePlan", 1, "Dispatches jobs for the specified Alteration Plan", "Alterations", Kind = ActivityKind.Task)]
 public class CompleteAlterationPlan : CodeActivity
 {
     /// <inheritdoc />

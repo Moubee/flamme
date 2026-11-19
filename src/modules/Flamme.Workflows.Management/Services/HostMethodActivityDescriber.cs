@@ -46,6 +46,8 @@ public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) :
             displayName = activityAttribute.DisplayName!;
 
         descriptor.Name = methodName;
+        descriptor.Namespace = activityTypeName[..activityTypeName.LastIndexOf('.')];
+        descriptor.Version = activityAttribute?.Version ?? 1;
         descriptor.TypeName = activityTypeName;
         descriptor.DisplayName = displayName;
         descriptor.Description = activityAttribute?.Description ?? method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? hostType.GetCustomAttribute<DescriptionAttribute>()?.Description;
@@ -60,6 +62,7 @@ public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) :
             var activityResult = context.CreateActivity<HostMethodActivity>();
             var activity = activityResult.Activity;
             activity.Type = activityTypeName;
+            activity.Version = descriptor.Version;
             activity.HostType = hostType;
             activity.MethodName = methodName;
             activity.RunAsynchronously ??= descriptor.RunAsynchronously;
@@ -109,7 +112,7 @@ public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) :
             return $"{activityAttribute.Namespace}.{typeSegment}";
         }
 
-        return $"Elsa.Dynamic.HostMethod.{key.Pascalize()}.{methodName}";
+        return $"System.HostMethod.{key.Pascalize()}.{methodName}";
     }
 
     private static string StripAsyncSuffix(string name)

@@ -64,7 +64,7 @@ public class ParallelForEachTests
         var fixture = new ActivityTestFixture(parallelForEach);
 
         fixture.AssertActivityAttributes(
-            expectedNamespace: "Elsa",
+            expectedNamespace: "ControlFlow",
             expectedKind: ActivityKind.Action,
             expectedCategory: "Looping",
             expectedDescription: "Schedule an activity for each item in parallel."

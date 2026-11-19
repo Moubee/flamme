@@ -9,7 +9,7 @@ namespace Flamme.Scheduling.Activities;
 /// <summary>
 /// Represents a timer to periodically trigger the workflow.
 /// </summary>
-[Activity("Elsa", "Scheduling", "Trigger workflow execution at a specific interval.")]
+[Activity("Time", "Timer", 1, "Trigger workflow execution at a specific interval.", "Scheduling")]
 public class Timer : TimerBase
 {
     /// <inheritdoc />

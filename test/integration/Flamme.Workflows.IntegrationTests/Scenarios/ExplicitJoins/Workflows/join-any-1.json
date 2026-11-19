@@ -17,7 +17,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "F44h770hvkSaOWI_jjbM_A",
     "metadata": {},
@@ -41,7 +41,7 @@
         },
         "id": "ImdIbHXtHkiLlrExFlW51A",
         "name": "FlowJoin1",
-        "type": "Elsa.FlowJoin",
+        "type": "ControlFlow.Join",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -73,7 +73,7 @@
         },
         "id": "cxnS1whoCESvwwPyBnno_Q",
         "name": "FlowJoin2",
-        "type": "Elsa.FlowJoin",
+        "type": "ControlFlow.Join",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -105,7 +105,7 @@
         },
         "id": "H0apwXYdoESn2TJ5T_3xAg",
         "name": "FlowJoin3",
-        "type": "Elsa.FlowJoin",
+        "type": "ControlFlow.Join",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -137,7 +137,7 @@
         },
         "id": "Kn9d-EVn2EiaYJqHd8VcmQ",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -169,7 +169,7 @@
         },
         "id": "haHoM3A5EU6aYu_8dCYaYg",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

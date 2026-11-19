@@ -15,7 +15,7 @@ namespace Flamme.Http;
 /// <summary>
 /// An activity that downloads a file from a given URL.
 /// </summary>
-[Activity("Elsa", "HTTP", "Downloads a file from a given URL.", DisplayName = "Download File", Kind = ActivityKind.Task)]
+[Activity("Http", "DownloadFile", 1, "Downloads a file from a given URL.", "HTTP", DisplayName = "Download File", Kind = ActivityKind.Task)]
 [Output(IsSerializable = false)]
 public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValueProvider
 {

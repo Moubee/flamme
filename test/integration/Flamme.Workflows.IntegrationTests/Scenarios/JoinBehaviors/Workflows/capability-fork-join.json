@@ -1,0 +1,39 @@
+{
+  "definitionId": "capability-fork-join",
+  "name": "Fork and join",
+  "version": 1,
+  "root": {
+    "id": "flow",
+    "type": "ControlFlow.Flowchart",
+    "version": 1,
+    "activities": [
+      {
+        "id": "fork", "type": "ControlFlow.Fork", "version": 1,
+        "branches": { "typeName": "String[]", "expression": { "type": "Object", "value": "[\"Wait\",\"Continue\"]" } }
+      },
+      {
+        "id": "pending", "type": "Signals.Event", "version": 1,
+        "eventName": { "typeName": "String", "expression": { "type": "Literal", "value": "pending" } }
+      },
+      {
+        "id": "ready", "type": "Console.WriteLine", "version": 1,
+        "text": { "typeName": "String", "expression": { "type": "Literal", "value": "ready" } }
+      },
+      {
+        "id": "join", "type": "ControlFlow.Join", "version": 1,
+        "mode": { "typeName": "Flamme.Workflows.Activities.Flowchart.Models.FlowJoinMode, Flamme.Workflows.Core", "expression": { "type": "Literal", "value": "WaitAny" } }
+      },
+      {
+        "id": "receipt", "type": "Console.WriteLine", "version": 1,
+        "text": { "typeName": "String", "expression": { "type": "Literal", "value": "Elsa.WriteLine" } }
+      }
+    ],
+    "connections": [
+      { "source": { "activity": "fork", "port": "Wait" }, "target": { "activity": "pending", "port": "In" } },
+      { "source": { "activity": "fork", "port": "Continue" }, "target": { "activity": "ready", "port": "In" } },
+      { "source": { "activity": "pending", "port": "Done" }, "target": { "activity": "join", "port": "In" } },
+      { "source": { "activity": "ready", "port": "Done" }, "target": { "activity": "join", "port": "In" } },
+      { "source": { "activity": "join", "port": "Done" }, "target": { "activity": "receipt", "port": "In" } }
+    ]
+  }
+}

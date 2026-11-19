@@ -15,7 +15,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// Notifies the application that a task with a given name is requested to start.
 /// When the application fulfilled the task, it is expected to report back to the workflow engine in order to resume the workflow. 
 /// </summary>
-[Activity("Elsa", "Primitives", "Requests a given task to be run. ", Kind = ActivityKind.Action)]
+[Activity("Tasks", "Run", 1, "Requests a given task to be run. ", "Primitives", Kind = ActivityKind.Action)]
 [UsedImplicitly]
 public class RunTask : Activity<object>
 {

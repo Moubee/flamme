@@ -20,7 +20,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "95a12c8ee4e8c5fc",
     "nodeId": "Workflow1:95a12c8ee4e8c5fc",
@@ -79,7 +79,7 @@
         "id": "90c3d3b2ea1f6ddc",
         "nodeId": "Workflow1:95a12c8ee4e8c5fc:90c3d3b2ea1f6ddc",
         "name": "HttpEndpoint1",
-        "type": "Elsa.HttpEndpoint",
+        "type": "Http.Endpoint",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,
@@ -115,7 +115,7 @@
         },
         "contentType": null,
         "responseHeaders": {
-          "typeName": "Flamme.Http.Models.HttpHeaders, Flamme.Http",
+          "typeName": "Flamme.Http.HttpHeaders, Flamme.Http",
           "expression": {
             "type": "Literal",
             "value": "{}"
@@ -124,7 +124,7 @@
         "id": "3048105347912af5",
         "nodeId": "Workflow1:95a12c8ee4e8c5fc:3048105347912af5",
         "name": "WriteHttpResponse1",
-        "type": "Elsa.WriteHttpResponse",
+        "type": "Http.WriteResponse",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

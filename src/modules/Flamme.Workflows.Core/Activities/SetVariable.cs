@@ -13,7 +13,7 @@ namespace Flamme.Workflows.Activities;
 /// Assign a workflow variable a value.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Primitives", "Assign value to a workflow variable.")]
+[Activity("Data", "SetVariable", 1, "Assign value to a workflow variable.", "Primitives")]
 [PublicAPI]
 public class SetVariable<T> : CodeActivity
 {
@@ -76,7 +76,7 @@ public class SetVariable<T> : CodeActivity
 /// <summary>
 /// Assign a workflow variable a value.
 /// </summary>
-[Activity("Elsa", "Primitives", "Assign a value to a workflow variable.")]
+[Activity("Data", "SetVariable", 1, "Assign a value to a workflow variable.", "Primitives")]
 [PublicAPI]
 public class SetVariable : CodeActivity
 {

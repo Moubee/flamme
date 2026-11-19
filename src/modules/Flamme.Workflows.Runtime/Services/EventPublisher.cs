@@ -1,4 +1,3 @@
-using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Runtime.Activities;
 using Flamme.Workflows.Runtime.Requests;
 using Flamme.Workflows.Runtime.Stimuli;
@@ -23,7 +22,7 @@ public class EventPublisher(IStimulusSender stimulusSender, IWorkflowDispatcher 
         {
             [Event.EventInputWorkflowInputKey] = payload ?? new Dictionary<string, object>()
         };
-        var triggerName = ActivityTypeNameHelper.GenerateTypeName<Event>();
+        var triggerName = RuntimeStimulusNames.Event;
 
         if (asynchronous)
         {

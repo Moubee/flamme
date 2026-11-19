@@ -19,7 +19,7 @@ namespace Flamme.Alterations.Activities;
     DisplayName = "Plan ID",
     Description = "The ID of the submitted alteration plan."
 )]
-[Activity("Elsa", "Alterations", "Submits an Alteration Plan", Kind = ActivityKind.Task)]
+[Activity("Alterations", "SubmitPlan", 1, "Submits an Alteration Plan", "Alterations", Kind = ActivityKind.Task)]
 public class SubmitAlterationPlan : CodeActivity<string>
 {
     /// <summary>

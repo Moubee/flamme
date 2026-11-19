@@ -21,7 +21,7 @@
   "root": {
     "id": "Flowchart1",
     "nodeId": "Workflow2:Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],

@@ -29,7 +29,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "2492a1125f14bc2d",
     "nodeId": "Workflow1:2492a1125f14bc2d",
@@ -55,7 +55,7 @@
         "id": "a3625dd2e8405265",
         "nodeId": "Workflow1:2492a1125f14bc2d:a3625dd2e8405265",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,
@@ -88,7 +88,7 @@
         "id": "31d29bf86b2b62cb",
         "nodeId": "Workflow1:2492a1125f14bc2d:31d29bf86b2b62cb",
         "name": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -121,7 +121,7 @@
         "id": "57576570e00a4c70",
         "nodeId": "Workflow1:2492a1125f14bc2d:57576570e00a4c70",
         "name": "WriteLine5",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -154,7 +154,7 @@
         "id": "caa57f31b8d0e0d1",
         "nodeId": "Workflow1:2492a1125f14bc2d:caa57f31b8d0e0d1",
         "name": "WriteLine4",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -194,7 +194,7 @@
         "id": "fb20dbd8777282b2",
         "nodeId": "Workflow1:2492a1125f14bc2d:fb20dbd8777282b2",
         "name": "RunJavaScript1",
-        "type": "Elsa.RunJavaScript",
+        "type": "Scripting.RunJavaScript",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -227,7 +227,7 @@
         "id": "8654ab45535f4069",
         "nodeId": "Workflow1:2492a1125f14bc2d:8654ab45535f4069",
         "name": "Complete1",
-        "type": "Elsa.Complete",
+        "type": "ControlFlow.Complete",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

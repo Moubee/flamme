@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Activities;
 /// Represents an inline code activity that can be used to execute arbitrary .NET code from a workflow.
 /// </summary>
 [Browsable(false)]
-[Activity("Elsa", "Primitives", "Evaluate a Boolean condition to determine which path to execute next.")]
+[Activity("Scripting", "Inline", 1, "Evaluate a Boolean condition to determine which path to execute next.", "Primitives")]
 [PublicAPI]
 public class Inline : CodeActivity
 {
@@ -98,6 +98,7 @@ public class Inline : CodeActivity
 /// Represents an inline code activity that can be used to execute arbitrary .NET code from a workflow and return a value.
 /// </summary>
 [PublicAPI]
+[Activity("Scripting", "Inline", 1)]
 public class Inline<T> : CodeActivity<T>
 {
     private readonly Func<ActivityExecutionContext, ValueTask<T>> _activity;

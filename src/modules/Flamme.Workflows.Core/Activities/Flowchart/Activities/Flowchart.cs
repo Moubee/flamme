@@ -12,7 +12,7 @@ namespace Flamme.Workflows.Activities.Flowchart.Activities;
 /// <summary>
 /// A flowchart consists of a collection of activities and connections between them.
 /// </summary>
-[Activity("Elsa", "Flow", "A flowchart is a collection of activities and connections between them.")]
+[Activity("ControlFlow", "Flowchart", 1, "A flowchart is a collection of activities and connections between them.", "Flow")]
 [Browsable(false)]
 public partial class Flowchart : Container
 {
@@ -133,7 +133,7 @@ public partial class Flowchart : Container
     /// Gets the effective execution mode for this flowchart execution.
     /// Priority: WorkflowExecutionContext.Properties > FlowchartOptions (DI) > Static UseTokenFlow flag
     /// </summary>
-    private static FlowchartExecutionMode GetEffectiveExecutionMode(ActivityExecutionContext context)
+    internal static FlowchartExecutionMode GetEffectiveExecutionMode(ActivityExecutionContext context)
     {
         var workflowExecutionContext = context.WorkflowExecutionContext;
 

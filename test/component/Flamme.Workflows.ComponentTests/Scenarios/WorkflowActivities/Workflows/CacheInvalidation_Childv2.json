@@ -19,7 +19,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "5d146ccb42668b6b",
     "nodeId": "Workflow1:5d146ccb42668b6b",
@@ -42,7 +42,7 @@
         "id": "d719079757f5d1bf",
         "nodeId": "Workflow1:5d146ccb42668b6b:d719079757f5d1bf",
         "name": "Correlate1",
-        "type": "Elsa.Correlate",
+        "type": "Workflows.Correlate",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

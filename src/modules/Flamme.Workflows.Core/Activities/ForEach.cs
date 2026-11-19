@@ -5,7 +5,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Iterate over a set of values.
 /// </summary>
-[Activity("Elsa", "Looping", "Iterate over a set of values.")]
+[Activity("ControlFlow", "ForEach", 1, "Iterate over a set of values.", "Looping")]
 public class ForEach : ForEach<object>
 {
 }

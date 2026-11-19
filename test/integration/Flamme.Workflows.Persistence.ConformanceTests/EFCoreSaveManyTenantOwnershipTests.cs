@@ -207,7 +207,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             TenantId = tenantId,
             Hash = hash,
             WorkflowInstanceId = "instance-1",
-            Name = "Elsa.HttpEndpoint",
+            Name = "Http.Endpoint",
             CreatedAt = CreatedAt
         };
 
@@ -219,7 +219,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             WorkflowInstanceId = "instance-1",
             ActivityId = "activity-1",
             ActivityNodeId = "node-1",
-            ActivityType = "Elsa.WriteLine",
+            ActivityType = "Console.WriteLine",
             ActivityTypeVersion = 1,
             Status = Workflows.ActivityStatus.Running,
             StartedAt = CreatedAt
@@ -236,7 +236,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             WorkflowVersion = 1,
             ActivityInstanceId = "ai-1",
             ActivityId = "activity-1",
-            ActivityType = "Elsa.WriteLine",
+            ActivityType = "Console.WriteLine",
             ActivityTypeVersion = 1,
             ActivityNodeId = "node-1",
             Timestamp = CreatedAt,
@@ -287,7 +287,7 @@ public sealed class EFCoreSaveManyTenantOwnershipTests
             new JsonObject
             {
                 ["id"] = id,
-                ["activityTypeName"] = "Elsa.HttpEndpoint",
+                ["activityTypeName"] = "Http.Endpoint",
                 ["workflowInstanceId"] = "instance-1",
                 ["activityInstanceId"] = null,
                 ["hash"] = "stolen",

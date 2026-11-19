@@ -116,6 +116,6 @@ public class MemoryBookmarkStoreTenantIsolationTests
             TenantId = tenantId,
             Hash = id,
             WorkflowInstanceId = "instance-1",
-            Name = "Elsa.HttpEndpoint"
+            Name = "Http.Endpoint"
         };
 }

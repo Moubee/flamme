@@ -26,7 +26,7 @@ Elsa provides the workflow engine foundation: activities, workflow definitions, 
 
 The backend and runtime take priority. UI development is currently secondary; this repository does not host a designer. [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) remains a separate upstream project, and compatibility with Flamme changes should be evaluated for your use case.
 
-Flamme packages, assemblies, public namespaces, and host composition use the Flamme name.
+Flamme packages, assemblies, public namespaces, and host composition use the Flamme name. Built-in activities have separate capability names in published workflows, including `ControlFlow.Flowchart` and `Console.WriteLine`.
 
 ## Scope
 

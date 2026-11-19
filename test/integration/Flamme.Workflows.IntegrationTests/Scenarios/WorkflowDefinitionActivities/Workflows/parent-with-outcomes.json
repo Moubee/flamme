@@ -21,7 +21,7 @@
   "root": {
     "id": "Flowchart1",
     "nodeId": "Workflow2:Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -68,7 +68,7 @@
         "id": "WriteLineFailed",
         "nodeId": "Workflow2:Flowchart1:WriteLineFailed",
         "name": null,
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -98,7 +98,7 @@
         "id": "WriteLineSuccess",
         "nodeId": "Workflow2:Flowchart1:WriteLineSuccess",
         "name": null,
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

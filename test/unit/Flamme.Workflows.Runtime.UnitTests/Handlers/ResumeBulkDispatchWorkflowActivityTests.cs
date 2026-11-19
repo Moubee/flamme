@@ -54,7 +54,7 @@ public class ResumeBulkDispatchWorkflowActivityTests
             stimulusSender);
 
         await handler.HandleAsync(
-            new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "single-stimulus-hash"),
+            new DispatchWorkflowActivationDenied("parent-1", "child-1", "Workflows.Dispatch", "single-stimulus-hash"),
             CancellationToken.None);
 
         Mock.Get(stimulusSender).SendAsync(

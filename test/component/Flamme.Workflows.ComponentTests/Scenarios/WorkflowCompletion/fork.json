@@ -20,7 +20,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "c74056c7f1f4a3",
     "nodeId": "Workflow1:c74056c7f1f4a3",
@@ -43,7 +43,7 @@
         "id": "c0e09e3ac3cfdba7",
         "nodeId": "Workflow1:c74056c7f1f4a3:c0e09e3ac3cfdba7",
         "name": "FlowFork1",
-        "type": "Elsa.FlowFork",
+        "type": "ControlFlow.Fork",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -73,7 +73,7 @@
         "id": "e6f0cddb1cdbdd7c",
         "nodeId": "Workflow1:c74056c7f1f4a3:e6f0cddb1cdbdd7c",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -103,7 +103,7 @@
         "id": "3ece093dfc20c752",
         "nodeId": "Workflow1:c74056c7f1f4a3:3ece093dfc20c752",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -133,7 +133,7 @@
         "id": "ca9fcd1d6069df9",
         "nodeId": "Workflow1:c74056c7f1f4a3:ca9fcd1d6069df9",
         "name": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

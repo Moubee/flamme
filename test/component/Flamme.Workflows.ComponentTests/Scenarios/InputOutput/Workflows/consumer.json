@@ -39,7 +39,7 @@
     "id": "938f2c91bb759a6a",
     "nodeId": "Workflow2:938f2c91bb759a6a",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -50,9 +50,9 @@
     "activities": [
       {
         "workflowDefinitionId": "780fbf96f1bb1e7e",
-        "workflowDefinitionVersionId": "640867552fc865d",
-        "latestAvailablePublishedVersion": 3,
-        "latestAvailablePublishedVersionId": "640867552fc865d",
+        "workflowDefinitionVersionId": "5ba5a7e36d60549b",
+        "latestAvailablePublishedVersion": 1,
+        "latestAvailablePublishedVersionId": "5ba5a7e36d60549b",
         "id": "8c1127e1193cd6e8",
         "nodeId": "Workflow2:938f2c91bb759a6a:8c1127e1193cd6e8",
         "name": "Output1",

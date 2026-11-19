@@ -21,9 +21,9 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
     public async Task<ActivityDescriptor> DescribeActivityAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type activityType, CancellationToken cancellationToken = default)
     {
         var activityAttr = activityType.GetCustomAttribute<ActivityAttribute>();
-        var ns = activityAttr?.Namespace ?? ActivityTypeNameHelper.GenerateNamespace(activityType) ?? "Elsa";
+        var ns = activityAttr?.Namespace ?? ActivityTypeNameHelper.GenerateNamespace(activityType) ?? string.Empty;
         var friendlyName = GetFriendlyActivityName(activityType);
-        var typeName = activityAttr?.Type ?? friendlyName;
+        var typeName = ActivityTypeNameHelper.GenerateTypeName(activityType, null);
         var typeVersion = activityAttr?.Version ?? 1;
         var fullTypeName = ActivityTypeNameHelper.GenerateTypeName(activityType);
         var displayNameAttr = activityType.GetCustomAttribute<DisplayNameAttribute>();

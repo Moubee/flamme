@@ -37,14 +37,14 @@ public class WorkflowDraftValidationTests
     public async Task DraftValidationReportsUnavailableActivityDescriptors()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IActivityRegistry>(new TestActivityRegistry(new ActivityDescriptor { TypeName = "Elsa.WriteLine", Name = "WriteLine", Version = 1 }));
+        services.AddSingleton<IActivityRegistry>(new TestActivityRegistry(new ActivityDescriptor { TypeName = "Console.WriteLine", Name = "WriteLine", Version = 1 }));
         using var serviceProvider = services.BuildServiceProvider();
         var validator = new WorkflowDraftValidationService(serviceProvider);
         var draft = new JsonObject
         {
             ["activities"] = new JsonArray
             {
-                (JsonNode)new JsonObject { ["id"] = "installed", ["type"] = "Elsa.WriteLine" },
+                (JsonNode)new JsonObject { ["id"] = "installed", ["type"] = "Console.WriteLine" },
                 (JsonNode)new JsonObject { ["id"] = "missing", ["type"] = "Elsa.Missing" }
             }
         };
@@ -52,7 +52,7 @@ public class WorkflowDraftValidationTests
         var diagnostics = validator.Validate(draft);
 
         await Assert.That(diagnostics).Contains(x => x.Code == "activity.unavailable" && x.Message.Contains("Elsa.Missing"));
-        await Assert.That(diagnostics).DoesNotContain(x => x.Message.Contains("Elsa.WriteLine"));
+        await Assert.That(diagnostics).DoesNotContain(x => x.Message.Contains("Console.WriteLine"));
     }
 
     private class TestActivityRegistry(params ActivityDescriptor[] descriptors) : IActivityRegistry

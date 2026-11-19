@@ -25,7 +25,7 @@
     "id": "8163a86bbcff6777",
     "nodeId": "Workflow1:8163a86bbcff6777",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [
@@ -83,7 +83,7 @@
         "id": "b036c71bbd31983d",
         "nodeId": "Workflow1:8163a86bbcff6777:b036c71bbd31983d",
         "name": "HttpEndpoint1",
-        "type": "Elsa.HttpEndpoint",
+        "type": "Http.Endpoint",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,
@@ -113,7 +113,7 @@
         "id": "b91befb34b3e44ea",
         "nodeId": "Workflow1:8163a86bbcff6777:b91befb34b3e44ea",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

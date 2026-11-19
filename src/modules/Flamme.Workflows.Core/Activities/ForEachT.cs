@@ -12,6 +12,7 @@ namespace Flamme.Workflows.Activities;
 /// A strongly-typed for-each construct where <typeparamref name="T"/> is the item type.
 /// </summary>
 /// <typeparam name="T">The type of items in the collection to iterate over.</typeparam>
+[Activity("ControlFlow", "ForEach", 1)]
 public class ForEach<T> : Activity
 {
     private const string CurrentIndexProperty = "CurrentIndex";

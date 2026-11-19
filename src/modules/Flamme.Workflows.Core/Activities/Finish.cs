@@ -7,7 +7,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Mark the workflow as finished.
 /// </summary>
-[Activity("Elsa", "Primitives", "Mark the workflow as finished.")]
+[Activity("ControlFlow", "Finish", 1, "Mark the workflow as finished.", "Primitives")]
 [PublicAPI]
 public class Finish : CodeActivity, ITerminalNode
 {

@@ -18,7 +18,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "refgraph-gc-flowchart",
     "nodeId": "RefGraphGrandchild:refgraph-gc-flowchart",
@@ -39,7 +39,7 @@
         "id": "refgraph-gc-setname",
         "nodeId": "RefGraphGrandchild:refgraph-gc-flowchart:refgraph-gc-setname",
         "name": "SetName1",
-        "type": "Elsa.SetName",
+        "type": "Workflows.SetName",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

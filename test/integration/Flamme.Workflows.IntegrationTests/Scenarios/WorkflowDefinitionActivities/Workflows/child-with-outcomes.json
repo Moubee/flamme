@@ -26,7 +26,7 @@
     "id": "3519519e32e50f38",
     "nodeId": "Workflow1:3519519e32e50f38",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -46,7 +46,7 @@
         "id": "a093b294de68dc32",
         "nodeId": "Workflow1:3519519e32e50f38:a093b294de68dc32",
         "name": "Complete1",
-        "type": "Elsa.Complete",
+        "type": "ControlFlow.Complete",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

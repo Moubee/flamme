@@ -291,7 +291,7 @@ public abstract class WorkflowStoreConformanceTests
         await Assert.That((await Assert.That(await scenario.ActivityExecutions.FindManyAsync(new ActivityExecutionRecordFilter())).HasSingleItem()).Id).IsEqualTo("ae-3");
 
         await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-1", "instance-1", "activity-a", "Started"));
-        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-2", "instance-1", "activity-b", "Completed", activityType: "Elsa.Delay"));
+        await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-2", "instance-1", "activity-b", "Completed", activityType: "Time.Delay"));
         await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-3", "instance-2", "activity-a", "Started"));
 
         await Assert.That((await scenario.ExecutionLogs.FindAsync(new WorkflowExecutionLogRecordFilter { Id = "el-1" }))!.Id).IsEqualTo("el-1");
@@ -308,7 +308,7 @@ public abstract class WorkflowStoreConformanceTests
         await Assert.That((await scenario.ExecutionLogs.FindAsync(new WorkflowExecutionLogRecordFilter { EventName = "Completed" }))!.Id).IsEqualTo("el-2");
         await Assert.That((await Assert.That((await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter { ActivityId = "activity-b" }, PageArgs.All)).Items).HasSingleItem()).Id).IsEqualTo("el-2");
 
-        var excluded = await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter { WorkflowInstanceId = "instance-1", ExcludeActivityType = "Elsa.WriteLine" }, PageArgs.All);
+        var excluded = await scenario.ExecutionLogs.FindManyAsync(new WorkflowExecutionLogRecordFilter { WorkflowInstanceId = "instance-1", ExcludeActivityType = "Console.WriteLine" }, PageArgs.All);
         await Assert.That((await Assert.That(excluded.Items).HasSingleItem()).Id).IsEqualTo("el-2");
 
         await scenario.ExecutionLogs.SaveAsync(ExecutionLog("el-1", "instance-1", "activity-a", "Resumed"));
@@ -530,7 +530,7 @@ public abstract class WorkflowStoreConformanceTests
             WorkflowDefinitionVersionId = workflowDefinitionVersionId,
             ActivityId = activityId,
             Hash = hash,
-            Name = "Elsa.HttpEndpoint"
+            Name = "Http.Endpoint"
         };
 
     private static WorkflowDefinition Definition(string id, string name, string? tenantId, string? definitionId = null, int version = 1) =>
@@ -559,7 +559,7 @@ public abstract class WorkflowStoreConformanceTests
             TenantId = tenantId,
             Hash = hash ?? id,
             WorkflowInstanceId = workflowInstanceId,
-            Name = "Elsa.HttpEndpoint",
+            Name = "Http.Endpoint",
             CreatedAt = StartedAt
         };
 
@@ -591,7 +591,7 @@ public abstract class WorkflowStoreConformanceTests
             WorkflowInstanceId = workflowInstanceId,
             ActivityId = activityId,
             ActivityNodeId = $"node-{activityId}",
-            ActivityType = "Elsa.WriteLine",
+            ActivityType = "Console.WriteLine",
             ActivityTypeVersion = 1,
             ActivityName = activityName ?? activityId,
             Status = status,
@@ -604,7 +604,7 @@ public abstract class WorkflowStoreConformanceTests
         string workflowInstanceId,
         string activityId,
         string eventName,
-        string activityType = "Elsa.WriteLine",
+        string activityType = "Console.WriteLine",
         DateTimeOffset? timestamp = null,
         long sequence = 0) =>
         new()

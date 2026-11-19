@@ -9,7 +9,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// <summary>
 /// Faults the workflow.
 /// </summary>
-[Activity("Elsa", "Primitives", "Publishes an event.")]
+[Activity("Signals", "PublishEvent", 1, "Publishes an event.", "Primitives")]
 [UsedImplicitly]
 public class PublishEvent([CallerFilePath] string? source = null, [CallerLineNumber] int? line = null) : Activity(source, line)
 {

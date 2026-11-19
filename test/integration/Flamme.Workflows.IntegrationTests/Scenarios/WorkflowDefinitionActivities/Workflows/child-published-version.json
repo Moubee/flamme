@@ -9,7 +9,7 @@
   "inputs": [],
   "outputs": [],
   "root": {
-    "type": "Elsa.WriteLine",
+    "type": "Console.WriteLine",
     "version": 1,
     "id": "WriteLine1",
     "text": {

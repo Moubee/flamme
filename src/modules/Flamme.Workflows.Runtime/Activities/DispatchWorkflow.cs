@@ -19,7 +19,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// When <see cref="WaitForCompletion"/> is enabled and activation is denied, the activity completes with a result dictionary containing
 /// <c>CannotStart</c> set to <c>true</c> and the requested <c>WorkflowInstanceId</c>.
 /// </summary>
-[Activity("Elsa", "Composition", "Create a new workflow instance of the specified workflow and dispatch it for execution.")]
+[Activity("Workflows", "Dispatch", 1, "Create a new workflow instance of the specified workflow and dispatch it for execution.", "Composition")]
 [UsedImplicitly]
 public class DispatchWorkflow : Activity<object>
 {

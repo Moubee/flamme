@@ -1,3 +1,4 @@
+using Flamme.Workflows.Attributes;
 using System.ComponentModel;
 
 namespace Flamme.Workflows.Activities;
@@ -6,6 +7,7 @@ namespace Flamme.Workflows.Activities;
 /// A dynamically provided activity with custom properties. This is experimental and may be removed.
 /// </summary>
 [Browsable(false)]
+[Activity("System", "Dynamic", 1)]
 public class DynamicActivity : CodeActivity
 {
     public IDictionary<string, object?> Properties { get; set; } = new Dictionary<string, object?>();

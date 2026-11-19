@@ -29,7 +29,7 @@ public class ResumeDispatchWorkflowActivityTests
                         return Task.FromResult(new SendStimulusResult([]));
                     });
 
-        await handler.HandleAsync(new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "dispatch-stimulus-hash"), CancellationToken.None);
+        await handler.HandleAsync(new DispatchWorkflowActivationDenied("parent-1", "child-1", "Workflows.Dispatch", "dispatch-stimulus-hash"), CancellationToken.None);
 
         Mock.Get(stimulusSender).SendAsync(
             "dispatch-stimulus-hash", Arg.Any<StimulusMetadata?>(), Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
@@ -60,7 +60,7 @@ public class ResumeDispatchWorkflowActivityTests
         var handler = new ResumeDispatchWorkflowActivity(bookmarkQueue, IStimulusHasher.Mock().Object, stimulusSender);
 
         await handler.HandleAsync(
-            new DispatchWorkflowActivationDenied("parent-1", "child-1", "Elsa.DispatchWorkflow", "dispatch-stimulus-hash"),
+            new DispatchWorkflowActivationDenied("parent-1", "child-1", "Workflows.Dispatch", "dispatch-stimulus-hash"),
             CancellationToken.None);
 
         await Assert.That(enqueuedItem).IsNotNull();

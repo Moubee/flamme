@@ -17,7 +17,7 @@ namespace Flamme.Http;
 /// <summary>
 /// Write a response to the current HTTP response object.
 /// </summary>
-[Activity("Elsa", "HTTP", "Write a response to the current HTTP response object.", DisplayName = "HTTP Response")]
+[Activity("Http", "WriteResponse", 1, "Write a response to the current HTTP response object.", "HTTP", DisplayName = "HTTP Response")]
 public class WriteHttpResponse : Activity
 {
     /// <inheritdoc />

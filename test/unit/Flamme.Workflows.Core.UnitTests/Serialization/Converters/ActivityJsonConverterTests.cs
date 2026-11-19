@@ -189,7 +189,7 @@ public sealed class ActivityJsonConverterTests
      "id": "b54b024aa7469287",
      "nodeId": "Workflow1:51139b0cc83d3b07:b54b024aa7469287",
      "name": "WriteLine1",
-     "type": "Elsa.WriteLine",
+     "type": "Console.WriteLine",
      "version": 1,
      "customProperties": {
          "canStartWorkflow": false,
@@ -234,7 +234,7 @@ public sealed class ActivityJsonConverterTests
     "id": "b54b024aa7469287",
     "nodeId": "Workflow1:51139b0cc83d3b07:b54b024aa7469287",
     "name": "WriteLine1",
-    "type": "Elsa.WriteLine",
+    "type": "Console.WriteLine",
     "customProperties": {
         "canStartWorkflow": false,
         "runAsynchronously": false

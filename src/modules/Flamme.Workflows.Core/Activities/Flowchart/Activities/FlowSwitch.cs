@@ -14,7 +14,7 @@ namespace Flamme.Workflows.Activities.Flowchart.Activities;
 /// Evaluates the specified case conditions and schedules the one that evaluates to <code>true</code>.
 /// </summary>
 [FlowNode("Default")]
-[Activity("Elsa", "Branching", "Evaluate a set of case conditions and schedule the activity for a matching case.", DisplayName = "Switch (flow)")]
+[Activity("ControlFlow", "SwitchFlow", 1, "Evaluate a set of case conditions and schedule the activity for a matching case.", "Branching", DisplayName = "Switch (flow)")]
 [PublicAPI]
 public class FlowSwitch : Activity
 {

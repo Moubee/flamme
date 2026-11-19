@@ -6,9 +6,9 @@ namespace Flamme.Workflows;
 public static class WorkflowScriptActivityTypeNames
 {
     /// <summary>
-    /// The Flamme activity namespace for built-in script activities.
+    /// The activity namespace for built-in script activities.
     /// </summary>
-    public const string Namespace = "Elsa";
+    public const string Namespace = "Scripting";
 
     /// <summary>
     /// The unqualified C# script activity type.

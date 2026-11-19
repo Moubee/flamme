@@ -50,7 +50,7 @@ public class MemoryBookmarkQueueStoreTenantIsolationTests
             WorkflowInstanceId = "instance-a",
             BookmarkId = "bookmark-a",
             StimulusHash = "hash-a",
-            ActivityTypeName = "Elsa.HttpEndpoint",
+            ActivityTypeName = "Http.Endpoint",
             Options = new ResumeBookmarkOptions()
         });
 

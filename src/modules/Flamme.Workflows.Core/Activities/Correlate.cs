@@ -11,7 +11,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Set the CorrelationId of the workflow to a given value.
 /// </summary>
-[Activity("Elsa", "Primitives", "Set the CorrelationId of the workflow to a given value.")]
+[Activity("Workflows", "Correlate", 1, "Set the CorrelationId of the workflow to a given value.", "Primitives")]
 [PublicAPI]
 public class Correlate : CodeActivity
 {

@@ -12,7 +12,7 @@
   "isLatest": true,
   "isPublished": false,
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "Flowchart1",
     "metadata": {},
@@ -33,7 +33,7 @@
           }
         },
         "id": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -62,7 +62,7 @@
           }
         },
         "id": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,
@@ -91,7 +91,7 @@
           }
         },
         "id": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "canStartWorkflow": false,
         "runAsynchronously": false,

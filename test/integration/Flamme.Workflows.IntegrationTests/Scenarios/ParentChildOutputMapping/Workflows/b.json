@@ -28,7 +28,7 @@
     "autoUpdateConsumingWorkflows": true
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "49a24a01a4c318de",
     "nodeId": "Workflow1:49a24a01a4c318de",
@@ -61,7 +61,7 @@
         "id": "247da1e267d76f80",
         "nodeId": "Workflow1:49a24a01a4c318de:247da1e267d76f80",
         "name": "RunCSharp1",
-        "type": "Elsa.RunCSharp",
+        "type": "Scripting.RunCSharp",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

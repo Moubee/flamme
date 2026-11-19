@@ -20,7 +20,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "f4b21c8e9a6d3057",
     "nodeId": "Workflow1:f4b21c8e9a6d3057",
@@ -43,7 +43,7 @@
         "id": "a91c3e7b5d204f18",
         "nodeId": "Workflow1:f4b21c8e9a6d3057:a91c3e7b5d204f18",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "logPersistenceConfig": {
@@ -83,7 +83,7 @@
         "id": "b02d4f8c6e315a29",
         "nodeId": "Workflow1:f4b21c8e9a6d3057:b02d4f8c6e315a29",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "logPersistenceConfig": {

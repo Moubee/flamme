@@ -28,7 +28,7 @@ public class WorkflowResumerConsumedBookmarkTests
             Id = "bookmark-1",
             WorkflowInstanceId = "instance-1",
             Hash = "hash",
-            Name = "Elsa.Event"
+            Name = "Signals.Event"
         });
 
         var runCount = 0;

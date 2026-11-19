@@ -19,7 +19,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "d3350290ed96e720",
     "nodeId": "Workflow1:d3350290ed96e720",
@@ -43,7 +43,7 @@
           }
         },
         "body": {
-          "type": "Elsa.Flowchart",
+          "type": "ControlFlow.Flowchart",
           "version": 1,
           "id": "b07170f2d68980cd",
           "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2:b07170f2d68980cd",
@@ -69,7 +69,7 @@
               "id": "33665f061d96b957",
               "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2:b07170f2d68980cd:33665f061d96b957",
               "name": "FlowDecision1",
-              "type": "Elsa.FlowDecision",
+              "type": "ControlFlow.Decide",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -93,7 +93,7 @@
               "id": "e27177eb5965bd6b",
               "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2:b07170f2d68980cd:e27177eb5965bd6b",
               "name": "WriteLine1",
-              "type": "Elsa.WriteLine",
+              "type": "Console.WriteLine",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -117,7 +117,7 @@
               "id": "343d233a75d8d8e9",
               "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2:b07170f2d68980cd:343d233a75d8d8e9",
               "name": "WriteLine2",
-              "type": "Elsa.WriteLine",
+              "type": "Console.WriteLine",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -150,7 +150,7 @@
               "id": "1f8625e278b74aa3",
               "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2:b07170f2d68980cd:1f8625e278b74aa3",
               "name": "FlowJoin1",
-              "type": "Elsa.FlowJoin",
+              "type": "ControlFlow.Join",
               "version": 1,
               "customProperties": {
                 "canStartWorkflow": false,
@@ -216,7 +216,7 @@
         "id": "70fc1183cd5800f2",
         "nodeId": "Workflow1:d3350290ed96e720:70fc1183cd5800f2",
         "name": "ParallelForEach1",
-        "type": "Elsa.ParallelForEach",
+        "type": "ControlFlow.ParallelForEach",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

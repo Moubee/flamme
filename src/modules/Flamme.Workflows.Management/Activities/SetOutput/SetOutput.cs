@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Management.Activities.SetOutput;
 /// <summary>
 /// Assigns a given value to a workflow definition's output.
 /// </summary>
-[Activity("Elsa", "Composition", "Assigns a given value to a the container's output.", Kind = ActivityKind.Action)]
+[Activity("Data", "SetOutput", 1, "Assigns a given value to a the container's output.", "Composition", Kind = ActivityKind.Action)]
 [PublicAPI]
 public class SetOutput : CodeActivity
 {

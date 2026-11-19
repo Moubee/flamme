@@ -36,7 +36,7 @@ public static class ActivityExtensions
 
         public async Task<MergeMode?> GetMergeModeAsync(ActivityExecutionContext context)
         {
-            if (activity.Type != "Elsa.FlowJoin")
+            if (activity is not FlowJoin)
             {
                 return activity.GetMergeMode();
             }

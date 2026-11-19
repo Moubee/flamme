@@ -24,7 +24,7 @@ namespace Flamme.Http;
 /// <summary>
 /// Sends a file to the HTTP response.
 /// </summary>
-[Activity("Elsa", "HTTP", "Send one ore more files (zipped) to the HTTP response.", DisplayName = "HTTP File Response")]
+[Activity("Http", "WriteFileResponse", 1, "Send one ore more files (zipped) to the HTTP response.", "HTTP", DisplayName = "HTTP File Response")]
 public class WriteFileHttpResponse : Activity
 {
     /// <summary>

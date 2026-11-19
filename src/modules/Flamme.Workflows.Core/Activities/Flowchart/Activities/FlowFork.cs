@@ -10,7 +10,7 @@ namespace Flamme.Workflows.Activities.Flowchart.Activities;
 /// <summary>
 /// Branch execution into multiple branches that will be executed in parallel.
 /// </summary>
-[Activity("Elsa", "Branching", "Branch execution into multiple branches that will be executed in parallel.", DisplayName = "Fork (flow)")]
+[Activity("ControlFlow", "Fork", 1, "Branch execution into multiple branches that will be executed in parallel.", "Branching", DisplayName = "Fork (flow)")]
 [PublicAPI]
 public class FlowFork : Activity
 {

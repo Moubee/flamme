@@ -38,7 +38,7 @@ public class Tests : IAsyncDisposable
         {
             Id = "writeLine",
             Name = "WriteLine",
-            Version = 3,
+            Version = 1,
             RunAsynchronously = false // Manually set to false because the manual construction defaults to null,
                                       // But deserialization uses the factory creation method that overwrites null values.
         };
@@ -53,8 +53,8 @@ public class Tests : IAsyncDisposable
         {
             Id = "flowchart",
             Name = "Flowchart",
-            Type = "Elsa.Flowchart",
-            Version = 42,
+            Type = "ControlFlow.Flowchart",
+            Version = 1,
             CustomProperties = new Dictionary<string, object>
             {
                 { "purpose", "somePurpose" }
@@ -101,8 +101,8 @@ public class Tests : IAsyncDisposable
         {
             Id = "sequence",
             Name = "Sequence",
-            Type = "Elsa.Sequence",
-            Version = 42,
+            Type = "ControlFlow.Sequence",
+            Version = 1,
             Variables = new List<Variable> {
                 new Variable<string>("TextVar", "This is the text to write")
             },
@@ -149,8 +149,8 @@ public class Tests : IAsyncDisposable
         {
             Id = "parallel",
             Name = "Parallel",
-            Type = "Elsa.Parallel",
-            Version = 42,
+            Type = "ControlFlow.Parallel",
+            Version = 1,
             Variables = new List<Variable> {
                 new Variable<string>("TextVar", "This is the text to write")
             },

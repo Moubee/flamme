@@ -2,5 +2,5 @@ namespace Flamme.Http;
 
 public class HttpStimulusNames
 {
-    public const string HttpEndpoint = "Elsa.HttpEndpoint";
+    public const string HttpEndpoint = "Http.Endpoint";
 }

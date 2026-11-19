@@ -23,7 +23,7 @@ namespace Flamme.Workflows.Runtime.Activities;
 /// <summary>
 /// Creates new workflow instances of the specified workflow for each item in the data source and dispatches them for execution.
 /// </summary>
-[Activity("Elsa", "Composition", "Create new workflow instances for each item in the data source and dispatch them for execution.", Kind = ActivityKind.Task)]
+[Activity("Workflows", "BulkDispatch", 1, "Create new workflow instances for each item in the data source and dispatch them for execution.", "Composition", Kind = ActivityKind.Task)]
 [FlowNode("Completed", "Canceled", "Done")]
 [UsedImplicitly]
 public class BulkDispatchWorkflows : Activity

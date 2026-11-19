@@ -51,7 +51,7 @@
     "id": "85a5e1d9e487bfa4",
     "nodeId": "Workflow1:85a5e1d9e487bfa4",
     "name": "Flowchart1",
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "customProperties": {
       "notFoundConnections": [],
@@ -78,7 +78,7 @@
         "id": "985eb3bfb8d4dd3f",
         "nodeId": "Workflow1:85a5e1d9e487bfa4:985eb3bfb8d4dd3f",
         "name": "SetOutput1",
-        "type": "Elsa.SetOutput",
+        "type": "Data.SetOutput",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,

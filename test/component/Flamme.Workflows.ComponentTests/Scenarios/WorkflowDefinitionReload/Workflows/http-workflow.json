@@ -20,7 +20,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "f8019bae-c506-4467-812b-e403e7aad8ff",
     "nodeId": "Workflow1:f8019bae-c506-4467-812b-e403e7aad8ff",
@@ -79,7 +79,7 @@
         "id": "cc196a5e-04f7-4794-b25c-1a0987632d8a",
         "nodeId": "Workflow1:f8019bae-c506-4467-812b-e403e7aad8ff:cc196a5e-04f7-4794-b25c-1a0987632d8a",
         "name": "HttpEndpoint1",
-        "type": "Elsa.HttpEndpoint",
+        "type": "Http.Endpoint",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": true,

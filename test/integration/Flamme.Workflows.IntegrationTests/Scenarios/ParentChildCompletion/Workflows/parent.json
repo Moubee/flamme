@@ -19,7 +19,7 @@
     "autoUpdateConsumingWorkflows": false
   },
   "root": {
-    "type": "Elsa.Flowchart",
+    "type": "ControlFlow.Flowchart",
     "version": 1,
     "id": "f9071ee83c88d765",
     "nodeId": "Workflow1:f9071ee83c88d765",
@@ -45,7 +45,7 @@
         "id": "77069142b8b9da15",
         "nodeId": "Workflow1:f9071ee83c88d765:77069142b8b9da15",
         "name": "WriteLine2",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -78,7 +78,7 @@
         "id": "34e3dcda423f3c1c",
         "nodeId": "Workflow1:f9071ee83c88d765:34e3dcda423f3c1c",
         "name": "WriteLine3",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -111,7 +111,7 @@
         "id": "8b7bf9cd03c066fa",
         "nodeId": "Workflow1:f9071ee83c88d765:8b7bf9cd03c066fa",
         "name": "WriteLine1",
-        "type": "Elsa.WriteLine",
+        "type": "Console.WriteLine",
         "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
@@ -131,15 +131,15 @@
         }
       },
       {
-        "workflowDefinitionId": "b8b45fd4dbffad5d",
-        "workflowDefinitionVersionId": "24dd11bc73a881d5",
-        "latestAvailablePublishedVersion": 7,
-        "latestAvailablePublishedVersionId": "24dd11bc73a881d5",
+        "workflowDefinitionId": "3dcdbf22d29d6e60",
+        "workflowDefinitionVersionId": "c8109a84c584c83c",
+        "latestAvailablePublishedVersion": 4,
+        "latestAvailablePublishedVersionId": "c8109a84c584c83c",
         "id": "abcd6d3d391bfe10",
         "nodeId": "Workflow1:f9071ee83c88d765:abcd6d3d391bfe10",
         "name": "SubworkflowTest1",
         "type": "SubworkflowTest",
-        "version": 7,
+        "version": 4,
         "customProperties": {
           "canStartWorkflow": false,
           "runAsynchronously": false

@@ -8,7 +8,7 @@ namespace Flamme.Workflows.Activities;
 /// <summary>
 /// Execute a set of activities in parallel.
 /// </summary>
-[Activity("Elsa", "Workflows", "Execute a set of activities in parallel.")]
+[Activity("ControlFlow", "Parallel", 1, "Execute a set of activities in parallel.", "Workflows")]
 [Browsable(false)] // Hidden from the designer until we have Sequential activity designer support.
 public class Parallel : Container
 {
