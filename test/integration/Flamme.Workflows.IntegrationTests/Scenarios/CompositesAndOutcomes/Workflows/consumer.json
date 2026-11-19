@@ -38,7 +38,7 @@
         "id": "ctusr1Uv40uFqIws9Ymt9A",
         "name": "Completor1",
         "type": "Completor",
-        "version": 2,
+        "version": 1,
         "customProperties": {
           "canStartWorkflow": false,
           "runAsynchronously": false

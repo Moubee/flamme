@@ -46,6 +46,19 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task ExplicitUnknownMajorPreservesTheMissingContract()
+    {
+        var registry = CreateActivityRegistry(WriteLineActivityTypeName, WriteLineActivity);
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+
+        var result = Execute(CreateSut(registry), """{ "type": "Console.WriteLine", "version": 42 }""");
+
+        var missing = await Assert.That(result).IsTypeOf<NotFoundActivity>();
+        await Assert.That(missing!.MissingTypeName).IsEqualTo("Console.WriteLine");
+        await Assert.That(missing.MissingTypeVersion).IsEqualTo(42);
+    }
+
+    [Test]
     public async Task When_DeserializeUnknownActivity_Then_ReturnsNotFoundActivity()
     {
         // Arrange
@@ -104,6 +117,34 @@ public sealed class ActivityJsonConverterTests
 
         // Assert
         await Assert.That(result).IsSameReferenceAs(WorkflowAsActivity);
+    }
+
+    [Test]
+    [Arguments("absent-revision")]
+    [Arguments("another-owners-revision")]
+    public async Task WorkflowReferenceCannotSelectAnotherDefinitionWithTheSameName(string revisionId)
+    {
+        var descriptor = new ActivityDescriptor
+        {
+            TypeName = "Send",
+            Version = 1,
+            Constructor = _ => new(WorkflowAsActivity),
+            CustomProperties =
+            {
+                ["WorkflowDefinitionId"] = "other-owner",
+                ["WorkflowDefinitionVersionId"] = "another-owners-revision"
+            }
+        };
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).Find("Send", 1).Returns(descriptor);
+        Mock.Get(registry).Find(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => predicate(descriptor) ? descriptor : null);
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+
+        var json = $$"""{"type":"Send","version":1,"workflowDefinitionId":"requested-owner","workflowDefinitionVersionId":"{{revisionId}}"}""";
+        var missing = await Assert.That(Execute(CreateSut(registry), json)).IsTypeOf<NotFoundActivity>();
+        await Assert.That(missing!.MissingTypeName).IsEqualTo("Send");
+        await Assert.That(missing.MissingTypeVersion).IsEqualTo(1);
     }
 
     [Test]

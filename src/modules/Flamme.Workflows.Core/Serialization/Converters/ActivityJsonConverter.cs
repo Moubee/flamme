@@ -125,28 +125,32 @@ public class ActivityJsonConverter(
             activityTypeVersion = activityDescriptor?.Version ?? 0;
         }
 
-        // This is a special case when working with the WorkflowDefinitionActivity: workflowDefinitionVersionId should be used to find the workflow-as-activity.
-        if (activityRoot.TryGetProperty("workflowDefinitionVersionId", out var workflowDefinitionVersionIdElement))
+        var owner = activityRoot.TryGetProperty("workflowDefinitionId", out var ownerElement) && ownerElement.ValueKind == JsonValueKind.String
+            ? ownerElement.GetString()
+            : null;
+        if (activityRoot.TryGetProperty("workflowDefinitionVersionId", out var revisionElement) && revisionElement.ValueKind == JsonValueKind.String)
         {
-            var activityDescriptorOverride = FindActivityDescriptorByCustomProperty("WorkflowDefinitionVersionId", workflowDefinitionVersionIdElement);
-            if (activityDescriptorOverride is null)
-                return activityTypeName;
-
-            activityDescriptor = activityDescriptorOverride;
-            activityTypeVersion = activityDescriptor.Version;
+            var revision = FindActivityDescriptorByCustomProperty("WorkflowDefinitionVersionId", revisionElement);
+            // An immutable revision takes precedence over the designer's cached display name and version.
+            // Legacy imports can carry a stale revision ID. Accept the tenant-scoped (name, version)
+            // descriptor only when the serialized logical owner independently identifies the same workflow.
+            if (revision != null)
+                activityDescriptor = owner == null || HasOwner(revision, owner) ? revision : null;
+            else if (owner == null || activityVersionElement.ValueKind == JsonValueKind.Undefined || !HasOwner(activityDescriptor, owner))
+                activityDescriptor = null;
         }
-        // This is also a special case when working with the WorkflowDefinitionActivity: if no 'well-known' activity could be found, it might be a workflow-as-activity with a workflowDefinitionId
-        else if (activityDescriptor is null
-                 && activityRoot.TryGetProperty("workflowDefinitionId", out var workflowDefinitionIdElement)
-                 && workflowDefinitionIdElement.ValueKind == JsonValueKind.String)
+        else if (owner != null && (activityDescriptor == null || activityDescriptor.CustomProperties.ContainsKey("WorkflowDefinitionId")) && !HasOwner(activityDescriptor, owner))
         {
             int? requestedVersion = activityVersionElement.ValueKind == JsonValueKind.Undefined ? null : activityTypeVersion;
-            activityDescriptor = FindActivityDescriptorByCustomProperty("WorkflowDefinitionId", workflowDefinitionIdElement, requestedVersion);
-            activityTypeVersion = activityDescriptor?.Version ?? activityTypeVersion;
+            activityDescriptor = FindActivityDescriptorByCustomProperty("WorkflowDefinitionId", ownerElement, requestedVersion);
         }
 
+        activityTypeVersion = activityDescriptor?.Version ?? activityTypeVersion;
         return activityTypeName;
     }
+
+    private static bool HasOwner(ActivityDescriptor? descriptor, string owner) =>
+        descriptor != null && descriptor.CustomProperties.TryGetValue("WorkflowDefinitionId", out var id) && Equals(id, owner);
 
     private ActivityDescriptor? FindActivityDescriptorByCustomProperty(string customPropertyName, JsonElement valueElement, int? version = null)
     {
