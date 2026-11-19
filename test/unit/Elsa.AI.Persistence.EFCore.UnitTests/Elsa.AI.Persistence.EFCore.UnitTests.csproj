@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\src\modules\Elsa.AI.Persistence.EFCore.PostgreSql\Elsa.AI.Persistence.EFCore.PostgreSql.csproj" />
-        <ProjectReference Include="..\..\..\src\modules\Elsa.AI.Persistence.EFCore\Elsa.AI.Persistence.EFCore.csproj" />
-        <ProjectReference Include="..\..\..\src\common\Elsa.Testing.Shared\Elsa.Testing.Shared.csproj" />
-    </ItemGroup>
-
-</Project>

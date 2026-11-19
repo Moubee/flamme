@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides the following JavaScript libraries for Flamme:
+            - lodash
+            - moment
+        </Description>
+        <PackageTags>flamme module expressions scripting javascript libraries</PackageTags>
+    </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj" />
+		<ProjectReference Include="..\Flamme.Expressions.JavaScript\Flamme.Expressions.JavaScript.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+      <None Remove="ClientLib\dist\*.js" />
+      <EmbeddedResource Include="ClientLib\dist\*.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ClientLib\dist\" />
+    </ItemGroup>
+
+</Project>

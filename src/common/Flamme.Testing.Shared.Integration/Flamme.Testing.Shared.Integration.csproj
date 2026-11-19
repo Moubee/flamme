@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides common utilities that are helpful when writing integration tests against Flamme functionality.
+        </Description>
+        <PackageTags>flamme integration testing</PackageTags>
+        <RootNamespace>Flamme.Testing.Shared</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="TUnit.Logging.Microsoft" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.CSharp\Flamme.Expressions.CSharp.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.JavaScript\Flamme.Expressions.JavaScript.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.Liquid\Flamme.Expressions.Liquid.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Scheduling\Flamme.Scheduling.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.WorkflowProviders.BlobStorage\Flamme.WorkflowProviders.BlobStorage.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme\Flamme.csproj" />
+        <ProjectReference Include="..\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

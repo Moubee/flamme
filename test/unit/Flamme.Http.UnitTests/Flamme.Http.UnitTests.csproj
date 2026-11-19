@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <PackageReference Include="TUnit.AspNetCore" />
+      <ProjectReference Include="..\..\..\src\modules\Flamme.Http\Flamme.Http.csproj" />
+    </ItemGroup>
+
+</Project>

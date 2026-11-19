@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\src\common\Elsa.Testing.Shared\Elsa.Testing.Shared.csproj"/>
-        <ProjectReference Include="..\..\..\src\modules\Elsa.UserTasks.Persistence.EFCore.PostgreSql\Elsa.UserTasks.Persistence.EFCore.PostgreSql.csproj"/>
-    </ItemGroup>
-</Project>

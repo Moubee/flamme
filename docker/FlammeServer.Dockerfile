@@ -1,0 +1,45 @@
+ARG DOTNET_RUNTIME_VERSION=11.0
+
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0.100 AS build
+ARG DOTNET_RUNTIME_VERSION
+WORKDIR /source
+
+# copy sources.
+COPY src/. ./src
+COPY ./NuGet.Config ./
+COPY *.props *.targets global.json ./
+
+# restore packages.
+RUN dotnet restore "./src/apps/Flamme.Server.Web/Flamme.Server.Web.csproj"
+
+# build and publish (UseAppHost=false creates platform independent binaries).
+WORKDIR /source/src/apps/Flamme.Server.Web
+RUN dotnet publish "Flamme.Server.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-restore -f net${DOTNET_RUNTIME_VERSION}
+
+# move binaries into smaller base image.
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_RUNTIME_VERSION} AS base
+WORKDIR /app
+COPY --from=build /app/publish ./
+
+# Install runtime dependencies, including CA certificates.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        libpython3-dev \
+        python3 \
+        python3-dev \
+        python3-pip \
+    && update-ca-certificates \
+    && ln -s "$(find /usr/lib -name 'libpython3*.so' -print -quit)" /usr/local/lib/libpython3.so \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set PYTHONNET_PYDLL environment variable
+ENV PYTHONNET_PYDLL=/usr/local/lib/libpython3.so
+
+EXPOSE 8080/tcp
+EXPOSE 443/tcp
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["dotnet", "Flamme.Server.Web.dll"]

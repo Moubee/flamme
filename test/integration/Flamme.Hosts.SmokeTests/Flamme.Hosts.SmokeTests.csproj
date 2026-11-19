@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="TUnit.AspNetCore" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\apps\Flamme.Server.Web\Flamme.Server.Web.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.AI.Host\Flamme.AI.Host.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Alterations\Flamme.Alterations.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.ExternalAuthentication\Flamme.ExternalAuthentication.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Resilience\Flamme.Resilience.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Secrets\Flamme.Secrets.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.UserTasks\Flamme.UserTasks.csproj" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

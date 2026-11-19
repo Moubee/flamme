@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides EF Core persistence for Flamme AI conversations, proposals and audit records.
+        </Description>
+        <PackageTags>flamme module ai persistence efcore</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Flamme.AI.Abstractions\Flamme.AI.Abstractions.csproj" />
+        <ProjectReference Include="..\Flamme.Persistence.EFCore.Common\Flamme.Persistence.EFCore.Common.csproj" />
+        <ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj" />
+    </ItemGroup>
+
+</Project>

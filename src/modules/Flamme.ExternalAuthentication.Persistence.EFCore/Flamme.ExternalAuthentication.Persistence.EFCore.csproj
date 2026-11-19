@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides Entity Framework Core persistence for Flamme external authentication.
+        </Description>
+        <PackageTags>flamme extension module external-authentication persistence efcore</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Flamme.Persistence.EFCore.Common\Flamme.Persistence.EFCore.Common.csproj" />
+        <ProjectReference Include="..\Flamme.ExternalAuthentication\Flamme.ExternalAuthentication.csproj" />
+    </ItemGroup>
+
+</Project>

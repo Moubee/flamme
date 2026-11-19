@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\src\common\Elsa.Testing.Shared\Elsa.Testing.Shared.csproj" />
-      <ProjectReference Include="..\..\..\src\modules\Elsa.Hosting.Management\Elsa.Hosting.Management.csproj" />
-    </ItemGroup>
-
-</Project>

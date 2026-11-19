@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides common utilities that are helpful when writing component tests against Flamme functionality.
+        </Description>
+        <PackageTags>elsa, component testing</PackageTags>
+        <RootNamespace>Flamme.Testing.Shared</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.CSharp\Flamme.Expressions.CSharp.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.JavaScript\Flamme.Expressions.JavaScript.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Expressions.Liquid\Flamme.Expressions.Liquid.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme\Flamme.csproj" />
+        <ProjectReference Include="..\..\clients\Flamme.Api.Client\Flamme.Api.Client.csproj" />
+        <ProjectReference Include="..\..\modules\Flamme.Tenants\Flamme.Tenants.csproj" />
+        <ProjectReference Include="..\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

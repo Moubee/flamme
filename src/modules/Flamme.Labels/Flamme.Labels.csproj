@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides funtionality to tag workflows with labels and filter by them.
+        </Description>
+        <PackageTags>flamme module labels</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Open.Linq.AsyncExtensions" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Flamme.Api.Common\Flamme.Api.Common.csproj" />
+      <ProjectReference Include="..\Flamme.Workflows.Management\Flamme.Workflows.Management.csproj" />
+    </ItemGroup>
+
+</Project>

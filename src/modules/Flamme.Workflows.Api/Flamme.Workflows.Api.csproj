@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides REST API endpoints for managing and executing Flamme workflows.
+        </Description>
+        <PackageTags>flamme module workflows api</PackageTags>
+    </PropertyGroup>
+	
+    <ItemGroup>
+        <ProjectReference Include="..\..\common\Flamme.Api.Common\Flamme.Api.Common.csproj" />
+        <ProjectReference Include="..\Flamme.Expressions.JavaScript\Flamme.Expressions.JavaScript.csproj" />
+        <ProjectReference Include="..\Flamme.SasTokens\Flamme.SasTokens.csproj" />
+        <ProjectReference Include="..\Flamme.Workflows.Management\Flamme.Workflows.Management.csproj" />
+        <ProjectReference Include="..\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj" />
+    </ItemGroup>
+
+</Project>

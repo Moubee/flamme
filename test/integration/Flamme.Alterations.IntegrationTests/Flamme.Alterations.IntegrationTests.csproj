@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="TUnit.AspNetCore" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared.Integration\Flamme.Testing.Shared.Integration.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Alterations\Flamme.Alterations.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Workflows\version-1.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Workflows\version-2.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>

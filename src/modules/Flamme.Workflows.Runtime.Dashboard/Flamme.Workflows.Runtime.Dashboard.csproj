@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides workflow runtime dashboard contributions.
+        </Description>
+        <PackageTags>flamme module workflows runtime dashboard operations</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Flamme.Dashboard.Abstractions\Flamme.Dashboard.Abstractions.csproj" />
+        <ProjectReference Include="..\Flamme.Dashboard.Api\Flamme.Dashboard.Api.csproj" />
+        <ProjectReference Include="..\Flamme.Workflows.Api\Flamme.Workflows.Api.csproj" />
+        <ProjectReference Include="..\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj" />
+    </ItemGroup>
+
+</Project>

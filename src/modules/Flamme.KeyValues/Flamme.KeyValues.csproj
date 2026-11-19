@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides a store for holding key value records.
+        </Description>
+        <PackageTags>flamme module keyvalue</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj" />
+      <ProjectReference Include="..\Flamme.Common\Flamme.Common.csproj" />
+    </ItemGroup>
+</Project>

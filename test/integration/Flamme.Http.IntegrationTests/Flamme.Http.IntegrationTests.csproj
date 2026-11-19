@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared.Integration\Flamme.Testing.Shared.Integration.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Http\Flamme.Http.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj" />
+    </ItemGroup>
+
+</Project>

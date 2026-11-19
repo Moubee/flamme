@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides multitenancy services.
+        </Description>
+        <PackageTags>flamme module multitenancy</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\common\Flamme.Api.Common\Flamme.Api.Common.csproj" />
+        <ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj"/>
+        <ProjectReference Include="..\Flamme.Common\Flamme.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Alterations.Core\Flamme.Alterations.Core.csproj" />
+    </ItemGroup>
+
+</Project>

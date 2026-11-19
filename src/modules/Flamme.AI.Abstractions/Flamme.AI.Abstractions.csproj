@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides provider-neutral abstractions for Flamme AI capabilities.
+        </Description>
+        <PackageTags>flamme module ai abstractions</PackageTags>
+    </PropertyGroup>
+
+</Project>

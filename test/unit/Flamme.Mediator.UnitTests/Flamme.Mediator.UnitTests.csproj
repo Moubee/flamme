@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\common\Flamme.Mediator\Flamme.Mediator.csproj"/>
+    </ItemGroup>
+
+    <Target Name="DefineRuntimeAsyncTestExpectation" BeforeTargets="_GenerateCompileDependencyCache;CoreCompile"
+            Condition="'$(TargetFramework)' == 'net11.0' And '$(UseRuntimeAsync)' == 'true'">
+        <PropertyGroup>
+            <DefineConstants>$(DefineConstants);FLAMME_RUNTIME_ASYNC</DefineConstants>
+        </PropertyGroup>
+    </Target>
+
+</Project>

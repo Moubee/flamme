@@ -52,7 +52,7 @@ jobs:
           workload: unit-integration
 
       - name: Restore unit and integration tests
-        run: dotnet restore Elsa.UnitIntegration.Tests.slnf --locked-mode --ignore-failed-sources
+        run: dotnet restore Flamme.UnitIntegration.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -62,7 +62,7 @@ jobs:
       - name: Run unit and integration tests with coverage
         run: |
           set -euo pipefail
-          dotnet test --solution Elsa.UnitIntegration.Tests.slnf \
+          dotnet test --solution Flamme.UnitIntegration.Tests.slnf \
             --framework ${{ matrix.framework }} \
             --configuration Release \
             --no-restore \
@@ -74,7 +74,7 @@ jobs:
             --report-trx
 
           coverage_count=$(find artifacts/test-results/unit-integration -maxdepth 1 -type f -name '*.cobertura.xml' | wc -l | tr -d ' ')
-          expected_coverage_count=$(python3 -c 'import json; print(len(json.load(open("Elsa.UnitIntegration.Tests.slnf"))["solution"]["projects"]))')
+          expected_coverage_count=$(python3 -c 'import json; print(len(json.load(open("Flamme.UnitIntegration.Tests.slnf"))["solution"]["projects"]))')
           if [[ "$coverage_count" != "$expected_coverage_count" ]]; then
             echo "Expected $expected_coverage_count unit/integration coverage files, found $coverage_count." >&2
             exit 1
@@ -127,7 +127,7 @@ jobs:
           workload: component
 
       - name: Restore component tests
-        run: dotnet restore Elsa.Component.Tests.slnf --locked-mode --ignore-failed-sources
+        run: dotnet restore Flamme.Component.Tests.slnf --locked-mode --ignore-failed-sources
 
       - name: Prepare test results directory
         run: |
@@ -137,7 +137,7 @@ jobs:
       - name: Run component tests with coverage and hang diagnostics
         run: |
           set -euo pipefail
-          dotnet test --solution Elsa.Component.Tests.slnf \
+          dotnet test --solution Flamme.Component.Tests.slnf \
             --framework ${{ matrix.framework }} \
             --configuration Release \
             --no-restore \
@@ -260,17 +260,17 @@ jobs:
           workload: solution
 
       - name: Restore
-        run: dotnet restore Elsa.slnx --locked-mode -p:Version="$VERSION"
+        run: dotnet restore Flamme.slnx --locked-mode -p:Version="$VERSION"
 
       - name: Build
-        run: dotnet build Elsa.slnx --configuration Release --no-restore -p:Version="$VERSION"
+        run: dotnet build Flamme.slnx --configuration Release --no-restore -p:Version="$VERSION"
 
       - name: Pack
-        run: dotnet pack Elsa.slnx --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
+        run: dotnet pack Flamme.slnx --configuration Release --no-build --no-restore --output packages -p:Version="$VERSION"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: elsa-nuget-packages
+          name: flamme-nuget-packages
           path: packages/*nupkg
           if-no-files-found: error

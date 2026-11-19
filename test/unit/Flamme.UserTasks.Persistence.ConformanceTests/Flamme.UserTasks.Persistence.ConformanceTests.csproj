@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\Flamme.UserTasks.Persistence.EFCore.PostgreSql\Flamme.UserTasks.Persistence.EFCore.PostgreSql.csproj"/>
+    </ItemGroup>
+</Project>

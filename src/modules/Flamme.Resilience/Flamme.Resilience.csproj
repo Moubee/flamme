@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides features and services for implementing resilient services and activities.
+        </Description>
+        <PackageTags>flamme module resilience</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Flamme.Api.Common\Flamme.Api.Common.csproj" />
+      <ProjectReference Include="..\Flamme.Resilience.Core\Flamme.Resilience.Core.csproj" />
+      <ProjectReference Include="..\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Polly" />
+    </ItemGroup>
+
+</Project>

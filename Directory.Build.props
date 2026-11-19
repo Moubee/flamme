@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Authors>Elsa Workflows Community</Authors>
+        <Authors>Flamme contributors; Elsa Workflows Community</Authors>
         <Copyright>2025</Copyright>
 
         <PackageProjectUrl>https://github.com/Moubee/flamme</PackageProjectUrl>

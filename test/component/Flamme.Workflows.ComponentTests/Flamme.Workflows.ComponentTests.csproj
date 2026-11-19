@@ -1,0 +1,129 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="Microsoft.Testing.Extensions.HangDump" />
+        <PackageReference Include="TUnit.AspNetCore" />
+    </ItemGroup>
+	
+    <ItemGroup>
+        <ProjectReference Include="..\Flamme.Workflows.ComponentTests.Host\Flamme.Workflows.ComponentTests.Host.csproj" />
+        <ProjectReference Include="..\..\..\src\clients\Flamme.Api.Client\Flamme.Api.Client.csproj" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared.Component\Flamme.Testing.Shared.Component.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Alterations\Flamme.Alterations.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Caching\Flamme.Caching.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Http\Flamme.Http.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Identity\Flamme.Identity.csproj" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Persistence.EFCore.Common\Flamme.Persistence.EFCore.Common.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Persistence.EFCore.PostgreSql\Flamme.Persistence.EFCore.PostgreSql.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Scheduling\Flamme.Scheduling.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Tenants.AspNetCore\Flamme.Tenants.AspNetCore.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.WorkflowProviders.BlobStorage\Flamme.WorkflowProviders.BlobStorage.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Workflows.Api\Flamme.Workflows.Api.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Workflows.Runtime.Distributed\Flamme.Workflows.Runtime.Distributed.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme\Flamme.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Scenarios\BasicWorkflows\hello-world.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowCompletion\fork.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\input-output-logging-1.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\input-output-logging-2.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\input-output-logging-3.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\input-output-logging-3-child.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\internal-state-logging-activity.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\LogPersistenceModes\internal-state-logging-workflow.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowCompletion\hello-world.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\CachingAndWorkflowDefinitionActivity\Workflows\workflow-definition-child.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\CachingAndWorkflowDefinitionActivity\Workflows\workflow-definition-grand-child.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\CachingAndWorkflowDefinitionActivity\Workflows\workflow-definition-parent.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowActivities\Workflows\CacheInvalidation_Child.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowActivities\Workflows\CacheInvalidation_Parent.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowActivities\Workflows\CacheInvalidation_Childv2.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowJsonStructures\main.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowJsonStructures\sub.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowDefinitionRefresh\dynamic-endpoint-http-workflow.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowDefinitionReload\http-workflow.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowDefinitionReload\Workflows\http-workflow.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\HttpWorkflows\Workflows\http-hello-world.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\InputOutput\Workflows\consumer.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\InputOutput\Workflows\provider.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\RestApis\Workflows\hello-world.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowReferenceGraph\Workflows\refgraph-grandchild.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowReferenceGraph\Workflows\refgraph-child.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Scenarios\WorkflowReferenceGraph\Workflows\refgraph-parent.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Scenarios\HostMethodActivities\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\..\unit\Flamme.Persistence.EFCore.UnitTests\StoreSaveManyTenantOwnershipTests.cs" Link="Scenarios/Persistence/StoreSaveManyTenantOwnershipTests.cs" />
+        <Compile Include="..\..\unit\Flamme.Persistence.EFCore.UnitTests\OwnershipStoreScenario.cs" Link="Scenarios/Persistence/OwnershipStoreScenario.cs" />
+    </ItemGroup>
+
+</Project>

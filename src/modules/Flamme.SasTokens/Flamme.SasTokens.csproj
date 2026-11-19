@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides services to generate SAS tokens.
+        </Description>
+        <PackageTags>flamme module security sas tokens</PackageTags>
+    </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj" />
+    </ItemGroup>
+</Project>

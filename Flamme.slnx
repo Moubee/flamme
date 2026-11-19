@@ -1,0 +1,214 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/docker/">
+    <File Path="docker/FlammeServer.Dockerfile" />
+    <File Path="docker/FlammeServer-Datadog.Dockerfile" />
+    <File Path="docker/entrypoint.sh" />
+  </Folder>
+  <Folder Name="/github/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/github/issue_templates/">
+    <File Path=".github/ISSUE_TEMPLATE/bug_report.md" />
+    <File Path=".github/ISSUE_TEMPLATE/documentation.md" />
+    <File Path=".github/ISSUE_TEMPLATE/feature_request.md" />
+    <File Path=".github/ISSUE_TEMPLATE/improvement.md" />
+    <File Path=".github/ISSUE_TEMPLATE/performance.md" />
+    <File Path=".github/ISSUE_TEMPLATE/task.md" />
+  </Folder>
+  <Folder Name="/github/workflows/">
+    <File Path=".github/workflows/copilot-setup-steps.yml" />
+    <File Path=".github/workflows/packages.yml" />
+    <File Path=".github/workflows/pr.yml" />
+    <File Path=".github/workflows/stale.yml" />
+  </Folder>
+  <Folder Name="/modules/">
+    <Project Path="src/modules/Flamme.UserTasks.Persistence.EFCore.PostgreSql/Flamme.UserTasks.Persistence.EFCore.PostgreSql.csproj" />
+    <Project Path="src/modules/Flamme.UserTasks.Persistence.EFCore/Flamme.UserTasks.Persistence.EFCore.csproj" />
+    <Project Path="src/modules/Flamme.UserTasks/Flamme.UserTasks.csproj" />
+  </Folder>
+  <Folder Name="/scripts/" />
+  <Folder Name="/scripts/migrations/">
+    <File Path="scripts/migrations/README.md" />
+  </Folder>
+  <Folder Name="/solution/">
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="icon.png" />
+    <File Path="NuGet.Config" />
+    <File Path="README.md" />
+    <File Path="renovate.json" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/apps/">
+    <File Path="src/apps/Directory.Build.props" />
+    <Project Path="src/apps/Flamme.AppHost/Flamme.AppHost.csproj" />
+    <Project Path="src/apps/Flamme.Server.Web/Flamme.Server.Web.csproj" />
+    <Project Path="src/apps/Flamme.ServiceDefaults/Flamme.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/clients/">
+    <Project Path="src/clients/Flamme.Api.Client/Flamme.Api.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/common/">
+    <Project Path="src/common/Flamme.Api.Common/Flamme.Api.Common.csproj" />
+    <Project Path="src/common/Flamme.Features/Flamme.Features.csproj" />
+    <Project Path="src/common/Flamme.Mediator/Flamme.Mediator.csproj" />
+    <Project Path="src/common/Flamme.Testing.Shared.Component/Flamme.Testing.Shared.Component.csproj" />
+    <Project Path="src/common/Flamme.Testing.Shared.Integration/Flamme.Testing.Shared.Integration.csproj" />
+    <Project Path="src/common/Flamme.Testing.Shared/Flamme.Testing.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/">
+    <Project Path="src/modules/Flamme.Common/Flamme.Common.csproj" />
+    <Project Path="src/modules/Flamme/Flamme.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/alterations/">
+    <Project Path="src/modules/Flamme.Alterations.Core/Flamme.Alterations.Core.csproj" />
+    <Project Path="src/modules/Flamme.Alterations/Flamme.Alterations.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/caching/">
+    <Project Path="src/modules/Flamme.Caching/Flamme.Caching.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/dashboard/">
+    <Project Path="src/modules/Flamme.Dashboard.Abstractions/Flamme.Dashboard.Abstractions.csproj" />
+    <Project Path="src/modules/Flamme.Dashboard.Api/Flamme.Dashboard.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/diagnostics/">
+  </Folder>
+  <Folder Name="/src/modules/expressions/">
+    <Project Path="src/modules/Flamme.Expressions.CSharp/Flamme.Expressions.CSharp.csproj" />
+    <Project Path="src/modules/Flamme.Expressions.JavaScript.Libraries/Flamme.Expressions.JavaScript.Libraries.csproj" />
+    <Project Path="src/modules/Flamme.Expressions.JavaScript/Flamme.Expressions.JavaScript.csproj" />
+    <Project Path="src/modules/Flamme.Expressions.Liquid/Flamme.Expressions.Liquid.csproj" />
+    <Project Path="src/modules/Flamme.Expressions.Python/Flamme.Expressions.Python.csproj" />
+    <Project Path="src/modules/Flamme.Expressions/Flamme.Expressions.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/hosting/">
+    <Project Path="src/modules/Flamme.Hosting.Management/Flamme.Hosting.Management.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/http/">
+    <Project Path="src/modules/Flamme.Http/Flamme.Http.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/keyvalues/">
+    <Project Path="src/modules/Flamme.KeyValues/Flamme.KeyValues.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/labels/">
+    <Project Path="src/modules/Flamme.Labels/Flamme.Labels.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/multitenancy/">
+    <Project Path="src/modules/Flamme.Tenants.AspNetCore/Flamme.Tenants.AspNetCore.csproj" />
+    <Project Path="src/modules/Flamme.Tenants/Flamme.Tenants.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/persistence/">
+    <Project Path="src/modules/Flamme.Persistence.EFCore.Common/Flamme.Persistence.EFCore.Common.csproj" />
+    <Project Path="src/modules/Flamme.Persistence.EFCore.PostgreSql/Flamme.Persistence.EFCore.PostgreSql.csproj" />
+    <Project Path="src/modules/Flamme.Persistence.EFCore/Flamme.Persistence.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/resilience/">
+    <Project Path="src/modules/Flamme.Resilience.Core/Flamme.Resilience.Core.csproj" />
+    <Project Path="src/modules/Flamme.Resilience/Flamme.Resilience.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/scheduling/">
+    <Project Path="src/modules/Flamme.Scheduling/Flamme.Scheduling.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/secrets/">
+    <Project Path="src/modules/Flamme.Secrets.JavaScript/Flamme.Secrets.JavaScript.csproj" />
+    <Project Path="src/modules/Flamme.Secrets.Persistence.EFCore.PostgreSql/Flamme.Secrets.Persistence.EFCore.PostgreSql.csproj" />
+    <Project Path="src/modules/Flamme.Secrets.Persistence.EFCore/Flamme.Secrets.Persistence.EFCore.csproj" />
+    <Project Path="src/modules/Flamme.Secrets/Flamme.Secrets.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/security/">
+    <Project Path="src/modules/Flamme.ExternalAuthentication.OpenIdConnect/Flamme.ExternalAuthentication.OpenIdConnect.csproj" />
+    <Project Path="src/modules/Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql/Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.csproj" />
+    <Project Path="src/modules/Flamme.ExternalAuthentication.Persistence.EFCore/Flamme.ExternalAuthentication.Persistence.EFCore.csproj" />
+    <Project Path="src/modules/Flamme.ExternalAuthentication.Secrets/Flamme.ExternalAuthentication.Secrets.csproj" />
+    <Project Path="src/modules/Flamme.ExternalAuthentication/Flamme.ExternalAuthentication.csproj" />
+    <Project Path="src/modules/Flamme.Identity/Flamme.Identity.csproj" />
+    <Project Path="src/modules/Flamme.SasTokens/Flamme.SasTokens.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/weaver/">
+    <Project Path="src/modules/Flamme.AI.Abstractions/Flamme.AI.Abstractions.csproj" />
+    <Project Path="src/modules/Flamme.AI.Copilot/Flamme.AI.Copilot.csproj" />
+    <Project Path="src/modules/Flamme.AI.Host/Flamme.AI.Host.csproj" />
+    <Project Path="src/modules/Flamme.AI.Persistence.EFCore.PostgreSql/Flamme.AI.Persistence.EFCore.PostgreSql.csproj" />
+    <Project Path="src/modules/Flamme.AI.Persistence.EFCore/Flamme.AI.Persistence.EFCore.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/workflows/">
+    <Project Path="src/modules/Flamme.WorkflowProviders.BlobStorage/Flamme.WorkflowProviders.BlobStorage.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Api/Flamme.Workflows.Api.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Core/Flamme.Workflows.Core.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Management/Flamme.Workflows.Management.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Runtime.Dashboard/Flamme.Workflows.Runtime.Dashboard.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Runtime.Distributed/Flamme.Workflows.Runtime.Distributed.csproj" />
+    <Project Path="src/modules/Flamme.Workflows.Runtime/Flamme.Workflows.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <File Path="test/Directory.Build.props" />
+    <Project Path="test/integration/Flamme.Hosts.SmokeTests/Flamme.Hosts.SmokeTests.csproj" />
+  </Folder>
+  <Folder Name="/test/component/">
+    <File Path="test/component/Directory.Build.props" />
+    <Project Path="test/component/Flamme.Workflows.ComponentTests.Host/Flamme.Workflows.ComponentTests.Host.csproj" />
+    <Project Path="test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj" />
+  </Folder>
+  <Folder Name="/test/integration/">
+    <File Path="test/integration/Directory.Build.props" />
+    <Project Path="test/integration/Flamme.Activities.IntegrationTests/Flamme.Activities.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.AI.IntegrationTests/Flamme.AI.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Alterations.IntegrationTests/Flamme.Alterations.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Alterations.Persistence.ConformanceTests/Flamme.Alterations.Persistence.ConformanceTests.csproj" />
+    <Project Path="test/integration/Flamme.Common.IntegrationTests/Flamme.Common.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.ExternalAuthentication.IntegrationTests/Flamme.ExternalAuthentication.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Http.IntegrationTests/Flamme.Http.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.JavaScript.IntegrationTests/Flamme.JavaScript.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Labels.Persistence.ConformanceTests/Flamme.Labels.Persistence.ConformanceTests.csproj" />
+    <Project Path="test/integration/Flamme.Resilience.IntegrationTests/Flamme.Resilience.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Workflows.IntegrationTests/Flamme.Workflows.IntegrationTests.csproj" />
+    <Project Path="test/integration/Flamme.Workflows.Persistence.ConformanceTests/Flamme.Workflows.Persistence.ConformanceTests.csproj" />
+  </Folder>
+  <Folder Name="/test/performance/">
+    <File Path="test/performance/Directory.Build.props" />
+    <Project Path="test/performance/Flamme.Workflows.PerformanceTests/Flamme.Workflows.PerformanceTests.csproj" />
+  </Folder>
+  <Folder Name="/test/unit/">
+    <File Path="test/unit/Directory.Build.props" />
+    <Project Path="test/unit/Flamme.Activities.UnitTests/Flamme.Activities.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.AI.Abstractions.UnitTests/Flamme.AI.Abstractions.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.AI.Copilot.UnitTests/Flamme.AI.Copilot.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.AI.Host.UnitTests/Flamme.AI.Host.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.AI.Persistence.EFCore.UnitTests/Flamme.AI.Persistence.EFCore.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Alterations.Core.UnitTests/Flamme.Alterations.Core.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Api.Common.UnitTests/Flamme.Api.Common.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Common.UnitTests/Flamme.Common.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Dashboard.Api.UnitTests/Flamme.Dashboard.Api.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Expressions.UnitTests/Flamme.Expressions.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.ExternalAuthentication.UnitTests/Flamme.ExternalAuthentication.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Features.UnitTests/Flamme.Features.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Hosting.Management.UnitTests/Flamme.Hosting.Management.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Http.UnitTests/Flamme.Http.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Identity.UnitTests/Flamme.Identity.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Labels.UnitTests/Flamme.Labels.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Mediator.UnitTests/Flamme.Mediator.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Persistence.EFCore.UnitTests/Flamme.Persistence.EFCore.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Resilience.Core.UnitTests/Flamme.Resilience.Core.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.SasTokens.UnitTests/Flamme.SasTokens.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Scheduling.UnitTests/Flamme.Scheduling.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Secrets.UnitTests/Flamme.Secrets.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Tenants.UnitTests/Flamme.Tenants.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.UserTasks.Persistence.ConformanceTests/Flamme.UserTasks.Persistence.ConformanceTests.csproj" />
+    <Project Path="test/unit/Flamme.UserTasks.Persistence.EFCore.UnitTests/Flamme.UserTasks.Persistence.EFCore.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.UserTasks.UnitTests/Flamme.UserTasks.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Workflows.Api.UnitTests/Flamme.Workflows.Api.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Workflows.Management.UnitTests/Flamme.Workflows.Management.UnitTests.csproj" />
+    <Project Path="test/unit/Flamme.Workflows.Runtime.UnitTests/Flamme.Workflows.Runtime.UnitTests.csproj" />
+  </Folder>
+</Solution>

@@ -89,7 +89,7 @@
     {
       "description": "The instrumented server image installs the release archive separately for each architecture.",
       "matchPackageNames": ["OpenTelemetry.AutoInstrumentation"],
-      "prBodyNotes": ["Update OTEL_VERSION in docker/ElsaServer-Datadog.Dockerfile and verify both Linux archive SHA-256 values against the matching upstream release."]
+      "prBodyNotes": ["Update OTEL_VERSION in docker/FlammeServer-Datadog.Dockerfile and verify both Linux archive SHA-256 values against the matching upstream release."]
     },
     {
       "matchManagers": ["npm"],

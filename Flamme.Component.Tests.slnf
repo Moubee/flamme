@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "Flamme.slnx",
+    "projects": [
+      "test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj"
+    ]
+  }
+}

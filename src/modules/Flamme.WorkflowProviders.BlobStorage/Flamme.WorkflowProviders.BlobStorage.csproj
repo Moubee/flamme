@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides a workflow definition provider that loads workflow definitions from files.
+        </Description>
+        <PackageTags>flamme extension module fluentstorage json blob</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+		<PackageReference Include="FluentStorage" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\Flamme.Features\Flamme.Features.csproj" />
+      <ProjectReference Include="..\Flamme.Common\Flamme.Common.csproj" />
+      <ProjectReference Include="..\Flamme.Workflows.Core\Flamme.Workflows.Core.csproj" />
+      <ProjectReference Include="..\Flamme.Workflows.Management\Flamme.Workflows.Management.csproj" />
+      <ProjectReference Include="..\Flamme.Workflows.Runtime\Flamme.Workflows.Runtime.csproj" />
+    </ItemGroup>
+
+</Project>

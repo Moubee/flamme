@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>
+            Provides alterations for workflow instances.
+        </Description>
+        <PackageTags>flamme extension module alterations</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Flamme.Alterations.Core\Flamme.Alterations.Core.csproj" />
+    </ItemGroup>
+</Project>

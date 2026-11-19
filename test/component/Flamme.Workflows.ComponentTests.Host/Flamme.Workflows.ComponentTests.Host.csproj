@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../../src/modules/Flamme.Http/Flamme.Http.csproj" />
+        <ProjectReference Include="../../../src/modules/Flamme.Scheduling/Flamme.Scheduling.csproj" />
+        <ProjectReference Include="../../../src/modules/Flamme.Tenants.AspNetCore/Flamme.Tenants.AspNetCore.csproj" />
+        <ProjectReference Include="../../../src/modules/Flamme.Workflows.Api/Flamme.Workflows.Api.csproj" />
+        <ProjectReference Include="../../../src/modules/Flamme.Workflows.Runtime.Distributed/Flamme.Workflows.Runtime.Distributed.csproj" />
+        <ProjectReference Include="../../../src/modules/Flamme/Flamme.csproj" />
+    </ItemGroup>
+
+</Project>

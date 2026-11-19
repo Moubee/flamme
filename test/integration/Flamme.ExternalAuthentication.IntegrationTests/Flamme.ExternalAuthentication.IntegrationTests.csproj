@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="TUnit.AspNetCore" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\apps\Flamme.Server.Web\Flamme.Server.Web.csproj" />
+        <ProjectReference Include="..\..\..\src\clients\Flamme.Api.Client\Flamme.Api.Client.csproj" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared\Flamme.Testing.Shared.csproj" />
+        <ProjectReference Include="..\..\..\src\common\Flamme.Testing.Shared.Integration\Flamme.Testing.Shared.Integration.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.ExternalAuthentication\Flamme.ExternalAuthentication.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.ExternalAuthentication.OpenIdConnect\Flamme.ExternalAuthentication.OpenIdConnect.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.ExternalAuthentication.Persistence.EFCore\Flamme.ExternalAuthentication.Persistence.EFCore.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql\Flamme.ExternalAuthentication.Persistence.EFCore.PostgreSql.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Identity\Flamme.Identity.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Persistence.EFCore\Flamme.Persistence.EFCore.csproj" />
+        <ProjectReference Include="..\..\..\src\modules\Flamme.Persistence.EFCore.PostgreSql\Flamme.Persistence.EFCore.PostgreSql.csproj" />
+    </ItemGroup>
+
+</Project>
