@@ -63,13 +63,14 @@ jobs:
         shell: bash
         run: |
           export FLAMME_FEED="$RUNNER_TEMP/flamme-feed"
+          version=$(dotnet msbuild src/modules/Flamme/Flamme.csproj -getProperty:PackageVersion)
           dotnet pack Flamme.slnx -c Release --no-build --no-restore -o "$FLAMME_FEED"
           cp -R samples/PublishedActivities "$RUNNER_TEMP/consumer"
           cp global.json "$RUNNER_TEMP/consumer/"
           cd "$RUNNER_TEMP/consumer"
           export NUGET_PACKAGES="$RUNNER_TEMP/consumer-cache"
-          dotnet restore --configfile NuGet.Config -p:FlammeVersion=1.0.0
-          dotnet build -c Release --no-restore -p:FlammeVersion=1.0.0
+          dotnet restore --configfile NuGet.Config -p:FlammeVersion="$version"
+          dotnet build -c Release --no-restore -p:FlammeVersion="$version"
           container=$(docker run -d --rm -p 127.0.0.1::5432 -e POSTGRES_PASSWORD=sample postgres:17-alpine)
           trap 'docker stop "$container" > /dev/null' EXIT
           for attempt in {1..30}; do
