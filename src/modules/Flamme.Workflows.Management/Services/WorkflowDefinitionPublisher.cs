@@ -190,31 +190,10 @@ public class WorkflowDefinitionPublisher(
 
     public async Task<WorkflowDefinition> RevertVersionAsync(string definitionId, int version, CancellationToken cancellationToken = default)
     {
-        var latestVersionFilter = new WorkflowDefinitionFilter
-        {
-            DefinitionId = definitionId,
-            VersionOptions = VersionOptions.Latest
-        };
-        var latestVersion = await workflowDefinitionStore.FindAsync(latestVersionFilter, cancellationToken);
-        var lastVersionFilter = new WorkflowDefinitionFilter
-        {
-            DefinitionId = definitionId
-        };
-        var lastVersion = await workflowDefinitionStore.FindLastVersionAsync(lastVersionFilter, cancellationToken);
-
-        if (latestVersion != null)
-        {
-            latestVersion.IsLatest = false;
-            await workflowDefinitionStore.SaveAsync(latestVersion, cancellationToken);
-        }
-
-        var draft = await GetDraftAsync(definitionId, VersionOptions.SpecificVersion(version), cancellationToken);
-        draft!.Id = identityGenerator.GenerateId();
-        draft.Version = (lastVersion?.Version ?? 0) + 1;
-        draft.IsLatest = true;
-
-        await workflowDefinitionStore.SaveAsync(draft, cancellationToken);
-        return draft;
+        var draft = await GetDraftAsync(definitionId, VersionOptions.SpecificVersion(version), cancellationToken)
+                    ?? throw new InvalidOperationException($"Workflow definition '{definitionId}' was not found.");
+        draft.Id = identityGenerator.GenerateId();
+        return await SaveDraftAsync(draft, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -235,11 +214,10 @@ public class WorkflowDefinitionPublisher(
         if (definition == null!)
             return null;
 
-        if (!definition.IsPublished && !definition.IsReadonly)
-            return definition;
-
         var draft = definition.ShallowClone();
         draft.CustomProperties = new Dictionary<string, object>(definition.CustomProperties);
+        if (!definition.IsPublished && !definition.IsReadonly)
+            return draft;
 
         draft.Version = lastVersion?.Version + 1 ?? 1;
         draft.CreatedAt = timeProvider.GetUtcNow();

@@ -1,4 +1,5 @@
 using Flamme.Extensions;
+using Flamme.Common.Multitenancy;
 using Flamme.Workflows.Management.Entities;
 using Flamme.Workflows.Models;
 using Humanizer;
@@ -9,8 +10,8 @@ public class WorkflowDefinitionActivityDescriptorFactory
 {
     public ActivityDescriptor CreateDescriptor(WorkflowDefinition definition, WorkflowDefinition? latestPublishedDefinition = null)
     {
-        var typeName = definition.Name!.Pascalize();
-        var tenantId = definition.TenantId;
+        var typeName = GetTypeName(definition.Name);
+        var tenantId = definition.TenantId.NormalizeTenantId();
         
         var ports = definition.Outcomes.Select(outcome => new Port
         {
@@ -73,6 +74,9 @@ public class WorkflowDefinitionActivityDescriptorFactory
         };
     }
     
+    internal static string GetTypeName(string? name) =>
+        !string.IsNullOrWhiteSpace(name) ? name.Pascalize() : throw new InvalidOperationException("A workflow exposed as an activity requires a name.");
+
     private static IEnumerable<InputDescriptor> DescribeInputs(WorkflowDefinition definition)
     {
         var inputs = definition.Inputs.Select(inputDefinition =>
