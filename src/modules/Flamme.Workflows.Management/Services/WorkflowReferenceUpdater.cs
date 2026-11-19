@@ -3,6 +3,7 @@ using Flamme.Extensions;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -114,7 +115,16 @@ public class WorkflowReferenceUpdater(
                 }
                 else
                 {
-                    updated = await publisher.SaveDraftAsync(updated, cancellationToken);
+                    try
+                    {
+                        updated = await publisher.SaveDraftAsync(updated, cancellationToken);
+                    }
+                    catch (WorkflowDefinitionValidationException e)
+                    {
+                        logger.LogWarning("Could not save reference updates for draft workflow definition {DefinitionId}: {Error}.", id, e.Message);
+                        continue;
+                    }
+
                     await RegisterSavedDraftAsync(updated, cancellationToken);
                 }
 

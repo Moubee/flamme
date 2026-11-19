@@ -134,8 +134,8 @@ public class ActivityJsonConverter(
             var revisionId = revisionElement.GetString();
             var revision = activityRegistry.Find(x => x.CustomProperties.TryGetValue("WorkflowDefinitionVersionId", out var id) && Equals(id, revisionId));
             // An immutable revision takes precedence over the designer's cached display name and version.
-            // Legacy imports can carry a stale revision ID. Accept the tenant-scoped (name, version)
-            // descriptor only when the serialized logical owner independently identifies the same workflow.
+            // To recover a stale revision ID, a legacy import must explicitly supply the numeric
+            // version as well as the logical owner and name. The latest revision may have changed.
             if (revision != null)
                 activityDescriptor = owner == null || HasOwner(revision, owner) ? revision : null;
             else

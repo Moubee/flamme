@@ -4,6 +4,7 @@ using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -19,13 +20,42 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
     private const string CustomSource = "custom workflow source";
 
     [Test]
-    [Arguments("Json Consumer")]
-    [Arguments(" ")]
-    public async Task UpdateWorkflowReferencesAsync_SkipsSourceOnlyConsumerAndUpdatesJsonConsumer(string consumerName)
+    public async Task UpdateWorkflowReferencesAsync_WhenDraftSaveIsRejected_UpdatesIndependentConsumer()
+    {
+        var target = CreateTargetDefinition();
+        var rejected = CreateJsonConsumer("Rejected Consumer");
+        rejected.Options.UsableAsActivity = true;
+        var sibling = CreateJsonConsumer("Sibling");
+        sibling.DefinitionId = "sibling";
+        sibling.Id = "sibling-v1";
+        var rejectedGraph = CreateConsumerGraph(rejected, target, "rejected-workflow");
+        var siblingGraph = CreateConsumerGraph(sibling, target, "sibling-workflow");
+        var logger = new CollectingLogger();
+        var publisher = IWorkflowDefinitionPublisher.Mock().Object;
+        var registry = IActivityRegistry.Mock().Object;
+        var updater = CreateUpdater(target, [rejected, sibling], [rejectedGraph, siblingGraph], publisher, logger, registry, out _);
+        const string reason = "Another workflow already provides this activity.";
+        Mock.Get(publisher).SaveDraftAsync(rejected, Arg.Any<CancellationToken>()).Throws(new WorkflowDefinitionValidationException(reason));
+
+        var result = await updater.UpdateWorkflowReferencesAsync(target);
+
+        var updated = await Assert.That(result.UpdatedWorkflows).HasSingleItem();
+        await Assert.That(updated.DefinitionId).IsEqualTo(sibling.DefinitionId);
+        Mock.Get(publisher).SaveDraftAsync(sibling, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(registry).Add(Arg.Any<Type>(), Arg.Any<ActivityDescriptor>()).WasNeverCalled();
+        await Assert.That(logger.Messages).Contains(message =>
+            message.Contains(rejected.DefinitionId, StringComparison.Ordinal) && message.Contains(reason, StringComparison.Ordinal));
+    }
+
+    [Test]
+    [Arguments("Json Consumer", 1)]
+    [Arguments(" ", 0)]
+    public async Task UpdateWorkflowReferencesAsync_SkipsSourceOnlyConsumerAndUpdatesJsonConsumer(string consumerName, int expectedRegistrations)
     {
         var target = CreateTargetDefinition();
         var sourceOnlyConsumer = CreateSourceOnlyConsumer();
         var jsonConsumer = CreateJsonConsumer(consumerName);
+        jsonConsumer.Options.UsableAsActivity = true;
         var sourceOnlyGraph = CreateConsumerGraph(sourceOnlyConsumer, target, "source-consumer-workflow");
         var jsonGraph = CreateConsumerGraph(jsonConsumer, target, "json-consumer-workflow");
         var logger = new CollectingLogger();
@@ -50,6 +80,7 @@ public class WorkflowReferenceUpdaterOriginalSourceTests
         Mock.Get(publisher).SaveDraftAsync(sourceOnlyConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(publisher).PublishAsync(sourceOnlyConsumer, Arg.Any<CancellationToken>()).WasNeverCalled();
         Mock.Get(publisher).SaveDraftAsync(jsonConsumer, Arg.Any<CancellationToken>()).WasCalled(Times.Exactly(1));
+        Mock.Get(activityRegistry).Add(typeof(WorkflowDefinitionActivityProvider), Arg.Any<ActivityDescriptor>()).WasCalled(Times.Exactly(expectedRegistrations));
         await Assert.That(logger.Messages).Contains(message =>
             message.Contains(sourceOnlyConsumer.DefinitionId, StringComparison.Ordinal)
             && message.Contains(target.DefinitionId, StringComparison.Ordinal)

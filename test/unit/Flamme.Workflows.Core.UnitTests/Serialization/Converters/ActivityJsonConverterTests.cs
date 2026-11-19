@@ -144,6 +144,31 @@ public sealed class ActivityJsonConverterTests
     }
 
     [Test]
+    public async Task StaleChildRevisionWithoutAnExplicitVersionCannotSelectTheLatestMatchingOwner()
+    {
+        var descriptor = new ActivityDescriptor
+        {
+            TypeName = "Send",
+            Version = 2,
+            CustomProperties = { ["WorkflowDefinitionId"] = "child", ["WorkflowDefinitionVersionId"] = "current" },
+            Constructor = _ => new(new WorkflowDefinitionActivity { WorkflowDefinitionId = "child", WorkflowDefinitionVersionId = "current", Version = 2 })
+        };
+        var registry = IActivityRegistry.Mock().Object;
+        Mock.Get(registry).Find("Send").Returns(descriptor);
+        Mock.Get(registry).FindMany(Arg.Any<Func<ActivityDescriptor, bool>>())
+            .Returns((Func<ActivityDescriptor, bool> predicate) => new[] { descriptor }.Where(predicate));
+        Mock.Get(registry).Find(NotFoundActivityTypeName).Returns(new ActivityDescriptor());
+        var sut = CreateSut(registry);
+
+        var unversioned = Execute(sut, """{"type":"Send","workflowDefinitionId":"child","workflowDefinitionVersionId":"stale"}""");
+        var versioned = Execute(sut, """{"type":"Send","version":2,"workflowDefinitionId":"child","workflowDefinitionVersionId":"stale"}""");
+
+        await Assert.That(unversioned).IsTypeOf<NotFoundActivity>();
+        var selected = await Assert.That(versioned).IsTypeOf<WorkflowDefinitionActivity>();
+        await Assert.That(selected!.WorkflowDefinitionVersionId).IsEqualTo("current");
+    }
+
+    [Test]
     [Arguments("absent-revision")]
     [Arguments("another-owners-revision")]
     public async Task WorkflowReferenceCannotSelectAnotherDefinitionWithTheSameName(string revisionId)
