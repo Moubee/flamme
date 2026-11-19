@@ -29,6 +29,13 @@ public interface IWorkflowDefinitionPublisher
     Task<WorkflowDefinition> NewAsync(IActivity? root = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Creates the first draft or publication of a new logical definition with a caller-supplied revision ID.
+    /// A collision fails the import and preserves the existing revision.
+    /// </summary>
+    Task<ImportWorkflowResult> CreateImportAsync(WorkflowDefinition definition, bool publish, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException("This publisher does not support importing caller-specified revision IDs.");
+
+    /// <summary>
     /// Publishes a workflow definition.
     /// </summary>
     /// <param name="definitionId">The ID of the workflow definition to publish.</param>

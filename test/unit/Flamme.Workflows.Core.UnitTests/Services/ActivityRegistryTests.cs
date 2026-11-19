@@ -1,4 +1,9 @@
 using Flamme.Common.Multitenancy;
+using Flamme.Workflows.Management;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Filters;
+using Flamme.Workflows.Management.Services;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using TUnit.Mocks;
@@ -328,39 +333,51 @@ public class ActivityRegistryTests
     }
 
     [Test]
-    public async Task RefreshDescriptorsAsync_LogsWarning_WhenDifferentProvidersRegisterSameActivity()
+    public async Task RefreshRejectsDifferentProvidersClaimingTheSameContract()
     {
-        // Arrange
-        // Create two different providers with the same activity
-        var descriptor1 = new ActivityDescriptor
+        var owner = CreateDescriptor("Duplicate", 1, CurrentTenant);
+        var one = new Provider1([owner]);
+        var two = new Provider2([CreateDescriptor("Duplicate", 1, CurrentTenant)]);
+
+        await _registry.RefreshDescriptorsAsync(one);
+        await Assert.That(() => _registry.RefreshDescriptorsAsync(two)).Throws<InvalidOperationException>();
+
+        await Assert.That(_registry.Find("Duplicate", 1)).IsSameReferenceAs(owner);
+    }
+
+    [Test]
+    public async Task IncrementalWorkflowDescriptorUpdatesPreserveTheLogicalOwner()
+    {
+        var definitions = new[] { "first", "second" }.Select(owner => new WorkflowDefinition
         {
-            TypeName = "DuplicateActivity",
-            Version = 1,
-            Kind = ActivityKind.Task,
-            Category = "Test",
-            Description = "From Provider 1",
-            IsBrowsable = true
-        };
+            DefinitionId = owner, Id = owner + "-revision", TenantId = CurrentTenant, Name = "Send", Version = 1
+        }).ToArray();
+        var store = IWorkflowDefinitionStore.Mock().Object;
+        Mock.Get(store).FindManyAsync(Arg.Any<WorkflowDefinitionFilter>(), Arg.Any<CancellationToken>())
+            .Returns(definitions);
+        var provider = new WorkflowDefinitionActivityProvider(store, new WorkflowDefinitionActivityDescriptorFactory());
+        var updater = new WorkflowDefinitionActivityRegistryUpdater(provider, _registry);
 
-        var descriptor2 = new ActivityDescriptor
-        {
-            TypeName = "DuplicateActivity",
-            Version = 1,
-            Kind = ActivityKind.Task,
-            Category = "Test",
-            Description = "From Provider 2",
-            IsBrowsable = true
-        };
+        await updater.AddToRegistry("first-revision", default);
+        await updater.AddToRegistry("first-revision", default);
+        await Assert.That(() => updater.AddToRegistry("second-revision", default)).Throws<InvalidOperationException>();
 
-        var provider1 = new Provider1([descriptor1]);
-        var provider2 = new Provider2([descriptor2]);
-        var providers = new IActivityProvider[] { provider1, provider2 };
+        var selected = _registry.Find("Send", 1);
+        await Assert.That(selected!.CustomProperties["WorkflowDefinitionId"]).IsEqualTo("first");
+    }
 
-        // Act
-        await _registry.RefreshDescriptorsAsync(providers);
+    [Test]
+    public async Task AmbiguousProviderRefreshLeavesPreviousCatalogIntact()
+    {
+        var existing = CreateDescriptor("Valid", 1, CurrentTenant);
+        var provider = new MutableProvider([existing]);
+        await _registry.RefreshDescriptorsAsync(provider);
+        provider.Descriptors = [CreateDescriptor("Conflict", 2, CurrentTenant), CreateDescriptor("Conflict", 2, CurrentTenant)];
 
-        // Assert - Should log a warning for the duplicate
-        await Assert.That(Mock.Get(_logger).Invocations.Count(call => call.MemberName == "Log" && Equals(call.Arguments[0], LogLevel.Warning) && call.Arguments[2]!.ToString()!.Contains("DuplicateActivity") && call.Arguments[2]!.ToString()!.Contains("was already registered"))).IsEqualTo(1);
+        await Assert.That(() => _registry.RefreshDescriptorsAsync(provider)).Throws<InvalidOperationException>();
+
+        await Assert.That(_registry.Find("Valid", 1)).IsSameReferenceAs(existing);
+        await Assert.That(_registry.Find("Conflict", 2)).IsNull();
     }
 
     [Test]
@@ -389,7 +406,7 @@ public class ActivityRegistryTests
     }
 
     [Test]
-    public async Task RefreshDescriptorsAsync_PreservesExistingDescriptors_WhenProviderReturnsNoTenantGroups()
+    public async Task RefreshDescriptorsAsync_RetiresExistingDescriptors_WhenProviderReturnsNoTenantGroups()
     {
         // Arrange
         var provider = new MutableProvider(
@@ -406,7 +423,7 @@ public class ActivityRegistryTests
         var result = _registry.Find(TestActivityType);
 
         // Assert
-        await AssertDescriptor(result, CurrentTenant, 2);
+        await Assert.That(result).IsNull();
     }
 
     [Test]

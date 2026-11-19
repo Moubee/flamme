@@ -95,6 +95,20 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
     }
 
     /// <inheritdoc />
+    public Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
+    {
+        lock (store.Sync)
+        {
+            var key = GetVersionKey(definition);
+            if (store.Any(x => x.Id == definition.Id || GetVersionKey(x) == key))
+                return Task.FromResult(false);
+
+            store.Save(definition, GetId);
+            return Task.FromResult(true);
+        }
+    }
+
+    /// <inheritdoc />
     public Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
         lock (store.Sync)
@@ -122,6 +136,10 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
 
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        SaveManyAsync(definitions, cancellationToken);
 
     /// <inheritdoc />
     public Task<WorkflowDefinitionUpdateResult> TryUpdateLatestAsync(
@@ -236,7 +254,7 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
         new($"A workflow definition already exists for definition '{definition.DefinitionId}' version {definition.Version} tenant '{definition.TenantId}'.");
 
     private static DefinitionVersionKey GetVersionKey(WorkflowDefinition definition) =>
-        new(definition.DefinitionId, definition.Version, definition.TenantId);
+        new(definition.DefinitionId, definition.Version, definition.TenantId.NormalizeTenantId());
 
     private string GetId(WorkflowDefinition workflowDefinition) => workflowDefinition.Id;
 

@@ -173,6 +173,23 @@ public interface IWorkflowDefinitionStore
     Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Inserts a new workflow revision. Returns false on a revision ID or logical version conflict.
+    /// Stores accepting imports with caller-supplied revision IDs must enforce uniqueness at write time.
+    /// </summary>
+    Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException("This store does not support importing caller-specified revision IDs.");
+
+    /// <summary>
+    /// Saves the demoted revisions and new publication, in order. Built-in stores commit these
+    /// changes atomically. The default preserves the save hooks of third-party stores.
+    /// </summary>
+    async Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
+    {
+        foreach (var definition in definitions)
+            await SaveAsync(definition, cancellationToken);
+    }
+
+    /// <summary>
     /// Deletes all workflow definitions matching the specified filter.
     /// </summary>
     /// <param name="filter">The filter.</param>

@@ -181,7 +181,7 @@ public class WorkflowDefinitionActivity : Composite, IInitializable
         }
     }
 
-    private async Task<WorkflowDefinition?> GetWorkflowDefinitionAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken)
+    private Task<WorkflowDefinition?> GetWorkflowDefinitionAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken)
     {
         var workflowDefinitionService = serviceProvider.GetRequiredService<IWorkflowDefinitionService>();
         var filter = new WorkflowDefinitionFilter
@@ -194,25 +194,18 @@ public class WorkflowDefinitionActivity : Composite, IInitializable
         else
             filter.VersionOptions = VersionOptions.SpecificVersion(Version);
 
-        var workflowDefinition =
-            await workflowDefinitionService.FindWorkflowDefinitionAsync(filter, cancellationToken)
-            ?? (await workflowDefinitionService.FindWorkflowDefinitionAsync(new WorkflowDefinitionFilter
-                {
-                    DefinitionId = WorkflowDefinitionId,
-                    VersionOptions = VersionOptions.Published
-                }, cancellationToken)
-                ?? await workflowDefinitionService.FindWorkflowDefinitionAsync(new WorkflowDefinitionFilter
-                {
-                    DefinitionId = WorkflowDefinitionId,
-                    VersionOptions = VersionOptions.Latest
-                }, cancellationToken));
-
-        return workflowDefinition;
+        // The descriptor has already selected a revision. Query only that revision so a later
+        // publication cannot replace the child between deserialization and graph initialization.
+        return workflowDefinitionService.FindWorkflowDefinitionAsync(filter, cancellationToken);
     }
 
-    private async Task<ActivityDescriptor?> FindActivityDescriptorAsync(IServiceProvider serviceProvider)
+    private Task<ActivityDescriptor?> FindActivityDescriptorAsync(IServiceProvider serviceProvider)
     {
         var activityRegistryLookup = serviceProvider.GetRequiredService<IActivityRegistryLookupService>();
-        return await activityRegistryLookup.FindAsync(Type, Version) ?? await activityRegistryLookup.FindAsync(Type);
+        return activityRegistryLookup.FindAsync(descriptor =>
+            descriptor.Version == Version &&
+            Equals(descriptor.CustomProperties.GetValueOrDefault(nameof(WorkflowDefinitionId)), WorkflowDefinitionId) &&
+            (WorkflowDefinitionVersionId == null ||
+             Equals(descriptor.CustomProperties.GetValueOrDefault(nameof(WorkflowDefinitionVersionId)), WorkflowDefinitionVersionId)));
     }
 }

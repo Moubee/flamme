@@ -1,5 +1,6 @@
 using Flamme.Common.Models;
 using Flamme.Workflows.Activities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Mappers;
 using Flamme.Workflows.Management.Materializers;
 using Flamme.Workflows.Management.Models;
@@ -71,13 +72,24 @@ namespace Flamme.Workflows.Management.Services
             draft.Options = model.Options ?? new WorkflowOptions();
             draft.ToolVersion = model.ToolVersion;
 
-            if (request.Publish ?? model.IsPublished)
+            var publish = request.Publish ?? model.IsPublished;
+            if (isNew && !string.IsNullOrWhiteSpace(model.Id))
+                return await _workflowDefinitionPublisher.CreateImportAsync(draft, publish, cancellationToken);
+
+            if (publish)
             {
                 var result = await _workflowDefinitionPublisher.PublishAsync(draft, cancellationToken);
                 return new ImportWorkflowResult(result.Succeeded, draft, result.ValidationErrors);
             }
 
-            await _workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            try
+            {
+                await _workflowDefinitionPublisher.SaveDraftAsync(draft, cancellationToken);
+            }
+            catch (WorkflowDefinitionValidationException e)
+            {
+                return new(false, draft, [new(e.Message)]);
+            }
             return new ImportWorkflowResult(true, draft, new List<WorkflowValidationError>());
         }
     }

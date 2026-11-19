@@ -118,10 +118,28 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
     }
 
     /// <inheritdoc />
+    public async Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await store.AddAsync(definition, OnSaveAsync, cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException ex) when (DbExceptionClassifier.IsDuplicateKey(ex))
+        {
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
     public async Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
         await store.SaveAsync(definition, OnSaveAsync, cancellationToken);
     }
+
+    /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        store.SaveTrackedAsync(definitions, x => x.Id, OnSaveAsync, cancellationToken);
 
     /// <inheritdoc />
     public async Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)

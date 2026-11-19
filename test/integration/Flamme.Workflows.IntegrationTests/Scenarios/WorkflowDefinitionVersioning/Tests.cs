@@ -4,6 +4,7 @@ using Flamme.Mediator.Contracts;
 using Flamme.Testing.Shared;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Management.Exceptions;
 using Flamme.Workflows.Management.Filters;
 using Flamme.Workflows.Management.Notifications;
 using Flamme.Workflows.Management.Services;
@@ -18,6 +19,63 @@ public class Tests : IAsyncDisposable
     public Tests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput).Build();
+    }
+
+    [Test]
+    public async Task RejectedNativeDraftDoesNotChangeSavedActivityOptions()
+    {
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
+        var owner = await publisher.NewAsync();
+        owner.Name = "NativeActivity";
+        owner.Options.UsableAsActivity = true;
+        await publisher.SaveDraftAsync(owner);
+        var other = await publisher.NewAsync();
+        other.Name = owner.Name;
+        await publisher.SaveDraftAsync(other);
+
+        var draft = await publisher.GetDraftAsync(other.DefinitionId, VersionOptions.Latest);
+        draft!.Options.UsableAsActivity = true;
+        await Assert.ThrowsExactlyAsync<WorkflowDefinitionValidationException>(() => publisher.SaveDraftAsync(draft));
+        var saved = await store.FindAsync(new() { Id = other.Id });
+        await Assert.That(saved!.Options.UsableAsActivity).IsNull();
+        await Assert.That(saved.IsLatest).IsTrue();
+    }
+
+    [Test]
+    public async Task RejectedPublicationShouldLeavePreviousHeadPublished()
+    {
+        await _services.PopulateRegistriesAsync();
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
+        var previous = await publisher.NewAsync();
+        await publisher.PublishAsync(previous);
+        var conflicting = await publisher.NewAsync();
+        conflicting.DefinitionId = previous.DefinitionId;
+        conflicting.Version = previous.Version;
+
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => publisher.PublishAsync(conflicting));
+        var head = await store.FindAsync(new() { DefinitionId = previous.DefinitionId, VersionOptions = VersionOptions.Published });
+        await Assert.That(head!.Id).IsEqualTo(previous.Id);
+        await Assert.That(head.IsLatest).IsTrue();
+    }
+
+    [Test]
+    public async Task RetractedReadOnlyPublicationShouldForkWhenEdited()
+    {
+        await _services.PopulateRegistriesAsync();
+        var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
+        var previous = await publisher.NewAsync();
+        previous.IsReadonly = true;
+        previous.CustomProperties["example"] = "v1";
+        await publisher.PublishAsync(previous);
+        await publisher.RetractAsync(previous);
+
+        var draft = await publisher.GetDraftAsync(previous.DefinitionId, VersionOptions.Latest);
+        await Assert.That(draft!.Id).IsNotEqualTo(previous.Id);
+        await Assert.That(draft.Version).IsEqualTo(2);
+        draft.CustomProperties["example"] = "v2";
+        await Assert.That(previous.CustomProperties["example"]).IsEqualTo("v1");
     }
 
     [Test]
