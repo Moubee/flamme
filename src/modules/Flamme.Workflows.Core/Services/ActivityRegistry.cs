@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Flamme.Workflows;
 
 /// <inheritdoc />
-public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<IActivityDescriptorModifier> modifiers, ITenantAccessor tenantAccessor, ILogger<ActivityRegistry> logger) : IActivityRegistry
+public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<IActivityDescriptorModifier> modifiers, ITenantAccessor tenantAccessor, ILogger<ActivityRegistry> logger, IEnumerable<IActivityDescriptorValidator>? validators = null) : IActivityRegistry
 {
     private readonly Lock _registrationLock = new();
 
@@ -285,6 +285,10 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
     {
         foreach (var modifier in modifiers)
             modifier.Modify(descriptor);
+
+        foreach (var validator in validators ?? [])
+            if (validator.GetValidationError(descriptor) is { } error)
+                throw new InvalidOperationException(error);
     }
 
     private void ValidateBinding(TenantRegistryData registry, ICollection<ActivityDescriptor>? owned, ActivityDescriptor descriptor)
