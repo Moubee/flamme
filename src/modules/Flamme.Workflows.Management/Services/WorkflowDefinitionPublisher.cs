@@ -70,6 +70,38 @@ public class WorkflowDefinitionPublisher(
     }
 
     /// <inheritdoc />
+    public async Task<ImportWorkflowResult> CreateImportAsync(WorkflowDefinition definition, bool publish, CancellationToken cancellationToken = default)
+    {
+        definition = Initialize(definition);
+        definition.Version = 1;
+        List<WorkflowValidationError> errors = [];
+        if (publish)
+        {
+            errors = await ValidateAsync(definition, cancellationToken);
+            if (errors.Count > 0 && options.Value.FailOnValidationErrors)
+                return new(false, definition, errors);
+
+            await mediator.SendAsync(new WorkflowDefinitionPublishing(definition), cancellationToken);
+        }
+        else
+            await mediator.SendAsync(new WorkflowDefinitionDraftSaving(definition), cancellationToken);
+
+        definition.IsPublished = publish;
+        definition.IsLatest = true;
+        if (!await workflowDefinitionStore.TryAddAsync(definition, cancellationToken))
+            return new(false, definition, [new("A workflow with this revision ID or logical version already exists.")]);
+
+        if (publish)
+            await mediator.SendAsync(new WorkflowDefinitionPublished(definition, new([])), cancellationToken);
+        else
+        {
+            await mediator.SendAsync(new WorkflowDefinitionDraftSaved(definition), cancellationToken);
+            await mediator.SendAsync(new WorkflowDefinitionCreated(definition), cancellationToken);
+        }
+        return new(true, definition, errors);
+    }
+
+    /// <inheritdoc />
     public async Task<PublishWorkflowDefinitionResult> PublishAsync(string definitionId, CancellationToken cancellationToken = default)
     {
         var filter = WorkflowDefinitionHandle.ByDefinitionId(definitionId, VersionOptions.Latest).ToFilter();
@@ -87,8 +119,7 @@ public class WorkflowDefinitionPublisher(
     /// <inheritdoc />
     public async Task<PublishWorkflowDefinitionResult> PublishAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
-        var workflowGraph = await workflowDefinitionService.MaterializeWorkflowAsync(definition, cancellationToken);
-        var validationErrors = (await workflowValidator.ValidateAsync(workflowGraph.Workflow, cancellationToken)).ToList();
+        var validationErrors = await ValidateAsync(definition, cancellationToken);
 
         if (validationErrors.Any() && options.Value.FailOnValidationErrors)
             return new(false, validationErrors, new([]));
@@ -274,5 +305,11 @@ public class WorkflowDefinitionPublisher(
             definition.Version = 1;
 
         return definition;
+    }
+
+    private async Task<List<WorkflowValidationError>> ValidateAsync(WorkflowDefinition definition, CancellationToken cancellationToken)
+    {
+        var graph = await workflowDefinitionService.MaterializeWorkflowAsync(definition, cancellationToken);
+        return (await workflowValidator.ValidateAsync(graph.Workflow, cancellationToken)).ToList();
     }
 }

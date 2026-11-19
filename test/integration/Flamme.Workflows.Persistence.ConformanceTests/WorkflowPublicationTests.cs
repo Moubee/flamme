@@ -38,6 +38,19 @@ public class WorkflowPublicationTests
         CreatedAt = DateTimeOffset.UtcNow, MaterializerName = "Json"
     };
 
+    [Test]
+    public async Task ConcurrentFirstImportsCanClaimARevisionIdOnlyOnce()
+    {
+        await using var scenario = await WorkflowStoreScenario.CreatePostgreSqlAsync("tenant-a", tenantsEnabled: false);
+        var north = Revision("shared-revision", 1);
+        var south = Revision("shared-revision", 1);
+        south.DefinitionId = "other";
+        var accepted = await Task.WhenAll(scenario.Definitions.TryAddAsync(north), scenario.Definitions.TryAddAsync(south));
+        await Assert.That(accepted.Count(x => x)).IsEqualTo(1);
+        var saved = await scenario.Definitions.FindAsync(new() { Id = north.Id });
+        await Assert.That(saved!.DefinitionId).IsEqualTo(accepted[0] ? north.DefinitionId : south.DefinitionId);
+    }
+
     private sealed class PublicationHook : IEntitySavingHandler
     {
         public string? Reject { get; set; }

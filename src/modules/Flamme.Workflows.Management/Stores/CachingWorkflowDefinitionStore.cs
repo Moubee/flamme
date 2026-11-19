@@ -93,6 +93,16 @@ public class CachingWorkflowDefinitionStore(IWorkflowDefinitionStore decoratedSt
     }
 
     /// <inheritdoc />
+    public async Task<bool> TryAddAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
+    {
+        if (!await decoratedStore.TryAddAsync(definition, cancellationToken))
+            return false;
+
+        await cacheManager.TriggerTokenAsync(CacheInvalidationTokenKey, cancellationToken);
+        return true;
+    }
+
+    /// <inheritdoc />
     public async Task SaveAsync(WorkflowDefinition definition, CancellationToken cancellationToken = default)
     {
         await decoratedStore.SaveAsync(definition, cancellationToken);

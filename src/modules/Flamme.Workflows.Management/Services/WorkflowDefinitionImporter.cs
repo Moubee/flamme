@@ -71,7 +71,11 @@ namespace Flamme.Workflows.Management.Services
             draft.Options = model.Options ?? new WorkflowOptions();
             draft.ToolVersion = model.ToolVersion;
 
-            if (request.Publish ?? model.IsPublished)
+            var publish = request.Publish ?? model.IsPublished;
+            if (isNew && !string.IsNullOrWhiteSpace(model.Id))
+                return await _workflowDefinitionPublisher.CreateImportAsync(draft, publish, cancellationToken);
+
+            if (publish)
             {
                 var result = await _workflowDefinitionPublisher.PublishAsync(draft, cancellationToken);
                 return new ImportWorkflowResult(result.Succeeded, draft, result.ValidationErrors);
