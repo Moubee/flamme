@@ -18,6 +18,6 @@ The maintainer will assess reports and coordinate investigation, fixes, and disc
 
 ## Deployment and historical assessments
 
-The reference server is a development host. Follow its [configuration notes](src/apps/Elsa.Server.Web/README.md), the [identity and tenancy guide](doc/wiki/identity-tenancy-security.md), and the [scripting trust boundaries](doc/wiki/expressions-and-scripting.md) before exposing a host to untrusted users.
+The reference server is a development host. Follow its [configuration notes](src/apps/Flamme.Server.Web/README.md), the [identity and tenancy guide](doc/wiki/identity-tenancy-security.md), and the [scripting trust boundaries](doc/wiki/expressions-and-scripting.md) before exposing a host to untrusted users.
 
 The [security assessment directory](doc/security-assessment/README.md) contains historical, AI-assisted draft material. Its dated observations and severity labels are not a list of confirmed current vulnerabilities or a security certification. The [reconciliation record](doc/security-assessment/elsa-workflows-elsa-core-findings-2026-05-20.md) distinguishes current implementation evidence from validation still needed.
