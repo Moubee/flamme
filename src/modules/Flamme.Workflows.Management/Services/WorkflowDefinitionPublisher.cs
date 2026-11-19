@@ -1,6 +1,7 @@
 using Flamme.Common;
 using Flamme.Common.Entities;
 using Flamme.Common.Models;
+using Flamme.Common.Multitenancy;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management.Entities;
@@ -23,7 +24,8 @@ public class WorkflowDefinitionPublisher(
     IActivitySerializer activitySerializer,
     IMediator mediator,
     TimeProvider timeProvider,
-    IOptions<ManagementOptions> options)
+    IOptions<ManagementOptions> options,
+    ITenantAccessor tenantAccessor)
     : IWorkflowDefinitionPublisher
 {
     /// <inheritdoc />
@@ -38,6 +40,7 @@ public class WorkflowDefinitionPublisher(
         {
             Id = id,
             DefinitionId = definitionId,
+            TenantId = tenantAccessor.TenantId,
             Version = version,
             IsLatest = true,
             IsPublished = false,
@@ -47,27 +50,8 @@ public class WorkflowDefinitionPublisher(
         };
     }
 
-    public Task<WorkflowDefinition> NewAsync(IActivity? root = null, CancellationToken cancellationToken = default)
-    {
-        root ??= new Sequence();
-        var id = identityGenerator.GenerateId();
-        var definitionId = identityGenerator.GenerateId();
-        const int version = 1;
-
-        var workflowDefinition = new WorkflowDefinition
-        {
-            Id = id,
-            DefinitionId = definitionId,
-            Version = version,
-            IsLatest = true,
-            IsPublished = false,
-            CreatedAt = timeProvider.GetUtcNow(),
-            StringData = activitySerializer.Serialize(root),
-            MaterializerName = JsonWorkflowMaterializer.MaterializerName
-        };
-
-        return Task.FromResult(workflowDefinition);
-    }
+    public Task<WorkflowDefinition> NewAsync(IActivity? root = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(New(root));
 
     /// <inheritdoc />
     public async Task<ImportWorkflowResult> CreateImportAsync(WorkflowDefinition definition, bool publish, CancellationToken cancellationToken = default)

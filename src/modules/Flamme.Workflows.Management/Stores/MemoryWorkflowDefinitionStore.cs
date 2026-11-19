@@ -254,7 +254,7 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
         new($"A workflow definition already exists for definition '{definition.DefinitionId}' version {definition.Version} tenant '{definition.TenantId}'.");
 
     private static DefinitionVersionKey GetVersionKey(WorkflowDefinition definition) =>
-        new(definition.DefinitionId, definition.Version, definition.TenantId);
+        new(definition.DefinitionId, definition.Version, definition.TenantId.NormalizeTenantId());
 
     private string GetId(WorkflowDefinition workflowDefinition) => workflowDefinition.Id;
 

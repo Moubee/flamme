@@ -1,3 +1,4 @@
+using Flamme.Common.Multitenancy;
 using Flamme.Common.Services;
 using Flamme.Testing.Shared.Multitenancy;
 using Flamme.Workflows.Management.Entities;
@@ -43,6 +44,21 @@ public class MemoryWorkflowDefinitionStoreUniquenessTests
         var stored = (await store.FindManyAsync(new WorkflowDefinitionFilter { TenantAgnostic = true })).ToList();
         var single = await Assert.That(stored).HasSingleItem();
         await Assert.That(single.Id).IsEqualTo("def-1");
+    }
+
+    [Test]
+    public async Task TryAddRecognizesLegacyAndCanonicalDefaultTenantAsOneVersion()
+    {
+        var store = new MemoryWorkflowDefinitionStore(new MemoryStore<WorkflowDefinition>(), new TestTenantAccessor(Tenant.DefaultTenantId));
+        var existing = Definition("old-id", "order");
+        existing.TenantId = null;
+        await store.SaveAsync(existing);
+
+        var imported = Definition("new-id", "order");
+        imported.TenantId = Tenant.DefaultTenantId;
+        await Assert.That(await store.TryAddAsync(imported)).IsFalse();
+        var retained = await store.FindAsync(new() { DefinitionId = "order" });
+        await Assert.That(retained!.Id).IsEqualTo("old-id");
     }
 
     private static MemoryWorkflowDefinitionStore CreateStore() =>

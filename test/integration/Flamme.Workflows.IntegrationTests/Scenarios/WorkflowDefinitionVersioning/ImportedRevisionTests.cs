@@ -1,3 +1,4 @@
+using Flamme.Common.Multitenancy;
 using Flamme.Extensions;
 using Flamme.Testing.Shared;
 using Flamme.Workflows.Activities;
@@ -9,6 +10,56 @@ namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionVersioni
 
 public class ImportedRevisionTests
 {
+    [Test]
+    [Arguments(true, true)]
+    [Arguments(true, false)]
+    [Arguments(false, true)]
+    [Arguments(false, false)]
+    public async Task NewImportBelongsToItsAmbientTenant(bool publish, bool preserveRevisionId)
+    {
+        var services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput).Build();
+        try
+        {
+            await services.PopulateRegistriesAsync();
+            var tenants = services.GetRequiredService<ITenantAccessor>();
+            var importer = services.GetRequiredService<IWorkflowDefinitionImporter>();
+            var store = services.GetRequiredService<IWorkflowDefinitionStore>();
+            const string definitionId = "tenant-import";
+
+            using (tenants.PushContext(new Tenant { Id = "north" }))
+            {
+                var request = new SaveWorkflowDefinitionRequest
+                {
+                    Publish = publish,
+                    Model = new()
+                    {
+                        DefinitionId = definitionId,
+                        TenantId = Tenant.AgnosticTenantId,
+                        Root = new WriteLine("north")
+                    }
+                };
+                if (preserveRevisionId)
+                    request.Model.Id = "import-v1";
+
+                var result = await importer.ImportAsync(request);
+                await Assert.That(result.Succeeded).IsTrue();
+                var stored = await store.FindAsync(new() { DefinitionId = definitionId });
+                await Assert.That(stored!.TenantId).IsEqualTo("north");
+                await Assert.That(stored.IsPublished).IsEqualTo(publish);
+                if (preserveRevisionId)
+                    await Assert.That(stored.Id).IsEqualTo("import-v1");
+            }
+
+            await Assert.That(await store.FindAsync(new() { DefinitionId = definitionId })).IsNull();
+            using (tenants.PushContext(new Tenant { Id = "south" }))
+                await Assert.That(await store.FindAsync(new() { DefinitionId = definitionId })).IsNull();
+        }
+        finally
+        {
+            await TestResourceDisposal.DisposeAsync(services);
+        }
+    }
+
     [Test]
     [Arguments(true)]
     [Arguments(false)]

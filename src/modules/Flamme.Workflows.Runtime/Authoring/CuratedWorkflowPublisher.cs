@@ -42,7 +42,6 @@ public sealed class CuratedWorkflowPublisher(
 
         var revision = await publisher.NewAsync(root, cancellationToken);
         revision.DefinitionId = source.DefinitionId;
-        revision.TenantId = tenantAccessor.TenantId;
         revision.Name = source.DefinitionId;
         revision.IsReadonly = true;
         revision.CustomProperties[ManifestProperty] = manifest;
