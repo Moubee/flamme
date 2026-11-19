@@ -121,7 +121,7 @@ public class WorkflowDefinitionPublisher(
         definition = Initialize(definition);
         definition.IsPublished = true;
         definition.IsLatest = true;
-        await workflowDefinitionStore.SaveManyAsync(demotions.Append(definition), cancellationToken);
+        await workflowDefinitionStore.SavePublicationAsync(demotions.Append(definition), cancellationToken);
 
         foreach (var retracted in retractions)
             await mediator.SendAsync(new WorkflowDefinitionVersionRetracted(retracted), cancellationToken);

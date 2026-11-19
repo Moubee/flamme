@@ -124,6 +124,10 @@ public class MemoryWorkflowDefinitionStore(MemoryStore<WorkflowDefinition> store
     }
 
     /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        SaveManyAsync(definitions, cancellationToken);
+
+    /// <inheritdoc />
     public Task<WorkflowDefinitionUpdateResult> TryUpdateLatestAsync(
         WorkflowDefinitionFilter filter,
         Func<WorkflowDefinition, bool> matchesExpected,

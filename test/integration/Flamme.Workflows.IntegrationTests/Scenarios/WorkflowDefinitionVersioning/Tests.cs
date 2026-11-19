@@ -23,6 +23,7 @@ public class Tests : IAsyncDisposable
     [Test]
     public async Task RejectedPublicationShouldLeavePreviousHeadPublished()
     {
+        await _services.PopulateRegistriesAsync();
         var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
         var store = _services.GetRequiredService<IWorkflowDefinitionStore>();
         var previous = await publisher.NewAsync();
@@ -40,6 +41,7 @@ public class Tests : IAsyncDisposable
     [Test]
     public async Task RetractedReadOnlyPublicationShouldForkWhenEdited()
     {
+        await _services.PopulateRegistriesAsync();
         var publisher = _services.GetRequiredService<IWorkflowDefinitionPublisher>();
         var previous = await publisher.NewAsync();
         previous.IsReadonly = true;

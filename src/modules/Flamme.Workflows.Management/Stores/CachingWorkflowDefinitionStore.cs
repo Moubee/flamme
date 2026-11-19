@@ -88,7 +88,7 @@ public class CachingWorkflowDefinitionStore(IWorkflowDefinitionStore decoratedSt
     /// <inheritdoc />
     public async Task<WorkflowDefinition?> FindLastVersionAsync(WorkflowDefinitionFilter filter, CancellationToken cancellationToken)
     {
-        var cacheKey = hasher.Hash(filter);
+        var cacheKey = hasher.Hash(nameof(FindLastVersionAsync), filter);
         return await GetOrCreateAsync(cacheKey, () => decoratedStore.FindLastVersionAsync(filter, cancellationToken));
     }
 
@@ -112,6 +112,13 @@ public class CachingWorkflowDefinitionStore(IWorkflowDefinitionStore decoratedSt
             await cacheManager.TriggerTokenAsync(CacheInvalidationTokenKey, cancellationToken);
 
         return result;
+    }
+
+    /// <inheritdoc />
+    public async Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
+    {
+        await decoratedStore.SavePublicationAsync(definitions, cancellationToken);
+        await cacheManager.TriggerTokenAsync(CacheInvalidationTokenKey, cancellationToken);
     }
 
     /// <inheritdoc />

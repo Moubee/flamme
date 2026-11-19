@@ -124,6 +124,10 @@ public class EFCoreWorkflowDefinitionStore(EntityStore<ManagementFlammeDbContext
     }
 
     /// <inheritdoc />
+    public Task SavePublicationAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default) =>
+        store.SaveTrackedAsync(definitions, x => x.Id, OnSaveAsync, cancellationToken);
+
+    /// <inheritdoc />
     public async Task SaveManyAsync(IEnumerable<WorkflowDefinition> definitions, CancellationToken cancellationToken = default)
     {
         await store.SaveManyAsync(definitions, OnSaveAsync, cancellationToken);

@@ -130,21 +130,31 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     /// <param name="keySelector">The key selector to get the primary key property.</param>
     /// <param name="onSaving">The callback to invoke before saving the entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task SaveAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken = default)
+    public Task SaveAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken = default) =>
+        SaveTrackedAsync([entity], keySelector, onSaving, cancellationToken);
+
+    /// <summary>
+    /// Upserts a small batch through EF's change tracker in one SaveChanges transaction, retaining
+    /// the tenant filters, interceptors and entity-saving hooks used for an individual write.
+    /// </summary>
+    public async Task SaveTrackedAsync(IEnumerable<TEntity> entities, Expression<Func<TEntity, string>> keySelector,
+        Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken = default)
     {
-        await Semaphore.WaitAsync(cancellationToken); // Asynchronous wait
+        await Semaphore.WaitAsync(cancellationToken);
 
         try
         {
             await using var dbContext = await CreateDbContextAsync(cancellationToken);
-
-            if (onSaving != null)
-                await onSaving(dbContext, entity, cancellationToken);
-
             var set = dbContext.Set<TEntity>();
-            var lambda = keySelector.BuildEqualsExpression(entity);
-            var exists = await set.AnyAsync(lambda, cancellationToken);
-            set.Entry(entity).State = exists ? EntityState.Modified : EntityState.Added;
+            foreach (var entity in entities)
+            {
+                if (onSaving != null)
+                    await onSaving(dbContext, entity, cancellationToken);
+
+                var exists = await set.AnyAsync(keySelector.BuildEqualsExpression(entity), cancellationToken);
+                set.Entry(entity).State = exists ? EntityState.Modified : EntityState.Added;
+            }
+
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
