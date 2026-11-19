@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Flamme.Common.DistributedHosting;
+using Flamme.Common.Multitenancy;
 using Flamme.Workflows.Activities;
 using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Entities;
@@ -19,6 +20,7 @@ public sealed class CuratedWorkflowPublisher(
     IWorkflowDefinitionPublisher publisher,
     IWorkflowDefinitionStore store,
     IActivityRegistry registry,
+    ITenantAccessor tenantAccessor,
     IDistributedLockProvider locks,
     IOptions<DistributedLockingOptions> lockOptions)
 {
@@ -40,6 +42,7 @@ public sealed class CuratedWorkflowPublisher(
 
         var revision = await publisher.NewAsync(root, cancellationToken);
         revision.DefinitionId = source.DefinitionId;
+        revision.TenantId = tenantAccessor.TenantId;
         revision.Name = source.DefinitionId;
         revision.IsReadonly = true;
         revision.CustomProperties[ManifestProperty] = manifest;
@@ -48,6 +51,8 @@ public sealed class CuratedWorkflowPublisher(
         await using var handle = await locks.AcquireLockAsync(lockName, lockOptions.Value.LockAcquisitionTimeout, cancellationToken);
         using var lease = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, handle.HandleLostToken);
         var previous = await store.FindLastVersionAsync(new() { DefinitionId = source.DefinitionId }, lease.Token);
+        if (previous != null && !TenantVisibility.CanReplace(previous.TenantId, tenantAccessor.TenantId))
+            throw new InvalidOperationException($"The current tenant cannot replace the published workflow '{source.DefinitionId}'.");
         if (previous != null && !previous.CustomProperties.ContainsKey(ManifestProperty))
             throw new InvalidOperationException($"'{source.DefinitionId}' already identifies a workflow outside the curated catalog.");
 
