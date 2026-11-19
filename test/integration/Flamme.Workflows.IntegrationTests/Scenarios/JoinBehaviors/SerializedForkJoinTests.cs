@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Flamme.Testing.Shared;
+using Flamme.Workflows.Activities;
 using Flamme.Workflows.Activities.Flowchart.Extensions;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Management;
@@ -13,6 +14,30 @@ namespace Flamme.Workflows.IntegrationTests.Scenarios.JoinBehaviors;
 
 public class SerializedForkJoinTests
 {
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task RuntimeRejectsScopedOrImpersonatingPrimitiveBeforeAndAfterBuiltinRegistration(bool registerBuiltinFirst)
+    {
+        await using var host = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
+        await host.BuildAsync();
+        var registry = host.Services.GetRequiredService<IActivityRegistry>();
+        var describer = host.Services.GetRequiredService<IActivityDescriber>();
+        registry.Clear();
+        var descriptor = await describer.DescribeActivityAsync(typeof(WriteLine));
+        if (registerBuiltinFirst)
+            registry.Register(descriptor);
+
+        var scoped = new ActivityDescriptor { TypeName = "Console.WriteLine", Version = 1, ClrType = typeof(WriteLine), TenantId = "tenant" };
+        var impersonator = new ActivityDescriptor { TypeName = "Console.WriteLine", Version = 1, ClrType = typeof(ReadLine) };
+        await Assert.That(() => registry.Register(scoped)).Throws<InvalidOperationException>();
+        await Assert.That(() => registry.Register(impersonator)).Throws<InvalidOperationException>();
+
+        if (!registerBuiltinFirst)
+            registry.Register(descriptor);
+        await Assert.That(registry.Find("Console.WriteLine", 1)).IsSameReferenceAs(descriptor);
+    }
+
     [Test]
     public async Task ExportedWaitAnyJoinCancelsTheOtherBranchAndWritesOneReceipt()
     {
