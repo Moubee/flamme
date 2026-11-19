@@ -26,7 +26,7 @@ public class UserCancelDuringDrainTests : IAsyncDisposable
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .AddActivitiesFrom<UserCancelDuringDrainTests>()
             .AddWorkflow<LongRunningObservableWorkflow>()
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     o.DrainDeadline = TimeSpan.FromMilliseconds(50);

@@ -239,7 +239,7 @@ public sealed class ExternalAuthenticationRoleDeletionDependencyContributor(
                             updated.Connection.Id,
                             null,
                             SecurityEventOutcome.Succeeded,
-                            "An Flamme Role reference was removed from an external authentication JIT policy."),
+                            "A Flamme Role reference was removed from an external authentication JIT policy."),
                         "default-role-removed",
                         updated.Connection.Revision,
                         updated.Connection.MaterialRevision),

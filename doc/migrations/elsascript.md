@@ -16,7 +16,7 @@ workflows in [C# or JSON](../wiki/activities-and-authoring.md) instead.
 
 Remove the retired package/project references, namespace imports, and feature
 registrations from custom hosts. The remaining
-`Elsa.WorkflowProviders.BlobStorage` module still loads `.json` definitions with
+`Flamme.WorkflowProviders.BlobStorage` module still loads `.json` definitions with
 `UseFluentStorageProvider()` and supports custom format handlers. Its built-in
 JSON handler does not load `.elsa` files.
 

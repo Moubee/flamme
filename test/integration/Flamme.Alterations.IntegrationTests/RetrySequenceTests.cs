@@ -29,7 +29,7 @@ public sealed class RetrySequenceTests : IAsyncInitializer, IAsyncDisposable
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_output)
             .ConfigureServices(services => services.AddSingleton(_probe))
-            .ConfigureFlamme(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(flamme => flamme.UseAlterations())
             .AddWorkflow<RetrySequenceWorkflow>()
             .AddWorkflow<RetryStandaloneSequenceWorkflow>()
             .AddActivitiesFrom<RetryBookmarkActivity>()

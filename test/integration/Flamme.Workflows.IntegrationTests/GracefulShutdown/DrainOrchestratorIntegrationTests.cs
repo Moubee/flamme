@@ -18,7 +18,7 @@ public class DrainOrchestratorIntegrationTests : IAsyncDisposable
     public DrainOrchestratorIntegrationTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflowRuntime(runtime => runtime
                     .ConfigureGracefulShutdown(options =>
                     {

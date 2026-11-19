@@ -15,7 +15,7 @@ public class Tests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureFlamme(elsa => elsa.UseJavaScript())
+            .ConfigureFlamme(flamme => flamme.UseJavaScript())
             .Build();
         _workflowBuilderFactory = _services.GetRequiredService<IWorkflowBuilderFactory>();
         _workflowRunner = _services.GetRequiredService<IWorkflowRunner>();

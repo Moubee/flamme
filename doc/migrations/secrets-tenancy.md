@@ -1,6 +1,6 @@
 # Secrets become tenant-scoped
 
-`Secret` had no notion of tenancy. It did not derive from `Elsa.Common.Entities.Entity`, so it carried no
+`Secret` had no notion of tenancy. It did not derive from `Flamme.Common.Entities.Entity`, so it carried no
 `TenantId` and no query filter applied to it — in a multi-tenant deployment every tenant could see and resolve
 every other tenant's secrets. Permissions did not help: `secrets:view` is evaluated against the caller, not
 against which tenant owns the secret, so any caller holding it reached the whole set.

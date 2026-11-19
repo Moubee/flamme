@@ -21,7 +21,7 @@ to true; disabling it skips only the separate build/pack job. All four coverage
 lanes and the aggregate 10% line-coverage gate still run. A successful artifact
 upload alone does not establish a passing workflow.
 
-Download `elsa-nuget-packages`, framework-specific test results, and
+Download `flamme-nuget-packages`, framework-specific test results, and
 `coverage-reports` from a Packages run. Superseded automatic runs are canceled;
 explicit manual Packages runs remain independent.
 
@@ -35,19 +35,19 @@ Central versions live in [`Directory.Packages.props`](../Directory.Packages.prop
 Executable entry points, tests, and benchmarks commit `packages.lock.json`;
 library dependencies are captured by those consuming applications.
 
-CI restores with `--locked-mode`. The `ELSA0003` build guard rejects missing
+CI restores with `--locked-mode`. The `FLAMME0003` build guard rejects missing
 executable lockfiles during locked restore. After intentional dependency changes:
 
 ```bash
-dotnet restore Elsa.slnx --force-evaluate
+dotnet restore Flamme.slnx --force-evaluate
 ```
 
 Review and commit the complete lock changes. Restore all target frameworks before
 selecting one for a test run:
 
 ```bash
-dotnet restore Elsa.slnx --locked-mode
-dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --framework net11.0 --no-restore
+dotnet restore Flamme.slnx --locked-mode
+dotnet test --project test/unit/Flamme.Mediator.UnitTests/Flamme.Mediator.UnitTests.csproj --framework net11.0 --no-restore
 ```
 
 A single-target restore can rewrite a two-target lock or fail locked validation.

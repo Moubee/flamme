@@ -21,7 +21,7 @@ public class WorkflowInstanceFinderTimestampFilterTests : IAsyncDisposable
     public WorkflowInstanceFinderTimestampFilterTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(flamme => flamme.UseAlterations())
             .Build();
         
         _workflowInstanceFinder = _services.GetRequiredService<IWorkflowInstanceFinder>();

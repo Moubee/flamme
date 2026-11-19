@@ -1,14 +1,14 @@
 # Aspire development and demonstration
 
-The root `aspire.config.json` selects `src/apps/Elsa.AppHost/Elsa.AppHost.csproj`. The
+The root `aspire.config.json` selects `src/apps/Flamme.AppHost/Flamme.AppHost.csproj`. The
 AppHost starts the reference server from source on .NET 11, provisions PostgreSQL
 17, waits for database readiness, and shows application logs, traces, metrics,
 endpoints, and health in the Aspire dashboard.
 
 ```mermaid
 flowchart LR
-    AppHost[Elsa.AppHost] --> Postgres[PostgreSQL 17 + data volume]
-    AppHost --> Server[Elsa.Server.Web]
+    AppHost[Flamme.AppHost] --> Postgres[PostgreSQL 17 + data volume]
+    AppHost --> Server[Flamme.Server.Web]
     Server --> Postgres
     Server -->|OTLP| Dashboard[Aspire dashboard]
 ```
@@ -46,10 +46,10 @@ For agents, background operation, or a separate Git worktree, start the exact
 AppHost with isolated ports and user secrets:
 
 ```bash
-aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait postgres --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire describe server --format Json --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire wait postgres --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire describe server --format Json --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 Use `aspire wait` before sending requests. Copy a published `server` URL from
@@ -77,7 +77,7 @@ The management API under `/elsa/api` still requires authentication and
 authorization. Development configuration contains sample identities and a
 development signing key. Use your own credentials, signing key, and connection
 configuration outside this local setup; see the
-[reference server notes](../src/apps/Elsa.Server.Web/README.md).
+[reference server notes](../src/apps/Flamme.Server.Web/README.md).
 
 The existing reference host can log `No users exist and no identity bootstrap is
 configured` at startup even when its configuration-based sample users can sign
@@ -88,24 +88,24 @@ bearer-authenticated management request were verified with this graph.
 ## Inspect telemetry and iterate
 
 After a workflow request, inspect the dashboard's structured logs, traces, and
-metrics. The server's shared `Elsa.ServiceDefaults` configures OTLP export when
+metrics. The server's shared `Flamme.ServiceDefaults` configures OTLP export when
 Aspire provides an exporter endpoint and includes the workflow activity sources.
 The existing `/health/live` and `/health/ready` routes remain the health endpoints.
 
 The same data is available through the CLI:
 
 ```bash
-aspire logs server --tail 50 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire otel logs server --limit 20 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire otel traces server --limit 20 --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire logs server --tail 50 --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire otel logs server --limit 20 --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire otel traces server --limit 20 --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 After changing server source, use the resource's Rebuild command in the dashboard,
 or the CLI when that command is available:
 
 ```bash
-aspire resource server rebuild --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire resource server rebuild --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 Keep an IDE's active debugging/hot-reload session in control of its own process.
@@ -115,8 +115,8 @@ After changing the AppHost resource graph or configuration, stop that AppHost
 and start it again, retaining `--isolated` for worktrees:
 
 ```bash
-aspire stop --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire stop --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 Rediscover endpoints before reusing a saved URL.
@@ -127,7 +127,7 @@ Press Ctrl+C in an interactive `aspire run --isolated` session, or stop the exac
 AppHost:
 
 ```bash
-aspire stop --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire stop --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 PostgreSQL uses a persistent container lifetime and a named data volume. Ordinary
@@ -140,7 +140,7 @@ workflow. When changing secret configuration with retained database data, preser
 the existing PostgreSQL credentials.
 
 The generated volume identity depends on the AppHost path. Moving the AppHost
-from the repository root to `src/apps/Elsa.AppHost` therefore selects a different
+from the repository root to `src/apps/Flamme.AppHost` therefore selects a different
 PostgreSQL volume. The previous volume and its data remain intact; this relocation
 does not migrate that data into the new volume.
 

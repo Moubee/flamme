@@ -6,7 +6,7 @@ using Polly;
 namespace Flamme.Api.Client.Options;
 
 /// <summary>
-/// Represents options for building an Flamme API client.
+/// Represents options for building a Flamme API client.
 /// </summary>
 public class FlammeClientBuilderOptions
 {

@@ -1,12 +1,12 @@
 # Identity, Tenancy, And Security
 
-Elsa security and tenancy are split across identity, SAS token, tenant, tenant HTTP routing, API authorization, and persistence packages.
+Flamme security and tenancy are split across identity, SAS token, tenant, tenant HTTP routing, API authorization, and persistence packages.
 
 ## Identity
 
-Start in [src/modules/Elsa.Identity](../../src/modules/Elsa.Identity).
+Start in [src/modules/Flamme.Identity](../../src/modules/Flamme.Identity).
 
-[IdentityFeature](../../src/modules/Elsa.Identity/Features/IdentityFeature.cs) registers:
+[IdentityFeature](../../src/modules/Flamme.Identity/Features/IdentityFeature.cs) registers:
 
 - identity token options
 - API key options
@@ -24,7 +24,7 @@ Identity supports store-based providers, configuration-based providers, and admi
 
 ## Authentication
 
-[DefaultAuthenticationFeature](../../src/modules/Elsa.Identity/Features/DefaultAuthenticationFeature.cs) wires default authentication. The reference server calls:
+[DefaultAuthenticationFeature](../../src/modules/Flamme.Identity/Features/DefaultAuthenticationFeature.cs) wires default authentication. The reference server calls:
 
 ```csharp
 elsa
@@ -32,19 +32,19 @@ elsa
     .UseDefaultAuthentication();
 ```
 
-See [src/apps/Elsa.Server.Web/Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
+See [src/apps/Flamme.Server.Web/Program.cs](../../src/apps/Flamme.Server.Web/Program.cs).
 
 Identity JWTs include a `token_use` claim. API bearer authentication accepts only access tokens (`token_use=access`), while `/identity/refresh-token` uses a dedicated refresh-token bearer scheme and accepts only refresh tokens (`token_use=refresh`). Clients should not send refresh tokens to normal API endpoints or access tokens to the refresh endpoint.
 
 Refresh resolves the caller only when every `sub` and inbound-mapped `NameIdentifier` value agrees on one non-blank id. A missing, blank, conflicting, or unknown subject is `401`, the same as an invalid token — not `200` with `isAuthenticated: false`. 3.0–3.7 also issued refresh tokens without `sub`, but the refresh scheme already rejects those because they lack `token_use`. 3.8.0-preview1 is the only release whose refresh-scheme-accepted tokens lacked `sub`, and they had a 2-hour lifetime. See [refresh-token user resolution](../migrations/refresh-token-user-resolution.md).
 
-Elsa-issued access and refresh tokens always carry a `permissions` claim. Each grant is one value (`permissions` is a JSON array when there are two or more). A caller whose roles grant nothing receives the sentinel `none`, which is not a grant: it exists so clients can tell a known empty set from a token that omits the claim entirely. Third-party OIDC tokens that do not carry Elsa permissions keep omitting the claim; Studio treats that as unknown and fails open.
+Flamme-issued access and refresh tokens always carry a `permissions` claim. Each grant is one value (`permissions` is a JSON array when there are two or more). A caller whose roles grant nothing receives the sentinel `none`, which is not a grant: it exists so clients can tell a known empty set from a token that omits the claim entirely. Third-party OIDC tokens that do not carry Flamme permissions keep omitting the claim; Studio treats that as unknown and fails open.
 
 JWT signing keys must be configured with a secure random value before production startup. Missing keys, weak keys shorter than 32 ASCII characters, and known public defaults are rejected by options startup validation. Known public defaults are only tolerated in the explicit `Development` or `Demo` environments for local/demo hosts. Use environment variables or a secrets manager, such as `Identity__Tokens__SigningKey` for the reference server.
 
 ### Signing Out
 
-Each sign-in starts a session. Its refresh token carries the session ID in the `elsa:session_id` claim, and every refresh token obtained by refreshing it carries the same ID. Each one also carries, in `elsa:session_exp`, the latest expiry of the refresh tokens it was refreshed through, including its own. `POST /identity/logout` ends a session of Elsa Identity (JWT) refresh tokens:
+Each sign-in starts a session. Its refresh token carries the session ID in the `elsa:session_id` claim, and every refresh token obtained by refreshing it carries the same ID. Each one also carries, in `elsa:session_exp`, the latest expiry of the refresh tokens it was refreshed through, including its own. `POST /identity/logout` ends a session of Flamme Identity (JWT) refresh tokens:
 
 ```http
 POST /identity/logout
@@ -56,14 +56,14 @@ Content-Type: application/json
 
 | Response | When |
 | --- | --- |
-| `204 No Content` | The session is revoked. Also returned when it already was, when the refresh token has expired (its session is still revoked), and when the token is not one Elsa Identity recognises, so a client can always sign out. |
+| `204 No Content` | The session is revoked. Also returned when it already was, when the refresh token has expired (its session is still revoked), and when the token is not one Flamme Identity recognises, so a client can always sign out. |
 | `400 Bad Request` | `refreshToken` is missing, or is a token of this deployment that is not a refresh token, such as the access token. |
 | `403 Forbidden` | The refresh token does not belong to the caller: it was issued to another user, to the same user in a different tenant than the access token, or it has no subject. |
 | `401 Unauthorized` | No valid access token. |
 
 The endpoint requires a valid access token. A client whose access token has expired refreshes first, then calls logout with the new refresh token, which belongs to the same session.
 
-Opaque refresh tokens issued by the External Authentication broker (`<sessionId>.<secret>`) are not Elsa Identity tokens: this endpoint answers `204` for them without revoking anything. They are revoked through the broker's own sign-out and session revocation.
+Opaque refresh tokens issued by the External Authentication broker (`<sessionId>.<secret>`) are not Flamme Identity tokens: this endpoint answers `204` for them without revoking anything. They are revoked through the broker's own sign-out and session revocation.
 
 After that, `/identity/refresh-token` answers `401` for every refresh token of the session, including those it held before its latest refresh, exactly as it does for an invalid or expired token. The external authentication broker's `refresh_token` grant refuses them as well. Other sessions of the same user are unaffected; there is no "sign out everywhere".
 
@@ -77,11 +77,11 @@ Apply the `RevokedSessions` migration before upgraded hosts refresh tokens, othe
 
 Refresh tokens issued before sessions existed keep working. Each one derives its own session ID from its hash, and a token refreshed from it carries that ID. A chain that was already refreshed before the upgrade has no session claim on its older tokens, so signing out with the newest token revokes only the session derived from that token. Older pre-upgrade tokens of the same chain stay valid for the remaining time under their issued expiry, which can outlast the current `RefreshTokenLifetime` if that setting was lowered during the upgrade.
 
-A custom `IAccessTokenIssuer` must implement `IssueTokensAsync(User, SignInSession? session, ...)`, which has no default implementation, and continue `session` in the refresh token it issues, for example by passing it to `IElsaTokenService.IssueRefreshTokenAsync` as `TokenIssuanceContext.Session`. See the [migration guide](../migrations/authorization-model.md#breaking-change-custom-iaccesstokenissuer-implementations).
+A custom `IAccessTokenIssuer` must implement `IssueTokensAsync(User, SignInSession? session, ...)`, which has no default implementation, and continue `session` in the refresh token it issues, for example by passing it to `IFlammeTokenService.IssueRefreshTokenAsync` as `TokenIssuanceContext.Session`. See the [migration guide](../migrations/authorization-model.md#breaking-change-custom-iaccesstokenissuer-implementations).
 
 ## Default Admin Bootstrap
 
-The default admin bootstrap is documented in [src/modules/Elsa.Identity/README.md](../../src/modules/Elsa.Identity/README.md) and [ADR 0010](../adr/0010-default-admin-user-bootstrap-for-initial-identity-access.md).
+The default admin bootstrap is documented in [src/modules/Flamme.Identity/README.md](../../src/modules/Flamme.Identity/README.md) and [ADR 0010](../adr/0010-default-admin-user-bootstrap-for-initial-identity-access.md).
 
 Key points:
 
@@ -92,19 +92,19 @@ Key points:
 
 ## SAS Tokens
 
-[SasTokensFeature](../../src/modules/Elsa.SasTokens/Features/SasTokensFeature.cs) registers data protection and `ITokenService`. Workflow API depends on SAS tokens. The default data protection application name is `Elsa Workflows`.
+[SasTokensFeature](../../src/modules/Flamme.SasTokens/Features/SasTokensFeature.cs) registers data protection and `ITokenService`. Workflow API depends on SAS tokens. The default data protection application name is `Flamme Workflows`.
 
 Use SAS tokens for protected links or temporary access flows where the API expects signed token semantics.
 
 ## Tenancy
 
-Start in [src/modules/Elsa.Tenants](../../src/modules/Elsa.Tenants).
+Start in [src/modules/Flamme.Tenants](../../src/modules/Flamme.Tenants).
 
 Key features:
 
-- [TenantsFeature](../../src/modules/Elsa.Tenants/Features/TenantsFeature.cs): enables tenant resolution pipeline, tenant options, and tenant resolver services.
-- [TenantManagementFeature](../../src/modules/Elsa.Tenants/Features/TenantManagementFeature.cs): registers tenant store, defaulting to memory.
-- [TenantManagementEndpointsFeature](../../src/modules/Elsa.Tenants/Features/TenantManagementEndpointsFeature.cs): exposes tenant management endpoints.
+- [TenantsFeature](../../src/modules/Flamme.Tenants/Features/TenantsFeature.cs): enables tenant resolution pipeline, tenant options, and tenant resolver services.
+- [TenantManagementFeature](../../src/modules/Flamme.Tenants/Features/TenantManagementFeature.cs): registers tenant store, defaulting to memory.
+- [TenantManagementEndpointsFeature](../../src/modules/Flamme.Tenants/Features/TenantManagementEndpointsFeature.cs): exposes tenant management endpoints.
 
 Tenant providers:
 
@@ -115,9 +115,9 @@ The reference server enables configuration-based tenants and a custom tenant res
 
 ## ASP.NET Core Tenant Routing
 
-[Elsa.Tenants.AspNetCore](../../src/modules/Elsa.Tenants.AspNetCore) integrates tenants with HTTP routing.
+[Flamme.Tenants.AspNetCore](../../src/modules/Flamme.Tenants.AspNetCore) integrates tenants with HTTP routing.
 
-[MultitenantHttpRoutingFeature](../../src/modules/Elsa.Tenants.AspNetCore/Features/MultitenantHttpRoutingFeature.cs):
+[MultitenantHttpRoutingFeature](../../src/modules/Flamme.Tenants.AspNetCore/Features/MultitenantHttpRoutingFeature.cs):
 
 - is a dependency of `HttpFeature` and `TenantsFeature`
 - configures HTTP endpoint routes and base path providers to use tenant prefixes
@@ -145,28 +145,28 @@ A trailing `*` on the resource axis matches the named node and every descendant,
 
 Endpoints declare their requirement with `RequirePermission(resource, verb)`, referencing the constant its owning module declares in `Permissions/<Module>Permissions.cs` alongside the descriptor, so the two cannot drift. An endpoint that accepts any one of several permissions declares `RequireAnyPermission((resource, verb), ...)`. An endpoint that needs an identity but no grant declares `RequireAuthenticatedOnly()`; one that needs neither declares `AllowAnonymous()`. An automated gate fails the build if an endpoint declares none of these. `EndpointPermissionRegistry.FindRequirement` reports the permissions each endpoint declared.
 
-Deployment read-only mode is a separate axis and keeps its own enforcement — see [AuthorizationPolicies](../../src/modules/Elsa.Workflows.Api/Constants/AuthorizationPolicies.cs) and [NotReadOnlyRequirement](../../src/modules/Elsa.Workflows.Api/Requirements/NotReadOnlyRequirement.cs). A caller holding every grant is still refused while the deployment is read-only, which is why it is not expressible as a permission.
+Deployment read-only mode is a separate axis and keeps its own enforcement — see [AuthorizationPolicies](../../src/modules/Flamme.Workflows.Api/Constants/AuthorizationPolicies.cs) and [NotReadOnlyRequirement](../../src/modules/Flamme.Workflows.Api/Requirements/NotReadOnlyRequirement.cs). A caller holding every grant is still refused while the deployment is read-only, which is why it is not expressible as a permission.
 
 Upgrading from the previous `verb:resource` vocabulary is a breaking change; see [the migration guide](../migrations/authorization-model.md).
 
 ## Secrets
 
-Start in [src/modules/Elsa.Secrets](../../src/modules/Elsa.Secrets).
+Start in [src/modules/Flamme.Secrets](../../src/modules/Flamme.Secrets).
 
-[SecretsFeature](../../src/modules/Elsa.Secrets/Features/SecretsFeature.cs) registers secrets services and FastEndpoints. It provides:
+[SecretsFeature](../../src/modules/Flamme.Secrets/Features/SecretsFeature.cs) registers secrets services and FastEndpoints. It provides:
 
-- [ISecretManager](../../src/modules/Elsa.Secrets/Contracts/ISecretManager.cs): create, get, rotate, revoke, delete, and test secrets.
-- [ISecretResolver](../../src/modules/Elsa.Secrets/Contracts/ISecretResolver.cs): resolve the latest active secret value by immutable technical name.
-- [ISecretStore](../../src/modules/Elsa.Secrets/Contracts/ISecretStore.cs) / [ISecretStoreRegistry](../../src/modules/Elsa.Secrets/Contracts/ISecretStoreRegistry.cs): pluggable backend stores.
-- [ISecretTypeRegistry](../../src/modules/Elsa.Secrets/Contracts/ISecretTypeRegistry.cs): extensible secret types (text, RSA key, X.509 certificate reference).
-- [ISecretRepository](../../src/modules/Elsa.Secrets/Contracts/ISecretRepository.cs): durable secret and version storage.
+- [ISecretManager](../../src/modules/Flamme.Secrets/Contracts/ISecretManager.cs): create, get, rotate, revoke, delete, and test secrets.
+- [ISecretResolver](../../src/modules/Flamme.Secrets/Contracts/ISecretResolver.cs): resolve the latest active secret value by immutable technical name.
+- [ISecretStore](../../src/modules/Flamme.Secrets/Contracts/ISecretStore.cs) / [ISecretStoreRegistry](../../src/modules/Flamme.Secrets/Contracts/ISecretStoreRegistry.cs): pluggable backend stores.
+- [ISecretTypeRegistry](../../src/modules/Flamme.Secrets/Contracts/ISecretTypeRegistry.cs): extensible secret types (text, RSA key, X.509 certificate reference).
+- [ISecretRepository](../../src/modules/Flamme.Secrets/Contracts/ISecretRepository.cs): durable secret and version storage.
 
 ### Built-In Stores
 
 | Store | Class | Notes |
 | --- | --- | --- |
-| Elsa-managed encrypted store | [EncryptedSecretStore](../../src/modules/Elsa.Secrets/Stores/EncryptedSecretStore.cs) | Encrypts values with data protection. Default writable store. |
-| Configuration-backed read-only | [ConfigurationSecretStore](../../src/modules/Elsa.Secrets/Stores/ConfigurationSecretStore.cs) | Maps configuration keys to secret values. Read-only; cannot be written from the API. |
+| Flamme-managed encrypted store | [EncryptedSecretStore](../../src/modules/Flamme.Secrets/Stores/EncryptedSecretStore.cs) | Encrypts values with data protection. Default writable store. |
+| Configuration-backed read-only | [ConfigurationSecretStore](../../src/modules/Flamme.Secrets/Stores/ConfigurationSecretStore.cs) | Maps configuration keys to secret values. Read-only; cannot be written from the API. |
 
 ### Secret Versioning
 
@@ -174,7 +174,7 @@ Each logical secret has an immutable technical name. `ISecretManager.RotateAsync
 
 ### Management Endpoints
 
-Routes under `/elsa/api` (Elsa route prefix applies):
+Routes under `/elsa/api` (Flamme route prefix applies):
 
 | Route | Permission |
 | --- | --- |
@@ -188,7 +188,7 @@ Routes under `/elsa/api` (Elsa route prefix applies):
 | `POST /secrets/picker` | `read:secrets` |
 | `GET /secrets/descriptors` | `read:secrets` |
 
-Permission constants are in [SecretsResourcePermissions](../../src/modules/Elsa.Secrets/Permissions/SecretsResourcePermissions.cs).
+Permission constants are in [SecretsResourcePermissions](../../src/modules/Flamme.Secrets/Permissions/SecretsResourcePermissions.cs).
 
 ### Using Secrets In Workflows
 
@@ -198,7 +198,7 @@ At runtime, the `Secret` expression calls `ISecretResolver` at the point of use 
 
 Sensitive activity inputs are not written to activity state after evaluation. Prefer a `Secret` expression for credentials such as bearer tokens, API keys, passwords, and connection strings instead of literals, variables, logs, workflow outputs, incident messages, or custom headers that are not marked sensitive. Treat any custom activity input that can carry credentials as sensitive by setting `CanContainSecrets = true`.
 
-JavaScript expressions can resolve secrets when the host enables `Elsa.Secrets.JavaScript`:
+JavaScript expressions can resolve secrets when the host enables `Flamme.Secrets.JavaScript`:
 
 ```javascript
 const token = await getSecret("crm:token");
@@ -209,18 +209,18 @@ return `Bearer ${token}`;
 
 ### Tests
 
-- [test/unit/Elsa.Secrets.UnitTests](../../test/unit/Elsa.Secrets.UnitTests)
-- [test/integration/Elsa.JavaScript.IntegrationTests](../../test/integration/Elsa.JavaScript.IntegrationTests)
-- [test/integration/Elsa.Activities.IntegrationTests](../../test/integration/Elsa.Activities.IntegrationTests)
+- [test/unit/Flamme.Secrets.UnitTests](../../test/unit/Flamme.Secrets.UnitTests)
+- [test/integration/Flamme.JavaScript.IntegrationTests](../../test/integration/Flamme.JavaScript.IntegrationTests)
+- [test/integration/Flamme.Activities.IntegrationTests](../../test/integration/Flamme.Activities.IntegrationTests)
 
 ## Ingress Rate Limiting
 
-Elsa exposes opt-in ASP.NET Core rate limiting hooks for two ingress surfaces:
+Flamme exposes opt-in ASP.NET Core rate limiting hooks for two ingress surfaces:
 
-- Elsa management API endpoints, through `ApiEndpointOptions.RateLimitingPolicyName` and `UseWorkflowsApiRateLimiting(...)`.
+- Flamme management API endpoints, through `ApiEndpointOptions.RateLimitingPolicyName` and `UseWorkflowsApiRateLimiting(...)`.
 - Public HTTP workflow trigger routes, through `HttpActivityOptions.RateLimitingPolicyName` and `UseWorkflowsRateLimiting(...)`.
 
-The reference server registers disabled-by-default fixed-window policies under `IngressRateLimiting`. Enable them by setting `IngressRateLimiting:Enabled` to `true`, then tune the API and HTTP workflow permit/window values for production traffic. Set `IngressRateLimiting:RegisterReferencePolicies` to `false` when policy names and policies are supplied externally. Custom hosts should register named policies with `services.AddRateLimiter(...)`, map Elsa API endpoints with `MapWorkflowsApi(...)`, apply the Elsa metadata hooks after endpoint routing has selected endpoints and before the rate limiter middleware, and call `app.UseRateLimiter()` once in the host pipeline. The Elsa hooks only attach endpoint metadata; ASP.NET Core validates configured policy names when the rate limiter middleware handles matching requests. Leave the option disabled, omit the policy names in custom hosts, or set the reference-server policy options to empty strings to run without Elsa-provided rate limiting. The reference server only assigns its default policy names when `Enabled` is `true`.
+The reference server registers disabled-by-default fixed-window policies under `IngressRateLimiting`. Enable them by setting `IngressRateLimiting:Enabled` to `true`, then tune the API and HTTP workflow permit/window values for production traffic. Set `IngressRateLimiting:RegisterReferencePolicies` to `false` when policy names and policies are supplied externally. Custom hosts should register named policies with `services.AddRateLimiter(...)`, map Flamme API endpoints with `MapWorkflowsApi(...)`, apply the Flamme metadata hooks after endpoint routing has selected endpoints and before the rate limiter middleware, and call `app.UseRateLimiter()` once in the host pipeline. The Flamme hooks only attach endpoint metadata; ASP.NET Core validates configured policy names when the rate limiter middleware handles matching requests. Leave the option disabled, omit the policy names in custom hosts, or set the reference-server policy options to empty strings to run without Flamme-provided rate limiting. The reference server only assigns its default policy names when `Enabled` is `true`.
 
 ## Security Review Checklist
 

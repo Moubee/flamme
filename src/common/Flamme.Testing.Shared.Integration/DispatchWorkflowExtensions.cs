@@ -48,7 +48,7 @@ public static class DispatchWorkflowExtensions
                 workflowFinished.TrySetResult((notification, cycleDisposed));
             }));
 
-            services.AddFlamme(elsa => configureFlamme?.Invoke(elsa));
+            services.AddFlamme(flamme => configureFlamme?.Invoke(flamme));
         });
         var host = hostBuilder.Build();
 

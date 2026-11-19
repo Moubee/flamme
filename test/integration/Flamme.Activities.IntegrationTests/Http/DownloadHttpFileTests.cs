@@ -191,7 +191,7 @@ public class DownloadHttpFileTests
 
     private WorkflowTestFixture CreateFixture(HttpMessageHandler handler) =>
         new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseHttp(http =>
+            .ConfigureFlamme(flamme => flamme.UseHttp(http =>
             {
                 http.HttpClientBuilder = builder => builder.ConfigurePrimaryHttpMessageHandler(() => handler);
             }));

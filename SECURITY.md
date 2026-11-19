@@ -4,7 +4,7 @@
 
 Flamme is preparing its first independent release. Security fixes currently target the latest `main` branch. There is no supported Flamme release series or commitment to backport fixes to older commits yet; review the release notes and this policy when releases become available.
 
-Flamme is an independent fork of Elsa Workflows. Upstream Elsa releases and packages have their own maintenance policies. Retained `Elsa.*` identifiers do not make a Flamme build an upstream Elsa release.
+Flamme is an independent fork of Elsa Workflows. Upstream Elsa releases and packages have their own maintenance policies.
 
 ## Report a vulnerability privately
 

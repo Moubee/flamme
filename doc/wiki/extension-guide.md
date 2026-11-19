@@ -1,6 +1,6 @@
 # Extension Guide
 
-Elsa is designed to be extended by adding modules, features, activities, stores, expression providers, API endpoints, and runtime integration points. This page collects the common patterns.
+Flamme is designed to be extended by adding modules, features, activities, stores, expression providers, API endpoints, and runtime integration points. This page collects the common patterns.
 
 ## Add A Code-First Feature
 
@@ -13,11 +13,11 @@ Elsa is designed to be extended by adding modules, features, activities, stores,
 7. Add `Extensions/ModuleExtensions.cs` with `UseMyFeature`.
 8. Add unit tests that prove core services register.
 
-Use [HttpFeature](../../src/modules/Elsa.Http/Features/HttpFeature.cs), [SchedulingFeature](../../src/modules/Elsa.Scheduling/Features/SchedulingFeature.cs), and [WorkflowsFeature](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs) as examples.
+Use [HttpFeature](../../src/modules/Flamme.Http/Features/HttpFeature.cs), [SchedulingFeature](../../src/modules/Flamme.Scheduling/Features/SchedulingFeature.cs), and [WorkflowsFeature](../../src/modules/Flamme.Workflows.Core/Features/WorkflowsFeature.cs) as examples.
 
 ## Deploy A Feature
 
-Register the feature through `AddElsa` in the host and include its project or package as a build-time reference. Deploy a new application version to change the feature set. Runtime package discovery and shell feature activation/reload are no longer supported.
+Register the feature through `AddFlamme` in the host and include its project or package as a build-time reference. Deploy a new application version to change the feature set. Runtime package discovery and shell feature activation/reload are no longer supported.
 
 ## Add An Activity
 
@@ -31,9 +31,9 @@ Register the feature through `AddElsa` in the host and include its project or pa
 
 Good examples:
 
-- [SetVariable](../../src/modules/Elsa.Workflows.Core/Activities/SetVariable.cs)
-- [HttpEndpoint](../../src/modules/Elsa.Http/Activities/HttpEndpoint.cs)
-- [RunCSharp](../../src/modules/Elsa.Expressions.CSharp/Activities/RunCSharp/RunCSharp.cs)
+- [SetVariable](../../src/modules/Flamme.Workflows.Core/Activities/SetVariable.cs)
+- [HttpEndpoint](../../src/modules/Flamme.Http/Activities/HttpEndpoint.cs)
+- [RunCSharp](../../src/modules/Flamme.Expressions.CSharp/Activities/RunCSharp/RunCSharp.cs)
 
 ## Add An Expression Provider
 
@@ -49,16 +49,16 @@ Expression providers need:
 
 Compare existing language modules:
 
-- [JavaScriptFeature](../../src/modules/Elsa.Expressions.JavaScript/Features/JavaScriptFeature.cs)
-- [CSharpFeature](../../src/modules/Elsa.Expressions.CSharp/Features/CSharpFeature.cs)
-- [PythonFeature](../../src/modules/Elsa.Expressions.Python/Features/PythonFeature.cs)
-- [LiquidFeature](../../src/modules/Elsa.Expressions.Liquid/Features/LiquidFeature.cs)
+- [JavaScriptFeature](../../src/modules/Flamme.Expressions.JavaScript/Features/JavaScriptFeature.cs)
+- [CSharpFeature](../../src/modules/Flamme.Expressions.CSharp/Features/CSharpFeature.cs)
+- [PythonFeature](../../src/modules/Flamme.Expressions.Python/Features/PythonFeature.cs)
+- [LiquidFeature](../../src/modules/Flamme.Expressions.Liquid/Features/LiquidFeature.cs)
 
 ## Add An API Endpoint
 
 1. Create a folder under the relevant `Endpoints` category.
 2. Add `Endpoint.cs` and local `Models.cs` when needed.
-3. Derive from the Elsa endpoint base used by nearby endpoints.
+3. Derive from the Flamme endpoint base used by nearby endpoints.
 4. Configure verb, route, permissions, and summary.
 5. Inject service contracts, not concrete internals when possible.
 6. Add endpoint tests or component coverage if behavior is important.
@@ -70,7 +70,7 @@ Use route prefixing from `MapWorkflowsApi`; endpoint routes should usually be wr
 
 For an EF Core-backed store:
 
-1. Add the entity/configuration/store to the shared EF Core module slice if it is a common Elsa domain.
+1. Add the entity/configuration/store to the shared EF Core module slice if it is a common Flamme domain.
 2. Add provider-specific migrations if persisted shape changes.
 3. Replace the owning feature's store factory in the persistence feature.
 4. Add tests for query/filter/order behavior.
@@ -93,7 +93,7 @@ Existing first-party examples are HTTP and Scheduling ingress source registratio
 
 ## Add A Workflow Provider
 
-Workflow providers bring definitions from external storage. [Elsa.WorkflowProviders.BlobStorage](../../src/modules/Elsa.WorkflowProviders.BlobStorage) includes a JSON format handler and supports custom formats through `IBlobWorkflowFormatHandler`. Register the provider with `UseFluentStorageProvider()`.
+Workflow providers bring definitions from external storage. [Flamme.WorkflowProviders.BlobStorage](../../src/modules/Flamme.WorkflowProviders.BlobStorage) includes a JSON format handler and supports custom formats through `IBlobWorkflowFormatHandler`. Register the provider with `UseFluentStorageProvider()`.
 
 Keep provider modules focused on discovery/materialization and leave execution to runtime.
 

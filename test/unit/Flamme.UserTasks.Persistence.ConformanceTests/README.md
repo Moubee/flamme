@@ -27,14 +27,14 @@ database it created. A working Docker engine or the configured PostgreSQL test s
 missing infrastructure fails the suite instead of silently skipping relational coverage.
 
 ```bash
-dotnet test --project test/unit/Elsa.UserTasks.Persistence.ConformanceTests/Elsa.UserTasks.Persistence.ConformanceTests.csproj
+dotnet test --project test/unit/Flamme.UserTasks.Persistence.ConformanceTests/Flamme.UserTasks.Persistence.ConformanceTests.csproj
 ```
 
 To use an existing **disposable** database directly, supply the optional conformance-specific override:
 
 ```bash
 ELSA_USERTASKS_TEST_POSTGRES="Host=localhost;Database=elsa_conformance;Username=elsa;Password=elsa" \
-  dotnet test --project test/unit/Elsa.UserTasks.Persistence.ConformanceTests/Elsa.UserTasks.Persistence.ConformanceTests.csproj
+  dotnet test --project test/unit/Flamme.UserTasks.Persistence.ConformanceTests/Flamme.UserTasks.Persistence.ConformanceTests.csproj
 ```
 
 The override database is migrated and each test uses its own tenant, but the suite never drops that

@@ -19,7 +19,7 @@ public class ExecutionCycleTrackingMiddlewareTests : IAsyncDisposable
     public ExecutionCycleTrackingMiddlewareTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(flamme => flamme.UseWorkflowRuntime())
             .Build();
         _workflowRunner = _services.GetRequiredService<IWorkflowRunner>();
         _cycleRegistry = _services.GetRequiredService<IExecutionCycleRegistry>();

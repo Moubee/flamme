@@ -7,7 +7,7 @@ namespace Flamme.Features.Services;
 /// Implementation of <see cref="IInstalledFeatureProvider"/> that delegates to <see cref="IInstalledFeatureRegistry"/>.
 /// </summary>
 /// <remarks>
-/// Features registered through an Flamme module are published in the installed feature registry.
+/// Features registered through a Flamme module are published in the installed feature registry.
 /// </remarks>
 public class InstalledFeatureProvider : IInstalledFeatureProvider
 {

@@ -714,11 +714,11 @@
       "flamme.api.common": {
         "type": "Project",
         "dependencies": {
-          "Flamme.Features": "[1.0.0, )",
-          "Flamme.Workflows.Core": "[1.0.0, )",
           "FastEndpoints": "[8.3.0, )",
           "FastEndpoints.Security": "[8.3.0, )",
-          "FastEndpoints.Swagger": "[8.3.0, )"
+          "FastEndpoints.Swagger": "[8.3.0, )",
+          "Flamme.Features": "[1.0.0, )",
+          "Flamme.Workflows.Core": "[1.0.0, )"
         }
       },
       "flamme.caching": {
@@ -2010,11 +2010,11 @@
       "flamme.api.common": {
         "type": "Project",
         "dependencies": {
-          "Flamme.Features": "[1.0.0, )",
-          "Flamme.Workflows.Core": "[1.0.0, )",
           "FastEndpoints": "[8.3.0, )",
           "FastEndpoints.Security": "[8.3.0, )",
-          "FastEndpoints.Swagger": "[8.3.0, )"
+          "FastEndpoints.Swagger": "[8.3.0, )",
+          "Flamme.Features": "[1.0.0, )",
+          "Flamme.Workflows.Core": "[1.0.0, )"
         }
       },
       "flamme.caching": {

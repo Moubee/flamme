@@ -13,17 +13,17 @@ API needs a `DateTime`, Unix timestamp or tick count.
 
 `ISystemClock`, `Elsa.Common.Services.SystemClock` and `SystemClockFeature` have
 been removed. Custom feature dependency attributes should reference
-`Elsa.Common.Features.TimeProviderFeature`. Default `AddElsa` composition provides
+`Flamme.Common.Features.TimeProviderFeature`. Default `AddFlamme` composition provides
 `TimeProvider.System`. Application services should receive the provider through
 DI. A custom provider must be registered as the base type:
 
 ```csharp
 services.AddSingleton<TimeProvider>(customTimeProvider);
-services.AddElsa(elsa => { /* feature configuration */ });
+services.AddFlamme(flamme => { /* feature configuration */ });
 ```
 
 Register before building the container. A host registration before or after
-`AddElsa` overrides the default; multiple explicit registrations follow DI's
+`AddFlamme` overrides the default; multiple explicit registrations follow DI's
 last-registration-wins behavior. Use a singleton provider that supports concurrent
 access. Scoped providers cannot be consumed by singleton services.
 
@@ -38,7 +38,7 @@ var now = context.WorkflowExecutionContext.TimeProvider.GetUtcNow();
 
 Constructors and factories that formerly took `ISystemClock` now take
 `TimeProvider` with parameter name `timeProvider`. The obsolete clock-based
-`DefaultAccessTokenIssuer` constructor has been removed; inject `IElsaTokenService`
+`DefaultAccessTokenIssuer` constructor has been removed; inject `IFlammeTokenService`
 through its remaining constructor.
 
 The five external-authentication records `ConnectionValidationContext`,

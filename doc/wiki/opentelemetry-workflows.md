@@ -1,10 +1,10 @@
 # OpenTelemetry Workflow Instrumentation
 
-Elsa emits workflow and activity traces and metrics through `System.Diagnostics`. The runtime provides the `Elsa.Workflows` activity source and meter; the host application selects the OpenTelemetry SDK, exporters, collector, and observability backend.
+Flamme emits workflow and activity traces and metrics through `System.Diagnostics`. The runtime provides the `Elsa.Workflows` activity source and meter; the host application selects the OpenTelemetry SDK, exporters, collector, and observability backend.
 
 ## Host configuration
 
-Configure the official OpenTelemetry packages in the application host. No Elsa diagnostics package is required:
+Configure the official OpenTelemetry packages in the application host. No Flamme diagnostics package is required:
 
 ```csharp
 using OpenTelemetry;
@@ -31,16 +31,16 @@ OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 The SDK handles protocol options, signal-specific paths, headers, batching, and export. For signal-specific endpoints and other options, see the [official OTLP exporter documentation](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md).
 
 The reference server registers the workflow source and meter through
-[`Elsa.ServiceDefaults`](../../src/apps/Elsa.ServiceDefaults/Extensions.cs). It enables
+[`Flamme.ServiceDefaults`](../../src/apps/Flamme.ServiceDefaults/Extensions.cs). It enables
 OTLP export when `OTEL_EXPORTER_OTLP_ENDPOINT` is configured. The
 [Aspire AppHost](../aspire-development.md) supplies that endpoint for local
 development; standalone hosts must configure their collector endpoint explicitly.
 
 ## Traces
 
-Elsa creates spans around workflow execution cycles and activity execution. The spans include workflow and activity identifiers, definition metadata, status, tenant ID when available, and fault status. Workflow input, activity input, output payloads, headers, and variable values are not added as span attributes.
+Flamme creates spans around workflow execution cycles and activity execution. The spans include workflow and activity identifiers, definition metadata, status, tenant ID when available, and fault status. Workflow input, activity input, output payloads, headers, and variable values are not added as span attributes.
 
-Faulted workflow and activity spans use `ActivityStatusCode.Error` and record the exception type as `exception.type` when an exception is available. Exception messages and stack traces are not added to spans or exception events by Elsa workflow instrumentation.
+Faulted workflow and activity spans use `ActivityStatusCode.Error` and record the exception type as `exception.type` when an exception is available. Exception messages and stack traces are not added to spans or exception events by Flamme workflow instrumentation.
 
 Outbound `SendHttpRequest` and `FlowSendHttpRequest` calls inject the current W3C trace context headers when an active workflow/activity span exists, so downstream services can continue the same trace. Enable standard .NET HTTP client instrumentation in the host when you want outbound HTTP spans for these calls.
 
@@ -68,7 +68,7 @@ The following custom telemetry packages and their tests have been removed:
 
 Remove package references and feature registration for `OpenTelemetry`, `StructuredLogs`, `ConsoleLogs`, `StructuredLogsDashboard`, and `ConsoleLogsDashboard`. Remove their `Use*`/`Add*` calls, hub mappings, console capture hooks, and related configuration.
 
-Elsa no longer hosts OTLP ingestion, telemetry buffers, log/trace/metric query endpoints, collector configuration APIs, or telemetry SignalR hubs. Existing diagnostics clients and dashboard integrations must use your observability platform instead. Retention, storage, queries, streaming, redaction, and access policies belong to that platform and the host's logging/export pipeline.
+Flamme no longer hosts OTLP ingestion, telemetry buffers, log/trace/metric query endpoints, collector configuration APIs, or telemetry SignalR hubs. Existing diagnostics clients and dashboard integrations must use your observability platform instead. Retention, storage, queries, streaming, redaction, and access policies belong to that platform and the host's logging/export pipeline.
 
 Replace `Diagnostics:OpenTelemetry:Exporter:Endpoint` and `Diagnostics:OpenTelemetry:Exporter:Protocol` with `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL`. Point the endpoint at an external collector or backend; the former `/elsa/otlp/v1/*` routes are gone. For HTTP/protobuf, supply a collector base URL and let the official SDK add the signal paths.
 
@@ -76,4 +76,4 @@ Replace any legacy `Elsa.OpenTelemetry` extension registration with the built-in
 
 Workflow execution journals, persisted workflow/activity records, and retry history remain workflow domain data. This removal concerns operational telemetry capture and storage.
 
-TUnit handles test-run logs and telemetry. Test hosts use TUnit's logging and ASP.NET Core integration rather than Elsa telemetry exporters or log-capture providers. Focused instrumentation tests can still observe the public .NET source/meter to verify emitted spans and measurements.
+TUnit handles test-run logs and telemetry. Test hosts use TUnit's logging and ASP.NET Core integration rather than Flamme telemetry exporters or log-capture providers. Focused instrumentation tests can still observe the public .NET source/meter to verify emitted spans and measurements.

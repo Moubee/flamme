@@ -20,10 +20,7 @@ and upstream attribution. The concise origin statement in the
 [Valkey README](https://github.com/valkey-io/valkey#readme) informed how this fork
 is introduced; Flamme's reasons are its own engineering and product priorities.
 
-The product name is Flamme. Existing `Elsa.*` project names, package identifiers,
-namespaces, configuration keys, and the `Elsa.slnx` solution still describe the
-current source tree. Renaming the project does not itself migrate these APIs or
-establish compatibility with future upstream releases.
+Flamme names its .NET packages, assemblies and public namespaces independently. Shared definitions identify built-in activities by capability and numeric version.
 
 ## Scope and priorities
 
@@ -56,7 +53,7 @@ their own design and operational validation before joining the supported set.
 This database policy covers engine and module persistence. It does not mean
 that a process cannot call an external database or other service as part of its
 work. Operational logs and telemetry are collected and stored by the host's
-external observability pipeline. Elsa supplies workflow activity sources and
+external observability pipeline. Flamme supplies workflow activity sources and
 meters; official OpenTelemetry packages handle export. See the
 [telemetry configuration and migration guide](wiki/opentelemetry-workflows.md).
 
@@ -80,7 +77,7 @@ The direction above is grounded in the current repository:
 - [Build SDK selection](../global.json) pins .NET SDK 11.0.100 with patch roll-forward.
 - [Library targets](../src/Directory.Build.props) and
   [reference host targets](../src/apps/Directory.Build.props) are .NET 10 and .NET 11.
-- [Reference server configuration](../src/apps/Elsa.Server.Web/Program.cs) wires
+- [Reference server configuration](../src/apps/Flamme.Server.Web/Program.cs) wires
   PostgreSQL persistence, distributed runtime behavior, and readiness checks.
 - [Persistence migration guidance](postgres-inmemory-migration.md) records the
   providers removed from the supported scope and remaining module limitations.

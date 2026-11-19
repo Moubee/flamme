@@ -26,7 +26,7 @@ public class Tests
         var commitTracker = new CommitTracker();
         var defaultStrategy = new ExecutedActivityStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows =>
                 {
                     workflows.WithDefaultActivityCommitStrategy(defaultStrategy);
@@ -59,7 +59,7 @@ public class Tests
         var commitTracker = new CommitTracker();
         var defaultStrategy = new ExecutedActivityStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows =>
                 {
                     workflows.WithDefaultActivityCommitStrategy(defaultStrategy);
@@ -93,7 +93,7 @@ public class Tests
         // Arrange
         var commitTracker = new CommitTracker();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows => workflows.CommitStateHandler = _ => commitTracker)
             )
             .AddWorkflow<SimpleWorkflowWithoutActivityCommitStrategy>()
@@ -120,7 +120,7 @@ public class Tests
         // Arrange
         var defaultStrategy = new ExecutedActivityStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows => workflows
                     .WithDefaultActivityCommitStrategy(defaultStrategy)
                 )
@@ -146,7 +146,7 @@ public class Tests
         // Arrange
         var defaultStrategy = new ExecutedActivityStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows => workflows
                     .WithDefaultActivityCommitStrategy(defaultStrategy)
                     .UseCommitStrategies(commitStrategies => commitStrategies.AddStandardStrategies())
@@ -178,7 +178,7 @@ public class Tests
         var commitTracker = new CommitTracker();
         var defaultWorkflowStrategy = new ActivityExecutedWorkflowStrategy();
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflows(workflows =>
                 {
                     workflows.WithDefaultWorkflowCommitStrategy(defaultWorkflowStrategy);

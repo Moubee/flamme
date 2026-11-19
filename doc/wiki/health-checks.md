@@ -1,18 +1,18 @@
 # Health Checks
 
-Elsa hosts can opt in to Elsa-specific readiness checks on top of the normal ASP.NET Core process liveness check. The first slice focuses on runtime dependencies that are available through existing Elsa service contracts and avoids exposing connection strings, credentials, or provider-specific details.
+Flamme hosts can opt in to Flamme-specific readiness checks on top of the normal ASP.NET Core process liveness check. The first slice focuses on runtime dependencies that are available through existing Flamme service contracts and avoids exposing connection strings, credentials, or provider-specific details.
 
 ## Opt In
 
-Register ASP.NET Core health checks and then add Elsa readiness checks:
+Register ASP.NET Core health checks and then add Flamme readiness checks:
 
 ```csharp
-using Elsa.Extensions;
+using Flamme.Extensions;
 using System;
 
 services
     .AddHealthChecks()
-    .AddElsaReadinessChecks(
+    .AddFlammeReadinessChecks(
         includeDistributedLocks: true,
         configureOptions: options => options.DistributedLockAcquisitionTimeout = TimeSpan.FromSeconds(1));
 ```
@@ -24,7 +24,7 @@ Persistence probes are enabled by default. Set `includePersistence: false` when 
 ```csharp
 services
     .AddHealthChecks()
-    .AddElsaReadinessChecks(includePersistence: false);
+    .AddFlammeReadinessChecks(includePersistence: false);
 ```
 
 Persistence probing stops after the first failed store by default to keep readiness responses bounded during dependency outages. Set `ContinuePersistenceProbesAfterFailure = true` when richer per-store diagnostics are more important than the fastest readiness response.
@@ -32,7 +32,7 @@ Persistence probing stops after the first failed store by default to keep readin
 Map separate endpoints for liveness and readiness:
 
 ```csharp
-using Elsa.Extensions;
+using Flamme.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -43,7 +43,7 @@ app.MapHealthChecks("/health/live", new()
 
 app.MapHealthChecks("/health/ready", new()
 {
-    Predicate = check => check.Tags.Contains(HealthCheckExtensions.ElsaTag) && check.Tags.Contains(HealthCheckExtensions.ReadinessTag),
+    Predicate = check => check.Tags.Contains(HealthCheckExtensions.FlammeTag) && check.Tags.Contains(HealthCheckExtensions.ReadinessTag),
     ResultStatusCodes =
     {
         [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable,
@@ -54,7 +54,7 @@ app.MapHealthChecks("/health/ready", new()
 
 The reference server also keeps `/` process-liveness compatible for existing probes by mapping it with `Predicate = _ => false`, the same as `/health/live`. Use `/health/ready` for checks that should return `503` while the runtime is paused, draining, or dependency-degraded.
 
-## Current Elsa Readiness Checks
+## Current Flamme Readiness Checks
 
 - `elsa-runtime`: creates a workflow runtime client and reports `Degraded` when the runtime is paused or draining, because it is process-up but not accepting new work.
 - `elsa-workflow-persistence`: performs small read-only probes against workflow definitions, workflow instances, triggers, and the bookmark queue store.
@@ -64,7 +64,7 @@ The health check data only includes subsystem categories and operational state s
 
 ## Kubernetes Recommendation
 
-Use liveness to answer "is the ASP.NET Core process alive?" and readiness to answer "can this Elsa instance accept workflow traffic?"
+Use liveness to answer "is the ASP.NET Core process alive?" and readiness to answer "can this Flamme instance accept workflow traffic?"
 
 ```yaml
 livenessProbe:
@@ -83,6 +83,6 @@ readinessProbe:
   failureThreshold: 3
 ```
 
-Do not point liveness at Elsa readiness checks. A paused, draining, or temporarily database-degraded runtime should be removed from service by readiness without forcing Kubernetes to restart the process.
+Do not point liveness at Flamme readiness checks. A paused, draining, or temporarily database-degraded runtime should be removed from service by readiness without forcing Kubernetes to restart the process.
 
 When `includeDistributedLocks: true` is enabled, set the readiness probe `timeoutSeconds` higher than the configured distributed-lock acquisition timeout. The built-in distributed-lock readiness check waits up to 1 second by default to acquire its probe lock, so the example uses `timeoutSeconds: 2` to avoid intermittent Kubernetes probe timeouts while the lock provider is still healthy.

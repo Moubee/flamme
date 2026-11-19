@@ -4,28 +4,28 @@ Flamme supports C# workflow classes, JSON definitions, visual designer definitio
 
 ## C# Workflows
 
-C# workflows usually derive from [WorkflowBase](../../src/modules/Elsa.Workflows.Core/Abstractions/WorkflowBase.cs) and implement `Build(IWorkflowBuilder builder)`.
+C# workflows usually derive from [WorkflowBase](../../src/modules/Flamme.Workflows.Core/Abstractions/WorkflowBase.cs) and implement `Build(IWorkflowBuilder builder)`.
 
 The root activity can be a `Sequence`, `Flowchart`, or another composite activity. The README has a minimal example that starts with `HttpEndpoint` and then sends email.
 
 Source landmarks:
 
-- [WorkflowBase](../../src/modules/Elsa.Workflows.Core/Abstractions/WorkflowBase.cs)
-- [WorkflowBuilder](../../src/modules/Elsa.Workflows.Core/Builders/WorkflowBuilder.cs)
-- [IWorkflowBuilder](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowBuilder.cs)
-- [Workflow runtime feature AddWorkflow/AddWorkflowsFrom](../../src/modules/Elsa.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs)
+- [WorkflowBase](../../src/modules/Flamme.Workflows.Core/Abstractions/WorkflowBase.cs)
+- [WorkflowBuilder](../../src/modules/Flamme.Workflows.Core/Builders/WorkflowBuilder.cs)
+- [IWorkflowBuilder](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowBuilder.cs)
+- [Workflow runtime feature AddWorkflow/AddWorkflowsFrom](../../src/modules/Flamme.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs)
 
-The reference server registers workflows from its assembly with `AddWorkflowsFrom<Program>()` in [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
+The reference server registers workflows from its assembly with `AddWorkflowsFrom<Program>()` in [Program.cs](../../src/apps/Flamme.Server.Web/Program.cs).
 
 ## JSON Workflows
 
-JSON definitions are materialized by [JsonWorkflowMaterializer](../../src/modules/Elsa.Workflows.Management/Materializers/JsonWorkflowMaterializer.cs). Sample JSON workflows appear in:
+JSON definitions are materialized by [JsonWorkflowMaterializer](../../src/modules/Flamme.Workflows.Management/Materializers/JsonWorkflowMaterializer.cs). Sample JSON workflows appear in:
 
-- [src/apps/Elsa.Server.Web/Workflows](../../src/apps/Elsa.Server.Web/Workflows)
-- [test/component/Elsa.Workflows.ComponentTests/Scenarios](../../test/component/Elsa.Workflows.ComponentTests/Scenarios)
-- [test/integration/Elsa.Workflows.IntegrationTests/Scenarios](../../test/integration/Elsa.Workflows.IntegrationTests/Scenarios)
+- [src/apps/Flamme.Server.Web/Workflows](../../src/apps/Flamme.Server.Web/Workflows)
+- [test/component/Flamme.Workflows.ComponentTests/Scenarios](../../test/component/Flamme.Workflows.ComponentTests/Scenarios)
+- [test/integration/Flamme.Workflows.IntegrationTests/Scenarios](../../test/integration/Flamme.Workflows.IntegrationTests/Scenarios)
 
-JSON workflows are important for designer compatibility and import/export tests. The [blob storage workflow provider](../../src/modules/Elsa.WorkflowProviders.BlobStorage) loads `.json` files through its built-in JSON format handler; register it with `UseFluentStorageProvider()`.
+JSON workflows are important for designer compatibility and import/export tests. The [blob storage workflow provider](../../src/modules/Flamme.WorkflowProviders.BlobStorage) loads `.json` files through its built-in JSON format handler; register it with `UseFluentStorageProvider()`.
 
 ## Designer Authored Workflows
 
@@ -39,28 +39,28 @@ The designer consumes metadata from workflow API descriptor endpoints and persis
 
 Relevant code:
 
-- [ActivityDescriptors endpoints](../../src/modules/Elsa.Workflows.Api/Endpoints/ActivityDescriptors)
-- [WorkflowDefinitions endpoints](../../src/modules/Elsa.Workflows.Api/Endpoints/WorkflowDefinitions)
-- [WorkflowDefinitionManager](../../src/modules/Elsa.Workflows.Management/Services/WorkflowDefinitionManager.cs)
-- [ActivityRegistryPopulator](../../src/modules/Elsa.Workflows.Management/Services/ActivityRegistryPopulator.cs)
+- [ActivityDescriptors endpoints](../../src/modules/Flamme.Workflows.Api/Endpoints/ActivityDescriptors)
+- [WorkflowDefinitions endpoints](../../src/modules/Flamme.Workflows.Api/Endpoints/WorkflowDefinitions)
+- [WorkflowDefinitionManager](../../src/modules/Flamme.Workflows.Management/Services/WorkflowDefinitionManager.cs)
+- [ActivityRegistryPopulator](../../src/modules/Flamme.Workflows.Management/Services/ActivityRegistryPopulator.cs)
 
 ## Host Method Activities
 
 Host method activities expose methods on registered host types as activities. Register host types with workflow management:
 
 ```csharp
-services.AddElsa(elsa =>
+services.AddFlamme(flamme =>
 {
-    elsa.AddActivityHost<MyHost>();
+    flamme.AddActivityHost<MyHost>();
 });
 ```
 
 Key files:
 
-- [HostMethodActivity](../../src/modules/Elsa.Workflows.Management/Activities/HostMethod/HostMethodActivity.cs)
-- [HostMethodActivityProvider](../../src/modules/Elsa.Workflows.Management/Activities/HostMethod/HostMethodActivityProvider.cs)
-- [HostMethodActivitiesOptions](../../src/modules/Elsa.Workflows.Management/Options/HostMethodActivitiesOptions.cs)
-- sample host type [Penguin](../../src/apps/Elsa.Server.Web/ActivityHosts/Penguin.cs)
+- [HostMethodActivity](../../src/modules/Flamme.Workflows.Management/Activities/HostMethod/HostMethodActivity.cs)
+- [HostMethodActivityProvider](../../src/modules/Flamme.Workflows.Management/Activities/HostMethod/HostMethodActivityProvider.cs)
+- [HostMethodActivitiesOptions](../../src/modules/Flamme.Workflows.Management/Options/HostMethodActivitiesOptions.cs)
+- sample host type [Penguin](../../src/apps/Flamme.Server.Web/ActivityHosts/Penguin.cs)
 
 Use host method activities when host application methods need to appear as designer activities without creating a full activity package.
 
@@ -70,24 +70,24 @@ Workflow definition activities let a workflow call another workflow definition. 
 
 Key files:
 
-- [WorkflowDefinitionActivity](../../src/modules/Elsa.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivity.cs)
-- [WorkflowDefinitionActivityDescriptorFactory](../../src/modules/Elsa.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivityDescriptorFactory.cs)
-- [WorkflowDefinitionActivityProvider](../../src/modules/Elsa.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivityProvider.cs)
-- [WorkflowReferenceGraphBuilder](../../src/modules/Elsa.Workflows.Management/Services/WorkflowReferenceGraphBuilder.cs)
+- [WorkflowDefinitionActivity](../../src/modules/Flamme.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivity.cs)
+- [WorkflowDefinitionActivityDescriptorFactory](../../src/modules/Flamme.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivityDescriptorFactory.cs)
+- [WorkflowDefinitionActivityProvider](../../src/modules/Flamme.Workflows.Management/Activities/WorkflowDefinitionActivity/WorkflowDefinitionActivityProvider.cs)
+- [WorkflowReferenceGraphBuilder](../../src/modules/Flamme.Workflows.Management/Services/WorkflowReferenceGraphBuilder.cs)
 
 Tests:
 
-- [CachingAndWorkflowDefinitionActivity](../../test/component/Elsa.Workflows.ComponentTests/Scenarios/CachingAndWorkflowDefinitionActivity)
-- [WorkflowReferenceGraph](../../test/component/Elsa.Workflows.ComponentTests/Scenarios/WorkflowReferenceGraph)
+- [CachingAndWorkflowDefinitionActivity](../../test/component/Flamme.Workflows.ComponentTests/Scenarios/CachingAndWorkflowDefinitionActivity)
+- [WorkflowReferenceGraph](../../test/component/Flamme.Workflows.ComponentTests/Scenarios/WorkflowReferenceGraph)
 
 ## StateMachine Activity
 
-The [StateMachine](../../src/modules/Elsa.Workflows.Core/Activities/StateMachine/Activities/StateMachine.cs) activity models named states with trigger-driven transitions. It lives in `Elsa.Workflows.Core` and is registered as a built-in activity.
+The [StateMachine](../../src/modules/Flamme.Workflows.Core/Activities/StateMachine/Activities/StateMachine.cs) activity models named states with trigger-driven transitions. It lives in `Flamme.Workflows.Core` and is registered as a built-in activity.
 
 Key concepts:
 
-- **States** ([StateMachineState](../../src/modules/Elsa.Workflows.Core/Activities/StateMachine/Models/StateMachineState.cs)): Named states, each with an optional `Entry` and `Exit` activity.
-- **Transitions** ([Transition](../../src/modules/Elsa.Workflows.Core/Activities/StateMachine/Models/Transition.cs)): Directed From→To pairs with an optional `Trigger` activity, optional `Condition` expression, and optional `Action` activity.
+- **States** ([StateMachineState](../../src/modules/Flamme.Workflows.Core/Activities/StateMachine/Models/StateMachineState.cs)): Named states, each with an optional `Entry` and `Exit` activity.
+- **Transitions** ([Transition](../../src/modules/Flamme.Workflows.Core/Activities/StateMachine/Models/Transition.cs)): Directed From→To pairs with an optional `Trigger` activity, optional `Condition` expression, and optional `Action` activity.
 - **InitialState**: The first state to enter when execution starts.
 
 Execution cycle:
@@ -106,21 +106,21 @@ Typical steps:
 
 1. Add an activity class in the owning module's `Activities` folder.
 2. Derive from the appropriate base class, usually `Activity` or `CodeActivity`.
-3. Define inputs and outputs with Elsa input/output models.
+3. Define inputs and outputs with Flamme input/output models.
 4. Register it with management, often via `Module.AddActivitiesFrom<TMarker>()` or `management.AddActivity<T>()`.
 5. Add a unit test with `ActivityTestFixture` for activity-only behavior.
 6. Add integration or component tests if it creates bookmarks, uses persistence, or participates in runtime dispatch.
 
 Good examples:
 
-- [WriteLine](../../src/modules/Elsa.Workflows.Core/Activities/WriteLine.cs)
-- [HttpEndpoint](../../src/modules/Elsa.Http/Activities/HttpEndpoint.cs)
-- [SendHttpRequest](../../src/modules/Elsa.Http/Activities/SendHttpRequest.cs)
-- [RunJavaScript](../../src/modules/Elsa.Expressions.JavaScript/Activities/RunJavaScript/RunJavaScript.cs)
+- [WriteLine](../../src/modules/Flamme.Workflows.Core/Activities/WriteLine.cs)
+- [HttpEndpoint](../../src/modules/Flamme.Http/Activities/HttpEndpoint.cs)
+- [SendHttpRequest](../../src/modules/Flamme.Http/Activities/SendHttpRequest.cs)
+- [RunJavaScript](../../src/modules/Flamme.Expressions.JavaScript/Activities/RunJavaScript/RunJavaScript.cs)
 
 ## Activity Metadata And UI Hints
 
-Designer-facing metadata is produced by descriptors and UI hint handlers. Core UI hints live under [Elsa.Workflows.Core/UIHints](../../src/modules/Elsa.Workflows.Core/UIHints). Module-specific handlers live with their module, such as HTTP content type options in [Elsa.Http/UIHints](../../src/modules/Elsa.Http/UIHints).
+Designer-facing metadata is produced by descriptors and UI hint handlers. Core UI hints live under [Flamme.Workflows.Core/UIHints](../../src/modules/Flamme.Workflows.Core/UIHints). Module-specific handlers live with their module, such as HTTP content type options in [Flamme.Http/UIHints](../../src/modules/Flamme.Http/UIHints).
 
 If an activity property needs dynamic options, add an `IPropertyUIHandler` and expose it through the descriptor option endpoint.
 

@@ -26,7 +26,7 @@ public class MigrationTests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureFlamme(elsa => elsa.UseAlterations())
+            .ConfigureFlamme(flamme => flamme.UseAlterations())
             .Build();
         _alterationRunner = _services.GetRequiredService<IAlterationRunner>();
         _workflowInstanceStore = _services.GetRequiredService<IWorkflowInstanceStore>();

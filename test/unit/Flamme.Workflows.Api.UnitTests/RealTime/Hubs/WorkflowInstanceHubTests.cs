@@ -75,7 +75,7 @@ public class WorkflowInstanceHubTests
     public async Task ObserveInstanceAsync_UsesFlammePermissionClaimType()
     {
         // Flamme is the only authority that expands roles into permission claims (ADR 0009), so a
-        // similarly named FastEndpoints claim must not grant an Flamme workflow permission.
+        // similarly named FastEndpoints claim must not grant a Flamme workflow permission.
         UseUserClaim(CustomPermissionsClaimType, ReadWorkflowInstancesPermission);
 
         await Assert.ThrowsExactlyAsync<HubException>(() => _hub.ObserveInstanceAsync(WorkflowInstanceId));

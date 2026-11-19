@@ -8,8 +8,8 @@ generation, BPMN execution/import/export, and WebhooksCore integration. Raw cons
 diagnostics were already retired by the baseline's OpenTelemetry migration.
 Unused central dependency declarations are removed after checking retained uses.
 
-Deploy the statically composed `Elsa.Server.Web` host or an application configured
-with `AddElsa`. Register modules and activities at build time; roll out a new
+Deploy the statically composed `Flamme.Server.Web` host or an application configured
+with `AddFlamme`. Register modules and activities at build time; roll out a new
 process/container image to change them. Existing CShells feature configuration,
 package feeds/catalogs, shell reload clients, and Platform recipe artifacts are no
 longer supported. Move recipe workflow imports to the workflow definition API.
@@ -24,7 +24,7 @@ workflow execution remain required behavior.
 
 The old modular sample also opted into AI, UserTasks, Secrets, external
 authentication and resilience modules. Enable each required retained capability
-explicitly through its classic `Use...` registration in a custom `AddElsa` host;
+explicitly through its classic `Use...` registration in a custom `AddFlamme` host;
 the reference server does not enable every module by default. Move tenant
 configuration to the classic `Multitenancy` section and each provider's classic
 registration; shell-specific connection settings are no longer read.

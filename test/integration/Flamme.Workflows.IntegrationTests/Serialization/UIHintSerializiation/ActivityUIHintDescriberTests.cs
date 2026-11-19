@@ -18,9 +18,9 @@ public class Tests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureFlamme(elsa =>
+            .ConfigureFlamme(flamme =>
             {
-                elsa.AddActivity<TestActivity>();
+                flamme.AddActivity<TestActivity>();
             })
             .Build();
     }

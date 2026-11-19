@@ -1,17 +1,17 @@
 # Module System
 
-The module system is the backbone of Elsa. It is a thin abstraction over `IServiceCollection` that lets packages register cohesive feature sets with dependency ordering.
+The module system is the backbone of Flamme. It is a thin abstraction over `IServiceCollection` that lets packages register cohesive feature sets with dependency ordering.
 
 ## Core Types
 
 | Type | File | Role |
 | --- | --- | --- |
-| `IModule` | [src/common/Elsa.Features/Services/IModule.cs](../../src/common/Elsa.Features/Services/IModule.cs) | Holds `IServiceCollection`, module properties, configured features, hosted service descriptors, and `Apply()`. |
-| `Module` | [src/common/Elsa.Features/Implementations/Module.cs](../../src/common/Elsa.Features/Implementations/Module.cs) | Concrete feature graph builder and applier. |
-| `IFeature` | [src/common/Elsa.Features/Services/IFeature.cs](../../src/common/Elsa.Features/Services/IFeature.cs) | Feature lifecycle contract. |
-| `FeatureBase` | [src/common/Elsa.Features/Abstractions/FeatureBase.cs](../../src/common/Elsa.Features/Abstractions/FeatureBase.cs) | Base class for most code-first features. |
-| `DependsOnAttribute` | [src/common/Elsa.Features/Attributes/DependsOn.cs](../../src/common/Elsa.Features/Attributes/DependsOn.cs) | Declares feature dependencies. |
-| `DependencyOfAttribute` | [src/common/Elsa.Features/Attributes/DependencyOf.cs](../../src/common/Elsa.Features/Attributes/DependencyOf.cs) | Declares optional dependency relationships. |
+| `IModule` | [src/common/Flamme.Features/Services/IModule.cs](../../src/common/Flamme.Features/Services/IModule.cs) | Holds `IServiceCollection`, module properties, configured features, hosted service descriptors, and `Apply()`. |
+| `Module` | [src/common/Flamme.Features/Implementations/Module.cs](../../src/common/Flamme.Features/Implementations/Module.cs) | Concrete feature graph builder and applier. |
+| `IFeature` | [src/common/Flamme.Features/Services/IFeature.cs](../../src/common/Flamme.Features/Services/IFeature.cs) | Feature lifecycle contract. |
+| `FeatureBase` | [src/common/Flamme.Features/Abstractions/FeatureBase.cs](../../src/common/Flamme.Features/Abstractions/FeatureBase.cs) | Base class for most code-first features. |
+| `DependsOnAttribute` | [src/common/Flamme.Features/Attributes/DependsOn.cs](../../src/common/Flamme.Features/Attributes/DependsOn.cs) | Declares feature dependencies. |
+| `DependencyOfAttribute` | [src/common/Flamme.Features/Attributes/DependencyOf.cs](../../src/common/Flamme.Features/Attributes/DependencyOf.cs) | Declares optional dependency relationships. |
 
 ## Lifecycle
 
@@ -30,7 +30,7 @@ A feature may introduce another feature from `Apply()`, for example by calling `
 The common public path is:
 
 ```csharp
-services.AddElsa(elsa =>
+services.AddFlamme(flamme =>
 {
     elsa
         .UseWorkflowManagement()
@@ -41,30 +41,30 @@ services.AddElsa(elsa =>
 
 Implementation links:
 
-- [AddElsa and ConfigureElsa](../../src/modules/Elsa/Extensions/DependencyInjectionExtensions.cs)
-- [CreateModule and Use<T>](../../src/common/Elsa.Features/Extensions/DependencyInjectionExtensions.cs)
-- [ElsaFeature](../../src/modules/Elsa/Features/ElsaFeature.cs)
-- [AppFeature](../../src/modules/Elsa/Features/AppFeature.cs)
+- [AddFlamme and ConfigureFlamme](../../src/modules/Flamme/Extensions/DependencyInjectionExtensions.cs)
+- [CreateModule and Use<T>](../../src/common/Flamme.Features/Extensions/DependencyInjectionExtensions.cs)
+- [FlammeFeature](../../src/modules/Flamme/Features/FlammeFeature.cs)
+- [AppFeature](../../src/modules/Flamme/Features/AppFeature.cs)
 
-`AppFeature` is a small wrapper that lets application-specific configuration run after the default `ElsaFeature` dependencies.
+`AppFeature` is a small wrapper that lets application-specific configuration run after the default `FlammeFeature` dependencies.
 
 ## Feature Dependencies
 
 Feature dependencies are explicit attributes. Examples:
 
-- [WorkflowsFeature](../../src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs) depends on system clock, expressions, mediator, default formatters, multitenancy, and commit strategies.
-- [WorkflowManagementFeature](../../src/modules/Elsa.Workflows.Management/Features/WorkflowManagementFeature.cs) depends on string compression, mediator, memory cache, system clock, workflows, workflow definitions, and workflow instances.
-- [WorkflowsApiFeature](../../src/modules/Elsa.Workflows.Api/Features/WorkflowsApiFeature.cs) depends on workflow instances, management, runtime, and SAS tokens.
+- [WorkflowsFeature](../../src/modules/Flamme.Workflows.Core/Features/WorkflowsFeature.cs) depends on system clock, expressions, mediator, default formatters, multitenancy, and commit strategies.
+- [WorkflowManagementFeature](../../src/modules/Flamme.Workflows.Management/Features/WorkflowManagementFeature.cs) depends on string compression, mediator, memory cache, system clock, workflows, workflow definitions, and workflow instances.
+- [WorkflowsApiFeature](../../src/modules/Flamme.Workflows.Api/Features/WorkflowsApiFeature.cs) depends on workflow instances, management, runtime, and SAS tokens.
 
 This is why feature classes are the best way to learn a module. They encode its runtime assumptions.
 
 ## Module Properties
 
-`IModule.Properties` is used as a shared bag during feature configuration. A concrete example is FastEndpoints assembly collection in [Elsa.Api.Common/Extensions/ModuleExtensions.cs](../../src/common/Elsa.Api.Common/Extensions/ModuleExtensions.cs). Features call `AddFastEndpointsAssembly`, and later `AddFastEndpointsFromModule` registers all collected assemblies with FastEndpoints.
+`IModule.Properties` is used as a shared bag during feature configuration. A concrete example is FastEndpoints assembly collection in [Flamme.Api.Common/Extensions/ModuleExtensions.cs](../../src/common/Flamme.Api.Common/Extensions/ModuleExtensions.cs). Features call `AddFastEndpointsAssembly`, and later `AddFastEndpointsFromModule` registers all collected assemblies with FastEndpoints.
 
 ## Static Host Composition
 
-Hosts select modules through code-first `AddElsa` registration and deploy the resulting application as a versioned image. The former configuration-driven shell feature system, runtime package loading, and independent shell reload APIs have been removed. Register custom activities and modules at build time and roll out a new host version when composition changes.
+Hosts select modules through code-first `AddFlamme` registration and deploy the resulting application as a versioned image. The former configuration-driven shell feature system, runtime package loading, and independent shell reload APIs have been removed. Register custom activities and modules at build time and roll out a new host version when composition changes.
 
 ## Extension Method Pattern
 

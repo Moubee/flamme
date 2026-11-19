@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 namespace Flamme.Identity.Services;
 
 /// <summary>
-/// Reads the user id from an Flamme Identity refresh token.
+/// Reads the user id from a Flamme Identity refresh token.
 /// </summary>
 /// <remarks>
 /// Collects every <c>sub</c> (<see cref="JwtRegisteredClaimNames.Sub"/>) and inbound-mapped

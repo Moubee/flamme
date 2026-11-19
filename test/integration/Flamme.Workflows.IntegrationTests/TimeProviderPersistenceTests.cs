@@ -138,7 +138,7 @@ public class TimeProviderPersistenceTests
     private static ServiceProvider CreateHost(string connectionString, TimeProvider timeProvider) =>
         (ServiceProvider)new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .ConfigureServices(services => services.AddSingleton<TimeProvider>(timeProvider))
-            .ConfigureFlamme(elsa => elsa.UseWorkflowManagement(management =>
+            .ConfigureFlamme(flamme => flamme.UseWorkflowManagement(management =>
                 management.UseWorkflowInstances(instances => instances.UseEntityFrameworkCore(ef => ef.UsePostgreSql(connectionString)))))
             .Build();
 

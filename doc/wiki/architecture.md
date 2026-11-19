@@ -1,12 +1,12 @@
 # Architecture
 
-Elsa Core is a modular workflow platform. The core engine is intentionally small compared with the full host surface: features add management stores, runtime dispatch, APIs, HTTP activities, expression languages, persistence, identity, tenants, and host-owned diagnostics integration.
+Flamme Core is a modular workflow platform. The core engine is intentionally small compared with the full host surface: features add management stores, runtime dispatch, APIs, HTTP activities, expression languages, persistence, identity, tenants, and host-owned diagnostics integration.
 
 ## Layered View
 
 ```mermaid
 flowchart TB
-    Host["Host app / sample server"] --> Entry["AddElsa / ConfigureElsa"]
+    Host["Host app / sample server"] --> Entry["AddFlamme / ConfigureFlamme"]
     Entry --> FeatureGraph["Feature graph"]
     FeatureGraph --> Core["Workflow Core"]
     FeatureGraph --> Mgmt["Workflow Management"]
@@ -28,7 +28,7 @@ The important boundary is that workflow execution concepts live in core, while p
 
 ## Default Feature Composition
 
-The default umbrella feature is [ElsaFeature](../../src/modules/Elsa/Features/ElsaFeature.cs). It depends on:
+The default umbrella feature is [FlammeFeature](../../src/modules/Flamme/Features/FlammeFeature.cs). It depends on:
 
 - `MediatorFeature`
 - `WorkflowsFeature`
@@ -36,7 +36,7 @@ The default umbrella feature is [ElsaFeature](../../src/modules/Elsa/Features/El
 - `DefaultWorkflowRuntimeFeature`
 - `WorkflowManagementFeature`
 
-When installed, it configures default workflow and activity execution pipelines and registers built-in core activities through workflow management. The public entry point is [AddElsa](../../src/modules/Elsa/Extensions/DependencyInjectionExtensions.cs).
+When installed, it configures default workflow and activity execution pipelines and registers built-in core activities through workflow management. The public entry point is [AddFlamme](../../src/modules/Flamme/Extensions/DependencyInjectionExtensions.cs).
 
 ## Main Runtime Flow
 
@@ -67,13 +67,13 @@ sequenceDiagram
 
 ## Activities And Control Flow
 
-Activities are the unit of work. Core activity types live under [Elsa.Workflows.Core/Activities](../../src/modules/Elsa.Workflows.Core/Activities). Control flow includes `Sequence`, `If`, `Switch`, `Fork`, `For`, `ForEach`, `While`, `Parallel`, `Flowchart`, `StateMachine`, and flowchart node activities.
+Activities are the unit of work. Core activity types live under [Flamme.Workflows.Core/Activities](../../src/modules/Flamme.Workflows.Core/Activities). Control flow includes `Sequence`, `If`, `Switch`, `Fork`, `For`, `ForEach`, `While`, `Parallel`, `Flowchart`, `StateMachine`, and flowchart node activities.
 
 Flowchart execution has a token-centric model documented in [ADR 0005](../adr/0005-token-centric-flowchart-execution-model.md), with explicit join behavior documented in [ADR 0007](../adr/0007-adoption-of-explicit-merge-modes-for-flowchart-joins.md).
 
 ## Management Layer
 
-[WorkflowManagementFeature](../../src/modules/Elsa.Workflows.Management/Features/WorkflowManagementFeature.cs) wires:
+[WorkflowManagementFeature](../../src/modules/Flamme.Workflows.Management/Features/WorkflowManagementFeature.cs) wires:
 
 - workflow definition and instance stores
 - workflow serializers and materializers
@@ -87,7 +87,7 @@ The management layer is what Studio and API endpoints use to list, save, publish
 
 ## Runtime Layer
 
-[WorkflowRuntimeFeature](../../src/modules/Elsa.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs) wires:
+[WorkflowRuntimeFeature](../../src/modules/Flamme.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs) wires:
 
 - local runtime and dispatchers
 - trigger and bookmark stores
@@ -102,9 +102,9 @@ The runtime can use in-memory stores by default or EF Core stores when persisten
 
 ## API Layer
 
-[WorkflowsApiFeature](../../src/modules/Elsa.Workflows.Api/Features/WorkflowsApiFeature.cs) registers FastEndpoints from the module and depends on workflow management, workflow instances, workflow runtime, and SAS tokens. The default route prefix is `elsa/api`, defined in [ApiEndpointOptions](../../src/modules/Elsa.Workflows.Api/Options/ApiEndpointOptions.cs) and applied by [MapWorkflowsApi](../../src/common/Elsa.Api.Common/Extensions/WebApplicationExtensions.cs) in endpoint-routed ASP.NET hosts.
+[WorkflowsApiFeature](../../src/modules/Flamme.Workflows.Api/Features/WorkflowsApiFeature.cs) registers FastEndpoints from the module and depends on workflow management, workflow instances, workflow runtime, and SAS tokens. The default route prefix is `elsa/api`, defined in [ApiEndpointOptions](../../src/modules/Flamme.Workflows.Api/Options/ApiEndpointOptions.cs) and applied by [MapWorkflowsApi](../../src/common/Flamme.Api.Common/Extensions/WebApplicationExtensions.cs) in endpoint-routed ASP.NET hosts.
 
-Real-time workflow updates are in [RealTimeWorkflowUpdatesFeature](../../src/modules/Elsa.Workflows.Api/Features/RealTimeWorkflowUpdatesFeature.cs) and [WorkflowInstanceHub](../../src/modules/Elsa.Workflows.Api/RealTime/Hubs/WorkflowInstanceHub.cs).
+Real-time workflow updates are in [RealTimeWorkflowUpdatesFeature](../../src/modules/Flamme.Workflows.Api/Features/RealTimeWorkflowUpdatesFeature.cs) and [WorkflowInstanceHub](../../src/modules/Flamme.Workflows.Api/RealTime/Hubs/WorkflowInstanceHub.cs).
 
 ## Persistence Layer
 
@@ -118,6 +118,6 @@ PostgreSQL provider packages depend on the shared EF Core module and provide dat
 
 ## Workflow Telemetry
 
-[WorkflowInstrumentation](../../src/modules/Elsa.Workflows.Core/Telemetry/WorkflowInstrumentation.cs) emits workflow and activity spans and metrics through the `Elsa.Workflows` activity source and meter. Libraries log through `Microsoft.Extensions.Logging`.
+[WorkflowInstrumentation](../../src/modules/Flamme.Workflows.Core/Telemetry/WorkflowInstrumentation.cs) emits workflow and activity spans and metrics through the `Elsa.Workflows` activity source and meter. Libraries log through `Microsoft.Extensions.Logging`.
 
-The application host configures official OpenTelemetry SDKs and exporters. External observability platforms own operational telemetry collection, storage, retention, queries, and viewing. Elsa's custom diagnostics modules, buffers, APIs, hubs, and dashboard adapters have been removed; see the [configuration and migration guide](opentelemetry-workflows.md).
+The application host configures official OpenTelemetry SDKs and exporters. External observability platforms own operational telemetry collection, storage, retention, queries, and viewing. Flamme's custom diagnostics modules, buffers, APIs, hubs, and dashboard adapters have been removed; see the [configuration and migration guide](opentelemetry-workflows.md).

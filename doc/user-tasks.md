@@ -1,10 +1,10 @@
 # User Tasks
 
-User Tasks add durable, workflow-bound human work to Elsa. A workflow suspends at the `UserTask` activity, authorized workers discover and act on the task through `/user-tasks`, and the workflow resumes with a typed action and validated form result.
+User Tasks add durable, workflow-bound human work to Flamme. A workflow suspends at the `UserTask` activity, authorized workers discover and act on the task through `/user-tasks`, and the workflow resumes with a typed action and validated form result.
 
 ## Identity integration
 
-The module does not require `Elsa.Identity`. It stores opaque, tenant-scoped participant references:
+The module does not require `Flamme.Identity`. It stores opaque, tenant-scoped participant references:
 
 ```json
 {
@@ -33,7 +33,7 @@ Protected task, form, and completion payloads are limited to 256 KiB by default.
 
 ## Persistence
 
-The Core feature includes an in-memory repository for development and tests. Production hosts use `Elsa.UserTasks.Persistence.EFCore.PostgreSql` for durable persistence. The provider-neutral API and activity contract do not change with the store.
+The Core feature includes an in-memory repository for development and tests. Production hosts use `Flamme.UserTasks.Persistence.EFCore.PostgreSql` for durable persistence. The provider-neutral API and activity contract do not change with the store.
 
 Terminal tasks are retained indefinitely by default. Configurable cleanup may purge terminal aggregates and their protected data, but never open tasks. Audit events remain append-only and contain safe metadata only.
 
@@ -47,7 +47,7 @@ Masked form fields never travel with the task detail. A client that needs one ca
 
 ## Guest invitations
 
-Guest invitations are task-scoped and do not create Elsa users. Core hashes the one-time token, retains retry material only in a Data Protection-encrypted transient outbox, and delegates delivery and challenge verification to host services. The first successful verification claims the task, revokes sibling invitations, and issues a bounded guest session. Anonymous errors are generic and rate-limited; guests cannot release or reassign work.
+Guest invitations are task-scoped and do not create Flamme users. Core hashes the one-time token, retains retry material only in a Data Protection-encrypted transient outbox, and delegates delivery and challenge verification to host services. The first successful verification claims the task, revokes sibling invitations, and issues a bounded guest session. Anonymous errors are generic and rate-limited; guests cannot release or reassign work.
 
 The transient delivery outbox encrypts pending secrets with ASP.NET Core Data Protection, so the module needs an `IDataProtectionProvider`. Web hosts register one by default; a non-web host that enables invitations must call `AddDataProtection()` itself.
 

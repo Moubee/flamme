@@ -36,7 +36,7 @@ internal class Logout(SessionRevoker sessionRevoker, IOptions<IdentityTokenOptio
         validationParameters.LifetimeValidator = null;
         var validationResult = await new JsonWebTokenHandler().ValidateTokenAsync(request.RefreshToken, validationParameters);
 
-        // Not an Flamme Identity refresh token, so there is no session to end here; answer idempotently. Opaque refresh tokens
+        // Not a Flamme Identity refresh token, so there is no session to end here; answer idempotently. Opaque refresh tokens
         // of the External Authentication broker are revoked through the broker's own sign-out.
         if (!validationResult.IsValid)
         {

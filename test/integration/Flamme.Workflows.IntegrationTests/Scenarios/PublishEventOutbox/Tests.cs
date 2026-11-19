@@ -88,7 +88,7 @@ public class Tests
         return (ServiceProvider)new TestApplicationBuilder(_testOutputHelper)
             .AddWorkflow<PublishOrderShippedEventWorkflow>()
             .AddWorkflow<ConsumeOrderShippedEventWorkflow>()
-            .ConfigureFlamme(elsa => elsa.Configure<KeyValueFeature>())
+            .ConfigureFlamme(flamme => flamme.Configure<KeyValueFeature>())
             .ConfigureServices(services => services.Configure<WorkflowDispatcherOptions>(options =>
             {
                 options.UseTransactionalOutbox = useTransactionalOutbox;

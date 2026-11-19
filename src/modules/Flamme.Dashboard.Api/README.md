@@ -1,6 +1,6 @@
-# Elsa Dashboard API
+# Flamme Dashboard API
 
-`Elsa.Dashboard.Api` exposes aggregate endpoints used by Elsa Studio's operational dashboard. Hosts opt in by enabling the dashboard API feature/module; older hosts that do not install this module simply do not expose the `/dashboard/*` routes.
+`Flamme.Dashboard.Api` exposes aggregate endpoints used by Elsa Studio's operational dashboard. Hosts opt in by enabling the dashboard API feature/module; older hosts that do not install this module simply do not expose the `/dashboard/*` routes.
 
 ## Endpoints
 
@@ -79,8 +79,8 @@ Dashboard overview degrades each section independently so an instance query fail
 
 Dashboard core owns the public `/dashboard/*` routes, permissions, range resolution, and contributor orchestration. Feature modules own their own dashboard data. This keeps the dependency direction open for extension:
 
-- `Elsa.Dashboard.Api` references `Elsa.Dashboard.Abstractions`.
-- Feature modules reference `Elsa.Dashboard.Abstractions` and register one or more `IDashboardContributor` implementations.
+- `Flamme.Dashboard.Api` references `Flamme.Dashboard.Abstractions`.
+- Feature modules reference `Flamme.Dashboard.Abstractions` and register one or more `IDashboardContributor` implementations.
 - Dashboard core does not reference workflow or future feature modules.
 
 `IDashboardContributor` is intentionally broad enough for a module to contribute only the surfaces it owns:
@@ -98,9 +98,9 @@ Contributor failures are isolated by the dashboard composer. A failed contributo
 ### Backend Weather Example
 
 ```csharp
-using Elsa.Dashboard.Abstractions.Contracts;
-using Elsa.Dashboard.Abstractions.Extensions;
-using Elsa.Dashboard.Abstractions.Models;
+using Flamme.Dashboard.Abstractions.Contracts;
+using Flamme.Dashboard.Abstractions.Extensions;
+using Flamme.Dashboard.Abstractions.Models;
 
 public class WeatherDashboardContributor(IWeatherService weatherService) : IDashboardContributor
 {
@@ -131,7 +131,7 @@ public class WeatherDashboardContributor(IWeatherService weatherService) : IDash
 services.AddDashboardContributor<WeatherDashboardContributor>();
 ```
 
-The example belongs in a hypothetical `Elsa.Weather.Dashboard` module or inside an existing Weather module, not in `Elsa.Dashboard.Api`.
+The example belongs in a hypothetical `Flamme.Weather.Dashboard` module or inside an existing Weather module, not in `Flamme.Dashboard.Api`.
 
 ### Studio Widget Model
 

@@ -26,19 +26,19 @@ Elsa provides the workflow engine foundation: activities, workflow definitions, 
 
 The backend and runtime take priority. UI development is currently secondary; this repository does not host a designer. [Elsa Studio](https://github.com/elsa-workflows/elsa-studio) remains a separate upstream project, and compatibility with Flamme changes should be evaluated for your use case.
 
-Flamme retains identifiers such as `Elsa.*`, `AddElsa(...)`, `Elsa.slnx`, and `/elsa/api` in the codebase. The project rename does not by itself rename packages, namespaces, configuration keys, or API routes. See the [original repository](https://github.com/elsa-workflows/elsa-core) for upstream development and attribution.
+Flamme packages, assemblies, public namespaces, and host composition use the Flamme name. Built-in activities have separate capability names in published workflows, including `ControlFlow.Flowchart` and `Console.WriteLine`.
 
 ## Scope
 
 Current foundations include C# and JSON workflow definitions, composable activities, short- and long-running execution, triggers and bookmarks, HTTP APIs, scheduling, distributed runtime support, and workflow traces and metrics. The [repository wiki](doc/wiki/README.md) maps these capabilities to their source modules.
 
-Hosts compose modules statically with `AddElsa` and deploy versioned applications.
+Hosts compose modules statically with `AddFlamme` and deploy versioned applications.
 Runtime package loading, shell hosting/reload, Platform recipes/catalog manifests,
 BPMN, and WebhooksCore integrations have been retired. Existing deployments should
 follow the [integration migration guide](doc/integration-removal.md), including
 the persisted pause-state migration before starting a replacement host.
 
-Elsa emits an `ActivitySource` and `Meter`; application hosts configure official OpenTelemetry packages and external observability backends. Custom diagnostics collectors, log buffers, exporters, and telemetry endpoints have been removed. See the [telemetry configuration and migration guide](doc/wiki/opentelemetry-workflows.md).
+Flamme emits an `ActivitySource` and `Meter`; application hosts configure official OpenTelemetry packages and external observability backends. Custom diagnostics collectors, log buffers, exporters, and telemetry endpoints have been removed. See the [telemetry configuration and migration guide](doc/wiki/opentelemetry-workflows.md).
 
 ### Persistence
 
@@ -99,7 +99,7 @@ Use the reference server to explore the backend. The commands below use a local 
    ASPNETCORE_ENVIRONMENT=Development \
    Http__BaseUrl=http://localhost:5001 \
    Scripting__Python__AllowHostCodeExecution=false \
-   dotnet run --project src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj \
+   dotnet run --project src/apps/Flamme.Server.Web/Flamme.Server.Web.csproj \
      --framework net11.0 --no-launch-profile --urls http://localhost:5001
    ```
 
@@ -111,12 +111,12 @@ Use the reference server to explore the backend. The commands below use a local 
 | [`/health/ready`](http://localhost:5001/health/ready) | Runtime readiness, including configured dependency checks. |
 | [`/elsa/api`](http://localhost:5001/elsa/api) | Management API route prefix; individual endpoints require authentication and authorization. |
 
-The Development configuration contains sample identities and a development signing key. Configure your own credentials, JWT signing key, and database connection for other environments; see the [server configuration notes](src/apps/Elsa.Server.Web/README.md). The local sample permits single-host locks for development.
+The Development configuration contains sample identities and a development signing key. Configure your own credentials, JWT signing key, and database connection for other environments; see the [server configuration notes](src/apps/Flamme.Server.Web/README.md). The local sample permits single-host locks for development.
 
 Build the solution with:
 
 ```bash
-dotnet build Elsa.slnx --configuration Release
+dotnet build Flamme.slnx --configuration Release
 ```
 
 See [Build, Run, And Operate](doc/wiki/build-run-operate.md) for container builds and [CONTRIBUTING.md](CONTRIBUTING.md) for targeted builds, tests, and packaging.
@@ -136,7 +136,7 @@ Use separate liveness and readiness probes, configure PostgreSQL persistence, an
 | [Roadmap](ROADMAP.md) | Flamme's development priorities and future database plans. |
 | [Repository wiki](doc/wiki/README.md) | Architecture, modules, runtime behavior, and source landmarks. |
 | [Persistence migration](doc/postgres-inmemory-migration.md) | Removed providers and PostgreSQL configuration. |
-| [Server configuration](src/apps/Elsa.Server.Web/README.md) | Reference host settings, identity, and ingress rate limiting. |
+| [Server configuration](src/apps/Flamme.Server.Web/README.md) | Reference host settings, identity, and ingress rate limiting. |
 | [Aspire development](doc/aspire-development.md) | Coordinated server/database startup, health checks, telemetry, and isolated worktrees. |
 | [Upstream Elsa documentation](https://docs.elsaworkflows.io/) | Background on inherited concepts; verify differences against Flamme's code and documentation. |
 

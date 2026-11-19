@@ -29,7 +29,7 @@ public class ExistingTriggerKindsTests : IAsyncDisposable
     public ExistingTriggerKindsTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseHttp().AddActivity<MultiStimulusTrigger>())
+            .ConfigureFlamme(flamme => flamme.UseHttp().AddActivity<MultiStimulusTrigger>())
             .Build();
 
         _triggerIndexer = _services.GetRequiredService<ITriggerIndexer>();

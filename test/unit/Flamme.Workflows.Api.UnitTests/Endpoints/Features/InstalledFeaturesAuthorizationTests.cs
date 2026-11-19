@@ -39,7 +39,7 @@ public class InstalledFeaturesAuthorizationTests
             options.Filter = endpoint => endpoint.Namespace?.StartsWith("Flamme.Workflows.Api.Endpoints.Features", StringComparison.Ordinal) == true;
         });
 
-        var feature = new FeatureDescriptor("SecretsFeature", "Elsa.Secrets", "Secrets");
+        var feature = new FeatureDescriptor("SecretsFeature", "Flamme.Secrets", "Secrets");
         var installedFeatureProvider = IInstalledFeatureProvider.Mock().Object;
         Mock.Get(installedFeatureProvider).List().Returns([feature]);
         Mock.Get(installedFeatureProvider).Find(FeatureFullName).Returns(feature);

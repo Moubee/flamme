@@ -26,9 +26,9 @@ needed. It also provides elapsed-time measurement and timers, which have differe
 semantics from reading a wall clock and need separate migration decisions.
 
 The repository already uses `TimeProvider` in
-[`SimulateResponseSessionStore`](../../src/modules/Elsa.Resilience/Endpoints/SimulateResponse/SimulateResponseSessionStore.cs),
+[`SimulateResponseSessionStore`](../../src/modules/Flamme.Resilience/Endpoints/SimulateResponse/SimulateResponseSessionStore.cs),
 registered by
-[`ResilienceFeature`](../../src/modules/Elsa.Resilience/Features/ResilienceFeature.cs).
+[`ResilienceFeature`](../../src/modules/Flamme.Resilience/Features/ResilienceFeature.cs).
 The migration must give old and new consumers one effective UTC source during
 the transition, including hosts and tests that override their clock.
 
@@ -54,9 +54,9 @@ rg -n 'DateTime(Offset)?\.(UtcNow|Now)|Task\.Delay|CancelAfter|PeriodicTimer|Sys
 
 Direct wall clocks and real timers are adjacent concerns, not automatically in
 scope for the first migration. In particular,
-[`CronSchedule`](../../src/modules/Elsa.Common/RecurringTasks/CronSchedule.cs)
+[`CronSchedule`](../../src/modules/Flamme.Common/RecurringTasks/CronSchedule.cs)
 uses `UtcNow.DateTime` and reads twice, while
-[`CronosCronParser`](../../src/modules/Elsa.Scheduling/Services/CronosCronParser.cs)
+[`CronosCronParser`](../../src/modules/Flamme.Scheduling/Services/CronosCronParser.cs)
 uses `DateTimeOffset` with an explicit UTC time zone. Characterize that difference
 before choosing a correction; do not hide it in a property-to-method replacement.
 
@@ -155,7 +155,7 @@ both orders, with and without a host-supplied provider.
 
 The five records are `ConnectionValidationContext`, `ExternalAuthorizationContext`,
 `ExternalCallbackContext`, `ConnectionTestContext`, and `ExternalLogoutContext` in
-[`ExternalAuthenticationContracts`](../../src/modules/Elsa.ExternalAuthentication/Contracts/ExternalAuthenticationContracts.cs).
+[`ExternalAuthenticationContracts`](../../src/modules/Flamme.ExternalAuthentication/Contracts/ExternalAuthenticationContracts.cs).
 Their constructor and generated member signatures change; consumers and provider
 adapters must rebuild. Do not claim source or binary compatibility for this release.
 

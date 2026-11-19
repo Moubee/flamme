@@ -9,57 +9,57 @@ Install the SDK selected by [global.json](../../global.json): .NET SDK 11.0.100 
 Restore first when working from a clean checkout or after dependency changes. Use `--ignore-failed-sources` when packages are available from other configured sources despite an unavailable feed:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet restore Flamme.slnx --ignore-failed-sources
 ```
 
 Build the solution (restore is implicit unless `--no-restore` is supplied):
 
 ```bash
-dotnet build Elsa.slnx
+dotnet build Flamme.slnx
 ```
 
 For an explicit restore/build sequence:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
-dotnet build Elsa.slnx --no-restore
+dotnet restore Flamme.slnx --ignore-failed-sources
+dotnet build Flamme.slnx --no-restore
 ```
 
 Run the TUnit suite directly through Microsoft Testing Platform:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
-dotnet test --solution Elsa.slnx --no-restore
+dotnet restore Flamme.slnx --ignore-failed-sources
+dotnet test --solution Flamme.slnx --no-restore
 ```
 
 Targeted test project:
 
 ```bash
-dotnet restore test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj --ignore-failed-sources
-dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj --no-restore
+dotnet restore test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj --ignore-failed-sources
+dotnet test --project test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj --no-restore
 ```
 
 ## Build System
 
 The .NET CLI invokes MSBuild directly. Shared settings live in [Directory.Build.props](../../Directory.Build.props) and [Directory.Build.targets](../../Directory.Build.targets). Builds default to Debug, while the CI workflows explicitly select Release. Pass `--configuration Debug` or `--configuration Release` to select a configuration explicitly.
 
-Clean the selected configuration with `dotnet clean Elsa.slnx --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
+Clean the selected configuration with `dotnet clean Flamme.slnx --configuration Release`. Standard build outputs remain in each project's `bin/` and `obj/` directories, and NuGet packages go to `packages/`. Cleaning build outputs does not remove previously created packages.
 
-Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Elsa.slnx`, or select one test project with `dotnet test --project <path-to-test.csproj>`. Add `--framework net10.0` or `--framework net11.0` to run one target.
+Tests use TUnit on Microsoft Testing Platform. Run the full suite with `dotnet test --solution Flamme.slnx`, or select one test project with `dotnet test --project <path-to-test.csproj>`. Add `--framework net10.0` or `--framework net11.0` to run one target.
 
 Source libraries multi-target `net10.0` and `net11.0` through [src/Directory.Build.props](../../src/Directory.Build.props). Central package versions are in [Directory.Packages.props](../../Directory.Packages.props), including framework-specific package versions where necessary for .NET 10 and .NET 11.
 
 ## Run The Reference Server
 
-The main sample host is [src/apps/Elsa.Server.Web](../../src/apps/Elsa.Server.Web). It wires most major modules in [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
+The main sample host is [src/apps/Flamme.Server.Web](../../src/apps/Flamme.Server.Web). It wires most major modules in [Program.cs](../../src/apps/Flamme.Server.Web/Program.cs).
 
 Start the isolated PostgreSQL development container using the [root README setup](../../README.md#run-locally). The checked-in `ConnectionStrings:PostgreSql` matches that example; override it for other environments. Custom hosts can omit EF Core persistence registrations to use process-local in-memory stores.
 
 Restore the project and run it with:
 
 ```bash
-dotnet restore src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj --ignore-failed-sources
-dotnet run --project src/apps/Elsa.Server.Web/Elsa.Server.Web.csproj --framework net11.0 --no-restore
+dotnet restore src/apps/Flamme.Server.Web/Flamme.Server.Web.csproj --ignore-failed-sources
+dotnet run --project src/apps/Flamme.Server.Web/Flamme.Server.Web.csproj --framework net11.0 --no-restore
 ```
 
 Notable toggles in `Program.cs`:
@@ -79,7 +79,7 @@ When running outside the explicit `Development` or `Demo` environments, configur
 Build the reference server image from the repository root:
 
 ```bash
-docker build -f docker/ElsaServer.Dockerfile -t flamme-server:local .
+docker build -f docker/FlammeServer.Dockerfile -t flamme-server:local .
 ```
 
 This command builds an image; running the reference host also requires PostgreSQL connectivity and environment configuration. Follow the canonical [local setup in the README](../../README.md) to start PostgreSQL and run the host. For containers, configure `ConnectionStrings__PostgreSql` with a database address reachable from the container rather than relying on the host's `localhost`.
@@ -135,7 +135,7 @@ The reference server pipeline is a useful ordering guide:
 12. Swagger UI in development
 13. SignalR workflow hubs if enabled
 
-See [Program.cs](../../src/apps/Elsa.Server.Web/Program.cs).
+See [Program.cs](../../src/apps/Flamme.Server.Web/Program.cs).
 
 ## Operational Endpoints
 
@@ -148,7 +148,7 @@ With default route prefix `elsa/api`, runtime admin endpoints include:
 
 Custom structured-log, console-log, and OpenTelemetry ingestion/query endpoints and SignalR hubs have been removed. Hosts configure official OpenTelemetry exporters and external logging infrastructure; see the [telemetry configuration and migration guide](opentelemetry-workflows.md).
 
-Health checks are mapped to `/` and `/health/live` for process liveness and `/health/ready` for Elsa runtime readiness in the reference server. See [Health Checks](health-checks.md) for Kubernetes liveness/readiness recommendations and Elsa-specific runtime readiness probes.
+Health checks are mapped to `/` and `/health/live` for process liveness and `/health/ready` for Flamme runtime readiness in the reference server. See [Health Checks](health-checks.md) for Kubernetes liveness/readiness recommendations and Flamme-specific runtime readiness probes.
 
 ## Runtime Knobs
 
@@ -160,7 +160,7 @@ Common runtime-related options in the reference host:
 - `IncidentOptions.DefaultIncidentStrategy`
 - recurring task schedules for trigger queue, bookmark queue purge, and interrupted workflow restart
 
-Configure operational telemetry through standard `OTEL_*` settings and your external observability platform. The former Elsa log capacity, query, heartbeat, redaction, and storage options have been removed.
+Configure operational telemetry through standard `OTEL_*` settings and your external observability platform. The former Flamme log capacity, query, heartbeat, redaction, and storage options have been removed.
 
 ## Local Development Notes
 
@@ -175,7 +175,7 @@ Configure operational telemetry through standard `OTEL_*` settings and your exte
 Create packages with an explicit version using the standard pack command:
 
 ```bash
-dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
+dotnet pack Flamme.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
 
 This restores and builds before packing. Use `--no-build` only when the same configuration and version have already been built. Package versions come from project metadata or the explicit `Version` MSBuild property; no timestamp suffix is added automatically. The package workflow supplies its release tag or preview version and uploads both `.nupkg` and `.snupkg` files from `packages/`.

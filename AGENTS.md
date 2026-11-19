@@ -1,7 +1,6 @@
 # Flamme Agent Guide
 
-Flamme is a .NET process orchestrator forked from Elsa 3.9. Existing `Elsa.*`
-technical identifiers remain unchanged. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+Flamme is a .NET process orchestrator forked from Elsa 3.9. Fork-owned projects and packages use the `Flamme` prefix. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 for build, test, dependency, and pull request workflows; use the SDK selected by
 [global.json](global.json).
 
@@ -14,7 +13,7 @@ Use the [ranked documentation index](doc/README.md) to find guidance for a task.
   [project direction](doc/project-direction.md) and [roadmap](ROADMAP.md).
 - PostgreSQL is the only supported durable database. In-memory stores support
   development and tests; MySQL, SQLite, and Cassandra are future plans.
-- Hosts use static `AddElsa` composition. Nuplane, CShells adapters/reload APIs,
+- Hosts use static `AddFlamme` composition. Nuplane, CShells adapters/reload APIs,
   Loom Platform recipes/catalog manifests, BPMN, and WebhooksCore are retired.
   See the [integration migration guide](doc/integration-removal.md).
 - Preserve C#, JavaScript, Python, and Liquid scripting, AI/blob, FastEndpoints,
@@ -50,7 +49,7 @@ Use the [ranked documentation index](doc/README.md) to find guidance for a task.
   Prefer targeted tests while iterating; run the complete suite for shared
   infrastructure or cross-module behavior changes.
 - Use TUnit on Microsoft Testing Platform, selected by `global.json`:
-  `dotnet test --project <csproj>` or `dotnet test --solution Elsa.slnx`.
+  `dotnet test --project <csproj>` or `dotnet test --solution Flamme.slnx`.
   Outer runner options go before `--`; later options reach the TUnit application.
 - Await TUnit assertions. Use `TUnit.Mocks` and existing shared fixtures; preserve
   async behavior, argument matching, capture, and property storage in mock changes.
@@ -61,7 +60,7 @@ Use the [ranked documentation index](doc/README.md) to find guidance for a task.
   thresholds. Do not add per-project Coverlet settings.
 - Executable entry points commit `packages.lock.json`; CI restores in locked
   mode. After dependency changes, restore all targets with
-  `dotnet restore Elsa.slnx --force-evaluate` and review lock updates. Restore all
+  `dotnet restore Flamme.slnx --force-evaluate` and review lock updates. Restore all
   targets before a `--framework <tfm> --no-restore` test run to avoid rewriting locks.
 - Use the [Aspire development guide](doc/aspire-development.md) for local server
   orchestration, endpoint discovery, telemetry, and worktree isolation.

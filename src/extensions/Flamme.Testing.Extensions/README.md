@@ -1,14 +1,14 @@
-# Elsa Testing Extensions
+# Flamme Testing Extensions
 
-This package provides extensions to help with testing Elsa Workflows applications.
+This package provides extensions to help with testing Flamme Workflows applications.
 
 ## WebApplicationFactory Extensions
 
-When using ASP.NET Core's `WebApplicationFactory<TEntryPoint>` for integration testing with Elsa Workflows, background tasks might continue running after tests complete. This can cause the test host to crash due to attempts to access resources (like databases) that have been disposed.
+When using ASP.NET Core's `WebApplicationFactory<TEntryPoint>` for integration testing with Flamme Workflows, background tasks might continue running after tests complete. This can cause the test host to crash due to attempts to access resources (like databases) that have been disposed.
 
-### ShutdownElsaAsync
+### ShutdownFlammeAsync
 
-The `ShutdownElsaAsync` extension method ensures proper cleanup by:
+The `ShutdownFlammeAsync` extension method ensures proper cleanup by:
 
 1. Accessing the tenant service
 2. Deactivating all tenants, which in turn:
@@ -31,8 +31,8 @@ public class MyIntegrationTest : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        // Explicitly shutdown Elsa before stopping the host
-        await Factory.ShutdownElsaAsync();
+        // Explicitly shutdown Flamme before stopping the host
+        await Factory.ShutdownFlammeAsync();
         
         // Then stop the server
         if (Factory.Server?.Host != null)

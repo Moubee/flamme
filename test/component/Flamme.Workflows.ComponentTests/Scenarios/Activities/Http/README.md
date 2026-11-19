@@ -1,6 +1,6 @@
 # HttpEndpoint Activity Component Tests
 
-This directory contains comprehensive component tests for the `HttpEndpoint` activity class in Elsa Workflows. The tests are designed to thoroughly validate the functionality, security, and edge cases of the HttpEndpoint activity.
+This directory contains comprehensive component tests for the `HttpEndpoint` activity class in Flamme Workflows. The tests are designed to thoroughly validate the functionality, security, and edge cases of the HttpEndpoint activity.
 
 ## Test Structure
 
@@ -103,13 +103,13 @@ The `Workflows/` directory contains test workflow implementations:
 
 ```bash
 # Run all HttpEndpoint tests
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpoint*Tests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpoint*Tests*/*"
 
 # Run specific test categories
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointTests*/*"
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointSecurityAndEdgeCasesTests*/*"
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointRouteParametersTests*/*"
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointFileUploadTests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointTests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointSecurityAndEdgeCasesTests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointRouteParametersTests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/HttpEndpointFileUploadTests*/*"
 ```
 
 ### Test Data and Scenarios
@@ -137,7 +137,7 @@ The tests follow the native TUnit component-test patterns:
 5. **Host Lifecycle**: The dedicated ASP.NET Core host starts through TUnit.AspNetCore; additional cluster pods are lazy
 6. **Assertions**: Native TUnit assertions validate status codes, content, and behavior
 
-## Integration with Elsa Framework
+## Integration with Flamme Framework
 
 These tests validate integration with:
 
@@ -178,5 +178,5 @@ The test suite provides comprehensive coverage of:
 - All supported HTTP methods and content types
 - Error conditions and validation scenarios
 - Security constraints and edge cases
-- Integration with the broader Elsa framework
+- Integration with the broader Flamme framework
 - Real-world usage patterns and scenarios

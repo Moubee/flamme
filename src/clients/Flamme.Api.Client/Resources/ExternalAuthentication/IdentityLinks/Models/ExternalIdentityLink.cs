@@ -1,7 +1,7 @@
 namespace Flamme.Api.Client.Resources.ExternalAuthentication.IdentityLinks.Models;
 
 /// <summary>
-/// Safe metadata for an external identity linked to an Flamme user.
+/// Safe metadata for an external identity linked to a Flamme user.
 /// </summary>
 public record ExternalIdentityLink(
     string Id,

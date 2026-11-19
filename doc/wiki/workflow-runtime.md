@@ -2,11 +2,11 @@
 
 Workflow runtime owns starting, dispatching, resuming, canceling, logging, and recovering workflow executions. It is the layer that turns definitions into running instances and responds to triggers, bookmarks, background work, and admin operations.
 
-Start in [src/modules/Elsa.Workflows.Runtime](../../src/modules/Elsa.Workflows.Runtime).
+Start in [src/modules/Flamme.Workflows.Runtime](../../src/modules/Flamme.Workflows.Runtime).
 
 ## Feature Wiring
 
-[WorkflowRuntimeFeature](../../src/modules/Elsa.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs) registers and configures:
+[WorkflowRuntimeFeature](../../src/modules/Flamme.Workflows.Runtime/Features/WorkflowRuntimeFeature.cs) registers and configures:
 
 - `IWorkflowRuntime`
 - `IWorkflowDispatcher`
@@ -29,15 +29,15 @@ It also configures `WorkflowsFeature` to use the runtime commit state handler.
 
 Important runtime entities:
 
-- [StoredTrigger](../../src/modules/Elsa.Workflows.Runtime/Entities/StoredTrigger.cs)
-- [StoredBookmark](../../src/modules/Elsa.Workflows.Runtime/Entities/StoredBookmark.cs)
-- [BookmarkQueueItem](../../src/modules/Elsa.Workflows.Runtime/Entities/BookmarkQueueItem.cs)
-- [BookmarkQueueDeadLetterItem](../../src/modules/Elsa.Workflows.Runtime/Entities/BookmarkQueueDeadLetterItem.cs)
-- [WorkflowExecutionLogRecord](../../src/modules/Elsa.Workflows.Runtime/Entities/WorkflowExecutionLogRecord.cs)
-- [ActivityExecutionRecord](../../src/modules/Elsa.Workflows.Runtime/Entities/ActivityExecutionRecord.cs)
-- [WorkflowInboxMessage](../../src/modules/Elsa.Workflows.Runtime/Entities/WorkflowInboxMessage.cs)
+- [StoredTrigger](../../src/modules/Flamme.Workflows.Runtime/Entities/StoredTrigger.cs)
+- [StoredBookmark](../../src/modules/Flamme.Workflows.Runtime/Entities/StoredBookmark.cs)
+- [BookmarkQueueItem](../../src/modules/Flamme.Workflows.Runtime/Entities/BookmarkQueueItem.cs)
+- [BookmarkQueueDeadLetterItem](../../src/modules/Flamme.Workflows.Runtime/Entities/BookmarkQueueDeadLetterItem.cs)
+- [WorkflowExecutionLogRecord](../../src/modules/Flamme.Workflows.Runtime/Entities/WorkflowExecutionLogRecord.cs)
+- [ActivityExecutionRecord](../../src/modules/Flamme.Workflows.Runtime/Entities/ActivityExecutionRecord.cs)
+- [WorkflowInboxMessage](../../src/modules/Flamme.Workflows.Runtime/Entities/WorkflowInboxMessage.cs)
 
-The default runtime feature uses memory stores. EF Core runtime persistence is wired by [EFCoreWorkflowRuntimePersistenceFeature](../../src/modules/Elsa.Persistence.EFCore/Modules/Runtime/WorkflowRuntimePersistenceFeature.cs), which replaces runtime store factories on `WorkflowRuntimeFeature`.
+The default runtime feature uses memory stores. EF Core runtime persistence is wired by [EFCoreWorkflowRuntimePersistenceFeature](../../src/modules/Flamme.Persistence.EFCore/Modules/Runtime/WorkflowRuntimePersistenceFeature.cs), which replaces runtime store factories on `WorkflowRuntimeFeature`.
 
 ## Dispatch Paths
 
@@ -57,15 +57,15 @@ flowchart TB
 
 Key files:
 
-- [LocalWorkflowRuntime](../../src/modules/Elsa.Workflows.Runtime/Services/LocalWorkflowRuntime.cs)
-- [BackgroundWorkflowDispatcher](../../src/modules/Elsa.Workflows.Runtime/Services/BackgroundWorkflowDispatcher.cs)
-- [TransactionalWorkflowDispatcher](../../src/modules/Elsa.Workflows.Runtime/Services/TransactionalWorkflowDispatcher.cs)
-- [ValidatingWorkflowDispatcher](../../src/modules/Elsa.Workflows.Runtime/Services/ValidatingWorkflowDispatcher.cs)
-- [WorkflowInvoker](../../src/modules/Elsa.Workflows.Runtime/Services/WorkflowInvoker.cs)
-- [DefaultWorkflowStarter](../../src/modules/Elsa.Workflows.Runtime/Services/DefaultWorkflowStarter.cs)
-- [WorkflowResumer](../../src/modules/Elsa.Workflows.Runtime/Services/WorkflowResumer.cs)
-- [BookmarkResumer](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkResumer.cs)
-- [TriggerInvoker](../../src/modules/Elsa.Workflows.Runtime/Services/TriggerInvoker.cs)
+- [LocalWorkflowRuntime](../../src/modules/Flamme.Workflows.Runtime/Services/LocalWorkflowRuntime.cs)
+- [BackgroundWorkflowDispatcher](../../src/modules/Flamme.Workflows.Runtime/Services/BackgroundWorkflowDispatcher.cs)
+- [TransactionalWorkflowDispatcher](../../src/modules/Flamme.Workflows.Runtime/Services/TransactionalWorkflowDispatcher.cs)
+- [ValidatingWorkflowDispatcher](../../src/modules/Flamme.Workflows.Runtime/Services/ValidatingWorkflowDispatcher.cs)
+- [WorkflowInvoker](../../src/modules/Flamme.Workflows.Runtime/Services/WorkflowInvoker.cs)
+- [DefaultWorkflowStarter](../../src/modules/Flamme.Workflows.Runtime/Services/DefaultWorkflowStarter.cs)
+- [WorkflowResumer](../../src/modules/Flamme.Workflows.Runtime/Services/WorkflowResumer.cs)
+- [BookmarkResumer](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkResumer.cs)
+- [TriggerInvoker](../../src/modules/Flamme.Workflows.Runtime/Services/TriggerInvoker.cs)
 
 ## Correlation IDs And Activation Strategies
 
@@ -97,13 +97,13 @@ services.Configure<WorkflowDispatcherOptions>(options =>
 });
 ```
 
-When enabled, [TransactionalWorkflowDispatcher](../../src/modules/Elsa.Workflows.Runtime/Services/TransactionalWorkflowDispatcher.cs) writes the command to [IWorkflowDispatchOutboxStore](../../src/modules/Elsa.Workflows.Runtime/Contracts/IWorkflowDispatchOutboxStore.cs) before the parent workflow state commits, and stores the outbox item ID in the parent `WorkflowState.Properties`. [WorkflowDispatchOutboxProcessor](../../src/modules/Elsa.Workflows.Runtime/Services/WorkflowDispatchOutboxProcessor.cs) delivers only records whose owner workflow state contains that committed marker. This prevents a crash between workflow-state commit and mediator enqueue from silently losing the dispatch: the durable outbox record is already present, and the committed marker authorizes delivery after restart.
+When enabled, [TransactionalWorkflowDispatcher](../../src/modules/Flamme.Workflows.Runtime/Services/TransactionalWorkflowDispatcher.cs) writes the command to [IWorkflowDispatchOutboxStore](../../src/modules/Flamme.Workflows.Runtime/Contracts/IWorkflowDispatchOutboxStore.cs) before the parent workflow state commits, and stores the outbox item ID in the parent `WorkflowState.Properties`. [WorkflowDispatchOutboxProcessor](../../src/modules/Flamme.Workflows.Runtime/Services/WorkflowDispatchOutboxProcessor.cs) delivers only records whose owner workflow state contains that committed marker. This prevents a crash between workflow-state commit and mediator enqueue from silently losing the dispatch: the durable outbox record is already present, and the committed marker authorizes delivery after restart.
 
 Operational notes:
 
 - The default outbox store uses `IKeyValueStore`; production hosts should pair this option with durable workflow instance persistence and durable key-value persistence.
 - Delivery is at-least-once. If the process crashes after sending a command but before deleting the outbox record, the processor may send it again.
-- Workflow definition dispatches generated by `DispatchWorkflow`/`BulkDispatchWorkflows` include a child workflow instance ID. [DispatchWorkflowRequestHandler](../../src/modules/Elsa.Workflows.Runtime/Handlers/DispatchWorkflowRequestHandler.cs) treats that ID as the idempotency key for outbox-routed commands and skips duplicate create-and-run attempts when the instance already exists.
+- Workflow definition dispatches generated by `DispatchWorkflow`/`BulkDispatchWorkflows` include a child workflow instance ID. [DispatchWorkflowRequestHandler](../../src/modules/Flamme.Workflows.Runtime/Handlers/DispatchWorkflowRequestHandler.cs) treats that ID as the idempotency key for outbox-routed commands and skips duplicate create-and-run attempts when the instance already exists.
 - Outbox processing is serialized with the configured distributed lock provider. Poison items are abandoned after `WorkflowDispatcherOptions.MaxOutboxDeliveryAttempts`, and missing-owner items are removed after `WorkflowDispatcherOptions.OrphanedOutboxItemRetention`.
 - Dispatch calls outside a workflow execution context, including API-triggered asynchronous events, continue to use the regular background dispatcher.
 - In-workflow `PublishEvent` and asynchronous `IEventPublisher` calls use `IWorkflowDispatcher` (`DispatchTriggerWorkflowsRequest`) so `TransactionalWorkflowDispatcher` applies. They do not go through `IStimulusDispatcher` / `BackgroundStimulusDispatcher`.
@@ -112,21 +112,21 @@ Operational notes:
 
 Triggers start workflows. Bookmarks resume suspended workflow instances. Runtime indexes and queries them through:
 
-- [TriggerIndexer](../../src/modules/Elsa.Workflows.Runtime/Services/TriggerIndexer.cs)
-- [DefaultBookmarkManager](../../src/modules/Elsa.Workflows.Runtime/Services/DefaultBookmarkManager.cs)
-- [BookmarkPersister](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkPersister.cs)
-- [BookmarkUpdater](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkUpdater.cs)
-- [BookmarkBoundWorkflowService](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkBoundWorkflowService.cs)
-- [TriggerBoundWorkflowService](../../src/modules/Elsa.Workflows.Runtime/Services/TriggerBoundWorkflowService.cs)
+- [TriggerIndexer](../../src/modules/Flamme.Workflows.Runtime/Services/TriggerIndexer.cs)
+- [DefaultBookmarkManager](../../src/modules/Flamme.Workflows.Runtime/Services/DefaultBookmarkManager.cs)
+- [BookmarkPersister](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkPersister.cs)
+- [BookmarkUpdater](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkUpdater.cs)
+- [BookmarkBoundWorkflowService](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkBoundWorkflowService.cs)
+- [TriggerBoundWorkflowService](../../src/modules/Flamme.Workflows.Runtime/Services/TriggerBoundWorkflowService.cs)
 
-The indexer stores one trigger per payload an [ITrigger](../../src/modules/Elsa.Workflows.Core/Contracts/ITrigger.cs) activity that can start the workflow returns. A trigger that returns no payloads, or throws while producing them, is stored as a single placeholder row with a `null` payload. [ValidateWorkflowRequestHandler](../../src/modules/Elsa.Workflows.Runtime/Handlers/ValidateWorkflowRequestHandler.cs) reports that row as `Trigger should have a payload`, so publication is refused. A trigger whose decision to register anything depends on its own configuration, and that has nothing to register as configured, sets [TriggerIndexingContext.RegistersNoTriggers](../../src/modules/Elsa.Workflows.Core/Contexts/TriggerIndexingContext.cs) and returns no payloads. The indexer then stores no row for it. The flag is ignored when the trigger returns payloads or throws. Custom trigger activities may use this flag when their configured mode is started explicitly rather than by an external event.
+The indexer stores one trigger per payload an [ITrigger](../../src/modules/Flamme.Workflows.Core/Contracts/ITrigger.cs) activity that can start the workflow returns. A trigger that returns no payloads, or throws while producing them, is stored as a single placeholder row with a `null` payload. [ValidateWorkflowRequestHandler](../../src/modules/Flamme.Workflows.Runtime/Handlers/ValidateWorkflowRequestHandler.cs) reports that row as `Trigger should have a payload`, so publication is refused. A trigger whose decision to register anything depends on its own configuration, and that has nothing to register as configured, sets [TriggerIndexingContext.RegistersNoTriggers](../../src/modules/Flamme.Workflows.Core/Contexts/TriggerIndexingContext.cs) and returns no payloads. The indexer then stores no row for it. The flag is ignored when the trigger returns payloads or throws. Custom trigger activities may use this flag when their configured mode is started explicitly rather than by an external event.
 
 Bookmark queue processing is handled by:
 
-- [StoreBookmarkQueue](../../src/modules/Elsa.Workflows.Runtime/Services/StoreBookmarkQueue.cs)
-- [BookmarkQueueProcessor](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkQueueProcessor.cs)
-- [BookmarkQueueWorker](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkQueueWorker.cs)
-- [BookmarkQueueSignaler](../../src/modules/Elsa.Workflows.Runtime/Services/BookmarkQueueSignaler.cs)
+- [StoreBookmarkQueue](../../src/modules/Flamme.Workflows.Runtime/Services/StoreBookmarkQueue.cs)
+- [BookmarkQueueProcessor](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkQueueProcessor.cs)
+- [BookmarkQueueWorker](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkQueueWorker.cs)
+- [BookmarkQueueSignaler](../../src/modules/Flamme.Workflows.Runtime/Services/BookmarkQueueSignaler.cs)
 
 Expired bookmark queue items are moved to the dead-letter store before they are removed from the active queue. Processing failures increment `DeliveryAttempts`; when `BookmarkQueuePurgeOptions.MaxDeliveryAttempts` is reached, the queue item is dead-lettered with the last exception type and message. `BookmarkQueuePurgeOptions.Ttl` controls active queue expiry, and `BookmarkQueuePurgeOptions.DeadLetterTtl` controls how long dead-letter records are retained before the purger deletes them.
 
@@ -143,10 +143,10 @@ Read responses return a dead-letter view model for audit and replay status. Resu
 
 Workflow and activity execution logs flow through sinks and stores:
 
-- [StoreWorkflowExecutionLogSink](../../src/modules/Elsa.Workflows.Runtime/Services/StoreWorkflowExecutionLogSink.cs)
-- [StoreActivityExecutionLogSink](../../src/modules/Elsa.Workflows.Runtime/Services/StoreActivityExecutionLogSink.cs)
-- [WorkflowExecutionLogRecordExtractor](../../src/modules/Elsa.Workflows.Runtime/Services/WorkflowExecutionLogRecordExtractor.cs)
-- [DefaultActivityExecutionMapper](../../src/modules/Elsa.Workflows.Runtime/Services/DefaultActivityExecutionMapper.cs)
+- [StoreWorkflowExecutionLogSink](../../src/modules/Flamme.Workflows.Runtime/Services/StoreWorkflowExecutionLogSink.cs)
+- [StoreActivityExecutionLogSink](../../src/modules/Flamme.Workflows.Runtime/Services/StoreActivityExecutionLogSink.cs)
+- [WorkflowExecutionLogRecordExtractor](../../src/modules/Flamme.Workflows.Runtime/Services/WorkflowExecutionLogRecordExtractor.cs)
+- [DefaultActivityExecutionMapper](../../src/modules/Flamme.Workflows.Runtime/Services/DefaultActivityExecutionMapper.cs)
 
 API endpoints under `WorkflowInstances/Journal`, `ActivityExecutions`, and `ActivityExecutionSummaries` expose this data.
 
@@ -166,12 +166,12 @@ These paths matter for tests: a workflow may return before background activity o
 
 Recent graceful shutdown work added node-local quiescence and drain concepts. Source landmarks:
 
-- [QuiescenceSignal](../../src/modules/Elsa.Workflows.Runtime/Services/QuiescenceSignal.cs)
-- [IngressSourceRegistry](../../src/modules/Elsa.Workflows.Runtime/Services/IngressSourceRegistry.cs)
-- [DrainOrchestrator](../../src/modules/Elsa.Workflows.Runtime/Services/DrainOrchestrator.cs)
-- [DrainOrchestratorHostedService](../../src/modules/Elsa.Workflows.Runtime/HostedServices/DrainOrchestratorHostedService.cs)
-- [InterruptedRecoveryScanner](../../src/modules/Elsa.Workflows.Runtime/Services/InterruptedRecoveryScanner.cs)
-- [RecoverInterruptedWorkflowsStartupTask](../../src/modules/Elsa.Workflows.Runtime/StartupTasks/RecoverInterruptedWorkflowsStartupTask.cs)
+- [QuiescenceSignal](../../src/modules/Flamme.Workflows.Runtime/Services/QuiescenceSignal.cs)
+- [IngressSourceRegistry](../../src/modules/Flamme.Workflows.Runtime/Services/IngressSourceRegistry.cs)
+- [DrainOrchestrator](../../src/modules/Flamme.Workflows.Runtime/Services/DrainOrchestrator.cs)
+- [DrainOrchestratorHostedService](../../src/modules/Flamme.Workflows.Runtime/HostedServices/DrainOrchestratorHostedService.cs)
+- [InterruptedRecoveryScanner](../../src/modules/Flamme.Workflows.Runtime/Services/InterruptedRecoveryScanner.cs)
+- [RecoverInterruptedWorkflowsStartupTask](../../src/modules/Flamme.Workflows.Runtime/StartupTasks/RecoverInterruptedWorkflowsStartupTask.cs)
 
 Ingress source adapters are currently registered by modules such as HTTP and Scheduling so the runtime can pause external event intake during drain.
 
@@ -184,18 +184,18 @@ The workflow API includes runtime admin endpoints:
 - `POST /elsa/api/admin/workflow-runtime/resume`: requires `ManageWorkflowRuntime`.
 - `POST /elsa/api/admin/workflow-runtime/force-drain`: requires `ManageWorkflowRuntime`.
 
-Endpoint code lives under [Elsa.Workflows.Api/Endpoints/RuntimeAdmin](../../src/modules/Elsa.Workflows.Api/Endpoints/RuntimeAdmin). The service behind these endpoints is [WorkflowRuntimeAdminService](../../src/modules/Elsa.Workflows.Runtime/Services/WorkflowRuntimeAdminService.cs).
+Endpoint code lives under [Flamme.Workflows.Api/Endpoints/RuntimeAdmin](../../src/modules/Flamme.Workflows.Api/Endpoints/RuntimeAdmin). The service behind these endpoints is [WorkflowRuntimeAdminService](../../src/modules/Flamme.Workflows.Runtime/Services/WorkflowRuntimeAdminService.cs).
 
 ## Distributed Runtime
 
-Distributed runtime support lives in [Elsa.Workflows.Runtime.Distributed](../../src/modules/Elsa.Workflows.Runtime.Distributed). It layers distributed coordination and resilience support on top of the base runtime. When making runtime changes, check whether the distributed project has a parallel worker or dispatcher that must honor the same semantics.
+Distributed runtime support lives in [Flamme.Workflows.Runtime.Distributed](../../src/modules/Flamme.Workflows.Runtime.Distributed). It layers distributed coordination and resilience support on top of the base runtime. When making runtime changes, check whether the distributed project has a parallel worker or dispatcher that must honor the same semantics.
 
 ### Distributed Lock Provider Safety
 
-The default workflow runtime lock provider is file-system based and writes under `App_Data/locks`. That provider is useful for single-host development and tests, but it is not safe for clustered deployments where nodes have separate file systems. When `UseDistributedRuntime()` is enabled, Elsa logs a startup warning if it detects the default file-system provider or the no-op provider unless the host explicitly acknowledges local-only lock semantics:
+The default workflow runtime lock provider is file-system based and writes under `App_Data/locks`. That provider is useful for single-host development and tests, but it is not safe for clustered deployments where nodes have separate file systems. When `UseDistributedRuntime()` is enabled, Flamme logs a startup warning if it detects the default file-system provider or the no-op provider unless the host explicitly acknowledges local-only lock semantics:
 
 ```csharp
-elsa.UseWorkflowRuntime(runtime =>
+flamme.UseWorkflowRuntime(runtime =>
 {
     runtime.UseDistributedRuntime();
 
@@ -215,7 +215,7 @@ Example PostgreSQL setup:
 ```csharp
 using Medallion.Threading.Postgres;
 
-elsa.UseWorkflowRuntime(runtime =>
+flamme.UseWorkflowRuntime(runtime =>
 {
     runtime.UseDistributedRuntime();
     runtime.DistributedLockProvider = _ =>
@@ -233,7 +233,7 @@ using StackExchange.Redis;
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
 
-elsa.UseWorkflowRuntime(runtime =>
+flamme.UseWorkflowRuntime(runtime =>
 {
     runtime.UseDistributedRuntime();
     runtime.DistributedLockProvider = sp =>
@@ -243,4 +243,4 @@ elsa.UseWorkflowRuntime(runtime =>
 
 ## When To Change This Layer
 
-Change runtime for dispatch semantics, trigger/bookmark indexing, background work, execution logs, recovery, cancellation, graceful shutdown, or runtime stores. If a change only affects how definitions are saved or described, it belongs in management. If it only changes HTTP endpoint activity behavior, start in `Elsa.Http`.
+Change runtime for dispatch semantics, trigger/bookmark indexing, background work, execution logs, recovery, cancellation, graceful shutdown, or runtime stores. If a change only affects how definitions are saved or described, it belongs in management. If it only changes HTTP endpoint activity behavior, start in `Flamme.Http`.

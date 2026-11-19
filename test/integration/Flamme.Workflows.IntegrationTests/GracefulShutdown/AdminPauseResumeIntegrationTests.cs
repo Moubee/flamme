@@ -22,7 +22,7 @@ public class AdminPauseResumeIntegrationTests : IAsyncDisposable
     {
         _recorder = new RecordingNotificationSender();
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(flamme => flamme.UseWorkflowRuntime())
             .ConfigureServices(s => s.AddSingleton<INotificationSender>(_recorder))
             .Build();
     }

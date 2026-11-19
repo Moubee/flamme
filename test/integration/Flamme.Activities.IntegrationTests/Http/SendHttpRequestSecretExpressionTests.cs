@@ -69,7 +69,7 @@ public class SendHttpRequestSecretExpressionTests
                 services.AddSingleton<ISecretResolver>(new TestSecretResolver());
                 services.AddSingleton<IExpressionDescriptorProvider, SecretExpressionDescriptorProvider>();
             })
-            .ConfigureFlamme(elsa => elsa.UseHttp(http =>
+            .ConfigureFlamme(flamme => flamme.UseHttp(http =>
             {
                 http.HttpClientBuilder = builder => builder.ConfigurePrimaryHttpMessageHandler(() => handler);
             }));

@@ -73,7 +73,7 @@ public class ImportAndPublishCronTests : IAsyncDisposable
         // Opt out of strict publishing.
         await using var services = (ServiceProvider)new TestApplicationBuilder(_testOutput)
             .WithCapturingTextWriter(_capturingTextWriter)
-            .ConfigureFlamme(elsa => elsa.UseWorkflowManagement(management => management.UseFailOnValidationErrors(false)))
+            .ConfigureFlamme(flamme => flamme.UseWorkflowManagement(management => management.UseFailOnValidationErrors(false)))
             .Build();
 
         // Populate registries.

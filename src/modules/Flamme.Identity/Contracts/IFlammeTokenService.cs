@@ -8,7 +8,7 @@ namespace Flamme.Identity.Contracts;
 public interface IFlammeTokenService
 {
     /// <summary>
-    /// Issues an Flamme access token.
+    /// Issues a Flamme access token.
     /// </summary>
     ValueTask<IssuedAccessToken> IssueAccessTokenAsync(TokenIssuanceContext context, CancellationToken cancellationToken = default);
 

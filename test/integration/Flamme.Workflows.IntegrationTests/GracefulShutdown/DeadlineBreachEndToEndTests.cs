@@ -33,7 +33,7 @@ public class DeadlineBreachEndToEndTests : IAsyncDisposable
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
             .AddActivitiesFrom<DeadlineBreachEndToEndTests>()
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     // The deadline test holds its activity until drain cancellation, regardless of scheduling delay.

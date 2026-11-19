@@ -36,7 +36,7 @@ public class DrainRecoveryEndToEndTests : IAsyncDisposable
             .ConfigureServices(services => services.AddSingleton(_resumeGate))
             .AddActivitiesFrom<DrainRecoveryEndToEndTests>()
             .AddWorkflow<RecoverableResumeWorkflow>()
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflowRuntime(runtime => runtime.ConfigureGracefulShutdown(o =>
                 {
                     o.DrainDeadline = TimeSpan.FromMilliseconds(50);

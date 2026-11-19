@@ -15,7 +15,7 @@ The repository already contains the following building blocks. Their presence do
 | Durable persistence | PostgreSQL through the existing EF Core provider packages. See the [persistence migration guide](doc/postgres-inmemory-migration.md). |
 | Development and tests | Process-local in-memory stores. State does not survive a restart and is not shared between replicas. |
 | Operations | Container build files, runtime diagnostics, OpenTelemetry instrumentation, and separate liveness/readiness endpoints. See [health checks](doc/wiki/health-checks.md). |
-| Tooling | The SDK selected by [global.json](global.json), the `Elsa.slnx` solution, native .NET CLI/MSBuild commands, and TUnit on Microsoft Testing Platform. See [build and operations](doc/wiki/build-run-operate.md). |
+| Tooling | The SDK selected by [global.json](global.json), the `Flamme.slnx` solution, native .NET CLI/MSBuild commands, and TUnit on Microsoft Testing Platform. See [build and operations](doc/wiki/build-run-operate.md). |
 
 ## Priority 1: measure and improve performance
 

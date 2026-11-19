@@ -45,9 +45,9 @@ public class Tests
 
         // Act
         var workflowFinishedRecord = await workflow.DispatchWorkflowAndRunToCompletion(
-            configureElsa: elsa =>
+            configureFlamme: flamme =>
             {
-                elsa.UseWorkflowRuntime(workflowRuntime =>
+                flamme.UseWorkflowRuntime(workflowRuntime =>
                 {
                     workflowRuntime.ActivityExecutionLogStore = sp => activityExecutionStore;
                 });
@@ -117,10 +117,10 @@ public class Tests
 
         // Act
         var workflowFinishedRecord = await workflow.DispatchWorkflowAndRunToCompletion(
-            configureElsa: elsa =>
+            configureFlamme: flamme =>
             {
                 // Use the distributed runtime feature so its workflow runtime, bookmark worker, and dependencies are registered.
-                elsa.UseWorkflowRuntime(workflowRuntime =>
+                flamme.UseWorkflowRuntime(workflowRuntime =>
                 {
                     workflowRuntime.UseDistributedRuntime();
                     workflowRuntime.DistributedLockingOptions = options => options.AllowLocalLockProviderInDistributedRuntime = true;

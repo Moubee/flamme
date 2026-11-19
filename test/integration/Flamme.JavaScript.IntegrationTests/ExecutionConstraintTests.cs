@@ -114,7 +114,7 @@ public class ExecutionConstraintTests : IAsyncDisposable
     private IServiceProvider BuildServices(Action<JintOptions> configure)
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseJavaScript(configure))
+            .ConfigureFlamme(flamme => flamme.UseJavaScript(configure))
             .Build();
         return _services;
     }

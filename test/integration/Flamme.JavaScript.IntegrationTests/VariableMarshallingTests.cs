@@ -58,7 +58,7 @@ public class VariableMarshallingTests
     {
         Engine? engine = null;
         await using var fixture = new WorkflowTestFixture(TestContext.Current!.Output.StandardOutput);
-        fixture.ConfigureFlamme(elsa => elsa.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
+        fixture.ConfigureFlamme(flamme => flamme.UseJavaScript(jintOptions => jintOptions.ConfigureEngine(e => engine = e)));
 
         var context = await fixture.CreateExpressionExecutionContextAsync([new Variable<ExpandoObject>("Person", CreatePerson())]);
         var evaluator = fixture.Services.GetRequiredService<IJavaScriptEvaluator>();

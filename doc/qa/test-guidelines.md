@@ -1,4 +1,4 @@
-# Elsa Core — Testing Strategy
+# Flamme Core — Testing Strategy
 
 ## Purpose
 
@@ -7,7 +7,7 @@ This document is a practical test guideline. It tells you *what* to test, *when*
 ---
 
 ## Summary
-The philosophy of testing in Elsa can be summarized as:
+The philosophy of testing in Flamme can be summarized as:
 
 ***Whenever a test fails, it should provide a clear direction towards the cause of the problem.***
 
@@ -36,17 +36,17 @@ For contributors, tests are the first line of code review: they must document in
 ## High-level testing pyramid
 
 - **Unit tests** — single-class logic (activities, converters, expression evaluators, serializers, service providers). Fast; no persistence.
-- **Integration tests** — multiple Elsa subsystems together (e.g., invoker + activities + registries). In-process; may deserialize workflow JSON. Use [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) and [`PopulateRegistriesAsync()`](../../src/common/Elsa.Testing.Shared.Integration/ServiceProviderExtensions.cs) when using existing definitions.
-- **Component tests** — persisted behaviour, journal/instance store assertions, bookmarks/resumption across lifecycle boundaries. Use [`AppComponentTest`](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Abstractions/AppComponentTest.cs) to instantiate and [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) queries for assertions.
+- **Integration tests** — multiple Flamme subsystems together (e.g., invoker + activities + registries). In-process; may deserialize workflow JSON. Use [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) and [`PopulateRegistriesAsync()`](../../src/common/Flamme.Testing.Shared.Integration/ServiceProviderExtensions.cs) when using existing definitions.
+- **Component tests** — persisted behaviour, journal/instance store assertions, bookmarks/resumption across lifecycle boundaries. Use [`AppComponentTest`](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Abstractions/AppComponentTest.cs) to instantiate and [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) queries for assertions.
 
-Each test layer has distinct goals and clear boundaries — see [**Which parts of Elsa to test**](#which-parts-of-elsa-to-test-and-which-test-types-to-use) for precise mapping of which aspects belong to which layer.
+Each test layer has distinct goals and clear boundaries — see [**Which parts of Flamme to test**](#which-parts-of-flamme-to-test-and-which-test-types-to-use) for precise mapping of which aspects belong to which layer.
 
 ---
 
 ## Quick Start for Contributors
 
 **Before you write a test:**
-1. ✅ Understand what you're testing (see [**Which parts of Elsa to test**](#which-parts-of-elsa-to-test-and-which-test-types-to-use))
+1. ✅ Understand what you're testing (see [**Which parts of Flamme to test**](#which-parts-of-flamme-to-test-and-which-test-types-to-use))
 2. ✅ Choose the right test layer (unit vs integration vs component)
 3. ✅ Use existing helpers (don't reinvent - see [**Test Helpers Reference**](#test-helpers-reference-quick-lookup))
 
@@ -55,8 +55,8 @@ Each test layer has distinct goals and clear boundaries — see [**Which parts o
     - Changed activity logic or created a new activity? → See [Activities](#activities)
     - Changed workflow execution? → See [Workflows execution](#workflow-execution-invoker-middleware-bookmarks)
 - [ ] Follow steps and code patterns in that section
-- [ ] Run the full suite locally: `dotnet test --solution Elsa.slnx`
-- [ ] While iterating, run the narrowest project: `dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj`
+- [ ] Run the full suite locally: `dotnet test --solution Flamme.slnx`
+- [ ] While iterating, run the narrowest project: `dotnet test --project test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj`
 - [ ] Verify no flaky behavior by running that targeted project command 10 times with `--no-build`
 
 ---
@@ -93,7 +93,7 @@ Build warnings do not include every analyzer suggestion. Use the SDK selected by
 `global.json` to inspect informational diagnostics as well:
 
 ```bash
-dotnet format analyzers Elsa.slnx --no-restore --severity info --verify-no-changes
+dotnet format analyzers Flamme.slnx --no-restore --severity info --verify-no-changes
 ```
 
 Review diagnostics and fixes before applying them; analyzer fixes do not replace
@@ -105,9 +105,9 @@ and [mock syntax and analyzers](https://tunit.dev/docs/writing-tests/mocking/) f
 
 ## Characteristics for testing
 
-- **Activities:** First-class pluggable units. Each activity implements execution logic and interacts with the [`ActivityExecutionContext`](../../src/modules/Elsa.Workflows.Core/Contexts/ActivityExecutionContext.cs). More details in [**Activities**](#activities).
+- **Activities:** First-class pluggable units. Each activity implements execution logic and interacts with the [`ActivityExecutionContext`](../../src/modules/Flamme.Workflows.Core/Contexts/ActivityExecutionContext.cs). More details in [**Activities**](#activities).
 
-- **Workflows:** Graphs of activities. A workflow can run synchronously or schedule asynchronous work (bookmarks, timers). When you run a workflow in-process with [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs), the runner will return when synchronous work completes. Some activities set `RunAsynchronously` causing background scheduling — tests need to take care when asserting. More details in [**Workflow execution**](#workflow-execution-invoker-middleware-bookmarks).
+- **Workflows:** Graphs of activities. A workflow can run synchronously or schedule asynchronous work (bookmarks, timers). When you run a workflow in-process with [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs), the runner will return when synchronous work completes. Some activities set `RunAsynchronously` causing background scheduling — tests need to take care when asserting. More details in [**Workflow execution**](#workflow-execution-invoker-middleware-bookmarks).
 
 ---
 
@@ -115,31 +115,31 @@ and [mock syntax and analyzers](https://tunit.dev/docs/writing-tests/mocking/) f
 
 Tests are organized by module and test type:
 
-- **`test/unit/Elsa.Activities.UnitTests`** - Activity unit tests
-- **`test/unit/Elsa.Expressions.UnitTests`** - Expression evaluation unit tests
-- **`test/unit/Elsa.Workflows.Core.UnitTests`** - Core workflow unit tests (ActivityExecutionContext extensions, etc.)
-- **`test/unit/Elsa.Workflows.Management.UnitTests`** - Workflow management unit tests
-- **`test/integration/Elsa.Workflows.IntegrationTests`** - Workflow integration tests
-- **`test/component/Elsa.Workflows.ComponentTests`** - End-to-end component tests
+- **`test/unit/Flamme.Activities.UnitTests`** - Activity unit tests
+- **`test/unit/Flamme.Expressions.UnitTests`** - Expression evaluation unit tests
+- **`test/unit/Flamme.Workflows.Core.UnitTests`** - Core workflow unit tests (ActivityExecutionContext extensions, etc.)
+- **`test/unit/Flamme.Workflows.Management.UnitTests`** - Workflow management unit tests
+- **`test/integration/Flamme.Workflows.IntegrationTests`** - Workflow integration tests
+- **`test/component/Flamme.Workflows.ComponentTests`** - End-to-end component tests
 
 **Shared test infrastructure:**
-- **`src/common/Elsa.Testing.Shared`** - Shared test helpers (`ActivityTestFixture`, fake strategies, extensions)
-- **`src/common/Elsa.Testing.Shared.Integration`** - Integration test helpers (`RunActivityExtensions`, `PopulateRegistriesAsync`)
-- **`src/common/Elsa.Testing.Shared.Component`** - Component test helpers (event handlers, workflow events)
+- **`src/common/Flamme.Testing.Shared`** - Shared test helpers (`ActivityTestFixture`, fake strategies, extensions)
+- **`src/common/Flamme.Testing.Shared.Integration`** - Integration test helpers (`RunActivityExtensions`, `PopulateRegistriesAsync`)
+- **`src/common/Flamme.Testing.Shared.Component`** - Component test helpers (event handlers, workflow events)
 
 ---
 
-## Which parts of Elsa to test, and which test types to use
+## Which parts of Flamme to test, and which test types to use
 
-This section maps Elsa aspects to the exact kinds of tests you should write, with examples and code patterns referencing repository conventions.
+This section maps Flamme aspects to the exact kinds of tests you should write, with examples and code patterns referencing repository conventions.
 
 ### Activities
 
 #### **Unit tests:**
 - Test the activity class logic only (no persistence, no scheduler). Cover configuration permutations and boundary inputs.
-- Use [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) to configure and execute the activity and obtain an [`ActivityExecutionContext`](../../src/modules/Elsa.Workflows.Core/Contexts/ActivityExecutionContext.cs) for assertions.
+- Use [`ActivityTestFixture`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs) to configure and execute the activity and obtain an [`ActivityExecutionContext`](../../src/modules/Flamme.Workflows.Core/Contexts/ActivityExecutionContext.cs) for assertions.
 - Use fluent methods: `ConfigureServices()` to add custom services, `ConfigureContext()` to set up context state
-- Assert using `context.GetActivityOutput()`([extension method](../../src/modules/Elsa.Workflows.Core/Extensions/ActivityExecutionContextExtensions.cs)) for outputs, or `context.Get()` for variables.
+- Assert using `context.GetActivityOutput()`([extension method](../../src/modules/Flamme.Workflows.Core/Extensions/ActivityExecutionContextExtensions.cs)) for outputs, or `context.Get()` for variables.
 
 **Example (does not set output):**
 ```csharp
@@ -239,11 +239,11 @@ public async Task Should_Return_Default_Outcome()
 }
 ```
 #### **Integration tests:**
-- Place the activity inside a minimal workflow definition and run via [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs). Assert outputs/variables and that the activity integrates correctly with preceding/following activities.
-- Use [`WorkflowTestFixture`](../../src/common/Elsa.Testing.Shared.Integration/WorkflowTestFixture.cs) for simplified integration testing with automatic service provider setup and output capture.
+- Place the activity inside a minimal workflow definition and run via [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs). Assert outputs/variables and that the activity integrates correctly with preceding/following activities.
+- Use [`WorkflowTestFixture`](../../src/common/Flamme.Testing.Shared.Integration/WorkflowTestFixture.cs) for simplified integration testing with automatic service provider setup and output capture.
 - If activity creates bookmarks or relies on scheduler semantics, integration tests should resume bookmarks via the engine APIs to validate resumption.
 
-Pattern note: [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) returns a [`RunWorkflowResult`](../../src/modules/Elsa.Workflows.Core/Models/RunWorkflowResult.cs) (or equivalent) containing the [`WorkflowInstance`](../../src/modules/Elsa.Workflows.Management/Entities/WorkflowInstance.cs) and output variables when run to completion.
+Pattern note: [`RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) returns a [`RunWorkflowResult`](../../src/modules/Flamme.Workflows.Core/Models/RunWorkflowResult.cs) (or equivalent) containing the [`WorkflowInstance`](../../src/modules/Flamme.Workflows.Management/Entities/WorkflowInstance.cs) and output variables when run to completion.
 Use returned state for deterministic assertions where possible.
 
 **Example (using WorkflowTestFixture - basic):**
@@ -332,7 +332,7 @@ public async Task Should_Execute_Workflow()
 - Rare: low-level pure helpers in the invoker may have unit tests for edge cases. Most invoker behavior requires integration testing.
 
 #### Integration tests:
-- Use [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) with small workflows to test variables propagation, branch logic (If/ForEach/Parallel), expression evaluation, and `RunAsynchronously` flags.
+- Use [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) with small workflows to test variables propagation, branch logic (If/ForEach/Parallel), expression evaluation, and `RunAsynchronously` flags.
 - When a workflow schedules async child work (bookmarks), simulate resumption by calling resume APIs.
 
 
@@ -346,7 +346,7 @@ await Assert.That(runResult.WorkflowInstance!.Status).IsEqualTo(WorkflowStatus.F
 ```
 
 #### Component tests (persistence & resumption):
-- Start a workflow that creates a bookmark. Persisted instance must be found via [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) after the creation point. Simulate host restart by disposing and rebuilding the service provider (keeping the same persistence store) and resume the bookmark to assert resumption completes.
+- Start a workflow that creates a bookmark. Persisted instance must be found via [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) after the creation point. Simulate host restart by disposing and rebuilding the service provider (keeping the same persistence store) and resume the bookmark to assert resumption completes.
 
 **Code pattern to resume a bookmark (integration/component):**
 
@@ -370,7 +370,7 @@ await Assert.That(resumed.WorkflowInstance.Status).IsEqualTo(WorkflowStatus.Fini
 | `ActivityTestFixture.BuildAsync`                | Build context without executing activity                     | When you need context setup without execution                           |
 | `ActivityTestFixture.ExecuteAsync`              | Execute activity and return context                          | Standard activity unit test execution                                   |
 | `WorkflowTestFixture`                           | Configure and run workflows/activities in integration tests  | Integration testing workflows and activities                            |
-| `WorkflowTestFixture.ConfigureElsa`             | Fluent API to configure Elsa features                        | Integration tests requiring custom Elsa configuration                   |
+| `WorkflowTestFixture.ConfigureFlamme`             | Fluent API to configure Flamme features                        | Integration tests requiring custom Flamme configuration                   |
 | `WorkflowTestFixture.ConfigureServices`         | Fluent API to add services to fixture                        | Integration tests requiring custom services                             |
 | `WorkflowTestFixture.RunActivityAsync`          | Run single activity as workflow                              | Integration tests for single activities                                 |
 | `WorkflowTestFixture.RunWorkflowAsync`          | Run workflow or workflow by definition ID                    | Integration tests for workflows                                         |
@@ -397,14 +397,14 @@ await Assert.That(resumed.WorkflowInstance.Status).IsEqualTo(WorkflowStatus.Fini
 
 ## Scheduler Strategies for Testing
 
-When testing activities in isolation, Elsa provides fake scheduler strategy implementations that bypass the production scheduling logic:
+When testing activities in isolation, Flamme provides fake scheduler strategy implementations that bypass the production scheduling logic:
 
 ### Available Strategies
 
-- **`FakeActivityExecutionContextSchedulerStrategy`** ([source](../../src/common/Elsa.Testing.Shared/FakeActivityExecutionContextSchedulerStrategy.cs)) - Schedules activities immediately within the activity execution context for deterministic testing
-- **`FakeWorkflowExecutionContextSchedulerStrategy`** ([source](../../src/common/Elsa.Testing.Shared/FakeWorkflowExecutionContextSchedulerStrategy.cs)) - Schedules activities immediately at the workflow level for deterministic testing
+- **`FakeActivityExecutionContextSchedulerStrategy`** ([source](../../src/common/Flamme.Testing.Shared/FakeActivityExecutionContextSchedulerStrategy.cs)) - Schedules activities immediately within the activity execution context for deterministic testing
+- **`FakeWorkflowExecutionContextSchedulerStrategy`** ([source](../../src/common/Flamme.Testing.Shared/FakeWorkflowExecutionContextSchedulerStrategy.cs)) - Schedules activities immediately at the workflow level for deterministic testing
 
-These strategies are automatically configured when using [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) and ensure that scheduled activities execute synchronously in tests, making assertions deterministic.
+These strategies are automatically configured when using [`ActivityTestFixture`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs) and ensure that scheduled activities execute synchronously in tests, making assertions deterministic.
 
 **Note:** You do not need to manually configure these strategies - `ActivityTestFixture` handles this for you.
 
@@ -413,9 +413,9 @@ These strategies are automatically configured when using [`ActivityTestFixture`]
 ## Decision helper (what to add — follow in order)
 
 1. **Changed code is a single activity class with no persistence/external calls?** → Unit test only.
-2. **Change touches multiple activities or workflow logic (If, ForEach, Parallel, Flow activities, etc.)?** → Integration test using [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) and a small workflow.
-3. **Change touches invoker/scheduler/bookmarks or similar multi-component feature?** → Integration test using [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) and a small workflow. If persistence semantics change, add component tests.
-4. **Change touches persistence/serializers or requires durable evidence (journal, bookmarks)?** → Component tests against [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs).
+2. **Change touches multiple activities or workflow logic (If, ForEach, Parallel, Flow activities, etc.)?** → Integration test using [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) and a small workflow.
+3. **Change touches invoker/scheduler/bookmarks or similar multi-component feature?** → Integration test using [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) and a small workflow. If persistence semantics change, add component tests.
+4. **Change touches persistence/serializers or requires durable evidence (journal, bookmarks)?** → Component tests against [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs).
 
 
 **Rule of thumb:**
@@ -430,15 +430,15 @@ When in doubt, add the minimal unit tests plus one integration test that reprodu
 
 ## Deterministic patterns to avoid flaky tests
 
-1. **For activity unit tests, prefer returned state from [`ActivityTestFixture.ExecuteAsync`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs).** Always inspect on the returned context — it is deterministic for synchronous workflows.
+1. **For activity unit tests, prefer returned state from [`ActivityTestFixture.ExecuteAsync`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs).** Always inspect on the returned context — it is deterministic for synchronous workflows.
 2. **Resume bookmarks explicitly.** Do not wait for external schedulers — call the engine's resume/trigger APIs in your test to continue execution.
-3. **For integration tests, locate instances deterministically.** Use an instance id returned by [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) or attach a `CorrelationId` test variable and query [`IWorkflowInstanceStore.FindByCorrelationIdAsync(...)`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs). Avoid using "latest" queries.
+3. **For integration tests, locate instances deterministically.** Use an instance id returned by [`RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) or attach a `CorrelationId` test variable and query [`IWorkflowInstanceStore.FindByCorrelationIdAsync(...)`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs). Avoid using "latest" queries.
 
 ---
 
 ## WorkflowTestFixture Helper Methods
 
-When using [`WorkflowTestFixture`](../../src/common/Elsa.Testing.Shared.Integration/WorkflowTestFixture.cs) for integration tests, use these helper methods to assert on activity behavior:
+When using [`WorkflowTestFixture`](../../src/common/Flamme.Testing.Shared.Integration/WorkflowTestFixture.cs) for integration tests, use these helper methods to assert on activity behavior:
 
 ### Asserting Activity Outputs
 
@@ -577,7 +577,7 @@ public async Task Dynamic_Variable_Accessors_Should_Work()
 
 ## Failure testing (faults & incidents)
 - **Integration test faulted activities**: Use `_fixture.GetActivityStatus(result, activity)` to assert that a specific activity faulted, rather than checking workflow-level status.
-- **Integration test faulted workflows**: build a workflow that throws and run via [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) — assert [`WorkflowInstance.Status`](../../src/modules/Elsa.Workflows.Management/Entities/WorkflowInstance.cs) == [`Faulted`](../../src/modules/Elsa.Workflows.Core/Enums/WorkflowStatus.cs) on the returned state or via [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs).
+- **Integration test faulted workflows**: build a workflow that throws and run via [`RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) — assert [`WorkflowInstance.Status`](../../src/modules/Flamme.Workflows.Management/Entities/WorkflowInstance.cs) == [`Faulted`](../../src/modules/Flamme.Workflows.Core/Enums/WorkflowStatus.cs) on the returned state or via [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs).
 - **Component tests for recovery/resume**: persist a faulted instance (or cause a host restart scenario), run your recovery logic, and assert the final state.
 
 ---
@@ -600,7 +600,7 @@ public async Task MyActivity_Test()
 }
 ```
 
-### Integration test — pattern using [`WorkflowTestFixture`](../../src/common/Elsa.Testing.Shared.Integration/WorkflowTestFixture.cs)
+### Integration test — pattern using [`WorkflowTestFixture`](../../src/common/Flamme.Testing.Shared.Integration/WorkflowTestFixture.cs)
 
 **Recommended approach** for activity integration tests:
 ```csharp
@@ -625,7 +625,7 @@ public class MyActivityTests : IAsyncDisposable
 }
 ```
 
-### Integration test — pattern using [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs)
+### Integration test — pattern using [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs)
 
 **Alternative approach** with manual setup (use when you need more control):
 ```csharp
@@ -663,7 +663,7 @@ public async Task Workflow_Persists_Instance_And_Journal()
 
 ### Component test with async workflow execution
 
-For testing workflows that complete asynchronously (e.g., with timers, external triggers), use [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs):
+For testing workflows that complete asynchronously (e.g., with timers, external triggers), use [`AsyncWorkflowRunner`](../../src/common/Flamme.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs):
 
 ```csharp
 [Test]
@@ -689,21 +689,21 @@ public async Task Workflow_Completes_Asynchronously()
 
 **Q: How do I import workflow definitions in tests and where do I put them?**
 
-A: For JSON-defined workflows use the repo's test integration helpers ([`PopulateRegistriesAsync()`](../../src/common/Elsa.Testing.Shared.Integration/ServiceProviderExtensions.cs) or the test registration helpers in `test/common`). 
+A: For JSON-defined workflows use the repo's test integration helpers ([`PopulateRegistriesAsync()`](../../src/common/Flamme.Testing.Shared.Integration/ServiceProviderExtensions.cs) or the test registration helpers in `test/common`). 
 See integration test examples in the test tree. 
 Leave the definitions next to the tests that use them.
 
 **Q: Which helper should I use to run a workflow?**
 
-A: Prefer [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) for in-process deterministic runs. For activities use [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs).
+A: Prefer [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) for in-process deterministic runs. For activities use [`ActivityTestFixture`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs).
 
 **Q: How do I check persisted journal entries?**
 
-A: Query [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) and inspect the persisted journal on the instance. Use deterministic instance id or correlation id to locate the exact instance.
+A: Query [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) and inspect the persisted journal on the instance. Use deterministic instance id or correlation id to locate the exact instance.
 
 **Q: Do I need a new helper to wait for workflow completion?**
 
-A: No. The repo provides [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) for integration tests and [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) for activity unit tests, as well as integration helpers that cover all necessary scenarios. For async workflows in component tests, use [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs).
+A: No. The repo provides [`RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) for integration tests and [`ActivityTestFixture`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs) for activity unit tests, as well as integration helpers that cover all necessary scenarios. For async workflows in component tests, use [`AsyncWorkflowRunner`](../../src/common/Flamme.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs).
 
 ---
 
@@ -711,6 +711,6 @@ A: No. The repo provides [`RunAsync`](../../src/modules/Elsa.Workflows.Core/Cont
 
 Search the `test/` tree for examples that follow the above patterns:
 
-- **Unit test activity examples:** `test/unit/Elsa.Activities.UnitTests` (look for [`ActivityTestFixture`](../../src/common/Elsa.Testing.Shared/ActivityTestFixture.cs) usage)
-- **Integration workflow examples:** `test/integration/Elsa.*.IntegrationTests` (look for [`PopulateRegistriesAsync()`](../../src/common/Elsa.Testing.Shared.Integration/ServiceProviderExtensions.cs) and [`IWorkflowRunner.RunAsync`](../../src/modules/Elsa.Workflows.Core/Contracts/IWorkflowRunner.cs) usage)
-- **Component scenarios exercising persistence:** `test/component/Elsa.Workflows.ComponentTests` (look for [`AsyncWorkflowRunner`](../../src/common/Elsa.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs) and [`IWorkflowInstanceStore`](../../src/modules/Elsa.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) assertions)
+- **Unit test activity examples:** `test/unit/Flamme.Activities.UnitTests` (look for [`ActivityTestFixture`](../../src/common/Flamme.Testing.Shared/ActivityTestFixture.cs) usage)
+- **Integration workflow examples:** `test/integration/Flamme.*.IntegrationTests` (look for [`PopulateRegistriesAsync()`](../../src/common/Flamme.Testing.Shared.Integration/ServiceProviderExtensions.cs) and [`IWorkflowRunner.RunAsync`](../../src/modules/Flamme.Workflows.Core/Contracts/IWorkflowRunner.cs) usage)
+- **Component scenarios exercising persistence:** `test/component/Flamme.Workflows.ComponentTests` (look for [`AsyncWorkflowRunner`](../../src/common/Flamme.Testing.Shared.Component/Services/AsyncWorkflowRunner.cs) and [`IWorkflowInstanceStore`](../../src/modules/Flamme.Workflows.Management/Contracts/IWorkflowInstanceStore.cs) assertions)

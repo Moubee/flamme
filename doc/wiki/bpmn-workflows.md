@@ -3,7 +3,7 @@
 BPMN execution and XML interchange have been removed. The `Elsa.Bpmn` and
 `Elsa.Bpmn.Interchange` packages, `UseBpmn`/`UseBpmnInterchange` registrations,
 `BpmnProcess` activity, and all `bpmn/*` API routes are no longer available.
-The reference server accepts native Elsa workflow definitions through the
+The reference server accepts native Flamme workflow definitions through the
 [workflow management APIs](workflow-management.md).
 
 ## Upgrade existing workflows
@@ -14,7 +14,7 @@ server while its BPMN routes are still available. A native JSON export of an old
 BPMN-backed definition still contains removed activity types and does not convert
 it into a supported workflow.
 
-Reimplement required behavior with native Elsa activities, flowcharts, bookmarks,
+Reimplement required behavior with native Flamme activities, flowcharts, bookmarks,
 and triggers, then validate it before publishing the replacement definition.
 There is no automatic BPMN-to-native conversion or migration of suspended BPMN
 interpreter state. Let existing BPMN instances finish on the old version, or plan

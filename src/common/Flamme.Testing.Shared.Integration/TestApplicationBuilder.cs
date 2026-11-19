@@ -36,7 +36,7 @@ public class TestApplicationBuilder
                 .SetMinimumLevel(LogLevel.Debug)
                 .AddCorrelatedTUnit(LogLevel.Debug));
 
-        _configureFlamme += elsa => elsa
+        _configureFlamme += flamme => flamme
             .AddActivitiesFrom<WriteLine>()
             .UseScheduling()
             .UseCSharp(options => options.AllowHostCodeExecution = true)
@@ -90,7 +90,7 @@ public class TestApplicationBuilder
         var combinedTextWriter = TextWriter.Synchronized(new CombinedTextWriter(capturingTextWriter, _testOutput));
         var provider = new StandardOutStreamProvider(combinedTextWriter);
 
-        ConfigureFlamme(elsa => elsa.UseWorkflows(workflows => workflows.WithStandardOutStreamProvider(_ => provider)));
+        ConfigureFlamme(flamme => flamme.UseWorkflows(workflows => workflows.WithStandardOutStreamProvider(_ => provider)));
         return this;
     }
 
@@ -99,7 +99,7 @@ public class TestApplicationBuilder
     /// </summary>
     public TestApplicationBuilder AddWorkflow<T>() where T : IWorkflow
     {
-        return ConfigureFlamme(elsa => elsa.AddWorkflow<T>());
+        return ConfigureFlamme(flamme => flamme.AddWorkflow<T>());
     }
     
     /// <summary>
@@ -107,7 +107,7 @@ public class TestApplicationBuilder
     /// </summary>
     public TestApplicationBuilder AddActivitiesFrom<T>()
     {
-        return ConfigureFlamme(elsa => elsa.AddActivitiesFrom<T>());
+        return ConfigureFlamme(flamme => flamme.AddActivitiesFrom<T>());
     }
     
     /// <summary>
@@ -119,7 +119,7 @@ public class TestApplicationBuilder
         var assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
         var assemblyDirectory = Path.GetDirectoryName(assemblyLocation)!;
         var workflowsDirectory = directory.Prepend(assemblyDirectory).ToArray();
-        _configureFlamme += elsa => elsa.UseFluentStorageProvider(storage => storage.BlobStorage = sp => StorageFactory.Blobs.DirectoryFiles(Path.Combine(workflowsDirectory)));
+        _configureFlamme += flamme => flamme.UseFluentStorageProvider(storage => storage.BlobStorage = sp => StorageFactory.Blobs.DirectoryFiles(Path.Combine(workflowsDirectory)));
         return this;
     }
 }

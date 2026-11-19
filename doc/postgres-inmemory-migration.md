@@ -16,20 +16,20 @@ Replace project/package references with the matching `*.Persistence.EFCore.Postg
 
 Core features provide process-local in-memory stores for development and tests. Omitting database persistence registration selects those stores. Data in those stores is lost when the process stops and is not shared between nodes.
 
-For durable workflow management and runtime persistence, reference `Elsa.Persistence.EFCore.PostgreSql` and supply a PostgreSQL connection string:
+For durable workflow management and runtime persistence, reference `Flamme.Persistence.EFCore.PostgreSql` and supply a PostgreSQL connection string:
 
 ```csharp
-using Elsa.Persistence.EFCore.Extensions;
-using Elsa.Extensions;
+using Flamme.Persistence.EFCore.Extensions;
+using Flamme.Extensions;
 
 var connectionString = configuration.GetConnectionString("PostgreSql")
     ?? throw new InvalidOperationException("Configure ConnectionStrings:PostgreSql.");
 
-services.AddElsa(elsa =>
+services.AddFlamme(flamme =>
 {
-    elsa.UseWorkflowManagement(management =>
+    flamme.UseWorkflowManagement(management =>
         management.UseEntityFrameworkCore(ef => ef.UsePostgreSql(connectionString)));
-    elsa.UseWorkflowRuntime(runtime =>
+    flamme.UseWorkflowRuntime(runtime =>
         runtime.UseEntityFrameworkCore(ef => ef.UsePostgreSql(connectionString)));
 });
 ```

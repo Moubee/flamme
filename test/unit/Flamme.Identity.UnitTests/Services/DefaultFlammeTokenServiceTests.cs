@@ -18,7 +18,7 @@ namespace Flamme.Identity.UnitTests.Services;
 public class DefaultFlammeTokenServiceTests
 {
     [Test]
-    [DisplayName("Token issuance context is projected into an Flamme access token")]
+    [DisplayName("Token issuance context is projected into a Flamme access token")]
     public async Task IssueAccessTokenProjectsContext()
     {
         var clock = new FakeTimeProvider(new DateTimeOffset(2026, 7, 24, 12, 0, 0, TimeSpan.Zero));

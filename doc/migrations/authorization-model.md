@@ -1,6 +1,6 @@
 # Migrate to the Structured Authorization Model
 
-Elsa's permission vocabulary changes shape. A permission is now `{resource}:{verb}` — a hierarchical resource path paired with a verb — replacing the flat `verb:resource` strings.
+Flamme's permission vocabulary changes shape. A permission is now `{resource}:{verb}` — a hierarchical resource path paired with a verb — replacing the flat `verb:resource` strings.
 
 **This is a breaking change for any deployment with hand-authored roles.** Legacy permission strings stop authorizing. Nothing silently degrades: a startup validator reports every stored permission that no longer resolves, identified by the role that holds it.
 
@@ -49,7 +49,7 @@ switch off; the switch is per language, so C# and Python can be decided separate
 
 The default access-token lifetime drops from 1 hour to **15 minutes**. This is the revocation bound: permission claims are issued at sign-in, and refreshing re-reads the user's roles, so removing a role takes effect at most one access-token lifetime later. Refresh already rotates both tokens, so no client change is required.
 
-Elsa role and permission changes take effect on the next token refresh or expiry. Changes to grants from an external identity provider take effect only after a fresh sign-in. Stamp-based revalidation (`Identity:PermissionStamp:IsEnabled` and a ~30 second `CacheLifetime`) is planned for 3.10; it is not available in 3.9.
+Flamme role and permission changes take effect on the next token refresh or expiry. Changes to grants from an external identity provider take effect only after a fresh sign-in. Stamp-based revalidation (`Identity:PermissionStamp:IsEnabled` and a ~30 second `CacheLifetime`) is planned for 3.10; it is not available in 3.9.
 
 ## Signing out revokes the session
 
@@ -57,7 +57,7 @@ Elsa role and permission changes take effect on the next token refresh or expiry
 
 Revocations need storage. With EF Core persistence, apply the `RevokedSessions` migration for your provider; it adds the `RevokedSessions` table (indexed on `ExpiresAt`) and changes nothing else. Without persistence, revocations are held in memory, which is only sound for a single node.
 
-**Apply the migration before upgraded hosts refresh tokens.** Every refresh consults the `RevokedSessions` table, so an upgraded host running against a database without it fails to refresh tokens. Elsa's automatic migration covers it: the Identity persistence features run their migrations at startup unless you turned that off (`RunMigrations = false`), in which case apply the `RevokedSessions` migration yourself before rolling out the new version.
+**Apply the migration before upgraded hosts refresh tokens.** Every refresh consults the `RevokedSessions` table, so an upgraded host running against a database without it fails to refresh tokens. Flamme's automatic migration covers it: the Identity persistence features run their migrations at startup unless you turned that off (`RunMigrations = false`), in which case apply the `RevokedSessions` migration yourself before rolling out the new version.
 
 **Changing `RefreshTokenLifetime`.** Raising it is safe. A revocation outlives every refresh token issued with a lifetime no longer than the current one, and every refresh token that the one presented at sign-out was refreshed from, whatever lifetime they were issued with. Lowering it leaves one gap, for at most the old lifetime: a refresh token issued with the old, longer lifetime that the presented one was not refreshed from, such as one obtained by refreshing a copy of an earlier token of the session, can outlive the revocation and work again once it is pruned. See [Signing Out](../wiki/identity-tenancy-security.md#signing-out).
 
@@ -65,7 +65,7 @@ Revocations need storage. With EF Core persistence, apply the `RevokedSessions` 
 
 `IAccessTokenIssuer` has a new member, `IssueTokensAsync(User user, SignInSession? session, CancellationToken cancellationToken = default)`, without a default implementation, so a custom issuer no longer compiles until it implements it. `/identity/refresh-token` and `IIdentityRefreshTokenService` call it with the session of the refresh token they exchange; `null` starts a new session, as signing in does.
 
-The refresh token it issues must continue that session. Pass it to `IElsaTokenService.IssueRefreshTokenAsync` as `TokenIssuanceContext.Session`, which is what `DefaultAccessTokenIssuer` does. An issuer that creates refresh tokens itself puts `session.Id` in the `elsa:session_id` claim, and the later of `session.ExpiresAt` and the token's own expiry in the `elsa:session_exp` claim, in seconds since the Unix epoch like `exp`. An issuer that drops the session starts a new one on every refresh, and signing out then leaves valid, until they expire, the refresh tokens held before the latest refresh; a default implementation would have done exactly that without any sign, which is why there is none.
+The refresh token it issues must continue that session. Pass it to `IFlammeTokenService.IssueRefreshTokenAsync` as `TokenIssuanceContext.Session`, which is what `DefaultAccessTokenIssuer` does. An issuer that creates refresh tokens itself puts `session.Id` in the `elsa:session_id` claim, and the later of `session.ExpiresAt` and the token's own expiry in the `elsa:session_exp` claim, in seconds since the Unix epoch like `exp`. An issuer that drops the session starts a new one on every refresh, and signing out then leaves valid, until they expire, the refresh tokens held before the latest refresh; a default implementation would have done exactly that without any sign, which is why there is none.
 
 ### Breaking change: `DefaultIdentityRefreshTokenService` constructor
 
@@ -91,7 +91,7 @@ by exact string, so they read the way a role does.
   `workflows/definitions:delete`, but an allow list naming only `workflows/definitions:delete` refuses a
   `workflows/*:delete` grant rather than admitting the part that overlaps.
 
-The boundary now also applies to permissions the user's **own Elsa roles** carry, not only to those an external
+The boundary now also applies to permissions the user's **own Flamme roles** carry, not only to those an external
 claim mapping confers. Previously token issuance concatenated role permissions raw, so a permission the boundary
 excluded during sign-in reappeared in the issued token from the same roles — which made the deny list
 unenforceable for anything a role happened to carry. If you configured a boundary expecting it to bound the whole

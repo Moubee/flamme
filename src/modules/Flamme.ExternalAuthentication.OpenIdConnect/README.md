@@ -1,16 +1,16 @@
-# Elsa External Authentication: OpenID Connect
+# Flamme External Authentication: OpenID Connect
 
-This package installs the `openid-connect` adapter for `Elsa.ExternalAuthentication`.
+This package installs the `openid-connect` adapter for `Flamme.ExternalAuthentication`.
 
 Enable the adapter through code-first feature registration:
 
 ```csharp
-services.AddElsa(elsa => elsa.UseOpenIdConnectExternalAuthentication());
+services.AddFlamme(flamme => flamme.UseOpenIdConnectExternalAuthentication());
 ```
 
 This feature depends on the External Authentication foundation. Shell-based feature registration has been removed; add the module to the host at build time.
 
-The direct service registration remains available for hosts that compose services without Elsa features:
+The direct service registration remains available for hosts that compose services without Flamme features:
 
 ```csharp
 services.AddOpenIdConnectExternalAuthentication();
@@ -33,7 +33,7 @@ The adapter uses the authorization-code flow, validates issuer, signature, audie
 
 Manual trust additionally requires `issuer`, `authorizationEndpoint`, and `tokenEndpoint`, plus either `jwksUri` or pinned `signingKeys`.
 
-For a callback with the default Elsa API prefix:
+For a callback with the default Flamme API prefix:
 
 ```text
 https://elsa.example/elsa/api/external-authentication/callback/{connection-key}

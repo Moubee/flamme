@@ -21,7 +21,7 @@ public class InterruptedRecoveryIntegrationTests : IAsyncDisposable
     public InterruptedRecoveryIntegrationTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(flamme => flamme.UseWorkflowRuntime())
             .Build();
     }
 

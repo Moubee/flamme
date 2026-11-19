@@ -9,9 +9,9 @@ Converters are synchronous, deterministic, and side-effect free. Their context c
 ```csharp
 using System.Globalization;
 using System.Text.Json;
-using Elsa.Extensions;
-using Elsa.Workflows;
-using Elsa.Workflows.Models;
+using Flamme.Extensions;
+using Flamme.Workflows;
+using Flamme.Workflows.Models;
 
 public sealed class NumberToTextConverter : IOutputConverter
 {
@@ -40,7 +40,7 @@ services.AddOutputConverter<NumberToTextConverter>(
 
 The converter ID is a persisted public contract. Keep lookup case-sensitive, do not reuse an ID for breaking behavior or settings changes, and register a new versioned ID instead.
 
-The default service lifetime is scoped. Elsa resolves the implementation from the active workflow execution scope; the registry caches descriptors and registrations, not converter instances.
+The default service lifetime is scoped. Flamme resolves the implementation from the active workflow execution scope; the registry caches descriptors and registrations, not converter instances.
 
 ## Configure A Binding
 
@@ -76,7 +76,7 @@ Bindings without a converter omit `converter` and retain the existing assignment
 
 ## Validation And Failure Behavior
 
-At definition validation and again at runtime, Elsa checks:
+At definition validation and again at runtime, Flamme checks:
 
 - the binding has a resolvable variable or workflow-output destination;
 - the converter ID is registered;
@@ -84,9 +84,9 @@ At definition validation and again at runtime, Elsa checks:
 - the converter result type is assignable to the destination;
 - JSON Schema and converter-owned settings validation pass.
 
-Null native values bypass converter invocation and are delivered only to destinations that permit null. Conversion and result validation finish before Elsa writes the destination, so a failure leaves it unchanged.
+Null native values bypass converter invocation and are delivered only to destinations that permit null. Conversion and result validation finish before Flamme writes the destination, so a failure leaves it unchanged.
 
-Runtime failures fault through Elsa's normal activity fault pipeline as `OutputConversionException`. Persisted exception state includes safe structured identities and the failure stage; it excludes native values, raw settings, and converter exception details.
+Runtime failures fault through Flamme's normal activity fault pipeline as `OutputConversionException`. Persisted exception state includes safe structured identities and the failure stage; it excludes native values, raw settings, and converter exception details.
 
 ## Discovery API And Studio
 

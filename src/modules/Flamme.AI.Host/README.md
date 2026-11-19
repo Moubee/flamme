@@ -1,6 +1,6 @@
-# Elsa AI Host
+# Flamme AI Host
 
-Elsa AI Host owns Weaver's provider-neutral server surface: chat orchestration, context resolution, tool registration, proposal governance, audit, and Studio-facing capabilities. Provider SDK types stay outside this module.
+Flamme AI Host owns Weaver's provider-neutral server surface: chat orchestration, context resolution, tool registration, proposal governance, audit, and Studio-facing capabilities. Provider SDK types stay outside this module.
 
 ## Grounding Tools
 
@@ -33,7 +33,7 @@ Runtime inspection tools:
 - `incidents.search`
 - `incidents.get`
 
-The tools read from Elsa server-side sources such as `IActivityRegistry`, `IWorkflowDefinitionStore`, and `IWorkflowInstanceStore`. If a source is not registered, the tool returns an unavailable result and `/ai/capabilities` reports the disabled reason for Studio.
+The tools read from Flamme server-side sources such as `IActivityRegistry`, `IWorkflowDefinitionStore`, and `IWorkflowInstanceStore`. If a source is not registered, the tool returns an unavailable result and `/ai/capabilities` reports the disabled reason for Studio.
 
 All tool results are bounded by `AIHostOptions.Grounding`, redacted before returning to the model or Studio, and audited by the existing AI Host tool invocation path.
 

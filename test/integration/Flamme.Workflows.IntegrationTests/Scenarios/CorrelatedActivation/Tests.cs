@@ -483,7 +483,7 @@ public class Tests
     private ServiceProvider CreatePostgreSqlServices(string connectionString, IDistributedLockProvider lockProvider)
     {
         var builder = new TestApplicationBuilder(_testOutputHelper)
-            .ConfigureFlamme(elsa => elsa
+            .ConfigureFlamme(flamme => flamme
                 .UseWorkflowManagement(management => management.UseWorkflowInstances(instances =>
                     instances.UseEntityFrameworkCore(persistence => persistence.UsePostgreSql(connectionString))))
                 .UseWorkflowRuntime(runtime => runtime.DistributedLockProvider = _ => lockProvider));

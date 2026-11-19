@@ -1,12 +1,12 @@
-# Elsa External Authentication: Elsa Secrets
+# Flamme External Authentication: Flamme Secrets
 
-This optional package connects External Authentication Secret Bindings to Elsa Secrets.
+This optional package connects External Authentication Secret Bindings to Flamme Secrets.
 
 ```csharp
-services.AddElsaSecretsExternalAuthentication();
+services.AddFlammeSecretsExternalAuthentication();
 ```
 
-Use resolver type `elsa-secrets` and set `reference` to the Elsa Secret name:
+Use resolver type `elsa-secrets` and set `reference` to the Flamme Secret name:
 
 ```json
 {

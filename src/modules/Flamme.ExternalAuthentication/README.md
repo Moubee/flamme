@@ -1,15 +1,15 @@
-# Elsa External Authentication
+# Flamme External Authentication
 
-`Elsa.ExternalAuthentication` is the protocol-neutral broker for Elsa-owned external sign-in. It composes deployment-installed provider adapters, connection sources, unlinked-identity policies, permission grant sources, secret resolvers, atomic flow stores, and Elsa token issuance.
+`Flamme.ExternalAuthentication` is the protocol-neutral broker for Flamme-owned external sign-in. It composes deployment-installed provider adapters, connection sources, unlinked-identity policies, permission grant sources, secret resolvers, atomic flow stores, and Flamme token issuance.
 
-OpenID Connect support and the Elsa Secrets bridge are separate optional packages. The broker does not retain provider tokens and does not treat external claims as Elsa permissions unless an explicitly configured grant source maps or bounds them.
+OpenID Connect support and the Flamme Secrets bridge are separate optional packages. The broker does not retain provider tokens and does not treat external claims as Flamme permissions unless an explicitly configured grant source maps or bounds them.
 
 ## Registration
 
 ```csharp
-services.AddElsa(elsa =>
+services.AddFlamme(flamme =>
 {
-    elsa.UseExternalAuthentication(feature =>
+    flamme.UseExternalAuthentication(feature =>
     {
         feature.ConfigureOptions = options =>
             configuration.GetSection("ExternalAuthentication").BindExternalAuthenticationOptions(options);
@@ -99,10 +99,10 @@ Secrets__ExternalAuthentication__StudioServerClientSecret=<deployment-secret>
 
 Any standard `IConfiguration` provider can supply the referenced value, including environment variables, Kubernetes-mounted configuration, and cloud secret providers. The reference is a path in the host configuration; the example above resolves `Secrets:ExternalAuthentication:StudioServerClientSecret` from the root `IConfiguration`. Move values from former shell feature blocks into deployment-owned host configuration and update each binding reference to its new path.
 
-Configuration bindings use `ownership: external`: their values and lifecycle remain deployment-owned and read-only in Studio. The optional Elsa Secrets bridge instead uses `ownership: managed` with resolver type `elsa-secrets`; it resolves active Elsa Secrets by name and allows authorized administrators to manage their lifecycle through Elsa. Public responses expose only configured/resolvable state for either binding type and never return secret values.
+Configuration bindings use `ownership: external`: their values and lifecycle remain deployment-owned and read-only in Studio. The optional Flamme Secrets bridge instead uses `ownership: managed` with resolver type `elsa-secrets`; it resolves active Flamme Secrets by name and allows authorized administrators to manage their lifecycle through Flamme. Public responses expose only configured/resolvable state for either binding type and never return secret values.
 
 ## Operations
 
-Management, descriptor, link, preview, test, and session APIs are served below `/external-authentication`. On-demand tests store only the latest redacted observation and become stale after a material connection revision. Preview state and results are short-lived, administrator-bound, and one-time; preview never creates a user, link, Elsa credential, or normal session.
+Management, descriptor, link, preview, test, and session APIs are served below `/external-authentication`. On-demand tests store only the latest redacted observation and become stale after a material connection revision. Preview state and results are short-lived, administrator-bound, and one-time; preview never creates a user, link, Flamme credential, or normal session.
 
-See [the OpenID Connect adapter](../Elsa.ExternalAuthentication.OpenIdConnect/README.md) for provider configuration and [the Studio migration guide](../../../doc/migrations/external-authentication.md) for rollout guidance.
+See [the OpenID Connect adapter](../Flamme.ExternalAuthentication.OpenIdConnect/README.md) for provider configuration and [the Studio migration guide](../../../doc/migrations/external-authentication.md) for rollout guidance.

@@ -2,7 +2,7 @@
 
 Flamme focuses on process orchestration for high-load, distributed production systems. Read the [project direction](doc/project-direction.md) and [roadmap](ROADMAP.md) when proposing work.
 
-Contributions to runtime correctness, measured performance, PostgreSQL persistence, Kubernetes operations, tests, and documentation are welcome. UI and visual-designer work are secondary. Existing `Elsa.*` identifiers remain in the source; see the [README](README.md) for the project's origin and current scope.
+Contributions to runtime correctness, measured performance, PostgreSQL persistence, Kubernetes operations, tests, and documentation are welcome. UI and visual-designer work are secondary. Existing `Flamme.*` identifiers remain in the source; see the [README](README.md) for the project's origin and current scope.
 
 ## Development workflow
 
@@ -33,7 +33,7 @@ the previous async compilation model. Rebuild affected projects when switching
 models; `--no-build` reuses whichever assemblies were built previously. For example:
 
 ```bash
-dotnet test --project test/unit/Elsa.Mediator.UnitTests/Elsa.Mediator.UnitTests.csproj --configuration Release --framework net11.0 --no-restore -p:UseRuntimeAsync=false
+dotnet test --project test/unit/Flamme.Mediator.UnitTests/Flamme.Mediator.UnitTests.csproj --configuration Release --framework net11.0 --no-restore -p:UseRuntimeAsync=false
 ```
 
 The default opt-in excludes Mono, browser/WASI runtime identifiers, and
@@ -43,9 +43,9 @@ supported CoreCLR consumers; consumers on unsupported runtimes should use the
 remain supported compilation modes.
 
 ```bash
-dotnet restore Elsa.slnx
-dotnet build Elsa.slnx --configuration Release --no-restore
-dotnet test --solution Elsa.slnx --configuration Release --no-build
+dotnet restore Flamme.slnx
+dotnet build Flamme.slnx --configuration Release --no-restore
+dotnet test --solution Flamme.slnx --configuration Release --no-build
 ```
 
 While iterating, use `dotnet test --project <test.csproj>` to select a test
@@ -53,14 +53,14 @@ project. Add `--framework net10.0` or `--framework net11.0` to run one target.
 Create versioned packages with:
 
 ```bash
-dotnet pack Elsa.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
+dotnet pack Flamme.slnx --configuration Release --output packages -p:Version=3.9.0-preview.1
 ```
 
 Packing restores and builds implicitly. Reuse existing outputs with `--no-build`
 only after building the same configuration and version. Packages are written to
 `packages/`; build and intermediate outputs remain in each project's `bin/` and
 `obj/` directories. Builds default to Debug and CI commands explicitly select
-Release; `--configuration` overrides the default. Use `dotnet clean Elsa.slnx` to
+Release; `--configuration` overrides the default. Use `dotnet clean Flamme.slnx` to
 clean outputs for the selected configuration.
 
 See [Build, Run, And Operate](doc/wiki/build-run-operate.md) for targeted commands,
@@ -73,8 +73,8 @@ logs, traces, metrics, and health in the dashboard. Run `aspire run --isolated` 
 repository root for an interactive session. For agents or Git worktrees, use:
 
 ```bash
-aspire start --non-interactive --isolated --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
-aspire wait server --non-interactive --apphost src/apps/Elsa.AppHost/Elsa.AppHost.csproj
+aspire start --non-interactive --isolated --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
+aspire wait server --non-interactive --apphost src/apps/Flamme.AppHost/Flamme.AppHost.csproj
 ```
 
 The [Aspire development guide](doc/aspire-development.md) covers prerequisites,
@@ -113,8 +113,8 @@ results in the PR. Keep fixes on the update PR where possible. Renovate
 documents how [maintainer edits affect rebases](https://docs.renovatebot.com/updating-rebasing/).
 
 - For NuGet or SDK changes, check the complete lockfile diff and run
-  `dotnet restore Elsa.slnx --locked-mode`. If locks need regeneration, run
-  `dotnet restore Elsa.slnx --force-evaluate` for all targets first. Both .NET
+  `dotnet restore Flamme.slnx --locked-mode`. If locks need regeneration, run
+  `dotnet restore Flamme.slnx --force-evaluate` for all targets first. Both .NET
   lanes in the PR workflow must pass.
 - For npm changes, run `npm ci` and the package's build script in the affected
   directory. Review and commit any changes to bundled assets shipped from Git.

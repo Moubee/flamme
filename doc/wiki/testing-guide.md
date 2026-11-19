@@ -1,6 +1,6 @@
 # Testing Guide
 
-Elsa uses TUnit on Microsoft Testing Platform (MTP) for unit, integration, and component tests. Performance benchmarks under `test/performance` use BenchmarkDotNet instead. The best test choice depends on what boundary you are changing.
+Flamme uses TUnit on Microsoft Testing Platform (MTP) for unit, integration, and component tests. Performance benchmarks under `test/performance` use BenchmarkDotNet instead. The best test choice depends on what boundary you are changing.
 
 The detailed internal testing strategy is [doc/qa/test-guidelines.md](../qa/test-guidelines.md). This page is a wiki-sized map.
 
@@ -15,9 +15,9 @@ The detailed internal testing strategy is [doc/qa/test-guidelines.md](../qa/test
 
 Shared helpers:
 
-- [Elsa.Testing.Shared](../../src/common/Elsa.Testing.Shared)
-- [Elsa.Testing.Shared.Integration](../../src/common/Elsa.Testing.Shared.Integration)
-- [Elsa.Testing.Shared.Component](../../src/common/Elsa.Testing.Shared.Component)
+- [Flamme.Testing.Shared](../../src/common/Flamme.Testing.Shared)
+- [Flamme.Testing.Shared.Integration](../../src/common/Flamme.Testing.Shared.Integration)
+- [Flamme.Testing.Shared.Component](../../src/common/Flamme.Testing.Shared.Component)
 
 ## Choosing A Test Type
 
@@ -30,55 +30,55 @@ Shared helpers:
 | API endpoint shape or authorization | Unit/integration endpoint test if existing pattern exists; component test for host-level behavior. |
 | EF Core store or migration | Provider-specific integration/component test. |
 | HTTP workflows | Component test under HTTP workflow scenarios. |
-| Workflow trace/metric instrumentation | `Elsa.Workflows.Core.UnitTests` instrumentation tests. |
+| Workflow trace/metric instrumentation | `Flamme.Workflows.Core.UnitTests` instrumentation tests. |
 | Test-run logs and telemetry | TUnit native logging and ASP.NET Core integration. |
-| Dashboard API endpoints or aggregation logic | `Elsa.Dashboard.Api.UnitTests`. |
-| AI/Weaver abstractions or host behavior | `Elsa.AI.Abstractions.UnitTests`, `Elsa.AI.Host.UnitTests`, or `Elsa.AI.IntegrationTests`. |
+| Dashboard API endpoints or aggregation logic | `Flamme.Dashboard.Api.UnitTests`. |
+| AI/Weaver abstractions or host behavior | `Flamme.AI.Abstractions.UnitTests`, `Flamme.AI.Host.UnitTests`, or `Flamme.AI.IntegrationTests`. |
 
 ## Useful Commands
 
 Use the SDK selected by [global.json](../../global.json) and install the .NET 10 SDK/runtime for test applications. Restore first when starting from a clean checkout or after dependency changes:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
+dotnet restore Flamme.slnx --ignore-failed-sources
 ```
 
 Build the solution with direct `dotnet` commands:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
-dotnet build Elsa.slnx --no-restore
+dotnet restore Flamme.slnx --ignore-failed-sources
+dotnet build Flamme.slnx --no-restore
 ```
 
 Run all tests with direct `dotnet` commands:
 
 ```bash
-dotnet restore Elsa.slnx --ignore-failed-sources
-dotnet test --solution Elsa.slnx --no-restore
+dotnet restore Flamme.slnx --ignore-failed-sources
+dotnet test --solution Flamme.slnx --no-restore
 ```
 
 Run targeted projects:
 
 ```bash
-dotnet restore test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj --ignore-failed-sources
-dotnet test --project test/unit/Elsa.Workflows.Core.UnitTests/Elsa.Workflows.Core.UnitTests.csproj --no-restore
+dotnet restore test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj --ignore-failed-sources
+dotnet test --project test/unit/Flamme.Workflows.Core.UnitTests/Flamme.Workflows.Core.UnitTests.csproj --no-restore
 
-dotnet restore test/integration/Elsa.Workflows.IntegrationTests/Elsa.Workflows.IntegrationTests.csproj --ignore-failed-sources
-dotnet test --project test/integration/Elsa.Workflows.IntegrationTests/Elsa.Workflows.IntegrationTests.csproj --no-restore
+dotnet restore test/integration/Flamme.Workflows.IntegrationTests/Flamme.Workflows.IntegrationTests.csproj --ignore-failed-sources
+dotnet test --project test/integration/Flamme.Workflows.IntegrationTests/Flamme.Workflows.IntegrationTests.csproj --no-restore
 
-dotnet restore test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj --ignore-failed-sources
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj --no-restore
+dotnet restore test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj --ignore-failed-sources
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj --no-restore
 
 ```
 
 ## Activity Tests
 
-Use `ActivityTestFixture` from [Elsa.Testing.Shared](../../src/common/Elsa.Testing.Shared). Activity tests should assert activity outputs, variables, scheduled child activities, outcomes, and fault behavior without needing a host.
+Use `ActivityTestFixture` from [Flamme.Testing.Shared](../../src/common/Flamme.Testing.Shared). Activity tests should assert activity outputs, variables, scheduled child activities, outcomes, and fault behavior without needing a host.
 
 Examples live in:
 
-- [test/unit/Elsa.Activities.UnitTests](../../test/unit/Elsa.Activities.UnitTests)
-- [test/unit/Elsa.Workflows.Core.UnitTests](../../test/unit/Elsa.Workflows.Core.UnitTests)
+- [test/unit/Flamme.Activities.UnitTests](../../test/unit/Flamme.Activities.UnitTests)
+- [test/unit/Flamme.Workflows.Core.UnitTests](../../test/unit/Flamme.Workflows.Core.UnitTests)
 
 ## Workflow Integration Tests
 
@@ -86,26 +86,26 @@ Use integration helpers when activity behavior depends on workflow runner behavi
 
 Examples:
 
-- [test/integration/Elsa.Workflows.IntegrationTests](../../test/integration/Elsa.Workflows.IntegrationTests)
-- [test/integration/Elsa.Activities.IntegrationTests](../../test/integration/Elsa.Activities.IntegrationTests)
-- [test/integration/Elsa.JavaScript.IntegrationTests](../../test/integration/Elsa.JavaScript.IntegrationTests)
+- [test/integration/Flamme.Workflows.IntegrationTests](../../test/integration/Flamme.Workflows.IntegrationTests)
+- [test/integration/Flamme.Activities.IntegrationTests](../../test/integration/Flamme.Activities.IntegrationTests)
+- [test/integration/Flamme.JavaScript.IntegrationTests](../../test/integration/Flamme.JavaScript.IntegrationTests)
 
 ## Component Tests
 
-Component tests use host fixtures. The base class is [AppComponentTest](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Abstractions/AppComponentTest.cs). It creates a scope, pushes the default tenant context, tracks in-flight workflows, and waits for them to idle on dispose.
+Component tests use host fixtures. The base class is [AppComponentTest](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Abstractions/AppComponentTest.cs). It creates a scope, pushes the default tenant context, tracks in-flight workflows, and waits for them to idle on dispose.
 
 Fixture landmarks:
 
-- [App](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Fixtures/App.cs)
-- [Cluster](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Fixtures/Cluster.cs)
-- [WorkflowServer](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Fixtures/WorkflowServer.cs)
-- [Infrastructure](../../test/component/Elsa.Workflows.ComponentTests/Helpers/Fixtures/Infrastructure.cs)
+- [App](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Fixtures/App.cs)
+- [Cluster](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Fixtures/Cluster.cs)
+- [WorkflowServer](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Fixtures/WorkflowServer.cs)
+- [Infrastructure](../../test/component/Flamme.Workflows.ComponentTests/Helpers/Fixtures/Infrastructure.cs)
 
 Use component tests when host lifecycle, HTTP server behavior, actual persistence, distributed runtime behavior, or multiple services working together are essential to the assertion.
 
 ## Logs And Telemetry
 
-TUnit owns test-run log capture, correlation, and telemetry. Shared integration hosts use the official TUnit logging provider, and TUnit ASP.NET Core integration configures application telemetry. Do not add Elsa log-capture providers, in-memory exporters, or telemetry receivers.
+TUnit owns test-run log capture, correlation, and telemetry. Shared integration hosts use the official TUnit logging provider, and TUnit ASP.NET Core integration configures application telemetry. Do not add Flamme log-capture providers, in-memory exporters, or telemetry receivers.
 
 `TestWebApplicationFactory` registers logging automatically for its application host.
 `TestApplicationBuilder` constructs a plain `ServiceCollection`, so it references
@@ -115,7 +115,7 @@ Set both the logging filter and the provider minimum to Debug to retain diagnost
 See TUnit's [standalone logging documentation](https://github.com/thomhurst/TUnit/blob/77453eab9cc452dbba8c53e77d12bf595f71cf30/docs/docs/extending/logging.md#standalone-no-aspnet-core),
 which matches the source commit of the installed TUnit 1.84.0 packages.
 
-The removed diagnostics modules and their test projects are no longer part of the solution. The retained [workflow instrumentation tests](../../test/unit/Elsa.Workflows.Core.UnitTests/Telemetry/WorkflowInstrumentationTests.cs) verify the `Elsa.Workflows` source and meter contract with native .NET listeners.
+The removed diagnostics modules and their test projects are no longer part of the solution. The retained [workflow instrumentation tests](../../test/unit/Flamme.Workflows.Core.UnitTests/Telemetry/WorkflowInstrumentationTests.cs) verify the `Elsa.Workflows` source and meter contract with native .NET listeners.
 
 ## Good Test Hygiene
 

@@ -1,6 +1,6 @@
 # Flamme reference server
 
-`Elsa.Server.Web` is the Flamme reference ASP.NET Core host for managing and executing workflows through APIs. Its project name and `Elsa.*` identifiers remain unchanged. It is a development host; production orchestration and Kubernetes operations guide the [project direction](../../../doc/project-direction.md), while UI work is secondary. See the [root README](../../../README.md) for local setup.
+`Flamme.Server.Web` is the Flamme reference ASP.NET Core host for managing and executing workflows through APIs. It is a development host; production orchestration and Kubernetes operations guide the [project direction](../../../doc/project-direction.md), while UI work is secondary. See the [root README](../../../README.md) for local setup.
 
 ## Persistence
 
@@ -17,7 +17,7 @@ registrations to use the built-in in-memory stores, whose state is lost at resta
 
 ## Ingress Rate Limiting
 
-The reference server includes opt-in ASP.NET Core rate limiting for Elsa management API requests and public HTTP workflow trigger routes. Enable it by setting `IngressRateLimiting:Enabled` to `true`.
+The reference server includes opt-in ASP.NET Core rate limiting for Flamme management API requests and public HTTP workflow trigger routes. Enable it by setting `IngressRateLimiting:Enabled` to `true`.
 
 Default policies are intentionally conservative and queue-free:
 
@@ -33,7 +33,7 @@ Default policies are intentionally conservative and queue-free:
 }
 ```
 
-Tune these values for production traffic and deployment topology. To disable the reference rate limiting behavior, leave `Enabled` as `false` and do not configure external policy names. Custom hosts can register their own named ASP.NET Core rate limiter policies with `services.AddRateLimiter(...)`, pass the policy names through `ApiEndpointOptions.RateLimitingPolicyName` and `HttpActivityOptions.RateLimitingPolicyName`, map Elsa API endpoints with `MapWorkflowsApi(...)`, call `UseWorkflowsApiRateLimiting(...)` and `UseWorkflowsRateLimiting(...)` after endpoint routing has selected endpoints, then call `app.UseRateLimiter()` once for the host pipeline. The Elsa hooks only attach endpoint metadata; ASP.NET Core validates configured policy names when the rate limiter middleware handles matching requests.
+Tune these values for production traffic and deployment topology. To disable the reference rate limiting behavior, leave `Enabled` as `false` and do not configure external policy names. Custom hosts can register their own named ASP.NET Core rate limiter policies with `services.AddRateLimiter(...)`, pass the policy names through `ApiEndpointOptions.RateLimitingPolicyName` and `HttpActivityOptions.RateLimitingPolicyName`, map Flamme API endpoints with `MapWorkflowsApi(...)`, call `UseWorkflowsApiRateLimiting(...)` and `UseWorkflowsRateLimiting(...)` after endpoint routing has selected endpoints, then call `app.UseRateLimiter()` once for the host pipeline. The Flamme hooks only attach endpoint metadata; ASP.NET Core validates configured policy names when the rate limiter middleware handles matching requests.
 
 In the reference server, `IngressRateLimiting:RegisterReferencePolicies` controls whether the built-in fixed-window policies are registered; when it is unset, it defaults to the value of `Enabled`. `Enabled` controls default policy-name assignment and the reference-server middleware toggle. Externally configured policy names are preserved. Set a policy option to an empty string to explicitly disable rate limiting for that surface even when reference policies are registered.
 
@@ -53,4 +53,4 @@ OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES=Proto.Actor,Elsa.Workflows
 OTEL_DOTNET_AUTO_TRACES_CONSOLE_EXPORTER_ENABLED=true
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-OTEL_RESOURCE_ATTRIBUTES=service.name=Elsa Server,service.version=3.3.0,service.instance.id=instance-123,deployment.environment=development
+OTEL_RESOURCE_ATTRIBUTES=service.name=Flamme Server,service.version=3.3.0,service.instance.id=instance-123,deployment.environment=development

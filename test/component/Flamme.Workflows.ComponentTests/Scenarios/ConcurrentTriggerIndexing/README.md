@@ -71,10 +71,10 @@ Uses the native TUnit component-test infrastructure:
 
 ```bash
 # Run all concurrent trigger tests
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/ConcurrentTriggerIndexingTests*/*"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/ConcurrentTriggerIndexingTests*/*"
 
 # Run specific test
-dotnet test --project test/component/Elsa.Workflows.ComponentTests/Elsa.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/ConcurrentTriggerIndexingTests*/ConcurrentIndexing_ShouldNotCreateDuplicates"
+dotnet test --project test/component/Flamme.Workflows.ComponentTests/Flamme.Workflows.ComponentTests.csproj -- --treenode-filter "/*/*/ConcurrentTriggerIndexingTests*/ConcurrentIndexing_ShouldNotCreateDuplicates"
 ```
 
 ## Test Validation
@@ -86,6 +86,6 @@ These tests:
 
 ## Related Files
 
-- `src/modules/Elsa.Workflows.Runtime/Services/TriggerIndexer.cs`
-- `src/modules/Elsa.Persistence.EFCore/Modules/Runtime/Configurations.cs`
-- `src/modules/Elsa.Persistence.EFCore/Modules/Runtime/TriggerStore.cs`
+- `src/modules/Flamme.Workflows.Runtime/Services/TriggerIndexer.cs`
+- `src/modules/Flamme.Persistence.EFCore/Modules/Runtime/Configurations.cs`
+- `src/modules/Flamme.Persistence.EFCore/Modules/Runtime/TriggerStore.cs`

@@ -56,9 +56,9 @@ var allowLocalDistributedRuntimeLockProvider =
     configuredAllowLocalDistributedRuntimeLockProvider ?? builder.Environment.IsDevelopment();
 
 services
-    .AddFlamme(elsa =>
+    .AddFlamme(flamme =>
     {
-        elsa
+        flamme
             .AddActivitiesFrom<Program>()
             .AddActivityHost<Penguin>()
             .AddWorkflowsFrom<Program>()
@@ -141,7 +141,7 @@ services
         
         if(useMultitenancy)
         {
-            elsa.UseTenants(tenants =>
+            flamme.UseTenants(tenants =>
             {
                 tenants.UseConfigurationBasedTenantsProvider(options => configuration.GetSection("Multitenancy").Bind(options));
                 tenants.ConfigureMultitenancy(options => options.TenantResolverPipelineBuilder = new TenantResolverPipelineBuilder()
@@ -149,7 +149,7 @@ services
             });
         }
 
-        ConfigureForTest?.Invoke(elsa);
+        ConfigureForTest?.Invoke(flamme);
     });
 
 // Obfuscate HTTP request headers.

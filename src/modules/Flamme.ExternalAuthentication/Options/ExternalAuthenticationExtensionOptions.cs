@@ -15,7 +15,7 @@ public enum ExternalAuthenticationExtensionKind
     Adapter,
     /// <summary>An unlinked external identity admission policy.</summary>
     UnlinkedIdentityPolicy,
-    /// <summary>An Flamme permission grant source.</summary>
+    /// <summary>A Flamme permission grant source.</summary>
     PermissionGrantSource
     ,
     /// <summary>A trusted deployed external-to-Flamme user matcher.</summary>

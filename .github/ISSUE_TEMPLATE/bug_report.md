@@ -41,7 +41,7 @@ Describe what actually happened. Include screenshots, if applicable.
 If possible, add screenshots or screen recordings to help explain the problem.
 
 ## Environment
-- **Elsa Package Version**: Specify the version. If you've cloned the repo, mention if you are using the latest source code from the main branch.
+- **Flamme Package Version**: Specify the version. If you've cloned the repo, mention if you are using the latest source code from the main branch.
 - **Operating System**: Include your OS version (e.g., Windows 10, macOS Big Sur, Ubuntu 18.04).
 - **Browser and Version**: If applicable, include your browser and version (e.g., Chrome 92).
 

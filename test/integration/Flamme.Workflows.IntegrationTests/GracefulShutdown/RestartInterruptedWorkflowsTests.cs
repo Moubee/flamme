@@ -21,7 +21,7 @@ public class RestartInterruptedWorkflowsTests : IAsyncDisposable
     public RestartInterruptedWorkflowsTests()
     {
         _services = new TestApplicationBuilder(TestContext.Current!.Output.StandardOutput)
-            .ConfigureFlamme(elsa => elsa.UseWorkflowRuntime())
+            .ConfigureFlamme(flamme => flamme.UseWorkflowRuntime())
             .Build();
     }
 

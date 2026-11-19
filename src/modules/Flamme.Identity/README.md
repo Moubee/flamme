@@ -1,4 +1,4 @@
-# Elsa.Identity
+# Flamme.Identity
 
 ## JWT Signing Key Configuration
 
@@ -9,7 +9,7 @@ Identity token signing requires a secure random key. Configure it through enviro
 
 ## Default Admin User Bootstrap
 
-Elsa supports bootstrapping an initial admin role and user through the `DefaultAdminUser` feature.
+Flamme supports bootstrapping an initial admin role and user through the `DefaultAdminUser` feature.
 
 This is the recommended way to initialize identity access now that user-management endpoints are permission-based and no longer rely on the `SecurityRoot` policy.
 
@@ -21,7 +21,7 @@ Call `UseDefaultAdmin` while configuring Identity in the host. Shell features an
 shell configuration paths have been removed.
 
 ```csharp
-services.AddElsa(elsa =>
+services.AddFlamme(flamme =>
 {
     elsa
         .UseIdentity(identity =>
@@ -63,11 +63,11 @@ New identity passwords, client secrets, and API keys are hashed with PBKDF2-SHA2
 
 ## External Authentication Compatibility
 
-External Authentication is additive to Elsa Identity:
+External Authentication is additive to Flamme Identity:
 
 - Existing `/identity/login`, `/identity/refresh-token` and `/identity/logout` contracts remain the direct local-credential flow. `POST /identity/logout` revokes the sign-in session of the refresh token in its body; see [Signing Out](../../../doc/wiki/identity-tenancy-security.md#signing-out).
-- The optional broker exposes separate local and external completion endpoints that return a short-lived, PKCE-bound authorization code before issuing Elsa credentials.
+- The optional broker exposes separate local and external completion endpoints that return a short-lived, PKCE-bound authorization code before issuing Flamme credentials.
 - Externally provisioned users may have no local password hash or salt. Such users fail direct local login with the same public result as any other invalid credential.
-- Elsa remains the issuer of access tokens and the authority for their `permissions` claim, regardless of how the user authenticated.
+- Flamme remains the issuer of access tokens and the authority for their `permissions` claim, regardless of how the user authenticated.
 
 See [the External Authentication migration guide](../../../doc/migrations/external-authentication.md) before changing a Studio host from direct OpenID Connect to brokered mode.

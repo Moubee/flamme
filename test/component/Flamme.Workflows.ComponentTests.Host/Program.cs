@@ -15,7 +15,7 @@ var services = builder.Services;
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
 // The component factory appends invocation-specific providers and applies this module once.
-services.ConfigureFlamme(elsa => elsa
+services.ConfigureFlamme(flamme => flamme
     .UseWorkflows(workflows => workflows.UseCommitStrategies(strategies =>
     {
         strategies.AddStandardStrategies();

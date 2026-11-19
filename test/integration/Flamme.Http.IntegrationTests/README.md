@@ -1,6 +1,6 @@
-# Elsa.Http Integration Tests
+# Flamme.Http Integration Tests
 
-This test project contains integration tests for HTTP-related activities in Elsa Workflows, specifically focusing on HTTP context loss scenarios.
+This test project contains integration tests for HTTP-related activities in Flamme Workflows, specifically focusing on HTTP context loss scenarios.
 
 ## Status
 
@@ -40,7 +40,7 @@ When HTTP context is not available:
 ## Project Structure
 
 ```
-Elsa.Http.IntegrationTests/
+Flamme.Http.IntegrationTests/
 ├── Activities/
 │   ├── HttpContextLossTests.cs           # Test class using WorkflowTestFixture
 │   └── Workflows/
@@ -48,20 +48,20 @@ Elsa.Http.IntegrationTests/
 │       └── WriteFileHttpResponseWithoutHttpContextWorkflow.cs
 ├── Helpers/
 │   └── NullHttpContextAccessor.cs        # Mock HTTP context accessor
-├── Elsa.Http.IntegrationTests.csproj
+├── Flamme.Http.IntegrationTests.csproj
 └── README.md
 ```
 
 ## Running the Tests
 
 ```bash
-dotnet test --project test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj
+dotnet test --project test/integration/Flamme.Http.IntegrationTests/Flamme.Http.IntegrationTests.csproj
 ```
 
 List the native TUnit discovery manifest with:
 
 ```bash
-dotnet test --project test/integration/Elsa.Http.IntegrationTests/Elsa.Http.IntegrationTests.csproj --list-tests
+dotnet test --project test/integration/Flamme.Http.IntegrationTests/Flamme.Http.IntegrationTests.csproj --list-tests
 ```
 
 ## Test Results
@@ -70,7 +70,7 @@ The verified native TUnit run reports 2 passed, 0 failed, and 0 skipped tests.
 
 ## Implementation Notes
 
-- Tests use `WorkflowTestFixture` from `Elsa.Testing.Shared` for consistent test setup
+- Tests use `WorkflowTestFixture` from `Flamme.Testing.Shared` for consistent test setup
 - Workflow classes are separated into individual files in the `Workflows` subfolder for better organization
 - `NullHttpContextAccessor` is a test helper that simulates HTTP context loss by always returning null
 - Tests automatically build the fixture and populate registries before execution
