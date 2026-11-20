@@ -2,14 +2,13 @@ using System.Linq.Expressions;
 using Flamme.Common.Entities;
 using Flamme.Common.Models;
 using Flamme.Common.Multitenancy;
+using Flamme.Persistence.EFCore.EntityHandlers;
 using Flamme.Persistence.EFCore.Extensions;
-using Flamme.Extensions;
 using Flamme.Tenants.Options;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Open.Linq.AsyncExtensions;
@@ -24,6 +23,8 @@ namespace Flamme.Persistence.EFCore;
 [PublicAPI]
 public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextFactory, IServiceProvider serviceProvider) where TDbContext : DbContext where TEntity : class, new()
 {
+    private const int LookupBatchSize = 500;
+
     /// <summary>
     /// Creates a new instance of the database context.
     /// </summary>
@@ -77,31 +78,11 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     /// <param name="entities">The entities to save.</param>
     /// <param name="onSaving">The callback to invoke before saving the entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task AddManyAsync(
+    public Task AddManyAsync(
         IEnumerable<TEntity> entities,
         Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving = null,
-        CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        try
-        {
-            var entityList = entities.ToList();
-            if (entityList.Count == 0)
-                return;
-
-            await ExecuteWriteAsync(async (dbContext, ct) =>
-            {
-                await InvokeSavingCallbacksAsync(dbContext, entityList, onSaving, ct);
-                await dbContext.BulkInsertAsync(entityList, ct);
-            }, cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            await HandleDbExceptionAsync(ex, cancellationToken);
-            throw;
-        }
-    }
+        CancellationToken cancellationToken = default) =>
+        WriteAsync(entities, null, onSaving, bulkSave: false, cancellationToken);
 
     /// <summary>
     /// Saves the entity.
@@ -112,125 +93,18 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     public async Task SaveAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, CancellationToken cancellationToken = default) => await SaveAsync(entity, keySelector, null, cancellationToken);
 
     /// <summary>
-    /// Saves the entity. Concurrent PostgreSQL calls to this method for the same mapped key
-    /// participate in a transaction-scoped lock. Existing rows are written without checking
-    /// an expected version.
+    /// Saves the entity.
     /// </summary>
-    /// <remarks>
-    /// A native insert can win after the existence read. The resulting unique conflict follows
-    /// the configured database exception handling path, with no internal replay of saving hooks.
-    /// </remarks>
     /// <param name="entity">The entity to save.</param>
     /// <param name="keySelector">The key selector to get the primary key property.</param>
     /// <param name="onSaving">The callback to invoke before saving the entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task SaveAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
+    public Task SaveAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving, CancellationToken cancellationToken = default) =>
+        WriteAsync([entity], keySelector, onSaving, bulkSave: false, cancellationToken);
 
-        try
-        {
-            await using var dbContext = await CreateDbContextAsync(cancellationToken);
-            if (onSaving != null)
-                await onSaving(dbContext, entity, cancellationToken);
-
-            var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
-            var table = entityType == null ? null : StoreObjectIdentifier.Create(entityType, StoreObjectType.Table);
-            var keyProperty = entityType?.FindProperty(keySelector.GetProperty()!.Name);
-
-            if (PostgreSqlWriteKeys.Supports(dbContext) && table.HasValue &&
-                keyProperty?.GetColumnName(table.Value) != null)
-            {
-                var key = dbContext.Entry(entity).Property<string>(keyProperty.Name).CurrentValue;
-                await PostgreSqlWriteKeys.ExecuteAsync(dbContext,
-                    async () =>
-                    {
-                        await PostgreSqlWriteKeys.AcquireAsync(dbContext, keyProperty, table.Value, key, cancellationToken);
-                        return await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken, (keyProperty, table.Value, key));
-                    },
-                    preparedState => WriteTrackedAsync(dbContext, entity, preparedState, cancellationToken),
-                    cancellationToken);
-                return;
-            }
-
-            var state = await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken);
-            await WriteTrackedAsync(dbContext, entity, state, cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            await HandleDbExceptionAsync(ex, cancellationToken);
-            throw;
-        }
-    }
-
-    private async Task<EntityState> FindSaveStateAsync(
-        TDbContext dbContext,
-        TEntity entity,
-        Expression<Func<TEntity, string>> keySelector,
-        CancellationToken cancellationToken,
-        (IProperty Property, StoreObjectIdentifier Table, string? Value)? mappedKey = null)
-    {
-        var set = dbContext.Set<TEntity>();
-        var query = set.Where(keySelector.BuildEqualsExpression(entity));
-        bool exists;
-
-        if (entity is Entity owned && serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true)
-        {
-            var keyName = mappedKey?.Property.Name ?? keySelector.GetProperty()!.Name;
-            var current = await query
-                .Select(row => new
-                {
-                    Key = EF.Property<string>(row, keyName),
-                    TenantId = EF.Property<string?>(row, nameof(Entity.TenantId))
-                })
-                .FirstOrDefaultAsync(cancellationToken);
-            exists = current != null;
-            if (current != null)
-            {
-                var writer = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId.NormalizeTenantId();
-                var incoming = (owned.TenantId ?? writer).NormalizeTenantId();
-                if ((incoming != writer && incoming != Tenant.AgnosticTenantId) ||
-                    incoming != current.TenantId.NormalizeTenantId() ||
-                    (mappedKey is { } key && !await MatchesTrackedKeyAsync(dbContext, key.Property, key.Table, current.Key, key.Value, cancellationToken)))
-                    throw new InvalidOperationException($"Cannot replace {typeof(TEntity).Name}: tenant ownership mismatch.");
-            }
-        }
-        else
-            exists = await query.AnyAsync(cancellationToken);
-
-        return exists ? EntityState.Modified : EntityState.Added;
-    }
-
-    private static async Task<bool> MatchesTrackedKeyAsync(TDbContext dbContext, IProperty keyProperty,
-        StoreObjectIdentifier table, string storedKey, string? submittedKey, CancellationToken cancellationToken)
-    {
-        var stored = PostgreSqlWriteKeys.GetProviderKey(keyProperty, storedKey);
-        var submitted = PostgreSqlWriteKeys.GetProviderKey(keyProperty, submittedKey);
-        if (string.Equals(stored, submitted, StringComparison.Ordinal))
-            return true;
-
-        if (!string.Equals(stored.TrimEnd(' '), submitted.TrimEnd(' '), StringComparison.Ordinal))
-            return false;
-
-        // PostgreSQL character columns can materialize trailing space padding. Check the
-        // physical type only for padding candidates, including when EF maps the key as text.
-        var tableName = dbContext.GetService<ISqlGenerationHelper>().DelimitIdentifier(table.Name, table.Schema);
-        var column = keyProperty.GetColumnName(table)!;
-        return await dbContext.Database.SqlQuery<bool>($"""
-            SELECT EXISTS (
-                SELECT FROM pg_catalog.pg_attribute
-                WHERE attrelid = pg_catalog.to_regclass({tableName})
-                  AND attname = {column}
-                  AND atttypid = 'pg_catalog.bpchar'::pg_catalog.regtype
-            ) AS "Value"
-            """).SingleAsync(cancellationToken);
-    }
-
-    private static Task WriteTrackedAsync(TDbContext dbContext, TEntity entity, EntityState state, CancellationToken cancellationToken)
-    {
-        dbContext.Set<TEntity>().Entry(entity).State = state;
-        return dbContext.SaveChangesAsync(cancellationToken);
-    }
+    // The key-value port reserves updates to shared keys for the agnostic writer.
+    internal Task SaveOwnedAsync(TEntity entity, Expression<Func<TEntity, string>> keySelector, CancellationToken cancellationToken) =>
+        WriteAsync([entity], keySelector, null, bulkSave: false, cancellationToken, allowSharedUpdates: false);
 
     /// <summary>
     /// Saves the specified entities.
@@ -247,36 +121,44 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     /// <param name="keySelector">The key selector to get the primary key property.</param>
     /// <param name="onSaving">The callback to invoke before saving the entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task SaveManyAsync(
+    public Task SaveManyAsync(
         IEnumerable<TEntity> entities,
         Expression<Func<TEntity, string>> keySelector,
         Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) =>
+        WriteAsync(entities, keySelector, onSaving, bulkSave: true, cancellationToken);
+
+    private async Task WriteAsync(
+        IEnumerable<TEntity> entities,
+        Expression<Func<TEntity, string>>? keySelector,
+        Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving,
+        bool bulkSave,
+        CancellationToken cancellationToken,
+        bool allowSharedUpdates = true)
     {
         cancellationToken.ThrowIfCancellationRequested();
-
         try
         {
-            var entityList = entities.ToList();
-            if (entityList.Count == 0)
+            var batch = entities.ToList();
+            if (batch.Count == 0)
                 return;
 
-            var tenantId = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId.NormalizeTenantId();
-            var tenancyEnabled = serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
-
-            await ExecuteWriteAsync(async (dbContext, ct) =>
+            await using var dbContext = await CreateDbContextAsync(cancellationToken);
+            if (onSaving != null)
             {
-                await InvokeSavingCallbacksAsync(dbContext, entityList, onSaving, ct);
-
-                // Bulk SQL bypasses EF's tenant-stamping hook. Explicit owners, including "*", stay intact.
-                foreach (var entity in entityList)
+                foreach (var entity in batch)
                 {
-                    if (entity is Entity entityWithTenant)
-                        entityWithTenant.TenantId ??= tenantId;
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await onSaving(dbContext, entity, cancellationToken);
                 }
+            }
 
-                await dbContext.BulkUpsertWithTenantOwnershipAsync(entityList, keySelector, tenancyEnabled ? tenantId : null, ct);
-            }, cancellationToken);
+            if (keySelector == null)
+                await dbContext.Set<TEntity>().AddRangeAsync(batch, cancellationToken);
+            else
+                await TrackForSaveAsync(dbContext, batch, keySelector.GetMemberAccess().Name, bulkSave, allowSharedUpdates, cancellationToken);
+
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -285,21 +167,93 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         }
     }
 
-    private static async Task InvokeSavingCallbacksAsync(
-        TDbContext dbContext,
-        IEnumerable<TEntity> entities,
-        Func<TDbContext, TEntity, CancellationToken, ValueTask>? onSaving,
-        CancellationToken cancellationToken)
+    private async Task TrackForSaveAsync(
+        TDbContext dbContext, IReadOnlyList<TEntity> entities, string keyName,
+        bool bulkSave, bool allowSharedUpdates, CancellationToken cancellationToken)
     {
-        if (onSaving == null)
-            return;
+        var set = dbContext.Set<TEntity>();
+        if (set.EntityType.FindPrimaryKey()?.Properties is not [var key] || key.Name != keyName || key.ClrType != typeof(string))
+            throw new NotSupportedException($"Saving {typeof(TEntity).Name} requires its single string primary key.");
 
-        // A batch callback can use EF's change tracker and shadow properties on this context.
+        var hasOwner = typeof(Entity).IsAssignableFrom(typeof(TEntity));
+        var tenancyEnabled = hasOwner && TenancyEnabled;
+        if (tenancyEnabled && !set.EntityType.GetProperty(nameof(Entity.TenantId)).IsConcurrencyToken)
+            throw new InvalidOperationException($"Configure {typeof(TEntity).Name}.TenantId as a concurrency token.");
+
+        var writer = hasOwner && (tenancyEnabled || bulkSave)
+            ? serviceProvider.GetRequiredService<ITenantAccessor>().TenantId
+            : null;
+        var byKey = new Dictionary<string, TEntity>(entities.Count, StringComparer.Ordinal);
         foreach (var entity in entities)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            await onSaving(dbContext, entity, cancellationToken);
+            if (entity is Entity owned)
+                owned.TenantId ??= writer;
+
+            var id = dbContext.Entry(entity).Property<string>(keyName).CurrentValue!;
+            if (!byKey.TryAdd(id, entity))
+                throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name} '{id}' twice in one batch.");
         }
+
+        // Read only the key and owner. The submitted entries hold callback-populated shadow properties.
+        // Single saves see the ordinary tenant-filtered set. Bulk imports also check ownership of hidden IDs.
+        var query = bulkSave ? set.IgnoreQueryFilters([SetTenantIdFilter.FilterName]) : set.AsQueryable();
+        foreach (var keys in byKey.Keys.ToArray().Chunk(LookupBatchSize))
+        {
+            var existing = await query.Where(row => keys.Contains(EF.Property<string>(row, keyName)))
+                .Select(row => new
+                {
+                    Key = EF.Property<string>(row, keyName),
+                    Owner = hasOwner ? EF.Property<string?>(row, nameof(Entity.TenantId)) : null
+                })
+                .ToListAsync(cancellationToken);
+
+            foreach (var row in existing)
+            {
+                if (!byKey.Remove(row.Key, out var entity))
+                    throw new InvalidOperationException($"A submitted {typeof(TEntity).Name} key has a different spelling in the database.");
+
+                if (tenancyEnabled && entity is Entity owned)
+                {
+                    var sharedUpdate = allowSharedUpdates && owned.TenantId == Tenant.AgnosticTenantId;
+                    if (owned.TenantId != row.Owner.NormalizeTenantId() || (owned.TenantId != writer && !sharedUpdate))
+                        throw new InvalidOperationException($"Cannot replace {typeof(TEntity).Name} '{row.Key}': tenant ownership mismatch.");
+                }
+
+                var entry = dbContext.Entry(entity);
+                entry.State = EntityState.Modified;
+                if (hasOwner)
+                    entry.Property(nameof(Entity.TenantId)).OriginalValue = row.Owner;
+            }
+        }
+
+        foreach (var entity in byKey.Values)
+            dbContext.Entry(entity).State = EntityState.Added;
+    }
+
+    private bool TenancyEnabled => serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
+
+    // Detached update/delete callers can omit TenantId. Use the expected owner in the DML predicate.
+    // Only the default tenant has two possible stored representations.
+    private async Task SetDetachedOwnerAsync(TDbContext dbContext, EntityEntry<TEntity> entry, CancellationToken cancellationToken)
+    {
+        if (entry.Entity is not Entity entity || !TenancyEnabled)
+            return;
+
+        var owner = entry.Property(nameof(Entity.TenantId));
+        if (!owner.Metadata.IsConcurrencyToken)
+            throw new InvalidOperationException($"Configure {typeof(TEntity).Name}.TenantId as a concurrency token.");
+
+        var writer = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId;
+        var expected = entity.TenantId ?? writer;
+        if (expected != writer && expected != Tenant.AgnosticTenantId)
+            throw new InvalidOperationException($"Cannot change {typeof(TEntity).Name} '{entity.Id}': tenant ownership mismatch.");
+
+        if (entry.State != EntityState.Deleted)
+            entity.TenantId = expected;
+
+        var legacyDefault = expected == Tenant.DefaultTenantId && await dbContext.Set<TEntity>().AnyAsync(
+            row => EF.Property<string>(row, nameof(Entity.Id)) == entity.Id && EF.Property<string?>(row, nameof(Entity.TenantId)) == null, cancellationToken);
+        owner.OriginalValue = legacyDefault ? null : expected;
     }
 
     private async Task HandleDbExceptionAsync(Exception exception, CancellationToken cancellationToken)
@@ -372,8 +326,9 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         if (onSaving != null)
             await onSaving(dbContext, entity, cancellationToken);
 
-        var set = dbContext.Set<TEntity>();
-        set.Entry(entity).State = EntityState.Modified;
+        var entry = dbContext.Entry(entity);
+        entry.State = EntityState.Modified;
+        await SetDetachedOwnerAsync(dbContext, entry, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -387,11 +342,12 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     public async Task UpdatePartialAsync(TEntity entity, Expression<Func<TEntity, object>>[] properties, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await CreateDbContextAsync(cancellationToken);
-        dbContext.Attach(entity);
+        var entry = dbContext.Attach(entity);
 
         foreach (var property in properties)
-            dbContext.Entry(entity).Property(property).IsModified = true;
+            entry.Property(property).IsModified = true;
 
+        await SetDetachedOwnerAsync(dbContext, entry, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -566,8 +522,9 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     public async Task<bool> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await CreateDbContextAsync(cancellationToken);
-        var set = dbContext.Set<TEntity>();
-        set.Attach(entity).State = EntityState.Deleted;
+        var entry = dbContext.Attach(entity);
+        entry.State = EntityState.Deleted;
+        await SetDetachedOwnerAsync(dbContext, entry, cancellationToken);
         return await dbContext.SaveChangesAsync(cancellationToken) == 1;
     }
 

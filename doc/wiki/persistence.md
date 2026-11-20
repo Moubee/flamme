@@ -21,24 +21,6 @@ Management persistence follows the same idea for definition and instance stores.
 
 Shared EF Core infrastructure lives in [Flamme.Persistence.EFCore.Common](../../src/modules/Flamme.Persistence.EFCore.Common) and [Flamme.Persistence.EFCore](../../src/modules/Flamme.Persistence.EFCore).
 
-### Concurrent PostgreSQL writes
-
-Each store call owns a context. Separate calls can write different IDs concurrently. Within a bulk call, the store awaits each saving callback on its shared context. Single-row `SaveAsync` keeps the EF tracked save pipeline and serializes participating single saves of the same mapped key using a PostgreSQL transaction-scoped advisory lock.
-
-The store honors Npgsql's ambient enlistment setting. With `Enlist=false`, the store commits independently when it starts its own transaction. If Npgsql EF misreads an equivalent spelling such as `Enlist = false`, the store suppresses the ambient scope for that independent write, including its EF saving hooks. The caller's `onSaving` callback still sees the original scope.
-
-Within an ambient scope, the store borrows an active transaction on an opted-out connection left open by the preparation callback. This includes enlistment through the underlying ADO.NET connection. If an EF preparation query closes the opted-out connection, the store starts its write in an independent transaction. A borrowed transaction keeps its isolation level and holds any tracked key lock until the caller finishes it.
-
-In a caller-owned transaction, a savepoint protects earlier work if the store call fails while waiting for a lock or writing. When the store owns the transaction, configured retries can reopen the connection, reacquire the lock and repeat the lookup before a tracked write. The preparation callback runs once. Errors from saving hooks, mutations or commit propagate to the caller for resolution.
-
-Under Read Committed, the tracked lookup after an advisory-lock wait takes a new snapshot that includes the preceding writer's commit. A caller-owned Repeatable Read or Serializable transaction keeps its isolation level and can retain a snapshot from before that commit. An insert based on that snapshot can fail with a uniqueness or serialization conflict. When the caller can safely retry, it must restart the whole transaction to get a fresh snapshot.
-
-`AddManyAsync` is insert-only. `SaveManyAsync` uses a guarded PostgreSQL upsert and rolls back the batch if an ownership check fails. Bulk writes arbitrate conflicting keys through the database's unique index. If a bulk or create-only writer inserts an absent key between a single save's existence check and its insert, the single save reports a uniqueness conflict. A caller handling that outcome must reload the row and decide whether its operation still applies. Arbitrary saving callbacks can have effects and are invoked once per attempted entity.
-
-Bulk upserts reject repeated provider keys before writing and roll back if separate chunks resolve to the same stored key. A single spelling alias can still update the stored row when the ownership policy allows the conflict update. Bulk writes use converted-key order when PostgreSQL's catalogs confirm a simple text primary key under Read Committed. Tables with other unique indexes, triggers, or key equality based on case or padding use caller order. Caller order allows an earlier input to release a unique value for a later input. Preexisting locks, overlapping caller-ordered writes, or writes to several tables can still deadlock. PostgreSQL reports the conflict and the bulk operation rolls back. Retry at the transaction boundary when the operation can be safely replayed.
-
-Updating an existing entity through generic `SaveAsync` replaces its saved values. A caller holding an older workflow snapshot needs an expected checkpoint revision to detect an intervening workflow transition. The workflow's `Version` identifies its definition version.
-
 Important base types:
 
 - [PersistenceFeatureBase](../../src/modules/Flamme.Persistence.EFCore.Common/PersistenceFeatureBase.cs)
@@ -114,6 +96,23 @@ Tenant conventions are documented in ADRs:
 
 - [ADR 0008: Empty String As Default Tenant ID](../adr/0008-empty-string-as-default-tenant-id.md)
 - [ADR 0009: Asterisk Sentinel Value For Tenant-Agnostic Entities](../adr/0009-asterisk-sentinel-value-for-tenant-agnostic-entities.md)
+
+## Concurrent PostgreSQL writes
+
+Workflow checkpoints and explicit instance saves use the tracked EF store. Each call prepares its own context, reads the primary key and owner, then calls `SaveChangesAsync` once. A writer waiting for a row holds up other writers to that row. Unrelated instances can commit independently.
+
+`SaveManyAsync` looks up existing IDs in groups of 500. It applies inserts, updates, shadow properties populated by serializers, and other tracked changes in one EF save. `AddManyAsync` remains insert-only. Both batch methods await each preparation callback in input order. EF saving handlers run for bulk saves as well as single saves. Each store call has its own atomicity boundary under the default host configuration.
+
+With multitenancy enabled, an update compares the original stored `TenantId` in the database. A delete or owner change after the lookup can raise `DbUpdateConcurrencyException`. The default tenant can update a legacy SQL NULL owner and stamp the empty string. A named tenant can resave an explicitly shared workflow definition as `*`. An implicit named owner cannot take over that row. The key-value store reserves replacement of a shared key for an agnostic writer. Trusted callers can still supply an explicit owner when creating a fresh ID.
+
+### Upgrading store callers
+
+- Two concurrent saves that both read an absent ID may race to insert it, including within one process. The loser receives the database uniqueness error through the configured exception handler. A failed batch rolls back its sibling writes. At an existing ID, later same-owner snapshots may overwrite earlier ones. Callers that need versioned checkpoints must supply their own version check.
+- A single save that encounters a hidden ID follows the filtered lookup and can receive a primary-key violation. A bulk save checks existing ownership across tenants and refuses an incompatible batch before committing. Handle errors at the operation boundary and reload the current state before making a new write decision. The store invokes preparation callbacks once per submission.
+- Pass each primary key once per save batch. Store saves accept the mapped single string primary key. For custom schemas, use keys that round-trip with the same spelling and case-sensitive owner equality as in the shipped PostgreSQL schema. Collation aliases and non-injective value converters can cause a refused save or a constraint violation. Migrate those keys and deduplicate input before calling the store.
+- Treat a bulk save as an unordered set. For example, trigger `z` can release a unique registration hash that trigger `a` needs. EF may update `a` first, which raises PostgreSQL `23505` and rolls back both updates. For an ordered handoff, open an ambient `TransactionScope` with async flow enabled and the normal enlisted connection. Await a single `SaveAsync` for `z`, await a single `SaveAsync` for `a`, then complete the scope. A failing second save rolls back the release as well.
+- Replace calls to the removed `DbContext.BulkUpsertAsync` extension with the registered store's `SaveManyAsync`. A caller that owns its own context and transaction can use EF tracking and `SaveChangesAsync` directly. Move any side effects duplicated between bulk preparation and EF saving handlers to one hook. Database transactions cover tracked database changes. Custom callbacks that perform their own I/O own those effects.
+- The existing nullable `TenantId` column supplies the EF concurrency token. Deploy the updated assemblies against the existing schema. Custom tenant-enabled EF models must retain that mapping. Detached EF writers outside the store must provide the original stored owner. Workflow heartbeats update only `UpdatedAt` through a tenant-filtered SQL update. Custom EF saving handlers for heartbeat notifications need a separate hook.
 
 ## Operational Log Storage
 

@@ -1,0 +1,13 @@
+{
+  "name": "Workflow store checkpoint benchmark",
+  "variables": [],
+  "root": {
+    "id": "wait",
+    "type": "Signals.Event",
+    "version": 1,
+    "eventName": {
+      "typeName": "String",
+      "expression": { "type": "Literal", "value": "store-bench" }
+    }
+  }
+}
