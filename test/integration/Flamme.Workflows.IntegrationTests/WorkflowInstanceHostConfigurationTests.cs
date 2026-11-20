@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Flamme.Extensions;
+using Flamme.Persistence.EFCore;
 using Flamme.Persistence.EFCore.Extensions;
 using Flamme.Persistence.EFCore.Modules.Management;
+using Flamme.Persistence.EFCore.PostgreSql;
 using Flamme.Tenants.Extensions;
 using Flamme.Testing.Shared;
 using Flamme.Testing.Shared.Databases;
@@ -9,6 +11,7 @@ using Flamme.Workflows.Management;
 using Flamme.Workflows.Management.Mappers;
 using Flamme.Workflows.State;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Flamme.Workflows.IntegrationTests;
@@ -16,8 +19,10 @@ namespace Flamme.Workflows.IntegrationTests;
 public sealed class WorkflowInstanceHostConfigurationTests
 {
     [Test]
+    [Arguments(false)]
+    [Arguments(true)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "This integration test migrates a real PostgreSQL database.")]
-    public async Task WorkflowStoresHonorEachHostsTenantConfigurationInOneProcess()
+    public async Task WorkflowStoresHonorEachHostsTenantConfigurationInOneProcess(bool useOptionsCallback)
     {
         await using var database = new PostgreSqlTestDatabase();
         await database.OpenAsync();
@@ -47,8 +52,23 @@ public sealed class WorkflowInstanceHostConfigurationTests
                     if (useTenants)
                         flamme.UseTenants();
                     flamme.UseWorkflowManagement(management => management.UseWorkflowInstances(instances =>
-                        instances.UseEntityFrameworkCore(ef => ef.UsePostgreSql(database.ConnectionString))));
+                        instances.UseEntityFrameworkCore(ConfigurePersistence)));
                 })
                 .Build();
+
+        void ConfigurePersistence(EFCoreWorkflowInstancePersistenceFeature feature)
+        {
+            if (!useOptionsCallback)
+            {
+                feature.UsePostgreSql(database.ConnectionString);
+                return;
+            }
+
+            feature.Module.Services.AddPostgreSqlEntityModelCreatingHandlers();
+            feature.DbContextOptionsBuilder = (_, options) => options
+                .ReplaceService<IMigrationsAssembly, DbSchemaAwareMigrationAssembly>()
+                .UseNpgsql(database.ConnectionString, provider => provider.MigrationsAssembly(typeof(ManagementDbContextFactory).Assembly)
+                    .MigrationsHistoryTable(FlammeDbContextBase.MigrationsHistoryTable, FlammeDbContextBase.FlammeSchema));
+        }
     }
 }
