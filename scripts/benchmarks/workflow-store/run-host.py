@@ -35,15 +35,24 @@ def wait_for(label, probe, seconds=90):
 
 
 def stop_child(child):
-    # Each child owns a fresh process group, including any workload diagnostics.
-    try:
-        os.killpg(child.pid, signal.SIGTERM)
-        child.wait(timeout=8)
-    except subprocess.TimeoutExpired:
-        os.killpg(child.pid, signal.SIGKILL)
-        child.wait(timeout=5)
-    except ProcessLookupError:
-        pass
+    # The workload leader may exit before its diagnostics in the same group.
+    for sig, grace in ((signal.SIGTERM, 8), (signal.SIGKILL, 5)):
+        deadline = time.monotonic() + grace
+        while True:
+            child.poll()  # Reap the leader so a zombie cannot keep the group around.
+            try:
+                os.killpg(child.pid, sig)
+                sig = 0  # After signalling, probe for remaining members.
+            except ProcessLookupError:
+                child.wait(timeout=5)
+                return
+            except PermissionError:
+                # Darwin can return EPERM while the group's last member exits.
+                pass
+            if time.monotonic() >= deadline:
+                break
+            time.sleep(0.05)
+    raise RuntimeError(f"Process group {child.pid} still exists after SIGKILL")
 
 
 def get_http(url, authorization=None, body=None):
