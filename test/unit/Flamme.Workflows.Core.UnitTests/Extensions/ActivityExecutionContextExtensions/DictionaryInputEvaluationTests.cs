@@ -33,6 +33,6 @@ public class DictionaryInputEvaluationTests
     private sealed class DictionaryInputActivity : CodeActivity
     {
         [Input(EvaluatorType = typeof(DictionaryValueEvaluator))]
-        public Input<Dictionary<string, object>> Values { get; set; } = new();
+        public required Input<Dictionary<string, object>> Values { get; set; }
     }
 }
