@@ -19,10 +19,19 @@ public static class FlammeDbContextOptionsExtensions
     {
         ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(new FlammeDbContextOptionsExtension(options));
         optionsBuilder.ReplaceService<IMigrationsAssembly, DbSchemaAwareMigrationAssembly>();
+        optionsBuilder.ReplaceService<IModelCacheKeyFactory, FlammeModelCacheKeyFactory>();
         return optionsBuilder;
     }
 
     public static string GetMigrationsAssemblyName(this FlammeDbContextOptions? options, Assembly migrationsAssembly) => options?.MigrationsAssemblyName ?? migrationsAssembly.GetName().Name!;
     public static string GetMigrationsHistoryTableName(this FlammeDbContextOptions? options) => options?.MigrationsHistoryTableName ?? FlammeDbContextBase.MigrationsHistoryTable;
     public static string GetSchemaName(this FlammeDbContextOptions? options) => options?.SchemaName ?? FlammeDbContextBase.FlammeSchema;
+}
+
+file sealed class FlammeModelCacheKeyFactory : IModelCacheKeyFactory
+{
+    // Schema, tenant visibility and the owner concurrency token are fixed when EF builds a model.
+    public object Create(DbContext context, bool designTime) => context is FlammeDbContextBase flamme
+        ? (context.GetType(), designTime, flamme.Schema, flamme.TenancyEnabled)
+        : new ModelCacheKey(context, designTime);
 }

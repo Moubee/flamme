@@ -1,9 +1,11 @@
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
 using Flamme.Extensions;
+using Flamme.Tenants.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Flamme.Persistence.EFCore;
 
@@ -20,6 +22,7 @@ public abstract class FlammeDbContextBase : DbContext, IFlammeDbContextSchema
 
     protected IServiceProvider ServiceProvider { get; }
     private readonly FlammeDbContextOptions? _flammeDbContextOptions;
+    internal bool TenancyEnabled => ServiceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true;
     public string? TenantId { get; set; }
 
     /// <summary>
