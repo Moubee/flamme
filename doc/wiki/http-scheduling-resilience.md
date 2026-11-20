@@ -16,7 +16,7 @@ Start in [src/modules/Flamme.Http](../../src/modules/Flamme.Http).
 - downloadable content handling
 - file cache and zip management
 - correlation and workflow instance ID selectors
-- HTTP activity descriptors and UI hints
+- HTTP activity descriptors and request configuration
 - HTTP resilience strategy registration
 - HTTP ingress source registration for graceful shutdown
 

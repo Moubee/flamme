@@ -20,7 +20,6 @@ Start in [src/modules/Flamme.Workflows.Core](../../src/modules/Flamme.Workflows.
 - storage drivers
 - serializers
 - incident strategies
-- UI hint handlers
 - identity and hashing services
 
 The feature also configures default workflow and activity pipelines. The umbrella [FlammeFeature](../../src/modules/Flamme/Features/FlammeFeature.cs) calls `WithDefaultWorkflowExecutionPipeline()` and `WithDefaultActivityExecutionPipeline()`.

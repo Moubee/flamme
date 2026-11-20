@@ -268,15 +268,11 @@ The permissions these endpoints used to require (`workflows/descriptors/<kind>:v
 catalog, and in the mapping below, so roles that already hold them keep resolving instead of being reported by the
 startup validator; you can drop them from your roles at your convenience.
 
-`workflows/descriptors/activities:view` is not one of the permissions you can drop. It still guards two things:
-
-- `GET /descriptors/activities?refresh=true`, which rebuilds the activity registry from the stored definitions. The flag
-  takes effect for a caller holding this permission or `workflows/definitions:view`; any other caller is not rejected,
-  the flag is ignored and the current registry is returned. Elsa Studio sends the flag on every load, which in a cluster
-  is how a node picks up a workflow-as-activity published through another node, so a role holding only
-  `workflows/definitions:view` opens the designer with a current catalog.
-- `POST /descriptors/activities/{activityTypeName}/options/{propertyName}`, which runs the property's option provider
-  with caller-supplied context.
+`GET /descriptors/activities?refresh=true` rebuilds the activity registry from
+stored definitions for callers holding `workflows/descriptors/activities:view`
+or `workflows/definitions:view`. Other callers receive the current registry.
+Use the refresh flag to pick up a workflow-as-activity published through
+another node.
 
 Some other calls the designer makes are also unchanged, so a role holding only `workflows/definitions:view` still
 needs their own permissions for them:

@@ -118,11 +118,11 @@ Good examples:
 - [SendHttpRequest](../../src/modules/Flamme.Http/Activities/SendHttpRequest.cs)
 - [RunJavaScript](../../src/modules/Flamme.Expressions.JavaScript/Activities/RunJavaScript/RunJavaScript.cs)
 
-## Activity Metadata And UI Hints
+## Activity Metadata
 
-Designer-facing metadata is produced by descriptors and UI hint handlers. Core UI hints live under [Flamme.Workflows.Core/UIHints](../../src/modules/Flamme.Workflows.Core/UIHints). Module-specific handlers live with their module, such as HTTP content type options in [Flamme.Http/UIHints](../../src/modules/Flamme.Http/UIHints).
-
-If an activity property needs dynamic options, add an `IPropertyUIHandler` and expose it through the descriptor option endpoint.
+Activity descriptors expose metadata such as input types, display names,
+descriptions, and defaults. For instructions on upgrading custom activities
+and API clients that used UI hints, see the [migration guide](../migrations/ui-hints.md).
 
 ## Authoring Choice Guide
 

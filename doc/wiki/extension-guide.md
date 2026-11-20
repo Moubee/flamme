@@ -23,11 +23,10 @@ Register the feature through `AddFlamme` in the host and include its project or 
 
 1. Put the activity in the owning module's `Activities` folder.
 2. Derive from `Activity`, `Activity<T>`, `CodeActivity`, or a module-specific base.
-3. Use `Input<T>` and `Output<T>` for designer/runtime compatibility.
+3. Use `Input<T>` and `Output<T>` for workflow runtime and descriptor support.
 4. Register the activity with workflow management.
-5. Add descriptor/UI hint handlers if the designer needs dynamic options.
-6. Test activity-only behavior with `ActivityTestFixture`.
-7. Add integration/component tests for bookmarks, triggers, persistence, or transport behavior.
+5. Test activity-only behavior with `ActivityTestFixture`.
+6. Add integration/component tests for bookmarks, triggers, persistence, or transport behavior.
 
 Good examples:
 
@@ -42,7 +41,6 @@ Expression providers need:
 - evaluator contract and implementation
 - expression descriptor provider
 - optional activity for running scripts
-- optional UI hint handler
 - option type
 - feature registration
 - tests for evaluator behavior and workflow integration
