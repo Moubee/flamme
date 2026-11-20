@@ -7,7 +7,9 @@ using Flamme.Extensions;
 using Flamme.Tenants.Options;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Open.Linq.AsyncExtensions;
@@ -144,7 +146,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
                     async () =>
                     {
                         await PostgreSqlWriteKeys.AcquireAsync(dbContext, keyProperty, table.Value, key, cancellationToken);
-                        return await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken, keyProperty, key);
+                        return await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken, (keyProperty, table.Value, key));
                     },
                     preparedState => WriteTrackedAsync(dbContext, entity, preparedState, cancellationToken),
                     cancellationToken);
@@ -166,8 +168,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         TEntity entity,
         Expression<Func<TEntity, string>> keySelector,
         CancellationToken cancellationToken,
-        IProperty? mappedKey = null,
-        string? submittedKey = null)
+        (IProperty Property, StoreObjectIdentifier Table, string? Value)? mappedKey = null)
     {
         var set = dbContext.Set<TEntity>();
         var query = set.Where(keySelector.BuildEqualsExpression(entity));
@@ -175,7 +176,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
 
         if (entity is Entity owned && serviceProvider.GetService<IOptions<TenantsOptions>>()?.Value.IsEnabled == true)
         {
-            var keyName = mappedKey?.Name ?? keySelector.GetProperty()!.Name;
+            var keyName = mappedKey?.Property.Name ?? keySelector.GetProperty()!.Name;
             var current = await query
                 .Select(row => new
                 {
@@ -188,13 +189,9 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             {
                 var writer = serviceProvider.GetRequiredService<ITenantAccessor>().TenantId.NormalizeTenantId();
                 var incoming = (owned.TenantId ?? writer).NormalizeTenantId();
-                var exactKey = mappedKey == null || string.Equals(
-                    PostgreSqlWriteKeys.GetProviderKey(mappedKey, current.Key),
-                    PostgreSqlWriteKeys.GetProviderKey(mappedKey, submittedKey),
-                    StringComparison.Ordinal);
-
-                if (!exactKey || (incoming != writer && incoming != Tenant.AgnosticTenantId) ||
-                    incoming != current.TenantId.NormalizeTenantId())
+                if ((incoming != writer && incoming != Tenant.AgnosticTenantId) ||
+                    incoming != current.TenantId.NormalizeTenantId() ||
+                    (mappedKey is { } key && !await MatchesTrackedKeyAsync(dbContext, key.Property, key.Table, current.Key, key.Value, cancellationToken)))
                     throw new InvalidOperationException($"Cannot replace {typeof(TEntity).Name}: tenant ownership mismatch.");
             }
         }
@@ -202,6 +199,31 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             exists = await query.AnyAsync(cancellationToken);
 
         return exists ? EntityState.Modified : EntityState.Added;
+    }
+
+    private static async Task<bool> MatchesTrackedKeyAsync(TDbContext dbContext, IProperty keyProperty,
+        StoreObjectIdentifier table, string storedKey, string? submittedKey, CancellationToken cancellationToken)
+    {
+        var stored = PostgreSqlWriteKeys.GetProviderKey(keyProperty, storedKey);
+        var submitted = PostgreSqlWriteKeys.GetProviderKey(keyProperty, submittedKey);
+        if (string.Equals(stored, submitted, StringComparison.Ordinal))
+            return true;
+
+        if (!string.Equals(stored.TrimEnd(' '), submitted.TrimEnd(' '), StringComparison.Ordinal))
+            return false;
+
+        // PostgreSQL character columns can materialize trailing space padding. Check the
+        // physical type only for padding candidates, including when EF maps the key as text.
+        var tableName = dbContext.GetService<ISqlGenerationHelper>().DelimitIdentifier(table.Name, table.Schema);
+        var column = keyProperty.GetColumnName(table)!;
+        return await dbContext.Database.SqlQuery<bool>($"""
+            SELECT EXISTS (
+                SELECT FROM pg_catalog.pg_attribute
+                WHERE attrelid = pg_catalog.to_regclass({tableName})
+                  AND attname = {column}
+                  AND atttypid = 'pg_catalog.bpchar'::pg_catalog.regtype
+            ) AS "Value"
+            """).SingleAsync(cancellationToken);
     }
 
     private static Task WriteTrackedAsync(TDbContext dbContext, TEntity entity, EntityState state, CancellationToken cancellationToken)

@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Flamme.Common.Entities;
+using Flamme.Common.Multitenancy;
 using Flamme.Persistence.EFCore;
+using Flamme.Persistence.EFCore.EntityHandlers;
 using Flamme.Tenants.Options;
 using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +68,139 @@ public sealed class PostgreSqlCollatedTrackedSaveTests
             await VerifyAsync<CitextSaveContext>(services, "Citext Rows", observer, hook, token, verifyUnmappedCitext: true);
         else
             await VerifyAsync<CollatedTextSaveContext>(services, "Rows", observer, hook, token);
+    }
+
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task SameOwnerCanSaveShortFixedWidthKeyAgain(bool mapped)
+    {
+        async Task VerifyAsync<TContext>(Store<TContext, CollatedSaveRow> store, NpgsqlConnection observer,
+            DefaultTenantAccessor tenants, CancellationToken token) where TContext : FlammeDbContextBase
+        {
+            using var owner = tenants.PushContext(new Tenant { Id = "owner", Name = "Owner" });
+            await store.SaveAsync(new CollatedSaveRow { Id = "A", Payload = "first" }, row => row.Id, token);
+            await store.SaveAsync(new CollatedSaveRow { Id = "A", Payload = "second" }, row => row.Id, token);
+
+            await using var command = observer.CreateCommand();
+            command.CommandText = """SELECT "Id", "TenantId", "Payload" FROM "Tenant Key Rows" """;
+            await using var reader = await command.ExecuteReaderAsync(token);
+            await Assert.That(await reader.ReadAsync(token)).IsTrue();
+            await Assert.That(reader.GetString(0)).IsEqualTo("A   ");
+            await Assert.That(reader.GetString(1)).IsEqualTo("owner");
+            await Assert.That(reader.GetString(2)).IsEqualTo("second");
+            await Assert.That(await reader.ReadAsync(token)).IsFalse();
+        }
+
+        if (mapped)
+            await WithTenantKeysAsync<MappedFixedWidthSaveContext>("character(4)", VerifyAsync);
+        else
+            await WithTenantKeysAsync<TenantTextSaveContext>("character(4)", VerifyAsync);
+    }
+
+    [Test]
+    [Arguments("text")]
+    [Arguments("icu")]
+    [Arguments("citext")]
+    public async Task TenantSaveKeepsNonFixedWidthSpelling(string kind)
+    {
+        if (kind == "citext")
+            await WithTenantKeysAsync<TenantCitextSaveContext>(kind, VerifyAsync);
+        else
+            await WithTenantKeysAsync<TenantTextSaveContext>(kind, VerifyAsync);
+
+        async Task VerifyAsync<TContext>(Store<TContext, CollatedSaveRow> store, NpgsqlConnection observer,
+            DefaultTenantAccessor tenants, CancellationToken token) where TContext : FlammeDbContextBase
+        {
+            using var owner = tenants.PushContext(new Tenant { Id = "owner", Name = "Owner" });
+            await store.SaveAsync(new CollatedSaveRow { Id = "A", Payload = "first" }, row => row.Id, token);
+            var alias = new CollatedSaveRow { Id = kind == "citext" ? "a" : "A ", Payload = "second" };
+            if (kind == "text")
+                await store.SaveAsync(alias, row => row.Id, token);
+            else
+                await Assert.That(() => store.SaveAsync(alias, row => row.Id, token)).Throws<InvalidOperationException>();
+
+            await using var command = observer.CreateCommand();
+            command.CommandText = """SELECT "Id", "Payload" FROM "Tenant Key Rows" ORDER BY "Id" COLLATE "C" """;
+            await using var rows = await command.ExecuteReaderAsync(token);
+            await Assert.That(await rows.ReadAsync(token)).IsTrue();
+            await Assert.That(rows.GetString(0)).IsEqualTo("A");
+            await Assert.That(rows.GetString(1)).IsEqualTo("first");
+            if (kind == "text")
+            {
+                await Assert.That(await rows.ReadAsync(token)).IsTrue();
+                await Assert.That(rows.GetString(0)).IsEqualTo("A ");
+                await Assert.That(rows.GetString(1)).IsEqualTo("second");
+            }
+
+            await Assert.That(await rows.ReadAsync(token)).IsFalse();
+        }
+    }
+
+    [Test]
+    public Task AnotherTenantCannotReplacePaddedKey() =>
+        WithTenantKeysAsync<TenantTextSaveContext>("character(4)", async (store, observer, tenants, token) =>
+        {
+            using (tenants.PushContext(new Tenant { Id = "owner", Name = "Owner" }))
+                await store.SaveAsync(new CollatedSaveRow { Id = "A", Payload = "first" }, row => row.Id, token);
+
+            using (tenants.PushContext(new Tenant { Id = "other", Name = "Other" }))
+                await Assert.That(() => store.SaveAsync(new CollatedSaveRow { Id = "A", Payload = "other" }, row => row.Id, token))
+                    .Throws<InvalidOperationException>();
+
+            await using var command = observer.CreateCommand();
+            command.CommandText = """SELECT "TenantId", "Payload" FROM "Tenant Key Rows" """;
+            await using var rows = await command.ExecuteReaderAsync(token);
+            await Assert.That(await rows.ReadAsync(token)).IsTrue();
+            await Assert.That(rows.GetString(0)).IsEqualTo("owner");
+            await Assert.That(rows.GetString(1)).IsEqualTo("first");
+            await Assert.That(await rows.ReadAsync(token)).IsFalse();
+        });
+
+    private static async Task WithTenantKeysAsync<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
+                                    DynamicallyAccessedMemberTypes.NonPublicConstructors |
+                                    DynamicallyAccessedMemberTypes.PublicProperties)] TContext>(
+        string kind, Func<Store<TContext, CollatedSaveRow>, NpgsqlConnection, DefaultTenantAccessor, CancellationToken, Task> verify)
+        where TContext : FlammeDbContextBase
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = timeout.Token;
+        await using var database = new PostgreSqlTestDatabase();
+        await database.OpenAsync();
+        var observer = database.Connection;
+
+        var columnType = kind switch
+        {
+            "icu" => "text COLLATE \"Ignore Space\"",
+            "citext" => "citext",
+            "text" => "text",
+            "character(4)" => "character(4)",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind))
+        };
+        await using (var setup = observer.CreateCommand())
+        {
+            setup.CommandText = $"""
+                CREATE COLLATION "Ignore Space"
+                    (provider = icu, locale = 'und-u-ka-shifted-ks-level2', deterministic = false);
+                CREATE EXTENSION citext;
+                CREATE TABLE "Tenant Key Rows" (
+                    "Id" {columnType} PRIMARY KEY, "TenantId" text, "Payload" text NOT NULL, "HookMarker" text);
+                """;
+            await setup.ExecuteNonQueryAsync(token);
+        }
+
+        await observer.ReloadTypesAsync(token);
+        var tenants = new DefaultTenantAccessor();
+        // Leave the model unfiltered to exercise the Store's ownership guard directly.
+        await using var services = new ServiceCollection()
+            .AddSingleton<ITenantAccessor>(tenants)
+            .Configure<TenantsOptions>(options => options.IsEnabled = true)
+            .AddScoped<IEntitySavingHandler, ApplyTenantId>()
+            .AddDbContextFactory<TContext>(builder => builder.UseNpgsql(database.ConnectionString))
+            .BuildServiceProvider();
+        var factory = services.GetRequiredService<IDbContextFactory<TContext>>();
+        await verify(new Store<TContext, CollatedSaveRow>(factory, services), observer, tenants, token);
     }
 
     private static async Task VerifyAsync<
@@ -196,6 +331,28 @@ public sealed class CitextSaveContext(DbContextOptions<CitextSaveContext> option
 
 public sealed class UnmappedCitextSaveContext(DbContextOptions<UnmappedCitextSaveContext> options, IServiceProvider services)
     : CollatedSaveContext(options, services, "Citext Rows", false);
+
+public abstract class TenantKeySaveContext(DbContextOptions options, IServiceProvider services, string? columnType)
+    : FlammeDbContextBase(options, services)
+{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        var row = modelBuilder.Entity<CollatedSaveRow>().ToTable("Tenant Key Rows", "public");
+        row.HasKey(x => x.Id);
+        if (columnType is not null)
+            row.Property(x => x.Id).HasColumnType(columnType);
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
+public sealed class TenantTextSaveContext(DbContextOptions<TenantTextSaveContext> options, IServiceProvider services)
+    : TenantKeySaveContext(options, services, null);
+
+public sealed class MappedFixedWidthSaveContext(DbContextOptions<MappedFixedWidthSaveContext> options, IServiceProvider services)
+    : TenantKeySaveContext(options, services, "character(4)");
+
+public sealed class TenantCitextSaveContext(DbContextOptions<TenantCitextSaveContext> options, IServiceProvider services)
+    : TenantKeySaveContext(options, services, "citext");
 
 public sealed class CollatedSaveRow : Entity
 {
