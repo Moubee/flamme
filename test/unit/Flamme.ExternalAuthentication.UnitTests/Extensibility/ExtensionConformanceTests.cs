@@ -149,7 +149,6 @@ public class ExtensionConformanceTests
         "A conformance field.",
         valueType,
         false,
-        "text",
         null,
         [],
         new SettingFieldValidation(),

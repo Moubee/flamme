@@ -36,7 +36,6 @@ public class ActivityGroundingMapper
             IsBrowsable = input.IsBrowsable ?? true,
             IsSensitive = input.IsSensitive,
             IsRequired = input.DefaultValue == null && !IsNullable(input.Type),
-            UIHint = input.UIHint,
             DefaultSyntax = input.DefaultSyntax
         };
 

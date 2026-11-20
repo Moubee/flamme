@@ -1022,8 +1022,8 @@ public class ConnectionManagementTests : WebApplicationTest<ConnectionManagement
         public bool RequiresClientSecret { get; set; }
         public ExternalAuthenticationAdapterDescriptor Describe() => new(Type, "Test", "Test adapter", 2,
         [
-            new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", RequiresClientSecret, "secret", null, [], new SettingFieldValidation(), true, false, null, null, true),
-            new SettingFieldDescriptor("unsafeMode", "Unsafe mode", "Unsafe", "boolean", false, "toggle", null, [], new SettingFieldValidation(), false, true, null, null, false)
+            new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", RequiresClientSecret, null, [], new SettingFieldValidation(), true, false, null, null, true),
+            new SettingFieldDescriptor("unsafeMode", "Unsafe mode", "Unsafe", "boolean", false, null, [], new SettingFieldValidation(), false, true, null, null, false)
         ], new(false, false, false), null);
         public ValueTask<ConnectionValidationResult> ValidateAsync(ConnectionValidationContext context, CancellationToken cancellationToken = default)
         {

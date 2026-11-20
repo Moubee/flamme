@@ -24,5 +24,4 @@ public record SecretTypeDescriptor(
     string Name,
     string DisplayName,
     string Description,
-    string EditorHint,
     IReadOnlyCollection<string> SupportedStoreNames);

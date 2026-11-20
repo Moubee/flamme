@@ -6,7 +6,6 @@ public class X509CertificateSecretTypeProvider : ISecretTypeProvider
         SecretTypeNames.X509Certificate,
         "X.509 Certificate",
         "A certificate reference, such as a thumbprint or configuration-backed certificate identity.",
-        "secret-x509-certificate",
         [SecretStoreNames.Encrypted, SecretStoreNames.Configuration]);
 
     public bool Validate(CreateSecretRequest request, out string? error) => ValidatePayload(request.StoreName, request.Value, request.ConfigurationKey, request.Metadata, out error);

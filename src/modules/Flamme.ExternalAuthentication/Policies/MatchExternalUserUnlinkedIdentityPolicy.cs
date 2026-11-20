@@ -16,9 +16,9 @@ public sealed class MatchExternalUserUnlinkedIdentityPolicy(IExternalUserMatcher
         "Uses one deployment-installed user matcher, then rejects or creates a user when no match is returned.",
         1,
         [
-            new("matcher", "User matcher", "Versioned matcher selection and settings.", "json", true, "json", null, [], new(), false, false, null, null, false),
-            new("noMatchAction", "No-match action", "Reject access or create a credential-less user.", "string", true, "select", null, ["reject", "create-user"], new(), false, false, null, null, false),
-            new("defaultRoleIds", "Default roles", "Role IDs applied only when the no-match action creates a user.", "string-array", false, "tags", null, [], new(), false, false, null, null, false)
+            new("matcher", "User matcher", "Versioned matcher selection and settings.", "json", true, null, [], new(), false, false, null, null, false),
+            new("noMatchAction", "No-match action", "Reject access or create a credential-less user.", "string", true, null, ["reject", "create-user"], new(), false, false, null, null, false),
+            new("defaultRoleIds", "Default roles", "Role IDs applied only when the no-match action creates a user.", "string-array", false, null, [], new(), false, false, null, null, false)
         ],
         null);
 

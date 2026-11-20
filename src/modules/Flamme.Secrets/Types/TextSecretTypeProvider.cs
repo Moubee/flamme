@@ -6,7 +6,6 @@ public class TextSecretTypeProvider : ISecretTypeProvider
         SecretTypeNames.Text,
         "Text",
         "A text value such as a password, token, or connection string.",
-        "secret-text",
         [SecretStoreNames.Encrypted, SecretStoreNames.Configuration]);
 
     public bool Validate(CreateSecretRequest request, out string? error)

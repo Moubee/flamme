@@ -21,7 +21,6 @@ internal sealed class ConformanceExternalAuthenticationAdapter : IExternalAuthen
                 "Stable external issuer namespace.",
                 "uri",
                 true,
-                "uri",
                 null,
                 [],
                 new SettingFieldValidation(1, 2048),

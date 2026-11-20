@@ -88,7 +88,7 @@ public class IdentityProviderConnectionValidityAssessorTests
             "Required secret",
             "Requires a client secret",
             1,
-            [new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", true, "secret", null, [], new SettingFieldValidation(), true, false, null, null, true)],
+            [new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", true, null, [], new SettingFieldValidation(), true, false, null, null, true)],
             new ExternalAuthenticationAdapterCapabilities(false, false, false),
             null);
 
