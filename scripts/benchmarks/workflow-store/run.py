@@ -17,9 +17,10 @@ from observer import await_writer, committed, literal, lock_instance, session
 
 
 class Api:
-    def __init__(self, url, authorization=None):
+    def __init__(self, url, authorization=None, *, open_request=urllib.request.urlopen):
         self.url = url.rstrip("/")
         self.authorization = authorization
+        self.open_request = open_request
         if not authorization:
             login = self.call("/identity/login", {
                 "username": os.getenv("BENCH_USER", "admin"),
@@ -36,7 +37,7 @@ class Api:
         if self.authorization:
             headers["Authorization"] = self.authorization
         req = urllib.request.Request(self.url + path, data=body, headers=headers)
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with self.open_request(req, timeout=30) as response:
             data = response.read()
             return json.loads(data) if data else None
 
@@ -47,7 +48,8 @@ def connect():
         auth = Path(fixture["authorization_file"]).read_text().strip()
         psql = ["docker", "exec", "-i", fixture["container_id"], "psql",
                 "-U", fixture["database_user"], "-d", fixture["database"]]
-        return Api(fixture["api_url"], auth), psql
+        direct = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        return Api(fixture["api_url"], auth, open_request=direct.open), psql
     api_url = os.environ["BENCH_URL"].rstrip("/") + os.getenv("BENCH_API_PREFIX", "/elsa/api")
     token = os.getenv("BENCH_TOKEN")
     return Api(api_url, "Bearer " + token if token else None), json.loads(os.environ["BENCH_PSQL"])
