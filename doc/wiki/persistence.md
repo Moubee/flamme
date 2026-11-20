@@ -21,6 +21,14 @@ Management persistence follows the same idea for definition and instance stores.
 
 Shared EF Core infrastructure lives in [Flamme.Persistence.EFCore.Common](../../src/modules/Flamme.Persistence.EFCore.Common) and [Flamme.Persistence.EFCore](../../src/modules/Flamme.Persistence.EFCore).
 
+### Concurrent PostgreSQL writes
+
+Each store call owns a context. Separate calls can write different IDs concurrently. Within a bulk call, the store awaits each saving callback on its shared context. Single-row `SaveAsync` keeps the EF tracked save pipeline and serializes participating single saves of the same mapped key using a PostgreSQL transaction-scoped advisory lock.
+
+`AddManyAsync` is insert-only. `SaveManyAsync` uses a guarded PostgreSQL upsert and rolls back the batch if an ownership check fails. Bulk writes arbitrate conflicting keys through the database's unique index. If a bulk or create-only writer inserts an absent key between a single save's existence check and its insert, the single save reports a uniqueness conflict. A caller handling that outcome must reload the row and decide whether its operation still applies. Arbitrary saving callbacks can have effects and are invoked once per attempted entity.
+
+Updating an existing entity through generic `SaveAsync` replaces its saved values. A caller holding an older workflow snapshot needs an expected checkpoint revision to detect an intervening workflow transition. The workflow's `Version` identifies its definition version.
+
 Important base types:
 
 - [PersistenceFeatureBase](../../src/modules/Flamme.Persistence.EFCore.Common/PersistenceFeatureBase.cs)
