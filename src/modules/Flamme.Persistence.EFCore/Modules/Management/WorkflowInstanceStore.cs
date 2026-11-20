@@ -155,10 +155,13 @@ public class EFCoreWorkflowInstanceStore : IWorkflowInstanceStore
         return await _store.DeleteWhereAsync(query => Filter(query, filter), cancellationToken);
     }
 
+    /// <inheritdoc />
+    /// <remarks>A heartbeat advances the stored timestamp only when its sample is newer.</remarks>
     public async Task UpdateUpdatedTimestampAsync(string workflowInstanceId, DateTimeOffset value, CancellationToken cancellationToken = default)
     {
         await using var dbContext = await _store.CreateDbContextAsync(cancellationToken);
-        await dbContext.WorkflowInstances.Where(x => x.Id == workflowInstanceId)
+        await dbContext.WorkflowInstances
+            .Where(x => x.Id == workflowInstanceId && x.UpdatedAt < value)
             .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.UpdatedAt, value), cancellationToken);
     }
 
