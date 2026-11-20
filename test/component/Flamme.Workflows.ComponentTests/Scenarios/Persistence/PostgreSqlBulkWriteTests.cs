@@ -110,7 +110,6 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
                     """).SingleAsync();
                 await Assert.That(advisoryLocks).IsEqualTo(0);
                 await Assert.That(await observer.Rows.CountAsync()).IsEqualTo(0);
-                Console.WriteLine($"Rows={rowCount}, writer backend={writerPid}, advisory locks before commit={advisoryLocks}.");
             }
 
             ambient.Complete();

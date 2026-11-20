@@ -1,18 +1,15 @@
-using System.Diagnostics;
 using System.Transactions;
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
 using Flamme.Persistence.EFCore;
 using Flamme.Persistence.EFCore.EntityHandlers;
-using Flamme.Persistence.EFCore.Extensions;
 using Flamme.Tenants.Options;
+using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using Testcontainers.PostgreSql;
 using TUnit.Core.Interfaces;
 
 namespace Flamme.Workflows.ComponentTests.Scenarios.Persistence;
@@ -82,7 +79,6 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         await Assert.That(stored.Owner).IsEqualTo("a");
         await Assert.That(stored.Payload).IsEqualTo("bulk");
         await Assert.That(stored.Shadow).IsNull();
-        Console.WriteLine($"i11 native bulk first: winner={stored.Payload} tracked_sqlstate={sqlState} callbacks={callbacks}");
     }
 
     [Test]
@@ -103,7 +99,6 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         var stored = await fixture.ReadAsync(id, token);
         await Assert.That(stored.Owner).IsEqualTo("a");
         await Assert.That(stored.Payload).IsEqualTo("bulk");
-        Console.WriteLine("i11 tracked first: native bulk settled the ensuing conflict");
     }
 
     [Test]
@@ -177,19 +172,15 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         var hot = fixture.SaveWithShadowAsync(NewRow(ids[0], "hot"), "hot", token);
         await fixture.WaitForBlockedWriter(blocker.ProcessID, "transactionid", token);
 
-        var clock = Stopwatch.StartNew();
         var cold = Task.WhenAll(ids.Skip(1).Select(id => fixture.SaveWithShadowAsync(NewRow(id, "cold"), "cold", token)));
-        await Task.WhenAny(cold, Task.Delay(TimeSpan.FromSeconds(1), token));
+        await cold.WaitAsync(token);
         var persisted = await fixture.CountAsync(ids[1..], "cold", token);
-        var elapsed = clock.Elapsed.TotalMilliseconds;
         var hotBeforeRelease = hot.IsCompleted;
 
         await transaction.RollbackAsync(token);
-        await Task.WhenAll(cold, hot);
-        Console.WriteLine(FormattableString.Invariant($"i11 held checkpoint persisted={persisted}/48 before_release_ms={elapsed:F1}"));
+        await hot;
         await Assert.That(hotBeforeRelease).IsFalse();
-        await Assert.That(persisted >= 44).IsTrue();
-        await Assert.That(await fixture.CountAsync(ids[1..], "cold", token)).IsEqualTo(48);
+        await Assert.That(persisted).IsEqualTo(48);
         await Assert.That((await fixture.ReadAsync(ids[0], token)).Payload).IsEqualTo("hot");
     }
 
@@ -240,7 +231,6 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         var sqlState = (failure?.InnerException as PostgresException)?.SqlState;
         await Assert.That(sqlState).IsEqualTo(PostgresErrorCodes.UniqueViolation);
         await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("explicit-create");
-        Console.WriteLine($"i11 non-participating AddAsync winner preserved; tracked SQLSTATE={sqlState}");
     }
 
     [Test]
@@ -263,11 +253,9 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         }, token);
 
         var heldPid = await holder.Ready;
-        var (locks, maxLocks, maxConnections, maxPrepared) = await fixture.ReadLockBudgetAsync(heldPid, token);
-        await Assert.That(locks).IsEqualTo(0);
+        await Assert.That(await fixture.CountAdvisoryLocksAsync(heldPid, token)).IsEqualTo(0);
         await holder.ReleaseAsync();
         await Assert.That(await fixture.CountAsync(rows.Select(row => row.Id).ToArray(), "bulk", token)).IsEqualTo(rows.Length);
-        Console.WriteLine($"i11 native batch={rows.Length} insert_only={insertOnly} advisory_held={locks} max_locks_per_transaction={maxLocks} max_connections={maxConnections} max_prepared_transactions={maxPrepared}");
     }
 
     [Test]
@@ -302,7 +290,6 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
             await Assert.That(failure?.Message).Contains("does not support user-initiated transactions");
         }
         await Assert.That(await fixture.CountAsync([unwrapped], "unsupported", token)).IsEqualTo(0);
-        Console.WriteLine("i11 retry strategy: local success; caller-wrapped ambient success; unwrapped ambient rejected");
     }
 
     private static string NewId() => $"id_{Guid.NewGuid():N}";
@@ -324,53 +311,38 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
 
 public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisposable
 {
-    private readonly string _schema = $"i11_{Guid.NewGuid():N}";
-    private readonly string _app = $"i11-{Guid.NewGuid():N}";
+    private readonly PostgreSqlTestDatabase _database = new();
     private readonly DefaultTenantAccessor _tenantAccessor = new();
     private ServiceProvider _services = null!;
-    private PostgreSqlContainer? _container;
     private string _observerConnection = null!;
     private string _writerConnection = null!;
     private IDbContextFactory<TrackedSaveContext> _factory = null!;
 
-    public string Table => $"\"{_schema}\".\"Rows\"";
+    public string Table => $"\"{TrackedSaveContext.SchemaName}\".\"{TrackedSaveContext.TableName}\"";
     public Store<TrackedSaveContext, TrackedSaveRow> Store { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
-        var connectionString = Environment.GetEnvironmentVariable("FLAMME_I11_TEST_POSTGRES");
-        if (string.IsNullOrWhiteSpace(connectionString))
+        await _database.OpenAsync();
+        _writerConnection = new NpgsqlConnectionStringBuilder(_database.ConnectionString)
         {
-            _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
-            await _container.StartAsync();
-            connectionString = _container.GetConnectionString();
-        }
-
-        var userConnection = new NpgsqlConnectionStringBuilder(connectionString)
-        {
-            ApplicationName = _app,
+            Pooling = true,
             MaxPoolSize = 16
-        };
-        _writerConnection = userConnection.ConnectionString;
-        _observerConnection = new NpgsqlConnectionStringBuilder(connectionString)
-        {
-            ApplicationName = _app + "-observer",
-            Enlist = false
         }.ConnectionString;
+        _observerConnection = new NpgsqlConnectionStringBuilder(_database.ConnectionString) { Enlist = false }.ConnectionString;
         _services = new ServiceCollection()
             .AddSingleton<ITenantAccessor>(_tenantAccessor)
             .Configure<TenantsOptions>(options => options.IsEnabled = true)
             .AddScoped<IEntityModelCreatingHandler, SetTenantIdFilter>()
             .AddScoped<IEntitySavingHandler, ApplyTenantId>()
             .AddScoped<IEntitySavingHandler, RecordTrackedSaveHook>()
-            .AddDbContextFactory<TrackedSaveContext>((_, builder) => builder.UseNpgsql(userConnection.ConnectionString)
-                .UseFlammeDbContextOptions(new FlammeDbContextOptions { SchemaName = _schema }))
+            .AddDbContextFactory<TrackedSaveContext>((_, builder) => builder.UseNpgsql(_writerConnection))
             .AddScoped<Store<TrackedSaveContext, TrackedSaveRow>>()
             .BuildServiceProvider();
         _factory = _services.GetRequiredService<IDbContextFactory<TrackedSaveContext>>();
         Store = _services.GetRequiredService<Store<TrackedSaveContext, TrackedSaveRow>>();
         await using var db = await _factory.CreateDbContextAsync();
-        await db.GetService<IRelationalDatabaseCreator>().CreateTablesAsync();
+        await db.Database.EnsureCreatedAsync();
     }
 
     public IDisposable UseTenant(string tenantId) => _tenantAccessor.PushContext(new Tenant { Id = tenantId, Name = tenantId });
@@ -382,10 +354,7 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
         {
             context.Entry(entity).Property("ShadowText").CurrentValue = shadow;
             if (backend != null)
-            {
-                await context.Database.OpenConnectionAsync(ct);
-                backend.SetResult(((NpgsqlConnection)context.Database.GetDbConnection()).ProcessID);
-            }
+                await ReadBackendAsync(context, backend, ct);
         }, token);
 
     public async Task SaveBulkAndReadBackendAsync(TrackedSaveRow row, TaskCompletionSource<int> backend, CancellationToken token)
@@ -422,12 +391,10 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
                 SELECT 1
                 FROM pg_stat_activity a
                 WHERE a.datname = current_database()
-                  AND a.application_name = $1
-                  AND a.wait_event = $2
-                  AND $3 = ANY (pg_blocking_pids(a.pid))
+                  AND a.wait_event = $1
+                  AND $2 = ANY (pg_blocking_pids(a.pid))
             )
             """, observer);
-        command.Parameters.Add(new NpgsqlParameter { Value = _app });
         command.Parameters.Add(new NpgsqlParameter { Value = waitEvent });
         command.Parameters.Add(new NpgsqlParameter { Value = blockerPid });
 
@@ -459,26 +426,20 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
         return (string?)await command.ExecuteScalarAsync(token);
     }
 
-    public async Task<(int Count, string MaxLocks, string MaxConnections, string MaxPrepared)> ReadLockBudgetAsync(
-        int backend, CancellationToken token)
+    public async Task<int> CountAdvisoryLocksAsync(int backend, CancellationToken token)
     {
         await using var db = await OpenObserverAsync(token);
         await using var command = new NpgsqlCommand("""
-            SELECT (SELECT count(*)::integer FROM pg_locks WHERE pid = $1 AND locktype = 'advisory' AND granted),
-                current_setting('max_locks_per_transaction'), current_setting('max_connections'),
-                current_setting('max_prepared_transactions')
+            SELECT count(*)::integer FROM pg_locks WHERE pid = $1 AND locktype = 'advisory'
             """, db);
         command.Parameters.Add(new NpgsqlParameter { Value = backend });
-        await using var reader = await command.ExecuteReaderAsync(token);
-        await reader.ReadAsync(token);
-        return (reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3));
+        return (int)(await command.ExecuteScalarAsync(token))!;
     }
 
     public (IDbContextFactory<TrackedSaveContext>, Store<TrackedSaveContext, TrackedSaveRow>) CreateRetryingStore()
     {
         var options = new DbContextOptionsBuilder<TrackedSaveContext>();
-        options.UseNpgsql(_writerConnection, provider => provider.EnableRetryOnFailure())
-            .UseFlammeDbContextOptions(new FlammeDbContextOptions { SchemaName = _schema });
+        options.UseNpgsql(_writerConnection, provider => provider.EnableRetryOnFailure());
         var factory = new RetryContextFactory(options.Options, _services);
         return (factory, new Store<TrackedSaveContext, TrackedSaveRow>(factory, _services));
     }
@@ -491,16 +452,20 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
 
     public async ValueTask DisposeAsync()
     {
-        if (_services != null)
+        try
         {
-            await using var db = await OpenObserverAsync(CancellationToken.None);
-            await using var command = new NpgsqlCommand($"DROP SCHEMA IF EXISTS \"{_schema}\" CASCADE", db);
-            await command.ExecuteNonQueryAsync();
-            await _services.DisposeAsync();
+            if (_services != null)
+                await _services.DisposeAsync();
         }
-
-        if (_container != null)
-            await _container.DisposeAsync();
+        finally
+        {
+            if (_writerConnection != null)
+            {
+                await using var writer = new NpgsqlConnection(_writerConnection);
+                NpgsqlConnection.ClearPool(writer);
+            }
+            await _database.DisposeAsync();
+        }
     }
 
     public sealed class HeldWrite : IAsyncDisposable
@@ -546,9 +511,12 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
 public sealed class TrackedSaveContext(DbContextOptions<TrackedSaveContext> options, IServiceProvider services)
     : FlammeDbContextBase(options, services)
 {
+    internal const string SchemaName = "Elsa";
+    internal const string TableName = "TrackedSaveRows";
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var row = modelBuilder.Entity<TrackedSaveRow>().ToTable("Rows");
+        var row = modelBuilder.Entity<TrackedSaveRow>().ToTable(TableName, SchemaName);
         row.HasKey(entity => entity.Id);
         row.Property(entity => entity.Id).HasConversion(v => v.ToUpperInvariant(), v => v.ToLowerInvariant());
         row.Property(entity => entity.Payload).HasConversion(v => v.ToUpperInvariant(), v => v.ToLowerInvariant());
