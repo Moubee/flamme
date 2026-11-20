@@ -21,6 +21,8 @@ Install the SDK selected by [global.json](global.json) (.NET SDK 11.0.100 with
 patch roll-forward), plus the .NET 10 runtime to run both supported targets.
 Libraries, app hosts, and correctness tests target .NET 10 and .NET 11; performance
 benchmarks target .NET 10. .NET 8 and .NET 9 are no longer supported.
+For PostgreSQL workflow persistence and reference-host measurements, see the
+[workflow store benchmarks](test/performance/Flamme.Workflows.PerformanceTests/WorkflowStore/README.md).
 
 .NET 11 server builds enable [runtime async](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime)
 centrally through the compiler's `runtime-async=on` feature. .NET 10 keeps the
