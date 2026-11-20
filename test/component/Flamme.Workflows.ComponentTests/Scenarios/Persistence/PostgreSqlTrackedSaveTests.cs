@@ -537,6 +537,59 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         });
 
     [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public Task OptedOutWriterCommitsIndependentlyAfterPreparationReadClosesConnection(bool bulk) =>
+        AssertWriterAmbientOutcomeAsync(fixture.CreateStore(enlistment: "Enlist = false").Store, enlist: false, bulk,
+            async (context, _, ct) => { await context.Set<TrackedSaveRow>().AsNoTracking().CountAsync(ct); });
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public Task WriterPreservesTransactionWhenPreparationLeavesAnEfOpenedConnection(bool bulk) =>
+        AssertWriterAmbientOutcomeAsync(fixture.CreateStore(enlistment: "Enlist = false").Store, enlist: true, bulk,
+            async (context, _, ct) => await context.Database.OpenConnectionAsync(ct));
+
+    [Test]
+    [Arguments("Enlist = false", false)]
+    [Arguments("Enlist = false", true)]
+    [Arguments("Enlist=false", false)]
+    [Arguments("Enlist=false", true)]
+    public Task WriterPreservesEnlistmentThroughUnderlyingConnection(string enlistment, bool bulk) =>
+        AssertWriterAmbientOutcomeAsync(fixture.CreateStore(enlistment: enlistment).Store, enlist: true, bulk,
+            async (context, _, ct) =>
+            {
+                var connection = context.Database.GetDbConnection();
+                await connection.OpenAsync(ct);
+                connection.EnlistTransaction(Transaction.Current);
+            });
+
+    [Test]
+    public async Task UnderlyingConnectionEnlistmentHoldsTheTrackedKeyLockUntilCommit()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var id = NewId();
+        var (_, store) = fixture.CreateStore(enlistment: "Enlist=false");
+        await using var holder = fixture.SaveInHeldTransaction(backend => store.SaveAsync(NewRow(id, "first"), row => row.Id,
+            async (context, _, ct) =>
+            {
+                var connection = (NpgsqlConnection)context.Database.GetDbConnection();
+                await connection.OpenAsync(ct);
+                connection.EnlistTransaction(Transaction.Current);
+                backend.SetResult(connection.ProcessID);
+            }, token), token);
+        var heldPid = await holder.Ready;
+        var second = fixture.SaveWithShadowAsync(NewRow(id, "second"), "second", token);
+
+        await fixture.WaitForBlockedWriter(heldPid, "advisory", token);
+        await holder.ReleaseAsync();
+        await second;
+        await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("second");
+    }
+
+    [Test]
     public async Task OptedOutCallerConnectionStaysReusableAfterSecurityInfoIsHidden()
     {
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));

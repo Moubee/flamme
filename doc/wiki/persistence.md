@@ -25,7 +25,9 @@ Shared EF Core infrastructure lives in [Flamme.Persistence.EFCore.Common](../../
 
 Each store call owns a context. Separate calls can write different IDs concurrently. Within a bulk call, the store awaits each saving callback on its shared context. Single-row `SaveAsync` keeps the EF tracked save pipeline and serializes participating single saves of the same mapped key using a PostgreSQL transaction-scoped advisory lock.
 
-The store honors Npgsql's ambient enlistment setting. A connection configured with `Enlist=false` commits independently of an ambient transaction unless the caller explicitly enlists it. When Npgsql EF misreads an equivalent spelling such as `Enlist = false`, the store suppresses the ambient scope during database work and EF saving hooks. The caller's `onSaving` callback still sees the original scope.
+The store honors Npgsql's ambient enlistment setting. With `Enlist=false`, the store commits independently when it starts its own transaction. If Npgsql EF misreads an equivalent spelling such as `Enlist = false`, the store suppresses the ambient scope for that independent write, including its EF saving hooks. The caller's `onSaving` callback still sees the original scope.
+
+Within an ambient scope, the store borrows an active transaction on an opted-out connection left open by the preparation callback. This includes enlistment through the underlying ADO.NET connection. If an EF preparation query closes the opted-out connection, the store starts its write in an independent transaction. A borrowed transaction keeps its isolation level and holds any tracked key lock until the caller finishes it.
 
 In a caller-owned transaction, a savepoint protects earlier work if the store call fails while waiting for a lock or writing. When the store owns the transaction, configured retries can reopen the connection, reacquire the lock and repeat the lookup before a tracked write. The preparation callback runs once. Errors from saving hooks, mutations or commit propagate to the caller for resolution.
 

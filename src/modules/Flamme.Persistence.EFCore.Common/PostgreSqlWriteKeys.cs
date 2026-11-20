@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Runtime.ExceptionServices;
@@ -14,6 +15,8 @@ namespace Flamme.Persistence.EFCore;
 /// </summary>
 internal static class PostgreSqlWriteKeys
 {
+    private const string StoreSavepoint = "flamme_store_write";
+
     internal static bool Supports(DbContext context) =>
         context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
@@ -48,15 +51,46 @@ internal static class PostgreSqlWriteKeys
 
         var explicitlyEnlisted = database.GetEnlistedTransaction();
         var enlistedOrAmbient = explicitlyEnlisted ?? GetAmbientTransaction(context);
-        if (explicitlyEnlisted is null && enlistedOrAmbient is not null && HasAmbientEnlistmentOptOut(database))
+        if (explicitlyEnlisted is null && (enlistedOrAmbient ?? Transaction.Current) is not null &&
+            HasAmbientEnlistmentOptOut(database))
         {
+            var connection = database.GetDbConnection();
+            if (connection.State == ConnectionState.Open && await TrySavepointOnOpenConnectionAsync(connection, cancellationToken))
+            {
+                // The callback left an actual transaction on this session. EF may have no
+                // transaction record for direct ADO.NET enlistment.
+                var autoTransactions = database.AutoTransactionBehavior;
+                database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+                try
+                {
+                    await ExecuteAtSavepointAsync(alreadyCreated: true);
+                }
+                finally
+                {
+                    database.AutoTransactionBehavior = autoTransactions;
+                }
+                return;
+            }
+
             // Npgsql EF 10 detects the literal "Enlist=false" and can misread equivalent spellings.
-            // Hide the ambient transaction during the store-owned unit, including EF saving hooks.
-            // The onSaving callback runs beforehand in the original scope.
-            using var suppression = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
-            await ExecuteLocallyAsync();
-            suppression.Complete();
-            return;
+            if (enlistedOrAmbient is not null)
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    // A preparation query can leave only EF's ambient bookkeeping after
+                    // closing the session. Clear it before opening an independent transaction.
+                    var commandTimeout = database.GetCommandTimeout();
+                    await context.GetService<IDbContextTransactionManager>().ResetStateAsync(cancellationToken);
+                    database.SetCommandTimeout(commandTimeout);
+                }
+
+                // Hide the ambient transaction during the local write and its EF saving hooks.
+                // The onSaving callback has already run in the original scope.
+                using var suppression = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
+                await ExecuteLocallyAsync();
+                suppression.Complete();
+                return;
+            }
         }
 
         if (enlistedOrAmbient is not null)
@@ -104,23 +138,26 @@ internal static class PostgreSqlWriteKeys
             failure?.Throw();
         }
 
-        async Task ExecuteAtSavepointAsync()
+        async Task ExecuteAtSavepointAsync(bool alreadyCreated = false)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             // Keep savepoint commands independent of cancellation of the protected work.
-            const string savepoint = "flamme_store_write";
-            await database.ExecuteSqlRawAsync("SAVEPOINT " + savepoint, CancellationToken.None);
+            if (!alreadyCreated)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await database.ExecuteSqlRawAsync("SAVEPOINT " + StoreSavepoint, CancellationToken.None);
+            }
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await write(await prepare());
-                await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + savepoint, CancellationToken.None);
+                await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + StoreSavepoint, CancellationToken.None);
             }
             catch (Exception writeException)
             {
                 try
                 {
-                    await database.ExecuteSqlRawAsync("ROLLBACK TO SAVEPOINT " + savepoint, CancellationToken.None);
-                    await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + savepoint, CancellationToken.None);
+                    await database.ExecuteSqlRawAsync("ROLLBACK TO SAVEPOINT " + StoreSavepoint, CancellationToken.None);
+                    await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + StoreSavepoint, CancellationToken.None);
                 }
                 catch (Exception rollbackException)
                 {
@@ -129,6 +166,22 @@ internal static class PostgreSqlWriteKeys
 
                 throw;
             }
+        }
+    }
+
+    private static async Task<bool> TrySavepointOnOpenConnectionAsync(DbConnection connection, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SAVEPOINT " + StoreSavepoint;
+        try
+        {
+            await command.ExecuteNonQueryAsync(CancellationToken.None);
+            return true;
+        }
+        catch (DbException exception) when (exception.SqlState == "25P01") // No active SQL transaction.
+        {
+            return false;
         }
     }
 
@@ -142,10 +195,8 @@ internal static class PostgreSqlWriteKeys
         if (key == null)
             return;
 
+        // ExecuteAsync prepares the write inside a local transaction or a borrowed savepoint.
         var database = context.Database;
-        if (database.CurrentTransaction is null && database.GetEnlistedTransaction() is null)
-            throw new InvalidOperationException("PostgreSQL write keys require an active database transaction.");
-
         var sql = context.GetService<ISqlGenerationHelper>();
         var tableName = sql.DelimitIdentifier(table.Name, table.Schema);
         var column = keyProperty.GetColumnName(table)!;
