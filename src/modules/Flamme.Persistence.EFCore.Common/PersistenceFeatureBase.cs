@@ -47,6 +47,8 @@ public abstract class PersistenceFeatureBase<TFeature, TDbContext>(IModule modul
         Action<IServiceProvider, DbContextOptionsBuilder> setup = (sp, opts) =>
         {
             opts.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            if (opts.Options.FindExtension<FlammeDbContextOptionsExtension>() == null)
+                opts.AddFlammeOptions(null);
             DbContextOptionsBuilder(sp, opts);
         };
 

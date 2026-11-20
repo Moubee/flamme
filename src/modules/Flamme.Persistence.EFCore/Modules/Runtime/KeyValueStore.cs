@@ -14,7 +14,7 @@ public class EFCoreKeyValueStore(Store<RuntimeFlammeDbContext, SerializedKeyValu
     /// <inheritdoc />
     public Task SaveAsync(SerializedKeyValuePair keyValuePair, CancellationToken cancellationToken)
     {
-        return store.SaveAsync(keyValuePair, x => x.Id, cancellationToken);
+        return store.SaveOwnedAsync(keyValuePair, x => x.Id, cancellationToken);
     }
 
     /// <inheritdoc />

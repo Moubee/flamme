@@ -97,6 +97,23 @@ Tenant conventions are documented in ADRs:
 - [ADR 0008: Empty String As Default Tenant ID](../adr/0008-empty-string-as-default-tenant-id.md)
 - [ADR 0009: Asterisk Sentinel Value For Tenant-Agnostic Entities](../adr/0009-asterisk-sentinel-value-for-tenant-agnostic-entities.md)
 
+## Concurrent PostgreSQL writes
+
+Workflow checkpoints and explicit instance saves use the tracked EF store. Each call prepares its own context, reads the primary key and owner, then calls `SaveChangesAsync` once. A writer waiting for a row holds up other writers to that row. Unrelated instances can commit independently.
+
+`SaveManyAsync` looks up existing IDs in groups of 500. It applies inserts, updates, shadow properties populated by serializers, and other tracked changes in one EF save. `AddManyAsync` remains insert-only. Both batch methods await each preparation callback in input order. EF saving handlers run for bulk saves as well as single saves. Each store call has its own atomicity boundary under the default host configuration.
+
+With multitenancy enabled, an update compares the original stored `TenantId` in the database. A delete or owner change after the lookup can raise `DbUpdateConcurrencyException`. The default tenant can update a legacy SQL NULL owner and stamp the empty string. A named tenant can resave an explicitly shared workflow definition as `*`. An implicit named owner cannot take over that row. The key-value store reserves replacement of a shared key for an agnostic writer. Trusted callers can still supply an explicit owner when creating a fresh ID.
+
+### Upgrading store callers
+
+- Two concurrent saves that both read an absent ID may race to insert it, including within one process. The loser receives the database uniqueness error through the configured exception handler. A failed batch rolls back its sibling writes. At an existing ID, later same-owner snapshots may overwrite earlier ones. Callers that need versioned checkpoints must supply their own version check.
+- A single save that encounters a hidden ID follows the filtered lookup and can receive a primary-key violation. A bulk save checks existing ownership across tenants and refuses an incompatible batch before committing. Handle errors at the operation boundary and reload the current state before making a new write decision. The store invokes preparation callbacks once per submission.
+- Pass each primary key once per save batch. Store saves accept the mapped single string primary key. For custom schemas, use keys that round-trip with the same spelling and case-sensitive owner equality as in the shipped PostgreSQL schema. Collation aliases and non-injective value converters can cause a refused save or a constraint violation. Migrate those keys and deduplicate input before calling the store.
+- Treat a bulk save as an unordered set. For example, trigger `z` can release a unique registration hash that trigger `a` needs. EF may update `a` first, which raises PostgreSQL `23505` and rolls back both updates. For an ordered handoff, open an ambient `TransactionScope` with async flow enabled and the normal enlisted connection. Await a single `SaveAsync` for `z`, await a single `SaveAsync` for `a`, then complete the scope. A failing second save rolls back the release as well.
+- Replace calls to the removed `DbContext.BulkUpsertAsync` extension with the registered store's `SaveManyAsync`. A caller that owns its own context and transaction can use EF tracking and `SaveChangesAsync` directly. Move any side effects duplicated between bulk preparation and EF saving handlers to one hook. Database transactions cover tracked database changes. Custom callbacks that perform their own I/O own those effects.
+- The existing nullable `TenantId` column supplies the EF concurrency token. Deploy the updated assemblies against the existing schema. Custom tenant-enabled EF models must retain that mapping. Detached EF writers outside the store must provide the original stored owner. PostgreSQL workflow heartbeats advance `UpdatedAt` through a tenant-filtered SQL update. An equal or older heartbeat leaves the stored timestamp in place. Custom EF saving handlers for heartbeat notifications need a separate hook.
+
 ## Operational Log Storage
 
 Operational logs and telemetry are stored by the host's external logging and observability pipeline. Flamme's custom structured-log, console-log, and OpenTelemetry storage packages have been removed; see the [migration guide](opentelemetry-workflows.md#upgrading-from-elsa-diagnostics-packages). Workflow execution journals and persisted activity records remain domain data.

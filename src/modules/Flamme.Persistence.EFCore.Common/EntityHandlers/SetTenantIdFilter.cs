@@ -13,19 +13,18 @@ namespace Flamme.Persistence.EFCore.EntityHandlers;
 /// </summary>
 public class SetTenantIdFilter(IOptions<TenantsOptions> tenantsOptions) : IEntityModelCreatingHandler
 {
+    internal const string FilterName = "FlammeTenant";
+
     /// <inheritdoc />
     public void Handle(FlammeDbContextBase dbContext, ModelBuilder modelBuilder, IMutableEntityType entityType)
     {
         if (!typeof(Entity).IsAssignableFrom(entityType.ClrType))
             return;
 
-        // Only apply the tenant filter if multitenancy is enabled
-        if (!tenantsOptions.Value.IsEnabled)
-            return;
-
-        modelBuilder
-            .Entity(entityType.ClrType)
-            .HasQueryFilter(CreateTenantFilterExpression(dbContext, entityType.ClrType));
+        var builder = modelBuilder.Entity(entityType.ClrType);
+        builder.Property(nameof(Entity.TenantId)).IsConcurrencyToken(tenantsOptions.Value.IsEnabled);
+        if (tenantsOptions.Value.IsEnabled)
+            builder.HasQueryFilter(FilterName, CreateTenantFilterExpression(dbContext, entityType.ClrType));
     }
 
     private LambdaExpression CreateTenantFilterExpression(FlammeDbContextBase dbContext, Type clrType)

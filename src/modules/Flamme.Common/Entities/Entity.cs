@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Flamme.Common.Entities;
 
 /// <summary>
@@ -13,5 +15,6 @@ public abstract class Entity
     /// <summary>
     /// Gets or sets the ID of the tenant that own this entity.
     /// </summary>
+    [ConcurrencyCheck]
     public string? TenantId { get; set; }
 }
