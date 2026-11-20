@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
+using Npgsql;
 
 namespace Flamme.Workflows.PerformanceTests.WorkflowStore;
 
@@ -101,6 +102,15 @@ public class WorkflowLifecycleBenchmarks
             if (matched != batch.Length)
                 throw new InvalidDataException($"Expected {batch.Length} {(finished ? "finished" : "suspended")} instances in the audit batch, verified {matched}.");
         }
+
+        const string sql = """SELECT count(*) FROM "Elsa"."WorkflowInstances" WHERE "DefinitionId" = @definition""";
+        await using var connection = new NpgsqlConnection(_host.ConnectionString);
+        await connection.OpenAsync();
+        await using var count = new NpgsqlCommand(sql, connection);
+        count.Parameters.AddWithValue("definition", _definition);
+        long total = (long)(await count.ExecuteScalarAsync())!;
+        if (total != _count)
+            throw new InvalidDataException($"Expected exactly {_count} persisted instances of {_definition}, found {total}.");
     }
 
     [GlobalCleanup]
