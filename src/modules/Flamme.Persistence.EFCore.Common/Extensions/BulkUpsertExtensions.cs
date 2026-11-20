@@ -3,6 +3,7 @@ using System.Text;
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -109,38 +110,92 @@ public static class BulkUpsertExtensions
                 throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name}: duplicate key '{key}' in the batch.");
         }
 
-        // Preserve caller order when mapped constraints or triggers can make DML order significant.
-        var writeOrder = CanOrderByConflictKey(dbContext, table, keyProperty)
-            ? entities.OrderBy(entity => PostgreSqlWriteKeys.GetProviderKey(keyProperty, getKey(entity)), StringComparer.Ordinal).ToArray()
-            : entities;
-
         await PostgreSqlWriteKeys.ExecuteAsync(dbContext, async () =>
         {
+            var writeOrder = entities.Count > 1 && await CanOrderByConflictKeyAsync(dbContext, table, keyProperty, cancellationToken)
+                ? entities.OrderBy(entity => PostgreSqlWriteKeys.GetProviderKey(keyProperty, getKey(entity)), StringComparer.Ordinal).ToArray()
+                : entities;
+            var storedKeys = new HashSet<string>(StringComparer.Ordinal);
+
             foreach (var batch in writeOrder.Chunk(batchSize))
             {
                 var (sql, parameters) = GeneratePostgresUpsert(dbContext, batch, entityType, keyProperty, table, writerTenantId);
-                var affected = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
-                if (affected != batch.Length)
+                var affected = await ReadReturnedKeysAsync(dbContext, sql, parameters, cancellationToken);
+                if (affected.Count != batch.Length)
                 {
                     var reason = writerTenantId == null
                         ? "The database refused a batch row."
                         : "Check tenant ownership and the exact stored key. Shared rows need TenantId '*'.";
                     throw new InvalidOperationException(
-                        $"Cannot save {typeof(TEntity).Name}: the database affected {affected} of {batch.Length} rows. {reason}");
+                        $"Cannot save {typeof(TEntity).Name}: the database affected {affected.Count} of {batch.Length} rows. {reason}");
+                }
+
+                // The conflict target can equate keys that are distinct to EF (for example, citext aliases).
+                foreach (var key in affected)
+                {
+                    if (key != null && !storedKeys.Add(key))
+                        throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name}: duplicate stored key '{key}' in the batch.");
                 }
             }
         }, cancellationToken);
     }
 
-    private static bool CanOrderByConflictKey(DbContext dbContext, StoreObjectIdentifier storeObject, IProperty keyProperty)
+    private static async Task<List<string?>> ReadReturnedKeysAsync(
+        DbContext dbContext, string sql, object[] parameters, CancellationToken cancellationToken)
     {
-        var table = dbContext.Model.GetRelationalModel().FindTable(storeObject.Name, storeObject.Schema);
-        return table?.PrimaryKey is { Columns: [var column] } primaryKey &&
-               column.Name == keyProperty.GetColumnName(storeObject) &&
-               table.UniqueConstraints.All(constraint => constraint == primaryKey) &&
-               !table.Indexes.Any(index => index.IsUnique) &&
-               !table.ForeignKeyConstraints.Any(constraint => constraint.PrincipalTable == table) &&
-               !table.Triggers.Any();
+        // Execute DML directly so the query pipeline cannot retry it or wrap its PostgreSQL error.
+        var command = dbContext.GetService<IRawSqlCommandBuilder>().Build(sql, parameters, dbContext.Model);
+        var arguments = new RelationalCommandParameterObject(
+            dbContext.GetService<IRelationalConnection>(), command.ParameterValues, null, dbContext,
+            dbContext.GetService<IRelationalCommandDiagnosticsLogger>(), CommandSource.ExecuteSqlRaw);
+        await using var reader = await command.RelationalCommand.ExecuteReaderAsync(arguments, cancellationToken);
+        var keys = new List<string?>();
+        while (await reader.ReadAsync(cancellationToken))
+            keys.Add(reader.DbDataReader.IsDBNull(0) ? null : reader.DbDataReader.GetString(0));
+        return keys;
+    }
+
+    private static async Task<bool> CanOrderByConflictKeyAsync(
+        DbContext dbContext, StoreObjectIdentifier storeObject, IProperty keyProperty, CancellationToken cancellationToken)
+    {
+        var sql = dbContext.GetService<ISqlGenerationHelper>();
+        var tableName = sql.DelimitIdentifier(storeObject.Name, storeObject.Schema);
+        var keyColumn = keyProperty.GetColumnName(storeObject);
+        var database = dbContext.Database;
+        // Preserve caller order if the physical schema could make write order significant.
+        var eligibility = database.SqlQuery<bool>($"""
+            SELECT pg_catalog.current_setting('transaction_isolation') IN ('read committed', 'read uncommitted')
+              AND EXISTS (
+                SELECT 1
+                FROM pg_catalog.pg_class AS target
+                JOIN pg_catalog.pg_index AS pk ON pk.indrelid = target.oid AND pk.indisprimary
+                JOIN pg_catalog.pg_attribute AS key_column ON key_column.attrelid = target.oid AND key_column.attnum = pk.indkey[0]
+                JOIN pg_catalog.pg_opclass AS opclass ON opclass.oid = pk.indclass[0]
+                JOIN pg_catalog.pg_collation AS key_collation ON key_collation.oid = pk.indcollation[0]
+                WHERE target.oid = pg_catalog.to_regclass({tableName})
+                  AND target.relkind = 'r' AND NOT target.relispartition AND NOT target.relhassubclass
+                  AND NOT target.relhastriggers AND NOT target.relhasrules
+                  AND pk.indnkeyatts = 1 AND pk.indisvalid AND key_column.attname = {keyColumn}
+                  AND key_column.atttypid IN ('pg_catalog.text'::regtype, 'pg_catalog.varchar'::regtype)
+                  AND opclass.opcdefault AND opclass.opcnamespace = 'pg_catalog'::regnamespace
+                  AND key_collation.collisdeterministic
+                  AND (pg_catalog.has_table_privilege(target.oid, 'INSERT')
+                       OR pg_catalog.has_table_privilege(target.oid, 'UPDATE'))
+                  AND NOT EXISTS (
+                      SELECT 1 FROM pg_catalog.pg_index AS other
+                      WHERE other.indrelid = target.oid AND other.indexrelid <> pk.indexrelid
+                        AND (other.indisunique OR other.indisexclusion)
+                  )
+              ) AS "Value"
+            """);
+        if (!await eligibility.SingleAsync(cancellationToken))
+            return false;
+
+        // The upsert takes this writer-compatible lock anyway. Take it before rechecking the catalogs
+        // so that concurrent DDL cannot make a newly discovered write order unsafe.
+        var lockTable = $"LOCK TABLE ONLY {tableName} IN ROW EXCLUSIVE MODE";
+        await database.ExecuteSqlRawAsync(lockTable, cancellationToken);
+        return await eligibility.SingleAsync(cancellationToken);
     }
 
     private static (string, object[]) GeneratePostgresUpsert<TEntity>(
@@ -230,6 +285,7 @@ public static class BulkUpsertExtensions
             parameters.Add(tenantMapping.CreateParameter(command, "bulk_shared_tenant", Tenant.AgnosticTenantId));
         }
 
+        sb.AppendLine($"RETURNING stored.{keyColumnName}::text AS \"Value\"");
         return (sb.ToString(), parameters.ToArray());
     }
 }

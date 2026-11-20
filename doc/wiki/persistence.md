@@ -31,6 +31,8 @@ Under Read Committed, the tracked lookup after an advisory-lock wait takes a new
 
 `AddManyAsync` is insert-only. `SaveManyAsync` uses a guarded PostgreSQL upsert and rolls back the batch if an ownership check fails. Bulk writes arbitrate conflicting keys through the database's unique index. If a bulk or create-only writer inserts an absent key between a single save's existence check and its insert, the single save reports a uniqueness conflict. A caller handling that outcome must reload the row and decide whether its operation still applies. Arbitrary saving callbacks can have effects and are invoked once per attempted entity.
 
+Bulk upserts reject repeated provider keys before writing and roll back if separate chunks resolve to the same stored key. A single spelling alias can still update the stored row when the ownership policy allows the conflict update. Bulk writes use converted-key order when PostgreSQL's catalogs confirm a simple text primary key under Read Committed. Tables with other unique indexes, triggers, or key equality based on case or padding use caller order. Caller order allows an earlier input to release a unique value for a later input. Preexisting locks, overlapping caller-ordered writes, or writes to several tables can still deadlock. PostgreSQL reports the conflict and the bulk operation rolls back. Retry at the transaction boundary when the operation can be safely replayed.
+
 Updating an existing entity through generic `SaveAsync` replaces its saved values. A caller holding an older workflow snapshot needs an expected checkpoint revision to detect an intervening workflow transition. The workflow's `Version` identifies its definition version.
 
 Important base types:

@@ -81,6 +81,80 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
     }
 
     [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task CitextAliasesInDifferentChunksRollbackAndAllowSingleAliasUpdate(bool existingRow)
+    {
+        await using var scenario = await CreateScenarioAsync(tenantsEnabled: false);
+        await using var db = await scenario.Store.CreateDbContextAsync();
+        await db.Database.ExecuteSqlRawAsync("""
+            CREATE EXTENSION citext;
+            ALTER TABLE "Elsa"."OwnedRows" ALTER COLUMN "Id" TYPE citext;
+            """);
+        if (existingRow)
+            await scenario.Store.AddAsync(Row("A", "original"));
+
+        var rows = Enumerable.Range(0, 49).Select(index => Row($"B{index:00}"))
+            .Prepend(Row("A", "first")).Append(Row("a", "second")).ToArray();
+        await using (var transaction = await db.Database.BeginTransactionAsync())
+        {
+            await db.BulkUpsertAsync([Row("keep")], row => row.Id, batchSize: 1);
+            var failure = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+                db.BulkUpsertAsync(rows, row => row.Id, batchSize: 50));
+            await Assert.That(failure!.Message).Contains("duplicate stored key");
+            await db.BulkUpsertAsync([Row("after")], row => row.Id, batchSize: 1);
+            await transaction.CommitAsync();
+        }
+
+        await Assert.That(await db.Rows.CountAsync()).IsEqualTo(existingRow ? 3 : 2);
+        await Assert.That(await ReadStoredPayloadAsync(db, "A")).IsEqualTo(existingRow ? "original" : null);
+        await Assert.That(await ReadStoredPayloadAsync(db, "keep")).IsNotNull();
+        await Assert.That(await ReadStoredPayloadAsync(db, "after")).IsNotNull();
+
+        if (!existingRow)
+            await scenario.Store.AddAsync(Row("A", "original"));
+        await scenario.Store.SaveManyAsync([Row("a", "single alias")], row => row.Id, onSaving: null);
+        await Assert.That(await ReadStoredPayloadAsync(db, "A")).IsEqualTo("single alias");
+        await Assert.That(await ReadStoredPayloadAsync(db, "a")).IsNull();
+    }
+
+    [Test]
+    public async Task PaddedAliasesWithSameOwnerRollbackAcrossChunks()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        await using var db = await scenario.Store.CreateDbContextAsync();
+        await db.Database.ExecuteSqlRawAsync("""
+            ALTER TABLE "Elsa"."OwnedRows" ALTER COLUMN "Id" TYPE character(4);
+            """);
+        await scenario.Store.AddAsync(Row("A", "original"));
+        var rows = Enumerable.Range(0, 49).Select(index => Row($"{index:00}"))
+            .Append(Row("A", "first")).Append(Row("A ", "second")).ToArray();
+
+        var failure = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+            scenario.Store.SaveManyAsync(rows, row => row.Id, onSaving: null));
+        await Assert.That(failure!.Message).Contains("duplicate stored key");
+        await Assert.That(await db.Rows.CountAsync()).IsEqualTo(1);
+        await Assert.That(await ReadStoredPayloadAsync(db, "A")).IsEqualTo("original");
+
+        await scenario.Store.SaveManyAsync([Row("A ", "single alias")], row => row.Id, onSaving: null);
+        await Assert.That(await ReadStoredPayloadAsync(db, "A")).IsEqualTo("single alias");
+    }
+
+    [Test]
+    public async Task DatabaseManagedUniqueIndexPreservesCallerOrder()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        await scenario.Store.SaveManyAsync([Row("z", "occupied"), Row("warmup", "warmup")], row => row.Id, onSaving: null);
+        await using (var db = await scenario.Store.CreateDbContextAsync())
+            await db.Database.ExecuteSqlRawAsync("""CREATE UNIQUE INDEX owned_payload_unique ON "Elsa"."OwnedRows" ("Payload")""");
+
+        await scenario.Store.SaveManyAsync([Row("z", "vacated"), Row("a", "occupied")], row => row.Id, onSaving: null);
+
+        await Assert.That((await scenario.FindAsync("z"))!.Payload).IsEqualTo("vacated");
+        await Assert.That((await scenario.FindAsync("a"))!.Payload).IsEqualTo("occupied");
+    }
+
+    [Test]
     public async Task LargeDistinctBulkRoundTripsWithoutAdvisoryLocks()
     {
         await using var scenario = await CreateScenarioAsync();
@@ -358,8 +432,8 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
         await Assert.That(await scenario.FindAsync(victimRows[0].Id)).IsNotNull();
     }
 
-    private Task<OwnershipStoreScenario> CreateScenarioAsync() =>
-        OwnershipStoreScenario.CreatePostgreSqlAsync(fixture.ConnectionString, "tenant-a", tenantsEnabled: true);
+    private Task<OwnershipStoreScenario> CreateScenarioAsync(bool tenantsEnabled = true) =>
+        OwnershipStoreScenario.CreatePostgreSqlAsync(fixture.ConnectionString, "tenant-a", tenantsEnabled);
 
     private static OwnedRow Row(string id, string payload = "initial", string tenant = "tenant-a") =>
         new() { Id = id, TenantId = tenant, Payload = payload };
@@ -373,6 +447,11 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
 
     private static Task<int> BackendPidAsync(OwnershipDbContext db) =>
         db.Database.SqlQueryRaw<int>("""SELECT pg_backend_pid() AS "Value" """).SingleAsync();
+
+    private static Task<string?> ReadStoredPayloadAsync(OwnershipDbContext db, string key) =>
+        db.Database.SqlQuery<string>($"""
+            SELECT "Payload" AS "Value" FROM "Elsa"."OwnedRows" WHERE "Id"::text = {key}
+            """).SingleOrDefaultAsync();
 
     private static async Task WaitForTransactionBlockAsync(OwnershipStoreScenario scenario, int blocker)
     {
