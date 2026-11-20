@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
@@ -24,8 +23,7 @@ public class SetOutput : CodeActivity
     /// </summary>
     [Input(
         DisplayName = "Output",
-        Description = "The output to assign.",
-        UIHint = InputUIHints.OutputPicker
+        Description = "The output to assign."
     )]
     public Input<string> OutputName { get; set; } = null!;
 

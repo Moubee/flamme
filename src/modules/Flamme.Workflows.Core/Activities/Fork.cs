@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Signals;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities;
@@ -28,8 +27,7 @@ public class Fork : Activity
     /// Controls when this activity yields control back to its parent activity.
     /// </summary>
     [Input(
-        Description = "Controls when this activity yields control back to its parent activity.",
-        UIHint = InputUIHints.DropDown
+        Description = "Controls when this activity yields control back to its parent activity."
     )]
     public ForkJoinMode JoinMode { get; set; } = ForkJoinMode.WaitAll;
 

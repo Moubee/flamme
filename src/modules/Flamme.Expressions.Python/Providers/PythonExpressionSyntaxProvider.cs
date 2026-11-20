@@ -1,6 +1,5 @@
 using Flamme.Expressions.Contracts;
 using Flamme.Expressions.Models;
-using Flamme.Extensions;
 using Flamme.Expressions.Python.Expressions;
 using Flamme.Expressions.Python.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,6 @@ internal class PythonExpressionDescriptorProvider(IOptions<PythonOptions> option
             Type = TypeName,
             DisplayName = "Python",
             IsBrowsable = options.Value.AllowHostCodeExecution,
-            Properties = new { MonacoLanguage = "python" }.ToDictionary(),
             HandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<PythonExpressionHandler>
         };
     }

@@ -39,10 +39,10 @@ public class DefaultExpressionDescriptorProvider : IExpressionDescriptorProvider
             });
     }
 
-    private ExpressionDescriptor CreateObjectDescriptor() => CreateDescriptor<ObjectExpressionHandler>("Object", "Object", monacoLanguage: "json", isBrowsable: false);
+    private ExpressionDescriptor CreateObjectDescriptor() => CreateDescriptor<ObjectExpressionHandler>("Object", "Object", isBrowsable: false);
 
     [Obsolete("Use Object instead.")]
-    private ExpressionDescriptor CreateJsonDescriptor() => CreateDescriptor<ObjectExpressionHandler>("Json", "Json", monacoLanguage: "json", isBrowsable: false);
+    private ExpressionDescriptor CreateJsonDescriptor() => CreateDescriptor<ObjectExpressionHandler>("Json", "Json", isBrowsable: false);
 
     private ExpressionDescriptor CreateDelegateDescriptor() => CreateDescriptor<DelegateExpressionHandler>("Delegate", "Delegate", false, false);
 
@@ -106,7 +106,6 @@ public class DefaultExpressionDescriptorProvider : IExpressionDescriptorProvider
         string displayName,
         bool isSerializable = true,
         bool isBrowsable = true,
-        string? monacoLanguage = null,
         Func<MemoryBlockReference>? memoryBlockReferenceFactory = default,
         Func<ExpressionSerializationContext, Expression>? deserialize = default)
         where THandler : IExpressionHandler
@@ -123,12 +122,6 @@ public class DefaultExpressionDescriptorProvider : IExpressionDescriptorProvider
 
         if (deserialize != null)
             descriptor.Deserialize = deserialize;
-
-        if (monacoLanguage != null)
-            descriptor.Properties = new
-            {
-                MonacoLanguage = monacoLanguage
-            }.ToDictionary();
 
         return descriptor;
     }

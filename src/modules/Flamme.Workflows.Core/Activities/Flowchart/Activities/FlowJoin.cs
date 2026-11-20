@@ -4,7 +4,6 @@ using Flamme.Workflows.Activities.Flowchart.Extensions;
 using Flamme.Workflows.Activities.Flowchart.Models;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities.Flowchart.Activities;
@@ -28,8 +27,7 @@ public class FlowJoin : Activity, IJoinNode
     /// </summary>
     [Input(
         Description = "The join mode determines whether this activity should continue as soon as one inbound path comes in (WaitAny), or once all inbound paths have executed (WaitAll). To wait for all activated inbound paths, set the mode to WaitAllActive.",
-        DefaultValue = FlowJoinMode.WaitAny,
-        UIHint = InputUIHints.DropDown
+        DefaultValue = FlowJoinMode.WaitAny
     )]
     public Input<FlowJoinMode> Mode { get; set; } = new(FlowJoinMode.WaitAny);
 

@@ -15,7 +15,6 @@ using Flamme.Expressions.JavaScript.Providers;
 using Flamme.Expressions.JavaScript.Services;
 using Flamme.Expressions.JavaScript.TypeDefinitions.Contracts;
 using Flamme.Expressions.JavaScript.TypeDefinitions.Services;
-using Flamme.Workflows;
 using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Flamme.Common.Serialization;
@@ -95,8 +94,5 @@ public class JavaScriptFeature : FeatureBase
 
         // Type Script definitions.
         Services.AddFunctionDefinitionProvider<InputFunctionsDefinitionProvider>();
-
-        // UI property handlers.
-        Services.AddScoped<IPropertyUIHandler, RunJavaScriptOptionsProvider>();
     }
 }

@@ -16,7 +16,6 @@ using Flamme.Http.Selectors;
 using Flamme.Http.Services;
 using Flamme.Http.Tasks;
 using Flamme.Http.TriggerPayloadValidators;
-using Flamme.Http.UIHints;
 using Flamme.Resilience.Extensions;
 using Flamme.Resilience.Features;
 using Flamme.Workflows;
@@ -39,7 +38,6 @@ namespace Flamme.Http.Features;
 public class HttpFeature(IModule module) : FeatureBase(module)
 {
     private Func<IServiceProvider, IHttpEndpointRoutesProvider> _httpEndpointRouteProvider = sp => sp.GetRequiredService<DefaultHttpEndpointRoutesProvider>();
-    private Func<IServiceProvider, IHttpEndpointBasePathProvider> _httpEndpointBasePathProvider = sp => sp.GetRequiredService<DefaultHttpEndpointBasePathProvider>();
 
     /// <summary>
     /// A delegate to configure <see cref="HttpActivityOptions"/>.
@@ -115,18 +113,6 @@ public class HttpFeature(IModule module) : FeatureBase(module)
         return this;
     }
     
-    public HttpFeature WithHttpEndpointBasePathProvider<T>() where T : class, IHttpEndpointBasePathProvider
-    {
-        Services.TryAddScoped<T>();
-        return WithHttpEndpointBasePathProvider(sp => sp.GetRequiredService<T>());
-    }
-    
-    public HttpFeature WithHttpEndpointBasePathProvider(Func<IServiceProvider, IHttpEndpointBasePathProvider> httpEndpointBasePathProvider)
-    {
-        _httpEndpointBasePathProvider = httpEndpointBasePathProvider;
-        return this;
-    }
-
     /// <inheritdoc />
     public override void Configure()
     {
@@ -195,11 +181,6 @@ public class HttpFeature(IModule module) : FeatureBase(module)
             .AddScoped<IHttpContentFactory, XmlContentFactory>()
             .AddScoped<IHttpContentFactory, FormUrlEncodedHttpContentFactory>()
 
-            // Activity property options providers.
-            .AddScoped<IPropertyUIHandler, HttpContentTypeOptionsProvider>()
-            .AddScoped<IPropertyUIHandler, HttpEndpointPathUIHandler>()
-            .AddScoped(_httpEndpointBasePathProvider)
-
             // Port resolvers.
             .AddScoped<IActivityResolver, SendHttpRequestActivityResolver>()
 
@@ -208,7 +189,6 @@ public class HttpFeature(IModule module) : FeatureBase(module)
             .AddScoped<AllowAnonymousHttpEndpointAuthorizationHandler>()
             .AddScoped<DefaultHttpEndpointFaultHandler>()
             .AddScoped<DefaultHttpEndpointRoutesProvider>()
-            .AddScoped<DefaultHttpEndpointBasePathProvider>()
             .AddScoped(HttpEndpointWorkflowFaultHandler)
             .AddScoped(HttpEndpointAuthorizationHandler)
             .AddScoped(_httpEndpointRouteProvider)

@@ -14,8 +14,6 @@ using Flamme.Workflows.Options;
 using Flamme.Workflows.Runtime.Notifications;
 using Flamme.Workflows.Runtime.Requests;
 using Flamme.Workflows.Runtime.Stimuli;
-using Flamme.Workflows.Runtime.UIHints;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Runtime.Activities;
@@ -41,8 +39,7 @@ public class BulkDispatchWorkflows : Activity
     /// </summary>
     [Input(
         DisplayName = "Workflow Definition",
-        Description = "The definition ID of the workflows to dispatch.",
-        UIHint = InputUIHints.WorkflowDefinitionPicker
+        Description = "The definition ID of the workflows to dispatch."
     )]
     public Input<string> WorkflowDefinitionId { get; set; } = null!;
 
@@ -92,9 +89,7 @@ public class BulkDispatchWorkflows : Activity
     /// </summary>
     [Input(
         DisplayName = "Channel",
-        Description = "The channel to dispatch the workflow to.",
-        UIHint = InputUIHints.DropDown,
-        UIHandler = typeof(DispatcherChannelOptionsProvider)
+        Description = "The channel to dispatch the workflow to."
     )]
     public Input<string?> ChannelName { get; set; } = null!;
 

@@ -212,7 +212,6 @@ public class ActivityTestFixture : IAsyncDisposable
         services.AddSingleton<IWellKnownTypeRegistry, WellKnownTypeRegistry>();
         services.AddSingleton<IActivityDescriber, ActivityDescriber>();
         services.AddSingleton<IPropertyDefaultValueResolver, PropertyDefaultValueResolver>();
-        services.AddSingleton<IPropertyUIHandlerResolver, PropertyUIHandlerResolver>();
         services.AddSingleton<IActivityRegistry, ActivityRegistry>();
         services.AddScoped<IActivityRegistryLookupService, ActivityRegistryLookupService>();
         services.AddScoped<IIdentityGraphService, IdentityGraphService>();

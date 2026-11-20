@@ -3,7 +3,6 @@ using Flamme.Workflows.Activities;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
 using TUnit.Mocks;
-using System.Threading.Tasks;
 
 namespace Flamme.Workflows.Core.UnitTests.Services;
 
@@ -14,12 +13,9 @@ public class ActivityDescriberTests
     public ActivityDescriberTests()
     {
         var defaultValueResolver = IPropertyDefaultValueResolver.Mock().Object;
-        var propertyUIHandlerResolver = IPropertyUIHandlerResolver.Mock().Object;
         Mock.Get(defaultValueResolver).GetDefaultValue(Arg.Any<PropertyInfo>()).Returns((object?)null);
-        Mock.Get(propertyUIHandlerResolver).GetUIPropertiesAsync(Arg.Any<PropertyInfo>(), Arg.Any<object?>(), Arg.Any<CancellationToken>())
-                    .Returns(() => new ValueTask<IDictionary<string, object>>(new Dictionary<string, object>()));
 
-        _describer = new ActivityDescriber(defaultValueResolver, propertyUIHandlerResolver);
+        _describer = new ActivityDescriber(defaultValueResolver);
     }
 
     [Test]

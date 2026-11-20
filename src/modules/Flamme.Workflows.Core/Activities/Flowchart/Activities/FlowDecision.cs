@@ -3,7 +3,6 @@ using Flamme.Expressions.Models;
 using Flamme.Workflows.Activities.Flowchart.Attributes;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities.Flowchart.Activities;
@@ -36,7 +35,7 @@ public class FlowDecision : Activity
     /// <summary>
     /// The condition to evaluate.
     /// </summary>
-    [Input(UIHint = InputUIHints.SingleLine)]
+    [Input]
     public Input<bool> Condition { get; set; } = new(new Literal<bool>(false));
 
     /// <inheritdoc />

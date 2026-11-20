@@ -91,7 +91,7 @@ public class WorkflowDefinitionActivityDescriptorFactory
                 DisplayName = inputDefinition.DisplayName,
                 Description = inputDefinition.Description,
                 Category = inputDefinition.Category,
-                UIHint = inputDefinition.UIHint,
+                EvaluatorType = inputDefinition.EvaluateDictionaryEntries ? typeof(DictionaryValueEvaluator) : null,
                 StorageDriverType = inputDefinition.StorageDriverType,
                 IsSynthetic = true
             };

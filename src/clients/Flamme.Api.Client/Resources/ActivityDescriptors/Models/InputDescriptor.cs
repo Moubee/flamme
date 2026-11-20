@@ -19,11 +19,6 @@ public class InputDescriptor : PropertyDescriptor
     public bool IsWrapped { get; set; }
     
     /// <summary>
-    /// A string value that hints at what UI control might be used to render in a UI tool.  
-    /// </summary>
-    public string UIHint { get; set; } = default!;
-    
-    /// <summary>
     /// The category to which this input belongs. Can be used by UI to e.g. render different inputs in different tabs.
     /// </summary>
     public string? Category { get; set; }
@@ -53,9 +48,4 @@ public class InputDescriptor : PropertyDescriptor
     /// If no driver is specified, the referenced memory block will remain in memory for as long as the expression execution context exists.
     /// </summary>
     public string? StorageDriverType { get; set; }
-    
-    /// <summary>
-    /// A dictionary of UI specifications to be used by the UI.
-    /// </summary>
-    public IDictionary<string, object>? UISpecifications { get; set; }
 }

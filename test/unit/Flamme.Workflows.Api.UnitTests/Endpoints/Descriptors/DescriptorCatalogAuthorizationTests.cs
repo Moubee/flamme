@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Flamme.Authorization;
 using Flamme.Common.Serialization;
 using Flamme.Expressions.Contracts;
@@ -29,7 +30,6 @@ public class DescriptorCatalogAuthorizationTests
 {
     private const string VersionsPath = "/workflow-definitions/my-definition/versions";
     private const string TypeName = "Elsa.Test";
-    private const string OptionsPath = "/descriptors/activities/" + TypeName + "/options/Property";
 
     private static readonly string DefinitionsView = new Permission(WorkflowPermissions.Definitions, CoreVerbs.View).ToString();
     private static readonly string VersionsView = new Permission(WorkflowPermissions.DefinitionVersions, CoreVerbs.View).ToString();
@@ -38,7 +38,6 @@ public class DescriptorCatalogAuthorizationTests
 
     private static readonly string[] CatalogNamespaces =
     [
-        "Flamme.Workflows.Api.Endpoints.ActivityDescriptorOptions",
         "Flamme.Workflows.Api.Endpoints.ActivityDescriptors",
         "Flamme.Workflows.Api.Endpoints.CommitStrategies",
         "Flamme.Workflows.Api.Endpoints.IncidentStrategies",
@@ -110,7 +109,13 @@ public class DescriptorCatalogAuthorizationTests
         var response = await SendAsync("/descriptors/activities/" + TypeName, authenticated: true);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        await Assert.That(await response.Content.ReadAsStringAsync()).Contains(TypeName);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var descriptor = json.RootElement;
+        var input = descriptor.GetProperty("inputs")[0];
+        await Assert.That(descriptor.GetProperty("typeName").GetString()).IsEqualTo(TypeName);
+        await Assert.That(input.GetProperty("name").GetString()).IsEqualTo("Property");
+        await Assert.That(input.TryGetProperty("uiHint", out _)).IsFalse();
+        await Assert.That(input.TryGetProperty("uiSpecifications", out _)).IsFalse();
     }
 
     [Test]
@@ -170,14 +175,6 @@ public class DescriptorCatalogAuthorizationTests
     }
 
     [Test]
-    public async Task ActivityPropertyOptions_WithoutActivitiesView_IsForbidden()
-    {
-        var response = await SendAsync(OptionsPath, DefinitionsView, method: HttpMethod.Post);
-
-        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Forbidden);
-    }
-
-    [Test]
     public async Task RefreshingTheActivityRegistry_WithSecurityDisabled_RefreshesForAnyCaller()
     {
         await _host.RestartWithSecurityDisabledAsync();
@@ -193,7 +190,11 @@ public class DescriptorCatalogAuthorizationTests
         var activityRegistry = IActivityRegistry.Mock().Object;
         Mock.Get(activityRegistry).ListAll().Returns([new ActivityDescriptor { TypeName = TypeName }]);
         var activityLookup = IActivityRegistryLookupService.Mock().Object;
-        Mock.Get(activityLookup).FindAsync(TypeName).Returns(new ActivityDescriptor { TypeName = TypeName });
+        Mock.Get(activityLookup).FindAsync(TypeName).Returns(new ActivityDescriptor
+        {
+            TypeName = TypeName,
+            Inputs = [new InputDescriptor { Name = "Property" }]
+        });
         var expressionRegistry = IExpressionDescriptorRegistry.Mock().Object;
         Mock.Get(expressionRegistry).ListAll().Returns([]);
         var storageDrivers = IStorageDriverManager.Mock().Object;
@@ -210,7 +211,6 @@ public class DescriptorCatalogAuthorizationTests
             .AddSingleton(activityRegistry)
             .AddSingleton(_registryPopulator)
             .AddSingleton(activityLookup)
-            .AddSingleton(IPropertyUIHandlerResolver.Mock().Object)
             .AddSingleton(expressionRegistry)
             .AddSingleton(storageDrivers)
             .AddSingleton(logPersistence)
@@ -222,6 +222,6 @@ public class DescriptorCatalogAuthorizationTests
             .AddSingleton<IOptions<ManagementOptions>>(new OptionsWrapper<ManagementOptions>(new ManagementOptions()));
     }
 
-    private Task<HttpResponseMessage> SendAsync(string path, string? permissions = null, bool authenticated = false, HttpMethod? method = null) =>
-        _host.SendAsync(method ?? HttpMethod.Get, path, permissions, authenticated);
+    private Task<HttpResponseMessage> SendAsync(string path, string? permissions = null, bool authenticated = false) =>
+        _host.SendAsync(HttpMethod.Get, path, permissions, authenticated);
 }

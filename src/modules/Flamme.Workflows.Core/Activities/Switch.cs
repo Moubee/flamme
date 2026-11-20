@@ -4,7 +4,6 @@ using Flamme.Expressions.Contracts;
 using Flamme.Expressions.Models;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities;
@@ -31,8 +30,7 @@ public class Switch : Activity
     /// The cases to evaluate.
     /// </summary>
     [Input(
-        Description = "The cases to evaluate.",
-        UIHint = "switch-editor"
+        Description = "The cases to evaluate."
     )]
     public ICollection<SwitchCase> Cases { get; set; } = new List<SwitchCase>();
 
@@ -40,8 +38,7 @@ public class Switch : Activity
     /// The switch mode determines whether the first match should be scheduled, or all matches.
     /// </summary>
     [Input(
-        Description = "The switch mode determines whether the first match should be scheduled, or all matches.",
-        UIHint = InputUIHints.DropDown
+        Description = "The switch mode determines whether the first match should be scheduled, or all matches."
     )]
     public Input<SwitchMode> Mode { get; set; } = new(SwitchMode.MatchFirst);
 

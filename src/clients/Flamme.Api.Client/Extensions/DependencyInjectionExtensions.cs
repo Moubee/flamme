@@ -1,5 +1,4 @@
 using Flamme.Api.Client.Options;
-using Flamme.Api.Client.Resources.ActivityDescriptorOptions.Contracts;
 using Flamme.Api.Client.Resources.ActivityDescriptors.Contracts;
 using Flamme.Api.Client.Resources.ActivityExecutions.Contracts;
 using Flamme.Api.Client.Resources.Alterations.Contracts;
@@ -74,7 +73,6 @@ public static class DependencyInjectionExtensions
             services.AddApi<IExecuteWorkflowApi>(builderOptionsWithoutRetryPolicy);
             services.AddApi<IWorkflowInstancesApi>(builderOptions);
             services.AddApi<IActivityDescriptorsApi>(builderOptions);
-            services.AddApi<IActivityDescriptorOptionsApi>(builderOptions);
             services.AddApi<IActivityExecutionsApi>(builderOptions);
             services.AddApi<IStorageDriversApi>(builderOptions);
             services.AddApi<IVariableTypesApi>(builderOptions);

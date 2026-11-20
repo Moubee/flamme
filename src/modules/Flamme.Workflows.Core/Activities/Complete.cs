@@ -6,7 +6,6 @@ using Flamme.Workflows.Activities.Flowchart.Models;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Signals;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities;
@@ -52,7 +51,6 @@ public class Complete : Activity, ITerminalNode
     /// </summary>
     [Input(
         Description = "The outcome or set of outcomes to complete this activity with.",
-        UIHint = InputUIHints.OutcomePicker,
         DefaultSyntax = "Object"
     )]
     public Input<object> Outcomes { get; set; } = null!;

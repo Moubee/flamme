@@ -19,7 +19,6 @@ public class InputDescriptor : PropertyDescriptor
         Func<IActivity, object?> valueGetter,
         Action<IActivity, object?> valueSetter,
         bool isWrapped,
-        string uiHint,
         string displayName,
         string? description = null,
         string? category = null,
@@ -33,8 +32,7 @@ public class InputDescriptor : PropertyDescriptor
         bool autoEvaluate = true,
         Type? evaluatorType = null,
         Type? storageDriverType = null,
-        PropertyInfo? propertyInfo = null,
-        IDictionary<string, object>? uiSpecifications = null
+        PropertyInfo? propertyInfo = null
     )
     {
         Name = name;
@@ -42,7 +40,6 @@ public class InputDescriptor : PropertyDescriptor
         ValueGetter = valueGetter;
         ValueSetter = valueSetter;
         IsWrapped = isWrapped;
-        UIHint = uiHint;
         DisplayName = displayName;
         Description = description;
         Category = category;
@@ -57,18 +54,12 @@ public class InputDescriptor : PropertyDescriptor
         IsBrowsable = isBrowsable;
         IsSerializable = isSerializable;
         PropertyInfo = propertyInfo;
-        UISpecifications = uiSpecifications;
     }
 
     /// <summary>
     /// True if the property is wrapped with an <see cref="Input{T}"/> type, false otherwise.
     /// </summary>
     public bool IsWrapped { get; set; }
-
-    /// <summary>
-    /// A string value that hints at what UI control might be used to render in a UI tool.  
-    /// </summary>
-    public string UIHint { get; set; } = null!;
 
     /// <summary>
     /// The category to which this input belongs. Can be used by UI to e.g. render different inputs in different tabs.
@@ -112,9 +103,4 @@ public class InputDescriptor : PropertyDescriptor
     /// The evaluator type determines how the value for the property is resolved at runtime.
     /// </summary>
     public Type? EvaluatorType { get; set; }
-
-    /// <summary>
-    /// A dictionary of UI specifications to be used by the UI.
-    /// </summary>
-    public IDictionary<string, object>? UISpecifications { get; set; }
 }

@@ -143,12 +143,12 @@ public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) :
             ValueSetter = (activity, value) => activity.SyntheticProperties[inputName] = value!,
             IsSynthetic = true,
             IsWrapped = true,
-            UIHint = inputAttribute?.UIHint ?? ActivityDescriber.GetUIHint(nakedInputType),
             Category = inputAttribute?.Category,
             DefaultValue = inputAttribute?.DefaultValue,
             Order = inputAttribute?.Order ?? 0,
             IsBrowsable = inputAttribute?.IsBrowsable ?? true,
             AutoEvaluate = inputAttribute?.AutoEvaluate ?? true,
+            EvaluatorType = inputAttribute?.EvaluatorType,
             IsSerializable = inputAttribute?.IsSerializable ?? true,
             IsSensitive = inputAttribute?.CanContainSecrets ?? false
         };
@@ -174,12 +174,12 @@ public class HostMethodActivityDescriber(IActivityDescriber activityDescriber) :
             ValueSetter = (activity, value) => activity.SyntheticProperties[inputName] = value!,
             IsSynthetic = true,
             IsWrapped = true,
-            UIHint = inputAttribute?.UIHint ?? ActivityDescriber.GetUIHint(nakedInputType),
             Category = inputAttribute?.Category,
             DefaultValue = inputAttribute?.DefaultValue,
             Order = inputAttribute?.Order ?? 0,
             IsBrowsable = inputAttribute?.IsBrowsable ?? true,
             AutoEvaluate = inputAttribute?.AutoEvaluate ?? true,
+            EvaluatorType = inputAttribute?.EvaluatorType,
             IsSerializable = inputAttribute?.IsSerializable ?? true,
             IsSensitive = inputAttribute?.CanContainSecrets ?? false
         };

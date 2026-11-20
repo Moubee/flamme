@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 
 namespace Flamme.Http;
@@ -24,7 +23,6 @@ public class FlowSendHttpRequest : SendHttpRequestBase, IActivityPropertyDefault
     /// </summary>
     [Input(
         Description = "A list of expected status codes to handle.",
-        UIHint = InputUIHints.MultiText,
         DefaultValueProvider = typeof(FlowSendHttpRequest),
         Order = 5.1f
     )]
