@@ -1,6 +1,6 @@
 # PostgreSQL workflow benchmarks
 
-Run from the repository root with the SDK in `global.json`, the .NET 10 runtime, and a local Docker engine. Each BenchmarkDotNet case creates its own PostgreSQL 16 container and removes it after validation. The HTTP cases also start the reference server on Kestrel, check its management and runtime migrations, and authenticate through its identity API. Database creation, host startup and login run outside the measured operations.
+Run from the repository root with the SDK in `global.json`, the .NET 10 runtime, and a local Docker engine. Each BenchmarkDotNet case creates its own PostgreSQL 16 container and removes it after validation. The HTTP cases also start the reference server on Kestrel, check its management and runtime migrations, and authenticate through its identity API. The caller and Kestrel share a benchmark process using server GC. Database creation, host startup and login run outside the measured operations.
 
 ```sh
 project=test/performance/Flamme.Workflows.PerformanceTests
@@ -8,7 +8,7 @@ dotnet run -c Release --project "$project" -- --filter '*WorkflowStore*' --list 
 dotnet run -c Release --project "$project" -- --filter '*StoreBenchmarks*' '*WorkflowHttpBenchmarks*' --job Dry
 ```
 
-The Dry job checks that the workload runs and its database assertions pass. For performance measurements, run the desired filter without `--job Dry` on an idle machine. BenchmarkDotNet writes statistics and managed allocations to `BenchmarkDotNet.Artifacts/results/`. Keep the commit, PostgreSQL image, runtime, machine configuration and job settings with each result.
+The Dry job checks that the workload runs and its database assertions pass. For store and peer-burst performance measurements, run the desired filter without `--job Dry` on an idle machine. BenchmarkDotNet writes statistics and managed allocations to `BenchmarkDotNet.Artifacts/results/`. Keep the commit, PostgreSQL image, runtime, machine configuration and job settings with each result.
 
 ## Store calls
 

@@ -14,7 +14,7 @@ namespace Flamme.Workflows.PerformanceTests.WorkflowStore;
 /// For a million, use --job Dry --filter '*WorkflowLifecycleBenchmarks*' for a single campaign.
 /// BDN measures the resume phase. Iteration cleanup reports both HTTP phase durations.
 /// </summary>
-[Config(typeof(OptInConfig)), RunOncePerIteration, EvaluateOverhead(false)]
+[Config(typeof(OptInConfig)), GcServer(true), RunOncePerIteration, EvaluateOverhead(false)]
 public class WorkflowLifecycleBenchmarks
 {
     private const string CountVariable = "FLAMME_BENCH_WORKFLOW_COUNT";

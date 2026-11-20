@@ -8,7 +8,7 @@ namespace Flamme.Workflows.PerformanceTests.WorkflowStore;
 public enum WorkflowHttpOperation { Resume, Import }
 
 /// <summary>Time a batch of 48 unrelated, existing-instance writes through the reference server.</summary>
-[JsonExporterAttribute.Full, RunOncePerIteration]
+[JsonExporterAttribute.Full, GcServer(true), RunOncePerIteration]
 [EvaluateOverhead(false)]
 public class WorkflowHttpBenchmarks
 {
