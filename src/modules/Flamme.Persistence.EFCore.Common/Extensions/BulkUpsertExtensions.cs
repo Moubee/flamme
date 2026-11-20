@@ -145,9 +145,7 @@ public static class BulkUpsertExtensions
     {
         // Execute DML directly so the query pipeline cannot retry it or wrap its PostgreSQL error.
         var command = dbContext.GetService<IRawSqlCommandBuilder>().Build(sql, parameters, dbContext.Model);
-        var arguments = new RelationalCommandParameterObject(
-            dbContext.GetService<IRelationalConnection>(), command.ParameterValues, null, dbContext,
-            dbContext.GetService<IRelationalCommandDiagnosticsLogger>(), CommandSource.ExecuteSqlRaw);
+        var arguments = CreateCommandParameters(dbContext, command);
         await using var reader = await command.RelationalCommand.ExecuteReaderAsync(arguments, cancellationToken);
         var keys = new List<string?>();
         while (await reader.ReadAsync(cancellationToken))
@@ -160,10 +158,10 @@ public static class BulkUpsertExtensions
     {
         var sql = dbContext.GetService<ISqlGenerationHelper>();
         var tableName = sql.DelimitIdentifier(storeObject.Name, storeObject.Schema);
-        var keyColumn = keyProperty.GetColumnName(storeObject);
+        var keyColumn = keyProperty.GetColumnName(storeObject)!;
         var database = dbContext.Database;
-        // Preserve caller order if the physical schema could make write order significant.
-        var eligibility = database.SqlQuery<bool>($"""
+        // Keep the catalog read in the write's transaction without invoking the EF query strategy.
+        var eligibility = dbContext.GetService<IRawSqlCommandBuilder>().Build("""
             SELECT pg_catalog.current_setting('transaction_isolation') IN ('read committed', 'read uncommitted')
               AND EXISTS (
                 SELECT 1
@@ -172,10 +170,10 @@ public static class BulkUpsertExtensions
                 JOIN pg_catalog.pg_attribute AS key_column ON key_column.attrelid = target.oid AND key_column.attnum = pk.indkey[0]
                 JOIN pg_catalog.pg_opclass AS opclass ON opclass.oid = pk.indclass[0]
                 JOIN pg_catalog.pg_collation AS key_collation ON key_collation.oid = pk.indcollation[0]
-                WHERE target.oid = pg_catalog.to_regclass({tableName})
+                WHERE target.oid = pg_catalog.to_regclass({0})
                   AND target.relkind = 'r' AND NOT target.relispartition AND NOT target.relhassubclass
                   AND NOT target.relhastriggers AND NOT target.relhasrules
-                  AND pk.indnkeyatts = 1 AND pk.indisvalid AND key_column.attname = {keyColumn}
+                  AND pk.indnkeyatts = 1 AND pk.indisvalid AND key_column.attname = {1}
                   AND key_column.atttypid IN ('pg_catalog.text'::regtype, 'pg_catalog.varchar'::regtype)
                   AND opclass.opcdefault AND opclass.opcnamespace = 'pg_catalog'::regnamespace
                   AND key_collation.collisdeterministic
@@ -186,17 +184,23 @@ public static class BulkUpsertExtensions
                       WHERE other.indrelid = target.oid AND other.indexrelid <> pk.indexrelid
                         AND (other.indisunique OR other.indisexclusion)
                   )
-              ) AS "Value"
-            """);
-        if (!await eligibility.SingleAsync(cancellationToken))
+              )
+            """, [tableName, keyColumn], dbContext.Model);
+        var command = eligibility.RelationalCommand;
+        var arguments = CreateCommandParameters(dbContext, eligibility);
+        if (await command.ExecuteScalarAsync(arguments, cancellationToken) is not true)
             return false;
 
         // The upsert takes this writer-compatible lock anyway. Take it before rechecking the catalogs
         // so that concurrent DDL cannot make a newly discovered write order unsafe.
         var lockTable = $"LOCK TABLE ONLY {tableName} IN ROW EXCLUSIVE MODE";
         await database.ExecuteSqlRawAsync(lockTable, cancellationToken);
-        return await eligibility.SingleAsync(cancellationToken);
+        return await command.ExecuteScalarAsync(arguments, cancellationToken) is true;
     }
+
+    private static RelationalCommandParameterObject CreateCommandParameters(DbContext dbContext, RawSqlCommand command) =>
+        new(dbContext.GetService<IRelationalConnection>(), command.ParameterValues, null, dbContext,
+            dbContext.GetService<IRelationalCommandDiagnosticsLogger>(), CommandSource.ExecuteSqlRaw);
 
     private static (string, object[]) GeneratePostgresUpsert<TEntity>(
         DbContext dbContext,

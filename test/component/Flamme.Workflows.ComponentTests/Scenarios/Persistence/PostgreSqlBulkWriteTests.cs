@@ -155,6 +155,25 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
     }
 
     [Test]
+    public async Task RetryingBulkUpsertUsesCallerOwnedLocalTransaction()
+    {
+        await using var scenario = await CreateScenarioAsync();
+        await using var observer = await scenario.Store.CreateDbContextAsync();
+        var options = new DbContextOptionsBuilder<OwnershipDbContext>()
+            .UseNpgsql(observer.Database.GetConnectionString(), provider => provider.EnableRetryOnFailure())
+            .Options;
+        await using var db = new OwnershipDbContext(options);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+
+        await db.BulkUpsertAsync([Row("b", "second"), Row("a", "first")], row => row.Id, batchSize: 2);
+
+        await Assert.That(await observer.Rows.CountAsync()).IsEqualTo(0);
+        await transaction.CommitAsync();
+        await Assert.That((await scenario.FindAsync("a"))!.Payload).IsEqualTo("first");
+        await Assert.That((await scenario.FindAsync("b"))!.Payload).IsEqualTo("second");
+    }
+
+    [Test]
     public async Task LargeDistinctBulkRoundTripsWithoutAdvisoryLocks()
     {
         await using var scenario = await CreateScenarioAsync();
