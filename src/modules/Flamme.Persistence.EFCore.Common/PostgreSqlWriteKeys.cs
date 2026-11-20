@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Globalization;
 using System.Runtime.ExceptionServices;
 using System.Transactions;
@@ -16,9 +17,18 @@ internal static class PostgreSqlWriteKeys
     internal static bool Supports(DbContext context) =>
         context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
-    private static Transaction? GetEnlistedOrAmbientTransaction(DbContext context) =>
-        context.Database.GetEnlistedTransaction() ??
+    private static Transaction? GetAmbientTransaction(DbContext context) =>
         (context.GetService<IDbContextTransactionManager>() as ITransactionEnlistmentManager)?.CurrentAmbientTransaction;
+
+    private static bool HasAmbientEnlistmentOptOut(DatabaseFacade database)
+    {
+        var connectionString = database.GetConnectionString();
+        if (connectionString is null || !connectionString.Contains("Enlist", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var settings = new DbConnectionStringBuilder { ConnectionString = connectionString };
+        return settings.TryGetValue("Enlist", out var value) && bool.TryParse(value as string, out var enlist) && !enlist;
+    }
 
     internal static Task ExecuteAsync(DbContext context, Func<Task> write, CancellationToken cancellationToken) =>
         ExecuteAsync(context, static () => Task.FromResult(false), _ => write(), cancellationToken);
@@ -36,7 +46,19 @@ internal static class PostgreSqlWriteKeys
             return;
         }
 
-        var enlistedOrAmbient = GetEnlistedOrAmbientTransaction(context);
+        var explicitlyEnlisted = database.GetEnlistedTransaction();
+        var enlistedOrAmbient = explicitlyEnlisted ?? GetAmbientTransaction(context);
+        if (explicitlyEnlisted is null && enlistedOrAmbient is not null && HasAmbientEnlistmentOptOut(database))
+        {
+            // Npgsql EF 10 detects the literal "Enlist=false" and can misread equivalent spellings.
+            // Hide the ambient transaction during the store-owned unit, including EF saving hooks.
+            // The onSaving callback runs beforehand in the original scope.
+            using var suppression = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
+            await ExecuteLocallyAsync();
+            suppression.Complete();
+            return;
+        }
+
         if (enlistedOrAmbient is not null)
         {
             // Keep the lock and subsequent EF commands on the same enlisted connection.
@@ -55,27 +77,32 @@ internal static class PostgreSqlWriteKeys
             return;
         }
 
-        var strategy = database.CreateExecutionStrategy();
-        var failure = await strategy.ExecuteAsync<ExceptionDispatchInfo?>(async ct =>
+        await ExecuteLocallyAsync();
+
+        async Task ExecuteLocallyAsync()
         {
-            var writing = false;
-            try
+            var strategy = database.CreateExecutionStrategy();
+            var failure = await strategy.ExecuteAsync<ExceptionDispatchInfo?>(async ct =>
             {
-                // A subsequent read must see the write that released a contended key.
-                await using var transaction = await database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
-                var prepared = await prepare();
-                writing = true;
-                await write(prepared);
-                await transaction.CommitAsync(ct);
-                return null;
-            }
-            catch (Exception exception) when (writing)
-            {
-                // Pass write and commit failures through without letting the strategy replay them.
-                return ExceptionDispatchInfo.Capture(exception);
-            }
-        }, cancellationToken);
-        failure?.Throw();
+                var writing = false;
+                try
+                {
+                    // A subsequent read must see the write that released a contended key.
+                    await using var transaction = await database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
+                    var prepared = await prepare();
+                    writing = true;
+                    await write(prepared);
+                    await transaction.CommitAsync(ct);
+                    return null;
+                }
+                catch (Exception exception) when (writing)
+                {
+                    // Pass write and commit failures through without letting the strategy replay them.
+                    return ExceptionDispatchInfo.Capture(exception);
+                }
+            }, cancellationToken);
+            failure?.Throw();
+        }
 
         async Task ExecuteAtSavepointAsync()
         {

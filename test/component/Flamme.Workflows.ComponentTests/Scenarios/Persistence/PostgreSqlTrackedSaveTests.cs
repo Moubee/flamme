@@ -511,34 +511,106 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
     }
 
     [Test]
-    [Arguments(true, false)]
+    [Arguments("Enlist=true", true, false, false)]
+    [Arguments("Enlist=false", false, false, false)]
+    [Arguments("Enlist = false", false, false, false)]
+    [Arguments("Enlist=true", true, true, false)]
+    [Arguments("Enlist=false", false, true, false)]
+    [Arguments("Enlist = false", false, true, false)]
+    [Arguments("Enlist = false", false, false, true)]
+    [Arguments("Enlist = false", false, true, true)]
+    public Task WriterHonorsConfiguredAmbientEnlistment(string enlistment, bool enlist, bool bulk, bool retry) =>
+        AssertWriterAmbientOutcomeAsync(fixture.CreateStore(enlistment: enlistment, retry: retry).Store, enlist, bulk);
+
+    [Test]
     [Arguments(false, false)]
-    [Arguments(true, true)]
     [Arguments(false, true)]
-    public async Task WriterHonorsConfiguredAmbientEnlistment(bool enlist, bool bulk)
+    [Arguments(true, false)]
+    [Arguments(true, true)]
+    public Task OpenWriterPreservesExplicitEnlistmentOrOptOut(bool explicitlyEnlist, bool bulk) =>
+        AssertWriterAmbientOutcomeAsync(fixture.CreateStore(enlistment: "Enlist = false").Store, explicitlyEnlist, bulk, async (context, _, ct) =>
+        {
+            // Use the provider API to open first, then enlist explicitly if requested.
+            await context.Database.GetDbConnection().OpenAsync(ct);
+            if (explicitlyEnlist)
+                context.Database.EnlistTransaction(Transaction.Current);
+        });
+
+    [Test]
+    public async Task OptedOutCallerConnectionStaysReusableAfterSecurityInfoIsHidden()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        await using var connection = fixture.CreateOptedOutConnection();
+        await connection.OpenAsync(deadline.Token);
+        await connection.CloseAsync();
+        var initialSettings = connection.ConnectionString;
+        var (_, store) = fixture.CreateStore(options => options.UseNpgsql(connection));
+
+        await AssertWriterAmbientOutcomeAsync(store, enlist: false, bulk: false);
+
+        await Assert.That(string.Equals(initialSettings, connection.ConnectionString, StringComparison.Ordinal)).IsTrue();
+        await connection.OpenAsync(deadline.Token);
+    }
+
+    [Test]
+    public async Task OptedOutCallerDataSourceStaysReusable()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        await using var dataSource = fixture.CreateOptedOutDataSource();
+        var (_, store) = fixture.CreateStore(options => options.UseNpgsql(dataSource));
+
+        await AssertWriterAmbientOutcomeAsync(store, enlist: false, bulk: true);
+
+        await using var connection = await dataSource.OpenConnectionAsync(deadline.Token);
+    }
+
+    [Test]
+    [Arguments("Enlist=false", true)]
+    [Arguments("Enlist = false", false)]
+    public async Task OnlyMisdetectedOptOutSuppressesAmbientDuringSaving(string enlistment, bool expectedDuringSave)
+    {
+        var probe = new SavingAmbientObserver();
+        var (_, store) = fixture.CreateStore(enlistment: enlistment, interceptor: probe);
+        bool? ambientDuringPreparation = null;
+
+        await AssertWriterAmbientOutcomeAsync(store, enlist: false, bulk: false, (_, _, _) =>
+        {
+            ambientDuringPreparation = Transaction.Current is not null;
+            return ValueTask.CompletedTask;
+        });
+
+        await Assert.That(ambientDuringPreparation).IsEqualTo(true);
+        await Assert.That(probe.AmbientDuringSave).IsEqualTo(expectedDuringSave);
+    }
+
+    private async Task AssertWriterAmbientOutcomeAsync(
+        Store<TrackedSaveContext, TrackedSaveRow> store, bool enlist, bool bulk,
+        Func<TrackedSaveContext, TrackedSaveRow, CancellationToken, ValueTask>? prepare = null)
     {
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         var token = deadline.Token;
         using var tenant = fixture.UseTenant("a");
-        var (_, store) = fixture.CreateStore(enlist: enlist);
         var id = NewId();
         var sql = $"SELECT \"Payload\" FROM {fixture.Table} WHERE \"Id\" = $1";
         var providerId = id.ToUpperInvariant();
         var expected = enlist ? null : "WRITTEN";
+        string? beforeRollback;
 
-        using (new TransactionScope(TransactionScopeOption.RequiresNew,
-                   new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+        using (BeginAmbientTransaction(IsolationLevel.ReadCommitted))
         {
+            var ambient = Transaction.Current;
             var row = NewRow(id, "written");
             if (bulk)
-                await store.SaveManyAsync([row], item => item.Id, cancellationToken: token);
+                await store.SaveManyAsync([row], item => item.Id, prepare, token);
             else
-                await store.SaveAsync(row, item => item.Id, token);
+                await store.SaveAsync(row, item => item.Id, prepare, token);
 
-            await Assert.That(await fixture.ReadScalarAsync(sql, providerId, token)).IsEqualTo(expected);
+            await Assert.That(Transaction.Current).IsEqualTo(ambient);
+            beforeRollback = await fixture.ReadScalarAsync(sql, providerId, token);
         }
 
-        await Assert.That(await fixture.ReadScalarAsync(sql, providerId, token)).IsEqualTo(expected);
+        var afterRollback = await fixture.ReadScalarAsync(sql, providerId, token);
+        await Assert.That((beforeRollback, afterRollback)).IsEqualTo((expected, expected));
     }
 
     [Test]
@@ -642,6 +714,18 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
                     throw new TimeoutException("Injected timeout before the existence read.");
             }
 
+            return ValueTask.FromResult(result);
+        }
+    }
+
+    private sealed class SavingAmbientObserver : SaveChangesInterceptor
+    {
+        public bool? AmbientDuringSave { get; private set; }
+
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            AmbientDuringSave = Transaction.Current is not null;
             return ValueTask.FromResult(result);
         }
     }
@@ -809,16 +893,26 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
         return (int)(await command.ExecuteScalarAsync(token))!;
     }
 
-    public (IDbContextFactory<TrackedSaveContext>, Store<TrackedSaveContext, TrackedSaveRow>) CreateStore(
-        bool enlist = true, bool retry = false, IInterceptor? interceptor = null)
+    public NpgsqlConnection CreateOptedOutConnection() => new($"{_writerConnection};Enlist = false;Persist Security Info=false");
+
+    public NpgsqlDataSource CreateOptedOutDataSource() => NpgsqlDataSource.Create($"{_writerConnection};Enlist = false;Persist Security Info=false");
+
+    public (IDbContextFactory<TrackedSaveContext> Factory, Store<TrackedSaveContext, TrackedSaveRow> Store) CreateStore(
+        string? enlistment = null, bool retry = false, IInterceptor? interceptor = null)
     {
-        var connection = new NpgsqlConnectionStringBuilder(_writerConnection) { Enlist = enlist };
-        var options = new DbContextOptionsBuilder<TrackedSaveContext>();
-        options.UseNpgsql(connection.ConnectionString, provider =>
+        var connection = enlistment is null ? _writerConnection : $"{_writerConnection};{enlistment}";
+        return CreateStore(options => options.UseNpgsql(connection, provider =>
         {
             if (retry)
                 provider.EnableRetryOnFailure(2, TimeSpan.FromMilliseconds(5), null);
-        });
+        }), interceptor);
+    }
+
+    public (IDbContextFactory<TrackedSaveContext> Factory, Store<TrackedSaveContext, TrackedSaveRow> Store) CreateStore(
+        Action<DbContextOptionsBuilder<TrackedSaveContext>> configure, IInterceptor? interceptor = null)
+    {
+        var options = new DbContextOptionsBuilder<TrackedSaveContext>();
+        configure(options);
         if (interceptor != null)
             options.AddInterceptors(interceptor);
         var factory = new TrackedSaveContextFactory(options.Options, _services);
