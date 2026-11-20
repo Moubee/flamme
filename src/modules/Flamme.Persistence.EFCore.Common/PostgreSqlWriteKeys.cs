@@ -105,7 +105,7 @@ internal static class PostgreSqlWriteKeys
         }
     }
 
-    internal static Task AcquireAsync(
+    internal static async Task AcquireAsync(
         DbContext context,
         IProperty keyProperty,
         StoreObjectIdentifier table,
@@ -113,7 +113,7 @@ internal static class PostgreSqlWriteKeys
         CancellationToken cancellationToken)
     {
         if (key == null)
-            return Task.CompletedTask;
+            return;
 
         var database = context.Database;
         if (database.CurrentTransaction is null && database.GetEnlistedTransaction() is null)
@@ -122,17 +122,28 @@ internal static class PostgreSqlWriteKeys
         var sql = context.GetService<ISqlGenerationHelper>();
         var tableName = sql.DelimitIdentifier(table.Name, table.Schema);
         var column = keyProperty.GetColumnName(table)!;
-        var providerKey = GetProviderKey(keyProperty, key);
+        var keyColumn = sql.DelimitIdentifier(column);
+        using var command = database.GetDbConnection().CreateCommand();
+        var keyParameter = keyProperty.GetRelationalTypeMapping().CreateParameter(command, "flamme_key", key);
 
-        // Resolve the table to its OID so EF contexts addressing the same table agree even if
-        // one mapping omits its schema.
-        return database.ExecuteSqlInterpolatedAsync($"""
+        // Project only the physical key from a typed row. PostgreSQL's record hash uses
+        // the projected column's type and collation. Other columns need no hash support.
+        // The relation OID keeps qualified and unqualified mappings in the same lock namespace.
+#pragma warning disable EF1002 // Only provider-delimited identifiers are interpolated. All values are bound parameters.
+        await database.ExecuteSqlRawAsync($$"""
             SELECT pg_catalog.pg_advisory_xact_lock(
-                pg_catalog.hashtextextended(
-                    {providerKey} COLLATE pg_catalog."C",
+                pg_catalog.hash_record_extended(
+                    ROW(typed_key.{{EscapeFormat(keyColumn)}}),
                     pg_catalog.hashtextextended(
-                        concat('flamme:store:', pg_catalog.to_regclass({tableName})::oid, ':', {column}), 0)))
-            """, cancellationToken);
+                        pg_catalog.concat('flamme:store:', pg_catalog.to_regclass({0})::oid, ':', {1}), 0)))
+            FROM pg_catalog.jsonb_populate_record(
+                NULL::{{EscapeFormat(tableName)}}, pg_catalog.jsonb_build_object({1}, {2})) AS typed_key
+            """, [tableName, column, keyParameter], cancellationToken);
+#pragma warning restore EF1002
+
+        // ExecuteSqlRaw formats parameter placeholders after identifiers are delimited.
+        static string EscapeFormat(string identifier) =>
+            identifier.Replace("{", "{{", StringComparison.Ordinal).Replace("}", "}}", StringComparison.Ordinal);
     }
 
     internal static string GetProviderKey(IProperty property, string? key)
