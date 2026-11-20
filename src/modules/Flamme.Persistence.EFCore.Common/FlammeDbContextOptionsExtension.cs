@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Flamme.Persistence.EFCore;
 
@@ -28,6 +29,8 @@ public class FlammeDbContextOptionsExtension : IDbContextOptionsExtension
     /// <inheritdoc />
     public void ApplyServices(IServiceCollection services)
     {
+        // EF applies the caller's explicit ReplaceService overrides after extension defaults.
+        services.Replace(ServiceDescriptor.Singleton<IModelCacheKeyFactory, FlammeModelCacheKeyFactory>());
     }
 
     /// <inheritdoc />
