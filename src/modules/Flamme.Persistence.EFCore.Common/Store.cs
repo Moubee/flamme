@@ -139,16 +139,20 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
             if (PostgreSqlWriteKeys.Supports(dbContext) && table.HasValue &&
                 keyProperty?.GetColumnName(table.Value) != null)
             {
-                await PostgreSqlWriteKeys.ExecuteAsync(dbContext, async () =>
-                {
-                    var key = dbContext.Entry(entity).Property<string>(keyProperty.Name).CurrentValue;
-                    await PostgreSqlWriteKeys.AcquireAsync(dbContext, keyProperty, table.Value, key, cancellationToken);
-                    await SaveTrackedAsync(dbContext, entity, keySelector, cancellationToken, keyProperty, key);
-                }, cancellationToken);
+                var key = dbContext.Entry(entity).Property<string>(keyProperty.Name).CurrentValue;
+                await PostgreSqlWriteKeys.ExecuteAsync(dbContext,
+                    async () =>
+                    {
+                        await PostgreSqlWriteKeys.AcquireAsync(dbContext, keyProperty, table.Value, key, cancellationToken);
+                        return await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken, keyProperty, key);
+                    },
+                    preparedState => WriteTrackedAsync(dbContext, entity, preparedState, cancellationToken),
+                    cancellationToken);
                 return;
             }
 
-            await SaveTrackedAsync(dbContext, entity, keySelector, cancellationToken);
+            var state = await FindSaveStateAsync(dbContext, entity, keySelector, cancellationToken);
+            await WriteTrackedAsync(dbContext, entity, state, cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -157,7 +161,7 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         }
     }
 
-    private async Task SaveTrackedAsync(
+    private async Task<EntityState> FindSaveStateAsync(
         TDbContext dbContext,
         TEntity entity,
         Expression<Func<TEntity, string>> keySelector,
@@ -197,8 +201,13 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         else
             exists = await query.AnyAsync(cancellationToken);
 
-        set.Entry(entity).State = exists ? EntityState.Modified : EntityState.Added;
-        await dbContext.SaveChangesAsync(cancellationToken);
+        return exists ? EntityState.Modified : EntityState.Added;
+    }
+
+    private static Task WriteTrackedAsync(TDbContext dbContext, TEntity entity, EntityState state, CancellationToken cancellationToken)
+    {
+        dbContext.Set<TEntity>().Entry(entity).State = state;
+        return dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>

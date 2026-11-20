@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.ExceptionServices;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -15,25 +16,37 @@ internal static class PostgreSqlWriteKeys
     internal static bool Supports(DbContext context) =>
         context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 
-    internal static async Task ExecuteAsync(DbContext context, Func<Task> operation, CancellationToken cancellationToken)
+    private static Transaction? GetEnlistedOrAmbientTransaction(DbContext context) =>
+        context.Database.GetEnlistedTransaction() ??
+        (context.GetService<IDbContextTransactionManager>() as ITransactionEnlistmentManager)?.CurrentAmbientTransaction;
+
+    internal static Task ExecuteAsync(DbContext context, Func<Task> write, CancellationToken cancellationToken) =>
+        ExecuteAsync(context, static () => Task.FromResult(false), _ => write(), cancellationToken);
+
+    internal static async Task ExecuteAsync<TPreparation>(
+        DbContext context,
+        Func<Task<TPreparation>> prepare,
+        Func<TPreparation, Task> write,
+        CancellationToken cancellationToken)
     {
         var database = context.Database;
         if (database.CurrentTransaction is not null)
         {
-            await operation();
+            await ExecuteAtSavepointAsync();
             return;
         }
 
-        if (Transaction.Current is not null || database.GetEnlistedTransaction() is not null)
+        var enlistedOrAmbient = GetEnlistedOrAmbientTransaction(context);
+        if (enlistedOrAmbient is not null)
         {
             // Keep the lock and subsequent EF commands on the same enlisted connection.
             await database.OpenConnectionAsync(cancellationToken);
             try
             {
-                if (database.GetEnlistedTransaction() is null && Transaction.Current is { } ambient)
-                    database.EnlistTransaction(ambient);
+                if (database.GetEnlistedTransaction() is null)
+                    database.EnlistTransaction(enlistedOrAmbient);
 
-                await operation();
+                await ExecuteAtSavepointAsync();
             }
             finally
             {
@@ -42,22 +55,53 @@ internal static class PostgreSqlWriteKeys
             return;
         }
 
-        if (database.CreateExecutionStrategy().RetriesOnFailure)
+        var strategy = database.CreateExecutionStrategy();
+        var failure = await strategy.ExecuteAsync<ExceptionDispatchInfo?>(async ct =>
         {
-            // This transaction is one unit. The Store cannot replay arbitrary saving hooks
-            // or determine if an interrupted COMMIT already succeeded.
-            await new SingleAttemptTransactionStrategy(context).ExecuteAsync(ExecuteLocalTransactionAsync, cancellationToken);
-            return;
-        }
+            var writing = false;
+            try
+            {
+                // A subsequent read must see the write that released a contended key.
+                await using var transaction = await database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
+                var prepared = await prepare();
+                writing = true;
+                await write(prepared);
+                await transaction.CommitAsync(ct);
+                return null;
+            }
+            catch (Exception exception) when (writing)
+            {
+                // Pass write and commit failures through without letting the strategy replay them.
+                return ExceptionDispatchInfo.Capture(exception);
+            }
+        }, cancellationToken);
+        failure?.Throw();
 
-        await ExecuteLocalTransactionAsync(cancellationToken);
-
-        async Task ExecuteLocalTransactionAsync(CancellationToken ct)
+        async Task ExecuteAtSavepointAsync()
         {
-            // A subsequent read must see the write that released a contended key.
-            await using var transaction = await database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
-            await operation();
-            await transaction.CommitAsync(ct);
+            cancellationToken.ThrowIfCancellationRequested();
+            // Keep savepoint commands independent of cancellation of the protected work.
+            const string savepoint = "flamme_store_write";
+            await database.ExecuteSqlRawAsync("SAVEPOINT " + savepoint, CancellationToken.None);
+            try
+            {
+                await write(await prepare());
+                await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + savepoint, CancellationToken.None);
+            }
+            catch (Exception writeException)
+            {
+                try
+                {
+                    await database.ExecuteSqlRawAsync("ROLLBACK TO SAVEPOINT " + savepoint, CancellationToken.None);
+                    await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT " + savepoint, CancellationToken.None);
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new AggregateException("Store write failed and restoring its savepoint failed.", writeException, rollbackException);
+                }
+
+                throw;
+            }
         }
     }
 
@@ -89,12 +133,6 @@ internal static class PostgreSqlWriteKeys
                     pg_catalog.hashtextextended(
                         concat('flamme:store:', pg_catalog.to_regclass({tableName})::oid, ':', {column}), 0)))
             """, cancellationToken);
-    }
-
-    private sealed class SingleAttemptTransactionStrategy(DbContext context)
-        : ExecutionStrategy(context, maxRetryCount: 0, maxRetryDelay: TimeSpan.Zero)
-    {
-        protected override bool ShouldRetryOn(Exception exception) => false;
     }
 
     internal static string GetProviderKey(IProperty property, string? key)

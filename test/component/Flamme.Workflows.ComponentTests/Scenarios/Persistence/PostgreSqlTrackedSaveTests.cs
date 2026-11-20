@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Transactions;
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
@@ -7,6 +8,7 @@ using Flamme.Tenants.Options;
 using Flamme.Testing.Shared.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -259,12 +261,191 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
     }
 
     [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task BorrowedTransactionCanCommitAfterAdvisoryWaitFails(bool cancelWait)
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        using var waitingCancellation = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var heldId = NewId();
+        var priorId = NewId();
+        var laterId = NewId();
+        await using var holder = fixture.SaveInHeldTransaction(
+            backend => fixture.SaveWithShadowAsync(NewRow(heldId, "winner"), "held", token, backend), token);
+        var heldPid = await holder.Ready;
+
+        var contender = Task.Run(async () =>
+        {
+            using var scope = BeginAmbientTransaction(IsolationLevel.ReadCommitted);
+            await fixture.SaveWithShadowAsync(NewRow(priorId, "prior"), "prior", token);
+            var failure = await FailureAsync(fixture.Store.SaveAsync(NewRow(heldId, "blocked"), row => row.Id,
+                async (context, _, ct) =>
+                {
+                    if (!cancelWait)
+                        await context.Database.ExecuteSqlRawAsync("SET LOCAL lock_timeout = '4s'", ct);
+                }, waitingCancellation.Token));
+            await fixture.SaveWithShadowAsync(NewRow(laterId, "later"), "later", token);
+            scope.Complete();
+            return failure;
+        }, token);
+
+        await fixture.WaitForBlockedWriter(heldPid, "advisory", token);
+        if (cancelWait)
+            await waitingCancellation.CancelAsync();
+        var failure = await contender.WaitAsync(token);
+
+        if (cancelWait)
+            await Assert.That(failure).IsAssignableTo<OperationCanceledException>();
+        else
+            await Assert.That((failure?.GetBaseException() as PostgresException)?.SqlState).IsEqualTo(PostgresErrorCodes.LockNotAvailable);
+        await Assert.That((await fixture.ReadAsync(priorId, token)).Payload).IsEqualTo("prior");
+        await Assert.That((await fixture.ReadAsync(laterId, token)).Payload).IsEqualTo("later");
+        await holder.ReleaseAsync();
+        await Assert.That((await fixture.ReadAsync(heldId, token)).Payload).IsEqualTo("winner");
+    }
+
+    [Test]
+    [Arguments(IsolationLevel.ReadCommitted, "read committed")]
+    [Arguments(IsolationLevel.RepeatableRead, "repeatable read")]
+    [Arguments(IsolationLevel.Serializable, "serializable")]
+    public async Task AdvisoryWaitPreservesTheCallersSnapshot(IsolationLevel isolation, string expectedIsolation)
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var id = NewId();
+        await using var holder = fixture.SaveInHeldTransaction(
+            backend => fixture.SaveWithShadowAsync(NewRow(id, "first"), "first", token, backend), token);
+        var heldPid = await holder.Ready;
+        string? observedIsolation = null;
+        bool? visibleBeforeWait = null;
+        var contender = Task.Run(async () =>
+        {
+            using var scope = BeginAmbientTransaction(isolation);
+            await fixture.Store.SaveAsync(NewRow(id, "second"), row => row.Id, async (context, _, ct) =>
+            {
+                observedIsolation = await context.Database.SqlQueryRaw<string>(
+                    """SELECT current_setting('transaction_isolation') AS "Value" """).SingleAsync(ct);
+                visibleBeforeWait = await context.Set<TrackedSaveRow>().AnyAsync(row => row.Id == id, ct);
+            }, token);
+            scope.Complete();
+        }, token);
+
+        await fixture.WaitForBlockedWriter(heldPid, "advisory", token);
+        await holder.ReleaseAsync();
+        var failure = await FailureAsync(contender);
+        await Assert.That(observedIsolation).IsEqualTo(expectedIsolation);
+        await Assert.That(visibleBeforeWait).IsEqualTo(false);
+
+        if (isolation == IsolationLevel.ReadCommitted)
+        {
+            await Assert.That(failure).IsNull();
+        }
+        else
+        {
+            var sqlState = (failure?.GetBaseException() as PostgresException)?.SqlState;
+            await Assert.That(sqlState is PostgresErrorCodes.UniqueViolation or PostgresErrorCodes.SerializationFailure).IsTrue();
+            await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("first");
+
+            using var retry = BeginAmbientTransaction(isolation);
+            await fixture.SaveWithShadowAsync(NewRow(id, "second"), "retry", token);
+            retry.Complete();
+        }
+
+        await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("second");
+    }
+
+    [Test]
+    [Arguments(true, false)]
+    [Arguments(false, false)]
+    [Arguments(true, true)]
+    [Arguments(false, true)]
+    public async Task WriterHonorsConfiguredAmbientEnlistment(bool enlist, bool bulk)
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var (_, store) = fixture.CreateStore(enlist: enlist);
+        var id = NewId();
+        var sql = $"SELECT \"Payload\" FROM {fixture.Table} WHERE \"Id\" = $1";
+        var providerId = id.ToUpperInvariant();
+        var expected = enlist ? null : "WRITTEN";
+
+        using (new TransactionScope(TransactionScopeOption.RequiresNew,
+                   new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var row = NewRow(id, "written");
+            if (bulk)
+                await store.SaveManyAsync([row], item => item.Id, cancellationToken: token);
+            else
+                await store.SaveAsync(row, item => item.Id, token);
+
+            await Assert.That(await fixture.ReadScalarAsync(sql, providerId, token)).IsEqualTo(expected);
+        }
+
+        await Assert.That(await fixture.ReadScalarAsync(sql, providerId, token)).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task TransientExistenceReadRetriesInAFreshTransactionWithoutPreparingAgain()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var failure = new FirstExistenceReadTimeout(fixture.Table);
+        var (_, store) = fixture.CreateStore(retry: true, interceptor: failure);
+        var id = NewId();
+        var callbacks = 0;
+
+        await store.SaveAsync(NewRow(id, "written"), item => item.Id, (context, item, _) =>
+        {
+            callbacks++;
+            context.Entry(item).Property("ShadowText").CurrentValue = "prepared";
+            return ValueTask.CompletedTask;
+        }, token);
+
+        await Assert.That(callbacks).IsEqualTo(1);
+        await Assert.That(failure.TransactionIds.Count).IsEqualTo(2);
+        await Assert.That(failure.TransactionIds[0]).IsNotNull();
+        await Assert.That(failure.TransactionIds[1]).IsNotNull();
+        await Assert.That(failure.TransactionIds[0]).IsNotEqualTo(failure.TransactionIds[1]);
+        var stored = await fixture.ReadAsync(id, token);
+        await Assert.That(stored.Shadow).IsEqualTo("prepared");
+        await Assert.That(stored.Hook).IsEqualTo("saved:written");
+    }
+
+    [Test]
+    public async Task TransientFailureReportedAfterCommitDoesNotReplayTheWrite()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var failure = new FirstCommitAcknowledgmentTimeout();
+        var (_, store) = fixture.CreateStore(retry: true, interceptor: failure);
+        var id = NewId();
+        var callbacks = 0;
+
+        var exception = await FailureAsync(store.SaveAsync(NewRow(id, "written"), item => item.Id, (_, _, _) =>
+        {
+            callbacks++;
+            return ValueTask.CompletedTask;
+        }, token));
+
+        await Assert.That(exception).IsTypeOf<TimeoutException>();
+        await Assert.That(failure.Commits).IsEqualTo(1);
+        await Assert.That(callbacks).IsEqualTo(1);
+        await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("written");
+    }
+
+    [Test]
     public async Task RetryingProviderAcceptsLocalWriteAndCallerWrappedAmbientTransaction()
     {
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         var token = deadline.Token;
         using var tenant = fixture.UseTenant("a");
-        var (factory, store) = fixture.CreateRetryingStore();
+        var (factory, store) = fixture.CreateStore(retry: true);
         var local = NewId();
         await store.SaveAsync(NewRow(local, "local"), row => row.Id, token);
         await Assert.That((await fixture.ReadAsync(local, token)).Payload).IsEqualTo("local");
@@ -292,8 +473,44 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         await Assert.That(await fixture.CountAsync([unwrapped], "unsupported", token)).IsEqualTo(0);
     }
 
+    private sealed class FirstExistenceReadTimeout(string table) : DbCommandInterceptor
+    {
+        public List<Guid?> TransactionIds { get; } = [];
+
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+            DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.StartsWith("SELECT", StringComparison.Ordinal) &&
+                command.CommandText.Contains($"FROM {table}", StringComparison.Ordinal))
+            {
+                TransactionIds.Add(eventData.Context?.Database.CurrentTransaction?.TransactionId);
+                if (TransactionIds.Count == 1)
+                    throw new TimeoutException("Injected timeout before the existence read.");
+            }
+
+            return ValueTask.FromResult(result);
+        }
+    }
+
+    private sealed class FirstCommitAcknowledgmentTimeout : DbTransactionInterceptor
+    {
+        public int Commits { get; private set; }
+
+        public override Task TransactionCommittedAsync(
+            DbTransaction transaction, TransactionEndEventData eventData, CancellationToken cancellationToken = default)
+        {
+            Commits++;
+            return Commits == 1
+                ? Task.FromException(new TimeoutException("Injected timeout after the database committed."))
+                : Task.CompletedTask;
+        }
+    }
+
     private static string NewId() => $"id_{Guid.NewGuid():N}";
     private static TrackedSaveRow NewRow(string id, string payload) => new() { Id = id, Payload = payload };
+    private static TransactionScope BeginAmbientTransaction(IsolationLevel isolation) =>
+        new(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = isolation }, TransactionScopeAsyncFlowOption.Enabled);
 
     private static async Task<Exception?> FailureAsync(Task operation)
     {
@@ -436,15 +653,23 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
         return (int)(await command.ExecuteScalarAsync(token))!;
     }
 
-    public (IDbContextFactory<TrackedSaveContext>, Store<TrackedSaveContext, TrackedSaveRow>) CreateRetryingStore()
+    public (IDbContextFactory<TrackedSaveContext>, Store<TrackedSaveContext, TrackedSaveRow>) CreateStore(
+        bool enlist = true, bool retry = false, IInterceptor? interceptor = null)
     {
+        var connection = new NpgsqlConnectionStringBuilder(_writerConnection) { Enlist = enlist };
         var options = new DbContextOptionsBuilder<TrackedSaveContext>();
-        options.UseNpgsql(_writerConnection, provider => provider.EnableRetryOnFailure());
-        var factory = new RetryContextFactory(options.Options, _services);
+        options.UseNpgsql(connection.ConnectionString, provider =>
+        {
+            if (retry)
+                provider.EnableRetryOnFailure(2, TimeSpan.FromMilliseconds(5), null);
+        });
+        if (interceptor != null)
+            options.AddInterceptors(interceptor);
+        var factory = new TrackedSaveContextFactory(options.Options, _services);
         return (factory, new Store<TrackedSaveContext, TrackedSaveRow>(factory, _services));
     }
 
-    private sealed class RetryContextFactory(DbContextOptions<TrackedSaveContext> options, IServiceProvider services)
+    private sealed class TrackedSaveContextFactory(DbContextOptions<TrackedSaveContext> options, IServiceProvider services)
         : IDbContextFactory<TrackedSaveContext>
     {
         public TrackedSaveContext CreateDbContext() => new(options, services);
@@ -483,6 +708,7 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
             {
                 try
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = new TransactionScope(TransactionScopeOption.RequiresNew,
                         new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled);
                     await run(backend);
@@ -490,12 +716,17 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
                     await _release.Task.WaitAsync(token);
                     scope.Complete();
                 }
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
+                    ready.TrySetCanceled(token);
+                    throw;
+                }
                 catch (Exception exception)
                 {
                     ready.TrySetException(exception);
                     throw;
                 }
-            }, token);
+            });
         }
 
         public Task ReleaseAsync()

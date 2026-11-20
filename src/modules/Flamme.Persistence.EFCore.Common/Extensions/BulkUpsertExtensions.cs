@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using System.Text;
-using System.Transactions;
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
 using Microsoft.EntityFrameworkCore;
@@ -109,7 +108,7 @@ public static class BulkUpsertExtensions
                 throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name}: duplicate key '{sorted[index].Key}' in the batch.");
         }
 
-        await ExecuteAtomicallyAsync(dbContext, async () =>
+        await PostgreSqlWriteKeys.ExecuteAsync(dbContext, async () =>
         {
             foreach (var batch in sorted.Select(item => item.Entity).Chunk(batchSize))
             {
@@ -123,40 +122,6 @@ public static class BulkUpsertExtensions
                     throw new InvalidOperationException(
                         $"Cannot save {typeof(TEntity).Name}: the database affected {affected} of {batch.Length} rows. {reason}");
                 }
-            }
-        }, cancellationToken);
-    }
-
-    private static Task ExecuteAtomicallyAsync(
-        DbContext dbContext, Func<Task> write, CancellationToken cancellationToken)
-    {
-        var database = dbContext.Database;
-        if (database.CurrentTransaction is null && Transaction.Current is null && database.GetEnlistedTransaction() is null)
-            return PostgreSqlWriteKeys.ExecuteAsync(dbContext, write, cancellationToken);
-
-        // An ambient PostgreSQL transaction has no EF transaction object. Issue
-        // savepoint commands on its connection, which must stay open across chunks.
-        return PostgreSqlWriteKeys.ExecuteAsync(dbContext, async () =>
-        {
-            await database.ExecuteSqlRawAsync("SAVEPOINT flamme_bulk_upsert", cancellationToken);
-            try
-            {
-                await write();
-                await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT flamme_bulk_upsert", cancellationToken);
-            }
-            catch (Exception writeException)
-            {
-                try
-                {
-                    await database.ExecuteSqlRawAsync("ROLLBACK TO SAVEPOINT flamme_bulk_upsert", CancellationToken.None);
-                    await database.ExecuteSqlRawAsync("RELEASE SAVEPOINT flamme_bulk_upsert", CancellationToken.None);
-                }
-                catch (Exception rollbackException)
-                {
-                    throw new AggregateException("Bulk upsert failed and restoring its savepoint failed.", writeException, rollbackException);
-                }
-
-                throw;
             }
         }, cancellationToken);
     }
