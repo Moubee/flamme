@@ -98,19 +98,25 @@ public static class BulkUpsertExtensions
         var keyProperty = entityType.FindProperty(keySelector.GetMemberAccess().Name)
             ?? throw new ArgumentException("The key must select a mapped property.", nameof(keySelector));
         var getKey = keySelector.Compile();
-        var sorted = entities.Select(entity => (Key: getKey(entity), Entity: entity))
-            .OrderBy(item => item.Key, StringComparer.Ordinal)
-            .ToArray();
+        var keyConverter = keyProperty.GetTypeMapping().Converter;
+        var providerKeys = new HashSet<object?>(keyProperty.GetProviderValueComparer());
 
-        for (var index = 1; index < sorted.Length; index++)
+        foreach (var entity in entities)
         {
-            if (StringComparer.Ordinal.Equals(sorted[index - 1].Key, sorted[index].Key))
-                throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name}: duplicate key '{sorted[index].Key}' in the batch.");
+            var key = getKey(entity);
+            var providerKey = keyConverter == null ? key : keyConverter.ConvertToProvider(key);
+            if (!providerKeys.Add(providerKey))
+                throw new InvalidOperationException($"Cannot save {typeof(TEntity).Name}: duplicate key '{key}' in the batch.");
         }
+
+        // Preserve caller order when mapped constraints or triggers can make DML order significant.
+        var writeOrder = CanOrderByConflictKey(dbContext, table, keyProperty)
+            ? entities.OrderBy(entity => PostgreSqlWriteKeys.GetProviderKey(keyProperty, getKey(entity)), StringComparer.Ordinal).ToArray()
+            : entities;
 
         await PostgreSqlWriteKeys.ExecuteAsync(dbContext, async () =>
         {
-            foreach (var batch in sorted.Select(item => item.Entity).Chunk(batchSize))
+            foreach (var batch in writeOrder.Chunk(batchSize))
             {
                 var (sql, parameters) = GeneratePostgresUpsert(dbContext, batch, entityType, keyProperty, table, writerTenantId);
                 var affected = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
@@ -124,6 +130,17 @@ public static class BulkUpsertExtensions
                 }
             }
         }, cancellationToken);
+    }
+
+    private static bool CanOrderByConflictKey(DbContext dbContext, StoreObjectIdentifier storeObject, IProperty keyProperty)
+    {
+        var table = dbContext.Model.GetRelationalModel().FindTable(storeObject.Name, storeObject.Schema);
+        return table?.PrimaryKey is { Columns: [var column] } primaryKey &&
+               column.Name == keyProperty.GetColumnName(storeObject) &&
+               table.UniqueConstraints.All(constraint => constraint == primaryKey) &&
+               !table.Indexes.Any(index => index.IsUnique) &&
+               !table.ForeignKeyConstraints.Any(constraint => constraint.PrincipalTable == table) &&
+               !table.Triggers.Any();
     }
 
     private static (string, object[]) GeneratePostgresUpsert<TEntity>(
@@ -197,13 +214,20 @@ public static class BulkUpsertExtensions
         {
             var tenantProperty = entityType.FindProperty(nameof(Entity.TenantId))!;
             var tenantColumn = sql.DelimitIdentifier(tenantProperty.GetColumnName(storeObject)!);
-            var incomingTenant = $"COALESCE(EXCLUDED.{tenantColumn}::text, '') COLLATE pg_catalog.\"C\"";
+            var tenantMapping = tenantProperty.GetRelationalTypeMapping();
+            var defaultTenant = $"CAST({{{parameterCount}}} AS text)";
+            var writerTenant = $"CAST({{{parameterCount + 1}}} AS text)";
+            var sharedTenant = $"CAST({{{parameterCount + 2}}} AS text)";
+            var storedTenant = $"COALESCE(stored.{tenantColumn}::text, {defaultTenant}) COLLATE pg_catalog.\"C\"";
+            var incomingTenant = $"COALESCE(EXCLUDED.{tenantColumn}::text, {defaultTenant}) COLLATE pg_catalog.\"C\"";
             // Compare actual key spelling and owner even when the unique collation equates variants.
             sb.AppendLine($"WHERE stored.{keyColumnName}::text COLLATE pg_catalog.\"C\" = EXCLUDED.{keyColumnName}::text COLLATE pg_catalog.\"C\"");
-            sb.AppendLine($"  AND COALESCE(stored.{tenantColumn}::text, '') COLLATE pg_catalog.\"C\" = {incomingTenant}");
-            sb.AppendLine($"  AND {incomingTenant} IN ({{{parameterCount}}}, {{{parameterCount + 1}}})");
-            parameters.Add(writerTenantId);
-            parameters.Add(Tenant.AgnosticTenantId);
+            sb.AppendLine($"  AND {storedTenant} IS NOT DISTINCT FROM {incomingTenant}");
+            sb.AppendLine($"  AND ({incomingTenant} IS NOT DISTINCT FROM {writerTenant} OR {incomingTenant} IS NOT DISTINCT FROM {sharedTenant})");
+            using var command = dbContext.Database.GetDbConnection().CreateCommand();
+            parameters.Add(tenantMapping.CreateParameter(command, "bulk_default_tenant", Tenant.DefaultTenantId));
+            parameters.Add(tenantMapping.CreateParameter(command, "bulk_writer_tenant", writerTenantId));
+            parameters.Add(tenantMapping.CreateParameter(command, "bulk_shared_tenant", Tenant.AgnosticTenantId));
         }
 
         return (sb.ToString(), parameters.ToArray());

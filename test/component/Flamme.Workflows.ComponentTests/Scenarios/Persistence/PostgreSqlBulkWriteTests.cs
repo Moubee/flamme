@@ -309,8 +309,9 @@ public sealed class PostgreSqlBulkWriteTests(PostgreSqlStoreSaveManyFixture fixt
         }
         await scenario.Store.AddAsync(Row("abc", "stored"));
 
-        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
-            scenario.Store.SaveManyAsync([Row("abc", "permitted alone"), Row("ABC", "collision"), Row("other")], row => row.Id, onSaving: null));
+        var failure = await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+            scenario.Store.SaveManyAsync([Row("ABC", "collision"), Row("other")], row => row.Id, onSaving: null));
+        await Assert.That(failure!.Message).Contains("affected 1 of 2 rows");
 
         var stored = await scenario.FindAsync("abc");
         await Assert.That(stored!.Id).IsEqualTo("abc");

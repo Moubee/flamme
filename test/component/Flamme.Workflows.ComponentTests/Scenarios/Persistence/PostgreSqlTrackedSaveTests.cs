@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Text;
 using System.Transactions;
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
@@ -233,6 +234,158 @@ public sealed class PostgreSqlTrackedSaveTests(PostgreSqlTrackedSaveFixture fixt
         var sqlState = (failure?.InnerException as PostgresException)?.SqlState;
         await Assert.That(sqlState).IsEqualTo(PostgresErrorCodes.UniqueViolation);
         await Assert.That((await fixture.ReadAsync(id, token)).Payload).IsEqualTo("explicit-create");
+    }
+
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task BulkRejectsDuplicateMappedKeys(bool crossChunkBoundary)
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var prefix = NewId();
+        var id = $"{prefix}-target";
+        var mappedId = id.ToUpperInvariant();
+        // CLR ordinal sorting puts the uppercase alias before the fillers and
+        // the lowercase alias after them, beyond the default 50-row chunk.
+        var fillers = Enumerable.Range(0, crossChunkBoundary ? 50 : 0)
+            .Select(index => NewRow($"{prefix}-item-{index:00}", "filler")).ToArray();
+        var rows = fillers.Prepend(NewRow(mappedId, "first")).Append(NewRow(id, "second")).ToArray();
+
+        var failure = await FailureAsync(fixture.Store.SaveManyAsync(rows, row => row.Id, cancellationToken: token));
+        var stored = await fixture.ReadScalarAsync($"SELECT \"Payload\" FROM {fixture.Table} WHERE \"Id\" = $1", mappedId, token);
+        await Assert.That(stored).IsNull();
+        await Assert.That(failure).IsTypeOf<InvalidOperationException>();
+        await Assert.That(failure!.Message).Contains("duplicate key");
+        await Assert.That(await fixture.CountAsync(fillers.Select(row => row.Id).ToArray(), "filler", token)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task BulkRejectsStructurallyEqualProviderKeys()
+    {
+        using var tenant = fixture.UseTenant("a");
+        var id = NewId();
+        var first = new MappedBulkRow { Id = id, UniqueValue = $"{id}-first" };
+        var second = new MappedBulkRow { Id = id.ToUpperInvariant(), UniqueValue = $"{id}-second" };
+
+        var failure = await FailureAsync(fixture.MappedStore.SaveManyAsync([first, second], row => row.Id, onSaving: null));
+        await Assert.That(failure).IsTypeOf<InvalidOperationException>();
+        await Assert.That(failure!.Message).Contains("duplicate key");
+        await using var db = await fixture.MappedStore.CreateDbContextAsync();
+        await Assert.That(await db.Set<MappedBulkRow>().IgnoreQueryFilters().AnyAsync(row => row.Id == id)).IsFalse();
+    }
+
+    [Test]
+    public async Task BulkUsesSamePhysicalLockOrderForNormalizedKeys()
+    {
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var token = deadline.Token;
+        using var tenant = fixture.UseTenant("a");
+        var prefix = NewId();
+        var a = $"{prefix}-a";
+        var b = $"{prefix}-b";
+        await fixture.Store.SaveManyAsync([NewRow(a, "seed"), NewRow(b, "seed")], row => row.Id, cancellationToken: token);
+
+        await using var blocker = await fixture.OpenObserverAsync(token);
+        await using var transaction = await blocker.BeginTransactionAsync(token);
+        await using var lockRow = new NpgsqlCommand($"SELECT 1 FROM {fixture.Table} WHERE \"Id\" = $1 FOR UPDATE", blocker, transaction);
+        lockRow.Parameters.Add(new NpgsqlParameter { Value = b.ToUpperInvariant() });
+        await lockRow.ExecuteNonQueryAsync(token);
+
+        var backend = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var first = fixture.Store.SaveManyAsync([NewRow(b.ToUpperInvariant(), "first"), NewRow(a, "first")], row => row.Id,
+            (db, _, ct) => backend.Task.IsCompleted ? ValueTask.CompletedTask : fixture.ReadBackendAsync(db, backend, ct), token);
+        var second = Task.CompletedTask;
+        try
+        {
+            var firstPid = await backend.Task.WaitAsync(token);
+            await fixture.WaitForBlockedWriter(blocker.ProcessID, "transactionid", token);
+
+            // The first batch has already written A while it waits to write B.
+            await using var observer = await fixture.OpenObserverAsync(token);
+            await using var probe = new NpgsqlCommand($"SELECT 1 FROM {fixture.Table} WHERE \"Id\" = $1 FOR UPDATE NOWAIT", observer);
+            probe.Parameters.Add(new NpgsqlParameter { Value = a.ToUpperInvariant() });
+            var locked = await Assert.ThrowsExactlyAsync<PostgresException>(() => probe.ExecuteNonQueryAsync(token));
+            await Assert.That(locked!.SqlState).IsEqualTo(PostgresErrorCodes.LockNotAvailable);
+
+            second = fixture.Store.SaveManyAsync([NewRow(a.ToUpperInvariant(), "second"), NewRow(b, "second")],
+                row => row.Id, cancellationToken: token);
+            await fixture.WaitForBlockedWriter(firstPid, "transactionid", token);
+        }
+        finally
+        {
+            await transaction.RollbackAsync(CancellationToken.None);
+            await Task.WhenAll(first, second).WaitAsync(token);
+        }
+
+        await Assert.That(await fixture.CountAsync([a, b], "second", token)).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task BulkReleasesAndReusesSecondaryUniqueValueInCallerOrder()
+    {
+        using var tenant = fixture.UseTenant("a");
+        var prefix = NewId();
+        var occupied = $"{prefix}-occupied";
+        var release = new MappedBulkRow { Id = $"{prefix}-z", UniqueValue = occupied };
+        await fixture.MappedStore.SaveManyAsync([release], row => row.Id, onSaving: null);
+        var take = new MappedBulkRow { Id = $"{prefix}-a", UniqueValue = occupied };
+        release.UniqueValue = $"{prefix}-vacated";
+
+        await fixture.MappedStore.SaveManyAsync([release, take], row => row.Id, onSaving: null);
+
+        await using var db = await fixture.MappedStore.CreateDbContextAsync();
+        var stored = await db.Set<MappedBulkRow>().IgnoreQueryFilters().Where(row => row.Id == release.Id || row.Id == take.Id)
+            .ToDictionaryAsync(row => row.Id, row => row.UniqueValue);
+        await Assert.That(stored[release.Id]).IsEqualTo(release.UniqueValue);
+        await Assert.That(stored[take.Id]).IsEqualTo(occupied);
+    }
+
+    [Test]
+    [Arguments("a", "a", false)]
+    [Arguments("a", Tenant.AgnosticTenantId, false)]
+    [Arguments(Tenant.DefaultTenantId, Tenant.DefaultTenantId, false)]
+    [Arguments(Tenant.DefaultTenantId, Tenant.DefaultTenantId, true)]
+    public async Task BulkPreservesConvertedTenantOwnership(string writer, string owner, bool legacyNull)
+    {
+        using var tenant = fixture.UseTenant(writer);
+        var id = NewId();
+        var row = new MappedBulkRow { Id = id, TenantId = owner, UniqueValue = $"{id}-original" };
+        await fixture.MappedStore.SaveManyAsync([row], item => item.Id, onSaving: null);
+        await using var db = await fixture.MappedStore.CreateDbContextAsync();
+        var stored = db.Set<MappedBulkRow>().IgnoreQueryFilters().Where(item => item.Id == id);
+        if (legacyNull)
+        {
+            var changed = await stored.ExecuteUpdateAsync(setters => setters.SetProperty(item => item.TenantId, (string?)null));
+            await Assert.That(changed).IsEqualTo(1);
+        }
+
+        row.UniqueValue = $"{id}-updated";
+        await fixture.MappedStore.SaveManyAsync([row], item => item.Id, onSaving: null);
+
+        var updated = await stored.AsNoTracking().SingleAsync();
+        await Assert.That(updated.TenantId).IsEqualTo(owner);
+        await Assert.That(updated.UniqueValue).IsEqualTo(row.UniqueValue);
+    }
+
+    [Test]
+    public async Task BulkRejectsReplacementByDifferentTenantWithConvertedOwner()
+    {
+        var id = NewId();
+        var row = new MappedBulkRow { Id = id, TenantId = "a", UniqueValue = $"{id}-original" };
+        using (fixture.UseTenant("a"))
+            await fixture.MappedStore.SaveManyAsync([row], item => item.Id, onSaving: null);
+
+        row.UniqueValue = $"{id}-forged";
+        using (fixture.UseTenant("b"))
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+                fixture.MappedStore.SaveManyAsync([row], item => item.Id, onSaving: null));
+
+        await using var db = await fixture.MappedStore.CreateDbContextAsync();
+        var stored = await db.Set<MappedBulkRow>().IgnoreQueryFilters().SingleAsync(item => item.Id == id);
+        await Assert.That(stored.TenantId).IsEqualTo("a");
+        await Assert.That(stored.UniqueValue).IsEqualTo($"{id}-original");
     }
 
     [Test]
@@ -537,6 +690,7 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
 
     public string Table => $"\"{TrackedSaveContext.SchemaName}\".\"{TrackedSaveContext.TableName}\"";
     public Store<TrackedSaveContext, TrackedSaveRow> Store { get; private set; } = null!;
+    public Store<TrackedSaveContext, MappedBulkRow> MappedStore { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
@@ -555,9 +709,11 @@ public sealed class PostgreSqlTrackedSaveFixture : IAsyncInitializer, IAsyncDisp
             .AddScoped<IEntitySavingHandler, RecordTrackedSaveHook>()
             .AddDbContextFactory<TrackedSaveContext>((_, builder) => builder.UseNpgsql(_writerConnection))
             .AddScoped<Store<TrackedSaveContext, TrackedSaveRow>>()
+            .AddScoped<Store<TrackedSaveContext, MappedBulkRow>>()
             .BuildServiceProvider();
         _factory = _services.GetRequiredService<IDbContextFactory<TrackedSaveContext>>();
         Store = _services.GetRequiredService<Store<TrackedSaveContext, TrackedSaveRow>>();
+        MappedStore = _services.GetRequiredService<Store<TrackedSaveContext, MappedBulkRow>>();
         await using var db = await _factory.CreateDbContextAsync();
         await db.Database.EnsureCreatedAsync();
     }
@@ -752,6 +908,15 @@ public sealed class TrackedSaveContext(DbContextOptions<TrackedSaveContext> opti
         row.Property(entity => entity.Id).HasConversion(v => v.ToUpperInvariant(), v => v.ToLowerInvariant());
         row.Property(entity => entity.Payload).HasConversion(v => v.ToUpperInvariant(), v => v.ToLowerInvariant());
         row.Property<string>("ShadowText");
+
+        var mapped = modelBuilder.Entity<MappedBulkRow>().ToTable("MappedBulkRows", SchemaName);
+        mapped.HasKey(entity => entity.Id);
+        mapped.Property(entity => entity.Id).HasConversion(
+            value => Encoding.UTF8.GetBytes(value.ToUpperInvariant()),
+            value => Encoding.UTF8.GetString(value).ToLowerInvariant());
+        mapped.Property(entity => entity.TenantId).HasConversion(value => "t:" + value, value => value.Substring(2));
+        mapped.HasIndex(entity => entity.UniqueValue).IsUnique();
+
         base.OnModelCreating(modelBuilder);
     }
 }
@@ -760,6 +925,11 @@ public sealed class TrackedSaveRow : Entity
 {
     public string Payload { get; set; } = null!;
     public string? HookMarker { get; set; }
+}
+
+public sealed class MappedBulkRow : Entity
+{
+    public string UniqueValue { get; set; } = null!;
 }
 
 public sealed class RecordTrackedSaveHook : IEntitySavingHandler
