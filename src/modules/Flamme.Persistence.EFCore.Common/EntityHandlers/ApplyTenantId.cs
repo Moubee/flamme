@@ -1,6 +1,7 @@
 using Flamme.Common.Entities;
 using Flamme.Common.Multitenancy;
 using Flamme.Tenants.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +20,9 @@ public class ApplyTenantId(IOptions<TenantsOptions> tenantsOptions) : IEntitySav
             return default;
 
         if (entry.Entity is not Entity entity)
+            return default;
+
+        if (entry.State == EntityState.Modified && !entry.Property(nameof(Entity.TenantId)).IsModified)
             return default;
 
         // Don't touch tenant-agnostic entities (marked with "*")

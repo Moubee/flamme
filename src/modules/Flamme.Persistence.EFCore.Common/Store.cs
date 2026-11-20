@@ -248,12 +248,28 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
         if (expected != writer && expected != Tenant.AgnosticTenantId)
             throw new InvalidOperationException($"Cannot change {typeof(TEntity).Name} '{entity.Id}': tenant ownership mismatch.");
 
-        if (entry.State != EntityState.Deleted)
-            entity.TenantId = expected;
+        var storedOwner = expected;
+        if (expected == Tenant.DefaultTenantId)
+        {
+            var matchingRow = dbContext.Set<TEntity>().AsQueryable();
+            foreach (var key in entry.Metadata.FindPrimaryKey()!.Properties)
+            {
+                var keyName = key.Name;
+                var keyValue = entry.Property(keyName).CurrentValue;
+                matchingRow = matchingRow.Where(row => EF.Property<object>(row, keyName).Equals(keyValue));
+            }
 
-        var legacyDefault = expected == Tenant.DefaultTenantId && await dbContext.Set<TEntity>().AnyAsync(
-            row => EF.Property<string>(row, nameof(Entity.Id)) == entity.Id && EF.Property<string?>(row, nameof(Entity.TenantId)) == null, cancellationToken);
-        owner.OriginalValue = legacyDefault ? null : expected;
+            if (await matchingRow.AnyAsync(row => EF.Property<string?>(row, nameof(Entity.TenantId)) == null, cancellationToken))
+                storedOwner = null;
+        }
+
+        var writeOwner = owner.IsModified;
+        owner.OriginalValue = storedOwner;
+        if (entry.State != EntityState.Deleted)
+        {
+            owner.CurrentValue = writeOwner ? expected : storedOwner;
+            owner.IsModified = writeOwner;
+        }
     }
 
     private async Task HandleDbExceptionAsync(Exception exception, CancellationToken cancellationToken)
@@ -341,6 +357,10 @@ public class Store<TDbContext, TEntity>(IDbContextFactory<TDbContext> dbContextF
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task UpdatePartialAsync(TEntity entity, Expression<Func<TEntity, object>>[] properties, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (properties.Length == 0)
+            return;
+
         await using var dbContext = await CreateDbContextAsync(cancellationToken);
         var entry = dbContext.Attach(entity);
 
