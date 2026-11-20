@@ -13,9 +13,10 @@ namespace Flamme.Workflows.ComponentTests.Scenarios.Persistence;
 public sealed class PostgreSqlCollatedTrackedSaveTests
 {
     [Test]
-    [Arguments(false)]
-    [Arguments(true)]
-    public async Task EquivalentFirstSavesUseTheSameLock(bool citext)
+    [Arguments(false, false)]
+    [Arguments(true, false)]
+    [Arguments(false, true)]
+    public async Task EquivalentFirstSavesUseTheSameLock(bool citext, bool requiredPayloadDomain)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         var token = timeout.Token;
@@ -38,6 +39,16 @@ public sealed class PostgreSqlCollatedTrackedSaveTests
                     "Payload" text NOT NULL, "HookMarker" text, "ShadowText" text, unused json);
                 """;
             await setup.ExecuteNonQueryAsync(token);
+
+            if (requiredPayloadDomain)
+            {
+                setup.CommandText = """
+                    CREATE DOMAIN "Lock {schema}"."Required Payload" AS text NOT NULL;
+                    ALTER TABLE "Lock {schema}"."Rows"
+                        ALTER COLUMN "Payload" TYPE "Lock {schema}"."Required Payload";
+                    """;
+                await setup.ExecuteNonQueryAsync(token);
+            }
         }
 
         await observer.ReloadTypesAsync(token);

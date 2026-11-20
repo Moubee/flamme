@@ -126,18 +126,21 @@ internal static class PostgreSqlWriteKeys
         using var command = database.GetDbConnection().CreateCommand();
         var keyParameter = keyProperty.GetRelationalTypeMapping().CreateParameter(command, "flamme_key", key);
 
-        // Project only the physical key from a typed row. PostgreSQL's record hash uses
-        // the projected column's type and collation. Other columns need no hash support.
+        // A zero-row subquery supplies the physical key's type and collation.
+        // Populate only that field so unrelated domain constraints stay out of the lock query.
         // The relation OID keeps qualified and unqualified mappings in the same lock namespace.
 #pragma warning disable EF1002 // Only provider-delimited identifiers are interpolated. All values are bound parameters.
         await database.ExecuteSqlRawAsync($$"""
             SELECT pg_catalog.pg_advisory_xact_lock(
                 pg_catalog.hash_record_extended(
-                    ROW(typed_key.{{EscapeFormat(keyColumn)}}),
+                    pg_catalog.jsonb_populate_record(
+                        (SELECT typed_key
+                         FROM (
+                             SELECT (SELECT {{EscapeFormat(keyColumn)}} FROM {{EscapeFormat(tableName)}} LIMIT 0) AS k
+                         ) AS typed_key),
+                        pg_catalog.jsonb_build_object('k', {2})),
                     pg_catalog.hashtextextended(
                         pg_catalog.concat('flamme:store:', pg_catalog.to_regclass({0})::oid, ':', {1}), 0)))
-            FROM pg_catalog.jsonb_populate_record(
-                NULL::{{EscapeFormat(tableName)}}, pg_catalog.jsonb_build_object({1}, {2})) AS typed_key
             """, [tableName, column, keyParameter], cancellationToken);
 #pragma warning restore EF1002
 
