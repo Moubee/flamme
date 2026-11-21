@@ -1,10 +1,11 @@
 using System.Globalization;
+using Flamme.ActivityGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Flamme.ActivityGenerator.ActivityGenerator;
+using static Flamme.ActivityGenerator.Helpers.ActivitySymbols;
 
-namespace Flamme.ActivityGenerator;
+namespace Flamme.ActivityGenerator.CodeGeneration;
 
 internal sealed partial class ActivityEmitter
 {

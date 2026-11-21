@@ -1,9 +1,10 @@
+using Flamme.ActivityGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
-using static Flamme.ActivityGenerator.ActivityGenerator;
+using static Flamme.ActivityGenerator.Helpers.ActivitySymbols;
 
-namespace Flamme.ActivityGenerator;
+namespace Flamme.ActivityGenerator.CodeGeneration;
 
-internal sealed partial class ActivityEmitter
+internal sealed partial class ActivityCallbackWriter
 {
     private const string CallbackLookupPrefix = "CallbackLookup_";
 
@@ -47,7 +48,7 @@ internal sealed partial class ActivityEmitter
         var depth = 0;
         for (INamedTypeSymbol? owner = activity; owner is not null; owner = owner.BaseType, depth++)
         {
-            var bridge = Same(owner.ContainingAssembly, compilation.Assembly) ? null : FindProducerBridge(owner);
+            var bridge = Same(owner.ContainingAssembly, compilation.Assembly) ? null : FindProducerBridge(compilation, owner);
             var declarations = CallbackLookupMethods(owner).Select(method =>
             {
                 var bind = SupportsCallback(method, context);

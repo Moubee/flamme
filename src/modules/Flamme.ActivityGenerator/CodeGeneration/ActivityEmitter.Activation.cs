@@ -1,8 +1,9 @@
 using System.Text;
+using Flamme.ActivityGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
-using static Flamme.ActivityGenerator.ActivityGenerator;
+using static Flamme.ActivityGenerator.Helpers.ActivitySymbols;
 
-namespace Flamme.ActivityGenerator;
+namespace Flamme.ActivityGenerator.CodeGeneration;
 
 internal sealed partial class ActivityEmitter
 {
@@ -46,7 +47,7 @@ internal sealed partial class ActivityEmitter
             member is IPropertySymbol { IsRequired: true } or IFieldSymbol { IsRequired: true }));
         if (Accessible(ctor) && (!required || FindAttribute(ctor, "System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute") is not null))
             return $"new {TypeName(activity)}({string.Join(", ", args)})";
-        return CallAccessor(ctor, "", args);
+        return accessors.Call(ctor, "", args);
     }
 
     private static string DefaultArgument(IParameterSymbol p)

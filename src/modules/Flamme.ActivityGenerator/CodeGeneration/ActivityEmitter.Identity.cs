@@ -1,8 +1,9 @@
 using System.Text;
+using Flamme.ActivityGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
-using static Flamme.ActivityGenerator.ActivityGenerator;
+using static Flamme.ActivityGenerator.Helpers.ActivitySymbols;
 
-namespace Flamme.ActivityGenerator;
+namespace Flamme.ActivityGenerator.CodeGeneration;
 
 internal sealed partial class ActivityEmitter
 {
@@ -72,5 +73,41 @@ internal sealed partial class ActivityEmitter
             return name;
 
         return name + " + \"<\" + " + string.Join(" + \",\" + ", arguments.Select(argument => RuntimeWireName(argument))) + " + \">\"";
+    }
+
+    private static string? ActivityNamespace(INamedTypeSymbol type) =>
+        ActivityArgument(type, "Namespace", "namespace") as string ??
+        (type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString());
+
+    private static string WireName(ITypeSymbol type)
+    {
+        if (type is IArrayTypeSymbol array)
+            return WireName(array.ElementType) + "[" + new string(',', array.Rank - 1) + "]";
+        if (type is not INamedTypeSymbol named)
+            return type is IDynamicTypeSymbol ? nameof(Object) : type.Name;
+        var name = ActivityArgument(named, "Type", "type") as string ?? named.Name;
+        var args = ContainingTypes(named).SelectMany(owner => owner.TypeArguments).ToArray();
+        return args.Length == 0 ? name : $"{name}<{string.Join(",", args.Select(WireName))}>";
+    }
+
+    private static string FriendlyName(INamedTypeSymbol type)
+    {
+        var args = ContainingTypes(type).SelectMany(owner => owner.TypeArguments).ToArray();
+        return args.Length == 0 ? type.Name : $"{type.Name}<{string.Join(", ", args.Select(argument => argument is INamedTypeSymbol named ? named.MetadataName : WireName(argument)))}>";
+    }
+
+    private static object? ActivityArgument(INamedTypeSymbol type, string property, string parameter)
+    {
+        var attribute = EffectiveActivityAttribute(type);
+        if (attribute is null || IsDerivedActivityAttribute(attribute))
+            return null;
+        foreach (var pair in attribute.NamedArguments)
+            if (pair.Key == property)
+                return pair.Value.Value;
+        var parameters = attribute.AttributeConstructor?.Parameters ?? [];
+        for (var index = 0; index < parameters.Length; index++)
+            if (parameters[index].Name == parameter)
+                return attribute.ConstructorArguments[index].Value;
+        return null;
     }
 }

@@ -1,0 +1,4 @@
+<Project>
+  <!-- The analyzer runs inside Roslyn and uses the repository's compiler settings. -->
+  <Import Project="../../../Directory.Build.props" />
+</Project>
