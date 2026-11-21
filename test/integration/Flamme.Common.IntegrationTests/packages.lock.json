@@ -577,7 +577,7 @@
       "flamme.common": {
         "type": "Project",
         "dependencies": {
-          "Cronos": "[0.11.1, )",
+          "Cronos": "[0.13.0, )",
           "DistributedLock.Core": "[1.0.9, )",
           "Flamme.Features": "[1.0.0, )",
           "Flamme.Mediator": "[1.0.0, )",
@@ -650,7 +650,7 @@
       "flamme.scheduling": {
         "type": "Project",
         "dependencies": {
-          "Cronos": "[0.11.1, )",
+          "Cronos": "[0.13.0, )",
           "Flamme.Workflows.Runtime": "[1.0.0, )"
         }
       },
@@ -745,9 +745,9 @@
       },
       "Cronos": {
         "type": "CentralTransitive",
-        "requested": "[0.11.1, )",
-        "resolved": "0.11.1",
-        "contentHash": "5Ug+giPQITSAdTp/METAsofRSSUi3I5p7t4dlcXnzUgUzwZb4HkOBcYfpHuPwAHrnKJjmyW8amVzLD6mfLpaBg=="
+        "requested": "[0.13.0, )",
+        "resolved": "0.13.0",
+        "contentHash": "Nkve+Yi0+ol3ntSBRHeW0ka9cJQ8vndSUvvkXqF9LVqwpoqWueyxu/HS275r98RDOmF7/mzRnZW5XXUBXob+TA=="
       },
       "DistributedLock.Core": {
         "type": "CentralTransitive",
@@ -1669,7 +1669,7 @@
       "flamme.common": {
         "type": "Project",
         "dependencies": {
-          "Cronos": "[0.11.1, )",
+          "Cronos": "[0.13.0, )",
           "DistributedLock.Core": "[1.0.9, )",
           "Flamme.Features": "[1.0.0, )",
           "Flamme.Mediator": "[1.0.0, )",
@@ -1732,7 +1732,7 @@
       "flamme.scheduling": {
         "type": "Project",
         "dependencies": {
-          "Cronos": "[0.11.1, )",
+          "Cronos": "[0.13.0, )",
           "Flamme.Workflows.Runtime": "[1.0.0, )"
         }
       },
@@ -1823,9 +1823,9 @@
       },
       "Cronos": {
         "type": "CentralTransitive",
-        "requested": "[0.11.1, )",
-        "resolved": "0.11.1",
-        "contentHash": "5Ug+giPQITSAdTp/METAsofRSSUi3I5p7t4dlcXnzUgUzwZb4HkOBcYfpHuPwAHrnKJjmyW8amVzLD6mfLpaBg=="
+        "requested": "[0.13.0, )",
+        "resolved": "0.13.0",
+        "contentHash": "Nkve+Yi0+ol3ntSBRHeW0ka9cJQ8vndSUvvkXqF9LVqwpoqWueyxu/HS275r98RDOmF7/mzRnZW5XXUBXob+TA=="
       },
       "DistributedLock.Core": {
         "type": "CentralTransitive",
