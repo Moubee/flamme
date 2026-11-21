@@ -5,6 +5,7 @@ using Flamme.Expressions.Models;
 using Flamme.Extensions;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Exceptions;
+using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Memory;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Options;
@@ -503,7 +504,7 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
     public Bookmark CreateBookmark(CreateBookmarkArgs? options = null)
     {
         var payload = options?.Stimulus;
-        var callback = options?.Callback;
+        var callbackName = ActivityCallbackNames.GetName(options?.Callback, Activity.GetType());
         var bookmarkName = options?.BookmarkName ?? Activity.Type;
         var bookmarkHasher = GetRequiredService<IStimulusHasher>();
         var identityGenerator = GetRequiredService<IIdentityGenerator>();
@@ -521,7 +522,7 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
             Id,
             _timeProvider.GetUtcNow(),
             options?.AutoBurn ?? true,
-            callback?.Method.Name,
+            callbackName,
             options?.AutoComplete ?? true,
             options?.Metadata);
 
@@ -781,7 +782,7 @@ public partial class ActivityExecutionContext : IExecutionContext, IDisposable
             return;
         }
 
-        var descriptor = ActivityDescriptor.Outputs.FirstOrDefault(x => x.PropertyInfo?.Name == outputName);
+        var descriptor = ActivityDescriptor.Outputs.FirstOrDefault(x => (x.MemberBinding?.ClrName ?? x.PropertyInfo?.Name) == outputName);
         descriptor ??= ActivityDescriptor.Outputs.FirstOrDefault(x => x.ValueGetter != null && ReferenceEquals(x.ValueGetter(Activity), output));
         var resolvedOutputName = descriptor?.Name ?? outputName ?? ActivityOutputRegister.DefaultOutputName;
         var sourceType = descriptor?.Type ?? GetOutputValueType(output.GetType()) ?? typeof(object);

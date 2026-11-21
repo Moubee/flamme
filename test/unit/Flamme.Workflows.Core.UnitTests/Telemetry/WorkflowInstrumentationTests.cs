@@ -625,7 +625,7 @@ public class WorkflowInstrumentationTests
         public Task ExecuteAsync(WorkflowExecutionContext context) => Task.CompletedTask;
     }
 
-    private sealed class TestActivity : Flamme.Workflows.Activity
+    internal sealed class TestActivity : Flamme.Workflows.Activity
     {
     }
 
@@ -638,7 +638,7 @@ public class WorkflowInstrumentationTests
             _listener = new()
             {
                 ShouldListenTo = source => source.Name == WorkflowInstrumentation.ActivitySourceName,
-                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+                Sample = (ref ActivityCreationOptions<System.Diagnostics.ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
                 ActivityStopped = activity => StoppedActivities.Enqueue(activity)
             };
 

@@ -103,8 +103,8 @@ public class SequenceTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = IActivity.Mock().Object;
-        var sequence = CreateSequenceWithActivities(writeLine, setVariable, mockActivity);
+        var stubActivity = new StubActivity();
+        var sequence = CreateSequenceWithActivities(writeLine, setVariable, stubActivity);
 
         // Act
         var context = await ExecuteSequenceAsync(sequence);
@@ -112,7 +112,7 @@ public class SequenceTests
         // Assert - First activity should be scheduled
         await Assert.That(context.HasScheduledActivity(writeLine)).IsTrue();
         await Assert.That(context.HasScheduledActivity(setVariable)).IsFalse();
-        await Assert.That(context.HasScheduledActivity(mockActivity)).IsFalse();
+        await Assert.That(context.HasScheduledActivity(stubActivity)).IsFalse();
     }
 
     [Test]

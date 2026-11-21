@@ -51,7 +51,7 @@ public class ParallelTests
     public async Task Should_Execute_Single_Activity()
     {
         // Arrange
-        var activity = IActivity.Mock().Object;
+        var activity = new StubActivity();
         var parallel = new Workflows.Activities.Parallel(activity);
 
         // Act
@@ -69,9 +69,9 @@ public class ParallelTests
         var writeLine = new WriteLine("Test output");
         var testVar = new Variable<int>("testVar", 0, "testVar");
         var setVariable = new SetVariable<int>(testVar, new Input<int>(42));
-        var mockActivity = IActivity.Mock().Object;
+        var stubActivity = new StubActivity();
 
-        var parallel = new Workflows.Activities.Parallel(writeLine, setVariable, mockActivity);
+        var parallel = new Workflows.Activities.Parallel(writeLine, setVariable, stubActivity);
 
         // Act
         var context = await new ActivityTestFixture(parallel).ExecuteAsync();
@@ -79,7 +79,7 @@ public class ParallelTests
         // Assert - All activities should be scheduled
         await Assert.That(context.HasScheduledActivity(writeLine)).IsTrue();
         await Assert.That(context.HasScheduledActivity(setVariable)).IsTrue();
-        await Assert.That(context.HasScheduledActivity(mockActivity)).IsTrue();
+        await Assert.That(context.HasScheduledActivity(stubActivity)).IsTrue();
     }
 
     [Test]

@@ -233,16 +233,16 @@ public class SendHttpRequestTests
     {
         var childActivities = new Dictionary<string, IActivity>();
 
-        // Create mock activities for expected status codes
+        // Create activities for expected status codes
         var expectedStatusCodeCases = expectedStatusCodes.Select(x =>
         {
-            var mockActivity = IActivity.Mock().Object;
-            childActivities[x.activityName] = mockActivity;
-            return new HttpStatusCodeCase(x.statusCode, mockActivity);
+            var stubActivity = new StubActivity();
+            childActivities[x.activityName] = stubActivity;
+            return new HttpStatusCodeCase(x.statusCode, stubActivity);
         }).ToList();
 
-        // Create mock activity for unmatched handler
-        var unmatchedActivity = IActivity.Mock().Object;
+        // Create an activity for the unmatched handler
+        var unmatchedActivity = new StubActivity();
         if (unmatchedHandler is not null)
         {
             childActivities[unmatchedHandler] = unmatchedActivity;
@@ -270,13 +270,13 @@ public class SendHttpRequestTests
 
         if (failedToConnect != null)
         {
-            failedToConnectActivity = IActivity.Mock().Object;
+            failedToConnectActivity = new StubActivity();
             childActivities[failedToConnect] = failedToConnectActivity;
         }
 
         if (timeout != null)
         {
-            timeoutActivity = IActivity.Mock().Object;
+            timeoutActivity = new StubActivity();
             childActivities[timeout] = timeoutActivity;
         }
 

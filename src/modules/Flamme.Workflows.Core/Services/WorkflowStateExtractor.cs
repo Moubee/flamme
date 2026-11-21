@@ -1,3 +1,4 @@
+using Flamme.Workflows.Helpers;
 using Flamme.Extensions;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Services;
@@ -282,7 +283,7 @@ public class WorkflowStateExtractor(ILogger<WorkflowStateExtractor> logger) : IW
                 throw new("Lost an owner context");
         }
 
-        var completionCallbacks = workflowExecutionContext.CompletionCallbacks.Select(x => new CompletionCallbackState(x.Owner.Id, x.Child.NodeId, x.CompletionCallback?.Method.Name, x.Tag));
+        var completionCallbacks = workflowExecutionContext.CompletionCallbacks.Select(x => new CompletionCallbackState(x.Owner.Id, x.Child.NodeId, ActivityCallbackNames.GetName(x.CompletionCallback, x.Owner.Activity.GetType()), x.Tag));
 
         state.CompletionCallbacks = completionCallbacks.ToList();
     }

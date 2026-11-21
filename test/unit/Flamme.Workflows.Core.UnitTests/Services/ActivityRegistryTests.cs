@@ -202,10 +202,11 @@ public class ActivityRegistryTests
     public async Task GetDescriptorsAsync_ReturnsEmpty_WhenRegistryCleared()
     {
         // Arrange
-        Mock.Get(_activityDescriber).DescribeActivityAsync(typeof(ActivityRegistryTests), Arg.Any<CancellationToken>())
+        var registeredType = typeof(Flamme.Workflows.Activities.WriteLine);
+        Mock.Get(_activityDescriber).DescribeActivityAsync(registeredType, Arg.Any<CancellationToken>())
                     .Returns(CreateDescriptor(TestActivityType, 1, CurrentTenant));
 
-        await _registry.RegisterAsync(typeof(ActivityRegistryTests), CancellationToken.None);
+        await _registry.RegisterAsync(registeredType, CancellationToken.None);
 
         // Act
         _registry.Clear();

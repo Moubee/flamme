@@ -5,16 +5,24 @@ namespace Flamme.Workflows.Helpers;
 
 public static class ActivityTypeNameHelper
 {
-    public static int GetVersion(Type type) => type.GetCustomAttribute<ActivityAttribute>()?.Version ?? 1;
+    public static int GetVersion(Type type) => GetConcreteBinding(type) is { } binding
+        ? binding.Version
+        : type.GetCustomAttribute<ActivityAttribute>()?.Version ?? 1;
 
     public static string? GenerateNamespace(Type activityType)
     {
+        if (GetConcreteBinding(activityType) is { } binding)
+            return binding.Namespace;
+
         var activityAttr = activityType.GetCustomAttribute<ActivityAttribute>();
         return activityAttr?.Namespace ?? activityType.Namespace;
     }
 
     public static string GenerateTypeName(Type type, string? ns)
     {
+        if (GetConcreteBinding(type) is { } binding)
+            return ns == null ? binding.Name : $"{ns}.{binding.Name}";
+
         var activityAttr = type.GetCustomAttribute<ActivityAttribute>();
         string typeName;
         
@@ -34,9 +42,17 @@ public static class ActivityTypeNameHelper
 
     public static string GenerateTypeName(Type type)
     {
+        if (GetConcreteBinding(type) is { } binding)
+            return binding.TypeName;
+
         var ns = GenerateNamespace(type);
         return GenerateTypeName(type, ns);
     }
+
+    private static GeneratedActivityBinding? GetConcreteBinding(Type type) =>
+        !type.IsAbstract && !type.ContainsGenericParameters && typeof(IActivity).IsAssignableFrom(type)
+            ? ActivityContextRegistry.GetRequiredBinding(type)
+            : null;
 
     public static string? GetCategoryFromNamespace(string? ns)
     {

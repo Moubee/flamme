@@ -14,7 +14,7 @@ public class WhileTests
     public async Task Should_Schedule_Body_Based_On_Condition(bool conditionValue, int expectedScheduledCount)
     {
         // Arrange
-        var bodyActivity = IActivity.Mock().Object;
+        var bodyActivity = new StubActivity();
         var whileActivity = new While(new Input<bool>(conditionValue), bodyActivity);
 
         // Act
@@ -34,7 +34,7 @@ public class WhileTests
     public async Task Should_Use_True_Factory_Method()
     {
         // Arrange
-        var bodyActivity = IActivity.Mock().Object;
+        var bodyActivity = new StubActivity();
         var whileActivity = While.True(bodyActivity);
 
         // Act
@@ -54,7 +54,7 @@ public class WhileTests
         // Arrange - Create separate condition functions for each test case to verify 
         // that each execution of the While activity evaluates the condition exactly once
         var conditionEvaluationCount = 0;
-        var bodyActivity = IActivity.Mock().Object;
+        var bodyActivity = new StubActivity();
         
         // Create condition that tracks evaluation count across multiple While activity executions
         var condition = new Input<bool>(_ => 
@@ -225,11 +225,11 @@ public class WhileTests
         await Assert.That(breakBehavior).IsNotNull();
     }
 
-    private class MockBodyActivity : Activity        {
+    internal class MockBodyActivity : Activity        {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context) => ValueTask.CompletedTask;
     }
 
-    private class ThrowingBody(Exception exception) : Activity
+    internal class ThrowingBody(Exception exception) : Activity
     {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context) => throw exception;
     }

@@ -88,7 +88,7 @@ public class ParallelForEachTests
         await Assert.That(scheduledActivities.Count).IsEqualTo(expectedCount);
     }
 
-    private class MockBodyActivity : Activity
+    internal class MockBodyActivity : Activity
     {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context) => ValueTask.CompletedTask;
     }

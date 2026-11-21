@@ -4,6 +4,9 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/build/">
+    <Project Path="src/build/Flamme.ActivityGenerator/Flamme.ActivityGenerator.csproj" />
+  </Folder>
   <Folder Name="/docker/">
     <File Path="docker/FlammeServer.Dockerfile" />
     <File Path="docker/FlammeServer-Datadog.Dockerfile" />

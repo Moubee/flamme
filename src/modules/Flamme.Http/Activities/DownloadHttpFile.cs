@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Http.ContentWriters;
@@ -266,14 +265,14 @@ public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValu
         return factories.FirstOrDefault(httpContentFactory => httpContentFactory.SupportedContentTypes.Any(c => c == parsedContentType.MediaType)) ?? new JsonContentFactory();
     }
 
-    object IActivityPropertyDefaultValueProvider.GetDefaultValue(PropertyInfo property)
+    object? IActivityPropertyDefaultValueProvider.GetDefaultValue(ActivityPropertyDefaultValueContext property)
     {
-        if (property.Name == nameof(ExpectedStatusCodes))
+        if (property.ClrName == nameof(ExpectedStatusCodes))
             return new List<int>
             {
                 200
             };
 
-        return null!;
+        return null;
     }
 }

@@ -60,7 +60,7 @@ public class ExecutionCycleTrackingMiddlewareTests : IAsyncDisposable
     }
 
     /// <summary>An activity that records the execution cycle registry's active count when it executes.</summary>
-    private sealed class ObservingActivity(IExecutionCycleRegistry registry, List<int> observed) : CodeActivity
+    internal sealed class ObservingActivity(IExecutionCycleRegistry registry, List<int> observed) : CodeActivity
     {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context)
         {

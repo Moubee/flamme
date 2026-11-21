@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Workflows;
@@ -56,13 +55,13 @@ public class FlowSendHttpRequest : SendHttpRequestBase, IActivityPropertyDefault
         await context.CompleteActivityWithOutcomesAsync("Timeout");
     }
 
-    object IActivityPropertyDefaultValueProvider.GetDefaultValue(PropertyInfo property)
+    object? IActivityPropertyDefaultValueProvider.GetDefaultValue(ActivityPropertyDefaultValueContext property)
     {
-        if (property.Name == nameof(ExpectedStatusCodes))
+        if (property.ClrName == nameof(ExpectedStatusCodes))
         {
             return new List<int> { 200 };
         }
 
-        return null!;
+        return null;
     }
 }

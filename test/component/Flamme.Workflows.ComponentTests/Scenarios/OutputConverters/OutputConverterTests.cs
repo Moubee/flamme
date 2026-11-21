@@ -93,7 +93,7 @@ public class OutputConverterTests(App app) : AppComponentTest(app)
         await Assert.That(incident.Message).DoesNotContain("native value");
     }
 
-    private sealed class NativeStringActivity : CodeActivity<string>
+    internal sealed class NativeStringActivity : CodeActivity<string>
     {
         protected override void Execute(ActivityExecutionContext context) => Result!.Set(context, "native value");
     }

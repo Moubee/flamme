@@ -124,7 +124,7 @@ public sealed class SyntheticPropertiesWriterTests
         return document.RootElement.Clone();
     }
 
-    private sealed class TestActivity : Activity
+    internal sealed class TestActivity : Activity
     {
     }
 }

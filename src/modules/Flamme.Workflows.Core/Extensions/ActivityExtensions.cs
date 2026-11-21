@@ -3,6 +3,7 @@ using System.Reflection;
 using Flamme.Expressions.Helpers;
 using Flamme.Expressions.Models;
 using Flamme.Workflows;
+using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Models;
 using JetBrains.Annotations;
 
@@ -23,15 +24,12 @@ public static class ActivityExtensions
         /// </summary>
         public IDictionary<string, Input> GetNamedInputs()
         {
-            var inputProps = activity.GetInputProperties().ToList();
-
-            var query =
-                from inputProp in inputProps
-                let inputValue = (Input?)inputProp.GetValue(activity)
-                where inputValue != null
-                select (inputProp, inputValue);
-
-            return query.DistinctBy(x => x.inputProp.Name).ToDictionary(x => x.inputProp.Name, x => x.inputValue);
+            return ActivityContextRegistry.GetRequiredBinding(activity.GetType()).Inputs
+                .Where(x => typeof(Input).IsAssignableFrom(x.PropertyType))
+                .Select(x => (x.ClrName, Value: (Input?)x.GetValue(activity)))
+                .Where(x => x.Value != null)
+                .DistinctBy(x => x.ClrName)
+                .ToDictionary(x => x.ClrName, x => x.Value!);
         }
 
         /// <summary>
@@ -49,15 +47,12 @@ public static class ActivityExtensions
         /// </summary>
         public IEnumerable<NamedOutput> GetOutputs()
         {
-            var outputProps = activity.GetType().GetProperties().Where(x => typeof(Output).IsAssignableFrom(x.PropertyType)).ToList();
-
-            var query =
-                from outputProp in outputProps
-                let output = (Output?)outputProp.GetValue(activity)
-                where output != null
-                select new NamedOutput(outputProp.Name, output);
-
-            return query.Select(x => x!).ToList();
+            var binding = ActivityContextRegistry.GetRequiredBinding(activity.GetType());
+            return binding.Outputs
+                .Select(x => (x.ClrName, Value: (Output?)x.GetValue(activity)))
+                .Where(x => x.Value != null)
+                .Select(x => new NamedOutput(x.ClrName, x.Value!))
+                .ToList();
         }
 
         /// <summary>
@@ -239,21 +234,22 @@ public static class ActivityExtensions
         /// </summary>
         public TDelegate GetDelegate<TDelegate>(string methodName) where TDelegate : Delegate
         {
+            if (typeof(TDelegate) != typeof(ExecuteActivityDelegate) && typeof(TDelegate) != typeof(ActivityCompletionCallback))
+                return BindCustomDelegate<TDelegate>(activity, methodName);
+
             var activityType = activity.GetType();
-            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
-            var resumeMethodInfo = default(MethodInfo?);
-            var currentType = activityType;
+            var binding = ActivityContextRegistry.GetRequiredBinding(activityType);
+            Delegate? callback = typeof(TDelegate) == typeof(ExecuteActivityDelegate)
+                ? binding.BindBookmarkCallback(activity, methodName)
+                : binding.BindCompletionCallback(activity, methodName);
 
-            while (currentType != null && resumeMethodInfo == null)
-            {
-                resumeMethodInfo = currentType.GetMethod(methodName, bindingFlags);
-                currentType = currentType.BaseType;
-            }
+            if (callback is TDelegate typedCallback)
+                return ActivityCallbackNames.Remember(typedCallback, methodName);
 
-            if (resumeMethodInfo == null)
-                throw new Exception($"Can't find method name {methodName} on type {activityType} or its base type {activityType.BaseType}");
+            if (methodName.StartsWith('<'))
+                throw ActivityCallbackNames.UnsupportedCompilerCallback(activityType, methodName);
 
-            return resumeMethodInfo.IsStatic ? (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), resumeMethodInfo) : (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), activity, resumeMethodInfo);
+            throw ActivityContextRegistry.MissingBinding(activityType, $"{typeof(TDelegate).Name} callback '{methodName}'");
         }
 
         /// <summary>
@@ -265,5 +261,24 @@ public static class ActivityExtensions
         /// Gets the Child Activity Completed method for the specified activity.
         /// </summary>
         public ActivityCompletionCallback GetActivityCompletionCallback(string completionMethodName) => activity.GetDelegate<ActivityCompletionCallback>(completionMethodName);
+    }
+
+    private static TDelegate BindCustomDelegate<TDelegate>(IActivity activity, string methodName) where TDelegate : Delegate
+    {
+        var activityType = activity.GetType();
+        const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+        var resumeMethodInfo = default(MethodInfo?);
+        var currentType = activityType;
+
+        while (currentType != null && resumeMethodInfo == null)
+        {
+            resumeMethodInfo = currentType.GetMethod(methodName, bindingFlags);
+            currentType = currentType.BaseType;
+        }
+
+        if (resumeMethodInfo == null)
+            throw new Exception($"Can't find method name {methodName} on type {activityType} or its base type {activityType.BaseType}");
+
+        return resumeMethodInfo.IsStatic ? (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), resumeMethodInfo) : (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), activity, resumeMethodInfo);
     }
 }

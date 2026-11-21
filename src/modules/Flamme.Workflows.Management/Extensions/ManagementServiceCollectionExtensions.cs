@@ -4,6 +4,8 @@ using Flamme.Workflows.Management.Models;
 using Flamme.Workflows.Management.Options;
 using Flamme.Workflows.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Flamme.Common.Serialization;
 
 // ReSharper disable once CheckNamespace
@@ -28,12 +30,24 @@ public static class ManagementServiceCollectionExtensions
     /// <summary>
     /// Registers the supplied activity <paramref name="types"/> with <see cref="ManagementOptions"/>.
     /// </summary>
-    public static IServiceCollection AddActivities(this IServiceCollection services, IEnumerable<Type> types) =>
-        services.Configure<ManagementOptions>(options =>
+    public static IServiceCollection AddActivities(this IServiceCollection services, IEnumerable<Type> types)
+    {
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ManagementOptions>, ActivityBindingOptionsValidator>());
+        return services.Configure<ManagementOptions>(options =>
         {
             foreach (var type in types)
                 options.ActivityTypes.Add(type);
         });
+    }
+
+    /// <summary>
+    /// Selects all activities supplied by a generated activity context.
+    /// </summary>
+    public static IServiceCollection AddActivities(this IServiceCollection services, ActivityContext context)
+    {
+        ActivityContextRegistry.RegisterBindings(context);
+        return services.AddActivities(context.Bindings.Select(binding => binding.ActivityType));
+    }
 
     /// <summary>
     /// Registers a single activity type <typeparamref name="TActivity"/> with <see cref="ManagementOptions"/>.
@@ -43,20 +57,13 @@ public static class ManagementServiceCollectionExtensions
         services.AddActivities([typeof(TActivity)]);
 
     /// <summary>
-    /// Scans <paramref name="assembly"/> and registers every concrete, non-generic
-    /// <see cref="IActivity"/> implementation found.
+    /// Selects the exported activities from the assembly's generated inventory.
     /// </summary>
-    public static IServiceCollection AddActivitiesFrom(this IServiceCollection services, Assembly assembly)
-    {
-        var types = assembly.GetExportedTypes()
-            .Where(t => typeof(IActivity).IsAssignableFrom(t)
-                        && t is { IsAbstract: false, IsInterface: false, IsGenericTypeDefinition: false });
-        return services.AddActivities(types);
-    }
+    public static IServiceCollection AddActivitiesFrom(this IServiceCollection services, Assembly assembly) =>
+        services.AddActivities(ActivityContextRegistry.GetRequiredContext(assembly).ExportedActivityTypes);
 
     /// <summary>
-    /// Scans the assembly that contains <typeparamref name="TMarker"/> and registers every
-    /// concrete, non-generic <see cref="IActivity"/> implementation found.
+    /// Selects the exported activities from the marker assembly's generated inventory.
     /// </summary>
     public static IServiceCollection AddActivitiesFrom<TMarker>(this IServiceCollection services) =>
         services.AddActivitiesFrom(typeof(TMarker).Assembly);

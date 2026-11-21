@@ -132,7 +132,7 @@ public class EventBaseTests
     }
 
     // Test implementation of EventBase for unit testing
-    private class TestEvent(string eventName) : EventBase<object?>
+    internal class TestEvent(string eventName) : EventBase<object?>
     {
         protected override string GetEventName(ExpressionExecutionContext context) => eventName;
 
@@ -140,7 +140,7 @@ public class EventBaseTests
     }
 
     // Test implementation with generic type and callback tracking
-    private class TestEvent<TResult>(string eventName) : EventBase<TResult>
+    internal class TestEvent<TResult>(string eventName) : EventBase<TResult>
     {
         public bool OnEventReceivedAsyncWasCalled { get; private set; }
         public TResult? ReceivedInput { get; private set; }

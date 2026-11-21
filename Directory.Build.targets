@@ -70,4 +70,10 @@
            Text="$(MSBuildProjectName) has a FodyWeavers.xml, which the WeaverConfiguration MSBuild property silently overrides. Delete the file; the ConfigureAwait directive belongs in src/Directory.Build.props only." />
 
   </Target>
+  <!-- Compile activity bindings in the assembly that declares or specializes them. -->
+  <ItemGroup Condition="'$(_FlammeIsToolingProject)' != 'true' And '$(MSBuildProjectExtension)' == '.csproj'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)src/build/Flamme.ActivityGenerator/Flamme.ActivityGenerator.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" IsAspireProjectResource="false"
+                      GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained;PublishAot;PublishTrimmed;PublishSingleFile;ArtifactsPath;UseArtifactsOutput;BaseOutputPath;OutputPath;OutDir" />
+  </ItemGroup>
 </Project>

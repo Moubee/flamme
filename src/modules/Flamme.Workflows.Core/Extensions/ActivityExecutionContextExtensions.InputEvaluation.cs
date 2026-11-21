@@ -96,12 +96,11 @@ public static partial class ActivityExecutionContextExtensions
 
                 if (defaultValue != null && wrappedInput == null)
                 {
-                    var typedInput = typeof(Input<>).MakeGenericType(inputDescriptor.Type);
                     var valueExpression = new Literal(defaultValue)
                     {
                         Id = identityGenerator.GenerateId(),
                     };
-                    wrappedInput = (Input)Activator.CreateInstance(typedInput, valueExpression)!;
+                    wrappedInput = CreateDefaultInput(activity, inputDescriptor, valueExpression);
                     inputDescriptor.ValueSetter(activity, wrappedInput);
                 }
                 else
@@ -139,6 +138,18 @@ public static partial class ActivityExecutionContextExtensions
 
             return value;
         }
+    }
+
+    private static Input CreateDefaultInput(IActivity activity, InputDescriptor inputDescriptor, Literal value)
+    {
+        if (inputDescriptor.MemberBinding?.CreateInput is { } createInput)
+            return createInput(value);
+
+        if (!inputDescriptor.IsSynthetic)
+            throw ActivityContextRegistry.MissingBinding(activity.GetType(), $"wrapped input constructor for '{inputDescriptor.Name}'");
+
+        var typedInput = typeof(Input<>).MakeGenericType(inputDescriptor.Type);
+        return (Input)Activator.CreateInstance(typedInput, value)!;
     }
 
     private static Task StoreInputValueAsync(ActivityExecutionContext context, InputDescriptor inputDescriptor, object value)

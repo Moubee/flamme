@@ -17,5 +17,5 @@ internal static class PropertyNameHelper
 
     private static string PrefixPropertyName(string name) => $"_{name}";
     private static string RemovePropertyNamePrefix(string name) => name.TrimStart('_');
-    private static bool IsReservedName(Type type, string name) => type.GetProperty(name) != null;
+    private static bool IsReservedName(Type type, string name) => ActivityContextRegistry.GetRequiredBinding(type).PublicPropertyNames.Contains(name);
 }

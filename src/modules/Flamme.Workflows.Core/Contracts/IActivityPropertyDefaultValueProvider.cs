@@ -1,8 +1,9 @@
-using System.Reflection;
-
 namespace Flamme.Workflows;
 
 public interface IActivityPropertyDefaultValueProvider
 {
-    object GetDefaultValue(PropertyInfo property);
+    /// <summary>
+    /// Returns a default value for the specified CLR member.
+    /// </summary>
+    object? GetDefaultValue(ActivityPropertyDefaultValueContext property);
 }

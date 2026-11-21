@@ -1,3 +1,4 @@
+using Flamme.Workflows.Helpers;
 using Flamme.Extensions;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Options;
@@ -33,7 +34,7 @@ public class ActivityExecutionContextSchedulerStrategy : IActivityExecutionConte
                 Options = options != null
                     ? new ScheduledActivityOptions
                     {
-                        CompletionCallback = options.CompletionCallback?.Method.Name,
+                        CompletionCallback = ActivityCallbackNames.GetName(options.CompletionCallback, (owner ?? context).Activity.GetType()),
                         Tag = options.Tag,
                         ExistingActivityInstanceId = options.ExistingActivityExecutionContext?.Id,
                         PreventDuplicateScheduling = options.PreventDuplicateScheduling,
