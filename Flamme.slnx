@@ -177,6 +177,7 @@
   </Folder>
   <Folder Name="/test/performance/">
     <File Path="test/performance/Directory.Build.props" />
+    <Project Path="test/performance/Flamme.ActivityStartupProbe/Flamme.ActivityStartupProbe.csproj" />
     <Project Path="test/performance/Flamme.Workflows.PerformanceTests/Flamme.Workflows.PerformanceTests.csproj" />
   </Folder>
   <Folder Name="/test/unit/">
