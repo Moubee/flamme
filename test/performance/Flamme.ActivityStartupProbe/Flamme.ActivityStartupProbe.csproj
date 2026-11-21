@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Remove="BenchmarkDotNet" />
+        <ProjectReference Include="../../../src/modules/Flamme.Workflows.Core/Flamme.Workflows.Core.csproj" />
+    </ItemGroup>
+</Project>
