@@ -25,7 +25,7 @@ public class DictionaryValueEvaluator(ILogger<DictionaryValueEvaluator> logger) 
         var tempDictionary = new Dictionary<string, object?>(dictionary.Count);
         foreach (var dict in dictionary)
         {
-            if (dict.Value is not JsonElement json)
+            if (dict.Value is not JsonElement { ValueKind: JsonValueKind.Object } json)
             {
                 // Not a JSON object, so just use the value as-is.
                 tempDictionary[dict.Key] = dict.Value;

@@ -9,15 +9,22 @@ namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExt
 public class DictionaryInputEvaluationTests
 {
     [Test]
-    public async Task ExplicitDictionaryEvaluatorEvaluatesEntriesAndPreservesPlainValues()
+    [Arguments("\"text\"")]
+    [Arguments("42")]
+    [Arguments("true")]
+    [Arguments("[1,2]")]
+    [Arguments("null")]
+    public async Task ExplicitDictionaryEvaluatorEvaluatesEntriesAndPreservesPlainValues(string jsonValue)
     {
         using var expression = JsonDocument.Parse("""{"type":"Literal","value":"evaluated"}""");
+        using var plainJson = JsonDocument.Parse(jsonValue);
         var activity = new DictionaryInputActivity
         {
             Values = new(new Dictionary<string, object>
             {
                 ["expression"] = expression.RootElement,
-                ["plain"] = "unchanged"
+                ["plain"] = "unchanged",
+                ["plainJson"] = plainJson.RootElement
             })
         };
         await using var fixture = new ActivityTestFixture(activity)
@@ -28,6 +35,7 @@ public class DictionaryInputEvaluationTests
 
         await Assert.That(values["expression"]).IsEqualTo("evaluated");
         await Assert.That(values["plain"]).IsEqualTo("unchanged");
+        await Assert.That(((JsonElement)values["plainJson"]).GetRawText()).IsEqualTo(jsonValue);
     }
 
     private sealed class DictionaryInputActivity : CodeActivity
