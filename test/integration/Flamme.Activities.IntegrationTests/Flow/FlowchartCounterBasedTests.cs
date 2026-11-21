@@ -472,7 +472,7 @@ public class FlowchartCounterBasedTests : IAsyncDisposable
     /// A minimal activity that suspends by creating a bookmark, simulating a blocking activity
     /// such as a Delay or Timer that would normally be resumed by an external stimulus.
     /// </summary>
-    private sealed class BlockingActivity : Activity
+    internal sealed class BlockingActivity : Activity
     {
         protected override void Execute(ActivityExecutionContext context) => context.CreateBookmark();
     }

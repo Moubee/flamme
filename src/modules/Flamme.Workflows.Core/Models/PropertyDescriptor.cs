@@ -62,6 +62,12 @@ public abstract class PropertyDescriptor
     public Action<IActivity, object?> ValueSetter { get; set; } = null!;
     
     /// <summary>
+    /// The producer binding for the physical member, when present.
+    /// </summary>
+    [JsonIgnore]
+    public ActivityMemberBinding? MemberBinding { get; set; }
+
+    /// <summary>
     /// The source of the property, if any.
     /// </summary>
     [JsonIgnore]

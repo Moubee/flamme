@@ -107,7 +107,7 @@ Typical steps:
 1. Add an activity class in the owning module's `Activities` folder.
 2. Derive from the appropriate base class, usually `Activity` or `CodeActivity`.
 3. Define inputs and outputs with Flamme input/output models.
-4. Register it with management, often via `Module.AddActivitiesFrom<TMarker>()` or `management.AddActivity<T>()`.
+4. Build the producer with the Flamme activity generator and select the activity in management. Use `Module.AddActivitiesFrom<TMarker>()` for the marker assembly's exported activities or `management.AddActivity<T>()` for an exact type.
 5. Add a unit test with `ActivityTestFixture` for activity-only behavior.
 6. Add integration or component tests if it creates bookmarks, uses persistence, or participates in runtime dispatch.
 
@@ -118,11 +118,49 @@ Good examples:
 - [SendHttpRequest](../../src/modules/Flamme.Http/Activities/SendHttpRequest.cs)
 - [RunJavaScript](../../src/modules/Flamme.Expressions.JavaScript/Activities/RunJavaScript/RunJavaScript.cs)
 
+### Producer contexts
+
+In an external activity project, reference the generator as a private build dependency.
+The project below uses central package management. Pin `Flamme.ActivityGenerator` to
+the same release as `Flamme.Workflows.Core` in your package versions file.
+
+```xml
+<PackageReference Include="Flamme.ActivityGenerator" PrivateAssets="all" />
+```
+
+The consuming host can use the compiled bindings from that package. A host that
+declares its own activities or closed generic contexts also needs the generator.
+
+The producer assembly supplies bindings for its public concrete activities, including activities without an `Activity` attribute. Assembly and marker registration select its generated export inventory. A producer can also declare an internal activity or a closed generic activity in a context.
+
+```csharp
+using Flamme.Workflows;
+using Flamme.Workflows.Activities;
+
+[ActivityBinding(typeof(SetVariable<Receipt>))]
+internal partial class ReceiptActivities : ActivityContext;
+```
+
+Use `management.AddActivities(ReceiptActivities.Default)` or `services.AddActivities(ReceiptActivities.Default)` to select an explicit context. Use `management.RemoveActivity<T>()` or update `ManagementOptions.ActivityTypes` to remove an activity from that host's catalog. A workflow can still use a bound activity in a code-first graph. When a host or graph selects an exact type without a binding, Flamme reports the module, activity and missing binding.
+
+Two producers can explicitly bind the same closed activity type. The registry shares their binding when the activity identity and the bound input and output members agree.
+
+Use named activity methods for bookmark and child-completion callbacks.
+Keep those names when changing activities used by suspended workflows. The
+generated bindings look up the stored callback name on the owning activity.
+
 ## Activity Metadata
 
 Activity descriptors expose metadata such as input types, display names,
 descriptions, and defaults. For instructions on upgrading custom activities
 and API clients that used UI hints, see the [migration guide](../migrations/ui-hints.md).
+
+The generator copies declared and inherited activity attributes into
+`ActivityDescriptor.Attributes`. Consumers that inspect this raw attribute
+list should obtain compiler-synthesized nullability annotations from the CLR
+type when they need them. The generated list omits those annotations.
+
+Implement `IActivityPropertyDefaultValueProvider.GetDefaultValue(ActivityPropertyDefaultValueContext)` for scoped defaults. The context includes the exact activity type, CLR member name, declaring type and CLR property type. Resolve dependency-based provider activities as host services or supply a direct provider construction binding. The host evaluates defaults and runs descriptor modifiers when it builds each catalog.
 
 ## Authoring Choice Guide
 

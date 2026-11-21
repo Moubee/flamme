@@ -214,7 +214,7 @@ public class OutputConverterInvokerTests
 
     private static JsonElement ParseJson(string json) => JsonDocument.Parse(json).RootElement.Clone();
 
-    private sealed class TestActivity : CodeActivity
+    internal sealed class TestActivity : CodeActivity
     {
         protected override void Execute(ActivityExecutionContext context)
         {

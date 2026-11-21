@@ -38,7 +38,7 @@ public class DictionaryInputEvaluationTests
         await Assert.That(((JsonElement)values["plainJson"]).GetRawText()).IsEqualTo(jsonValue);
     }
 
-    private sealed class DictionaryInputActivity : CodeActivity
+    internal sealed class DictionaryInputActivity : CodeActivity
     {
         [Input(EvaluatorType = typeof(DictionaryValueEvaluator))]
         public required Input<Dictionary<string, object>> Values { get; set; }

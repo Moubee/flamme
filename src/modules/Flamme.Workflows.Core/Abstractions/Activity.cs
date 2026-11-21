@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Flamme.Extensions;
 using Flamme.Workflows.Behaviors;
-using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Serialization.Converters;
 using JetBrains.Annotations;
@@ -24,16 +23,20 @@ public abstract class Activity : IActivity, ISignalHandler
     protected Activity(string? source = null, int? line = null)
     {
         this.SetSource(source, line);
-        Type = ActivityTypeNameHelper.GenerateTypeName(GetType());
-        Version = ActivityTypeNameHelper.GetVersion(GetType());
-        Behaviors.Add<ScheduledChildCallbackBehavior>(this);
+        var binding = ActivityContextRegistry.GetRequiredBinding(GetType());
+        Type = binding.TypeName;
+        Version = binding.Version;
+        Behaviors.Add(new ScheduledChildCallbackBehavior(this));
     }
 
     /// <inheritdoc />
-    protected Activity(string activityType, int version = 1, string? source = null, int? line = null) : this(source, line)
+    protected Activity(string activityType, int version = 1, string? source = null, int? line = null)
     {
+        ActivityContextRegistry.GetRequiredBinding(GetType());
+        this.SetSource(source, line);
         Type = activityType;
         Version = version;
+        Behaviors.Add(new ScheduledChildCallbackBehavior(this));
     }
 
     /// <inheritdoc />

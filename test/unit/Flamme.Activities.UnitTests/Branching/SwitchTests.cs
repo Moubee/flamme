@@ -15,13 +15,13 @@ public class SwitchTests
     public async Task Should_Handle_No_Matching_Cases_Correctly(SwitchMode mode, bool hasDefault)
     {
         // Arrange
-        var defaultActivity = hasDefault ? CreateActivityMock() : null;
+        var defaultActivity = hasDefault ? new StubActivity() : null;
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("False Case", Expression.LiteralExpression(false), CreateActivityMock())
+                new("False Case", Expression.LiteralExpression(false), new StubActivity())
             },
             Default = defaultActivity
         };
@@ -48,14 +48,14 @@ public class SwitchTests
     public async Task Should_Handle_Multiple_Matching_Cases_According_To_Mode(SwitchMode mode, int expectedScheduledCount)
     {
         // Arrange
-        var firstTrueActivity = CreateActivityMock();
-        var secondTrueActivity = CreateActivityMock();
+        var firstTrueActivity = new StubActivity();
+        var secondTrueActivity = new StubActivity();
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("False", Expression.LiteralExpression(false), CreateActivityMock()),
+                new("False", Expression.LiteralExpression(false), new StubActivity()),
                 new("First True", Expression.LiteralExpression(true), firstTrueActivity),
                 new("Second True", Expression.LiteralExpression(true), secondTrueActivity)
             }
@@ -83,8 +83,8 @@ public class SwitchTests
     public async Task Should_Use_MatchFirst_As_Default_Mode()
     {
         // Arrange
-        var firstTrueActivity = CreateActivityMock();
-        var secondTrueActivity = CreateActivityMock();
+        var firstTrueActivity = new StubActivity();
+        var secondTrueActivity = new StubActivity();
         var switchActivity = new Switch
         {
             // No Mode explicitly set - should default to MatchFirst
@@ -110,13 +110,13 @@ public class SwitchTests
     public async Task Should_Schedule_Default_When_Null_Case_Condition_Evaluates_False(SwitchMode mode)
     {
         // Arrange
-        var defaultActivity = CreateActivityMock();
+        var defaultActivity = new StubActivity();
         var switchActivity = new Switch
         {
             Mode = new(mode),
             Cases = new List<SwitchCase>
             {
-                new("Null condition", Expression.LiteralExpression(null), CreateActivityMock())
+                new("Null condition", Expression.LiteralExpression(null), new StubActivity())
             },
             Default = defaultActivity
         };
@@ -138,7 +138,7 @@ public class SwitchTests
     public async Task Should_Handle_Empty_Cases_Correctly(SwitchMode mode, bool hasDefault)
     {
         // Arrange
-        var defaultActivity = hasDefault ? CreateActivityMock() : null;
+        var defaultActivity = hasDefault ? new StubActivity() : null;
         var switchActivity = new Switch
         {
             Mode = new(mode),
@@ -172,7 +172,7 @@ public class SwitchTests
         await Assert.That(switchActivity.Cases).IsNotNull();
         await Assert.That(switchActivity.Cases).IsEmpty();
 
-        switchActivity.Cases.Add(new("Test", Expression.LiteralExpression(true), CreateActivityMock()));
+        switchActivity.Cases.Add(new("Test", Expression.LiteralExpression(true), new StubActivity()));
         await Assert.That(switchActivity.Cases).HasSingleItem();
     }
 
@@ -187,13 +187,6 @@ public class SwitchTests
         // The actual default value verification is handled by the mode-specific behavior tests
     }
     
-    private static IActivity CreateActivityMock()
-    {
-        var mock = IActivity.Mock();
-        mock.SetupAllProperties();
-        return mock.Object;
-    }
-
     private static Task<ActivityExecutionContext> ExecuteAsync(IActivity activity)
     {
         return new ActivityTestFixture(activity).ExecuteAsync();

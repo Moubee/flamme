@@ -371,7 +371,7 @@ public class FlowGraphTests
         await flowGraph.ValidateAncestorActivities([c, d, a, b, start], e);
     }
 
-    class TestActivity : Activity
+    internal class TestActivity : Activity
     {
         public TestActivity(string id)
         {

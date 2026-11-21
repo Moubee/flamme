@@ -33,7 +33,7 @@ public class ResultTests
         Assert.ThrowsExactly<Exception>(() => context.SetResult("value"));
     }
 
-    private class ActivityWithResult : Activity, IActivityWithResult
+    internal class ActivityWithResult : Activity, IActivityWithResult
     {
         public Output? Result { get; set; } = new Output<object?>();
     }

@@ -12,15 +12,38 @@ public class PropertyDefaultValueResolver(IServiceScopeFactory scopeFactory) : I
     {
         var inputAttribute = activityPropertyInfo.GetCustomAttribute<InputAttribute>();
 
-        if (inputAttribute == null)
-            return null;
+        var declaringType = activityPropertyInfo.DeclaringType!;
+        var context = new ActivityPropertyDefaultValueContext(
+            activityPropertyInfo.ReflectedType ?? declaringType,
+            activityPropertyInfo.Name,
+            declaringType,
+            activityPropertyInfo.PropertyType);
 
-        if (inputAttribute.DefaultValueProvider == null)
-            return inputAttribute.DefaultValue;
+        return GetDefaultValue(context, inputAttribute?.DefaultValueProvider, inputAttribute?.DefaultValue);
+    }
 
-        var providerType = inputAttribute.DefaultValueProvider;
+    /// <inheritdoc />
+    public object? GetDefaultValue(ActivityPropertyDefaultValueContext context, Type? providerType, object? defaultValue)
+    {
+        if (providerType is null)
+            return defaultValue;
+
         using var scope = scopeFactory.CreateScope();
-        var provider = (IActivityPropertyDefaultValueProvider) ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, providerType);
-        return provider.GetDefaultValue(activityPropertyInfo);
+        var serviceProvider = scope.ServiceProvider;
+        var provider = serviceProvider.GetService(providerType) ?? CreateProvider(serviceProvider, providerType);
+        return ((IActivityPropertyDefaultValueProvider)provider).GetDefaultValue(context);
+    }
+
+    private static object CreateProvider(IServiceProvider services, Type providerType)
+    {
+        if (typeof(IActivity).IsAssignableFrom(providerType))
+        {
+            var binding = ActivityContextRegistry.GetRequiredBinding(providerType);
+            var create = binding.CreateDefaultValueProvider
+                ?? throw ActivityContextRegistry.MissingBinding(providerType, "default provider constructor");
+            return create(services);
+        }
+
+        return ActivatorUtilities.CreateInstance(services, providerType);
     }
 }

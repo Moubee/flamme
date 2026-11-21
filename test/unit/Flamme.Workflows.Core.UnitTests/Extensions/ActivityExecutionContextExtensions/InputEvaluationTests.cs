@@ -51,7 +51,7 @@ public class InputEvaluationTests
 
     private Task<ActivityExecutionContext> ActivateAsync() => _fixture.ExecuteAsync();
 
-    private sealed class ActivityWithSensitiveInputs : CodeActivity
+    internal sealed class ActivityWithSensitiveInputs : CodeActivity
     {
         [Input(CanContainSecrets = true)]
         public Input<string?> SensitiveText { get; set; } = new("secret");

@@ -109,7 +109,7 @@ public class ValidateOutputConvertersTests
         }
     }
 
-    private sealed class TestActivity : CodeActivity
+    internal sealed class TestActivity : CodeActivity
     {
         public Output<int> Result { get; set; } = new();
 

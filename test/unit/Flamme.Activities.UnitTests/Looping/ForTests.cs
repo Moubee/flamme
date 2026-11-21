@@ -461,7 +461,7 @@ public class ForTests
     /// <summary>
     /// Mock activity to represent the body of the For loop
     /// </summary>
-    private class MockBodyActivity : Activity
+    internal class MockBodyActivity : Activity
     {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context) => ValueTask.CompletedTask;
     }
@@ -469,7 +469,7 @@ public class ForTests
     /// <summary>
     /// A body that throws a provided exception when executed
     /// </summary>
-    private class ThrowingBody(Exception exception) : Activity
+    internal class ThrowingBody(Exception exception) : Activity
     {
         protected override ValueTask ExecuteAsync(ActivityExecutionContext context) => throw exception;
     }

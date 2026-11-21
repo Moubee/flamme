@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Reflection;
 using System.Text.Json;
@@ -32,6 +31,7 @@ using Flamme.Workflows.Serialization.Serializers;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Flamme.Common.Serialization;
 
 namespace Flamme.Workflows.Management.Features;
@@ -111,14 +111,23 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     }
 
     /// <summary>
-    /// Adds all types implementing <see cref="IActivity"/> to the system.
+    /// Selects the exported activities from the marker assembly's generated inventory.
     /// </summary>
-    public WorkflowManagementFeature AddActivitiesFrom<TMarker>()
+    public WorkflowManagementFeature AddActivitiesFrom<TMarker>() => AddActivitiesFrom(typeof(TMarker).Assembly);
+
+    /// <summary>
+    /// Selects the exported activities from the assembly's generated inventory.
+    /// </summary>
+    public WorkflowManagementFeature AddActivitiesFrom(Assembly assembly) =>
+        AddActivities(ActivityContextRegistry.GetRequiredContext(assembly).ExportedActivityTypes);
+
+    /// <summary>
+    /// Selects all activities supplied by a generated activity context.
+    /// </summary>
+    public WorkflowManagementFeature AddActivities(ActivityContext context)
     {
-        var activityTypes = typeof(TMarker).Assembly.GetExportedTypes()
-            .Where(x => typeof(IActivity).IsAssignableFrom(x) && x is { IsAbstract: false, IsInterface: false, IsGenericType: false })
-            .ToList();
-        return AddActivities(activityTypes);
+        ActivityContextRegistry.RegisterBindings(context);
+        return AddActivities(context.Bindings.Select(binding => binding.ActivityType));
     }
 
     /// <summary>
@@ -260,7 +269,6 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
     }
 
     /// <inheritdoc />
-    [RequiresUnreferencedCode("The assembly containing the specified marker type will be scanned for activity types.")]
     public override void Configure()
     {
         AddActivitiesFrom<WorkflowManagementFeature>();
@@ -315,6 +323,7 @@ public class WorkflowManagementFeature(IModule module) : FeatureBase(module)
             .AddNotificationHandler<ValidateOutputConverters>()
             ;
 
+        Services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ManagementOptions>, ActivityBindingOptionsValidator>());
         Services.Configure<ManagementOptions>(options =>
         {
             foreach (var activityType in ActivityTypes.Distinct())

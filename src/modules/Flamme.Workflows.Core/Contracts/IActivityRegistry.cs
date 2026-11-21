@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Flamme.Workflows.Models;
 
 namespace Flamme.Workflows;
@@ -75,7 +74,7 @@ public interface IActivityRegistry : IActivityProvider
     /// </summary>
     /// <param name="activityType">The activity type to register.</param>
     /// <param name="cancellationToken">An optional cancellation token.</param>
-    Task RegisterAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type activityType, CancellationToken cancellationToken = default);
+    Task RegisterAsync(Type activityType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Registers multiple activity types.

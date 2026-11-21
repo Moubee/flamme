@@ -198,7 +198,7 @@ public class ActivityExecutionContextOutputConversionTests
         return await fixture.BuildAsync();
     }
 
-    private sealed class TestActivity : CodeActivity
+    internal sealed class TestActivity : CodeActivity
     {
         public Output<int> Result { get; set; } = new();
 
@@ -207,7 +207,7 @@ public class ActivityExecutionContextOutputConversionTests
         }
     }
 
-    private sealed class NullableTestActivity : CodeActivity
+    internal sealed class NullableTestActivity : CodeActivity
     {
         public Output<int?> Result { get; set; } = new();
 

@@ -8,6 +8,11 @@ namespace Flamme.Workflows;
 public interface IPropertyDefaultValueResolver
 {
     /// <summary>
+    /// Resolves an activity member's default using generated metadata.
+    /// </summary>
+    object? GetDefaultValue(ActivityPropertyDefaultValueContext context, Type? providerType, object? defaultValue);
+
+    /// <summary>
     /// Returns the default value for the specified property.
     /// </summary>
     /// <param name="activityPropertyInfo">The property to return the default value for.</param>

@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flamme.Expressions.Models;
 using Flamme.Extensions;
@@ -109,5 +108,5 @@ public class Delay : Activity, IActivityPropertyDefaultValueProvider
         double value,
         [CallerFilePath] string? source = null, [CallerLineNumber] int? line = null) => new(System.TimeSpan.FromDays(value), source, line);
 
-    object IActivityPropertyDefaultValueProvider.GetDefaultValue(PropertyInfo property) => System.TimeSpan.FromMinutes(1);
+    object? IActivityPropertyDefaultValueProvider.GetDefaultValue(ActivityPropertyDefaultValueContext property) => System.TimeSpan.FromMinutes(1);
 }

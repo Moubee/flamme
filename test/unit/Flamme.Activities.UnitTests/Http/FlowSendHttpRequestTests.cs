@@ -178,8 +178,10 @@ public class FlowSendHttpRequestTests
         var flowSendHttpRequest = new FlowSendHttpRequest();
 
         // Act - Get the default value
-        var defaultValue = ((IActivityPropertyDefaultValueProvider)flowSendHttpRequest)
-            .GetDefaultValue(typeof(FlowSendHttpRequest).GetProperty(nameof(FlowSendHttpRequest.ExpectedStatusCodes))!);
+        var activityType = typeof(FlowSendHttpRequest);
+        var member = new ActivityPropertyDefaultValueContext(
+            activityType, nameof(FlowSendHttpRequest.ExpectedStatusCodes), activityType, typeof(Input<ICollection<int>>));
+        var defaultValue = ((IActivityPropertyDefaultValueProvider)flowSendHttpRequest).GetDefaultValue(member);
 
         // Assert
         var defaultStatusCodes = defaultValue as List<int>;

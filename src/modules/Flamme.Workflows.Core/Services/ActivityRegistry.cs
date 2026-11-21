@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using Flamme.Common.Multitenancy;
-using Flamme.Workflows.Helpers;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
@@ -155,9 +153,9 @@ public class ActivityRegistry(IActivityDescriber activityDescriber, IEnumerable<
     }
 
     /// <inheritdoc />
-    public async Task RegisterAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type activityType, CancellationToken cancellationToken)
+    public async Task RegisterAsync(Type activityType, CancellationToken cancellationToken)
     {
-        var activityTypeName = ActivityTypeNameHelper.GenerateTypeName(activityType);
+        var activityTypeName = ActivityContextRegistry.GetRequiredBinding(activityType).TypeName;
 
         // Check if already registered in any registry
         if (ListAll().Any(x => x.TypeName == activityTypeName))

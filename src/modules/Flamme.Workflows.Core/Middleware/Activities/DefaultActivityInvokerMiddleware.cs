@@ -1,4 +1,3 @@
-using System.Reflection;
 using Flamme.Extensions;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows.Activities;
@@ -26,7 +25,6 @@ public static class ActivityInvokerMiddlewareExtensions
 public class DefaultActivityInvokerMiddleware(ActivityMiddlewareDelegate next, ICommitStrategyRegistry commitStrategyRegistry, IOptions<CommitStateOptions> commitStateOptions, ILogger<DefaultActivityInvokerMiddleware> logger)
     : IActivityExecutionMiddleware
 {
-    private static readonly MethodInfo ExecuteAsyncMethodInfo = typeof(IActivity).GetMethod(nameof(IActivity.ExecuteAsync))!;
 
     /// <inheritdoc />
     public async ValueTask InvokeAsync(ActivityExecutionContext context)
@@ -106,8 +104,10 @@ public class DefaultActivityInvokerMiddleware(ActivityMiddlewareDelegate next, I
     /// </summary>
     protected virtual async ValueTask ExecuteActivityAsync(ActivityExecutionContext context)
     {
-        var executeDelegate = context.WorkflowExecutionContext.ExecuteDelegate ?? (ExecuteActivityDelegate)Delegate.CreateDelegate(typeof(ExecuteActivityDelegate), context.Activity, ExecuteAsyncMethodInfo);
-        await executeDelegate(context);
+        if (context.WorkflowExecutionContext.ExecuteDelegate is { } executeOverride)
+            await executeOverride(context);
+        else
+            await context.Activity.ExecuteAsync(context);
     }
 
     private async Task EvaluateInputPropertiesAsync(ActivityExecutionContext context)

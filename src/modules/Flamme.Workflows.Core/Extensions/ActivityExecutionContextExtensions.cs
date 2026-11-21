@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text.Json;
 using Flamme.Common;
 using Flamme.Expressions.Contracts;
@@ -7,7 +6,6 @@ using Flamme.Expressions.Helpers;
 using Flamme.Expressions.Models;
 using Flamme.Mediator.Contracts;
 using Flamme.Workflows;
-using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Memory;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Notifications;
@@ -206,15 +204,8 @@ public static partial class ActivityExecutionContextExtensions
         public string GetOutcomeName(string portPropertyName)
         {
             var owner = activityExecutionContext.Activity;
-            var ports = owner.GetType().GetProperties().Where(x => typeof(IActivity).IsAssignableFrom(x.PropertyType)).ToList();
-
-            var portQuery =
-                from p in ports
-                where p.Name == portPropertyName
-                select p;
-
-            var portProperty = portQuery.First();
-            return portProperty.GetCustomAttribute<PortAttribute>()?.Name ?? portProperty.Name;
+            var binding = ActivityContextRegistry.GetRequiredBinding(owner.GetType());
+            return binding.GetOutcomeName(portPropertyName);
         }
 
         /// <summary>

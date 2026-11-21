@@ -142,6 +142,7 @@
     <Project Path="src/modules/Flamme.AI.Persistence.EFCore/Flamme.AI.Persistence.EFCore.csproj" />
   </Folder>
   <Folder Name="/src/modules/workflows/">
+    <Project Path="src/modules/Flamme.ActivityGenerator/Flamme.ActivityGenerator.csproj" />
     <Project Path="src/modules/Flamme.WorkflowProviders.BlobStorage/Flamme.WorkflowProviders.BlobStorage.csproj" />
     <Project Path="src/modules/Flamme.Workflows.Api/Flamme.Workflows.Api.csproj" />
     <Project Path="src/modules/Flamme.Workflows.Core/Flamme.Workflows.Core.csproj" />

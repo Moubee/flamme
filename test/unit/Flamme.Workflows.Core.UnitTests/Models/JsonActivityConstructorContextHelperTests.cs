@@ -50,7 +50,7 @@ public sealed class JsonActivityConstructorContextHelperTests
         return JsonElement.Parse(jsonWithInputName);
     }
 
-    private class WorkflowAsActivity : IActivity
+    internal class WorkflowAsActivity : IActivity
     {
         public string Id { get; set; } = "Id";
         public string NodeId { get; set; } = "NodeId";

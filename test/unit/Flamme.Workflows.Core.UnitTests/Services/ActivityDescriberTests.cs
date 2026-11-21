@@ -55,12 +55,12 @@ public class ActivityDescriberTests
         await Assert.That(explicitVersion.Version).IsEqualTo(2);
     }
 
-    private sealed class CustomWriteLine() : WriteLine("sample");
+    internal sealed class CustomWriteLine() : WriteLine("sample");
 
     [Activity("Samples", "Write", 2)]
-    private sealed class VersionedWriteLine() : WriteLine("sample");
+    internal sealed class VersionedWriteLine() : WriteLine("sample");
 
-    private sealed class ActivityWithSensitiveInputs : CodeActivity
+    internal sealed class ActivityWithSensitiveInputs : CodeActivity
     {
         [Input(CanContainSecrets = true)]
         public Input<string?> SensitiveText { get; set; } = new("secret");
