@@ -71,8 +71,7 @@ internal sealed partial class ActivityEmitter(
         source.AppendLine("    {");
         foreach (var property in properties.Where(property => property.Child).GroupBy(property => property.Symbol.Name).Select(group => group.First()))
         {
-            var outcome = FindAttribute(property.Symbol, Attributes + "PortAttribute");
-            source.AppendLine($"        {Quote(property.Symbol.Name)} => {PortOutcomeName(outcome)} ?? name,");
+            source.AppendLine($"        {Quote(property.Symbol.Name)} => {PortOutcomeName(property.Symbol)} ?? name,");
         }
         source.AppendLine("        _ => throw new InvalidOperationException($\"Activity does not have a child port named '{name}'.\"),");
         source.AppendLine("    };");

@@ -11,8 +11,7 @@ internal sealed partial class ActivityEmitter
     {
         source.AppendLine($"    private static ActivityDescriptor Describe{row}(IPropertyDefaultValueResolver defaults)");
         source.AppendLine("    {");
-        var attributes = string.Join(", ", GetInheritedAttributes().Select(NewAttribute));
-        source.AppendLine($"        Attribute[] attributes = [{attributes}];");
+        source.AppendLine($"        Attribute[] attributes = {ActivityAttributeList()};");
         var descriptorIdentity = identity is null
             ? $"{Quote(fullName)}, {Quote(name)}, {Quote(ns ?? string.Empty)}, {version}"
             : $"{identity}.TypeName, {identity}.Name, {identity}.Namespace ?? string.Empty, {identity}.Version";
@@ -60,6 +59,10 @@ internal sealed partial class ActivityEmitter
             $"{propertyType}, {output}, {description}, attributes);");
     }
 
-    private string AttributeExpression(ISymbol member, string attributeName) =>
-        FindAttribute(member, attributeName) is { } attribute ? NewAttribute(attribute) : "null";
+    private string AttributeExpression(IPropertySymbol property, string attributeName) =>
+        FindAttribute(property, attributeName) is { } attribute ? PropertyAttributeExpression(property, attributeName, attribute) : "null";
+
+    private string PropertyAttributeExpression(IPropertySymbol property, string attributeName, AttributeData attribute) =>
+        CanConstructAttribute(attribute) ? NewAttribute(attribute) :
+            $"GeneratedActivityDescriptorFactory.ReadPropertyAttribute<global::{attributeName}>({TypeOf(property.ContainingType)}, {Quote(property.Name)})";
 }

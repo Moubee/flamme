@@ -26,7 +26,10 @@ internal sealed partial class ActivityCallbackWriter(
         var callbacks = CallbackKinds.SelectMany(kind => declarations.Where(method =>
                 SupportsCallback(method, kind.Context) && method.DeclaredAccessibility != Accessibility.Public)
             .Select(method => (kind.Kind, kind.Delegate, Method: method))).ToArray();
-        var lookupMetadata = CallbackLookupMetadata(declarations);
+        var specialized = new Dictionary<IMethodSymbol, string>(SymbolEqualityComparer.Default);
+        foreach (var method in declarations.Where(CanSpecializeCallback))
+            specialized.Add(method, $"SpecializedCallback_{specialized.Count}");
+        var lookupMetadata = CallbackLookupMetadata(declarations, specialized);
         var memberAccessors = properties
             .SelectMany(property => new[] { (Method: property.GetMethod, Prefix: "Get_"), (Method: property.SetMethod, Prefix: "Set_") })
             .Where(accessor => accessor.Method is { DeclaredAccessibility: not Accessibility.Public } ||
@@ -35,12 +38,22 @@ internal sealed partial class ActivityCallbackWriter(
             return;
 
         var typeParameters = ContainingTypes(activity).SelectMany(owner => owner.TypeParameters).ToArray();
+        if (typeParameters.Select(parameter => parameter.Name).Distinct(StringComparer.Ordinal).Count() != typeParameters.Length)
+            throw new BindingException("producer bridge type parameters", "Use distinct generic parameter names in the declaring type and its enclosing types.", SourceLocations(activity));
         var typeArguments = typeParameters.Length == 0 ? "" : $"<{string.Join(", ", typeParameters.Select(p => Identifier(p.Name)))}>";
         source.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
         source.AppendLine($"public static class {row}{typeArguments} {string.Join(" ", typeParameters.Select(ActivityAccessorWriter.Constraints))}");
         source.AppendLine("{");
         for (var index = 0; index < lookupMetadata.Length; index++)
             source.AppendLine($"    public const string {CallbackLookupPrefix}{index} = {Quote(lookupMetadata[index])};");
+        foreach (var entry in specialized)
+        {
+            var method = entry.Key;
+            var parameter = TypeName(method.Parameters[0].Type);
+            var target = ActivityAccessorWriter.InstanceTarget(activity, "activity");
+            var call = accessors.Call(method, target, ["context"], isProducerBridge);
+            source.AppendLine($"    public static {TypeName(method.ReturnType)} {entry.Value}(IActivity activity, {parameter} context) => {call};");
+        }
         // A name can accept more than one callback signature through contravariance.
         // Keep one exported entry per kind and name and use the selected CLR signature to invoke it.
         foreach (var group in callbacks.GroupBy(callback => (callback.Kind, callback.Delegate, callback.Method.Name)))

@@ -21,7 +21,7 @@ internal sealed partial class ActivityEmitter
         source.AppendLine($"    private static (string? Namespace, string Name, string TypeName, int Version) Create{identity}()");
         source.AppendLine("    {");
         if (derived)
-            source.AppendLine($"        var metadata = (global::{ActivityAttributeName})({NewAttribute(attribute!)});");
+            source.AppendLine($"        var metadata = {DerivedActivityAttributeExpression(activity, attribute!)};");
 
         var ns = ActivityNamespace(activity);
         var namespaceLiteral = ns is null ? "null" : Quote(ns);
@@ -48,6 +48,11 @@ internal sealed partial class ActivityEmitter
     private static bool IsDerivedActivityAttribute(AttributeData? attribute) =>
         attribute?.AttributeClass is { } type && !Is(type, ActivityAttributeName);
 
+    private string DerivedActivityAttributeExpression(INamedTypeSymbol target, AttributeData attribute) =>
+        CanConstructAttribute(attribute)
+            ? $"((global::{ActivityAttributeName})({NewAttribute(attribute)}))"
+            : $"((global::{ActivityAttributeName})Attribute.GetCustomAttribute({TypeOf(target)}, typeof(global::{ActivityAttributeName}), inherit: true)!)";
+
     private static bool RequiresRuntimeIdentity(ITypeSymbol type)
     {
         if (type is not INamedTypeSymbol named)
@@ -63,7 +68,7 @@ internal sealed partial class ActivityEmitter
 
         var attribute = EffectiveActivityAttribute(named);
         if (metadata is null && IsDerivedActivityAttribute(attribute))
-            metadata = $"((global::{ActivityAttributeName})({NewAttribute(attribute!)}))";
+            metadata = DerivedActivityAttributeExpression(named, attribute!);
 
         var name = metadata is null
             ? Quote(ActivityArgument(named, "Type", "type") as string ?? named.Name)
@@ -81,8 +86,8 @@ internal sealed partial class ActivityEmitter
 
     private static string WireName(ITypeSymbol type)
     {
-        if (type is IArrayTypeSymbol array)
-            return WireName(array.ElementType) + "[" + new string(',', array.Rank - 1) + "]";
+        if (type is IArrayTypeSymbol)
+            return ClrName(type);
         if (type is not INamedTypeSymbol named)
             return type is IDynamicTypeSymbol ? nameof(Object) : type.Name;
         var name = ActivityArgument(named, "Type", "type") as string ?? named.Name;
@@ -93,7 +98,17 @@ internal sealed partial class ActivityEmitter
     private static string FriendlyName(INamedTypeSymbol type)
     {
         var args = ContainingTypes(type).SelectMany(owner => owner.TypeArguments).ToArray();
-        return args.Length == 0 ? type.Name : $"{type.Name}<{string.Join(", ", args.Select(argument => argument is INamedTypeSymbol named ? named.MetadataName : WireName(argument)))}>";
+        return args.Length == 0 ? type.Name : $"{type.Name}<{string.Join(", ", args.Select(ClrName))}>";
+    }
+
+    // The persisted name of an array argument uses CLR Type.Name, including the element's metadata arity.
+    private static string ClrName(ITypeSymbol type)
+    {
+        if (type is not IArrayTypeSymbol array)
+            return type is IDynamicTypeSymbol ? nameof(Object) : type.MetadataName;
+
+        var rank = array.Rank == 1 && !array.IsSZArray ? "*" : new string(',', array.Rank - 1);
+        return ClrName(array.ElementType) + "[" + rank + "]";
     }
 
     private static object? ActivityArgument(INamedTypeSymbol type, string property, string parameter)

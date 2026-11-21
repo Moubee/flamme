@@ -143,6 +143,8 @@ internal partial class ReceiptActivities : ActivityContext;
 
 Use `management.AddActivities(ReceiptActivities.Default)` or `services.AddActivities(ReceiptActivities.Default)` to select an explicit context. Use `management.RemoveActivity<T>()` or update `ManagementOptions.ActivityTypes` to remove an activity from that host's catalog. A workflow can still use a bound activity in a code-first graph. When a host or graph selects an exact type without a binding, Flamme reports the module, activity and missing binding.
 
+Two producers can explicitly bind the same closed activity type. The registry shares their binding when the activity identity and the bound input and output members agree.
+
 Use named activity methods for bookmark and child-completion callbacks.
 Keep those names when changing activities used by suspended workflows. The
 generated bindings look up the stored callback name on the owning activity.

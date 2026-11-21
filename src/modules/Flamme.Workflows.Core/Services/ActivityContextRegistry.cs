@@ -123,12 +123,28 @@ public static class ActivityContextRegistry
 
     private static bool CanShareBinding(GeneratedActivityBinding existing, GeneratedActivityBinding candidate) =>
         existing == candidate ||
-        (existing.IsInferred || candidate.IsInferred) &&
-        existing.ActivityType.IsConstructedGenericType &&
         existing.TypeName == candidate.TypeName &&
         existing.Version == candidate.Version &&
         existing.Namespace == candidate.Namespace &&
-        existing.Name == candidate.Name;
+        existing.Name == candidate.Name &&
+        HaveSameMembers(existing.Inputs, candidate.Inputs) &&
+        HaveSameMembers(existing.Outputs, candidate.Outputs);
+
+    private static bool HaveSameMembers(IReadOnlyList<ActivityMemberBinding> first, IReadOnlyList<ActivityMemberBinding> second)
+    {
+        if (first.Count != second.Count)
+            return false;
+
+        for (var i = 0; i < first.Count; i++)
+        {
+            var left = first[i];
+            var right = second[i];
+            if (left.ClrName != right.ClrName || left.DeclaringType != right.DeclaringType || left.PropertyType != right.PropertyType)
+                return false;
+        }
+
+        return true;
+    }
 
     private static void ValidateMembers(Type type, IReadOnlyList<ActivityMemberBinding> members)
     {
@@ -137,7 +153,8 @@ public static class ActivityContextRegistry
             if (member.GetValue is null || member.SetValue is null)
                 throw MissingBinding(type, $"accessors for '{member.ClrName}'");
 
-            if (typeof(Input).IsAssignableFrom(member.PropertyType) && member.CreateInput is null)
+            if (member.PropertyType.IsGenericType && member.PropertyType.GetGenericTypeDefinition() == typeof(Input<>) &&
+                member.CreateInput is null)
                 throw MissingBinding(type, $"wrapped input factory for '{member.ClrName}'");
         }
     }

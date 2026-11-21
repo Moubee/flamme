@@ -23,7 +23,7 @@ internal sealed class ActivityAccessorWriter(string row)
         var methodKind = method.MethodKind == MethodKind.Constructor ? "Constructor" : method.IsStatic ? "StaticMethod" : "Method";
         var attribute = method.MethodKind == MethodKind.Constructor ? "" : $", Name = {Quote(method.MetadataName)}";
         var returnType = method.MethodKind == MethodKind.Constructor ? owner.OriginalDefinition : definition.ReturnType;
-        var parameters = definition.Parameters.Select(parameter => $"{TypeName(parameter.Type)} {Identifier(parameter.Name)}");
+        var parameters = definition.Parameters.Select((parameter, index) => $"{TypeName(parameter.Type)} argument{index}");
         if (method.MethodKind != MethodKind.Constructor)
             parameters = parameters.Prepend((UsesByReferenceReceiver(method) ? "ref " : "") + TypeName(owner.OriginalDefinition) + " owner");
         var declaration = $"        [UnsafeAccessor(UnsafeAccessorKind.{methodKind}{attribute})]\n" +

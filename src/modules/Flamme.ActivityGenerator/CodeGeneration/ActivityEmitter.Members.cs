@@ -10,7 +10,7 @@ internal sealed partial class ActivityEmitter
     private static bool IsBoundProperty(IPropertySymbol property) =>
         IsAssignableTo(property.Type, Input) || IsAssignableTo(property.Type, Output) ||
         FindAttribute(property, InputAttribute) is not null ||
-        !property.IsStatic && (IsAssignableTo(property.Type, ActivityInterface) || IsActivityCollection(property.Type));
+        !property.IsStatic && (IsAssignableTo(property.Type, ActivityInterface) || ActivityEnumerable(property.Type) is not null);
 
     private IEnumerable<IPropertySymbol> GetProperties()
     {
@@ -66,13 +66,18 @@ internal sealed partial class ActivityEmitter
         var runtimeSetter = write is null ? $"static (a, v) => throw new ArgumentException(\"Property setter not found. \" + {name})"
             : $"static (a, v) => {{ {invalidValue} try {{ {write}; }} catch (Exception e) {{ throw new TargetInvocationException(e); }} }}";
 
-        return new(property, runtimeGetter, runtimeSetter, !property.IsStatic && IsAssignableTo(property.Type, ActivityInterface),
-            !property.IsStatic && IsActivityCollection(property.Type));
+        var child = !property.IsStatic && IsAssignableTo(property.Type, ActivityInterface);
+        var enumerable = property.IsStatic ? null : ActivityEnumerable(property.Type);
+        // A child that also enumerates struct activities is itself a single port.
+        var collection = enumerable is not null && (!child || enumerable.TypeArguments[0].IsReferenceType);
+        return new(property, runtimeGetter, runtimeSetter, child, collection);
     }
 
-    private static bool IsActivityCollection(ITypeSymbol type) => type.AllInterfaces.Prepend(type)
-        .OfType<INamedTypeSymbol>().Any(iface => Is(iface, "System.Collections.Generic.IEnumerable`1") &&
-            IsAssignableTo(iface.TypeArguments[0], ActivityInterface));
+    private static INamedTypeSymbol? ActivityEnumerable(ITypeSymbol type) => type.AllInterfaces.Prepend(type)
+        .OfType<INamedTypeSymbol>().Where(iface => Is(iface, "System.Collections.Generic.IEnumerable`1") &&
+            IsAssignableTo(iface.TypeArguments[0], ActivityInterface))
+        .OrderByDescending(iface => iface.TypeArguments[0].IsReferenceType)
+        .FirstOrDefault();
 
     private void EmitMember(StringBuilder source, Property property, string id, bool isInput)
     {
@@ -83,15 +88,33 @@ internal sealed partial class ActivityEmitter
         if (isInput && IsAssignableTo(symbol.Type, Input))
         {
             var wrapped = GetWrapper(symbol.Type, Input);
-            if (wrapped is null || !Same(wrapped, symbol.Type))
-                throw new BindingException("omitted input " + symbol.Name, "Declare the property as Input<T> to supply a typed default factory.",
-                    SourceLocations(symbol));
-            // Omitted defaults historically use the normalized descriptor type. Preserve
-            // the incompatible-wrapper error for an omitted non-null nullable value default.
-            var valueType = NormalizeNullable(wrapped.TypeArguments[0]);
-            source.Append($" {{ CreateInput = static e => new global::{Input}<{TypeName(valueType)}>(e) }}");
+            if (wrapped is null)
+                throw new BindingException("input " + symbol.Name, "Derive the wrapper from Input<T> to declare its value type.", SourceLocations(symbol));
+
+            if (Same(wrapped, symbol.Type))
+            {
+                // Exact Input<T> defaults use the normalized descriptor type.
+                var valueType = NormalizeNullable(wrapped.TypeArguments[0]);
+                source.Append($" {{ CreateInput = static e => new global::{Input}<{TypeName(valueType)}>(e) }}");
+            }
+            else if (symbol.Type is INamedTypeSymbol inputType && CanCreateFromLiteral(inputType))
+            {
+                source.Append($" {{ CreateInput = static e => new {TypeName(inputType)}(e) }}");
+            }
         }
         source.AppendLine(";");
+    }
+
+    private bool CanCreateFromLiteral(INamedTypeSymbol type)
+    {
+        if (type.IsAbstract)
+            return false;
+
+        var hasRequiredMembers = Hierarchy(type).Any(owner => owner.GetMembers().Any(member =>
+            member is IPropertySymbol { IsRequired: true } or IFieldSymbol { IsRequired: true }));
+        return type.InstanceConstructors.Any(ctor => Accessible(ctor) && ctor.Parameters.Length == 1 &&
+            ctor.Parameters[0].RefKind == RefKind.None && Is(ctor.Parameters[0].Type, "Flamme.Expressions.Models.Literal") &&
+            (!hasRequiredMembers || FindAttribute(ctor, "System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute") is not null));
     }
 
     private void EmitPorts(StringBuilder source, Property[] properties)
@@ -104,8 +127,14 @@ internal sealed partial class ActivityEmitter
         {
             var kind = property.ChildCollection ? "Activities" : "Activity";
             var type = property.ChildCollection ? "IEnumerable<IActivity>" : "IActivity";
+            var children = $"port{portIndex}";
+            if (property.ChildCollection && ActivityEnumerable(property.Symbol.Type) is { } enumerable && enumerable.TypeArguments[0].IsValueType)
+            {
+                type = TypeName(enumerable);
+                children = $"global::System.Linq.Enumerable.Select(port{portIndex}, static child => (IActivity)child)";
+            }
             source.AppendLine($"        if (((Func<IActivity, object?>)({property.Getter}))(activity) is {type} port{portIndex})");
-            source.AppendLine($"            ports.Add(ActivityPort.From{kind}(port{portIndex}, {Quote(property.Symbol.Name)}));");
+            source.AppendLine($"            ports.Add(ActivityPort.From{kind}({children}, {Quote(property.Symbol.Name)}));");
             portIndex++;
         }
         source.AppendLine("        return ports;");

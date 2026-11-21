@@ -88,9 +88,12 @@ internal static class ActivityModuleWriter
         var declaration = context.DeclaringSyntaxReferences
             .Select(reference => reference.GetSyntax(cancellationToken)).OfType<ClassDeclarationSyntax>().FirstOrDefault();
         if (declaration is null || !declaration.Modifiers.Any(SyntaxKind.PartialKeyword) ||
-            context.ContainingType is not null || context.Arity != 0 || context.IsAbstract)
+            context.ContainingType is not null || context.Arity != 0 || context.IsAbstract || context.IsFileLocal)
         {
-            BindingDiagnostics.Report(report, compilation, context, "context declaration", "Use a non-abstract, top-level, non-generic partial class.");
+            var remedy = context.IsFileLocal
+                ? "Use an internal or public partial class so the generated file can extend this context."
+                : "Use a non-abstract, top-level, non-generic partial class.";
+            BindingDiagnostics.Report(report, compilation, context, "context declaration", remedy);
             return;
         }
 

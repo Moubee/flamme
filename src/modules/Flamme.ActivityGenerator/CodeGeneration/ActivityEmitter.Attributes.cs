@@ -9,7 +9,14 @@ namespace Flamme.ActivityGenerator.CodeGeneration;
 
 internal sealed partial class ActivityEmitter
 {
-    private IEnumerable<AttributeData> GetInheritedAttributes() => GetInheritedAttributes(activity);
+    private string ActivityAttributeList()
+    {
+        var attributes = GetInheritedAttributes(activity).ToArray();
+        if (attributes.Any(attribute => !CanConstructAttribute(attribute)))
+            return $"GeneratedActivityDescriptorFactory.ReadActivityAttributes({TypeOf(activity)})";
+
+        return $"[{string.Join(", ", attributes.Select(NewAttribute))}]";
+    }
 
     private static IEnumerable<AttributeData> GetInheritedAttributes(INamedTypeSymbol symbol)
     {
@@ -65,14 +72,15 @@ internal sealed partial class ActivityEmitter
         InputAttribute or OutputAttribute or Attributes + "PortAttribute" or
         "System.ComponentModel.DescriptionAttribute" or "System.ComponentModel.BrowsableAttribute";
 
-    private string PortOutcomeName(AttributeData? attribute)
+    private string PortOutcomeName(IPropertySymbol property)
     {
+        var portName = Attributes + "PortAttribute";
+        var attribute = FindAttribute(property, portName);
         if (attribute is null)
             return "null";
 
-        var portName = Attributes + "PortAttribute";
         if (!Is(attribute.AttributeClass, portName))
-            return $"((global::{portName})({NewAttribute(attribute)})).Name";
+            return $"((global::{portName})({PropertyAttributeExpression(property, portName, attribute)})).Name";
 
         return Constant(NamedValue(attribute, "Name", attribute.ConstructorArguments.FirstOrDefault().Value));
     }
@@ -117,12 +125,32 @@ internal sealed partial class ActivityEmitter
         return fallback;
     }
 
-    private string NewAttribute(AttributeData attribute)
-    {
-        if (attribute.AttributeClass is not { } type || attribute.AttributeConstructor is not { } constructor ||
-            !Accessible(type) || !Accessible(constructor))
-            throw new BindingException("attribute " + attribute.AttributeClass?.Name, "Expose the attribute type and its constructor to the producer.");
+    private bool CanConstructAttribute(AttributeData attribute) =>
+        attribute.AttributeClass is { } type && CanNameAttributeType(type) &&
+        attribute.AttributeConstructor is { } constructor && Accessible(constructor) &&
+        constructor.Parameters.All(parameter => CanNameAttributeType(parameter.Type)) &&
+        attribute.ConstructorArguments.All(CanEmitConstant) &&
+        attribute.NamedArguments.All(pair => CanEmitConstant(pair.Value));
 
+    private bool CanNameAttributeType(ITypeSymbol type) => type switch
+    {
+        IArrayTypeSymbol array => CanNameAttributeType(array.ElementType),
+        INamedTypeSymbol named => !named.IsFileLocal && Accessible(named) &&
+            (named.ContainingType is null || CanNameAttributeType(named.ContainingType)) &&
+            (named.IsUnboundGenericType || named.TypeArguments.All(CanNameAttributeType)),
+        _ => Accessible(type)
+    };
+
+    private bool CanEmitConstant(TypedConstant constant) =>
+        (constant.Type is null || CanNameAttributeType(constant.Type)) &&
+        (constant.Kind == TypedConstantKind.Array
+            ? constant.IsNull || constant.Values.All(CanEmitConstant)
+            : constant.Value is not ITypeSymbol type || CanNameAttributeType(type));
+
+    private static string NewAttribute(AttributeData attribute)
+    {
+        var type = attribute.AttributeClass!;
+        var constructor = attribute.AttributeConstructor!;
         var arguments = attribute.ConstructorArguments.Select((argument, index) =>
             $"({TypeName(constructor.Parameters[index].Type)})({Constant(argument)})");
         var initializer = attribute.NamedArguments.Length == 0 ? "" : " { " +
@@ -160,6 +188,10 @@ internal sealed partial class ActivityEmitter
         long number => number.ToString(CultureInfo.InvariantCulture) + "L",
         ulong number => number.ToString(CultureInfo.InvariantCulture) + "UL",
         uint number => number.ToString(CultureInfo.InvariantCulture) + "U",
+        byte number => "(byte)" + number.ToString(CultureInfo.InvariantCulture),
+        sbyte number => "(sbyte)" + number.ToString(CultureInfo.InvariantCulture),
+        short number => "(short)" + number.ToString(CultureInfo.InvariantCulture),
+        ushort number => "(ushort)" + number.ToString(CultureInfo.InvariantCulture),
         IFormattable number => number.ToString(null, CultureInfo.InvariantCulture),
         _ => throw new BindingException("constant metadata", "Use a supported attribute constant.")
     };

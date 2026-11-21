@@ -29,7 +29,8 @@ internal sealed class ActivityDiscovery
 
     internal static IncrementalValuesProvider<SyntaxNode> CreateCandidates(SyntaxValueProvider syntax) =>
         syntax.CreateSyntaxProvider(
-                static (node, _) => node is TypeDeclarationSyntax or GenericNameSyntax or InvocationExpressionSyntax,
+                static (node, _) => node is TypeDeclarationSyntax or GenericNameSyntax or
+                    QualifiedNameSyntax { Right: IdentifierNameSyntax } or InvocationExpressionSyntax,
                 static (context, cancellationToken) => GetCandidate(context, cancellationToken))
             .Where(static node => node is not null)
             .Select(static (node, _) => node!)
@@ -143,7 +144,7 @@ internal sealed class ActivityDiscovery
         var argument = attribute.ConstructorArguments.FirstOrDefault().Value as INamedTypeSymbol;
         return argument is not null && CanBind(argument, activity) && !HasUnnameableType(argument) &&
             compilation.IsSymbolAccessibleWithin(argument, compilation.Assembly)
-            ? (INamedTypeSymbol)NormalizeDynamicType(compilation, argument)
+            ? (INamedTypeSymbol)NormalizeBindingType(compilation, argument)
             : null;
     }
 
@@ -152,7 +153,7 @@ internal sealed class ActivityDiscovery
     {
         var type = node switch
         {
-            GenericNameSyntax generic => model.GetSymbolInfo(generic, cancellationToken).Symbol as INamedTypeSymbol,
+            NameSyntax name => model.GetSymbolInfo(name, cancellationToken).Symbol as INamedTypeSymbol,
             InvocationExpressionSyntax invocation => model.GetTypeInfo(invocation, cancellationToken).Type as INamedTypeSymbol,
             _ => null
         };
@@ -161,7 +162,7 @@ internal sealed class ActivityDiscovery
 
     private void AddInferredBinding(INamedTypeSymbol closed, SyntaxNode node)
     {
-        var canonical = (INamedTypeSymbol)NormalizeDynamicType(compilation, closed);
+        var canonical = (INamedTypeSymbol)NormalizeBindingType(compilation, closed);
         if (descriptors.ContainsKey(canonical))
             return;
 
@@ -199,8 +200,8 @@ internal sealed class ActivityDiscovery
     private static bool IsOpenArgument(ITypeSymbol type) => type is ITypeParameterSymbol ||
         type is INamedTypeSymbol named && IsOpen(named) || type is IArrayTypeSymbol array && IsOpenArgument(array.ElementType);
 
-    // Roslyn distinguishes dynamic from object in symbol keys. Both spellings name the same CLR row.
-    private static ITypeSymbol NormalizeDynamicType(Compilation compilation, ITypeSymbol type)
+    // Binding keys follow CLR type identity, which erases dynamic and tuple element names.
+    private static ITypeSymbol NormalizeBindingType(Compilation compilation, ITypeSymbol type)
     {
         if (type is IDynamicTypeSymbol)
             return compilation.GetSpecialType(SpecialType.System_Object).WithNullableAnnotation(type.NullableAnnotation);
@@ -208,7 +209,7 @@ internal sealed class ActivityDiscovery
         var comparer = SymbolEqualityComparer.Default;
         if (type is IArrayTypeSymbol array)
         {
-            var element = NormalizeDynamicType(compilation, array.ElementType);
+            var element = NormalizeBindingType(compilation, array.ElementType);
             return comparer.Equals(element, array.ElementType)
                 ? type
                 : compilation.CreateArrayTypeSymbol(element, array.Rank, array.ElementNullableAnnotation).WithNullableAnnotation(type.NullableAnnotation);
@@ -216,23 +217,12 @@ internal sealed class ActivityDiscovery
 
         if (type is not INamedTypeSymbol { IsGenericType: true, TypeKind: not TypeKind.Error } named)
             return type;
-        if (named.IsTupleType)
-        {
-            var elements = named.TupleElements.Select(element => NormalizeDynamicType(compilation, element.Type)).ToImmutableArray();
-            if (Enumerable.SequenceEqual(elements, named.TupleElements.Select(element => element.Type), comparer))
-                return type;
-
-            return compilation.CreateTupleTypeSymbol(elements,
-                named.TupleElements.Select(element => element.IsExplicitlyNamedTupleElement ? element.Name : null).ToImmutableArray(),
-                elementNullableAnnotations: named.TupleElements.Select(element => element.NullableAnnotation).ToImmutableArray())
-                .WithNullableAnnotation(type.NullableAnnotation);
-        }
-
-        var containing = named.ContainingType is { } owner ? (INamedTypeSymbol)NormalizeDynamicType(compilation, owner) : null;
-        var arguments = named.TypeArguments.Select(argument => NormalizeDynamicType(compilation, argument)).ToImmutableArray();
+        named = named.TupleUnderlyingType ?? named;
+        var containing = named.ContainingType is { } owner ? (INamedTypeSymbol)NormalizeBindingType(compilation, owner) : null;
+        var arguments = named.TypeArguments.Select(argument => NormalizeBindingType(compilation, argument)).ToImmutableArray();
         var sameOwner = comparer.Equals(containing, named.ContainingType);
         if (sameOwner && Enumerable.SequenceEqual(arguments, named.TypeArguments, comparer))
-            return type;
+            return named;
 
         var definition = sameOwner ? named.ConstructedFrom : containing!.GetTypeMembers(named.Name, named.Arity)
             .Single(candidate => comparer.Equals(candidate.OriginalDefinition, named.OriginalDefinition));

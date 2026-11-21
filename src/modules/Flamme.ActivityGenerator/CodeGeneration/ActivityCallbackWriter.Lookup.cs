@@ -14,22 +14,62 @@ internal sealed partial class ActivityCallbackWriter
     private static IEnumerable<IMethodSymbol> CallbackLookupMethods(INamedTypeSymbol owner) =>
         owner.GetMembers().OfType<IMethodSymbol>().Where(method => method.MethodKind == MethodKind.Ordinary);
 
-    private bool SupportsCallback(IMethodSymbol method, string context)
+    private static bool HasCallbackShape(IMethodSymbol method, int receiverParameters = 0) =>
+        method.Arity == 0 && !method.ReturnsByRef && !method.ReturnsByRefReadonly &&
+        method.Parameters.Length == receiverParameters + 1 && method.Parameters[receiverParameters].RefKind == RefKind.None;
+
+    private bool SupportsCallback(IMethodSymbol method, string context, int receiverParameters = 0)
     {
-        if (method.Arity != 0 || method.ReturnsByRef || method.ReturnsByRefReadonly ||
-            method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.None ||
-            !Is(method.ReturnType, "System.Threading.Tasks.ValueTask"))
+        if (!HasCallbackShape(method, receiverParameters) || !Is(method.ReturnType, "System.Threading.Tasks.ValueTask"))
             return false;
 
         var contextType = compilation.GetTypeByMetadataName(Workflows + context)!;
-        var conversion = compilation.ClassifyCommonConversion(contextType, method.Parameters[0].Type);
+        var conversion = compilation.ClassifyCommonConversion(contextType, method.Parameters[receiverParameters].Type);
         return conversion.IsIdentity || conversion is { IsImplicit: true, IsReference: true };
     }
 
-    private string[] CallbackLookupMetadata(IMethodSymbol[] methods)
+    // A private method can disappear from a reference assembly before the consumer closes its owner.
+    // Expose its signature when substituting the owner's arguments could produce a callback.
+    private bool CanSpecializeCallback(IMethodSymbol method)
+    {
+        if (method.DeclaredAccessibility == Accessibility.Public || !HasCallbackShape(method) ||
+            !(method.ReturnType is ITypeParameterSymbol || Is(method.ReturnType, "System.Threading.Tasks.ValueTask")))
+            return false;
+
+        var parameter = method.Parameters[0].Type;
+        if (!CanExpose(parameter))
+            return false;
+        if (parameter is ITypeParameterSymbol)
+            return true;
+
+        foreach (var kind in CallbackKinds)
+        {
+            var context = compilation.GetTypeByMetadataName(Workflows + kind.Context)!;
+            var conversion = compilation.ClassifyCommonConversion(context, parameter);
+            if (method.ReturnType is ITypeParameterSymbol && (conversion.IsIdentity || conversion is { IsImplicit: true, IsReference: true }))
+                return true;
+
+            if (parameter is INamedTypeSymbol { IsGenericType: true } named &&
+                ContainsTypeParameter(named) &&
+                context.AllInterfaces.Any(iface => Same(iface.OriginalDefinition, named.OriginalDefinition)))
+                return true;
+        }
+        return false;
+    }
+
+    private static bool ContainsTypeParameter(ITypeSymbol type) => type is ITypeParameterSymbol ||
+        type is IArrayTypeSymbol array && ContainsTypeParameter(array.ElementType) ||
+        type is INamedTypeSymbol named && ContainingTypes(named).SelectMany(t => t.TypeArguments).Any(ContainsTypeParameter);
+
+    private static bool CanExpose(ITypeSymbol type) => type is ITypeParameterSymbol or IDynamicTypeSymbol ||
+        type is IArrayTypeSymbol array && CanExpose(array.ElementType) ||
+        type is INamedTypeSymbol named && ContainingTypes(named).All(t =>
+            t.DeclaredAccessibility == Accessibility.Public && t.TypeArguments.All(CanExpose));
+
+    private string[] CallbackLookupMetadata(IMethodSymbol[] methods, IReadOnlyDictionary<IMethodSymbol, string> specialized)
     {
         var callbackNames = new HashSet<string>(methods.GroupBy(method => method.Name, StringComparer.Ordinal)
-            .Where(group => group.Skip(1).Any() || group.Any(method => CallbackKinds.Any(kind => SupportsCallback(method, kind.Context))))
+            .Where(group => group.Skip(1).Any() || group.Any(method => specialized.ContainsKey(method) || CallbackKinds.Any(kind => SupportsCallback(method, kind.Context))))
             .Select(group => group.Key), StringComparer.Ordinal);
 
         return methods.Where(method => method.DeclaredAccessibility is Accessibility.Internal or Accessibility.ProtectedAndInternal ||
@@ -39,7 +79,7 @@ internal sealed partial class ActivityCallbackWriter
                 var signature = CallbackSignature(method);
                 var privateMember = method.DeclaredAccessibility == Accessibility.Private ? "1" : "0";
                 var kinds = string.Join(",", CallbackKinds.Where(kind => SupportsCallback(method, kind.Context)).Select(kind => kind.Kind));
-                return $"{method.Name}|{privateMember}|{kinds}|{signature}";
+                return $"{method.Name}|{privateMember}|{(specialized.TryGetValue(method, out var bridge) ? bridge : kinds)}|{signature}";
             }).ToArray();
     }
 
@@ -83,8 +123,12 @@ internal sealed partial class ActivityCallbackWriter
                 if (count < seen[key].Count())
                     continue;
 
-                var invocation = metadata[2].Split(',').Contains(kind, StringComparer.Ordinal)
-                    ? CallbackBridgeCall(bridge, kind, name, metadata[3]) : null;
+                string? invocation = null;
+                if (bridge.GetMembers(metadata[2]).OfType<IMethodSymbol>().FirstOrDefault() is { } specialized &&
+                    SupportsCallback(specialized, context, receiverParameters: 1))
+                    invocation = $"context => {TypeName(bridge)}.{specialized.Name}(activity, context)";
+                else if (metadata[2].Split(',').Contains(kind, StringComparer.Ordinal))
+                    invocation = CallbackBridgeCall(bridge, kind, name, metadata[3]);
                 yield return new(name, signature, depth, isPrivate, invocation is not null, Bridge: invocation);
             }
         }

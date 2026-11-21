@@ -1,4 +1,7 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Flamme.Workflows.Activities.Flowchart.Attributes;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Helpers;
@@ -13,6 +16,19 @@ namespace Flamme.Workflows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class GeneratedActivityDescriptorFactory
 {
+    /// <summary>Reads raw metadata when an activity annotation is inaccessible to the generated module.</summary>
+    public static Attribute[] ReadActivityAttributes(Type activityType) =>
+        Attribute.GetCustomAttributes(activityType, inherit: true)
+            .Where(attribute => attribute is not (NullableAttribute or NullableContextAttribute)).ToArray();
+
+    /// <summary>Reads property metadata whose concrete attribute type or constructor is inaccessible to the generated module.</summary>
+    public static T ReadPropertyAttribute<T>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type declaringType,
+        string propertyName) where T : Attribute
+    {
+        var property = declaringType.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)!;
+        return property.GetCustomAttribute<T>(inherit: true)!;
+    }
+
     public static ActivityDescriptor Create(
         Type type,
         string typeName,
