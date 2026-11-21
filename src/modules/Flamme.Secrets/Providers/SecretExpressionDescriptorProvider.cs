@@ -11,7 +11,6 @@ namespace Flamme.Secrets.Providers;
 /// </summary>
 public class SecretExpressionDescriptorProvider : IExpressionDescriptorProvider
 {
-    private const string SecretPickerUIHint = "secret-picker";
     private const string SecretPickerEndpoint = "/secrets/picker";
 
     /// <inheritdoc />
@@ -24,7 +23,6 @@ public class SecretExpressionDescriptorProvider : IExpressionDescriptorProvider
             HandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<SecretExpressionHandler>,
             Properties = new Dictionary<string, object>
             {
-                ["UIHint"] = SecretPickerUIHint,
                 ["PickerEndpoint"] = SecretPickerEndpoint
             },
             Deserialize = Deserialize

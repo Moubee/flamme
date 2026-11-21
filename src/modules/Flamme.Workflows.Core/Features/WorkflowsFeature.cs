@@ -25,11 +25,6 @@ using Flamme.Workflows.Serialization.Helpers;
 using Flamme.Workflows.Serialization.Serializers;
 using Flamme.Workflows.Services;
 using Flamme.Workflows.State;
-using Flamme.Workflows.UIHints.CheckList;
-using Flamme.Workflows.UIHints.Dictionary;
-using Flamme.Workflows.UIHints.Dropdown;
-using Flamme.Workflows.UIHints.JsonEditor;
-using Flamme.Workflows.UIHints.RadioList;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json.Linq;
@@ -224,7 +219,6 @@ public class WorkflowsFeature : FeatureBase
             .AddSingleton<IOutputConverterSettingsValidator, OutputConverterSettingsValidator>()
             .AddScoped<IOutputConverterInvoker, OutputConverterInvoker>()
             .AddSingleton<IPropertyDefaultValueResolver, PropertyDefaultValueResolver>()
-            .AddSingleton<IPropertyUIHandlerResolver, PropertyUIHandlerResolver>()
             .AddSingleton<IActivityFactory, ActivityFactory>()
             .AddTransient<WorkflowBuilder>()
             .AddScoped(typeof(Func<IWorkflowBuilder>), sp => () => sp.GetRequiredService<WorkflowBuilder>())
@@ -235,6 +229,7 @@ public class WorkflowsFeature : FeatureBase
             .AddScoped<IWorkflowInstanceVariableReader, DefaultWorkflowInstanceVariableReader>()
             .AddScoped<IWorkflowInstanceVariableWriter, DefaultWorkflowInstanceVariableWriter>()
             .AddScoped<DefaultActivityInputEvaluator>()
+            .AddScoped<DictionaryValueEvaluator>()
 
             // Incident Strategies.
             .AddTransient<IIncidentStrategy, FaultStrategy>()
@@ -284,18 +279,6 @@ public class WorkflowsFeature : FeatureBase
 
             // Instantiation strategies.
             .AddScoped<IWorkflowActivationStrategy, AllowAlwaysStrategy>()
-
-            // UI.
-            .AddScoped<IUIHintHandler, DropDownUIHintHandler>()
-            .AddScoped<IUIHintHandler, CheckListUIHintHandler>()
-            .AddScoped<IUIHintHandler, RadioListUIHintHandler>()
-            .AddScoped<IUIHintHandler, JsonEditorUIHintHandler>()
-            .AddScoped<IPropertyUIHandler, StaticCheckListOptionsProvider>()
-            .AddScoped<IPropertyUIHandler, StaticRadioListOptionsProvider>()
-            .AddScoped<IPropertyUIHandler, StaticDropDownOptionsProvider>()
-            .AddScoped<IPropertyUIHandler, JsonCodeOptionsProvider>()
-            .AddScoped<DictionaryValueEvaluator>()
-            .AddSingleton<IActivityDescriptorModifier, DictionaryUIHintInputModifier>()
 
             // Logger state generators.
             .AddSingleton(WorkflowLoggerStateGenerator)

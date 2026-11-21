@@ -25,7 +25,6 @@ using Flamme.Workflows.Runtime.Providers;
 using Flamme.Workflows.Runtime.Stimuli;
 using Flamme.Workflows.Runtime.Stores;
 using Flamme.Workflows.Runtime.Tasks;
-using Flamme.Workflows.Runtime.UIHints;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
@@ -415,9 +414,6 @@ public class WorkflowRuntimeFeature(IModule module) : FeatureBase(module)
 
             // Workflow providers.
             .AddWorkflowsProvider<ClrWorkflowsProvider>()
-            
-            // UI property handlers.
-            .AddScoped<IPropertyUIHandler, DispatcherChannelOptionsProvider>()
 
             // Domain handlers.
             .AddCommandHandler<DispatchWorkflowCommandHandler>()

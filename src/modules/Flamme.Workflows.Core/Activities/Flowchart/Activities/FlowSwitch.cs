@@ -5,7 +5,6 @@ using Flamme.Workflows.Activities.Flowchart.Attributes;
 using Flamme.Workflows.Activities.Flowchart.Models;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities.Flowchart.Activities;
@@ -26,15 +25,14 @@ public class FlowSwitch : Activity
     /// <summary>
     /// The possible cases to evaluate.
     /// </summary>
-    [Input(UIHint = "flow-switch-editor")]
+    [Input]
     public ICollection<FlowSwitchCase> Cases { get; set; } = new List<FlowSwitchCase>();
 
     /// <summary>
     /// The switch mode determines whether the first match should be scheduled, or all matches.
     /// </summary>
     [Input(
-        Description = "The switch mode determines whether the first match should be scheduled, or all matches.",
-        UIHint = InputUIHints.DropDown
+        Description = "The switch mode determines whether the first match should be scheduled, or all matches."
     )]
     public Input<SwitchMode> Mode { get; set; } = new(SwitchMode.MatchFirst);
 

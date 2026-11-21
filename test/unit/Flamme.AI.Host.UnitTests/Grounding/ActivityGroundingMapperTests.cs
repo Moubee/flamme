@@ -30,7 +30,6 @@ public class ActivityGroundingMapperTests
                     DisplayName = "API key",
                     Description = "A sensitive input",
                     Type = typeof(string),
-                    UIHint = "single-line",
                     IsSensitive = true
                 }
             },

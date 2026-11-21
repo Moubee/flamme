@@ -36,11 +36,7 @@ public class MultitenantHttpRoutingFeature(IModule module) : FeatureBase(module)
     
     public override void Configure()
     {
-        Module.Configure<HttpFeature>(feature =>
-        {
-            feature.WithHttpEndpointRoutesProvider<TenantPrefixHttpEndpointRoutesProvider>();
-            feature.WithHttpEndpointBasePathProvider<TenantPrefixHttpEndpointBasePathProvider>();
-        });
+        Module.Configure<HttpFeature>(feature => feature.WithHttpEndpointRoutesProvider<TenantPrefixHttpEndpointRoutesProvider>());
     }
 
     public override void Apply()

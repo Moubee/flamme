@@ -1,6 +1,5 @@
 using Flamme.Expressions.Contracts;
 using Flamme.Expressions.Models;
-using Flamme.Extensions;
 using Flamme.Expressions.JavaScript.Expressions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +17,6 @@ internal class JavaScriptExpressionDescriptorProvider : IExpressionDescriptorPro
         {
             Type = TypeName,
             DisplayName = "JavaScript",
-            Properties = new { MonacoLanguage = "javascript" }.ToDictionary(),
             HandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<JavaScriptExpressionHandler>
         };
     }

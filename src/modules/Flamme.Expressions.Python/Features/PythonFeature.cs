@@ -5,7 +5,6 @@ using Flamme.Extensions;
 using Flamme.Features.Abstractions;
 using Flamme.Features.Attributes;
 using Flamme.Features.Services;
-using Flamme.Expressions.Python.Activities;
 using Flamme.Expressions.Python.Contracts;
 using Flamme.Expressions.Python.HostedServices;
 using Flamme.Expressions.Python.Options;
@@ -56,8 +55,5 @@ public class PythonFeature : FeatureBase
 
         // Activities.
         Module.AddActivitiesFrom<PythonFeature>();
-        
-        // UI property handlers.
-        Services.AddScoped<IPropertyUIHandler, RunPythonOptionsProvider>();
     }
 }

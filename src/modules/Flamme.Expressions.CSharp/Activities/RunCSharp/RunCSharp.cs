@@ -6,7 +6,6 @@ using Flamme.Expressions.Models;
 using Flamme.Extensions;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 
 // ReSharper disable once CheckNamespace
@@ -34,16 +33,14 @@ public class RunCSharp : CodeActivity<object?>
     /// </summary>
     [Input(
         Description = "The script to run.",
-        DefaultSyntax = "CSharp",
-        UIHint = InputUIHints.CodeEditor,
-        UIHandler = typeof(RunCSharpOptionsProvider)
+        DefaultSyntax = "CSharp"
     )]
     public Input<string> Script { get; set; } = new("");
 
     /// <summary>
     /// A list of possible outcomes. Use "SetOutcome(string)" to set the outcome. Use "SetOutcomes(params string[])" to set multiple outcomes.
     /// </summary>
-    [Input(Description = "A list of possible outcomes.", UIHint = InputUIHints.DynamicOutcomes)]
+    [Input(Description = "A list of possible outcomes.")]
     public Input<ICollection<string>> PossibleOutcomes { get; set; } = null!;
 
     /// <inheritdoc />

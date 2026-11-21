@@ -1,4 +1,8 @@
 using Flamme.Testing.Shared;
+using Flamme.Workflows.Management.Activities.WorkflowDefinitionActivity;
+using Flamme.Workflows.Management.Entities;
+using Flamme.Workflows.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Flamme.Workflows.IntegrationTests.Scenarios.WorkflowDefinitionActivities;
 
@@ -36,6 +40,27 @@ public class Tests : IAsyncDisposable
         yield return static () => ("parent-with-output", "Received from child: Child output value");
         yield return static () => ("parent-with-outcomes", "Success path taken");
         yield return static () => ("parent-version-fallback", "Published version executed");
+    }
+
+    [Test]
+    public async Task PublishedWorkflowInputUsesExplicitDictionaryEvaluationInsteadOfLegacyMetadata()
+    {
+        const string legacyJson = """{"name":"Values","type":"ObjectMap","uiHint":"dictionary"}""";
+        var serializer = _services.GetRequiredService<IPayloadSerializer>();
+        var input = serializer.Deserialize<InputDefinition>(legacyJson);
+        var definition = new WorkflowDefinition { Name = "Dictionary Workflow", Inputs = [input], IsPublished = true };
+        var factory = new WorkflowDefinitionActivityDescriptorFactory();
+
+        var defaultDescriptor = factory.CreateDescriptor(definition).Inputs.Single();
+        await Assert.That(defaultDescriptor.Type).IsEqualTo(typeof(Dictionary<string, object>));
+        await Assert.That(defaultDescriptor.EvaluatorType).IsNull();
+
+        input.EvaluateDictionaryEntries = true;
+        var json = serializer.SerializeToElement(input);
+        await Assert.That(json.TryGetProperty("uiHint", out _)).IsFalse();
+        definition.Inputs = [serializer.Deserialize<InputDefinition>(json)];
+        var descriptor = factory.CreateDescriptor(definition).Inputs.Single();
+        await Assert.That(descriptor.EvaluatorType).IsEqualTo(typeof(DictionaryValueEvaluator));
     }
 
     public ValueTask DisposeAsync() => TestResourceDisposal.DisposeAsync(_services);

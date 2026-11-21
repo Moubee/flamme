@@ -2,12 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using Flamme.Extensions;
 using Flamme.Http.ContentWriters;
-using Flamme.Http.UIHints;
 using Flamme.Resilience;
 using Flamme.Resilience.Models;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -31,12 +29,7 @@ public abstract class SendHttpRequestBase(string? source = null, int? line = nul
     /// </summary>
     [Input(
         Description = "The HTTP method to use when sending the request.",
-        Options = new[]
-        {
-            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
-        },
         DefaultValue = "GET",
-        UIHint = InputUIHints.DropDown,
         Order = 1
     )]
     public Input<string> Method { get; set; } = new("GET");
@@ -55,8 +48,6 @@ public abstract class SendHttpRequestBase(string? source = null, int? line = nul
     /// </summary>
     [Input(
         Description = "The content type to use when sending the request.",
-        UIHandler = typeof(HttpContentTypeOptionsProvider),
-        UIHint = InputUIHints.DropDown,
         Order = 3
     )]
     public Input<string?> ContentType { get; set; } = null!;
@@ -88,7 +79,6 @@ public abstract class SendHttpRequestBase(string? source = null, int? line = nul
     /// </summary>
     [Input(
         Description = "The headers to send along with the request.",
-        UIHint = InputUIHints.JsonEditor,
         Category = "Advanced",
         Order = 6
     )]

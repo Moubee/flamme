@@ -5,7 +5,6 @@ using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Behaviors;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Options;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities;
@@ -70,7 +69,7 @@ public class While : Activity
     /// <summary>
     /// The condition to evaluate.
     /// </summary>
-    [Input(AutoEvaluate = false, UIHint = InputUIHints.SingleLine)]
+    [Input(AutoEvaluate = false)]
     public Input<bool> Condition { get; set; } = new(false);
 
     /// <summary>

@@ -19,7 +19,7 @@ public sealed class CreateUserUnlinkedIdentityPolicy : IUnlinkedIdentityPolicy
         "Create a user",
         "Creates a credential-less Flamme user and an external identity link after successful external authentication.",
         1,
-        [new("defaultRoleIds", "Default roles", "Role IDs assigned only when this policy creates a new user.", "string-array", false, "tags", null, [], new(), false, false, null, null, false)],
+        [new("defaultRoleIds", "Default roles", "Role IDs assigned only when this policy creates a new user.", "string-array", false, null, [], new(), false, false, null, null, false)],
         null);
 
     public ValueTask<UnlinkedIdentityDecision> EvaluateAsync(UnlinkedIdentityContext context, CancellationToken cancellationToken = default)

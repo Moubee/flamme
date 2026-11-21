@@ -1,6 +1,5 @@
 using Flamme.Expressions.Contracts;
 using Flamme.Expressions.Models;
-using Flamme.Extensions;
 using Flamme.Expressions.Liquid.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,8 +22,7 @@ public class LiquidExpressionDescriptorProvider : IExpressionDescriptorProvider
         {
             Type = TypeName,
             DisplayName = "Liquid",
-            Properties = new { MonacoLanguage = "liquid" }.ToDictionary(),
-            HandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<LiquidExpressionHandler> 
+            HandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<LiquidExpressionHandler>
         };
     }
 }

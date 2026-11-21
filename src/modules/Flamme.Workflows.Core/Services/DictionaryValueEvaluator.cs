@@ -3,7 +3,7 @@ using Flamme.Expressions.Models;
 using Flamme.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Flamme.Workflows.UIHints.Dictionary;
+namespace Flamme.Workflows;
 
 /// <summary>
 /// A class that evaluates activity inputs configured to be dictionaries. It resolves expressions and modifies the input dictionary accordingly.
@@ -19,13 +19,13 @@ public class DictionaryValueEvaluator(ILogger<DictionaryValueEvaluator> logger) 
         var defaultValue = inputDescriptor.DefaultValue;
         var value = wrappedInput.Expression != null ? await evaluator.EvaluateAsync(wrappedInput, expressionExecutionContext) : defaultValue;
         
-        if (value is not IDictionary<string, object> dictionary || inputDescriptor.UIHint != InputUIHints.Dictionary)
+        if (value is not IDictionary<string, object> dictionary)
             return value;
 
         var tempDictionary = new Dictionary<string, object?>(dictionary.Count);
         foreach (var dict in dictionary)
         {
-            if (dict.Value is not JsonElement json)
+            if (dict.Value is not JsonElement { ValueKind: JsonValueKind.Object } json)
             {
                 // Not a JSON object, so just use the value as-is.
                 tempDictionary[dict.Key] = dict.Value;

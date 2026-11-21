@@ -1,7 +1,6 @@
 using Flamme.Caching.Features;
 using Flamme.Common.Features;
 using Flamme.Expressions.CSharp.ActivityDescriptorModifiers;
-using Flamme.Expressions.CSharp.Activities;
 using Flamme.Expressions.CSharp.Contracts;
 using Flamme.Expressions.CSharp.Options;
 using Flamme.Expressions.CSharp.Providers;
@@ -51,8 +50,5 @@ public class CSharpFeature : FeatureBase
 
         // Activities.
         Module.AddActivitiesFrom<CSharpFeature>();
-        
-        // UI property handlers.
-        Services.AddScoped<IPropertyUIHandler, RunCSharpOptionsProvider>();
     }
 }

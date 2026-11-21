@@ -1,0 +1,46 @@
+using System.Text.Json;
+using Flamme.Testing.Shared;
+using Flamme.Workflows.Attributes;
+using Flamme.Workflows.Models;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Flamme.Workflows.Core.UnitTests.Extensions.ActivityExecutionContextExtensions;
+
+public class DictionaryInputEvaluationTests
+{
+    [Test]
+    [Arguments("\"text\"")]
+    [Arguments("42")]
+    [Arguments("true")]
+    [Arguments("[1,2]")]
+    [Arguments("null")]
+    public async Task ExplicitDictionaryEvaluatorEvaluatesEntriesAndPreservesPlainValues(string jsonValue)
+    {
+        using var expression = JsonDocument.Parse("""{"type":"Literal","value":"evaluated"}""");
+        using var plainJson = JsonDocument.Parse(jsonValue);
+        var activity = new DictionaryInputActivity
+        {
+            Values = new(new Dictionary<string, object>
+            {
+                ["expression"] = expression.RootElement,
+                ["plain"] = "unchanged",
+                ["plainJson"] = plainJson.RootElement
+            })
+        };
+        await using var fixture = new ActivityTestFixture(activity)
+            .ConfigureServices(services => services.AddScoped<DictionaryValueEvaluator>());
+
+        var context = await fixture.ExecuteAsync();
+        var values = (Dictionary<string, object>)context.ActivityState[nameof(DictionaryInputActivity.Values)];
+
+        await Assert.That(values["expression"]).IsEqualTo("evaluated");
+        await Assert.That(values["plain"]).IsEqualTo("unchanged");
+        await Assert.That(((JsonElement)values["plainJson"]).GetRawText()).IsEqualTo(jsonValue);
+    }
+
+    private sealed class DictionaryInputActivity : CodeActivity
+    {
+        [Input(EvaluatorType = typeof(DictionaryValueEvaluator))]
+        public required Input<Dictionary<string, object>> Values { get; set; }
+    }
+}

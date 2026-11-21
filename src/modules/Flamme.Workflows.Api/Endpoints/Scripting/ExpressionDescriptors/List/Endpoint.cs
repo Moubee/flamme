@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace Flamme.Workflows.Api.Endpoints.Scripting.ExpressionDescriptors.List;
 
 /// <summary>
-/// Returns a TypeScript definition that is used by the Monaco editor to display intellisense for JavaScript expressions.
+/// Lists descriptors for the expression types available in the host.
 /// </summary>
 [UsedImplicitly]
 internal class List(IExpressionDescriptorRegistry expressionDescriptorRegistry) : FlammeEndpointWithoutRequest<ListResponse<ExpressionDescriptorModel>>

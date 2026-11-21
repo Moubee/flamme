@@ -2,7 +2,6 @@ namespace Flamme.Workflows.Attributes;
 
 /// <summary>
 /// Specifies various metadata about an activity's input property.
-/// This metadata can be used by visual designers to control various aspects of the input editor control.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public class InputAttribute : Attribute
@@ -13,17 +12,12 @@ public class InputAttribute : Attribute
     public string? Name { get; set; }
 
     /// <summary>
-    /// A hint to workflow tooling what input control to use. 
-    /// </summary>
-    public string? UIHint { get; set; }
-
-    /// <summary>
     /// The user-friendly name of the activity property.
     /// </summary>
     public string? DisplayName { get; set; }
 
     /// <summary>
-    /// A brief description about this property for workflow tooling to use when displaying activity editors.
+    /// A brief description of the input property.
     /// </summary>
     public string? Description { get; set; }
 
@@ -31,11 +25,6 @@ public class InputAttribute : Attribute
     /// A category to group this property with.
     /// </summary>
     public string? Category { get; set; }
-
-    /// <summary>
-    /// A value representing options specific to a given UI hint.
-    /// </summary>
-    public object? Options { get; set; }
 
     /// <summary>
     /// A value to order this property by. Properties are displayed in ascending order (lower appears before higher).
@@ -94,14 +83,4 @@ public class InputAttribute : Attribute
     /// When set to true, the input will be treated as a secret and will be encrypted, masked or otherwise protected, depending on the configured policy.
     /// </summary>
     public bool CanContainSecrets { get; set; }
-
-    /// <summary>
-    /// A <see cref="IPropertyUIHandler"/> type that can be used to customize the UI for this property.
-    /// </summary>
-    public Type? UIHandler { get; set; }
-
-    /// <summary>
-    /// A set of <see cref="IPropertyUIHandler"/> types that can be used to customize the UI for this property.
-    /// </summary>
-    public Type[]? UIHandlers { get; set; }
 }

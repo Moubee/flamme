@@ -2,7 +2,6 @@ using System.Runtime.CompilerServices;
 using Flamme.Expressions.Models;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities;
@@ -40,7 +39,7 @@ public class If : Activity<bool>
     /// <summary>
     /// The condition to evaluate.
     /// </summary>
-    [Input(UIHint = InputUIHints.SingleLine)]
+    [Input]
     public Input<bool> Condition { get; set; } = new(new Literal<bool>(false));
 
     /// <summary>

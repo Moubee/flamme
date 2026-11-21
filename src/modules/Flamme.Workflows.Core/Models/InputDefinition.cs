@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Flamme.Workflows.Models;
 
 /// <summary>
@@ -6,9 +8,10 @@ namespace Flamme.Workflows.Models;
 public class InputDefinition : ArgumentDefinition
 {
     /// <summary>
-    /// The UI hint to use for this input. 
+    /// Evaluate expressions in the entries of a dictionary input when a published workflow is used as an activity.
     /// </summary>
-    public string UIHint { get; set; } = default!;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EvaluateDictionaryEntries { get; set; }
 
     /// <summary>
     /// The type of the storage driver to use for this input.

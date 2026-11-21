@@ -88,8 +88,6 @@ public sealed class ExtensionDescriptorValidator
                 failures.Add($"Field '{field.Name}' must define display text.");
             if (!SupportedValueTypes.Contains(field.ValueType))
                 failures.Add($"Field '{field.Name}' has unsupported value type '{field.ValueType}'.");
-            if (string.IsNullOrWhiteSpace(field.UiHint))
-                failures.Add($"Field '{field.Name}' must define a UI hint.");
             if (field.Validation.MinimumLength is < 0 ||
                 field.Validation.MaximumLength is < 0 ||
                 field.Validation.MinimumLength > field.Validation.MaximumLength)

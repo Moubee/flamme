@@ -2,7 +2,6 @@
 using Flamme.Extensions;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Activities.Flowchart.Activities;
@@ -23,8 +22,7 @@ public class FlowFork : Activity
     /// A list of expected outcomes to handle.
     /// </summary>
     [Input(
-        Description = "A list of expected outcomes to handle.",
-        UIHint = InputUIHints.DynamicOutcomes
+        Description = "A list of expected outcomes to handle."
     )]
     public Input<ICollection<string>> Branches { get; set; } = null!;
 

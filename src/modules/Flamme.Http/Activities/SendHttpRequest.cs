@@ -19,8 +19,7 @@ public class SendHttpRequest : SendHttpRequestBase
     /// A list of expected status codes to handle and the corresponding activity to execute when the status code matches.
     /// </summary>
     [Input(
-        Description = "A list of expected status codes to handle and the corresponding activity to execute when the status code matches.",
-        UIHint = "http-status-codes"
+        Description = "A list of expected status codes to handle and the corresponding activity to execute when the status code matches."
     )]
     public ICollection<HttpStatusCodeCase> ExpectedStatusCodes { get; set; } = new List<HttpStatusCodeCase>();
 

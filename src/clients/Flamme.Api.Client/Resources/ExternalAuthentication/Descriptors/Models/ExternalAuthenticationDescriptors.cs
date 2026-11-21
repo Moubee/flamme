@@ -64,7 +64,6 @@ public sealed class ExternalAuthenticationSettingFieldDescriptor
     public string Description { get; set; } = "";
     public string ValueType { get; set; } = "";
     public bool IsRequired { get; set; }
-    public string UiHint { get; set; } = "";
     public JsonElement? DefaultValue { get; set; }
     public ICollection<string> AllowedValues { get; set; } = [];
     public ExternalAuthenticationSettingFieldValidation Validation { get; set; } = new();

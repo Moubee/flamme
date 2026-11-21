@@ -3,10 +3,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Http.ContentWriters;
-using Flamme.Http.UIHints;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 using Microsoft.Extensions.Logging;
 
@@ -35,12 +33,7 @@ public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValu
     /// </summary>
     [Input(
         Description = "The HTTP method to use when sending the request.",
-        Options = new[]
-        {
-            "GET", "POST", "PUT"
-        },
-        DefaultValue = "GET",
-        UIHint = InputUIHints.DropDown
+        DefaultValue = "GET"
     )]
     public Input<string> Method { get; set; } = new("GET");
 
@@ -49,7 +42,6 @@ public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValu
     /// </summary>
     [Input(
         Description = "A list of expected status codes to handle.",
-        UIHint = InputUIHints.MultiText,
         DefaultValueProvider = typeof(FlowSendHttpRequest)
     )]
     public Input<ICollection<int>> ExpectedStatusCodes { get; set; } = null!;
@@ -65,9 +57,7 @@ public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValu
     /// </summary>
     [Input(
         DisplayName = "Content Type",
-        Description = "The content type to use when sending the request.",
-        UIHandler = typeof(HttpContentTypeOptionsProvider),
-        UIHint = InputUIHints.DropDown
+        Description = "The content type to use when sending the request."
     )]
     public Input<string?> RequestContentType { get; set; } = null!;
 
@@ -89,7 +79,6 @@ public class DownloadHttpFile : Activity<HttpFile>, IActivityPropertyDefaultValu
     /// </summary>
     [Input(
         Description = "The headers to send along with the request.",
-        UIHint = InputUIHints.JsonEditor,
         Category = "Advanced"
     )]
     public Input<HttpHeaders?> RequestHeaders { get; set; } = new(new HttpHeaders());

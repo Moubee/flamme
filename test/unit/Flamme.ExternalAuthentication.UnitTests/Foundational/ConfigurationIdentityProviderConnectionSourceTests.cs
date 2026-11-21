@@ -93,7 +93,7 @@ public class ConfigurationIdentityProviderConnectionSourceTests
     {
         public string Type => "test";
         public ExternalAuthenticationAdapterDescriptor Describe() => new(Type, "Test", "Test", 1,
-            [new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", false, "secret", null, [], new SettingFieldValidation(), true, false, null, null, true)],
+            [new SettingFieldDescriptor("clientSecret", "Client secret", "Secret", "secret", false, null, [], new SettingFieldValidation(), true, false, null, null, true)],
             new ExternalAuthenticationAdapterCapabilities(false, false, false),
             null);
         public ValueTask<ConnectionValidationResult> ValidateAsync(ConnectionValidationContext context, CancellationToken cancellationToken = default) => throw new NotSupportedException();

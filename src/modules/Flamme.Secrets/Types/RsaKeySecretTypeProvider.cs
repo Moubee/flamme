@@ -6,7 +6,6 @@ public class RsaKeySecretTypeProvider : ISecretTypeProvider
         SecretTypeNames.RsaKey,
         "RSA Key",
         "RSA key material stored as encrypted text or referenced from configuration.",
-        "secret-rsa-key",
         [SecretStoreNames.Encrypted, SecretStoreNames.Configuration]);
 
     public bool Validate(CreateSecretRequest request, out string? error) => ValidatePayload(request.StoreName, request.Value, request.ConfigurationKey, out error);

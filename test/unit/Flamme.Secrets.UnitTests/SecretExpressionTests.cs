@@ -178,7 +178,6 @@ public class SecretExpressionTests
         var descriptor = provider.GetDescriptors().Single();
 
         await Assert.That(descriptor.Type).IsEqualTo(SecretExpression.TypeName);
-        await Assert.That(descriptor.Properties["UIHint"]).IsEqualTo("secret-picker");
         await Assert.That(descriptor.Properties["PickerEndpoint"]).IsEqualTo("/secrets/picker");
     }
 

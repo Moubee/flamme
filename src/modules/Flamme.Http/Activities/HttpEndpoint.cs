@@ -4,10 +4,8 @@ using Flamme.Expressions.Models;
 using Flamme.Extensions;
 using Flamme.Http.Bookmarks;
 using Flamme.Http.Extensions;
-using Flamme.Http.UIHints;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -47,9 +45,7 @@ public class HttpEndpoint : Trigger<HttpRequest>
     /// The path to associate with the workflow.
     /// </summary>
     [Input(
-        Description = "The path to associate with the workflow.",
-        UIHint = InputUIHints.SingleLine,
-        UIHandler = typeof(HttpEndpointPathUIHandler)
+        Description = "The path to associate with the workflow."
     )]
     public Input<string> Path { get; set; } = null!;
 
@@ -57,9 +53,8 @@ public class HttpEndpoint : Trigger<HttpRequest>
     /// The HTTP methods to accept.
     /// </summary>
     [Input(
-        Description = "The HTTP methods to accept.",
-        Options = new[] { "GET", "POST", "PUT", "HEAD", "DELETE" },
-        UIHint = InputUIHints.CheckList)]
+        Description = "The HTTP methods to accept."
+    )]
     public Input<ICollection<string>> SupportedMethods { get; set; } = new(ObjectLiteral.From(new[] { HttpMethods.Get }));
 
     /// <summary>
@@ -95,19 +90,19 @@ public class HttpEndpoint : Trigger<HttpRequest>
     /// <summary>
     /// The allowed file extensions,
     /// </summary>
-    [Input(Description = "Only file extensions in this list are allowed. Leave empty to allow all extensions", Category = "Upload", UIHint = InputUIHints.MultiText)]
+    [Input(Description = "Only file extensions in this list are allowed. Leave empty to allow all extensions", Category = "Upload")]
     public Input<ICollection<string>> AllowedFileExtensions { get; set; } = null!;
 
     /// <summary>
     /// The allowed file extensions,
     /// </summary>
-    [Input(Description = "File extensions in this list are forbidden. Leave empty to not block any extension.", Category = "Upload", UIHint = InputUIHints.MultiText)]
+    [Input(Description = "File extensions in this list are forbidden. Leave empty to not block any extension.", Category = "Upload")]
     public Input<ICollection<string>> BlockedFileExtensions { get; set; } = null!;
 
     /// <summary>
     /// The allowed file extensions,
     /// </summary>
-    [Input(Description = "Only MIME types in this list are allowed. Leave empty to allow all types", Category = "Upload", UIHint = InputUIHints.MultiText)]
+    [Input(Description = "Only MIME types in this list are allowed. Leave empty to allow all types", Category = "Upload")]
     public Input<ICollection<string>> AllowedMimeTypes { get; set; } = null!;
 
     /// <summary>

@@ -2,10 +2,8 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using Flamme.Extensions;
 using Flamme.Http.ContentWriters;
-using Flamme.Http.UIHints;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
-using Flamme.Workflows.UIHints;
 using Flamme.Workflows.Exceptions;
 using Flamme.Workflows.Models;
 using Microsoft.AspNetCore.Http;
@@ -43,8 +41,7 @@ public class WriteHttpResponse : Activity
     /// </summary>
     [Input(
         DefaultValue = HttpStatusCode.OK,
-        Description = "The status code to return.",
-        UIHint = InputUIHints.DropDown
+        Description = "The status code to return."
     )]
     public Input<HttpStatusCode> StatusCode { get; set; } = new(HttpStatusCode.OK);
 
@@ -58,9 +55,7 @@ public class WriteHttpResponse : Activity
     /// The content type to use when returning the response.
     /// </summary>
     [Input(
-        Description = "The content type to write when sending the response.",
-        UIHandler = typeof(HttpContentTypeOptionsProvider),
-        UIHint = InputUIHints.DropDown
+        Description = "The content type to write when sending the response."
     )]
     public Input<string?> ContentType { get; set; } = null!;
 
@@ -69,7 +64,6 @@ public class WriteHttpResponse : Activity
     /// </summary>
     [Input(
         Description = "The headers to send along with the response.",
-        UIHint = InputUIHints.JsonEditor,
         Category = "Advanced"
     )]
     public Input<HttpHeaders?> ResponseHeaders { get; set; } = new(new HttpHeaders());

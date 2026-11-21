@@ -5,7 +5,6 @@ using Flamme.Expressions.JavaScript.Contracts;
 using Flamme.Workflows;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using Jint;
 
 // ReSharper disable once CheckNamespace
@@ -33,16 +32,14 @@ public class RunJavaScript : CodeActivity<object?>
     /// </summary>
     [Input(
         Description = "The script to run.",
-        DefaultSyntax = "JavaScript",
-        UIHint = InputUIHints.CodeEditor,
-        UIHandler = typeof(RunJavaScriptOptionsProvider)
+        DefaultSyntax = "JavaScript"
     )]
     public Input<string> Script { get; set; } = new("");
 
     /// <summary>
     /// A list of possible outcomes. Use "setOutcome()" to set the outcome. Use "setOutcomes" to set multiple outcomes.
     /// </summary>
-    [Input(Description = "A list of possible outcomes.", UIHint = InputUIHints.DynamicOutcomes)]
+    [Input(Description = "A list of possible outcomes.")]
     public Input<ICollection<string>> PossibleOutcomes { get; set; } = null!;
 
     /// <inheritdoc />

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -6,16 +5,14 @@ using Flamme.Extensions;
 using Flamme.Workflows.Activities.Flowchart.Attributes;
 using Flamme.Workflows.Attributes;
 using Flamme.Workflows.Helpers;
-using Flamme.Workflows.Memory;
 using Flamme.Workflows.Models;
-using Flamme.Workflows.UIHints;
 using Humanizer;
 using Container = Flamme.Workflows.Activities.Container;
 
 namespace Flamme.Workflows;
 
 /// <inheritdoc />
-public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolver, IPropertyUIHandlerResolver propertyUIHandlerResolver) : IActivityDescriber
+public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolver) : IActivityDescriber
 {
     /// <inheritdoc />
     public async Task<ActivityDescriptor> DescribeActivityAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type activityType, CancellationToken cancellationToken = default)
@@ -128,7 +125,7 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
     }
 
     /// <inheritdoc />
-    public async Task<InputDescriptor> DescribeInputPropertyAsync(PropertyInfo propertyInfo, CancellationToken cancellationToken = default)
+    public Task<InputDescriptor> DescribeInputPropertyAsync(PropertyInfo propertyInfo, CancellationToken cancellationToken = default)
     {
         var inputAttribute = propertyInfo.GetCustomAttribute<InputAttribute>();
         var descriptionAttribute = propertyInfo.GetCustomAttribute<DescriptionAttribute>();
@@ -140,15 +137,12 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
         if (wrappedPropertyType.IsNullableType())
             wrappedPropertyType = wrappedPropertyType.GetTypeOfNullable();
 
-        var uiSpecification = await propertyUIHandlerResolver.GetUIPropertiesAsync(propertyInfo, null, cancellationToken);
-
-        return new(
+        var descriptor = new InputDescriptor(
             inputAttribute?.Name ?? propertyInfo.Name,
             wrappedPropertyType,
             propertyInfo.GetValue,
             propertyInfo.SetValue,
             isWrappedProperty,
-            GetUIHint(wrappedPropertyType, inputAttribute),
             inputAttribute?.DisplayName ?? propertyInfo.Name.Humanize(LetterCasing.Title),
             descriptionAttribute?.Description ?? inputAttribute?.Description,
             inputAttribute?.Category,
@@ -162,12 +156,13 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
             autoEvaluate,
             inputAttribute?.EvaluatorType,
             null,
-            propertyInfo,
-            uiSpecification
+            propertyInfo
         )
         {
             IsSensitive = inputAttribute?.CanContainSecrets ?? false
         };
+
+        return Task.FromResult(descriptor);
     }
 
     /// <inheritdoc />
@@ -183,35 +178,6 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
         return await DescribeOutputPropertiesAsync(GetOutputProperties(activityType), cancellationToken);
     }
 
-    public static string GetUIHint(Type wrappedPropertyType, InputAttribute? inputAttribute = null)
-    {
-        if (inputAttribute?.UIHint != null)
-            return inputAttribute.UIHint;
-
-        if (wrappedPropertyType == typeof(bool) || wrappedPropertyType == typeof(bool?))
-            return InputUIHints.Checkbox;
-
-        if (wrappedPropertyType == typeof(string))
-            return InputUIHints.SingleLine;
-
-        if (typeof(IEnumerable).IsAssignableFrom(wrappedPropertyType))
-            return InputUIHints.DropDown;
-
-        if (wrappedPropertyType.IsEnum || wrappedPropertyType.IsNullableType() && wrappedPropertyType.GetTypeOfNullable().IsEnum)
-            return InputUIHints.DropDown;
-
-        if (wrappedPropertyType == typeof(Variable))
-            return InputUIHints.VariablePicker;
-
-        if (wrappedPropertyType == typeof(WorkflowInput))
-            return InputUIHints.InputPicker;
-
-        if (wrappedPropertyType == typeof(Type))
-            return InputUIHints.TypePicker;
-
-        return InputUIHints.SingleLine;
-    }
-
     private static string GetFriendlyActivityName(Type t)
     {
         if (!t.IsGenericType)
@@ -223,7 +189,7 @@ public class ActivityDescriber(IPropertyDefaultValueResolver defaultValueResolve
 
     private async Task<IEnumerable<InputDescriptor>> DescribeInputPropertiesAsync(IEnumerable<PropertyInfo> properties, CancellationToken cancellationToken = default)
     {
-        return await Task.WhenAll(properties.Select(async x => await DescribeInputPropertyAsync(x, cancellationToken)));
+        return await Task.WhenAll(properties.Select(x => DescribeInputPropertyAsync(x, cancellationToken)));
     }
 
     private async Task<IEnumerable<OutputDescriptor>> DescribeOutputPropertiesAsync(IEnumerable<PropertyInfo> properties, CancellationToken cancellationToken = default)

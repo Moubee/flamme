@@ -92,7 +92,7 @@ These services are used by API endpoints for workflow definition import/export a
 
 ## Activity And Variable Descriptors
 
-Designer and API clients need metadata about available activities, inputs, outputs, UI hints, variable types, and expressions. Management provides:
+Management supplies descriptors for available activities, inputs, outputs, variable types, and expressions.
 
 - [TypedActivityProvider](../../src/modules/Flamme.Workflows.Management/Providers/TypedActivityProvider.cs)
 - [DefaultExpressionDescriptorProvider](../../src/modules/Flamme.Workflows.Management/Providers/DefaultExpressionDescriptorProvider.cs)

@@ -8,7 +8,6 @@ public sealed record SettingFieldDescriptor(
     string Description,
     string ValueType,
     bool IsRequired,
-    string UiHint,
     JsonElement? DefaultValue,
     IReadOnlyCollection<string> AllowedValues,
     SettingFieldValidation Validation,

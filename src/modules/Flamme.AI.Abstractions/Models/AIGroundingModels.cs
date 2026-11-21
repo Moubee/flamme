@@ -51,7 +51,6 @@ public record ActivityPortSummary
     public bool IsBrowsable { get; init; } = true;
     public bool IsSensitive { get; init; }
     public bool IsRequired { get; init; }
-    public string? UIHint { get; init; }
     public string? DefaultSyntax { get; init; }
 }
 

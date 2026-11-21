@@ -6,7 +6,6 @@ using Flamme.Workflows.Management;
 using Flamme.Workflows.Models;
 using Flamme.Workflows.Options;
 using Flamme.Workflows.Runtime.Stimuli;
-using Flamme.Workflows.UIHints;
 using JetBrains.Annotations;
 
 namespace Flamme.Workflows.Runtime.Activities;
@@ -28,8 +27,7 @@ public class ExecuteWorkflow : Activity<ExecuteWorkflowResult>
     /// </summary>
     [Input(
         DisplayName = "Workflow Definition",
-        Description = "The definition ID of the workflow to execute.",
-        UIHint = InputUIHints.WorkflowDefinitionPicker
+        Description = "The definition ID of the workflow to execute."
     )]
     public Input<string> WorkflowDefinitionId { get; set; } = null!;
 
